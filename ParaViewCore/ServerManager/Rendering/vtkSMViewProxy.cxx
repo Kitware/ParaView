@@ -86,7 +86,7 @@ namespace
       }
     return NULL;
     }
-};
+}
 
 bool vtkSMViewProxy::TransparentBackground = false;
 

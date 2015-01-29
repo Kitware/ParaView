@@ -548,7 +548,7 @@ const char* const Process_4_1_to_4_2::NAME = "name";
 const char* const Process_4_1_to_4_2::VALUE = "value";
 
 
-};
+}
 
 vtkStandardNewMacro(vtkSMStateVersionController);
 //----------------------------------------------------------------------------

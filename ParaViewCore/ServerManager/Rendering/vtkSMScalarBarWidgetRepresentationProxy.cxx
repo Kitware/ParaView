@@ -201,7 +201,7 @@ namespace
       clamp(anchor[1], 0, 1), clamp(anchor[1] + size[1], 0, 1),
       0, 0);
     }
-};
+}
 
 //----------------------------------------------------------------------------
 bool vtkSMScalarBarWidgetRepresentationProxy::PlaceInView(vtkSMProxy* view)

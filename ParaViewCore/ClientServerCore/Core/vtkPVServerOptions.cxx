@@ -36,7 +36,7 @@ namespace
   static int VTK_STEREO_ANAGLYPH=7;
   static int VTK_STEREO_CHECKERBOARD=8;
   static int VTK_STEREO_SPLITVIEWPORT_HORIZONTAL=9;
-};
+}
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerOptions);

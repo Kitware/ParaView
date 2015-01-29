@@ -68,7 +68,7 @@ namespace
     {
     return vtkMultiProcessControllerHelper::MergePieces(pieces, result);
     }
-};
+}
 
 
 vtkStandardNewMacro(vtkMPIMoveData);

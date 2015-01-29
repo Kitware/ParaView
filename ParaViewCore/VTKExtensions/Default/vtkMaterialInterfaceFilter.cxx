@@ -245,7 +245,7 @@ int GetEnabledArrayNames(
     }
   return nEnabled;
 }
-};
+}
 //============================================================================
 // A class that implements an equivalent set.  It is used to combine fragments
 // from different processes.
