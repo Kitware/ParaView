@@ -396,7 +396,7 @@ void vtkSQKernelConvolution::ClearInputArrays()
     << "=====vtkSQKernelConvolution::ClearInputArrays" << std::endl;
   #endif
 
-  if (this->InputArrays.size())
+  if (!this->InputArrays.empty())
     {
     this->InputArrays.clear();
     this->Modified();
@@ -425,7 +425,7 @@ void vtkSQKernelConvolution::ClearArraysToCopy()
   pCerr() << "=====vtkSQKernelConvolution::ClearArraysToCopy" << std::endl;
   #endif
 
-  if (this->ArraysToCopy.size())
+  if (!this->ArraysToCopy.empty())
     {
     this->ArraysToCopy.clear();
     this->Modified();
@@ -1225,7 +1225,7 @@ int vtkSQKernelConvolution::RequestData(
       }
 
     // Deep copy the input
-    if (this->ArraysToCopy.size())
+    if (!this->ArraysToCopy.empty())
       {
       if (this->LogLevel || globalLogLevel)
         {

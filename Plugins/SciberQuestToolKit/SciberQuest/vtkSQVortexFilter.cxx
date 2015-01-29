@@ -192,7 +192,7 @@ void vtkSQVortexFilter::ClearInputArrays()
     << "=====vtkSQVortexFilter::ClearInputArrays" << std::endl;
   #endif
 
-  if (this->InputArrays.size())
+  if (!this->InputArrays.empty())
     {
     this->InputArrays.clear();
     this->Modified();
@@ -221,7 +221,7 @@ void vtkSQVortexFilter::ClearArraysToCopy()
   pCerr() << "=====vtkSQVortexFilter::ClearArraysToCopy" << std::endl;
   #endif
 
-  if (this->ArraysToCopy.size())
+  if (!this->ArraysToCopy.empty())
     {
     this->ArraysToCopy.clear();
     this->Modified();

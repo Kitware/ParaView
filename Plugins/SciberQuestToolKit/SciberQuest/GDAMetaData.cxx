@@ -356,7 +356,7 @@ int GDAMetaData::OpenDatasetForRead(const char *fileName)
       prefix+="_";
       }
     GetSeriesIds(path,prefix.c_str(),this->TimeSteps);
-    if (!this->TimeSteps.size())
+    if (this->TimeSteps.empty())
       {
       sqErrorMacro(std::cerr,
         << " Error: Time series was not found in " << path << "."
