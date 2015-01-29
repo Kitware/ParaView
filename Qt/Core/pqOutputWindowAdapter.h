@@ -56,14 +56,6 @@ public:
   static pqOutputWindowAdapter *New();
   vtkTypeMacro(pqOutputWindowAdapter, vtkOutputWindow);
 
-  /// Returns the number of text messages received
-  unsigned int getTextCount();
-  /// Returns the number of error messages received
-  unsigned int getErrorCount();
-  /// Returns the number of warning messages received
-  unsigned int getWarningCount();
-  /// Returns the number of generic warning messages received
-  unsigned int getGenericWarningCount();
   /// If active signals are emitted on messages.
   void setActive(bool active);
 
@@ -92,11 +84,6 @@ private:
   pqOutputWindowAdapter(const pqOutputWindowAdapter&);
   pqOutputWindowAdapter& operator=(const pqOutputWindowAdapter&);
   ~pqOutputWindowAdapter();
-
-  unsigned int TextCount;
-  unsigned int ErrorCount;
-  unsigned int WarningCount;
-  unsigned int GenericWarningCount;
 
   virtual void DisplayText(const char*);
   virtual void DisplayErrorText(const char*);
