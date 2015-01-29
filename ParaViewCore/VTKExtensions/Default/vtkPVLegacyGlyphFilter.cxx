@@ -487,7 +487,7 @@ void vtkPVLegacyGlyphFilter::CalculatePtsToGlyph(double PtsNotBlanked)
   this->BlockPointCounter = 0;
   this->BlockNumGlyphedPts = 0;
 
-  if( !this->KeepRandomPoints || !this->RandomPtsInDataset.size() || this->MaximumNumberOfPoints != this->MaximumNumberOfPointsOld )
+  if( !this->KeepRandomPoints || this->RandomPtsInDataset.empty() || this->MaximumNumberOfPoints != this->MaximumNumberOfPointsOld )
   {
   //Reset the random points vector
   this->RandomPtsInDataset.clear();

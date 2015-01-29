@@ -247,7 +247,7 @@ void vtkSQFTLE::ClearInputArrays()
     << "=====vtkSQFTLE::ClearInputArrays" << std::endl;
   #endif
 
-  if (this->InputArrays.size())
+  if (!this->InputArrays.empty())
     {
     this->InputArrays.clear();
     this->Modified();

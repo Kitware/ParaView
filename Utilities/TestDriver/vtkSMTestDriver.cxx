@@ -390,7 +390,7 @@ vtkSMTestDriver::CreateCommandLine(std::vector<const char*>& commandLine,
       }
     }
 
-  if(this->PVSSHFlags.size() && (type == SERVER || type == DATA_SERVER))
+  if(!this->PVSSHFlags.empty() && (type == SERVER || type == DATA_SERVER))
     {
       {
       // First add the ssh command:

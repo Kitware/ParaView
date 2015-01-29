@@ -157,7 +157,7 @@ void vtkSQImageGhosts::ClearArraysToCopy()
   pCerr() << "=====vtkSQImageGhosts::ClearArraysToCopy" << std::endl;
   #endif
 
-  if (this->ArraysToCopy.size())
+  if (!this->ArraysToCopy.empty())
     {
     this->ArraysToCopy.clear();
     this->Modified();

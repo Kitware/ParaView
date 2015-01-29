@@ -560,7 +560,7 @@ int vtkPhastaReader::RequestData(vtkInformation*,
     points->Delete();    
     }
 
-  if (!this->Internal->FieldInfoMap.size())
+  if (this->Internal->FieldInfoMap.empty())
     {
     vtkDataSetAttributes* field = output->GetPointData();
     this->ReadFieldFile(this->FieldFileName, fvn, field, noOfNodes);
