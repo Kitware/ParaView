@@ -142,10 +142,11 @@ class ParaViewWebMouseHandler(ParaViewWebProtocol):
         """
         view = self.getView(event['view'])
 
-        if event["action"] == 'down':
-            view.UseInteractiveRenderingForScreenshots = 1
-        elif event["action"] == 'up':
-            view.UseInteractiveRenderingForScreenshots = 0
+        if hasattr(view, 'UseInteractiveRenderingForScreenshots'):
+            if event["action"] == 'down':
+                view.UseInteractiveRenderingForScreenshots = 1
+            elif event["action"] == 'up':
+                view.UseInteractiveRenderingForScreenshots = 0
 
         buttons = 0
         if event["buttonLeft"]:
