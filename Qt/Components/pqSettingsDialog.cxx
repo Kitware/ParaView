@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyWidget.h"
 #include "pqSearchBox.h"
 #include "pqServer.h"
+#include "pqServerManagerModel.h"
 #include "pqSettings.h"
 #include "pqUndoStack.h"
 #include "vtkNew.h"
@@ -52,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QKeyEvent>
 #include <QMap>
+#include <QPointer>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QSpacerItem>
@@ -65,6 +67,8 @@ public:
   // Map from tab indices to stack widget indices. This is needed because there
   // are more widgets in the stacked widgets than just what we add.
   QMap<int, int> TabToStackedWidgets;
+
+  QPointer<pqServer> Server;
 };
 
 bool pqSettingsDialog::ShowRestartRequired = false;
@@ -87,6 +91,8 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
   QList<vtkSMProxy*> proxies_to_show;
 
   pqServer* server = pqActiveObjects::instance().activeServer();
+  this->Internals->Server = server;
+
   vtkNew<vtkSMProxyIterator> iter;
   iter->SetSession(server->session());
   iter->SetModeToOneGroup();
@@ -167,6 +173,9 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
   this->onTabIndexChanged(0);
 
   this->filterPanelWidgets();
+
+  pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
+  this->connect(smmodel, SIGNAL(serverRemoved(pqServer*)), SLOT(serverRemoved(pqServer*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -174,6 +183,16 @@ pqSettingsDialog::~pqSettingsDialog()
 {
   delete this->Internals;
   this->Internals = NULL;
+}
+
+//-----------------------------------------------------------------------------
+void pqSettingsDialog::serverRemoved(pqServer* server)
+{
+  // BUG #14957: Close this dialog if the server session closes.
+  if (this->Internals->Server == server)
+    {
+    this->close();
+    }
 }
 
 //-----------------------------------------------------------------------------
