@@ -70,6 +70,7 @@ pqCPExportStateWizard::pqCPExportStateWizard(
 {
 }
 
+
 //-----------------------------------------------------------------------------
 pqCPExportStateWizard::~pqCPExportStateWizard()
 {
@@ -161,15 +162,16 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
         cinemaCam = QString("{\"camera\":\"");
         cinemaCam += camType;
         cinemaCam += "\", \"phi\":[";
-        for (int i = -180; i < 180; i+= (360/viewInfo->getPhi()))
+        int j;
+        for (j = -180; j < 180; j+= (360/viewInfo->getPhi()))
           {
-          cinemaCam += QString::number(i) + ",";
+          cinemaCam += QString::number(j) + ",";
           }
         cinemaCam.chop(1);
         cinemaCam += "], \"theta\":[";
-        for (int i = -180; i < 180; i+= (360/viewInfo->getTheta()))
+        for (j = -180; j < 180; j+= (360/viewInfo->getTheta()))
           {
-          cinemaCam += QString::number(i) + ",";
+          cinemaCam += QString::number(j) + ",";
           }
         cinemaCam.chop(1);
         cinemaCam += "] }";

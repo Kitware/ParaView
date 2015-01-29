@@ -233,7 +233,6 @@ pqSGExportStateWizard::pqSGExportStateWizard(
   for(QList<pqPipelineFilter*>::Iterator it=filters.begin();
       it!=filters.end();it++)
     {
-    const QString &name =(*it)->getSMName();
     if (strcmp((*it)->getProxy()->GetVTKClassName(), "Cut") ||
         strcmp((*it)->getProxy()->GetVTKClassName(), "Contour"))
       {
