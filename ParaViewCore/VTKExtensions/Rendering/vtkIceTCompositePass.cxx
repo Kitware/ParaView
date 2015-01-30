@@ -225,7 +225,8 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
   vtkMatrix4x4 *wcvc;
   vtkMatrix3x3 *norms;
   vtkMatrix4x4 *vcdc;
-  cam->GetKeyMatrices(render_state->GetRenderer(),wcvc,norms,vcdc);
+  vtkMatrix4x4 *unused;
+  cam->GetKeyMatrices(render_state->GetRenderer(), wcvc, norms, vcdc, unused);
   glMatrixMode(GL_PROJECTION);
   glLoadMatrixd(vcdc->Element[0]);
   glMatrixMode(GL_MODELVIEW);
@@ -593,7 +594,8 @@ void vtkIceTCompositePass::Draw(const vtkRenderState* render_state)
     vtkMatrix4x4 *wcvc;
     vtkMatrix3x3 *norms;
     vtkMatrix4x4 *vcdc;
-    cam->GetKeyMatrices(render_state->GetRenderer(),wcvc,norms,vcdc);
+    vtkMatrix4x4 *unused;
+    cam->GetKeyMatrices(render_state->GetRenderer(), wcvc, norms, vcdc, unused);
     // double projection_matrix[16];
     // double modelview_matrix[16];
     glGetDoublev(GL_PROJECTION_MATRIX, vcdc->Element[0]);
