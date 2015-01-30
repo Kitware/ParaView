@@ -58,7 +58,6 @@ set(Module_SRCS
   vtkHybridProbeFilter.cxx
   vtkIntegrateAttributes.cxx
   vtkIntegrateFlowThroughSurface.cxx
-#  vtkInteractorStyleTransferFunctionEditor.cxx
   vtkIntersectFragments.cxx
   vtkIsoVolume.cxx
   vtkMaterialInterfaceCommBuffer.cxx
