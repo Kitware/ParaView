@@ -50,24 +50,24 @@ public:
 //ETX
 
   // Description:
+  // Return the render window from which offscreen rendering and interactor can
+  // be accessed
+  virtual vtkRenderWindow* GetRenderWindow();
+
+  // Description:
   // A client process need to set the interactor to enable interactivity. Use
   // this method to set the interactor and initialize it as needed by the
   // RenderView. This include changing the interactor style as well as
   // overriding VTK rendering to use the Proxy/ViewProxy API instead.
-  void SetupInteractor(vtkRenderWindowInteractor* iren);
+  virtual void SetupInteractor(vtkRenderWindowInteractor* iren);
 
   // Description:
   // Returns the interactor.
-  vtkRenderWindowInteractor* GetInteractor();
+  virtual vtkRenderWindowInteractor* GetInteractor();
 
   // Description:
   // Resets the zoom level to 100%
   virtual void ResetDisplay();
-
-  // Description:
-  // Return the render window from which offscreen rendering and interactor can
-  // be accessed
-  virtual vtkRenderWindow* GetRenderWindow();
 
   // Description:
   // Overridden to report to applications that producers producing non-table

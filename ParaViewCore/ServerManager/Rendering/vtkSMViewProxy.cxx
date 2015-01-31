@@ -732,3 +732,48 @@ bool vtkSMViewProxy::HideOtherRepresentationsIfNeeded(vtkSMProxy* repr)
     }
   return modified;
 }
+
+//----------------------------------------------------------------------------
+bool vtkSMViewProxy::GetLocalProcessSupportsInteraction()
+{
+  this->CreateVTKObjects();
+  vtkPVView* pvview = vtkPVView::SafeDownCast(this->GetClientSideObject());
+  return pvview? pvview->GetLocalProcessSupportsInteraction() : false;
+}
+
+
+//----------------------------------------------------------------------------
+bool vtkSMViewProxy::MakeRenderWindowInteractor(bool quiet)
+{
+  if (this->GetInteractor() != NULL)
+    {
+    // all's setup already. nothing to do.
+    return true;
+    }
+  if (!this->GetLocalProcessSupportsInteraction())
+    {
+    return false;
+    }
+
+  vtkRenderWindow* renWin = this->GetRenderWindow();
+  if (!renWin)
+    {
+    if (!quiet)
+      {
+      vtkWarningMacro("Not a view that has a vtkRenderWindow. Cannot setup interactor.");
+      }
+    return false;
+    }
+  if (renWin->GetMapped())
+    {
+    if (!quiet)
+      {
+      vtkErrorMacro("Window is currently mapped. "
+        "Currently, interaction is only supported on unmapped windows.");
+      }
+    return false;
+    }
+  vtkRenderWindowInteractor* iren = renWin->MakeRenderWindowInteractor();
+  this->SetupInteractor(iren);
+  return this->GetInteractor() != NULL;
+}

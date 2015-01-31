@@ -336,12 +336,15 @@ vtkCamera* vtkSMRenderViewProxy::GetActiveCamera()
 //----------------------------------------------------------------------------
 void vtkSMRenderViewProxy::SetupInteractor(vtkRenderWindowInteractor* iren)
 {
-  this->CreateVTKObjects();
-  vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
+  if (this->GetLocalProcessSupportsInteraction())
+    {
+    this->CreateVTKObjects();
+    vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
 
-  // Remember, these calls end up changing ivars on iren.
-  rv->SetupInteractor(iren);
-  this->InteractorHelper->SetupInteractor(rv->GetInteractor());
+    // Remember, these calls end up changing ivars on iren.
+    rv->SetupInteractor(iren);
+    this->InteractorHelper->SetupInteractor(rv->GetInteractor());
+    }
 }
 
 //----------------------------------------------------------------------------

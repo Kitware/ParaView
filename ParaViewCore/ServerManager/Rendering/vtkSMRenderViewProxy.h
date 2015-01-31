@@ -124,11 +124,11 @@ public:
   // this method to set the interactor and initialize it as needed by the
   // RenderView. This include changing the interactor style as well as
   // overriding VTK rendering to use the Proxy/ViewProxy API instead.
-  void SetupInteractor(vtkRenderWindowInteractor* iren);
+  virtual void SetupInteractor(vtkRenderWindowInteractor* iren);
 
   // Description:
   // Returns the interactor.
-  vtkRenderWindowInteractor* GetInteractor();
+  virtual vtkRenderWindowInteractor* GetInteractor();
 
   // Description:
   // Returns the client-side renderer (composited or 3D).

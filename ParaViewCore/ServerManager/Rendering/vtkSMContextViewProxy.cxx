@@ -64,13 +64,16 @@ vtkSMContextViewProxy::~vtkSMContextViewProxy()
 //----------------------------------------------------------------------------
 void vtkSMContextViewProxy::SetupInteractor(vtkRenderWindowInteractor* iren)
 {
-  this->CreateVTKObjects();
-  vtkPVContextView* pvview = vtkPVContextView::SafeDownCast(
-    this->GetClientSideObject());
+  if (this->GetLocalProcessSupportsInteraction())
+    {
+    this->CreateVTKObjects();
+    vtkPVContextView* pvview = vtkPVContextView::SafeDownCast(
+        this->GetClientSideObject());
 
-  // Remember, these calls end up changing ivars on iren.
-  pvview->SetupInteractor(iren);
-  this->InteractorHelper->SetupInteractor(pvview->GetInteractor());
+    // Remember, these calls end up changing ivars on iren.
+    pvview->SetupInteractor(iren);
+    this->InteractorHelper->SetupInteractor(pvview->GetInteractor());
+    }
 }
 
 //----------------------------------------------------------------------------
