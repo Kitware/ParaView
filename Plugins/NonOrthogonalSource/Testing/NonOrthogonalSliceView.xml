@@ -1,5 +1,9 @@
 <?xml version="1.0" ?>
 <pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View/Toolbars" command="activate" arguments="Center Axes Controls" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View/Toolbars" command="activate" arguments="Macros Toolbars" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
   <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="ShearedWavelet" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/U/LineEdit1" command="set_string" arguments="1" />
