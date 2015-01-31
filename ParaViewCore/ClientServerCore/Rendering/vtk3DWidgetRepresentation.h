@@ -93,6 +93,12 @@ protected:
   void OnRepresentationModified();
 
   // Description:
+  // Callback whenever the view is modified. If the view's interactor has
+  // changed, we will pass that to the vtkAbstractWidget instance and then call
+  // UpdateEnabled().
+  void OnViewModified();
+
+  // Description:
   // Forwards this->CustomTransform to the representation.
   void UpdateTransform();
 
@@ -107,6 +113,7 @@ private:
   vtk3DWidgetRepresentation(const vtk3DWidgetRepresentation&); // Not implemented
   void operator=(const vtk3DWidgetRepresentation&); // Not implemented
   unsigned long RepresentationObserverTag;
+  unsigned long ViewObserverTag;
 //ETX
 };
 

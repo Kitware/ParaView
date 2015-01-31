@@ -524,6 +524,8 @@ void vtkPVRenderView::SetupInteractor(vtkRenderWindowInteractor* iren)
       this->InteractionMode = -1;
       this->SetInteractionMode(mode);
       }
+
+    this->Modified();
     }
 }
 

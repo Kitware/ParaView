@@ -38,6 +38,7 @@ vtk3DWidgetRepresentation::vtk3DWidgetRepresentation()
   this->CustomTransform->PostMultiply();
   this->CustomTransform->Identity();
   this->RepresentationObserverTag = 0;
+  this->ViewObserverTag = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -83,7 +84,6 @@ bool vtk3DWidgetRepresentation::AddToView(vtkView* view)
       pvview->GetNonCompositedRenderer() : pvview->GetRenderer();
     if (this->Widget)
       {
-      this->Widget->SetInteractor(pvview->GetInteractor());
       // If DefaultRenderer is non-null, SetCurrentRenderer() will have no
       // effect.
       this->Widget->SetDefaultRenderer(NULL);
@@ -97,7 +97,15 @@ bool vtk3DWidgetRepresentation::AddToView(vtkView* view)
       this->Representation->SetRenderer(activeRenderer);
       activeRenderer->AddActor(this->Representation);
       }
+    if (this->View)
+      {
+      this->View->RemoveObserver(this->ViewObserverTag);
+      this->ViewObserverTag = 0;
+      }
     this->View = pvview;
+    // observer the view so we know when it gets a new interactor.
+    this->ViewObserverTag = this->View->AddObserver(vtkCommand::ModifiedEvent,
+      this, &vtk3DWidgetRepresentation::OnViewModified);
     this->UpdateEnabled();
     this->UpdateTransform();
     return true;
@@ -143,6 +151,10 @@ void vtk3DWidgetRepresentation::UpdateEnabled()
 
   if (this->Widget->GetEnabled() != (enable_widget? 1 : 0))
     {
+    // We do this here, instead of AddToView() since
+    // the View may not have the interactor setup when
+    // AddToView() is called (which happens when loading state files).
+    this->Widget->SetInteractor(this->View->GetInteractor());
     this->Widget->SetEnabled(enable_widget? 1 : 0);
     }
 }
@@ -155,6 +167,15 @@ void vtk3DWidgetRepresentation::OnRepresentationModified()
   this->UpdateEnabled();
 }
 
+//----------------------------------------------------------------------------
+void vtk3DWidgetRepresentation::OnViewModified()
+{
+  if (this->View && this->Widget &&
+    this->View->GetInteractor() != this->Widget->GetInteractor())
+    {
+    this->UpdateEnabled();
+    }
+}
 //----------------------------------------------------------------------------
 bool vtk3DWidgetRepresentation::RemoveFromView(vtkView* view)
 {
