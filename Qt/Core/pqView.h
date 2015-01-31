@@ -243,6 +243,13 @@ private slots:
   /// moment as not a "reasonable moment" to render and defer the render again.
   void tryRender();
 
+  /// These slots help use avoid the undo stack being modified during rendering.
+  /// A few views (e.g. vtkSMContextViewProxy) may change some of its properties
+  /// during a render. We don't want those to get captured in the undo/redo
+  /// stack.
+  void onBeginRender();
+  void onEndRender();
+
 protected:
   /// Constructor:
   /// \c type  :- view type.

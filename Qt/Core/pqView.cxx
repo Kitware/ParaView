@@ -61,6 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqTimeKeeper.h"
 #include "pqTimer.h"
+#include "pqUndoStack.h"
 
 #include <cmath>
 
@@ -114,9 +115,9 @@ pqView::pqView( const QString& type,
   // Fire start/end render signals when the underlying proxy
   // fires appropriate events.
   this->Internal->VTKConnect->Connect(view,
-    vtkCommand::StartEvent, this, SIGNAL(beginRender()));
+    vtkCommand::StartEvent, this, SLOT(onBeginRender()));
   this->Internal->VTKConnect->Connect(view,
-    vtkCommand::EndEvent, this, SIGNAL(endRender()));
+    vtkCommand::EndEvent, this, SLOT(onEndRender()));
 
   // Fire updateDataEvent
   this->Internal->VTKConnect->Connect(view,
@@ -503,6 +504,21 @@ bool pqView::canDisplay(pqOutputPort* opPort) const
   return this->getViewProxy()->CanDisplayData(sourceProxy, opPort->getPortNumber());
 }
 
+//-----------------------------------------------------------------------------
+void pqView::onBeginRender()
+{
+  BEGIN_UNDO_EXCLUDE();
+  emit this->beginRender();
+}
+
+//-----------------------------------------------------------------------------
+void pqView::onEndRender()
+{
+  emit this->endRender();
+  END_UNDO_EXCLUDE();
+}
+
+//-----------------------------------------------------------------------------
 #ifndef VTK_LEGACY_REMOVE
 QWidget* pqView::getWidget()
 {
