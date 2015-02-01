@@ -272,6 +272,12 @@ def Interact(view=None):
     if not view.MakeRenderWindowInteractor(False):
         raise RuntimeError, "Configuration doesn't support interaction."
     paraview.print_debug_info("Staring interaction. Use 'q' to quit.")
+
+    # Views like ComparativeRenderView require that Render() is called before
+    # the Interaction is begun. Hence we call a Render() before start the
+    # interactor loop. This also avoids the case where there are pending updates
+    # and thus the interaction will be begun on stale datasets.
+    Render(view)
     view.GetInteractor().Start()
 
 # -----------------------------------------------------------------------------
