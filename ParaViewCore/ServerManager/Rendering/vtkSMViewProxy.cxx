@@ -17,17 +17,19 @@
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkErrorCode.h"
+#include "vtkGenericRenderWindowInteractor.h"
 #include "vtkImageData.h"
 #include "vtkMath.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
 #include "vtkPVView.h"
 #include "vtkPVXMLElement.h"
-#include "vtkProcessModule.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderer.h"
 #include "vtkRendererCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyManager.h"
@@ -36,7 +38,6 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMUncheckedPropertyHelper.h"
 #include "vtkSMUtilities.h"
-#include "vtkSmartPointer.h"
 
 #include <assert.h>
 
@@ -773,7 +774,19 @@ bool vtkSMViewProxy::MakeRenderWindowInteractor(bool quiet)
       }
     return false;
     }
-  vtkRenderWindowInteractor* iren = renWin->MakeRenderWindowInteractor();
+  // in reality batch shouldn't have an interactor at all. However, to avoid the
+  // mismatch in the vtkPVAxesWidget (orientation widget) when using pvpython or
+  // pvbatch, we do create one. However, lets create a non-interactive
+  // interactor in batch mode.
+  vtkSmartPointer<vtkRenderWindowInteractor> iren;
+  if (vtkProcessModule::GetProcessType() != vtkProcessModule::PROCESS_BATCH)
+    {
+    iren = renWin->MakeRenderWindowInteractor();
+    }
+  else
+    {
+    iren = vtkSmartPointer<vtkGenericRenderWindowInteractor>::New();
+    }
   this->SetupInteractor(iren);
   return this->GetInteractor() != NULL;
 }
