@@ -84,9 +84,9 @@ pqComparativeRenderView::pqComparativeRenderView(
 //-----------------------------------------------------------------------------
 pqComparativeRenderView::~pqComparativeRenderView()
 {
-  foreach (pqQVTKWidget* widget, this->Internal->RenderWidgets.values())
+  foreach (pqQVTKWidget* wdg, this->Internal->RenderWidgets.values())
     {
-    delete widget;
+    delete wdg;
     }
 
   delete this->Internal;
