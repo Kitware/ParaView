@@ -1,0 +1,451 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="camera">
+    <CameraProxy class="vtkCamera"
+                 name="Camera"
+                 processes="client">
+      <!-- |dataserver|renderserver -->
+      <DoubleVectorProperty command="GetPosition"
+                            default_values="0 0 6.69"
+                            information_only="1"
+                            name="CameraPositionInfo"
+                            number_of_elements="3">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPosition"
+                            default_values="0 0 6.69"
+                            ignore_synchronization="1"
+                            immediate_update="1"
+                            information_property="CameraPositionInfo"
+                            name="CameraPosition"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty command="GetFocalPoint"
+                            default_values="0 0 0"
+                            information_only="1"
+                            name="CameraFocalPointInfo"
+                            number_of_elements="3">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetFocalPoint"
+                            default_values="0 0 0"
+                            ignore_synchronization="1"
+                            immediate_update="1"
+                            information_property="CameraFocalPointInfo"
+                            name="CameraFocalPoint"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty command="GetViewUp"
+                            default_values="0 1 0"
+                            information_only="1"
+                            name="CameraViewUpInfo"
+                            number_of_elements="3">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetViewUp"
+                            default_values="0 1 0"
+                            ignore_synchronization="1"
+                            immediate_update="1"
+                            information_property="CameraViewUpInfo"
+                            name="CameraViewUp"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty command="GetViewAngle"
+                            information_only="1"
+                            name="CameraViewAngleInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetViewAngle"
+                            default_values="30"
+                            ignore_synchronization="1"
+                            immediate_update="1"
+                            information_property="CameraViewAngleInfo"
+                            name="CameraViewAngle"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="4.63 0.30"
+                            information_only="1"
+                            name="CameraClippingRangeInfo"
+                            number_of_elements="2">
+        <SimpleDoubleInformationHelper />
+        <!-- bogus property, only left to avoid backwards compatibility issues
+             for now-->
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="4.63 0.30"
+                            ignore_synchronization="1"
+                            immediate_update="1"
+                            information_property="CameraClippingRangeInfo"
+                            name="CameraClippingRange"
+                            number_of_elements="2">
+        <!-- bogus property, only left to avoid backwards compatibility issues
+             for now-->
+        </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetParallelScale"
+                            default_values="1.73"
+                            ignore_synchronization="1"
+                            information_property="CameraParallelScaleInfo"
+                            name="CameraParallelScale"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <DoubleVectorProperty command="GetParallelScale"
+                            default_values="1.73"
+                            information_only="1"
+                            name="CameraParallelScaleInfo"
+                            number_of_elements="1">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetParallelProjection"
+                         default_values="0"
+                         ignore_synchronization="1"
+                         name="CameraParallelProjection"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetEyeAngle"
+                            default_values="2.0"
+                            ignore_synchronization="1"
+                            name="EyeAngle"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetUseOffAxisProjection"
+                         default_values="0"
+                         name="EnableTracking"
+                         number_of_elements="1"></IntVectorProperty>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="SetEyeTransformMatrix"
+                            default_values="1.0 0.0 0.0 0.0
+                         0.0 1.0 0.0 0.0
+                         0.0 0.0 1.0 0.0
+                         0.0 0.0 0.0 1.0"
+                            immediate_update="1"
+                            is_internal="1"
+                            name="EyeTransformMatrix"
+                            number_of_elements="16"></DoubleVectorProperty>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="SetModelTransformMatrix"
+                            default_values="1.0 0.0 0.0 0.0
+                         0.0 1.0 0.0 0.0
+                         0.0 0.0 1.0 0.0
+                         0.0 0.0 0.0 1.0"
+                            immediate_update="1"
+                            is_internal="1"
+                            name="ModelTransformMatrix"
+                            number_of_elements="16"></DoubleVectorProperty>
+    </CameraProxy>
+    <!-- end of Camera Proxy -->
+  </ProxyGroup>
+  <ProxyGroup name="mappers">
+    <Proxy class="vtkProjectedTetrahedraMapper"
+           name="ProjectedTetrahedraMapper"
+           processes="client|renderserver|dataserver"></Proxy>
+    <Proxy name="DummyVolumeMapper">
+      <ProxyProperty command="SetRayCastFunction"
+                     name="RayCastFunction">
+        <ProxyGroupDomain name="groups">
+          <Group name="ugrid_raycast_functions" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+    </Proxy>
+    <Proxy class="vtkUnstructuredGridVolumeRayCastMapper"
+           name="UnstructuredGridVolumeRayCastMapper"
+           processes="client|renderserver|dataserver">
+      <ProxyProperty command="SetRayCastFunction"
+                     name="RayCastFunction">
+        <ProxyGroupDomain name="groups">
+          <Group name="ugrid_raycast_functions" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+    </Proxy>
+    <Proxy class="vtkUnstructuredGridVolumeZSweepMapper"
+           name="UnstructuredGridVolumeZSweepMapper"
+           processes="client|renderserver|dataserver"></Proxy>
+    <Proxy class="vtkGPUVolumeRayCastMapper"
+           name="GPUVolumeRayCastMapper"
+           processes="client|renderserver|dataserver">
+      <Documentation>This is the proxy for GPU based volume
+      rendering.</Documentation>
+      <IntVectorProperty animateable="0"
+                         command="SetBlendMode"
+                         default_values="0"
+                         name="BlendMode"
+                         number_of_elements="1">
+        <Documentation>Set the current blend mode. Default is Composite.
+        MaximumIntensity is also known as MIP rendering.</Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Composite"
+                 value="0" />
+          <Entry text="MaximumIntensity"
+                 value="1" />
+          <Entry text="MinimumIntensity"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetAutoAdjustSampleDistances"
+                         default_values="1"
+                         name="AutoAdjustSampleDistances"
+                         number_of_elements="1">
+        <Documentation>If AutoAdjustSampleDistances is on, the the
+        ImageSampleDistance will be varied to achieve the allocated render time
+        of this prop (controlled by the desired update rate and any culling in
+        use).</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="0"
+                            command="SetSampleDistance"
+                            default_values="1.0"
+                            name="SampleDistance"
+                            number_of_elements="1">
+        <Documentation>Set/Get the distance between samples used for rendering
+        when AutoAdjustSampleDistances is off, or when this mapper has more
+        than 1 second allocated to it for rendering.</Documentation>
+      </DoubleVectorProperty>
+      <!-- End of GPUVolumeRayCastMapper -->
+    </Proxy>
+    <Proxy class="vtkFixedPointVolumeRayCastMapper"
+           name="FixedPointVolumeRayCastMapper"
+           processes="client|renderserver|dataserver">
+      <IntVectorProperty animateable="0"
+                         command="SetBlendMode"
+                         default_values="0"
+                         name="BlendMode"
+                         number_of_elements="1">
+        <Documentation>Set the current blend mode. Default is Composite.
+        MaximumIntensity is also known as MIP rendering.</Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Composite"
+                 value="0" />
+          <Entry text="MaximumIntensity"
+                 value="1" />
+          <Entry text="MinimumIntensity"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetLockSampleDistanceToInputSpacing"
+                         default_values="1"
+                         name="LockSampleDistanceToInputSpacing"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <!-- End of FixedPointVolumeRayCastMapper -->
+    </Proxy>
+    <!-- End of "mappers" -->
+  </ProxyGroup>
+  <ProxyGroup name="ugrid_raycast_functions">
+    <Proxy class="vtkUnstructuredGridBunykRayCastFunction"
+           name="BunykRayCastFunction"></Proxy>
+  </ProxyGroup>
+  <ProxyGroup name="textures">
+    <SourceProxy class="vtkTexture"
+                 name="Texture">
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+      </InputProperty>
+    </SourceProxy>
+    <Proxy class="vtkTexture"
+           name="ImageTexture"
+           si_class="vtkSIImageTextureProxy"
+           processes="client|renderserver">
+      <Documentation>This is a proxy for a vtkTexture which also includes an
+      image file reader. This reader can read an image of client/data server or
+      render server and then transmit it to the client/render server where it
+      will be used for texturing.</Documentation>
+      <SubProxy>
+        <Proxy name="Source"
+               proxygroup="sources"
+               proxyname="NetworkImageSource" />
+        <ExposedProperties>
+          <Property name="FileName" />
+        </ExposedProperties>
+      </SubProxy>
+      <IntVectorProperty animateable="1"
+                         command="SetRestrictPowerOf2ImageSmaller"
+                         default_values="0"
+                         name="RestrictPowerOf2ImageSmaller"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+    </Proxy>
+  </ProxyGroup>
+  <ProxyGroup name="props">
+    <Proxy class="vtkTextActor"
+           name="TextActor">
+      <Documentation>Proxy for a text actor. Not to be used
+      directly.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetInput"
+                            name="Text"
+                            number_of_elements="1"></StringVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="0"
+                            command="SetPosition"
+                            default_values="0 0"
+                            name="Position"
+                            number_of_elements="2">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetTextScaleMode"
+                         default_values="2"
+                         name="TextScaleMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="None"
+                 value="0" />
+          <Entry text="Prop"
+                 value="1" />
+          <Entry text="Viewport"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <ProxyProperty command="SetTextProperty"
+                     name="TextProperty">
+        <ProxyGroupDomain name="groups">
+          <Group name="properties" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <!-- End of TextActor -->
+    </Proxy>
+    <!-- End of group "props" -->
+  </ProxyGroup>
+  <ProxyGroup name="properties">
+    <Proxy class="vtkTextProperty"
+           name="TextProperty">
+      <DoubleVectorProperty animateable="0"
+                            argument_is_array="1"
+                            command="SetColor"
+                            default_values="1.0 1.0 1.0"
+                            name="Color"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <GlobalPropertyLink type="ColorPalette" property="TextAnnotationColor" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="0"
+                            command="SetOpacity"
+                            default_values="1.0"
+                            name="Opacity"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1.0"
+                           min="0.0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetFontFamily"
+                         default_values="0"
+                         name="FontFamily"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Arial"
+                 value="0" />
+          <Entry text="Courier"
+                 value="1" />
+          <Entry text="Times"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetBold"
+                         default_values="0"
+                         name="Bold"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetItalic"
+                         default_values="0"
+                         name="Italic"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetShadow"
+                         default_values="0"
+                         name="Shadow"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetFontSize"
+                         default_values="18"
+                         name="FontSize"
+                         number_of_elements="1">
+        <IntRangeDomain min="0"
+                        name="range" />
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="0"
+                            command="SetOrientation"
+                            default_values="0"
+                            name="Orientation"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <DoubleVectorProperty animateable="0"
+                            command="SetLineOffset"
+                            default_values="0"
+                            name="LineOffset"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetJustification"
+                         default_values="0"
+                         name="Justification"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Left"
+                 value="0" />
+          <Entry text="Center"
+                 value="1" />
+          <Entry text="Right"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetVerticalJustification"
+                         default_values="0"
+                         name="VerticalJustification"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Bottom"
+                 value="0" />
+          <Entry text="Center"
+                 value="1" />
+          <Entry text="Top"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <!-- End of TextProperty -->
+    </Proxy>
+  </ProxyGroup>
+  <ProxyGroup name="PropPickers">
+    <Proxy class="vtkRenderedAreaPicker"
+           name="AreaPicker">
+      <ProxyProperty command="SetRenderer"
+                     name="SetRenderer">
+        <ProxyGroupDomain name="groups">
+          <Group name="renderers" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <DoubleVectorProperty command="SetPickCoords"
+                            default_values="0.0 0.0 0.0 0.0"
+                            name="SetPickCoords"
+                            number_of_elements="4">
+        <DoubleRangeDomain min="0.0 0.0 0.0 0.0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <Property command="Pick"
+                is_internal="1"
+                name="Pick"></Property>
+    </Proxy>
+    <!-- End of PropPickers -->
+  </ProxyGroup>
+</ServerManagerConfiguration>

@@ -103,13 +103,20 @@ SET(requestedResourceFiles
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/filters.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/internal_writers.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/readers.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/rendering.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/sources.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/utilities.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/views_and_representations.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/writers.xml
   ${module_sm_xmls}
   )
+
+if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
+  list(APPEND requestedResourceFiles
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/rendering_opengl2.xml)
+else()
+  list(APPEND requestedResourceFiles
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/rendering.xml)
+endif()
 
 if (PARAVIEW_ENABLE_PYTHON)
   list(APPEND requestedResourceFiles
