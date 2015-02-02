@@ -786,6 +786,9 @@ bool vtkSMViewProxy::MakeRenderWindowInteractor(bool quiet)
   else
     {
     iren = vtkSmartPointer<vtkGenericRenderWindowInteractor>::New();
+    // This initialize is essential. Otherwise vtkRenderWindow::Render causes
+    // the interactor to initialize which in turn triggers a render!
+    iren->Initialize();
     }
   this->SetupInteractor(iren);
   return this->GetInteractor() != NULL;
