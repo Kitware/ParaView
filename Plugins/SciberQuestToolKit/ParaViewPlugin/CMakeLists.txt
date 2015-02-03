@@ -89,6 +89,10 @@ set (SQTK_SM_XML
 
 include_directories(${VTK_INCLUDE_DIRS} ${MPI_CXX_INCLUDE_PATH})
 
+if(PARAVIEW_USE_MPI)
+  include(vtkMPI)
+endif()
+
 # Generate the plugin, servermanager and wrapped language bindings.
 add_paraview_plugin(
   SciberQuestToolKit "${SQTK_VERSION}"
@@ -110,6 +114,5 @@ install(TARGETS SciberQuestToolKit
   LIBRARY DESTINATION ${VTK_INSTALL_LIBRARY_DIR})
 
 if(PARAVIEW_USE_MPI)
-  include(vtkMPI)
   vtk_mpi_link(SciberQuestToolKit)
 endif()
