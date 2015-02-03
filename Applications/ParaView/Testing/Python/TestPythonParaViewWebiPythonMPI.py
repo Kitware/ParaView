@@ -35,7 +35,7 @@ webArguments   = pv_ipython.WebArguments('%s/www' % build_path)
 sphere = None
 
 def start():
-    paraviewHelper.Initialize('/tmp/mpi-python')
+    paraviewHelper.Initialize(os.path.join(os.getcwd(), 'Testing', 'Temporary', 'mpi-python'))
     pv_ipython.IPythonProtocol.updateArguments(webArguments)
     paraviewHelper.SetWebProtocol(pv_ipython.IPythonProtocol, webArguments)
     return paraviewHelper.Start()
