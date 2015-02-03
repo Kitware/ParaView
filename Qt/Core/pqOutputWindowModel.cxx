@@ -58,7 +58,7 @@ enum ColumnLocation
   COLUMN_TYPE,
   COLUMN_COUNT,
   COLUMN_MESSAGE,
-  COUNT
+  NUMBER_OF_COLUMNS
 };
 };
 
@@ -90,7 +90,7 @@ int pqOutputWindowModel::rowCount(const QModelIndex &_parent) const
 int pqOutputWindowModel::columnCount(const QModelIndex &_parent) const
 {
   (void)_parent;
-  return COUNT;
+  return NUMBER_OF_COLUMNS;
 }
 
 Qt::ItemFlags pqOutputWindowModel::flags(const QModelIndex & _index) const
@@ -196,13 +196,11 @@ void pqOutputWindowModel::appendLastRow()
   this->endInsertRows();
   if (this->Rows.size() == 1)
     {
-    for (int i = 0; i < 3; ++i)
-      {
-      this->View->resizeColumnToContents(i);
-      }
+    this->resizeColumnsToContents();
     }
   this->View->resizeRowToContents(this->Rows.size() - 1);
 }
+
 
 void pqOutputWindowModel::expandRow(int r)
 {
@@ -278,4 +276,26 @@ void pqOutputWindowModel::setView(QTableView* view)
   // debug
   this->Internals->Icons.push_back(
     style->standardIcon(QStyle::SP_MessageBoxInformation));
+}
+
+void pqOutputWindowModel::resizeColumnsToContents()
+{
+  for (int i = 0; i < NUMBER_OF_COLUMNS - 1; ++i)
+    {
+    this->View->resizeColumnToContents(i);
+    }
+}
+
+
+void pqOutputWindowModel::updateCount(int messageIndex)
+{
+  for (int i = 0; i < this->Rows.size(); ++i)
+    {
+    if (this->Rows[i] == messageIndex)
+      {
+      emit this->dataChanged(this->createIndex(i, 0), 
+                             this->createIndex(i, NUMBER_OF_COLUMNS - 1));
+      this->resizeColumnsToContents();
+      }
+    }
 }
