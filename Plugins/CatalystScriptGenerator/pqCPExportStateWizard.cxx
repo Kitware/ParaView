@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqCPExportStateWizard.cxx
+   Module:    pqCinemaTrack.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -37,8 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMViewProxy.h>
 #include <vtkPVXMLElement.h>
 
-#include <pqCinemaTrack.h>
 #include <pqApplicationCore.h>
+#include <pqCinemaTrack.h>
 #include <pqFileDialog.h>
 #include <pqImageOutputInfo.h>
 #include <pqPipelineSource.h>
@@ -191,11 +191,9 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
     rendering_info.chop(1);
     }
 
-  QString cinema_info = "None";
+  QString cinema_info = "";
   if(this->Internals->outputCinema->isChecked())
     {
-    cinema_info = "";
-
     for(int i=0;i<this->Internals->cinemaContainer->count();i++)
       {
       pqCinemaTrack *p = dynamic_cast<pqCinemaTrack*>(this->Internals->cinemaContainer->widget(i));

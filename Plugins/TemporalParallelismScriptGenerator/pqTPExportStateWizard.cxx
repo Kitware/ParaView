@@ -82,6 +82,8 @@ void pqTPExportStateWizard::customize()
   this->Internals->nameWidget->setHorizontalHeaderLabels(labels);
   this->Internals->liveViz->hide();
   this->Internals->rescaleDataRange->hide();
+  this->Internals->outputCinema->hide();
+  this->Internals->cinemaContainer->hide();
 }
 
 //-----------------------------------------------------------------------------
