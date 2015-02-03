@@ -497,7 +497,7 @@ int vtkPVPostFilter::ExtractComponent(vtkDataSetAttributes* dsa,
 
   int cIndex = -1;
   bool found = false;
-  // demagled_component_name can be a real component name OR
+  // demangled_component_name can be a real component name OR
   // X,Y,Z for the first 3 components OR
   // 0,...N i.e. an integer for the index OR
   // Magnitude to indicate vector magnitude.
@@ -518,7 +518,7 @@ int vtkPVPostFilter::ExtractComponent(vtkDataSetAttributes* dsa,
       }
     }
 
-  //if we still haven't found a match we will check the component agianst the
+  //if we still haven't found a match we will check the component against the
   //the default names.
   int numComps = array->GetNumberOfComponents();
   //compare agianst cIndex to only run this if component names didn't match

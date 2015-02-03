@@ -1421,12 +1421,12 @@ def test3(basePath):
     w = simple.Wavelet()
     points_series = [ { "name": "Diagonal" , "probes": [ [ float(x), float(x), float(x) ] for x in range(-10, 10)] }, \
                       { "name": "Slice", "probes": [ [ float(x), float(y), 0.0 ] for x in range(-10, 10) for y in range(-10, 10)] } ]
-    time_serie = [ {"name": "Origin", "probe": [0.0, 0.0, 0.0]}, {"name": "FaceCenter", "probe": [10.0, 0.0, 0.0]} ]
+    time_series = [ {"name": "Origin", "probe": [0.0, 0.0, 0.0]}, {"name": "FaceCenter", "probe": [10.0, 0.0, 0.0]} ]
 
     prober = DataProber( FileNameGenerator(os.path.join(basePath, 'dataprober'), 'data_{time}_{field}_{serie}.csv'), w, points_series, [ "RTData" ])
     prober.UpdatePipeline(0.0)
 
-    timeProber = TimeSerieDataProber( FileNameGenerator('/tmp/dataprober_time', 'data_{field}.csv'), w, time_serie, [ "RTData"], 100)
+    timeProber = TimeSerieDataProber( FileNameGenerator(os.path.join(os.getcwd(), 'Testing/Temporary/dataprober_time'), 'data_{field}.csv'), w, time_series, [ "RTData"], 100)
     for time in range(101):
         timeProber.UpdatePipeline(time)
 
