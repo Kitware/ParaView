@@ -17,6 +17,8 @@
         <link rel='stylesheet' href='style.css' type='text/css' />
 
         <script type="text/javascript">
+            stop = vtkWeb.NoOp;
+
             $(function() {
                 var viewport$ = $("#viewport");
 
@@ -187,57 +189,37 @@
                     // the the page.
                     if (!pv.connection) {
                         viewport$.addClass("session_started");
-                        var serviceURL = location.protocol + "//" + location.hostname +
-                            ":" + location.port + "/paraview";
                         var config = {
-                            sessionManagerURL: serviceURL,
+                            sessionManagerURL: vtkWeb.properties.sessionManagerURL,
                             name: "Data Prober",
                             description: "3D visualization with ParaView/Web",
                             application: "data_prober"
                         };
 
-                        // Start a new VTKWeb instance.
-                        vtkWeb.start(config,
-                        function (conn) {
-                            setupConnection(conn);
-                        },
-                        function (err) {
-                            //console.log("Connection failed.");
-
-                            var conn = {sessionURL: "ws://" +
-                                    location.hostname + ":" +
-                                    location.port + "/ws"};
-                            setupConnection(conn);
-                        }
-                    );
+                        // Try to launch the Viz process
+                        vtkWeb.smartConnect(config, start, function(code,reason){
+                            console.log(reason);
+                        });
                     }
                 }
 
                 //-----------------------------------------------------------------------------
                 // Setup paraview
-                function setupConnection(connection) {
-                    if(location.protocol == "http:") {
-                        connection.sessionURL = connection.sessionURL.replace("wss:","ws:");
-                    }
+                function start(conn) {
+                    pv.connection = conn;
+                    pv.viewport = vtkWeb.createViewport({session:conn.session});
+                    pv.viewport.bind("#viewport");
 
-                    // connect to the ParaView/Web instance, so we can start
-                    // visualizing.
-                    vtkWeb.connect(connection,
-                    function(conn) {
-                        pv.connection = conn;
-                        pv.viewport = vtkWeb.createViewport({session:conn.session});
-                        pv.viewport.bind("#viewport");
+                    // setup the chart for rendering.
+                    //pv.chart = $("#chart svg").lineChart({connection : conn});
+                    pv.chart = $("#chart").graph({connection: conn});
 
-                        // setup the chart for rendering.
-                        //pv.chart = $("#chart svg").lineChart({connection : conn});
-                        pv.chart = $("#chart").graph({connection: conn});
-                    },
-                    function(code,reason){
-                        pv.connection = null;
-                        console.log(reason);
-                        cleanup();
+                    // Update stop method to close the connection
+                    stop = function() {
+                        pv.connection.session.call('application.exit');
+                        pv.connection.session.close();
+                        pv.connection.session = null;
                     }
-                );
                 }
 
                 function cleanup() {
@@ -328,7 +310,7 @@
             });
         </script>
     </head>
-    <body>
+    <body onbeforeunload="stop()" onunload="stop()">
         <div class="toolbar">
             <center>
                 <button class="toolbar-button" id="selectdata">Select Data</button>

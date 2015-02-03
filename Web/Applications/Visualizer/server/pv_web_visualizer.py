@@ -161,15 +161,14 @@ class _VisualizerServer(pv_wamp.PVServerProtocol):
             _VisualizerServer.saveDataDir = args.saveDataDir
 
         if args.file:
-            _VisualizerServer.fileToLoad  = args.path + '/' + args.file
+            _VisualizerServer.fileToLoad  = os.path.join(args.path, args.file)
 
     def initialize(self):
         # Bring used components
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebStartupRemoteConnection(_VisualizerServer.dsHost, _VisualizerServer.dsPort, _VisualizerServer.rsHost, _VisualizerServer.rsPort, _VisualizerServer.rcPort))
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebStartupPluginLoader(_VisualizerServer.plugins))
-        self.registerVtkWebProtocol(pv_protocols.ParaViewWebStateLoader(_VisualizerServer.fileToLoad))
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebFileListing(_VisualizerServer.dataDir, "Home", _VisualizerServer.excludeRegex, _VisualizerServer.groupRegex))
-        self.registerVtkWebProtocol(pv_protocols.ParaViewWebProxyManager(allowedProxiesFile=_VisualizerServer.proxies, baseDir=_VisualizerServer.dataDir, allowUnconfiguredReaders=_VisualizerServer.allReaders))
+        self.registerVtkWebProtocol(pv_protocols.ParaViewWebProxyManager(allowedProxiesFile=_VisualizerServer.proxies, baseDir=_VisualizerServer.dataDir, fileToLoad=_VisualizerServer.fileToLoad, allowUnconfiguredReaders=_VisualizerServer.allReaders))
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebColorManager(pathToColorMaps=_VisualizerServer.colorPalette))
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebMouseHandler())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebViewPort())

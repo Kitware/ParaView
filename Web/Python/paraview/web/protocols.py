@@ -603,7 +603,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                        'unspecified',     # 14
                        'signed_char' ]    # 15
 
-    def __init__(self, allowedProxiesFile=None, baseDir=None, allowUnconfiguredReaders=True):
+    def __init__(self, allowedProxiesFile=None, baseDir=None, fileToLoad=None, allowUnconfiguredReaders=True):
         """
         - basePath: specify the base directory (or directories) that we should start with, if this
          parameter takes the form: "name1=path1|name2=path2|...", then we will treat this as the
@@ -651,6 +651,9 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
             path = os.path.dirname(module_path)
             proxyFile = os.path.join(path, 'defaultProxies.json')
             self.readAllowedProxies(proxyFile)
+
+        if fileToLoad:
+            self.open(fileToLoad)
 
         self.simpleTypes = [int, float, list, str]
         self.view = simple.GetRenderView()
