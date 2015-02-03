@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqImageOutputInfo.h
+   Module:    pqCinemaTrack.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,56 +29,41 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqImageOutputInfo_h
-#define __pqImageOutputInfo_h
+#ifndef __pqCinemaTrack_h
+#define __pqCinemaTrack_h
 
 #include "pqComponentsModule.h"
 #include <QString>
 #include <QStringList>
 #include <QWidget>
 #include <QScopedPointer>
+#include <QVariantList>
 
-class pqView;
-namespace Ui { class ImageOutputInfo; }
+class pqPipelineFilter;
+class pqScalarValueListPropertyWidget;
 
-class PQCOMPONENTS_EXPORT pqImageOutputInfo : public QWidget
+namespace Ui { class CinemaTrack; }
+
+class PQCOMPONENTS_EXPORT pqCinemaTrack : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
 public:
-  pqImageOutputInfo(
-    QWidget *parentObject, Qt::WindowFlags parentFlags, pqView* view, QString& viewName);
-  ~pqImageOutputInfo();
+  pqCinemaTrack(
+    QWidget *parentObject, Qt::WindowFlags parentFlags, pqPipelineFilter *filter);
+  ~pqCinemaTrack();
 
-  void setupScreenshotInfo();
-
-  pqView* getView();
-  QString getImageFileName();
-  void hideFrequencyInput();
-  void showFrequencyInput();
-  void hideFitToScreen();
-  void showFitToScreen();
-  int getWriteFrequency();
-  bool fitToScreen();
-  int getMagnification();
-
-  void showCinema();
-  void hideCinema();
-
-  const QString getCameraType();
-  double getPhi();
-  double getTheta();
+  bool explore() const;
+  QVariantList scalars() const;
+  QString filterName() const;
 
 public slots:
-  void updateImageFileName();
-  void updateImageFileNameExtension(const QString&);
-  void updateCinemaType(const QString&);
+
+  void toggleTrack(bool checked);
 
 private:
-  Q_DISABLE_COPY(pqImageOutputInfo)
-  QScopedPointer<Ui::ImageOutputInfo> Info;
-  pqView* View;
-
-  void updateSpherical();
+  Q_DISABLE_COPY(pqCinemaTrack)
+  QScopedPointer<Ui::CinemaTrack> Track;
+  pqScalarValueListPropertyWidget *valsWidget;
 };
 #endif

@@ -583,6 +583,8 @@ if(PARAVIEW_ENABLE_PYTHON)
   LIST(APPEND Module_SRCS
     pqImageOutputInfo.cxx
     pqImageOutputInfo.h
+    pqCinemaTrack.cxx
+    pqCinemaTrack.h
     pqSGExportStateWizard.cxx
     pqSGExportStateWizard.h
     pqSGPluginManager.cxx
@@ -592,12 +594,14 @@ if(PARAVIEW_ENABLE_PYTHON)
     )
   LIST(APPEND Module_MOC_HDRS
     pqImageOutputInfo.h
+    pqCinemaTrack.h
     pqSGExportStateWizard.h
     pqSGPluginManager.h
     pqSGWritersMenuManager.h
     )
   LIST(APPEND Module_UI_FILES
     Resources/UI/pqImageOutputInfo.ui
+    Resources/UI/pqCinemaTrack.ui
     Resources/UI/pqExportStateWizard.ui
     )
 endif()
