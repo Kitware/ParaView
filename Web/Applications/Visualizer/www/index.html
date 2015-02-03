@@ -5,17 +5,17 @@
     <meta content="IE=edge" http-equiv="X-UA-Compatible">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>ParaViewWeb - Visualizer</title>
-    <link rel="icon" type="image/png" href="../../lib/css/assets/favicon-32.png">
+    <link rel="icon" type="image/png" href="favicon.png">
     <link rel='stylesheet' href='main.css' type='text/css'>
 </head>
 <body class='container-fluid' onbeforeunload="stop()" onunload="stop()">
     <div class="row-fluid app-wait-start-page">
-        <img src="../../lib/css/paraview/toolbar/common/logo_title.png" class="span12 start-page-image">
+        <img src="start_page_image.png" class="span12 start-page-image">
         <div class="vtk-icon-cog animate-spin start-page-busy-icon"></div>
     </div>
     <div class='row pv-gray-darker head-toolbar hide-on-start'>
         <div class='col-xs-12 col-sm-5 col-md-4 col-lg-3 '>
-            <img src='../../lib/css/assets/logo.svg'
+            <img src='toolbar_logo.svg'
                  class='clickable toggle-inspector'
                  height='20'
                  style='margin: 5px 0;'
@@ -143,21 +143,32 @@
                         </div>
                     </div>
                     <div class="row label-spacing">
-                        <div class="col-xs-12">
+                        <div class="col-xs-4">
                             Filename
+                        </div>
+                        <div class="col-xs-8 text-right">
+                            <span class="data-save-only active-data-type-label"></span>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-xs-12">
-                            <input type="text" class="save-data-filename form-control input-sm"/>
+                            <input type="text" class="save-data-filename form-control input-sm" data-toggle='tooltip' data-placement='bottom' title='Enter relative path and filename to server location where file should be written'/>
                         </div>
                     </div>
                     <div class="row label-spacing">
                         <div class="col-xs-6">
-                            <button type="button" class="screenshot-save-only screenshot-grab-image-btn btn btn-default btn-sm">Capture</button>
+                            <button type="button"
+                                    class="screenshot-save-only screenshot-grab-image-btn btn btn-default btn-sm"
+                                    data-toggle="tooltip"
+                                    data-placement="bottom"
+                                    title="Capture contents of render window">Capture</button>
                         </div>
                         <div class="col-xs-6 text-right">
-                            <button type="button" class="save-data-button btn btn-default btn-sm">Save</button>
+                            <button type="button"
+                                    class="save-data-button btn btn-default btn-sm"
+                                    data-toggle="tooltip"
+                                    data-placement="bottom"
+                                    title="Save file to server">Save</button>
                         </div>
                     </div>
                     <div class="row label-spacing captured-screenshot-container screenshot-save-only">
@@ -196,9 +207,9 @@
             // Update stop method to use the connection
             stop = function() {
                 if (reallyStop === true) {
-                    connection.session.call('application.exit');
+                    connection.session.call('application.exit', []);
                 }
-            }
+            };
         };
 
         // Try to launch the Viz process

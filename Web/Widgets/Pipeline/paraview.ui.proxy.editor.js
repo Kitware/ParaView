@@ -26,9 +26,9 @@
         "<span class='vtk-icon-resize-horizontal-1 color-customization-button btn btn-default btn-xs' data-action='toggle-scalar-range-editor' data-toggle='tooltip' data-placement='bottom' title='Toggle Color Range Editor'></span>" +
         "</div></div></div></div>" +
         "<div class='col-sm-8 text-center'>" +
-        "<select class='form-control pv-form-height array bottom-property top-property' data-cancel-value='VALUES' data-action='rescale-to-data' data-toggle='tooltip' data-placement='bottom' title='Array Name'>ARRAY_OPTIONS</select>" +
-        "<select class='form-control pv-form-height component bottom-property top-property' data-action='rescale-to-data' data-toggle='tooltip' data-placement='bottom' title='Array Component'></select>" +
-        "<select class='form-control pv-form-height palette bottom-property top-property' data-action='rescale-to-data' data-toggle='tooltip' data-placement='bottom' title='Preset Color Map'>PALETTE_OPTIONS</select>" +
+        "<select class='form-control pv-form-height array bottom-property top-property' data-cancel-value='VALUES' data-toggle='tooltip' data-placement='bottom' title='Array Name'>ARRAY_OPTIONS</select>" +
+        "<select class='form-control pv-form-height component bottom-property top-property' data-toggle='tooltip' data-placement='bottom' title='Array Component'></select>" +
+        "<select class='form-control pv-form-height palette bottom-property top-property' data-toggle='tooltip' data-placement='bottom' title='Preset Color Map'>PALETTE_OPTIONS</select>" +
         "</div>" +
         "<div class='scalar-opacity-editor-container'></div>" +
         "<div class='color-editor-container row' style='margin-top: 5px; margin-right: 30px; margin-left: 0;'>" +
@@ -463,7 +463,7 @@
                         for (var rangeIdx = ui.range.length - 1; rangeIdx >= 0; rangeIdx -= 1) {
                             var ttRegex = new RegExp('TOOLTIPRANGE' + (rangeIdx + 1), 'g');
                             var range = ui.range[rangeIdx];
-                            html = html.replace(ttRegex, "data-toggle='tooltip' data-placement='right' title='Range: [" + range.min + ', ' + range.max + "]'");
+                            html = html.replace(ttRegex, "data-toggle='tooltip' data-placement='bottom' title='Range: [" + range.min + ', ' + range.max + "]'");
                         }
                     } else {
                         html = html.replace(/TOOLTIPRANGE1/g, '');
@@ -587,8 +587,6 @@
                             type: 'delete-proxy',
                             id: target_container.attr('data-proxy-id')
                         });
-                        // Make sure all old tooltips are cleaned up...
-                        $('.tooltip').remove();
                     } else if (action === 'apply-property-values') {
                         apply(me, wantColorManagement);
                     } else if (action === 'toggle-scalarbar') {
