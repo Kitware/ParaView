@@ -185,7 +185,7 @@ class _VisualizerServer(pv_wamp.PVServerProtocol):
         self.updateSecret(_VisualizerServer.authKey)
 
         # Disable interactor-based render calls
-        simple.GetRenderView().GetRenderWindow().GetInteractor().RenderCallsEnabledOff()
+        simple.GetRenderView().EnableRenderOnInteraction = 0
 
 # =============================================================================
 # Main: Parse args and start server

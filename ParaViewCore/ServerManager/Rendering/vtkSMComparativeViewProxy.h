@@ -73,6 +73,20 @@ public:
   // Returns the render-window used by the root view, if any.
   virtual vtkRenderWindow* GetRenderWindow()
     { return this->GetRootView()? this->GetRootView()->GetRenderWindow() : NULL; }
+  virtual vtkRenderWindowInteractor* GetInteractor()
+    { return this->GetRootView()? this->GetRootView()->GetInteractor() : NULL; }
+
+  // Description:
+  // To avoid misuse of this method for comparative views, this method will
+  // raise an error. Client code should set up interactor for each of the
+  // internal views explicitly.
+  virtual void SetupInteractor(vtkRenderWindowInteractor* iren);
+
+  // Description:
+  // Overridden to call MakeRenderWindowInteractor() on each of the internal
+  // views.
+  virtual bool MakeRenderWindowInteractor(bool quiet=false);
+
 protected:
   vtkSMComparativeViewProxy();
   ~vtkSMComparativeViewProxy();

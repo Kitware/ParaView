@@ -36,9 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCollection.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkImageData.h"
+#include "vtkNew.h"
 #include "vtkPVServerInformation.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMAnimationSceneImageWriter.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMComparativeViewProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
@@ -77,32 +78,26 @@ pqComparativeRenderView::pqComparativeRenderView(
   this->Internal = new pqInternal();
   this->Internal->VTKConnect->Connect(
     viewProxy, vtkCommand::ConfigureEvent,
-    this, SLOT(onComparativeVisLayoutChanged()));
+    this, SLOT(updateViewWidgets()));
 }
 
 //-----------------------------------------------------------------------------
 pqComparativeRenderView::~pqComparativeRenderView()
 {
-  foreach (pqQVTKWidget* widget, this->Internal->RenderWidgets.values())
+  foreach (pqQVTKWidget* wdg, this->Internal->RenderWidgets.values())
     {
-    delete widget;
+    delete wdg;
     }
 
   delete this->Internal;
 }
 
 //-----------------------------------------------------------------------------
-void pqComparativeRenderView::initialize()
+QWidget* pqComparativeRenderView::createWidget()
 {
-  this->Superclass::initialize();
-  this->onComparativeVisLayoutChanged();
-}
-
-//-----------------------------------------------------------------------------
-QWidget* pqComparativeRenderView::createWidget() 
-{
-  QWidget* widget = new QWidget();
-  return widget;
+  QWidget* container = new QWidget();
+  this->updateViewWidgets(container);
+  return container;
 }
 
 //-----------------------------------------------------------------------------
@@ -119,14 +114,14 @@ vtkSMRenderViewProxy* pqComparativeRenderView::getRenderViewProxy() const
 }
 
 //-----------------------------------------------------------------------------
-void pqComparativeRenderView::onComparativeVisLayoutChanged()
+void pqComparativeRenderView::updateViewWidgets(
+  QWidget* container/*=NULL*/)
 {
   // Create QVTKWidgets for new view modules and destroy old ones.
-  vtkCollection* currentViews =  vtkCollection::New();
-  
+  vtkNew<vtkCollection> currentViews;
   vtkSMComparativeViewProxy* compView = vtkSMComparativeViewProxy::SafeDownCast(
     this->getProxy());
-  compView->GetViews(currentViews);
+  compView->GetViews(currentViews.GetPointer());
 
   QSet<vtkSMViewProxy*> currentViewsSet;
 
@@ -140,7 +135,7 @@ void pqComparativeRenderView::onComparativeVisLayoutChanged()
 
   QSet<vtkSMViewProxy*> oldViews = QSet<vtkSMViewProxy*>::fromList(
     this->Internal->RenderWidgets.keys());
-  
+
   QSet<vtkSMViewProxy*> removed = oldViews - currentViewsSet;
   QSet<vtkSMViewProxy*> added = currentViewsSet - oldViews;
 
@@ -157,12 +152,13 @@ void pqComparativeRenderView::onComparativeVisLayoutChanged()
     vtkSMRenderViewProxy* renView = vtkSMRenderViewProxy::SafeDownCast(key);
     renView->UpdateVTKObjects();
 
-    pqQVTKWidget* widget = new pqQVTKWidget();
-    widget->SetRenderWindow(renView->GetRenderWindow());
-    widget->setSession(compView->GetSession());
-    widget->installEventFilter(this);
-    widget->setContextMenuPolicy(Qt::NoContextMenu);
-    this->Internal->RenderWidgets[key] = widget;
+    pqQVTKWidget* wdg = new pqQVTKWidget();
+    wdg->SetRenderWindow(renView->GetRenderWindow());
+    renView->SetupInteractor(wdg->GetInteractor());
+    wdg->setSession(compView->GetSession());
+    wdg->installEventFilter(this);
+    wdg->setContextMenuPolicy(Qt::NoContextMenu);
+    this->Internal->RenderWidgets[key] = wdg;
     }
 
   // Now layout the views.
@@ -173,11 +169,11 @@ void pqComparativeRenderView::onComparativeVisLayoutChanged()
     dimensions[0] = dimensions[1] = 1;
     }
 
-  // destroy the old layout and create a new one. 
-  QWidget* widget = this->getWidget();
-  delete widget->layout();
+  // destroy the old layout and create a new one.
+  container = container? container : this->widget();
+  delete container->layout();
 
-  QGridLayout* layout = new QGridLayout(widget);
+  QGridLayout* layout = new QGridLayout(container);
   layout->setSpacing(1);
   layout->setMargin(0);
   for (int x=0; x < dimensions[0]; x++)
@@ -191,7 +187,6 @@ void pqComparativeRenderView::onComparativeVisLayoutChanged()
       layout->addWidget(vtkwidget, y, x);
       }
     }
-  currentViews->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -215,7 +210,7 @@ void adjustImageExtent(vtkImageData * image, int topLeftX, int topLeftY)
 //-----------------------------------------------------------------------------
 vtkImageData* pqComparativeRenderView::captureImage(int magnification)
 {
-  if (!this->getWidget()->isVisible())
+  if (!this->widget()->isVisible())
     {
     // Don't return any image when the view is not visible.
     return NULL;

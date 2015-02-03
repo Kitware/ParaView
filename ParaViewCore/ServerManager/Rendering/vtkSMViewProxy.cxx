@@ -17,17 +17,19 @@
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkErrorCode.h"
+#include "vtkGenericRenderWindowInteractor.h"
 #include "vtkImageData.h"
 #include "vtkMath.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
 #include "vtkPVView.h"
 #include "vtkPVXMLElement.h"
-#include "vtkProcessModule.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderer.h"
 #include "vtkRendererCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyManager.h"
@@ -36,7 +38,6 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMUncheckedPropertyHelper.h"
 #include "vtkSMUtilities.h"
-#include "vtkSmartPointer.h"
 
 #include <assert.h>
 
@@ -731,4 +732,64 @@ bool vtkSMViewProxy::HideOtherRepresentationsIfNeeded(vtkSMProxy* repr)
       }
     }
   return modified;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMViewProxy::GetLocalProcessSupportsInteraction()
+{
+  this->CreateVTKObjects();
+  vtkPVView* pvview = vtkPVView::SafeDownCast(this->GetClientSideObject());
+  return pvview? pvview->GetLocalProcessSupportsInteraction() : false;
+}
+
+
+//----------------------------------------------------------------------------
+bool vtkSMViewProxy::MakeRenderWindowInteractor(bool quiet)
+{
+  if (this->GetInteractor() != NULL)
+    {
+    // all's setup already. nothing to do.
+    return true;
+    }
+  if (!this->GetLocalProcessSupportsInteraction())
+    {
+    return false;
+    }
+
+  vtkRenderWindow* renWin = this->GetRenderWindow();
+  if (!renWin)
+    {
+    if (!quiet)
+      {
+      vtkWarningMacro("Not a view that has a vtkRenderWindow. Cannot setup interactor.");
+      }
+    return false;
+    }
+  if (renWin->GetMapped())
+    {
+    if (!quiet)
+      {
+      vtkErrorMacro("Window is currently mapped. "
+        "Currently, interaction is only supported on unmapped windows.");
+      }
+    return false;
+    }
+  // in reality batch shouldn't have an interactor at all. However, to avoid the
+  // mismatch in the vtkPVAxesWidget (orientation widget) when using pvpython or
+  // pvbatch, we do create one. However, lets create a non-interactive
+  // interactor in batch mode.
+  vtkSmartPointer<vtkRenderWindowInteractor> iren;
+  if (vtkProcessModule::GetProcessType() != vtkProcessModule::PROCESS_BATCH)
+    {
+    iren = renWin->MakeRenderWindowInteractor();
+    }
+  else
+    {
+    iren = vtkSmartPointer<vtkGenericRenderWindowInteractor>::New();
+    // This initialize is essential. Otherwise vtkRenderWindow::Render causes
+    // the interactor to initialize which in turn triggers a render!
+    iren->Initialize();
+    }
+  this->SetupInteractor(iren);
+  return this->GetInteractor() != NULL;
 }

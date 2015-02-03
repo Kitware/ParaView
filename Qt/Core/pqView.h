@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqProxy.h"
 #include <QSize> // needed for QSize.
+#include "vtkSetGet.h" // needed for VTK_LEGACY.
 
 class pqOutputPort;
 class pqPipelineSource;
@@ -65,8 +66,17 @@ public:
   /// or return NULL.
   virtual vtkView* getClientSideView() const;
 
-  /// Return a widget associated with this view
-  virtual QWidget* getWidget() = 0;
+  /// Return a widget associated with this view. Every view in ParaView Qt
+  /// application must be able to render itself in a QWidget. The first time
+  /// this method is called, this will call pqView::createWidget(). Subclasses
+  /// createWidget() to create a QWidget for the view.
+  /// This may return NULL if the view doesn't have QWidget associated with it
+  /// (which is rare, if impossible) or the QWidget was previously created but
+  /// since has been destroyed due to Qt cleanup.
+  QWidget* widget();
+
+  /// @deprecated Replaced by pqView::widget() as of ParaView 4.4.
+  VTK_LEGACY(QWidget* getWidget());
 
   /// Returns if this view module can support 
   /// undo/redo. Returns false by default. Subclassess must override
@@ -233,6 +243,13 @@ private slots:
   /// moment as not a "reasonable moment" to render and defer the render again.
   void tryRender();
 
+  /// These slots help use avoid the undo stack being modified during rendering.
+  /// A few views (e.g. vtkSMContextViewProxy) may change some of its properties
+  /// during a render. We don't want those to get captured in the undo/redo
+  /// stack.
+  void onBeginRender();
+  void onEndRender();
+
 protected:
   /// Constructor:
   /// \c type  :- view type.
@@ -253,6 +270,9 @@ protected:
   /// after the object has been created. 
   /// Overridden to update the list of representations currently available.
   virtual void initialize();
+
+  /// Subclasses must override this method to create a widget for the view.
+  virtual QWidget* createWidget() = 0;
 
 private:
   pqView(const pqView&); // Not implemented.

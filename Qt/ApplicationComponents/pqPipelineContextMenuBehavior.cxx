@@ -135,7 +135,7 @@ void pqPipelineContextMenuBehavior::onViewAdded(pqView* view)
   if (view && view->getProxy()->IsA("vtkSMRenderViewProxy"))
     {
     // add a link view menu
-    view->getWidget()->installEventFilter(this);
+    view->widget()->installEventFilter(this);
     }
 }
 

@@ -136,6 +136,11 @@ def CreateView(view_xml_name, **params):
     SetProperties(view, **params)
     controller.PostInitializeProxy(view)
     controller.RegisterViewProxy(view, registrationName)
+
+    # setup an interactor if current process support interaction if an
+    # interactor hasn't already been set. This overcomes the problem where VTK
+    # segfaults if the interactor is created after the window was created.
+    view.MakeRenderWindowInteractor(True)
     return view
 
 # -----------------------------------------------------------------------------
@@ -234,6 +239,12 @@ def Render(view=None):
     """Renders the given view (default value is active view)"""
     if not view:
         view = active_objects.view
+    if not view:
+        raise AttributeError, "view cannot be None"
+    # setup an interactor if current process support interaction if an
+    # interactor hasn't already been set. This overcomes the problem where VTK
+    # segfaults if the interactor is created after the window was created.
+    view.MakeRenderWindowInteractor(True)
     view.StillRender()
     if _funcs_internals.first_render:
         # Not all views have a ResetCamera method
@@ -248,6 +259,26 @@ def Render(view=None):
 def RenderAllViews():
     """Render all views"""
     for view in GetViews(): Render(view)
+
+# -----------------------------------------------------------------------------
+def Interact(view=None):
+    """Call this method to start interacting with a view. This method will
+    block till the interaction is done. This method will simply return
+    if the local process cannot support interactions."""
+    if not view:
+        view = active_objects.view
+    if not view:
+        raise ValueError, "view argument cannot be None"
+    if not view.MakeRenderWindowInteractor(False):
+        raise RuntimeError, "Configuration doesn't support interaction."
+    paraview.print_debug_info("Staring interaction. Use 'q' to quit.")
+
+    # Views like ComparativeRenderView require that Render() is called before
+    # the Interaction is begun. Hence we call a Render() before start the
+    # interactor loop. This also avoids the case where there are pending updates
+    # and thus the interaction will be begun on stale datasets.
+    Render(view)
+    view.GetInteractor().Start()
 
 # -----------------------------------------------------------------------------
 

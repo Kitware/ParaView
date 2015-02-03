@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageData.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVXMLElement.h"
 #include "vtkRenderWindow.h"
 #include "vtkSMDoubleVectorProperty.h"
@@ -46,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMViewProxyInteractorHelper.h"
 
 // Qt Includes.
 #include <QList>
@@ -77,19 +77,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqRenderViewBase::pqInternal
 {
 public:
-  QPointer<QWidget> Viewport;
   QPoint MouseOrigin;
-  bool InitializedAfterObjectsCreated;
   bool IsInteractiveDelayActive;
   double TimeLeftBeforeFullResolution;
 
   pqInternal()
     {
-    this->InitializedAfterObjectsCreated=false;
     }
   ~pqInternal()
     {
-    delete this->Viewport;
     }
 
   void writeToStatusBar(const char* txt)
@@ -155,22 +151,6 @@ pqRenderViewBase::~pqRenderViewBase()
 }
 
 //-----------------------------------------------------------------------------
-QWidget* pqRenderViewBase::getWidget()
-{
-  if (!this->Internal->Viewport)
-    {
-    this->Internal->Viewport = this->createWidget();
-    // we manage the context menu ourself, so it doesn't interfere with
-    // render window interactions
-    this->Internal->Viewport->setContextMenuPolicy(Qt::NoContextMenu);
-    this->Internal->Viewport->installEventFilter(this);
-    this->Internal->Viewport->setObjectName("Viewport");
-    }
-
-  return this->Internal->Viewport;
-}
-
-//-----------------------------------------------------------------------------
 QWidget* pqRenderViewBase::createWidget()
 {
   pqQVTKWidget* vtkwidget = new pqQVTKWidget();
@@ -196,6 +176,8 @@ QWidget* pqRenderViewBase::createWidget()
     }
 #endif
 
+  vtkwidget->setContextMenuPolicy(Qt::NoContextMenu);
+  vtkwidget->installEventFilter(this);
   return vtkwidget;
 }
 
@@ -228,30 +210,17 @@ void pqRenderViewBase::initialize()
 //-----------------------------------------------------------------------------
 void pqRenderViewBase::initializeAfterObjectsCreated()
 {
-  if (!this->Internal->InitializedAfterObjectsCreated)
-    {
-    this->Internal->InitializedAfterObjectsCreated = true;
-    this->initializeWidgets();
-    }
-
   // Attach Qt Signal to VTK interactor Delay event
   vtkSMRenderViewProxy* renderViewProxy;
   renderViewProxy = vtkSMRenderViewProxy::SafeDownCast(this->getProxy());
   if( renderViewProxy != NULL )
     {
-    // Generate Signals when interaction event occurs ??? Here ???
-    this->getConnector()->Connect(
-        renderViewProxy->GetInteractor(),
-        vtkPVGenericRenderWindowInteractor::EndDelayNonInteractiveRenderEvent,
-        this, SLOT(endDelayInteractiveRender()));
-    this->getConnector()->Connect( renderViewProxy->GetInteractor(),
-                                   vtkCommand::StartInteractionEvent,
-                                   this,
-                                   SLOT(endDelayInteractiveRender()));
-    this->getConnector()->Connect( renderViewProxy->GetInteractor(),
-                                   vtkPVGenericRenderWindowInteractor::BeginDelayNonInteractiveRenderEvent,
-                                   this,
-                                   SLOT(beginDelayInteractiveRender()));
+    vtkSMViewProxyInteractorHelper* helper = renderViewProxy->GetInteractorHelper();
+    Q_ASSERT(helper);
+    vtkEventQtSlotConnect* cntor = this->getConnector();
+    cntor->Connect(helper, vtkCommand::CreateTimerEvent, this, SLOT(beginDelayInteractiveRender()));
+    cntor->Connect(helper, vtkCommand::DestroyTimerEvent, this, SLOT(endDelayInteractiveRender()));
+    cntor->Connect(helper, vtkCommand::TimerEvent, this, SLOT(endDelayInteractiveRender()));
 
     this->InteractiveDelayUpdateTimer->setSingleShot(false);
     QObject::connect( this->InteractiveDelayUpdateTimer,
@@ -306,10 +275,10 @@ bool pqRenderViewBase::eventFilter(QObject* caller, QEvent* e)
       QPoint delta = newPos - this->Internal->MouseOrigin;
       if (delta.manhattanLength() < 3 && qobject_cast<QWidget*>(caller))
         {
-        QList<QAction*> actions = this->Internal->Viewport->actions();
+        QList<QAction*> actions = this->widget()->actions();
         if (!actions.isEmpty())
           {
-          QMenu* menu = new QMenu(this->Internal->Viewport);
+          QMenu* menu = new QMenu(this->widget());
           menu->setAttribute(Qt::WA_DeleteOnClose);
           menu->addActions(actions);
           menu->popup(qobject_cast<QWidget*>(caller)->mapToGlobal(newPos));

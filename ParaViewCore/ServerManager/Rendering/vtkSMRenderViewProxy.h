@@ -23,14 +23,15 @@
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMViewProxy.h"
-
+#include "vtkNew.h" // needed for vtkInteractorObserver.
 class vtkCamera;
 class vtkCollection;
 class vtkIntArray;
-class vtkPVGenericRenderWindowInteractor;
 class vtkRenderer;
 class vtkRenderWindow;
+class vtkRenderWindowInteractor;
 class vtkSMDataDeliveryManager;
+class vtkSMViewProxyInteractorHelper;
 
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMRenderViewProxy : public vtkSMViewProxy
 {
@@ -119,8 +120,15 @@ public:
   virtual const char* IsSelectVisiblePointsAvailable();
 
   // Description:
+  // A client process need to set the interactor to enable interactivity. Use
+  // this method to set the interactor and initialize it as needed by the
+  // RenderView. This include changing the interactor style as well as
+  // overriding VTK rendering to use the Proxy/ViewProxy API instead.
+  virtual void SetupInteractor(vtkRenderWindowInteractor* iren);
+
+  // Description:
   // Returns the interactor.
-  vtkPVGenericRenderWindowInteractor* GetInteractor();
+  virtual vtkRenderWindowInteractor* GetInteractor();
 
   // Description:
   // Returns the client-side renderer (composited or 3D).
@@ -170,6 +178,12 @@ public:
   // Description:
   // Returns the render window used by this view.
   virtual vtkRenderWindow* GetRenderWindow();
+
+  // Description:
+  // Provides access to the vtkSMViewProxyInteractorHelper object that handles
+  // the interaction/view sync. We provide access to it for applications to
+  // monitor timer events etc.
+  vtkSMViewProxyInteractorHelper* GetInteractorHelper();
 
 //BTX
 protected:
@@ -230,6 +244,8 @@ protected:
 private:
   vtkSMRenderViewProxy(const vtkSMRenderViewProxy&); // Not implemented
   void operator=(const vtkSMRenderViewProxy&); // Not implemented
+
+  vtkNew<vtkSMViewProxyInteractorHelper> InteractorHelper;
 //ETX
 };
 

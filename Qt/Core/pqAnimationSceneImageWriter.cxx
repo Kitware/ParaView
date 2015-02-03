@@ -59,7 +59,7 @@ vtkImageData* pqAnimationSceneImageWriter::CaptureViewImage(
   pqServerManagerModel* smmodel = core->getServerManagerModel();
 
   pqView* pq_view = smmodel->findItem<pqView*>(view);
-  if (pq_view && pq_view->getWidget()->isVisible())
+  if (pq_view && pq_view->widget()->isVisible())
     {
     return pq_view->captureImage(magnification);
     }

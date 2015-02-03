@@ -40,6 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkPVContextView::vtkPVContextView()
+  : InteractorStyle()
 {
   vtkPVOptions* options = vtkProcessModule::GetProcessModule()?
     vtkProcessModule::GetProcessModule()->GetOptions() : NULL;
@@ -51,25 +52,14 @@ vtkPVContextView::vtkPVContextView()
   this->RenderWindow = this->SynchronizedWindows->NewRenderWindow();
   this->RenderWindow->SetOffScreenRendering(this->UseOffscreenRendering? 1 : 0);
   this->ContextView = vtkContextView::New();
+
+  // Let the application setup the interactor.
   this->ContextView->SetRenderWindow(this->RenderWindow);
-
-  // Disable interactor on server processes (or batch processes), since
-  // otherwise the vtkContextInteractorStyle triggers renders on changes to the
-  // vtkContextView which is bad and can cause deadlock (BUG #122651).
-  if (this->SynchronizedWindows->GetMode() !=
-    vtkPVSynchronizedRenderWindows::BUILTIN &&
-    this->SynchronizedWindows->GetMode() !=
-    vtkPVSynchronizedRenderWindows::CLIENT)
+  if (this->ContextView->GetInteractor())
     {
-    vtkContextInteractorStyle* style = vtkContextInteractorStyle::SafeDownCast(
-      this->ContextView->GetInteractor()->GetInteractorStyle());
-    if (style)
-      {
-      style->SetScene(NULL);
-      }
-    this->ContextView->SetInteractor(NULL);
+    this->ContextView->GetInteractor()->SetInteractorStyle(NULL);
     }
-
+  this->ContextView->SetInteractor(NULL);
   this->ContextView->GetRenderer()->AddObserver(
     vtkCommand::StartEvent, this, &vtkPVContextView::OnStartRender);
   this->ContextView->GetRenderer()->AddObserver(
@@ -96,6 +86,31 @@ void vtkPVContextView::Initialize(unsigned int id)
   this->SynchronizedWindows->AddRenderWindow(id, this->RenderWindow);
   this->SynchronizedWindows->AddRenderer(id, this->ContextView->GetRenderer());
   this->Superclass::Initialize(id);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVContextView::SetupInteractor(vtkRenderWindowInteractor* iren)
+{
+  // Disable interactor on server processes (or batch processes), since
+  // otherwise the vtkContextInteractorStyle triggers renders on changes to the
+  // vtkContextView which is bad and can cause deadlock (BUG #122651).
+  if (this->GetLocalProcessSupportsInteraction() == false)
+    {
+    // We don't setup interactor on non-driver processes.
+    return;
+    }
+  this->ContextView->SetInteractor(iren);
+  this->InteractorStyle->SetScene(this->ContextView->GetScene());
+  if (iren)
+    {
+    iren->SetInteractorStyle(this->InteractorStyle.GetPointer());
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkRenderWindowInteractor* vtkPVContextView::GetInteractor()
+{
+  return this->ContextView->GetInteractor();
 }
 
 //----------------------------------------------------------------------------

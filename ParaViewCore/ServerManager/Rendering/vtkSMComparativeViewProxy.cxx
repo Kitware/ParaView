@@ -14,7 +14,9 @@
 =========================================================================*/
 #include "vtkSMComparativeViewProxy.h"
 
+#include "vtkCollection.h"
 #include "vtkCommand.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVComparativeView.h"
 #include "vtkPVSession.h"
@@ -183,6 +185,29 @@ void vtkSMComparativeViewProxy::GetRepresentations(int x, int y,
     }
 
   GET_PV_COMPARATIVE_VIEW()->GetRepresentations(x, y, collection);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMComparativeViewProxy::SetupInteractor(vtkRenderWindowInteractor*)
+{
+  vtkErrorMacro("vtkSMComparativeViewProxy doesn't support SetupInteractor. "
+      "Please setup interactors on each of the internal views explicitly.");
+
+}
+//----------------------------------------------------------------------------
+bool vtkSMComparativeViewProxy::MakeRenderWindowInteractor(bool quiet)
+{
+  bool flag = true;
+  vtkNew<vtkCollection> views;
+  this->GetViews(views.GetPointer());
+
+  views->InitTraversal();
+  for (vtkSMViewProxy* view = vtkSMViewProxy::SafeDownCast(views->GetNextItemAsObject());
+    view != NULL; view = vtkSMViewProxy::SafeDownCast(views->GetNextItemAsObject()))
+    {
+    flag = view->MakeRenderWindowInteractor(quiet) && flag;
+    }
+  return flag;
 }
 
 //----------------------------------------------------------------------------

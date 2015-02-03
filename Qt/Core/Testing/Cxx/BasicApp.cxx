@@ -44,7 +44,7 @@ MainWindow::MainWindow()
 
   this->RenderView = smmodel->findItem<pqRenderView*>(viewProxy);
   Q_ASSERT(this->RenderView);
-  this->setCentralWidget(this->RenderView->getWidget());
+  this->setCentralWidget(this->RenderView->widget());
 
   // create source and elevation filter
   vtkSmartPointer<vtkSMProxy> source;
@@ -104,7 +104,7 @@ bool MainWindow::compareView(const QString& referenceImage, double threshold,
     return false;
     }
 
-  QVTKWidget* const widget = qobject_cast<QVTKWidget*>(renModule->getWidget());
+  QVTKWidget* const widget = qobject_cast<QVTKWidget*>(renModule->widget());
   if(!widget)
     {
     output << "ERROR: Not a QVTKWidget." << endl;

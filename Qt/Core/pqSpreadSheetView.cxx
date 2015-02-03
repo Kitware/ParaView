@@ -133,12 +133,10 @@ pqSpreadSheetView::pqSpreadSheetView(
     }
 
   this->Internal->Container = new QWidget();
-  this->Internal->Container->setObjectName("pqSpreadSheetContainer");
   QVBoxLayout *layout = new QVBoxLayout(this->Internal->Container);
   layout->setSpacing(2);
   layout->setContentsMargins(0, 0, 0, 0);
   layout->addWidget(this->Internal->Table);
-
 }
 
 //-----------------------------------------------------------------------------
@@ -148,8 +146,9 @@ pqSpreadSheetView::~pqSpreadSheetView()
 }
 
 //-----------------------------------------------------------------------------
-QWidget* pqSpreadSheetView::getWidget()
+QWidget* pqSpreadSheetView::createWidget()
 {
+  // The viewport is already created. Just return that.
   return this->Internal->Container;
 }
 

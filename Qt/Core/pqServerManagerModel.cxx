@@ -322,11 +322,6 @@ void pqServerManagerModel::onProxyRegistered(const QString& group,
 
   if (view)
     {
-    // This ensures that the QVTKWidget (or any other rendering
-    // widget) for the view is created thus avoiding the window from ever
-    // popping up and causing issues as as seen in BUG #13855.
-    view->getWidget();
-
     emit this->preViewAdded(view);
     }
   else if (source)
@@ -367,6 +362,10 @@ void pqServerManagerModel::onProxyRegistered(const QString& group,
 
   if (view)
     {
+    // This ensures that the QVTKWidget (or any other rendering
+    // widget) for the view is created thus avoiding the window from ever
+    // popping up and causing issues as as seen in BUG #13855.
+    view->widget();
     emit this->viewAdded(view);
     }
   else if (source)
@@ -383,6 +382,9 @@ void pqServerManagerModel::onProxyRegistered(const QString& group,
   // of the pqProxy from its underlying proxy. Hence we emit this->proxyAdded()
   // before we do a pqSource->initialize();
   item->initialize();
+
+  // FIXME: I think item->initialize() must happen before these signals are
+  // fired.
 }
 
 //-----------------------------------------------------------------------------

@@ -789,10 +789,11 @@ void vtkPVAxesWidget::SetInteractive(int state)
   if (!state)
     {
     this->OnButtonRelease();
-    this->MouseCursorState = vtkPVAxesWidget::Outside;
     this->Renderer->RemoveActor(this->OutlineActor);
-    if (this->Interactor)
+    if (this->Interactor &&
+      this->MouseCursorState != vtkPVAxesWidget::Outside)
       {
+      this->MouseCursorState = vtkPVAxesWidget::Outside;
       this->SetMouseCursor(this->MouseCursorState);
       // this->Interactor->Render();
       }

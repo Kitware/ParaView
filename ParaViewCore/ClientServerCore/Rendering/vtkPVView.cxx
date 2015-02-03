@@ -194,6 +194,14 @@ bool vtkPVView::InTileDisplayMode()
 }
 
 //----------------------------------------------------------------------------
+bool vtkPVView::GetLocalProcessSupportsInteraction()
+{
+  return this->SynchronizedWindows->GetLocalProcessIsDriver();
+//  return (this->SynchronizedWindows->GetMode() == vtkPVSynchronizedRenderWindows::CLIENT ||
+//    this->SynchronizedWindows->GetMode() == vtkPVSynchronizedRenderWindows::BUILTIN)
+}
+
+//----------------------------------------------------------------------------
 bool vtkPVView::SynchronizeBounds(double bounds[6])
 {
   return this->SynchronizedWindows->SynchronizeBounds(bounds);

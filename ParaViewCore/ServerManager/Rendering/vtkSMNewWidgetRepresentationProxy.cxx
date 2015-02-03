@@ -20,7 +20,7 @@
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkRenderWindowInteractor.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
@@ -206,12 +206,9 @@ void vtkSMNewWidgetRepresentationProxy::ExecuteEvent(unsigned long event)
 
   if (event == vtkCommand::StartInteractionEvent)
     {
-    vtkPVGenericRenderWindowInteractor* inter =
-        vtkPVGenericRenderWindowInteractor::SafeDownCast(
-            this->Widget->GetInteractor());
-    if (inter)
+    if (vtkRenderWindowInteractor* iren = this->Widget->GetInteractor())
       {
-      inter->InteractiveRenderEnabledOn();
+      iren->InvokeEvent(event);
       }
     if(widgetRepresentation)
       {
@@ -223,6 +220,10 @@ void vtkSMNewWidgetRepresentationProxy::ExecuteEvent(unsigned long event)
     this->RepresentationProxy->UpdatePropertyInformation();
     this->UpdateVTKObjects();
 
+    if (vtkRenderWindowInteractor* iren = this->Widget->GetInteractor())
+      {
+      iren->InvokeEvent(event);
+      }
     if(widgetRepresentation)
       {
       widgetRepresentation->OnInteraction();
@@ -230,13 +231,6 @@ void vtkSMNewWidgetRepresentationProxy::ExecuteEvent(unsigned long event)
     }
   else if (event == vtkCommand::EndInteractionEvent)
     {
-    vtkPVGenericRenderWindowInteractor* inter =
-        vtkPVGenericRenderWindowInteractor::SafeDownCast(
-            this->Widget->GetInteractor());
-    if (inter)
-      {
-      inter->InteractiveRenderEnabledOff();
-      }
     vtkSMProperty* sizeHandles =
         this->RepresentationProxy->GetProperty("SizeHandles");
     if (sizeHandles)
@@ -244,9 +238,14 @@ void vtkSMNewWidgetRepresentationProxy::ExecuteEvent(unsigned long event)
       sizeHandles->Modified();
       this->RepresentationProxy->UpdateProperty("SizeHandles");
       }
+
     if(widgetRepresentation)
       {
       widgetRepresentation->OnEndInteraction();
+      }
+    if (vtkRenderWindowInteractor* iren = this->Widget->GetInteractor())
+      {
+      iren->InvokeEvent(event);
       }
     }
 }

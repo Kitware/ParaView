@@ -38,8 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkIntArray.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkPVInteractorStyle.h"
 #include "vtkPVRenderView.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
@@ -108,11 +106,9 @@ public:
   bool UpdatingStack;
   int CurrentInteractionMode;
 
-  bool InitializedWidgets;
   pqInternal()
     {
     this->CurrentInteractionMode = -1;
-    this->InitializedWidgets = false;
     this->UpdatingStack = false;
     this->InteractionUndoStack = vtkSmartPointer<vtkSMUndoStack>::New();
     // FIXME this->InteractionUndoStack->SetClientOnly(true);
@@ -186,33 +182,28 @@ vtkSMRenderViewProxy* pqRenderView::getRenderViewProxy() const
 }
 
 //-----------------------------------------------------------------------------
-QWidget* pqRenderView::createWidget() 
+void pqRenderView::initialize()
 {
-  QWidget* vtkwidget = this->Superclass::createWidget();
-  return vtkwidget;
+  this->Superclass::initialize();
+
+  // initialize the interaction undo-redo stack.
+  vtkSMRenderViewProxy* viewProxy = this->getRenderViewProxy();
+  this->Internal->UndoStackBuilder->SetRenderView(viewProxy);
 }
 
 //-----------------------------------------------------------------------------
-// This method is called for all pqRenderView objects irrespective
-// of whether it is created from state/undo-redo/python or by the GUI. Hence
-// don't change any render module properties here.
-void pqRenderView::initializeWidgets()
+QWidget* pqRenderView::createWidget()
 {
-  if (this->Internal->InitializedWidgets)
+  QWidget* vtkwidget = this->Superclass::createWidget();
+  if (QVTKWidget* qvtkwidget = qobject_cast<QVTKWidget*>(vtkwidget))
     {
-    return;
+    vtkSMRenderViewProxy* renModule = this->getRenderViewProxy();
+    qvtkwidget->SetRenderWindow(renModule->GetRenderWindow());
+    // This is needed to ensure that the interactor is initialized with
+    // ParaView specific interactor styles etc.
+    renModule->SetupInteractor(qvtkwidget->GetInteractor());
     }
-
-  this->Internal->InitializedWidgets = true;
-
-  vtkSMRenderViewProxy* renModule = this->getRenderViewProxy();
-
-  QVTKWidget* vtkwidget = qobject_cast<QVTKWidget*>(this->getWidget());
-  if (vtkwidget)
-    {
-    vtkwidget->SetRenderWindow(renModule->GetRenderWindow());
-    }
-  this->Internal->UndoStackBuilder->SetRenderView(renModule);
+  return vtkwidget;
 }
 
 //-----------------------------------------------------------------------------
@@ -366,7 +357,7 @@ void pqRenderView::linkToOtherView()
 {
   pqLinkViewWidget* linkWidget = new pqLinkViewWidget(this);
   linkWidget->setAttribute(Qt::WA_DeleteOnClose);
-  QPoint pos = this->getWidget()->mapToGlobal(QPoint(2,2));
+  QPoint pos = this->widget()->mapToGlobal(QPoint(2,2));
   linkWidget->move(pos);
   linkWidget->show();
 }
@@ -900,5 +891,5 @@ void pqRenderView::onInteractionModeChange()
 //-----------------------------------------------------------------------------
 void pqRenderView::setCursor(const QCursor &c)
 {
-  this->getWidget()->setCursor(c);
+  this->widget()->setCursor(c);
 }

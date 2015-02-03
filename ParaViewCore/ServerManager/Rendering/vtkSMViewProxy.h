@@ -35,6 +35,7 @@
 class vtkImageData;
 class vtkRenderer;
 class vtkRenderWindow;
+class vtkRenderWindowInteractor;
 class vtkSMRepresentationProxy;
 class vtkSMSourceProxy;
 class vtkView;
@@ -133,6 +134,30 @@ public:
   virtual vtkRenderWindow* GetRenderWindow() { return NULL; }
 
   // Description:
+  // Returns the interactor. Note, that views may not use vtkRenderWindow at all
+  // in which case they will not have any interactor and will return NULL.
+  // Default implementation returns NULL.
+  virtual vtkRenderWindowInteractor* GetInteractor() { return NULL; }
+
+  // Description:
+  // A client process need to set the interactor to enable interactivity. Use
+  // this method to set the interactor and initialize it as needed by the
+  // RenderView. This include changing the interactor style as well as
+  // overriding VTK rendering to use the Proxy/ViewProxy API instead.
+  // Default implementation does nothing. Views that support interaction using
+  // vtkRenderWindowInteractor should override this method to set the interactor
+  // up.
+  virtual void SetupInteractor(vtkRenderWindowInteractor* iren) {(void) iren;}
+
+  // Description:
+  // Creates a default render window interactor for the vtkRenderWindow and sets
+  // it up on the local process if the local process supports interaction. This
+  // should not be used when putting the render window in a QVTKWidget as that
+  // may cause issues. One should let the QVTKWidget create the interactor and
+  // then call SetupInteractor().
+  virtual bool MakeRenderWindowInteractor(bool quiet=false);
+
+  // Description:
   // Sets whether screenshots have a transparent background.
   static void SetTransparentBackground(bool val);
 
@@ -181,6 +206,11 @@ protected:
   // Description:
   // Read attributes from an XML element.
   virtual int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element);
+
+  // Description:
+  // Convenience method to call
+  // vtkPVView::SafeDownCast(this->GetClientSideObject())->GetLocalProcessSupportsInteraction();
+  bool GetLocalProcessSupportsInteraction();
 
   vtkSetStringMacro(DefaultRepresentationName);
   char* DefaultRepresentationName;

@@ -24,49 +24,20 @@
 #include "vtkEventForwarderCommand.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVContextView.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkProcessModule.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMUtilities.h"
+#include "vtkSMViewProxyInteractorHelper.h"
 #include "vtkStructuredData.h"
 #include "vtkWeakPointer.h"
 #include "vtkWindowToImageFilter.h"
 
-//****************************************************************************
-// vtkSMContextViewInteractorStyle makes it possible for us to call
-// StillRender() as the user interacts with the chart views on the client side
-// instead of directly calling Render() on the render-window. This makes no
-// difference in general, except in tile-display mode, where the StillRender()
-// ensures that the server-side views are updated as well.
-class vtkSMContextViewInteractorStyle : public vtkContextInteractorStyle
-{
-public:
-  static vtkSMContextViewInteractorStyle*New();
-  vtkTypeMacro(vtkSMContextViewInteractorStyle, vtkContextInteractorStyle);
-
-  void SetView(vtkSMContextViewProxy* view)
-    { this->ViewProxy = view; }
-protected:
-  virtual void RenderNow()
-    {
-    if (this->ViewProxy)
-      {
-      this->ViewProxy->StillRender();
-      }
-    }
-
-private:
-  vtkSMContextViewInteractorStyle() {}
-  ~vtkSMContextViewInteractorStyle() {}
-  vtkWeakPointer<vtkSMContextViewProxy> ViewProxy;
-};
-
-vtkStandardNewMacro(vtkSMContextViewInteractorStyle);
 //****************************************************************************
 
 namespace {
@@ -76,14 +47,42 @@ const char* XY_CHART_VIEW = "XYChartView";
 vtkStandardNewMacro(vtkSMContextViewProxy);
 //----------------------------------------------------------------------------
 vtkSMContextViewProxy::vtkSMContextViewProxy()
+  : InteractorHelper()
 {
   this->ChartView = NULL;
   this->SkipPlotableCheck = false;
+  this->InteractorHelper->SetViewProxy(this);
 }
 
 //----------------------------------------------------------------------------
 vtkSMContextViewProxy::~vtkSMContextViewProxy()
 {
+  this->InteractorHelper->SetViewProxy(NULL);
+  this->InteractorHelper->CleanupInteractor();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMContextViewProxy::SetupInteractor(vtkRenderWindowInteractor* iren)
+{
+  if (this->GetLocalProcessSupportsInteraction())
+    {
+    this->CreateVTKObjects();
+    vtkPVContextView* pvview = vtkPVContextView::SafeDownCast(
+        this->GetClientSideObject());
+
+    // Remember, these calls end up changing ivars on iren.
+    pvview->SetupInteractor(iren);
+    this->InteractorHelper->SetupInteractor(pvview->GetInteractor());
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkRenderWindowInteractor* vtkSMContextViewProxy::GetInteractor()
+{
+  this->CreateVTKObjects();
+  vtkPVContextView* pvview = vtkPVContextView::SafeDownCast(
+    this->GetClientSideObject());
+  return pvview? pvview->GetInteractor() : NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -116,14 +115,6 @@ void vtkSMContextViewProxy::CreateVTKObjects()
   this->GetContextItem()->AddObserver(
     vtkCommand::InteractionEvent, this,
     &vtkSMContextViewProxy::OnInteractionEvent);
-
-  // update the interactor style.
-  vtkSMContextViewInteractorStyle* style =
-    vtkSMContextViewInteractorStyle::New();
-  style->SetScene(this->ChartView->GetScene());
-  style->SetView(this);
-  this->ChartView->GetInteractor()->SetInteractorStyle(style);
-  style->Delete();
 }
 
 //----------------------------------------------------------------------------

@@ -81,10 +81,10 @@ public:
 
 //-----------------------------------------------------------------------------
 pqSpreadSheetViewDecorator::pqSpreadSheetViewDecorator(pqSpreadSheetView* view):
-  Superclass(view->getWidget()) // we make our parent the view's widget.
+  Superclass(view->widget()) // we make our parent the view's widget.
 {
   this->Spreadsheet = view;
-  QWidget* container = view->getWidget();
+  QWidget* container = view->widget();
 
   QWidget* header = new QWidget(container);
   QVBoxLayout* layout = qobject_cast<QVBoxLayout*>(container->layout());

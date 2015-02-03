@@ -70,17 +70,12 @@ public:
 
 protected slots:
   /// Called when the layout on the comparative vis changes.
-  void onComparativeVisLayoutChanged();
+  void updateViewWidgets(QWidget* container=NULL);
 
 protected:
   /// Creates a new instance of the QWidget subclass to be used to show this
   /// view. Default implementation creates a QVTKWidget.
   virtual QWidget* createWidget();
-
-  /// Use this method to initialize the pqObject state using the
-  /// underlying vtkSMProxy. This needs to be done only once,
-  /// after the object has been created. 
-  virtual void initialize();
 
 private:
   pqComparativeRenderView(const pqComparativeRenderView&); // Not implemented.

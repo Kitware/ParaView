@@ -44,8 +44,12 @@ endif()
 paraview_add_test_python(
   NO_DATA NO_RT
   TestPythonViewScript.py
-  CinemaTest.py
   TestColorHistogram.py
+)
+
+paraview_add_test_pvbatch(
+  NO_DATA NO_RT
+  CinemaTest.py
 )
 
 # these tests could run safely in serial and
@@ -107,4 +111,4 @@ if(BUILD_SHARED_LIBS)
 endif()
 
 # Extend timeout for CinemaTest
-set_tests_properties(pvpythonPython-CinemaTest PROPERTIES TIMEOUT 500)
+set_tests_properties(pvpythonPython-Batch-CinemaTest PROPERTIES TIMEOUT 500)

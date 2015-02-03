@@ -49,7 +49,6 @@
 #include "vtkPVDataDeliveryManager.h"
 #include "vtkPVDataRepresentation.h"
 #include "vtkPVDisplayInformation.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVHardwareSelector.h"
 #include "vtkPVInteractorStyle.h"
 #include "vtkPVOptions.h"
@@ -151,7 +150,8 @@ vtkInformationKeyRestrictedMacro(
 vtkCxxSetObjectMacro(vtkPVRenderView, LastSelection, vtkSelection);
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
-  : Annotation()
+  : Annotation(),
+  OrientationWidgetVisibility(false)
 {
   this->Internals = new vtkInternals();
   // non-reference counted, so no worries about reference loops.
@@ -203,19 +203,10 @@ vtkPVRenderView::vtkPVRenderView()
 
   this->SynchronizedRenderers = vtkPVSynchronizedRenderer::New();
 
-  if (this->SynchronizedWindows->GetLocalProcessIsDriver())
-    {
-    this->Interactor = vtkPVGenericRenderWindowInteractor::New();
-    // essential to call Initialize() otherwise first time the render is called
-    // on  the render window, it initializes the interactor which in turn
-    // results in a call to Render() which can cause uncanny side effects.
-    this->Interactor->Initialize();
-    }
-
   vtkRenderWindow* window = this->SynchronizedWindows->NewRenderWindow();
   window->SetMultiSamples(0);
   window->SetOffScreenRendering(this->UseOffscreenRendering? 1 : 0);
-  window->SetInteractor(this->Interactor);
+
   this->RenderView = vtkRenderViewBase::New();
   this->RenderView->SetRenderWindow(window);
   window->Delete();
@@ -249,14 +240,13 @@ vtkPVRenderView::vtkPVRenderView()
   this->GetRenderer()->AddLight(this->Light);
   this->GetRenderer()->SetAutomaticLightCreation(0);
 
-  if (this->Interactor)
+  // Setup interactor styles. Since these are only needed on the process that
+  // the users interact with, we only create it on the "driver" process.
+  if (this->SynchronizedWindows->GetLocalProcessIsDriver())
     {
     this->InteractorStyle = // Default one will be the 3D
         this->ThreeDInteractorStyle = vtkPVInteractorStyle::New();
     this->TwoDInteractorStyle = vtkPVInteractorStyle::New();
-
-    this->Interactor->SetRenderWindow(this->GetRenderWindow());
-    this->Interactor->SetInteractorStyle(this->ThreeDInteractorStyle);
 
     // Add some default manipulators. Applications can override them without
     // much ado.
@@ -304,7 +294,7 @@ vtkPVRenderView::vtkPVRenderView()
 
   this->OrientationWidget->SetParentRenderer(this->GetRenderer());
   this->OrientationWidget->SetViewport(0, 0, 0.25, 0.25);
-  this->OrientationWidget->SetInteractor(this->Interactor);
+//  this->OrientationWidget->SetInteractor(this->Interactor);
 
   this->GetRenderer()->AddActor(this->CenterAxes);
 
@@ -344,12 +334,8 @@ vtkPVRenderView::~vtkPVRenderView()
   this->Light->Delete();
   this->CenterAxes->Delete();
   this->OrientationWidget->Delete();
+  this->Interactor = 0;
 
-  if (this->Interactor)
-    {
-    this->Interactor->Delete();
-    this->Interactor = 0;
-    }
   if (this->InteractorStyle)
     {
     // Don't want to delete it as it is only pointing to either
@@ -501,6 +487,46 @@ vtkCamera* vtkPVRenderView::GetActiveCamera()
 vtkRenderWindow* vtkPVRenderView::GetRenderWindow()
 {
   return this->RenderView->GetRenderWindow();
+}
+
+//----------------------------------------------------------------------------
+vtkRenderWindowInteractor* vtkPVRenderView::GetInteractor()
+{
+  return this->Interactor;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetupInteractor(vtkRenderWindowInteractor* iren)
+{
+  if (this->GetLocalProcessSupportsInteraction() == false)
+    {
+    // We don't setup interactor on non-driver processes.
+    return;
+    }
+
+  if (this->Interactor != iren)
+    {
+    this->Interactor = iren;
+    this->OrientationWidget->SetInteractor(this->Interactor);
+    if (this->OrientationWidgetVisibility)
+      {
+      // don't ask! vtkPVAxesWidget must die!
+      this->OrientationWidget->SetEnabled(0);
+      this->OrientationWidget->SetEnabled(1);
+      }
+
+    if (this->Interactor)
+      {
+      this->Interactor->SetRenderWindow(this->GetRenderWindow());
+
+      // this will set the interactor style.
+      int mode = this->InteractionMode;
+      this->InteractionMode = -1;
+      this->SetInteractionMode(mode);
+      }
+
+    this->Modified();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1742,16 +1768,6 @@ void vtkPVRenderView::InvalidateCachedSelection()
   this->Selector->InvalidateCachedSelection();
 }
 
-//----------------------------------------------------------------------------
-void vtkPVRenderView::PrepareForScreenshot()
-{
-  if (this->Interactor && this->GetRenderWindow())
-    {
-    this->GetRenderWindow()->SetInteractor(this->Interactor);
-    }
-  this->Superclass::PrepareForScreenshot();
-}
-
 //*****************************************************************
 // Forwarded to orientation axes widget.
 
@@ -1765,6 +1781,7 @@ void vtkPVRenderView::SetOrientationAxesInteractivity(bool v)
 void vtkPVRenderView::SetOrientationAxesVisibility(bool v)
 {
   this->OrientationWidget->SetEnabled(v);
+  this->OrientationWidgetVisibility = v;
 }
 
 //----------------------------------------------------------------------------
@@ -1788,39 +1805,31 @@ void vtkPVRenderView::SetCenterAxesVisibility(bool v)
 }
 
 //*****************************************************************
-// Forward to vtkPVGenericRenderWindowInteractor.
+// Forward to vtkPVInteractorStyle instances.
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetCenterOfRotation(double x, double y, double z)
 {
   this->CenterAxes->SetPosition(x, y, z);
-  if (this->Interactor)
+  if (this->TwoDInteractorStyle)
     {
-    this->Interactor->SetCenterOfRotation(x, y, z);
+    this->TwoDInteractorStyle->SetCenterOfRotation(x, y, z);
+    }
+  if (this->ThreeDInteractorStyle)
+    {
+    this->ThreeDInteractorStyle->SetCenterOfRotation(x, y, z);
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetRotationFactor(double factor)
 {
-  if (this->Interactor)
+  if (this->TwoDInteractorStyle)
     {
-    this->Interactor->SetRotationFactor(factor);
+    this->TwoDInteractorStyle->SetRotationFactor(factor);
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetNonInteractiveRenderDelay(double seconds)
-{
-  if (this->Interactor)
+  if (this->ThreeDInteractorStyle)
     {
-    if(seconds > 0)
-      {
-      this->Interactor->SetNonInteractiveRenderDelay(static_cast<unsigned long>(seconds*1000));
-      }
-    else
-      {
-      this->Interactor->SetNonInteractiveRenderDelay(0);
-      }
+    this->ThreeDInteractorStyle->SetRotationFactor(factor);
     }
 }
 

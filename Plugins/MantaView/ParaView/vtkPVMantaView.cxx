@@ -21,7 +21,6 @@
 #include "vtkMantaRenderer.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVAxesWidget.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVSynchronizedRenderer.h"
 #include "vtkRenderViewBase.h"
 

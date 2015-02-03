@@ -50,17 +50,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 
 #include "vtkEventQtSlotConnect.h"
+#include "vtkPVServerInformation.h"
+#include "vtkRenderWindowInteractor.h"
 #include "vtkSMCollaborationManager.h"
 #include "vtkSMMessage.h"
-#include "vtkSMSession.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMRenderViewProxy.h"
 #include "vtkSMProxySelectionModel.h"
+#include "vtkSMRenderViewProxy.h"
+#include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkPVServerInformation.h"
 
 #include "vtkCommand.h"
 #include <vtkNew.h>

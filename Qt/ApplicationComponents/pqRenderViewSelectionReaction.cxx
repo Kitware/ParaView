@@ -36,8 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "vtkCommand.h"
 #include "vtkIntArray.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVRenderView.h"
+#include "vtkRenderWindowInteractor.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 

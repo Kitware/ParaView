@@ -32,7 +32,7 @@ vtkPVInteractorStyle::vtkPVInteractorStyle()
 {
   this->UseTimers = 0;
   this->CameraManipulators = vtkCollection::New();
-  this->Current = NULL;
+  this->CurrentManipulator = NULL;
   this->CenterOfRotation[0] = this->CenterOfRotation[1]
     = this->CenterOfRotation[2] = 0;
   this->RotationFactor = 1.0;
@@ -82,7 +82,7 @@ void vtkPVInteractorStyle::OnRightButtonDown()
 void vtkPVInteractorStyle::OnButtonDown(int button, int shift, int control)
 {
   // Must not be processing an interaction to start another.
-  if (this->Current)
+  if (this->CurrentManipulator)
     {
     return;
     }
@@ -96,15 +96,15 @@ void vtkPVInteractorStyle::OnButtonDown(int button, int shift, int control)
     }
 
   // Look for a matching camera interactor.
-  this->Current = this->FindManipulator(button, shift, control);
-  if (this->Current)
+  this->CurrentManipulator = this->FindManipulator(button, shift, control);
+  if (this->CurrentManipulator)
     {
-    this->Current->Register(this);
+    this->CurrentManipulator->Register(this);
     this->InvokeEvent(vtkCommand::StartInteractionEvent);
-    this->Current->SetCenter(this->CenterOfRotation);
-    this->Current->SetRotationFactor(this->RotationFactor);
-    this->Current->StartInteraction();
-    this->Current->OnButtonDown(this->Interactor->GetEventPosition()[0],
+    this->CurrentManipulator->SetCenter(this->CenterOfRotation);
+    this->CurrentManipulator->SetRotationFactor(this->RotationFactor);
+    this->CurrentManipulator->StartInteraction();
+    this->CurrentManipulator->OnButtonDown(this->Interactor->GetEventPosition()[0],
                                 this->Interactor->GetEventPosition()[1],
                                 this->CurrentRenderer,
                                 this->Interactor);
@@ -149,27 +149,27 @@ void vtkPVInteractorStyle::OnRightButtonUp()
 //-------------------------------------------------------------------------
 void vtkPVInteractorStyle::OnButtonUp(int button)
 {
-  if (this->Current == NULL)
+  if (this->CurrentManipulator == NULL)
     {
     return;
     }
-  if (this->Current->GetButton() == button)
+  if (this->CurrentManipulator->GetButton() == button)
     {
-    this->Current->OnButtonUp(this->Interactor->GetEventPosition()[0],
+    this->CurrentManipulator->OnButtonUp(this->Interactor->GetEventPosition()[0],
                               this->Interactor->GetEventPosition()[1],
                               this->CurrentRenderer,
                               this->Interactor);
-    this->Current->EndInteraction();
+    this->CurrentManipulator->EndInteraction();
     this->InvokeEvent(vtkCommand::EndInteractionEvent);
-    this->Current->UnRegister(this);
-    this->Current = NULL;
+    this->CurrentManipulator->UnRegister(this);
+    this->CurrentManipulator = NULL;
     }
 }
 
 //-------------------------------------------------------------------------
 void vtkPVInteractorStyle::OnMouseMove()
 {
-  if (this->CurrentRenderer && this->Current)
+  if (this->CurrentRenderer && this->CurrentManipulator)
     {
     // When an interaction is active, we should not change the renderer being
     // interacted with.
@@ -180,15 +180,32 @@ void vtkPVInteractorStyle::OnMouseMove()
       this->Interactor->GetEventPosition()[1]);
     }
 
-  if (this->Current)
+  if (this->CurrentManipulator)
     {
-    this->Current->OnMouseMove(this->Interactor->GetEventPosition()[0],
+    this->CurrentManipulator->OnMouseMove(this->Interactor->GetEventPosition()[0],
                                this->Interactor->GetEventPosition()[1],
                                this->CurrentRenderer,
                                this->Interactor);
+    this->InvokeEvent(vtkCommand::InteractionEvent);
     }
 }
 
+//-------------------------------------------------------------------------
+void vtkPVInteractorStyle::OnChar()
+{
+  vtkRenderWindowInteractor *rwi = this->Interactor;
+
+  switch (rwi->GetKeyCode())
+    {
+    case 'Q' :
+    case 'q' :
+      // It must be noted that this has no effect in QVTKInteractor and hence
+      // we're assured that the Qt application won't exit because the user hit
+      // 'q'.
+      rwi->ExitCallback();
+      break;
+    }
+}
 
 //-------------------------------------------------------------------------
 void vtkPVInteractorStyle::ResetLights()

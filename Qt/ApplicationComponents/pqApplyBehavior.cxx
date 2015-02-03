@@ -187,7 +187,7 @@ void pqApplyBehavior::applied(pqPropertiesPanel*)
   // Perform the render on visible views.
   foreach (pqView* view, dirty_views)
     {
-    if (view->getWidget()->isVisible())
+    if (view->widget()->isVisible())
       {
       view->forceRender();
       }

@@ -23,13 +23,16 @@
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVView.h"
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer.
+#include "vtkNew.h" // needed for vtkNew.
 
 class vtkAbstractContextItem;
 class vtkChart;
 class vtkChartRepresentation;
+class vtkContextInteractorStyle;
 class vtkContextView;
 class vtkInformationIntegerKey;
 class vtkRenderWindow;
+class vtkRenderWindowInteractor;
 class vtkSelection;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVContextView : public vtkPVView
@@ -59,6 +62,13 @@ public:
 
   // Description:
   vtkGetObjectMacro(RenderWindow, vtkRenderWindow);
+
+  // Description:
+  // Set the interactor. Client applications must set the interactor to enable
+  // interactivity. Note this method will also change the interactor styles set
+  // on the interactor.
+  virtual void SetupInteractor(vtkRenderWindowInteractor*);
+  vtkRenderWindowInteractor* GetInteractor();
 
   // Description:
   // Initialize the view with an identifier. Unless noted otherwise, this method
@@ -145,6 +155,7 @@ private:
   // Used in GetSelection to avoid modifying the selection obtained from the
   // annotation link.
   vtkSmartPointer<vtkSelection> SelectionClone;
+  vtkNew<vtkContextInteractorStyle> InteractorStyle;
 
   template <class T>
   vtkSelection* GetSelectionImplementation(T* chart);

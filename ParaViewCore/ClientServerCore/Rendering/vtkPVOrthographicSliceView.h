@@ -76,6 +76,7 @@ public:
   virtual void ResetCamera();
   virtual void ResetCamera(double bounds[6]);
   virtual void SetInteractionMode(int mode);
+  virtual void SetupInteractor(vtkRenderWindowInteractor*);
 
   // Description:
   // Set the slice position.
@@ -128,6 +129,9 @@ private:
   void OnMouseWheelForwardEvent();
   void OnMouseWheelBackwardEvent();
   void MoveSlicePosition(vtkRenderer* ren, double position[3]);
+
+  unsigned long MouseWheelForwardEventId;
+  unsigned long MouseWheelBackwardEventId;
 
   friend class vtkPVOrthographicSliceViewInteractorStyle;
 

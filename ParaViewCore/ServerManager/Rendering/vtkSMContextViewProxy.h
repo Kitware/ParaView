@@ -22,12 +22,15 @@
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMViewProxy.h"
+#include "vtkNew.h" // needed for vtkInteractorObserver.
 
 class vtkAbstractContextItem;
 class vtkContextView;
 class vtkImageData;
 class vtkRenderWindow;
+class vtkRenderWindowInteractor;
 class vtkSelection;
+class vtkSMViewProxyInteractorHelper;
 
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMContextViewProxy : public vtkSMViewProxy
 {
@@ -47,13 +50,24 @@ public:
 //ETX
 
   // Description:
-  // Resets the zoom level to 100%
-  virtual void ResetDisplay();
-
-  // Description:
   // Return the render window from which offscreen rendering and interactor can
   // be accessed
   virtual vtkRenderWindow* GetRenderWindow();
+
+  // Description:
+  // A client process need to set the interactor to enable interactivity. Use
+  // this method to set the interactor and initialize it as needed by the
+  // RenderView. This include changing the interactor style as well as
+  // overriding VTK rendering to use the Proxy/ViewProxy API instead.
+  virtual void SetupInteractor(vtkRenderWindowInteractor* iren);
+
+  // Description:
+  // Returns the interactor.
+  virtual vtkRenderWindowInteractor* GetInteractor();
+
+  // Description:
+  // Resets the zoom level to 100%
+  virtual void ResetDisplay();
 
   // Description:
   // Overridden to report to applications that producers producing non-table
@@ -112,6 +126,8 @@ private:
   // Copies axis ranges from each of the vtkAxis on the vtkChartXY to the
   // SMproperties.
   void CopyAxisRangesFromChart();
+
+  vtkNew<vtkSMViewProxyInteractorHelper> InteractorHelper;
 //ETX
 };
 

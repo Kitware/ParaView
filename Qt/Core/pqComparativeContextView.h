@@ -47,9 +47,6 @@ class PQCORE_EXPORT pqComparativeContextView : public pqContextView
 public:
   virtual ~pqComparativeContextView();
 
-  /// Return a widget associated with this view.
-  virtual QWidget* getWidget();
-
   /// \returns the internal vtkContextView which provides the implementation for
   /// the chart rendering.
   virtual vtkContextView* getVTKContextView() const;
@@ -65,11 +62,11 @@ public:
 
 protected slots:
   /// Called when the layout on the comparative vis changes.
-  void onComparativeVisLayoutChanged();
+  void updateViewWidgets();
 
 protected:
-  /// On creation of the view, we need to layout the initial plots.
-  virtual void initialize();
+  /// Create the QWidget for this view.
+  virtual QWidget* createWidget();
 
 protected:
   /// Constructor:

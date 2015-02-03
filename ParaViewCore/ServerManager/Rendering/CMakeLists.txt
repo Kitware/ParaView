@@ -64,6 +64,7 @@ set (Module_SRCS
   vtkSMUtilities.cxx
   vtkSMViewLayoutProxy.cxx
   vtkSMViewProxy.cxx
+  vtkSMViewProxyInteractorHelper.cxx
   vtkSMWidgetRepresentationProxy.cxx
 )
 

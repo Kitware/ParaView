@@ -49,6 +49,11 @@ public:
   virtual void OnRightButtonUp();
 
   // Description:
+  // Overrides superclass behaviors to only support the key codes that make
+  // sense in a ParaView application.
+  virtual void OnChar();
+
+  // Description:
   // Access to adding or removing manipulators.
   void AddManipulator(vtkCameraManipulator *m);
 
@@ -84,9 +89,6 @@ public:
   vtkSetMacro(RotationFactor, double);
   vtkGetMacro(RotationFactor, double);
 
-  // Description:
-  // Do not let the superclass do anything with a char event.
-  virtual void OnChar() {};
 
   // Description:
   // Returns the chosen manipulator based on the modifiers.
@@ -96,7 +98,7 @@ protected:
   vtkPVInteractorStyle();
   ~vtkPVInteractorStyle();
 
-  vtkCameraManipulator *Current;
+  vtkCameraManipulator *CurrentManipulator;
   double CenterOfRotation[3];
   double RotationFactor;
 

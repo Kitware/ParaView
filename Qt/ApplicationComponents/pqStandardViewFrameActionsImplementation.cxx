@@ -449,10 +449,10 @@ namespace
   inline QAction* findActiveAction(const QString& name)
     {
     pqView* activeView = pqActiveObjects::instance().activeView();
-    if (activeView && activeView->getWidget() &&
-      activeView->getWidget()->parentWidget())
+    if (activeView && activeView->widget() &&
+      activeView->widget()->parentWidget())
       {
-      return activeView->getWidget()->parentWidget()->findChild<QAction*>(name);
+      return activeView->widget()->parentWidget()->findChild<QAction*>(name);
       }
     return NULL;
     }

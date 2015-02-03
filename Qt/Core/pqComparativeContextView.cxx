@@ -72,25 +72,18 @@ pqComparativeContextView::pqComparativeContextView(const QString& type,
   this->Internal = new pqInternal();
   this->Widget = new QWidget;
   this->getConnector()->Connect(view, vtkCommand::ConfigureEvent,
-                                this, SLOT(onComparativeVisLayoutChanged()));
+                                this, SLOT(updateViewWidgets()));
 }
 
 //-----------------------------------------------------------------------------
 pqComparativeContextView::~pqComparativeContextView()
 {
-  foreach (QVTKWidget* widget, this->Internal->RenderWidgets.values())
+  foreach (QVTKWidget* wdg, this->Internal->RenderWidgets.values())
     {
-    delete widget;
+    delete wdg;
     }
   delete this->Internal;
   delete this->Widget;
-}
-
-//-----------------------------------------------------------------------------
-void pqComparativeContextView::initialize()
-{
-  this->Superclass::initialize();
-  this->onComparativeVisLayoutChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -107,8 +100,10 @@ vtkSMContextViewProxy* pqComparativeContextView::getContextViewProxy() const
 }
 
 //-----------------------------------------------------------------------------
-QWidget* pqComparativeContextView::getWidget()
+QWidget* pqComparativeContextView::createWidget()
 {
+  // widget is already created. Return that.
+  this->updateViewWidgets();
   return this->Widget;
 }
 
@@ -125,7 +120,7 @@ vtkSMViewProxy* pqComparativeContextView::getViewProxy() const
 }
 
 //-----------------------------------------------------------------------------
-void pqComparativeContextView::onComparativeVisLayoutChanged()
+void pqComparativeContextView::updateViewWidgets()
   {
   // This logic is adapted from pqComparativeRenderView, the two should be
   // consolidated/refactored to have a common base class.
@@ -163,15 +158,15 @@ void pqComparativeContextView::onComparativeVisLayoutChanged()
   // Create QVTKWidgets for new ones.
   foreach (vtkSMViewProxy* key, added)
     {
-    vtkSMContextViewProxy* renView = vtkSMContextViewProxy::SafeDownCast(key);
-    renView->UpdateVTKObjects();
+    vtkSMContextViewProxy* cntxtView = vtkSMContextViewProxy::SafeDownCast(key);
+    cntxtView->UpdateVTKObjects();
 
-    QVTKWidget* widget = new QVTKWidget();
-    renView->GetContextView()->SetInteractor(widget->GetInteractor());
-    widget->SetRenderWindow(renView->GetContextView()->GetRenderWindow());
-    widget->installEventFilter(this);
-    widget->setContextMenuPolicy(Qt::NoContextMenu);
-    this->Internal->RenderWidgets[key] = widget;
+    QVTKWidget* wdg = new QVTKWidget();
+    wdg->SetRenderWindow(cntxtView->GetContextView()->GetRenderWindow());
+    cntxtView->SetupInteractor(wdg->GetInteractor());
+    wdg->installEventFilter(this);
+    wdg->setContextMenuPolicy(Qt::NoContextMenu);
+    this->Internal->RenderWidgets[key] = wdg;
     }
 
   // Now layout the views.
@@ -183,10 +178,10 @@ void pqComparativeContextView::onComparativeVisLayoutChanged()
     }
 
   // destroy the old layout and create a new one.
-  QWidget* widget = this->getWidget();
-  delete widget->layout();
+  QWidget* wdg = this->Widget;
+  delete wdg->layout();
 
-  QGridLayout* layout = new QGridLayout(widget);
+  QGridLayout* layout = new QGridLayout(wdg);
   layout->setSpacing(1);
   layout->setMargin(0);
   for (int x = 0; x < dimensions[0]; ++x)
