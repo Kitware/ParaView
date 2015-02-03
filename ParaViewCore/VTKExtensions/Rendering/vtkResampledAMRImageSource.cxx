@@ -29,7 +29,6 @@
 #include "vtkUniformGridAMRDataIterator.h"
 #include "vtkUniformGrid.h"
 #include "vtkVoxel.h"
-#include "vtkXMLImageDataWriter.h"
 
 #include <algorithm>
 #include <assert.h>
@@ -119,11 +118,6 @@ void vtkResampledAMRImageSource::UpdateResampledVolume(
       this->ResampledAMRPointData->GetAbstractArray(cc)->Modified();
       }
     }
-    
-  //vtkNew<vtkXMLImageDataWriter> tmp;
-  //tmp->SetFileName("/tmp/foo.vti");
-  //tmp->SetInputData(this->ResampledAMR);
-  //tmp->Update();
 }
 
 //----------------------------------------------------------------------------
