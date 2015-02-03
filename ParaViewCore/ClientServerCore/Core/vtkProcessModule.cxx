@@ -55,6 +55,7 @@
 
 #include <assert.h>
 #include <stdexcept> // for runtime_error
+#include <clocale> // needed for setlocale()
 
 namespace
 {
