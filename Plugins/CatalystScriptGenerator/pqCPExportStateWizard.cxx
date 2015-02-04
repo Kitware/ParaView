@@ -59,7 +59,7 @@ namespace
     "   rescale_data_range=%4,\n"
     "   enable_live_viz=%5,\n"
     "   live_viz_frequency=%6,\n"
-    "   cinema_info={%7},\n"
+    "   cinema_tracks=%7,\n"
     "   filename='%8')\n";
 }
 
@@ -155,7 +155,7 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
       vtkSMViewProxy* viewProxy = view->getViewProxy();
 
       //cinema camera parameters
-      QString cinemaCam = "{None}";
+      QString cinemaCam = "{}";
       QString camType = viewInfo->getCameraType();
       if (camType != "None")
         {
@@ -191,7 +191,7 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
     rendering_info.chop(1);
     }
 
-  QString cinema_info = "";
+  QString cinema_tracks = "{";
   if(this->Internals->outputCinema->isChecked())
     {
     for(int i=0;i<this->Internals->cinemaContainer->count();i++)
@@ -212,11 +212,12 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
       values.chop(1);
       values += "]";
       QString info = QString(" '%1' : %2,").arg(name).arg(values);
-      cinema_info+= info;
+      cinema_tracks+= info;
       }
 
-    cinema_info.chop(1);
+    cinema_tracks.chop(1);
     }
+  cinema_tracks+="}";
 
   QString filters ="ParaView Python State Files (*.py);;All files (*)";
 
@@ -266,7 +267,7 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
                    .arg(rescale_data_range)
                    .arg(live_visualization)
                    .arg(live_visualization_frequency)
-                   .arg(cinema_info)
+                   .arg(cinema_tracks)
                    .arg(filename);
 
   return true;

@@ -20,7 +20,7 @@ def reset_cpstate_globals():
     cpstate_globals.view_proxies = []
     cpstate_globals.screenshot_info = {}
     cpstate_globals.export_rendering = False
-    cpstate_globals.cinema_info = False
+    cpstate_globals.cinema_tracks = {}
 
 reset_cpstate_globals()
 
@@ -91,8 +91,8 @@ class SliceAccessor(smtrace.RealProxyAccessor):
         original_trace = smtrace.RealProxyAccessor.trace_ctor(\
             self, ctor, filter, ctor_args, skip_assignment)
         trace = smtrace.TraceOutput(original_trace)
-        if cpstate_globals.cinema_info and self.varname in cpstate_globals.cinema_info:
-            valrange = cpstate_globals.cinema_info[self.varname]
+        if cpstate_globals.cinema_tracks and self.varname in cpstate_globals.cinema_tracks:
+            valrange = cpstate_globals.cinema_tracks[self.varname]
             trace.append_separated(["# register the filter with the coprocessor's cinema generator"])
             trace.append(["coprocessor.RegisterCinemaTrack('slice', %s, 'SliceOffsetValues', %s)" % (self, valrange)])
             trace.append_separator()
@@ -112,8 +112,8 @@ class ContourAccessor(smtrace.RealProxyAccessor):
         original_trace = smtrace.RealProxyAccessor.trace_ctor(\
             self, ctor, filter, ctor_args, skip_assignment)
         trace = smtrace.TraceOutput(original_trace)
-        if cpstate_globals.cinema_info and self.varname in cpstate_globals.cinema_info:
-            valrange = cpstate_globals.cinema_info[self.varname]
+        if cpstate_globals.cinema_tracks and self.varname in cpstate_globals.cinema_tracks:
+            valrange = cpstate_globals.cinema_tracks[self.varname]
             trace.append_separated(["# register the filter with the coprocessor's cinema generator"])
             trace.append(["coprocessor.RegisterCinemaTrack('contour', %s, 'Isosurfaces', %s)" % (self, valrange)])
             trace.append_separator()
@@ -239,7 +239,7 @@ class cpstate_filter_proxies_to_serialize(object):
         return True
 
 # -----------------------------------------------------------------------------
-def DumpPipeline(export_rendering, simulation_input_map, screenshot_info, cinema_info):
+def DumpPipeline(export_rendering, simulation_input_map, screenshot_info, cinema_tracks):
     """
         Method that will dump the current pipeline and return it as a string trace
         - export_rendering    : boolean telling if we want to export rendering
@@ -250,7 +250,7 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info, cinema
                                 value -> [filename, writefreq, fitToScreen,
                                           magnification, width, height,
                                           cinemacamera options]
-        - cinema_info         : map with information about cinema tracks to record
+        - cinema_tracks       : map with information about cinema tracks to record
                                 key -> proxy name
                                 value -> argument ranges
     """
@@ -261,7 +261,7 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info, cinema
     cpstate_globals.export_rendering = export_rendering
     cpstate_globals.simulation_input_map = simulation_input_map
     cpstate_globals.screenshot_info = screenshot_info
-    cpstate_globals.cinema_info = cinema_info
+    cpstate_globals.cinema_tracks = cinema_tracks
 
     # Initialize the write frequency map
     for key in cpstate_globals.simulation_input_map.values():
@@ -338,7 +338,7 @@ def run(filename=None):
     script = DumpPipeline(export_rendering=True,
         simulation_input_map={"Wavelet1" : "input"},
         screenshot_info={viewname : [ 'image.png', '1', '1', '2', '400', '400']},
-        cinema_info=None)
+        cinema_tracks={})
     if filename:
         f = open(filename, "w")
         f.write(script)

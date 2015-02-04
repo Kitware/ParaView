@@ -76,7 +76,7 @@ from paraview import cpstate
 
 def DumpCoProcessingScript(export_rendering, simulation_input_map, screenshot_info,
     rescale_data_range, enable_live_viz, live_viz_frequency,
-    cinema_info,
+    cinema_tracks,
     filename=None):
     """Returns a string with the generated CoProcessing script based on the
         options specified.
@@ -90,11 +90,11 @@ def DumpCoProcessingScript(export_rendering, simulation_input_map, screenshot_in
                               handle live-visualization.
         live_viz_frequency :- integer specifying how often should
                               the coprocessor send the live data
-        cinema_info        :- cinema offline visualizer parameters
+        cinema_tracks        :- cinema offline visualizer parameters
         filename           :- if specified, the script is written to the file.
     """
     pipeline_script = cpstate.DumpPipeline(\
-        export_rendering, simulation_input_map, screenshot_info, cinema_info)
+        export_rendering, simulation_input_map, screenshot_info, cinema_tracks)
     script = __output_contents % (pipeline_script,
                                   enable_live_viz, live_viz_frequency,
                                   rescale_data_range)
@@ -117,7 +117,7 @@ def run(filename=None):
         rescale_data_range=True,
         enable_live_viz=True,
         live_viz_frequency=1,
-        cinema_info=None,
+        cinema_tracks={},
         filename=filename)
     if not filename:
         print "# *** Generated Script Begin ***"
