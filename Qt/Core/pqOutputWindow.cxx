@@ -108,21 +108,15 @@ bool parseVtkMessage(int messageType,
 
 struct pqOutputWindow::pqImplementation
 {
-  pqImplementation(QObject* parent) :
-    EventToSlot(vtkEventQtSlotConnect::New())
+  pqImplementation(QObject* parent)
   {
     // pqOutputWindow is the parent, so this object is deleted then.
     this->TableModel = new pqOutputWindowModel(parent, Messages);
-  }
-  ~pqImplementation()
-  {
-    this->EventToSlot->Delete();
   }
 
   Ui::pqOutputWindow Ui;
   QList<MessageT> Messages;
   pqOutputWindowModel* TableModel;
-  vtkEventQtSlotConnect* EventToSlot;
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -168,12 +162,6 @@ pqOutputWindow::pqOutputWindow(QWidget* Parent) :
   filterMenu->addAction(debugAction);
   ui.filterButton->setMenu(filterMenu);
 
-  // get notified when the active session changed
-  this->Implementation->EventToSlot->Connect(
-    vtkSMProxyManager::GetProxyManager(), vtkSMProxyManager::ActiveSessionChanged,
-    this, SLOT(onActiveSessionChanged()));
-
-
   ui.tableView->verticalHeader()->hide();
   ui.tableView->horizontalHeader()->hide();
   ui.tableView->setShowGrid(false);
@@ -186,22 +174,6 @@ pqOutputWindow::pqOutputWindow(QWidget* Parent) :
 
 pqOutputWindow::~pqOutputWindow()
 {
-}
-
-
-void pqOutputWindow::onActiveSessionChanged()
-{
-  // listen to StartEvent/EndEvent from ProgressHandler.
-  vtkSMSession* activeSession =
-    vtkSMProxyManager::GetProxyManager()->GetActiveSession();
-  if (activeSession)
-    {
-    vtkPVProgressHandler* progressHandler = activeSession->GetProgressHandler();
-    
-    this->Implementation->EventToSlot->Connect(
-      progressHandler, vtkCommand::StartEvent,
-      this, SLOT(onProgressStartEvent()));
-    }
 }
 
 void pqOutputWindow::onDisplayTextInWindow(const QString& text)

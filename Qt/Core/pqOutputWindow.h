@@ -92,8 +92,6 @@ private slots:
   void debugToggled(bool checked);
   /// Slots called on progress handlers' StartEvent
   void onProgressStartEvent();
-  /// Called when the active session changed (needed for {start/end}Progress)
-  void onActiveSessionChanged();
 
 private:
   pqOutputWindow(const pqOutputWindow&);
