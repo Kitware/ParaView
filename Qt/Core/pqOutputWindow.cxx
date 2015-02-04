@@ -194,12 +194,14 @@ void pqOutputWindow::onActiveSessionChanged()
   // listen to StartEvent/EndEvent from ProgressHandler.
   vtkSMSession* activeSession =
     vtkSMProxyManager::GetProxyManager()->GetActiveSession();
-  Q_ASSERT(activeSession);
-  vtkPVProgressHandler* progressHandler = activeSession->GetProgressHandler();
-
-  this->Implementation->EventToSlot->Connect(
-    progressHandler, vtkCommand::StartEvent,
-    this, SLOT(onProgressStartEvent()));
+  if (activeSession)
+    {
+    vtkPVProgressHandler* progressHandler = activeSession->GetProgressHandler();
+    
+    this->Implementation->EventToSlot->Connect(
+      progressHandler, vtkCommand::StartEvent,
+      this, SLOT(onProgressStartEvent()));
+    }
 }
 
 void pqOutputWindow::onDisplayTextInWindow(const QString& text)
