@@ -258,7 +258,7 @@ void vtkPANLSubhaloFinder::ExecuteSubHaloFinder(vtkUnstructuredGrid* input,
     for (vtkIdType i = finalHalosToProcess->GetNumberOfIds() - 1; i >= 0; --i)
       {
         if (this->Internal->haloIndices[finalHalosToProcess->GetId(i)].size() <
-            this->SizeThreshold)
+            static_cast<size_t>(this->SizeThreshold))
           {
           finalHalosToProcess->DeleteId(finalHalosToProcess->GetId(i));
           i = std::min(i,finalHalosToProcess->GetNumberOfIds());
