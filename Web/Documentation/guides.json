@@ -103,6 +103,11 @@
         "title": "Gallery",
         "description": "This guide illustrates some of the applications which have been built with ParaViewWeb."
       },{
+        "name": "web_visualizer",
+        "url": "guides/web_visualizer",
+        "title": "Web Visualizer",
+        "description": "This document explains how to use the Web Visualizer application provided with ParaViewWeb."
+      },{
         "name": "parallel_app",
         "url": "guides/parallel_app",
         "title": "Parallel Visualization",
