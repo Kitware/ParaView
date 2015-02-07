@@ -15,12 +15,11 @@ usage(){
     echo "   client-app-name: [loader, visualizer]"
     echo "   resource: Number of nodes to run on"
     echo "   file-to-load: File that should be pre-loaded is any"
-    echo "   secret: Password used to authenticate user"
     exit 1
 }
 
 # Check if we got all the command line arguments we need
-if [[ $# -ne 5 ]]
+if [[ $# -ne 4 ]]
 then
     usage
 fi
@@ -30,7 +29,6 @@ HTTPport=$1
 client=$2
 resource=$3
 file=$4
-secret=$5
 server=$PV_WEB_SERVER_PATH/pv_web_file_loader.py
 
 # Find the server script to use
@@ -61,5 +59,5 @@ mpirun -n $resource $PVSERVER --server-port=$MPIport &
 
 # Wait for the server to start and run the client
 sleep 1
-echo $PVPYTHON $server -f --ds-host localhost --ds-port $MPIport --port $HTTPport --data-dir $DATA_DIR --authKey $secret
-$PVPYTHON $server -f --ds-host localhost --ds-port $MPIport --port $HTTPport --data-dir $DATA_DIR --authKey $secret
+echo $PVPYTHON $server -f --ds-host localhost --ds-port $MPIport --port $HTTPport --data-dir $DATA_DIR --load-file $file
+$PVPYTHON $server -f --ds-host localhost --ds-port $MPIport --port $HTTPport --data-dir $DATA_DIR --load-file $file

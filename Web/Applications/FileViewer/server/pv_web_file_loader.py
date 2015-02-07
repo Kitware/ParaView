@@ -4,7 +4,7 @@ r"""
 
         $ pvpython .../pv_web_file_loader.py --data-dir /.../path-to-your-data-directory --file-to-load /.../any-vtk-friendly-file.vtk
 
-        --file-to-load is optional and allow the user to pre-load a given dataset.
+        --load-file is optional and allow the user to pre-load a given dataset.
 
         --data-dir
             Path used to list that directory on the server and let the client choose a
@@ -152,25 +152,26 @@ if __name__ == "__main__":
     server.add_arguments(parser)
 
     # Add local arguments
-    parser.add_argument("--file-to-load", help="relative file path to load based on --data-dir argument", dest="data")
+    parser.add_argument("--load-file", default=None, help="relative file path to load based on --data-dir argument", dest="data")
     parser.add_argument("--data-dir", default=os.getcwd(), help="Base path directory", dest="path")
     parser.add_argument("--ds-host", default=None, help="Hostname to connect to for DataServer", dest="dsHost")
     parser.add_argument("--ds-port", default=11111, type=int, help="Port number to connect to for DataServer", dest="dsPort")
     parser.add_argument("--rs-host", default=None, help="Hostname to connect to for RenderServer", dest="rsHost")
     parser.add_argument("--rs-port", default=11111, type=int, help="Port number to connect to for RenderServer", dest="rsPort")
 
-
     # Exctract arguments
     args = parser.parse_args()
 
     # Configure our current application
-    _FileOpener.fileToLoad = args.data
     _FileOpener.pathToList = args.path
     _FileOpener.authKey    = args.authKey
     _FileOpener.dsHost     = args.dsHost
     _FileOpener.dsPort     = args.dsPort
     _FileOpener.rsHost     = args.rsHost
     _FileOpener.rsPort     = args.rsPort
+
+    if args.data:
+        _FileOpener.fileToLoad = os.path.join(_FileOpener.pathToList, args.data)
 
     # Start server
     server.start_webserver(options=args, protocol=_FileOpener)
