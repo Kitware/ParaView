@@ -213,6 +213,7 @@ void pqProgressManager::triggerAbort()
 void pqProgressManager::onStartProgress()
 {
   this->ReadyEnableProgress = true;
+  emit progressStartEvent();
 }
 
 //-----------------------------------------------------------------------------
@@ -224,6 +225,7 @@ void pqProgressManager::onEndProgress()
     this->setEnableProgress(false);
     }
   this->EnableProgress = false;
+  emit progressEndEvent();
 }
 
 //-----------------------------------------------------------------------------

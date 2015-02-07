@@ -76,8 +76,16 @@ public:
   /// 'show' tells us if a pqOutputArray::MessageType element should be shown 
   /// or not
   void ShowMessages(bool* show);
+  /// Expand/Contract a row to show/hide the location of the message
   void expandRow(int r);
   void contractRow(int r);
+  /// Updates the model when the count for the message at 'messageIndex'
+  /// was updated
+  void updateCount(int messageIndex);
+
+private:
+  /// Resize all columns but the last to fit the contents. 
+  void resizeColumnsToContents();
 
 private:
   const QList<MessageT>& Messages; 

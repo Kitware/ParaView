@@ -90,6 +90,8 @@ private slots:
   void errorToggled(bool checked);
   void warningToggled(bool checked);
   void debugToggled(bool checked);
+  /// Slots called on progress handlers' StartEvent
+  void onProgressStartEvent();
 
 private:
   pqOutputWindow(const pqOutputWindow&);
@@ -104,6 +106,8 @@ private:
   virtual void hideEvent(QHideEvent*);
   
   bool Show[MESSAGE_TYPE_COUNT];
+  /// One past the index of the last error
+  int StartEventIndex;
   struct pqImplementation;
   const QScopedPointer<pqImplementation> Implementation;
 };

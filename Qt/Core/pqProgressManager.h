@@ -107,6 +107,9 @@ signals:
 
   void enableAbort(bool);
 
+  void progressStartEvent();
+  void progressEndEvent();
+
 protected slots:
   /// callbacks for signals fired from vtkProcessModule.
   void onStartProgress();

@@ -126,6 +126,8 @@ pqApplicationCore::pqApplicationCore(int& argc, char** argv, pqOptions* options,
   vtkInitializationHelper::Initialize(argc, argv,
     vtkProcessModule::PROCESS_CLIENT, options);
   this->constructor();
+  QObject::connect(this->ProgressManager, SIGNAL(progressStartEvent()),
+                   this->OutputWindow, SLOT(onProgressStartEvent()));
 }
 
 //-----------------------------------------------------------------------------

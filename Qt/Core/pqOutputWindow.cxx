@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -43,14 +43,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSettings.h"
 
 
+#include "vtkCommand.h"
+#include "vtkEventQtSlotConnect.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVProgressHandler.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMSession.h"
+
+
 
 #include "ui_pqOutputWindow.h"
 
 
 namespace
 {
-const int LOOK_BACK = 4;
 
 bool parsePythonMessage(
   const QString& text, QList<QString>* location, QList<QString>* message)
@@ -69,7 +75,7 @@ bool parsePythonMessage(
 }
 
 
-bool parseVtkMessage(int messageType, 
+bool parseVtkMessage(int messageType,
                      const QString& text, QString* location, QString* message)
 {
   // WARNING: This array has to match the order of pqOutputWindow::MessageType
@@ -86,7 +92,7 @@ bool parseVtkMessage(int messageType,
     *message = reMessage.cap(2);
     return true;
     }
-  else if(messageType == pqOutputWindow::WARNING && 
+  else if(messageType == pqOutputWindow::WARNING &&
           reAlternateWarning.exactMatch(text))
     {
     *location = reAlternateWarning.cap(1);
@@ -107,6 +113,7 @@ struct pqOutputWindow::pqImplementation
     // pqOutputWindow is the parent, so this object is deleted then.
     this->TableModel = new pqOutputWindowModel(parent, Messages);
   }
+
   Ui::pqOutputWindow Ui;
   QList<MessageT> Messages;
   pqOutputWindowModel* TableModel;
@@ -117,8 +124,9 @@ struct pqOutputWindow::pqImplementation
 
 pqOutputWindow::pqOutputWindow(QWidget* Parent) :
   Superclass(Parent),
+  StartEventIndex(0),
   Implementation(new pqImplementation(this))
-{  
+{
   for (int i = 0; i < MESSAGE_TYPE_COUNT; ++i)
     {
     this->Show[i] = true;
@@ -129,11 +137,11 @@ pqOutputWindow::pqOutputWindow(QWidget* Parent) :
   this->setObjectName("outputDialog");
   this->setWindowTitle(tr("Output Messages"));
 
-  QObject::connect(ui.clearButton, 
+  QObject::connect(ui.clearButton,
     SIGNAL(clicked(bool)), this, SLOT(clear()));
   QObject::connect(ui.checkBoxConsoleView,
                    SIGNAL(stateChanged(int)), this, SLOT(setConsoleView(int)));
-  QMenu* filterMenu = new QMenu();  
+  QMenu* filterMenu = new QMenu();
   QAction* errorAction = new QAction (tr("Errors"), this);
   errorAction->setCheckable(true);
   errorAction->setChecked(true);
@@ -153,7 +161,7 @@ pqOutputWindow::pqOutputWindow(QWidget* Parent) :
                    this, SLOT(debugToggled(bool)));
   filterMenu->addAction(debugAction);
   ui.filterButton->setMenu(filterMenu);
-  
+
   ui.tableView->verticalHeader()->hide();
   ui.tableView->horizontalHeader()->hide();
   ui.tableView->setShowGrid(false);
@@ -196,7 +204,7 @@ void pqOutputWindow::onDisplayErrorTextInWindow(const QString& text)
     this->show();
     this->addPythonMessages(ERROR, text);
     }
-  
+
 }
 
 void pqOutputWindow::onDisplayText(const QString& text)
@@ -206,7 +214,7 @@ void pqOutputWindow::onDisplayText(const QString& text)
   format.setForeground(Qt::darkGreen);
   format.clearBackground();
   ui.consoleWidget->setFormat(format);
-  
+
   ui.consoleWidget->printString(text + "\n");
   cerr << text.toLatin1().data() << endl;
   if (!text.trimmed().isEmpty())
@@ -232,7 +240,7 @@ void pqOutputWindow::onDisplayWarningText(const QString& text)
   format.setForeground(Qt::black);
   format.clearBackground();
   ui.consoleWidget->setFormat(format);
-  
+
   ui.consoleWidget->printString(text + "\n");
   cerr << text.toLatin1().data() << endl;
 
@@ -250,7 +258,7 @@ void pqOutputWindow::onDisplayGenericWarningText(const QString& text)
   format.setForeground(Qt::black);
   format.clearBackground();
   ui.consoleWidget->setFormat(format);
-  
+
   ui.consoleWidget->printString(text + "\n");
   cerr << text.toLatin1().data() << endl;
 
@@ -278,7 +286,7 @@ void pqOutputWindow::onDisplayErrorText(const QString& text)
   format.setForeground(Qt::darkRed);
   format.clearBackground();
   ui.consoleWidget->setFormat(format);
-  
+
   ui.consoleWidget->printString(text + "\n");
   cerr << text.toLatin1().data() << endl;
 
@@ -382,19 +390,19 @@ void pqOutputWindow::addPythonMessages(int messageType, const QString& text)
 }
 
 
-void pqOutputWindow::addMessage(int messageType, 
+void pqOutputWindow::addMessage(int messageType,
                                 const QString& location, const QString& message)
 {
-  int i = 0;
-  for (; i < LOOK_BACK && this->Implementation->Messages.size() - 1 - i >= 0; ++i)
+  for (int j = this->Implementation->Messages.size() - 1;
+       j >= this->StartEventIndex; --j)
     {
-    MessageT& wholeMessage = this->Implementation->Messages[
-      this->Implementation->Messages.size() - 1 - i];
-    if (wholeMessage.Type == messageType && 
-        (location.isEmpty() ? wholeMessage.Message == message : 
-         wholeMessage.Location == location))
+    MessageT& wholeMessage = this->Implementation->Messages[j];
+    if (wholeMessage.Type == messageType &&
+        wholeMessage.Message == message &&
+        wholeMessage.Location == location)
       {
       ++wholeMessage.Count;
+      this->Implementation->TableModel->updateCount(j);
       return;
       }
     }
@@ -405,4 +413,9 @@ void pqOutputWindow::addMessage(int messageType,
     {
     this->Implementation->TableModel->appendLastRow();
     }
+}
+
+void pqOutputWindow::onProgressStartEvent()
+{
+  this->StartEventIndex = this->Implementation->Messages.size();
 }
