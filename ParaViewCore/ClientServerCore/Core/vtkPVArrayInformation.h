@@ -66,8 +66,8 @@ public:
 
   // Description:
   // Set/get the array's length
-  vtkSetMacro(NumberOfTuples, int);
-  vtkGetMacro(NumberOfTuples, int);
+  vtkSetMacro(NumberOfTuples, vtkTypeInt64);
+  vtkGetMacro(NumberOfTuples, vtkTypeInt64);
 
   // Description:
   // There is a range for each component.
@@ -141,7 +141,7 @@ protected:
   int IsPartial;
   int DataType;
   int NumberOfComponents;
-  int NumberOfTuples;
+  vtkTypeInt64 NumberOfTuples;
   char* Name;
   double* Ranges;
 
