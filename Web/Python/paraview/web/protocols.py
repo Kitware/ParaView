@@ -1737,7 +1737,14 @@ class ParaViewWebSaveData(ParaViewWebProtocol):
 
     def __init__(self, baseSavePath=''):
         super(ParaViewWebSaveData, self).__init__()
-        self.baseSavePath = baseSavePath
+
+        savePath = baseSavePath
+
+        if baseSavePath.find('=') >= 0:
+            parts = baseSavePath.split('=')
+            savePath = parts[-1]
+
+        self.baseSavePath = savePath
 
         self.imageExtensions = [ 'jpg', 'png' ]
         self.dataExtensions = [ 'vtk', 'ex2', 'vtp', 'vti', 'vtu', 'vtm', 'vts', 'vtr', 'csv' ]
