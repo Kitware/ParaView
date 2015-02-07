@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqCPExportStateWizard.cxx
+   Module:    pqCinemaTrack.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -37,8 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMViewProxy.h>
 #include <vtkPVXMLElement.h>
 
-#include <pqCinemaTrack.h>
 #include <pqApplicationCore.h>
+#include <pqCinemaTrack.h>
 #include <pqFileDialog.h>
 #include <pqImageOutputInfo.h>
 #include <pqPipelineSource.h>
@@ -59,7 +59,7 @@ namespace
     "   rescale_data_range=%4,\n"
     "   enable_live_viz=%5,\n"
     "   live_viz_frequency=%6,\n"
-    "   cinema_info={%7},\n"
+    "   cinema_tracks=%7,\n"
     "   filename='%8')\n";
 }
 
@@ -155,7 +155,7 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
       vtkSMViewProxy* viewProxy = view->getViewProxy();
 
       //cinema camera parameters
-      QString cinemaCam = "{None}";
+      QString cinemaCam = "{}";
       QString camType = viewInfo->getCameraType();
       if (camType != "None")
         {
@@ -191,11 +191,9 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
     rendering_info.chop(1);
     }
 
-  QString cinema_info = "None";
+  QString cinema_tracks = "{";
   if(this->Internals->outputCinema->isChecked())
     {
-    cinema_info = "";
-
     for(int i=0;i<this->Internals->cinemaContainer->count();i++)
       {
       pqCinemaTrack *p = dynamic_cast<pqCinemaTrack*>(this->Internals->cinemaContainer->widget(i));
@@ -214,11 +212,12 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
       values.chop(1);
       values += "]";
       QString info = QString(" '%1' : %2,").arg(name).arg(values);
-      cinema_info+= info;
+      cinema_tracks+= info;
       }
 
-    cinema_info.chop(1);
+    cinema_tracks.chop(1);
     }
+  cinema_tracks+="}";
 
   QString filters ="ParaView Python State Files (*.py);;All files (*)";
 
@@ -268,7 +267,7 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
                    .arg(rescale_data_range)
                    .arg(live_visualization)
                    .arg(live_visualization_frequency)
-                   .arg(cinema_info)
+                   .arg(cinema_tracks)
                    .arg(filename);
 
   return true;
