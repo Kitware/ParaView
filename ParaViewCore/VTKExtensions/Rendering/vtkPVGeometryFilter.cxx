@@ -670,15 +670,14 @@ namespace
 };
 
 //----------------------------------------------------------------------------
-//----------------------------------------------------------------------------
 void vtkPVGeometryFilter::AddCompositeIndex(vtkPolyData* pd, unsigned int index)
 {
   vtkUnsignedIntArray* cindex = vtkUnsignedIntArray::New();
   cindex->SetNumberOfComponents(1);
-  cindex->SetNumberOfTuples(pd->GetNumberOfCells());
+  cindex->SetNumberOfTuples(1);
   cindex->FillComponent(0, index);
   cindex->SetName("vtkCompositeIndex");
-  pd->GetCellData()->AddArray(cindex);
+  pd->GetFieldData()->AddArray(cindex);
   cindex->FastDelete();
 }
 
