@@ -191,7 +191,7 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
     rendering_info.chop(1);
     }
 
-  QString cinema_tracks = "{";
+  QString cinema_tracks = "{ "; //trailing space matters
   if(this->Internals->outputCinema->isChecked())
     {
     for(int i=0;i<this->Internals->cinemaContainer->count();i++)
