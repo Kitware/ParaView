@@ -182,6 +182,9 @@
      <property name="enabled">
       <bool>false</bool>
      </property>
+     <property name="toolTip">
+      <string>Mode for the cinema store of this view: None=no cinema export, Static=Stationary Camera, Spherical=Phi*Theta camera positions around center of rotation.</string>
+     </property>
      <item>
       <property name="text">
        <string>None</string>
@@ -258,6 +261,9 @@
        <property name="enabled">
         <bool>false</bool>
        </property>
+       <property name="toolTip">
+        <string>The number of camera positions in phi direction.</string>
+       </property>
        <property name="minimum">
         <number>1</number>
        </property>
@@ -292,6 +298,9 @@
       <widget class="QSpinBox" name="thetaResolution">
        <property name="enabled">
         <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>The number of camera positions in the theta direction.</string>
        </property>
        <property name="minimum">
         <number>1</number>
