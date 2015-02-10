@@ -272,6 +272,39 @@
     </NewWidgetRepresentationProxy>
     <!-- ================================================================== -->
     <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
+                                  name="PolyLineWidgetRepresentation">
+      <Documentation>Representation proxy for the the poly line widget. This
+      includes the widget/representation proxies for the sphere 3D
+      widget.</Documentation>
+      <IntVectorProperty command="SetEnabled"
+                         default_values="0"
+                         name="Enabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/Disable widget interaction.</Documentation>
+      </IntVectorProperty>
+      <SubProxy>
+        <Proxy name="Prop"
+               proxygroup="3d_widget_representations"
+               proxyname="PolyLineRepresentation"></Proxy>
+        <ExposedProperties>
+          <Property name="PlaceWidget" />
+          <Property name="Visibility" />
+          <Property name="HandlePositions" />
+          <Property name="HandlePositionsInfo" />
+          <Property name="Closed" />
+          <Property name="LineColor" />
+        </ExposedProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Widget"
+               proxygroup="3d_widgets"
+               proxyname="PolyLineWidget"></Proxy>
+      </SubProxy>
+      <!-- End of PolyLineWidgetRepresentation -->
+    </NewWidgetRepresentationProxy>
+    <!-- ================================================================== -->
+    <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
                                   name="SplineWidgetRepresentation">
       <Documentation>Representation proxy for the the spline widget. This
       includes the widget/representation proxies for the sphere 3D
@@ -684,6 +717,60 @@
                            name="range" />
       </DoubleVectorProperty>
       <!-- End of SplineRepresentation -->
+    </Proxy>
+    <!-- ================================================================== -->
+    <Proxy class="vtkPolyLineRepresentation"
+           name="PolyLineRepresentation">
+      <Documentation>Representation for poly line source.</Documentation>
+      <IntVectorProperty animateable="1"
+                         command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="PlaceWidget"
+                            default_values="none"
+                            name="PlaceWidget"
+                            number_of_elements="6">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPlaceFactor"
+                            default_values="1.0"
+                            name="PlaceFactor"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0.01"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetHandlePosition"
+                            default_values="0 0 0 1 0 0"
+                            information_property="HandlePositionsInfo"
+                            name="HandlePositions"
+                            number_of_elements="6"
+                            number_of_elements_per_command="3"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfHandles"
+                            use_index="1"></DoubleVectorProperty>
+      <DoubleVectorProperty command="GetHandlePositions"
+                            information_only="1"
+                            name="HandlePositionsInfo">
+        <DoubleArrayInformationHelper />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetClosed"
+                         default_values="0"
+                         name="Closed"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetLineColor"
+                            default_values="1.0 1.0 0.0"
+                            name="LineColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+      </DoubleVectorProperty>
     </Proxy>
     <!-- ================================================================== -->
     <Proxy class="vtkSliderRepresentation3D"
@@ -1286,6 +1373,10 @@
            base_proxyname="WidgetBase"
            class="vtkSplineWidget2"
            name="SplineWidget2"></Proxy>
+    <Proxy base_proxygroup="3d_widgets"
+           base_proxyname="WidgetBase"
+           class="vtkPolyLineWidget"
+           name="PolyLineWidget"></Proxy>
     <Proxy base_proxygroup="3d_widgets"
            base_proxyname="WidgetBase"
            class="vtkContourWidget"
