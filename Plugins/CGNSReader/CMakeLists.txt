@@ -59,6 +59,10 @@ vtkCGNSReader.cxx
 vtkCGNSReader.h
 )
 
+if(PARAVIEW_USE_MPI)
+  include(vtkMPI)
+endif()
+
 # ---------------------------------------------------------------------------
 # Combined plugin
 # -----------------------------------------------------------------------------
@@ -90,4 +94,8 @@ endif()
 # Add testing if necessary
 if (BUILD_TESTING)
   add_subdirectory(Testing)
+endif()
+
+if(PARAVIEW_USE_MPI)
+  vtk_mpi_link(CGNSReader)
 endif()
