@@ -1426,7 +1426,7 @@ def test3(basePath):
     prober = DataProber( FileNameGenerator(os.path.join(basePath, 'dataprober'), 'data_{time}_{field}_{serie}.csv'), w, points_series, [ "RTData" ])
     prober.UpdatePipeline(0.0)
 
-    timeProber = TimeSerieDataProber( FileNameGenerator(os.path.join(os.getcwd(), 'Testing', 'Temporary', 'dataprober_time'), 'data_{field}.csv'), w, time_serie, [ "RTData"], 100)
+    timeProber = TimeSerieDataProber( FileNameGenerator(os.path.join(os.getcwd(), 'Testing', 'Temporary', 'dataprober_time'), 'data_{field}.csv'), w, time_series, [ "RTData"], 100)
     for time in range(101):
         timeProber.UpdatePipeline(time)
 
