@@ -43,12 +43,14 @@ void vtkSIUnstructuredGridVolumeRepresentationProxy::OnCreateVTKObjects()
          << "Projected tetra"
          << this->GetSubSIProxy("VolumePTMapper")->GetVTKObject()
          << vtkClientServerStream::End;
+#ifndef VTKGL2
   stream << vtkClientServerStream::Invoke
          << self
          << "AddVolumeMapper"
          << "HAVS"
          << this->GetSubSIProxy("VolumeHAVSMapper")->GetVTKObject()
          << vtkClientServerStream::End;
+#endif
   stream << vtkClientServerStream::Invoke
          << self
          << "AddVolumeMapper"
@@ -70,6 +72,7 @@ void vtkSIUnstructuredGridVolumeRepresentationProxy::OnCreateVTKObjects()
 void vtkSIUnstructuredGridVolumeRepresentationProxy::UpdateRenderViewExtensions(
   vtkSIViewProxy* view)
 {
+#ifndef VTKGL2
   vtkSIRenderViewProxy* rvp = vtkSIRenderViewProxy::SafeDownCast(view);
   if (!rvp)
     {
@@ -108,6 +111,7 @@ void vtkSIUnstructuredGridVolumeRepresentationProxy::UpdateRenderViewExtensions(
       this->SupportsHAVSMapper = 1;
       }
     }
+#endif
   this->RenderViewExtensionsTested = 1;
 }
 #endif
