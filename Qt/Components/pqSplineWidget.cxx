@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSplineWidget.h"
 #include "ui_pqSplineWidget.h"
 
+#include <iostream>
+
 #include "pq3DWidgetFactory.h"
 #include "pqApplicationCore.h"
 #include "pqPropertyLinks.h"
@@ -46,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
+#include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMPropertyHelper.h"
 
@@ -61,6 +64,9 @@ pqSplineWidget::pqSplineWidget(
   vtkSMProxy* _smproxy, vtkSMProxy* pxy, QWidget* p) :
   Superclass(_smproxy, pxy, p)
 {
+  // enable picking.
+  this->pickingSupported(QKeySequence(tr("P")));
+
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
   this->Internals->PointsAdaptor = new pqSignalAdaptorTreeWidget(
@@ -149,13 +155,33 @@ void pqSplineWidget::removePoints()
     this->Internals->HandlePositions->selectedItems(); 
   foreach (QTreeWidgetItem* item, items)
     {
-    if (this->Internals->HandlePositions->topLevelItemCount() <= 1)
+    if (this->Internals->HandlePositions->topLevelItemCount() <= 2)
       {
       qDebug() <<
-        "At least one point location is required. Deletion request ignored.";
-      // don't allow deletion of the last point.
+        "At least two point locations are required. Deletion request ignored.";
+      // don't allow deletion of the last two points.
       break;
       }
     delete item;
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqSplineWidget::pick(double x, double y, double z)
+{
+  vtkSMProxy* widget = this->getWidgetProxy();
+
+  QList<QTreeWidgetItem*> items =
+    this->Internals->HandlePositions->selectedItems(); 
+  if (items.size() > 0)
+    {
+    QTreeWidgetItem* item = items.front();
+    item->setText(0, QString("%1").arg(x));
+    item->setText(1, QString("%1").arg(y));
+    item->setText(2, QString("%1").arg(z));
+    }
+
+  widget->UpdateVTKObjects();
+  this->setModified();
+  this->render();
 }

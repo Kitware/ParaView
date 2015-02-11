@@ -57,9 +57,13 @@ public:
     { return this->Superclass::resetBounds(); }
 
   void setLineColor(const QColor& color);
+
 protected slots:
   void addPoint();
   void removePoints();
+
+  /// Snap currently selected point to surface.
+  virtual void pick(double x, double y, double z);
 
 protected:
   /// Internal method to create the widget.
