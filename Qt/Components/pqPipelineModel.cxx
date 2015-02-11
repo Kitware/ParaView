@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
+#include "pqServerConfiguration.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 #include "pqSpreadSheetView.h"
@@ -815,7 +816,16 @@ QVariant pqPipelineModel::data(const QModelIndex &idx, int role) const
       {
       if(server)
         {
-        return QVariant(server->getResource().toURI());
+        const pqServerResource& resource = server->getResource();
+        if (!resource.configuration().isNameDefault())
+          {
+          QString name = resource.configuration().name();
+          return QString ("%1 (%2)").arg(name).arg(resource.toURI());
+          }
+        else
+          {
+          return QVariant(resource.toURI());
+          }
         }
       else if(source)
         {

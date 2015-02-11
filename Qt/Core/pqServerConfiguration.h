@@ -58,6 +58,11 @@ public:
   void setName(const QString& name);
   QString name() const;
 
+  /// Returns true if the name for this configuration is the default one i.e.
+  /// the one that gets set when none is specified. Useful to determine "empty"
+  /// configurations.
+  bool isNameDefault() const;
+
   /// Get/Set the URI that describes the server scheme, hostname(s) and port(s).
   pqServerResource resource() const;
   void setResource(const pqServerResource&);

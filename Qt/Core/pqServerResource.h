@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreModule.h"
 
 #include <QString>
+class pqServerConfiguration;
 
 /// pqServerResource encapsulates a resource in ParaView. A resource can be anything,
 /// a data file, a list of data files, a state file, or a connection to a server. 
@@ -101,9 +102,14 @@ class PQCORE_EXPORT pqServerResource
 public:
   pqServerResource();
   pqServerResource(const QString&);
+  pqServerResource(const QString&, const pqServerConfiguration&);
   pqServerResource(const pqServerResource&);
   pqServerResource& operator=(const pqServerResource&);
   ~pqServerResource();
+
+  /// Returns the pqServerConfiguration from which this resource was created,
+  /// if any.
+  const pqServerConfiguration& configuration() const;
 
   /// Returns a compact string representation of the resource in URI format
   const QString toURI() const;
