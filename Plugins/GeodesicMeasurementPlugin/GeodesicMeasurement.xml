@@ -1,0 +1,64 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <SourceProxy name="GeodesicMeasurement"
+                 class="vtkGeodesicsBetweenPoints"
+                 label="Geodesic Measurement">
+      <Documentation
+          long_help=""
+          short_help="">
+      </Documentation>
+      <InputProperty
+          name="Input"
+          command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <InputProperty command="SetEndpointsConnection"
+                     name="Endpoints"
+                     panel_visibility="default">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPointSet" />
+        </DataTypeDomain>
+        <Documentation>The input that provides the endpoints between
+        which geodesic paths will be computed.
+        </Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetLoop"
+                         name="Loop"
+                         label="Create Loop"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If on, enables loop creation by computing a path from the
+          last point to first point in the endpoints.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetLoopWithLine"
+                         name="LoopWithLine"
+                         label="Create Loop with Line"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If on and if Create Loop is on, uses a straight line segment
+          to connect the last point to the first point in the endpoints.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="Loop" function="boolean" index="0" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
