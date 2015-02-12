@@ -2100,6 +2100,8 @@
                  value="8" />
           <Entry text="SplitViewportHorizontal"
                  value="9" />
+          <Entry text="None"
+                 value="10" />
         </EnumerationDomain>
         <Hints>
           <NoDefault />
@@ -2129,6 +2131,7 @@
           <Entry text="Anaglyph" value="7" />
           <Entry text="Checkerboard" value="8" />
           <Entry text="SplitViewportHorizontal" value="9" />
+          <Entry text="None" value="10" />
         </EnumerationDomain>
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
