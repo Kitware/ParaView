@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ui_pqCinemaTrack.h"
 
-//widget and state for a cinema property track 
+//widget and state for a cinema property track
 
 //-----------------------------------------------------------------------------
 pqCinemaTrack::pqCinemaTrack(
@@ -57,6 +57,7 @@ pqCinemaTrack::pqCinemaTrack(
   this->Track->setupUi(this);
 
   vtkSMProxy *prox = filter->getProxy();
+  //"ContourValues" because slice and isocontour happen to use same name
   vtkSMProperty *prop = prox->GetProperty("ContourValues");
   if (prop)
     {
@@ -69,17 +70,19 @@ pqCinemaTrack::pqCinemaTrack(
       {
       this->Track->label->setText(filter->getSMName().toLower());
       this->Track->radioButton->setEnabled(true);
+      this->Track->radioButton->setChecked(false);
       QObject::connect(this->Track->radioButton, SIGNAL(toggled(bool)),
                        this, SLOT(toggleTrack(bool)));
 
       pqScalarValueListPropertyWidget *vals = new pqScalarValueListPropertyWidget(prop, prox, this);
       vals->setFixedHeight(200);
       this->valsWidget = vals;
+
       vals->setRangeDomain(dom);
-      vals->setEnabled(true);
+      vals->setEnabled(false);
       QVBoxLayout *valsLayout = new QVBoxLayout(this->Track->scrollAreaWidgetContents_2);
       valsLayout->addWidget(vals);
-      valsLayout->insertSpacing(-1, 100); 
+      valsLayout->insertSpacing(-1, 100);
       }
     }
 };
@@ -98,7 +101,9 @@ void pqCinemaTrack::toggleTrack(bool checked)
 //-----------------------------------------------------------------------------
 bool pqCinemaTrack::explore() const
 {
-  return this->Track->radioButton->isChecked();
+  return (this->Track->radioButton->isChecked() && 
+          this->valsWidget &&
+          !this->valsWidget->scalars().isEmpty());
 }
 
 //-----------------------------------------------------------------------------

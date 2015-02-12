@@ -50,6 +50,9 @@
      </item>
      <item>
       <widget class="QRadioButton" name="radioButton">
+       <property name="toolTip">
+        <string>Check to allow the user to explore this parameter.</string>
+       </property>
        <property name="layoutDirection">
         <enum>Qt::LeftToRight</enum>
        </property>
@@ -57,7 +60,7 @@
         <string>Cinema Explore</string>
        </property>
        <property name="checked">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -65,6 +68,9 @@
    </item>
    <item>
     <widget class="QScrollArea" name="scrollArea">
+     <property name="toolTip">
+      <string>Specify values that cinema will expose to the user here.</string>
+     </property>
      <property name="verticalScrollBarPolicy">
       <enum>Qt::ScrollBarAlwaysOn</enum>
      </property>

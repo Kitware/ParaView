@@ -436,8 +436,22 @@ void pqSGExportStateWizard::toggleCinema(bool state)
   if(state)
     {
     this->Internals->cinemaContainer->setEnabled(true);
-    this->Internals->nextTrack->setEnabled(true);
-    this->Internals->previousTrack->setEnabled(true);
+    if (this->CurrentTrack >= this->Internals->cinemaContainer->count()-1)
+      {
+      this->Internals->nextTrack->setEnabled(false);
+      }
+    else
+      {
+      this->Internals->nextTrack->setEnabled(true);
+      }
+    if (this->CurrentTrack == 0)
+      {
+      this->Internals->previousTrack->setEnabled(false);
+      }
+    else
+      {
+      this->Internals->previousTrack->setEnabled(true);
+      }
     //cinema depends on rendering being on
     this->Internals->outputRendering->setChecked(true);
     //add cinema controls to each view
