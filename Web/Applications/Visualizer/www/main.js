@@ -513,6 +513,8 @@
         proxyEditor.bind('initialize-scalar-opacity-widget', onInitializeScalarOpacityWidget);
         proxyEditor.bind('request-scalar-range', onRequestScalarRange);
         proxyEditor.bind('push-new-surface-opacity', onSurfaceOpacityChanged);
+        proxyEditor.bind('initialize-color-editor-widget', onInitializeColorEditorWidget);
+        proxyEditor.bind('update-rgb-points', onUpdateRgbPoints);
     }
 
     // ------------------------------------------------------------------------
@@ -562,7 +564,7 @@
             session.call('pv.color.manager.opacity.points.set', args).then(function(successResult) {
                 viewport.invalidateScene();
                 workDone();
-            }, workDone);
+            }, error);
         }
     }
 
@@ -576,7 +578,7 @@
             session.call('pv.color.manager.surface.opacity.set', args).then(function(successResult) {
                 viewport.invalidateScene();
                 workDone();
-            }, workDone);
+            }, error);
         }
     }
 
@@ -588,7 +590,7 @@
             var storeKey = colorArray[1] + ":opacityParameters";
             var args = [storeKey, event.parameters];
             startWorking();
-            session.call('pv.keyvaluepair.store', args).then(workDone, workDone);
+            session.call('pv.keyvaluepair.store', args).then(workDone, error);
         }
     }
 
@@ -604,7 +606,7 @@
                 'max': curScalarRange.max
             });
             workDone();
-        }, workDone);
+        }, error);
     }
 
     // ------------------------------------------------------------------------
@@ -619,14 +621,24 @@
         session.call('pv.color.manager.rescale.transfer.function', [options]).then(function(successResult) {
             if (successResult['success'] === true) {
                 viewport.invalidateScene();
+
                 proxyEditor.trigger({
                     'type': 'update-scalar-range-values',
                     'min': successResult.range.min,
                     'max': successResult.range.max
                 });
+
+                session.call('pv.color.manager.rgb.points.get', [event.colorBy.array[1]]).then(function(result) {
+                    proxyEditor.trigger({
+                        'type': 'notify-new-rgb-points-received',
+                        'rgbpoints': result
+                    });
+                    workDone();
+                }, error);
+            } else {
+                workDone();
             }
-            workDone();
-        }, workDone);
+        }, error);
     }
 
     // ------------------------------------------------------------------------
@@ -646,24 +658,31 @@
     function onNewProxyLoaded() {
         if(pipelineDataModel.metadata && pipelineDataModel.source && pipelineDataModel.representation && pipelineDataModel.view) {
             var colorBy = pipelineDataModel.representation.colorBy,
+                widgetKey = 'pv.proxy.editor.settings',
+                widgetSettings = retrieveWidgetSettings(widgetKey),
+                options = { 'widgetKey': widgetKey, 'widgetData': widgetSettings },
+                srcVal = widgetSettings['Source'] || "+Source",
+                repVal = widgetSettings['Representation'] || "-Representation",
+                viewVal = widgetSettings['View'] || "-View",
+                colMgmtVal = widgetSettings['Color Management'] || "+Color Management",
                 props = [].concat(
-                    "+Source", pipelineDataModel.source.properties, '_Source',
-                    "-Representation", pipelineDataModel.representation.properties, '_Representation',
-                    "-View", pipelineDataModel.view.properties, "_View"
+                    srcVal, pipelineDataModel.source.properties, '_Source',
+                    repVal, pipelineDataModel.representation.properties, '_Representation',
+                    viewVal, pipelineDataModel.view.properties, "_View"
                     ),
                 ui = [].concat(
-                    "+Source", pipelineDataModel.source.ui, '_Source',
-                    "-Representation", pipelineDataModel.representation.ui, '_Representation',
-                    "-View", pipelineDataModel.view.ui, "_View"
+                    srcVal, pipelineDataModel.source.ui, '_Source',
+                    repVal, pipelineDataModel.representation.ui, '_Representation',
+                    viewVal, pipelineDataModel.view.ui, "_View"
                     );
 
             if (!$.isEmptyObject(colorBy) && colorBy.hasOwnProperty('array')) {
-                props = [].concat("+Color Management",
+                props = [].concat(colMgmtVal,
                                   extractRepresentation(pipelineDataModel.representation.properties),
                                   "ColorByPanel",
                                   "_Color Management",
                                   props);
-                ui = [].concat("+Color Management",
+                ui = [].concat(colMgmtVal,
                                extractRepresentation(pipelineDataModel.representation.ui),
                                "ColorByPanel",
                                "_Color Management",
@@ -678,7 +697,9 @@
                                         ui,
                                         pipelineDataModel.source.data.arrays,
                                         paletteNameList,
-                                        colorBy);
+                                        colorBy,
+                                        options);
+                proxyEditor.bind('store-widget-settings', onStoreWidgetSettings);
                 $('.inspector-container').scrollTop(0);
             } catch(err) {
                 console.log(err);
@@ -701,6 +722,57 @@
         }
     }
 
+    // ------------------------------------------------------------------------
+
+    function onStoreWidgetSettings(event) {
+        vtkWeb.storeApplicationDataObject(event.widgetKey, event.widgetData);
+    }
+
+    function retrieveWidgetSettings(widgetKey) {
+        return vtkWeb.retrieveApplicationDataObject(widgetKey);
+    }
+
+    // ========================================================================
+    // Color editor widget creation
+    // ========================================================================
+
+    function onInitializeColorEditorWidget(event) {
+        var container = event.container,
+            colorArray = event.colorBy.array,
+            initOptions = {
+                'topMargin': 10,
+                'rightMargin': 15,
+                'bottomMargin': 10,
+                'leftMargin': 15,
+                'widgetKey': 'pv.color.editor.settings'
+            };
+
+        if (colorArray.length >= 2 && colorArray[1] !== '') {
+            startWorking();
+            session.call('pv.color.manager.rgb.points.get', [colorArray[1]]).then(function(result) {
+                initOptions['rgbInfo'] = result;
+                initOptions['widgetData'] = retrieveWidgetSettings(initOptions['widgetKey']);
+                container.colorEditor(initOptions);
+                container.bind('store-widget-settings', onStoreWidgetSettings);
+                workDone();
+            }, error);
+        } else {
+            console.log("WARNING: Initializing the color editor while not coloring by an array.");
+            container.colorEditor(initOptions);
+        }
+    }
+
+    function onUpdateRgbPoints(event) {
+        var arrayName = event.colorBy.array[1];
+        var rgbInfo = event.rgbInfo;
+
+        startWorking();
+        session.call('pv.color.manager.rgb.points.set', [arrayName, rgbInfo]).then(function(result) {
+            workDone();
+            viewport.invalidateScene();
+        }, error);
+    }
+
     // ========================================================================
     // Opacity editor widget creation
     // ========================================================================
@@ -713,13 +785,16 @@
                 'topMargin': 10,
                 'rightMargin': 15,
                 'bottomMargin': 10,
-                'leftMargin': 15
+                'leftMargin': 15,
+                'widgetKey': 'pv.opacity.editor.settings'
             };
 
         function gotInitParam(paramName) {
             needParams.splice(needParams.indexOf(paramName), 1);
             if (needParams.length === 0) {
+                initOptions['widgetData'] = retrieveWidgetSettings(initOptions['widgetKey']);
                 container.opacityEditor(initOptions);
+                container.bind('store-widget-settings', onStoreWidgetSettings);
             }
         }
 
@@ -731,11 +806,10 @@
                     initOptions.gaussiansList = result.gaussianPoints;
                     initOptions.linearPoints = result.linearPoints;
                     initOptions.gaussianMode = result.gaussianMode;
-                    initOptions.interactiveMode = result.interactiveMode;
                 }
                 gotInitParam('currentPointSet');
                 workDone();
-            }, workDone);
+            }, error);
 
             var representation = event.colorBy.representation;
             session.call('pv.color.manager.surface.opacity.get', [representation]).then(function(result) {
@@ -744,7 +818,7 @@
                 }
                 gotInitParam('surfaceOpacityEnabled');
                 workDone();
-            }, workDone);
+            }, error);
 
         } else {
             console.log("WARNING: Initializing the opacity editor while not coloring by an array.");
@@ -806,7 +880,7 @@
                 alert(saveResult.message);
             }
             workDone();
-        }, workDone);
+        }, error);
     }
 
     function updateSaveDataFilename(activeType) {

@@ -1,0 +1,119 @@
+.color-editor-container {
+    display: none;
+    min-height: 60px;
+    clear: both;
+    position: relative;
+}
+
+.color-editor-overflow-container {
+    overflow: hidden;
+    /*position: absolute;*/
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    /*bottom: -7px;*/
+    height: 50px;
+}
+
+.color-editor-canvas-container {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    /*position: absolute;*/
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    height: 50px;
+}
+
+.color-editor-canvas {
+    /*position: absolute;*/
+    bottom: 0px;
+    left: 0px;
+}
+
+.color-editor-button-container {
+    position: relative;
+    margin-left: 15px;
+    margin-right: 15px;
+    top: 3px;
+}
+
+.color-editor-button {
+    cursor: pointer;
+    position: relative;
+    display: inline-block;
+}
+
+.left-button-panel {
+    text-align: left;
+    width: 60%;
+    display: inline-block;
+}
+
+.right-button-panel {
+    text-align: right;
+    width: 40%;
+    display: inline-block;
+}
+
+.color-editor-list-container {
+    position: relative;
+    margin-top: 7px;
+}
+
+.color-select-button {
+    cursor: pointer;
+    border-radius: 3px;
+    width: 80%;
+    height: 100%;
+}
+
+.color-swatch-table {
+    margin-top: 3px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.rgb-edit-fields {
+    /*width: 30%;*/
+}
+
+.rgb-label {
+    font-family: fixed;
+    font-weight: bold;
+}
+
+.rgb-input-field {
+    width: 80%;
+    float: right;
+}
+
+span.delete-control-point-btn.can-delete-cp {
+    opacity: 1.0;
+    cursor: pointer;
+}
+
+span.delete-control-point-btn.cannot-delete-cp {
+    opacity: 0.3;
+    cursor: default;
+}
+
+.color-editor-toggle-list {
+    display: none;
+}
+
+.icon-toggled-on {
+    background: #969696;
+    border-radius: 3px;
+}
+
+div.left-button-panel > div.color-editor-button {
+    margin-right: 2px;
+}
+
+div.right-button-panel > div.color-editor-button {
+    margin-left: 2px;
+}

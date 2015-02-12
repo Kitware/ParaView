@@ -45,14 +45,28 @@ In this case, you will probably find a file named `httpd-vhosts.conf` located in
 
 In this case you should create a file in `/etc/apache2/sites-available/` and make a symbolic link to it from `/etc/apache2/sites-enabled/`.  We'll assume you named this file `001-pvw.conf`.
 
-In either case, make sure to replace the `ServerName` value (shown below as `<MY-SERVER-NAME>`) with the correct host name.  Also make sure the `DocumentRoot` value (shown below as `<MY-DOCUMENT-ROOT>`) makes sense for your particular deployment, we typically point it at the `www` directory of the ParaView build or install tree.
+In either case, make sure to replace the `ServerName` value (shown below as `${MY-SERVER-NAME}`) with the correct host name.  Also make sure the `DocumentRoot` value (shown below as `${MY-DOCUMENT-ROOT}`) makes sense for your particular deployment, we typically point it at the `www` directory of the ParaView build or install tree.  Additionally, be sure to change `${MAPPING-FILE-DIR}` to the real location where you have put the map file.
 
     <VirtualHost *:80>
-        ServerName <MY-SERVER-NAME>
+        ServerName ${MY-SERVER-NAME}
         ServerAdmin webmaster@example-host.example.com
-        DocumentRoot "<MY-DOCUMENT-ROOT>"
+        DocumentRoot ${MY-DOCUMENT-ROOT}
         ErrorLog "logs/pv-error_log"
         CustomLog "logs/pv-access_log" common
+
+        ### The following commented lines could be useful when running
+        ### over https and wss:
+        # SSLEngine On
+        # SSLCertificateFile    /etc/apache2/ssl/your_certificate.crt
+        # SSLCertificateKeyFile /etc/apache2/ssl/your_domain_key.key
+        # SSLCertificateChainFile /etc/apache2/ssl/DigiCertCA.crt
+        #
+        # <Location ${MY-DOCUMENT-ROOT} >
+        #   SSLRequireSSL On
+        #   SSLVerifyClient optional
+        #   SSLVerifyDepth 1
+        #   SSLOptions +StdEnvVars +StrictRequire
+        # </Location>
 
         # Have Apache pass these requests to the launcher
         ProxyPass /paraview http://localhost:9000/paraview
@@ -61,7 +75,7 @@ In either case, make sure to replace the `ServerName` value (shown below as `<MY
         RewriteEngine On
 
         # This is the path the mapping file Jetty creates
-        RewriteMap session-to-port txt:<MAPPING-FILE-DIR/proxy.txt
+        RewriteMap session-to-port txt:${MAPPING-FILE-DIR}/proxy.txt
 
         # This is the rewrite condition. Look for anything with a sessionId= in the query part of the URL and capture the value to use below.
         RewriteCond %{QUERY_STRING}     ^sessionId=(.*)$ [NC]
@@ -69,7 +83,7 @@ In either case, make sure to replace the `ServerName` value (shown below as `<MY
         # This does the rewrite using the mapping file and the sessionId
         RewriteRule    ^/proxy.*$  ws://${session-to-port:%1}/ws  [P]
 
-        <Directory "<MY-DOCUMENT-ROOT">
+        <Directory "${MY-DOCUMENT-ROOT}">
             Options Indexes FollowSymLinks
             Order allow,deny
             Allow from all

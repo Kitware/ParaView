@@ -31,9 +31,7 @@
         "<select class='form-control pv-form-height palette bottom-property top-property' data-toggle='tooltip' data-placement='bottom' title='Preset Color Map'>PALETTE_OPTIONS</select>" +
         "</div>" +
         "<div class='scalar-opacity-editor-container'></div>" +
-        "<div class='color-editor-container row' style='margin-top: 5px; margin-right: 30px; margin-left: 0;'>" +
-        "<span class='coming-soon-placeholder col-xs-12 col-sm-12 top-property bottom-property'>Coming Soon: Color Map Editor</span>" +
-        "</div>" +
+        "<div class='color-editor-container'></div>" +
         "<div class='scalar-range-editor-container' style='display: none;'><div class='col-sm-4'><div class='row'>" +
         "<label class='col-sm-12 col-xs-6 color-by-label control-label top-property' data-toggle='tooltip' data-placement='bottom' title='Scalar Color Range'>Range</label>" +
         "<div class='top-property pv-form-height col-sm-12 col-xs-6 scalar-range-button-container color-options-button-panel' data-proxy-id='_ID_'>" +
@@ -334,8 +332,11 @@
      *      }
      *
      */
-    $.fn.proxyEditor = function(title, is_leaf, proxyId, properties, ui_list, arrayList, paletteList, colorByInfo) {
+    $.fn.proxyEditor = function(title, is_leaf, proxyId, properties, ui_list, arrayList, paletteList, colorByInfo, options) {
         // Handle data with default values
+        var opts = $.extend({}, $.fn.proxyEditor.defaults, options);
+
+        // Widget creator function
         return this.each(function() {
             var me = $(this).empty().addClass('pv-proxy-editor'),
                 bufferProperties = [];
@@ -350,7 +351,31 @@
                 activePalette = 'FIXME not yet available',
                 wantColorManagement = !$.isEmptyObject(colorByInfo) && colorByInfo.hasOwnProperty('array'),
                 colorToolsDisabled = false,
-                scalarOpacityEditorInitialized = false;
+                scalarOpacityEditorInitialized = false,
+                colorEditorInitialized = false,
+                widgetKey = opts.widgetKey,
+                widgetData = $.extend(true, {}, opts.widgetData);
+
+            /*
+             * Update the application data object and store it
+             */
+            function storeWidgetSettings(keyvals) {
+                for (var key in keyvals) {
+                    if (keyvals.hasOwnProperty(key)) {
+                        widgetData[key] = keyvals[key];
+                    }
+                }
+                me.trigger({
+                    type: 'store-widget-settings',
+                    widgetKey: widgetKey,
+                    widgetData: widgetData
+                });
+            }
+
+            function persistToggleState() {
+                var activeToggle = $('.color-customization-button.active', me).attr('data-action') || '';
+                storeWidgetSettings({ 'activeToggle': activeToggle });
+            }
 
             // Make sure all old tooltips are cleaned up...
             $('.tooltip').remove();
@@ -360,6 +385,13 @@
                 me.unbind('update-scalar-range-values').bind('update-scalar-range-values', function(newRange) {
                     $('.scalar-range-min', me).val(newRange.min);
                     $('.scalar-range-max', me).val(newRange.max);
+                });
+
+                me.unbind('notify-new-rgb-points-received').bind('notify-new-rgb-points-received', function(event) {
+                    $('.color-editor-container', me).trigger({
+                        type: 'new-rgb-points-received',
+                        rgbpoints: event.rgbpoints
+                    });
                 });
             }
 
@@ -607,16 +639,36 @@
                                                         [$('.color-editor-container', me),  $('.scalar-opacity-editor-container', me)],
                                                         target_container,
                                                         [$('[data-action=toggle-scalar-opacity-editor]', me), $('[data-action=toggle-color-editor]', me)]);
+                        persistToggleState();
                     } else if (action === 'toggle-color-editor' && colorToolsDisabled === false) {
-                        updateColorManagementVisibility($('.color-editor-container', me),
+                        var colorEditorElt = $('.color-editor-container', me);
+                        updateColorManagementVisibility(colorEditorElt,
                                                         [$('.scalar-range-editor-container', me),  $('.scalar-opacity-editor-container', me)],
                                                         target_container,
                                                         [$('[data-action=toggle-scalar-opacity-editor]', me), $('[data-action=toggle-scalar-range-editor]', me)]);
+                        persistToggleState();
+                        if (colorEditorElt.is(':visible') && colorEditorInitialized === false) {
+                            var currentColorBy = extractColorBy();
+                            me.trigger({
+                                type: 'initialize-color-editor-widget',
+                                container: colorEditorElt,
+                                colorBy: currentColorBy
+                            });
+                            colorEditorElt.on('color-editor-cp-update', function(cpEvt) {
+                                me.trigger({
+                                    type: 'update-rgb-points',
+                                    colorBy: extractColorBy(),
+                                    rgbInfo: cpEvt.rgbInfo
+                                });
+                            });
+                            colorEditorInitialized = true;
+                        }
                     } else if (action === 'rescale-to-data') {
                         me.trigger({
                             type: 'rescale-transfer-function',
                             mode: 'data',
-                            id: target_container.parent().attr('data-proxy-id')
+                            id: target_container.parent().attr('data-proxy-id'),
+                            colorBy: extractColorBy()
                         });
                     } else if (action === 'rescale-to-custom') {
                         me.trigger({
@@ -624,13 +676,15 @@
                             mode: 'custom',
                             min: $('.scalar-range-min', me).val(),
                             max: $('.scalar-range-max', me).val(),
-                            id: target_container.parent().attr('data-proxy-id')
+                            id: target_container.parent().attr('data-proxy-id'),
+                            colorBy: extractColorBy()
                         });
                     } else if (action === 'rescale-to-time') {
                         me.trigger({
                             type: 'rescale-transfer-function',
                             mode: 'time',
-                            id: target_container.parent().attr('data-proxy-id')
+                            id: target_container.parent().attr('data-proxy-id'),
+                            colorBy: extractColorBy()
                         });
                     } else if (action === 'toggle-scalar-opacity-editor' && colorToolsDisabled === false) {
                         var opacityEditorElt = $('.scalar-opacity-editor-container', me);
@@ -638,7 +692,7 @@
                                                         [$('.scalar-range-editor-container', me),  $('.color-editor-container', me)],
                                                         target_container,
                                                         [$('[data-action=toggle-color-editor]', me), $('[data-action=toggle-scalar-range-editor]', me)]);
-
+                        persistToggleState();
                         if (opacityEditorElt.is(':visible') && scalarOpacityEditorInitialized === false) {
                             var currentColorBy = extractColorBy();
                             me.trigger({
@@ -659,8 +713,7 @@
                                     parameters: {
                                         'linearPoints': opEvt.linearPoints,
                                         'gaussianPoints': opEvt.gaussianPoints,
-                                        'gaussianMode': opEvt.gaussianMode,
-                                        'interactiveMode': opEvt.interactiveMode
+                                        'gaussianMode': opEvt.gaussianMode
                                     }
                                 });
                             });
@@ -753,11 +806,28 @@
 
             // Handle collapse panel
             $('.pv-collapsable-action', me).click(function(){
-                $(this).parent().toggleClass('pv-collapse');
+                var elt = $(this),
+                    key = $('span', elt).html(),
+                    keyval = {};
+                elt.parent().toggleClass('pv-collapse');
+                keyval[key] = elt.parent().hasClass('pv-collapse') ? '-' + key : '+' + key;
+                storeWidgetSettings(keyval);
             });
 
             $('[data-toggle="tooltip"]').tooltip({container: 'body'});
+
+            if (wantColorManagement === true && colorToolsDisabled === false) {
+                if (widgetData.hasOwnProperty('activeToggle') && widgetData.activeToggle !== '') {
+                    var activeTabBtn = $('[data-action=' + widgetData.activeToggle + ']', me);
+                    activeTabBtn.trigger('click');
+                }
+            }
         });
+    };
+
+    $.fn.proxyEditor.defaults = {
+        widgetKey: 'proxy-editor',
+        widgetData: {}
     };
 
     // ----------------------------------------------------------------------
