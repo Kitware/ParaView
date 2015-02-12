@@ -470,7 +470,8 @@ public:
   // Forward to vtkRenderWindow.
   void SetStereoCapableWindow(int val);
   void SetStereoRender(int val);
-  void SetStereoType(int val);
+  vtkSetMacro(StereoType, int);
+  vtkSetMacro(ServerStereoType, int);
   void SetMultiSamples(int val);
   void SetAlphaBitPlanes(int val);
   void SetStencilCapable(int val);
@@ -746,6 +747,11 @@ private:
   void UpdateAnnotationText();
 
   bool OrientationWidgetVisibility;
+
+  int StereoType;
+  int ServerStereoType;
+  void UpdateStereoProperties();
+
 //ETX
 };
 
