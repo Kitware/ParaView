@@ -1,3 +1,5 @@
+include(vtkTestingMacros)
+
 # Override vtk_add_test_* variables for use with ParaView.
 macro (_paraview_override_vtk_dirs)
   set(VTK_TEST_DATA_DIR    ${PARAVIEW_TEST_OUTPUT_DATA_DIR})
