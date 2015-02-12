@@ -10,6 +10,7 @@ if (NOT CGNS_FOUND)
   message(FATAL_ERROR "Unable to locate CGNS library.")
 endif()
 
+vtk_module_load(vtkhdf5)
 #
 include_directories(${CGNS_INCLUDE_DIR})
 
@@ -58,6 +59,10 @@ vtkCGNSReader.cxx
 vtkCGNSReader.h
 )
 
+if(PARAVIEW_USE_MPI)
+  include(vtkMPI)
+endif()
+
 # ---------------------------------------------------------------------------
 # Combined plugin
 # -----------------------------------------------------------------------------
@@ -78,15 +83,19 @@ else()
     SERVER_MANAGER_SOURCES ${SOURCES})
 endif()
 
-set(CGNS_LINK_TO_HDF5 ON CACHE BOOL "use -lhdf5 for linking cgns to hdf5" )
+set(CGNS_LINK_TO_HDF5 ON CACHE BOOL "use vtkhdf5_LIBRARIES for linking cgns to hdf5" )
 mark_as_advanced(CGNS_LINK_TO_HDF5)
 
 target_link_libraries(CGNSReader LINK_PRIVATE vtksys ${CGNS_LIBRARIES})
 if (CGNS_LINK_TO_HDF5)
-  target_link_libraries(CGNSReader LINK_PRIVATE -lhdf5)
+  target_link_libraries(CGNSReader LINK_PRIVATE ${vtkhdf5_LIBRARIES})
 endif()
 
 # Add testing if necessary
 if (BUILD_TESTING)
   add_subdirectory(Testing)
+endif()
+
+if(PARAVIEW_USE_MPI)
+  vtk_mpi_link(CGNSReader)
 endif()
