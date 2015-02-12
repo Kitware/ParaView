@@ -39,7 +39,7 @@ if (NOT CMAKE_CROSSCOMPILING)
   if (UNIX)
     # setup install rpath correctly so that kwProcessXML can file needed libraries
     # at runtime.
-    set (_temp_prefix "/tmp")
+    set (_temp_prefix "/example-prefix")
     set (_bin "${_temp_prefix}/${VTK_INSTALL_RUNTIME_DIR}")
     set (_so "${_temp_prefix}/${VTK_INSTALL_LIBRARY_DIR}")
     file (RELATIVE_PATH relative_path "${_bin}" "${_so}")

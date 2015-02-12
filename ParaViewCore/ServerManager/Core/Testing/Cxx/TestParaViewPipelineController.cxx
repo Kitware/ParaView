@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMViewProxy.h"
+#include "vtkTestUtilities.h"
 
 #include <vtksys/ios/sstream>
 #include <assert.h>
@@ -96,7 +97,17 @@ int TestParaViewPipelineController(int argc, char* argv[])
     view->UpdateVTKObjects();
     }
 
-  pxm->SaveXMLState("/tmp/state.pvsm");
+  char *tempDir = vtkTestUtilities::GetArgOrEnvOrDefault(
+    "-T", argc, argv, "VTK_TEMP_DIR", "Testing/Temporary");
+  if (!tempDir)
+    {
+    cerr << "Could not determine temporary directory.\n";
+    return EXIT_FAILURE;
+    }
+  std::string path = tempDir;
+  path += "/state.pvsm";
+  pxm->SaveXMLState(path.c_str());
+  delete [] tempDir;
   session->Delete();
   vtkInitializationHelper::Finalize();
   return EXIT_SUCCESS;
