@@ -32,10 +32,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqServerResource.h"
 
+#include "pqServerConfiguration.h"
+
 #include <QDir>
 #include <QRegExp>
 #include <QUrl>
 #include <QtDebug>
+#include <QPointer>
 
 //////////////////////////////////////////////////////////////////////////////
 // pqServerResource::pqImplementation
@@ -50,10 +53,11 @@ public:
   {
   }
   
-  pqImplementation(const QString& rhs) :
+  pqImplementation(const QString& rhs, const pqServerConfiguration& config=pqServerConfiguration()) :
     Port(-1),
     DataServerPort(-1),
-    RenderServerPort(-1)
+    RenderServerPort(-1),
+    Configuration(config)
   {
     QStringList strings = rhs.split(";");
 
@@ -169,6 +173,7 @@ public:
   QString Path;
   QString SessionServer;
   QMap<QString, QString> ExtraData;
+  pqServerConfiguration Configuration;
 };
 
 pqServerResource::pqServerResource() :
@@ -178,6 +183,12 @@ pqServerResource::pqServerResource() :
 
 pqServerResource::pqServerResource(const QString& rhs) :
   Implementation(new pqImplementation(rhs))
+{
+}
+
+pqServerResource::pqServerResource(
+  const QString& rhs, const pqServerConfiguration& config) :
+  Implementation(new pqImplementation(rhs, config))
 {
 }
 
@@ -561,3 +572,7 @@ const QString pqServerResource::serializeString() const
   return uri;
 }
 
+const pqServerConfiguration& pqServerResource::configuration() const
+{
+  return this->Implementation->Configuration;
+}

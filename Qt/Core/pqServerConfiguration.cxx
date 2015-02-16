@@ -40,12 +40,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTextStream>
 #include <vtksys/ios/sstream>
 
+#define SERVER_CONFIGURATION_DEFAULT_NAME "unknown"
+
 //-----------------------------------------------------------------------------
 pqServerConfiguration::pqServerConfiguration()
 {
   vtkNew<vtkPVXMLParser> parser;
   parser->Parse(
-    "<Server name=\"unknown\" configuration=\"\"><ManualStartup/></Server>");
+    "<Server name='" SERVER_CONFIGURATION_DEFAULT_NAME "' configuration=''><ManualStartup/></Server>");
   this->constructor(parser->GetRootElement());
 }
 
@@ -81,9 +83,15 @@ QString pqServerConfiguration::name() const
 }
 
 //-----------------------------------------------------------------------------
+bool pqServerConfiguration::isNameDefault() const
+{
+  return this->name() == SERVER_CONFIGURATION_DEFAULT_NAME;
+}
+
+//-----------------------------------------------------------------------------
 pqServerResource pqServerConfiguration::resource() const
 {
-  return pqServerResource(this->XML->GetAttributeOrDefault("resource", ""));
+  return pqServerResource(this->XML->GetAttributeOrDefault("resource", ""), *this);
 }
 
 //-----------------------------------------------------------------------------

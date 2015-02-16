@@ -32,7 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPluginManager.h"
 
 #include "pqApplicationCore.h"
+#include "pqDebug.h"
 #include "pqObjectBuilder.h"
+#include "pqServerConfiguration.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
@@ -48,7 +50,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QCoreApplication>
 #include <QPointer>
 #include <QSet>
-#include <QtDebug>
 
 #include <vtksys/ios/sstream>
 class pqPluginManager::pqInternals
@@ -82,6 +83,26 @@ public:
     return QString(stream.str().c_str());
     }
 };
+
+//=============================================================================
+static QString pqPluginManagerSettingsKeyForRemote(pqServer* server)
+{
+  Q_ASSERT(server && server->isRemote());
+  // locate the xml-config from settings associated with this server and ask
+  // the server to parse it.
+  const pqServerResource& resource = server->getResource();
+  QString uri = resource.configuration().isNameDefault() ?
+    resource.schemeHostsPorts().toURI() : resource.configuration().name();
+  QString key = QString("/PluginsList/%1:%2").arg(uri).arg(
+    QCoreApplication::applicationFilePath());
+  return key;
+}
+
+//=============================================================================
+static QString pqPluginManagerSettingsKeyForLocal()
+{
+ return QString("/PluginsList/Local:%1").arg(QCoreApplication::applicationFilePath());
+}
 
 //-----------------------------------------------------------------------------
 pqPluginManager::pqPluginManager(QObject* parentObject)
@@ -130,11 +151,12 @@ void pqPluginManager::loadPluginsFromSettings()
 {
   // Load local plugins information and then load those plugins.
   pqSettings* settings = pqApplicationCore::instance()->settings();
-  QString key = QString("/PluginsList/Local/%1").arg(
-    QCoreApplication::applicationFilePath());
+  QString key = pqPluginManagerSettingsKeyForLocal();
   QString local_plugin_config = settings->value(key).toString();
   if (!local_plugin_config.isEmpty())
     {
+    pqDebug("PV_PLUGIN_DEBUG") <<
+      "Loading local Plugin configuration using settings key: " << key;
     vtkSMProxyManager::GetProxyManager()->GetPluginManager()->
       LoadPluginConfigurationXMLFromString(
         local_plugin_config.toLatin1().data(), NULL, false);
@@ -149,15 +171,15 @@ void pqPluginManager::loadPluginsFromSettings(pqServer* server)
     {
     // locate the xml-config from settings associated with this server and ask
     // the server to parse it.
+    QString key = pqPluginManagerSettingsKeyForRemote(server);
     pqSettings* settings = pqApplicationCore::instance()->settings();
-    QString uri = server->getResource().schemeHostsPorts().toURI();
-    QString key = QString("/PluginsList/%1/%2").arg(uri).arg(
-      QCoreApplication::applicationFilePath());
     QString remote_plugin_config = settings->value(key).toString();
     // now pass this xml to the vtkPVPluginTracker on the remote
     // processes.
     if (!remote_plugin_config.isEmpty())
       {
+      pqDebug("PV_PLUGIN_DEBUG") <<
+        "Loading remote Plugin configuration using settings key: " << key;
       vtkSMProxyManager::GetProxyManager()->GetPluginManager()->
         LoadPluginConfigurationXMLFromString(
           remote_plugin_config.toLatin1().data(), server->session(), true);
@@ -185,20 +207,21 @@ void pqPluginManager::onServerDisconnected(pqServer* server)
   pqSettings* settings = pqApplicationCore::instance()->settings();
   if (server && server->isRemote())
     {
+    QString remoteKey = pqPluginManagerSettingsKeyForRemote(server);
     // locate the xml-config from settings associated with this server and ask
     // the server to parse it.
-    QString uri = server->getResource().schemeHostsPorts().toURI();
-    QString key = QString("/PluginsList/%1/%2").arg(uri).arg(
-      QCoreApplication::applicationFilePath());
-    settings->setValue(key,
+    settings->setValue(remoteKey,
       this->Internals->getXML(this->loadedExtensions(server, true), true));
+    pqDebug("PV_PLUGIN_DEBUG") <<
+      "Saving remote Plugin configuration using settings key: " << remoteKey;
     }
 
   // just save the local plugin info to be on the safer side.
-  QString key = QString("/PluginsList/Local/%1").arg(
-    QCoreApplication::applicationFilePath());
+  QString key = pqPluginManagerSettingsKeyForLocal();
   settings->setValue(key,
     this->Internals->getXML(this->loadedExtensions(server, false), false));
+  pqDebug("PV_PLUGIN_DEBUG") <<
+    "Saving local Plugin configuration using settings key: " << key;
 
   this->Internals->Servers.removeAll(server);
 }
