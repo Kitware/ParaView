@@ -148,10 +148,15 @@ vtkInformationKeyRestrictedMacro(
   vtkPVRenderView, VIEW_PLANES, DoubleVector, 24);
 
 vtkCxxSetObjectMacro(vtkPVRenderView, LastSelection, vtkSelection);
+
+#define VTK_STEREOTYPE_SAME_AS_CLIENT 0
+
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
   : Annotation(),
-  OrientationWidgetVisibility(false)
+  OrientationWidgetVisibility(false),
+  StereoType(VTK_STEREO_RED_BLUE),
+  ServerStereoType(VTK_STEREOTYPE_SAME_AS_CLIENT)
 {
   this->Internals = new vtkInternals();
   // non-reference counted, so no worries about reference loops.
@@ -1126,6 +1131,8 @@ void vtkPVRenderView::InteractiveRender()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 {
+  this->UpdateStereoProperties();
+
   if (this->SynchronizedWindows->GetMode() !=
     vtkPVSynchronizedRenderWindows::CLIENT ||
     (!interactive && this->UseDistributedRenderingForStillRender) ||
@@ -2018,9 +2025,60 @@ void vtkPVRenderView::SetStereoRender(int val)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SetStereoType(int val)
+inline int vtkGetNumberOfRendersPerFrame(int stereoMode)
 {
-  this->GetRenderWindow()->SetStereoType(val);
+  switch(stereoMode)
+    {
+  case VTK_STEREO_CRYSTAL_EYES:
+  case VTK_STEREO_RED_BLUE:
+  case VTK_STEREO_INTERLACED:
+  case VTK_STEREO_DRESDEN:
+  case VTK_STEREO_ANAGLYPH:
+  case VTK_STEREO_CHECKERBOARD:
+  case VTK_STEREO_SPLITVIEWPORT_HORIZONTAL:
+  case VTK_STEREO_FAKE:
+    return 2;
+
+  case VTK_STEREO_LEFT:
+  case VTK_STEREO_RIGHT:
+  default:
+    return 1;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::UpdateStereoProperties()
+{
+  if (!this->GetRenderWindow()->GetStereoRender())
+    {
+    return;
+    }
+
+  if (this->ServerStereoType != 0 &&
+    vtkGetNumberOfRendersPerFrame(this->ServerStereoType)
+    != vtkGetNumberOfRendersPerFrame(this->StereoType))
+    {
+    vtkWarningMacro("Incompatible stereo types for client and server ranks. "
+      "Forcing the server use the same type as the client.");
+    this->ServerStereoType = 0;
+    }
+
+  switch (this->SynchronizedWindows->GetMode())
+    {
+  case vtkPVSynchronizedRenderWindows::RENDER_SERVER:
+    if (this->ServerStereoType == VTK_STEREOTYPE_SAME_AS_CLIENT)
+      {
+      this->GetRenderWindow()->SetStereoType(this->StereoType);
+      }
+    else
+      {
+      this->GetRenderWindow()->SetStereoType(this->ServerStereoType);
+      }
+    break;
+
+  default:
+    this->GetRenderWindow()->SetStereoType(this->StereoType);
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -2069,14 +2069,18 @@
       <IntVectorProperty command="SetStereoRender"
                          default_values="0"
                          name="StereoRender"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="never">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetStereoType"
                          default_values="none"
                          name="StereoType"
-                         panel_visibility="never"
                          number_of_elements="1">
+        <Documentation>
+          Set the stereo rendering mode to use. In client-server configurations,
+          you may also want to set the ServerStereoType.
+        </Documentation>
         <EnumerationDomain name="enum">
           <Entry text="Crystal Eyes"
                  value="1" />
@@ -2096,9 +2100,43 @@
                  value="8" />
           <Entry text="SplitViewportHorizontal"
                  value="9" />
+          <Entry text="None"
+                 value="10" />
         </EnumerationDomain>
         <Hints>
           <NoDefault />
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="StereoRender" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetServerStereoType"
+                         default_values="0"
+                         name="ServerStereoType"
+                         number_of_elements="1">
+        <Documentation>
+          This property allows you to set a different stereo mode for the server processes.
+          Note that the stereo type selected on the client and server must be *compatible*, i.e.
+          if the stereo type on the client side needs 2 renders each frame, the stereo type on the
+          server must do exactly the same, otherwise deadlocks may ensue.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Same As Client" value="0" />
+          <Entry text="Crystal Eyes" value="1" />
+          <Entry text="Red-Blue" value="2" />
+          <Entry text="Interlaced" value="3" />
+          <Entry text="Left" value="4" />
+          <Entry text="Right" value="5" />
+          <Entry text="Dresden" value="6" />
+          <Entry text="Anaglyph" value="7" />
+          <Entry text="Checkerboard" value="8" />
+          <Entry text="SplitViewportHorizontal" value="9" />
+          <Entry text="None" value="10" />
+        </EnumerationDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="StereoRender" />
+          </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetMultiSamples"
@@ -2245,6 +2283,12 @@
         <Property name="UseGradientBackground"/>
         <Property name="UseTexturedBackground"/>
         <Property name="BackgroundTexture"/>
+      </PropertyGroup>
+      <PropertyGroup label="Stereo">
+        <Property name="StereoCapableWindow" />
+        <Property name="StereoRender" />
+        <Property name="StereoType" />
+        <Property name="ServerStereoType" />
       </PropertyGroup>
     </RenderViewProxy>
 
@@ -7319,8 +7363,11 @@
           <Property name="NonInteractiveRenderDelay" panel_visibility="never"/>
           <Property name="EnableRenderOnInteraction" panel_visibility="never"/>
           <!-- Renderer -->
-          <Property name="StereoRender" panel_visibility="never"/>
-          <Property name="StereoType" panel_visibility="never"/>
+          <PropertyGroup label="Stereo">
+            <Property name="StereoRender"/>
+            <Property name="StereoType"/>
+            <Property name="ServerStereoType"/>
+          </PropertyGroup>
         </ExposedProperties>
         <!-- End of "RootView" subproxy -->
       </SubProxy>
