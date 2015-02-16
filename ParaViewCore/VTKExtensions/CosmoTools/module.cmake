@@ -11,6 +11,10 @@ vtk_module(vtkPVVTKExtensionsCosmoTools
       vtkCosmoHaloFinder
    KIT
       vtkPVExtensions
+   TEST_DEPENDS
+      vtkTestingCore
+      vtkTestingRendering
+      vtkParallelMPI
 )
 
 # paraview-specific extensions to a module to bring in proxy XML configs
