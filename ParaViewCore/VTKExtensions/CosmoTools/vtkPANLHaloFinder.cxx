@@ -259,7 +259,7 @@ int vtkPANLHaloFinder::RequestData(vtkInformation *, vtkInformationVector **inVe
   this->DistributeInput(grid);
   this->CreateGhostParticles();
   this->ExecuteHaloFinder(output,fofProperties);
-  this->FindCenters(fofProperties);
+  this->FindCenters(output,fofProperties);
   if (this->RunSubHaloFinder)
     {
     this->ExecuteSubHaloFinder(output,subFofProperties);
@@ -630,7 +630,8 @@ void vtkPANLHaloFinder::ExecuteSubHaloFinder(vtkUnstructuredGrid *allParticles,
 
 }
 
-void vtkPANLHaloFinder::FindCenters(vtkUnstructuredGrid *fofProperties)
+void vtkPANLHaloFinder::FindCenters(vtkUnstructuredGrid* allParticles,
+                                    vtkUnstructuredGrid *fofProperties)
 {
   if (this->CenterFindingMode == vtkPANLHaloFinder::NONE)
     {
@@ -692,7 +693,7 @@ void vtkPANLHaloFinder::FindCenters(vtkUnstructuredGrid *fofProperties)
     float center[] = { 0.0, 0.0, 0.0 };
     if (centerIndex >= 0)
       {
-      double* point = fofProperties->GetPoint(haloData.GetActualIndex(centerIndex));
+      double* point = allParticles->GetPoint(haloData.GetActualIndex(centerIndex));
       center[0] = point[0];
       center[1] = point[1];
       center[2] = point[2];
