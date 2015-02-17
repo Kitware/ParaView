@@ -17,14 +17,17 @@
 
 #include "HaloFinderTestHelpers.h"
 
+#include "vtkArrayCalculator.h"
+#include "vtkColorTransferFunction.h"
 #include "vtkMPIController.h"
 #include "vtkRegressionTestImage.h"
 
 namespace {
-int runHaloFinderTest1(int argc, char*argv[])
+int runHaloFinderTest(int argc, char*argv[])
 {
   HaloFinderTestHelpers::HaloFinderTestVTKObjects to =
-      HaloFinderTestHelpers::SetupHaloFinderTest(argc, argv);
+      HaloFinderTestHelpers::SetupHaloFinderTest(
+        argc, argv, vtkPANLHaloFinder::MOST_BOUND_PARTICLE);
 
   vtkUnstructuredGrid* allParticles = to.haloFinder->GetOutput(0);
   if (!HaloFinderTestHelpers::pointDataHasTheseArrays(allParticles->GetPointData(),
@@ -35,12 +38,37 @@ int runHaloFinderTest1(int argc, char*argv[])
     }
   vtkUnstructuredGrid* haloSummaries = to.haloFinder->GetOutput(1);
   if (!HaloFinderTestHelpers::pointDataHasTheseArrays(haloSummaries->GetPointData(),
-                               HaloFinderTestHelpers::getHaloSummaryArrays()))
+                               HaloFinderTestHelpers::getHaloSummaryWithCenterInfoArrays()))
     {
     std::cerr << "Error at line: " << __LINE__ << std::endl;
     return 0;
     }
 
+  vtkNew< vtkArrayCalculator > calc;
+  calc->SetInputConnection(to.haloFinder->GetOutputPort(1));
+  calc->SetResultArrayName("Result");
+  calc->AddCoordinateVectorVariable("coords");
+  calc->AddVectorArrayName("fof_center");
+  calc->SetFunction("mag(fof_center - coords)");
+  calc->Update();
+
+  double range[2];
+  calc->GetOutput()->GetPointData()->GetArray("Result")->GetRange(range);
+
+  to.maskPoints->SetInputConnection(calc->GetOutputPort());
+  to.maskPoints->Update();
+
+  vtkNew< vtkColorTransferFunction > lut;
+  lut->AddRGBPoint(range[0], 59/255.0, 76/255.0, 192/255.0);
+  lut->AddRGBPoint(range[1], 180/255.0, 4/255.0, 38/255.0);
+  lut->SetColorSpaceToDiverging();
+  lut->SetVectorModeToMagnitude();
+
+  to.mapper->SetLookupTable(lut.GetPointer());
+  to.mapper->ScalarVisibilityOn();
+//  to.mapper->SelectColorArray("Result");
+  to.mapper->SetInputArrayToProcess(0,0,0,vtkDataObject::FIELD_ASSOCIATION_POINTS,"Result");
+  to.mapper->InterpolateScalarsBeforeMappingOn();
 
   int retVal = vtkRegressionTestImage(to.renWin.GetPointer());
   if ( retVal == vtkRegressionTester::DO_INTERACTOR)
@@ -48,11 +76,12 @@ int runHaloFinderTest1(int argc, char*argv[])
     to.iren->Start();
     }
 
+
   return retVal;
 }
 }
 
-int TestHaloFinder(int argc, char* argv[])
+int TestHaloFinderSummaryInfo(int argc, char* argv[])
 {
   MPI_Init(&argc,&argv);
 
@@ -60,7 +89,7 @@ int TestHaloFinder(int argc, char* argv[])
   controller->Initialize();
   vtkMultiProcessController::SetGlobalController(controller.GetPointer());
 
-  int retVal = runHaloFinderTest1(argc,argv);
+  int retVal = runHaloFinderTest(argc,argv);
 
   controller->Finalize();
   return !retVal;

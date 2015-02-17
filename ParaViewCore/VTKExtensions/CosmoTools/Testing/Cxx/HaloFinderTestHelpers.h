@@ -51,7 +51,7 @@ struct HaloFinderTestVTKObjects {
   vtkSmartPointer< vtkCompositePolyDataMapper2 > mapper;
 };
 
-std::set< std::string > getFirstOutputArrays()
+inline std::set< std::string > getFirstOutputArrays()
 {
   std::set< std::string > arrayNames;
   arrayNames.insert("vx");
@@ -62,7 +62,7 @@ std::set< std::string > getFirstOutputArrays()
   return arrayNames;
 }
 
-std::set< std::string > getHaloSummaryArrays()
+inline std::set< std::string > getHaloSummaryArrays()
 {
   std::set< std::string > arrayNames;
   arrayNames.insert("fof_halo_tag");
@@ -74,14 +74,14 @@ std::set< std::string > getHaloSummaryArrays()
   return arrayNames;
 }
 
-std::set< std::string > getHaloSummaryWithCenterInfoArrays()
+inline std::set< std::string > getHaloSummaryWithCenterInfoArrays()
 {
   std::set< std::string > arrayNames = getHaloSummaryArrays();
-  arrayNames.insert("fof_halo_center");
+  arrayNames.insert("fof_center");
   return arrayNames;
 }
 
-bool pointDataHasTheseArrays(vtkPointData* pd, const std::set< std::string >& arrays)
+inline bool pointDataHasTheseArrays(vtkPointData* pd, const std::set< std::string >& arrays)
 {
   if (pd->GetNumberOfArrays() != arrays.size())
     {
@@ -99,7 +99,8 @@ bool pointDataHasTheseArrays(vtkPointData* pd, const std::set< std::string >& ar
   return true;
 }
 
-HaloFinderTestVTKObjects SetupHaloFinderTest(int argc, char* argv[])
+inline HaloFinderTestVTKObjects SetupHaloFinderTest(
+    int argc, char* argv[], vtkPANLHaloFinder::CenterFindingType centerFinding = vtkPANLHaloFinder::NONE)
 {
   HaloFinderTestVTKObjects testObjects;
   char* fname =
@@ -122,6 +123,10 @@ HaloFinderTestVTKObjects SetupHaloFinderTest(int argc, char* argv[])
   testObjects.haloFinder->SetRL(128);
   testObjects.haloFinder->SetNP(128);
   testObjects.haloFinder->SetPMin(100);
+  testObjects.haloFinder->SetCenterFindingMode(centerFinding);
+  testObjects.haloFinder->SetOmegaDM(0.2068);
+  testObjects.haloFinder->SetDeut(0.0224);
+  testObjects.haloFinder->SetHubble(0.72);
   testObjects.haloFinder->Update();
 
   testObjects.onlyPointsInHalos->SetInputConnection(

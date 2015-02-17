@@ -4,7 +4,8 @@ genericio/m000.499.allparticles
 
 paraview_add_test_cxx(${vtk-module}CxxTests tests
   NO_OUTPUT
-  TestHaloFinder.cxx
+  TestHaloFinder.cxx # test of particles output
+  TestHaloFinderSummaryInfo.cxx # test of summary information output
 )
 
 vtk_test_mpi_executable(${vtk-module}CxxTests tests
