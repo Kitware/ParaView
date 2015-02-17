@@ -535,7 +535,8 @@ class CoProcessor(object):
             vals.append([view, 'CameraViewUp', list(up)])
 
         fnpattern = fnpattern[:-1] #strip trailing /
-        fnpattern = fnpattern + ".png"
+        imgext = view.cpFileName[view.cpFileName.rfind("."):]
+        fnpattern = fnpattern + imgext
         fs.filename_pattern = fnpattern
 
         #at current time, run through parameters and dump files

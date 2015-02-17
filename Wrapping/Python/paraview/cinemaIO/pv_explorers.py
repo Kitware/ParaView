@@ -12,8 +12,9 @@ class ImageExplorer(explorers.Explorer):
     def insert(self, document):
         # FIXME: for now we'll write a temporary image and read that in.
         # we need to provide nicer API for this.
-        simple.WriteImage("temporary.png", view=self.view)
-        with open("temporary.png", "rb") as file:
+        extension = self.cinema_store.get_image_type()
+        simple.WriteImage("temporary"+extension, view=self.view)
+        with open("temporary"+extension, "rb") as file:
             document.data = file.read()
 
         #alternatively if you are just writing out files and don't need them in memory

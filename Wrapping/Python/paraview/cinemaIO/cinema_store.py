@@ -150,6 +150,9 @@ class Store(object):
     def find(self, q=None):
         raise RuntimeError("Subclasses must define this method")
 
+    def get_image_type(self):
+        return ".png"
+
 class FileStore(Store):
     """Implementation of a store based on files and directories"""
 
@@ -193,6 +196,9 @@ class FileStore(Store):
     @filename_pattern.setter
     def filename_pattern(self, val):
         self.__filename_pattern = val
+
+    def get_image_type(self):
+        return self.filename_pattern[self.filename_pattern.rfind("."):]
 
     def insert(self, document):
         super(FileStore, self).insert(document)
