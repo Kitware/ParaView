@@ -359,6 +359,7 @@
         { "class": "vtkInteractorObserver" },
         { "class": "vtkInteractorStyle" },
         { "class": "vtkInteractorStyleSwitchBase" },
+        { "class": "vtkLabeledContourMapper" },
         { "class": "vtkLight" },
         { "class": "vtkLightCollection" },
         { "class": "vtkLightKit" },
@@ -394,6 +395,7 @@
         { "class": "vtkTextActor3D" },
         { "class": "vtkTextMapper" },
         { "class": "vtkTextProperty" },
+        { "class": "vtkTextPropertyCollection" },
         { "class": "vtkTextRenderer" },
         { "class": "vtkTexture" },
         { "class": "vtkTexturedActor2D" },
@@ -674,6 +676,7 @@
         { "class": "vtkSMUtilities" },
         { "class": "vtkSMViewLayoutProxy" },
         { "class": "vtkSMViewProxy" },
+        { "class": "vtkSMViewProxyInteractorHelper" },
         { "class": "vtkSMWidgetRepresentationProxy" }
       ],
       "replace": [
