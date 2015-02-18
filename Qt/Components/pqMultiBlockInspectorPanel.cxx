@@ -258,6 +258,7 @@ void pqMultiBlockInspectorPanel::onRepresentationChanged(
                                       this,
                                       SLOT(onColorArrayNameModified()));
       }
+    onColorArrayNameModified();
     }
   else
     {
