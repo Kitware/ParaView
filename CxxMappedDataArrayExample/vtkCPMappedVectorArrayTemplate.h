@@ -13,13 +13,12 @@
 
 =========================================================================*/
 
-// .NAME vtkCPMappedVectorArrayTemplate - Map native Exodus II coordinate
-// arrays into the vtkDataArray interface.
+// .NAME vtkCPMappedVectorArrayTemplate - Map native data arrays into
+// the vtkDataArray interface.
 //
 // .SECTION Description
-// Map native Exodus II coordinate arrays into the vtkDataArray interface. Use
-// the vtkCPExodusIIInSituReader to read an Exodus II file's data into this
-// structure.
+// Map native simulation code data arrays into the vtkDataArray interface.
+// This is based on the vtkCPExodusIIResultsArrayTemplate.h class in VTK.
 
 #ifndef __vtkCPMappedVectorArrayTemplate_h
 #define __vtkCPMappedVectorArrayTemplate_h
@@ -77,6 +76,8 @@ public:
   void InsertTuple(vtkIdType i, const double *source);
   void InsertTuples(vtkIdList *dstIds, vtkIdList *srcIds,
                     vtkAbstractArray *source);
+  void InsertTuples(vtkIdType dstStart, vtkIdType n, vtkIdType srcStart,
+                    vtkAbstractArray* source);
   vtkIdType InsertNextTuple(vtkIdType j, vtkAbstractArray *source);
   vtkIdType InsertNextTuple(const float *source);
   vtkIdType InsertNextTuple(const double *source);
@@ -116,4 +117,3 @@ private:
 #include "vtkCPMappedVectorArrayTemplate.txx"
 
 #endif //__vtkCPMappedVectorArrayTemplate_h
-

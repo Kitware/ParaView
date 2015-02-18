@@ -131,7 +131,7 @@ void Attributes::UpdateFields(double time)
 {
   size_t numPoints = this->GridPtr->GetNumberOfPoints();
   this->Velocity.resize(numPoints*3);
-  double coord[3];
+  double coord[3] = {0, 0, 0};
   for(size_t pt=0;pt<numPoints;pt++)
     {
     this->GridPtr->GetPoint(pt, coord);
