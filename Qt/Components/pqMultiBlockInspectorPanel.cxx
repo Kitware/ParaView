@@ -343,10 +343,6 @@ void pqMultiBlockInspectorPanel::onDataUpdated()
     this->TreeWidget->blockSignals(true);
     int flatIndex = 0;
 
-    // get data
-    vtkSMSourceProxy* sourceProxy = 
-      vtkSMSourceProxy::SafeDownCast(source->getProxy());
-    
     // create root item
     QString rootLabel = source->getSMName();
     QTreeWidgetItem *rootItem =
@@ -658,8 +654,13 @@ void pqMultiBlockInspectorPanel::updateTree()
 
   // get the array name we color by
   vtkSMProxy *representationProxy = this->Representation->getProxy();
-  vtkSMPropertyHelper colorArrayHelper(representationProxy, "ColorArrayName");
+  vtkSMPropertyHelper colorArrayHelper(representationProxy, "ColorArrayName",
+                                       true);
   const char* arrayName = colorArrayHelper.GetInputArrayNameToProcess();
+  if (! arrayName)
+    {
+    return;
+    }
   this->ColorTransferFunction = NULL;
   this->OpacityTransferFunction = NULL;
   // field name setup in vtkPVGeometryFilter to contain the current block index
@@ -770,8 +771,13 @@ void pqMultiBlockInspectorPanel::onColorArrayNameModified()
 {
   // get the array name we color by
   vtkSMProxy *representationProxy = this->Representation->getProxy();
-  vtkSMPropertyHelper colorArrayHelper(representationProxy, "ColorArrayName");
+  vtkSMPropertyHelper colorArrayHelper(representationProxy, "ColorArrayName",
+                                       true);
   const char* arrayName = colorArrayHelper.GetInputArrayNameToProcess();
+  if (! arrayName)
+    {
+    return;
+    }
 
   // field name setup in vtkPVGeometryFilter to contain the current block index
   if (! strcmp(arrayName, "vtkCompositeIndex"))
@@ -783,18 +789,15 @@ void pqMultiBlockInspectorPanel::onColorArrayNameModified()
     vtkSMProxy* colorTransferProxy = 
       transferFunctionManager->GetColorTransferFunction(
         arrayName, activeSessionProxyManager);
-    if (colorTransferProxy != this->ColorTransferProxy)
+    if (this->ColorTransferProxy)
       {
-      if (this->ColorTransferProxy)
-        {
-        this->PropertyListener->Disconnect(colorTransferProxy);
-        }
-      this->PropertyListener->Connect(colorTransferProxy,
-                                      vtkCommand::ModifiedEvent,
-                                      &this->UpdateUITimer,
-                                      SLOT(start()));
-      this->ColorTransferProxy = colorTransferProxy;
+      this->PropertyListener->Disconnect(colorTransferProxy);
       }
+    this->PropertyListener->Connect(colorTransferProxy,
+                                    vtkCommand::ModifiedEvent,
+                                    &this->UpdateUITimer,
+                                    SLOT(start()));
+    this->ColorTransferProxy = colorTransferProxy;
     }
   updateTree();
 }
