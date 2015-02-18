@@ -648,7 +648,7 @@ void pqMultiBlockInspectorPanel::updateBlockOpacities()
 
 void pqMultiBlockInspectorPanel::updateTree()
 {
-  if(!this->Representation)
+  if(!this->Representation || !this->OutputPort)
     {
     return;
     }
