@@ -6,6 +6,7 @@ paraview_add_test_cxx(${vtk-module}CxxTests tests
   NO_OUTPUT
   TestHaloFinder.cxx # test of particles output
   TestHaloFinderSummaryInfo.cxx # test of summary information output
+  TestHaloFinderSubhaloFinding.cxx # test of subhalo finding option
 )
 
 vtk_test_mpi_executable(${vtk-module}CxxTests tests

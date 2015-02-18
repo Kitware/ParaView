@@ -85,6 +85,8 @@ inline bool pointDataHasTheseArrays(vtkPointData* pd, const std::set< std::strin
 {
   if (pd->GetNumberOfArrays() != arrays.size())
     {
+    std::cerr << "Wrong number of arrays.  There should be " << arrays.size()
+              << " and there are " << pd->GetNumberOfArrays() << std::endl;
     return false;
     }
   for (std::set< std::string >::iterator itr = arrays.begin();
@@ -100,7 +102,9 @@ inline bool pointDataHasTheseArrays(vtkPointData* pd, const std::set< std::strin
 }
 
 inline HaloFinderTestVTKObjects SetupHaloFinderTest(
-    int argc, char* argv[], vtkPANLHaloFinder::CenterFindingType centerFinding = vtkPANLHaloFinder::NONE)
+    int argc, char* argv[],
+    vtkPANLHaloFinder::CenterFindingType centerFinding = vtkPANLHaloFinder::NONE,
+    bool findSubhalos = false)
 {
   HaloFinderTestVTKObjects testObjects;
   char* fname =
@@ -121,12 +125,22 @@ inline HaloFinderTestVTKObjects SetupHaloFinderTest(
 
   testObjects.haloFinder->SetInputConnection(testObjects.reader->GetOutputPort());
   testObjects.haloFinder->SetRL(128);
+  testObjects.haloFinder->SetParticleMass(13070871810);
   testObjects.haloFinder->SetNP(128);
   testObjects.haloFinder->SetPMin(100);
   testObjects.haloFinder->SetCenterFindingMode(centerFinding);
   testObjects.haloFinder->SetOmegaDM(0.2068);
   testObjects.haloFinder->SetDeut(0.0224);
   testObjects.haloFinder->SetHubble(0.72);
+  if (findSubhalos)
+    {
+    testObjects.haloFinder->SetRunSubHaloFinder(1);
+    testObjects.haloFinder->SetMinFOFSubhaloSize(7000);
+    testObjects.haloFinder->SetMinCandidateSize(20);
+    // Expand the linking length a bit for the subhalo finding test, we need big
+    // halos to have interesting subhalos
+    testObjects.haloFinder->SetBB(0.2);
+    }
   testObjects.haloFinder->Update();
 
   testObjects.onlyPointsInHalos->SetInputConnection(
