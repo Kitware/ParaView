@@ -339,7 +339,7 @@ int vtkSpyPlotUniReader::MakeCurrent()
       blocksExists = 1;
       }
     // Did we create data blocks that we do not need any more
-    if ( (!needMarkers && !this->CellArraySelection->ArrayIsEnabled(var->Name)) ||
+    if ( (!this->CellArraySelection->ArrayIsEnabled(var->Name)) ||
          (this->DataTypeChanged && this->IsVolumeFraction(var) ) )
       {
       if ( var->DataBlocks )
