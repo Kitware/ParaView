@@ -1,10 +1,5 @@
 """
     Module defining classes and methods for managing cinema data storage.
-
-    TODO:
-    child stores (for workbench)
-    cost data
-    expand beyond parametric-image-stack type use case
 """
 
 import sys
@@ -18,7 +13,8 @@ class Document(object):
     """
     This refers to a document in the cinema data storage. A document is
     uniquely identified by a 'descriptor'. A descriptor is a dictionary with
-    key-value pairs, where key is the component name and value is its value.
+    key-value pairs, where key is a parameter name and value is the value for
+    that particular parameter.
 
     A document can have arbitrary meta-data (as 'attributes') and data (as
     'data') associated with it.
@@ -57,19 +53,21 @@ class Document(object):
         self.__data = val
 
 class Store(object):
-    """Base class for a cinema store. This class is an abstract class defining
-    the API and storage independent logic. Storage specific subclasses handle
-    the 'database' access.
+    """Base class for a cinema store. A store is a collection of Documents,
+    with API to add, find, and access them.
+
+    This class is an abstract class defining the API and storage independent
+    logic. Storage specific subclasses handle the 'database' access.
 
     The design of cinema store is based on the following principles:
 
-    The store comprises of documents (Document instances). Each document has an
-    unique descriptor associated with it. This can be thought of as the 'unique
-    key' in database terminology.
+    The store comprises of documents (Document instances). Each document has a
+    unique set of parameters, aka a "descriptor" associated with it. This
+    can be thought of as the 'unique key' in database terminology.
 
-    One can define the components for descriptors for documents in a Store on
-    the store itself. This is referred to as 'descriptor_definition'. One can
-    use 'add_descriptor()' calls to add new descriptor definitions for a new
+    One defines the parameters (contents of the descriptor) for documents
+    on the store itself. The set of them is is referred to as 'parameter_list'.
+    One uses 'add_parameter()' calls to add new parameter definitions for a new
     store instance.
 
     Users insert documents in the store using 'insert'. One can find
@@ -79,16 +77,16 @@ class Store(object):
 
     def __init__(self):
         self.__metadata = None #better name is view hints
-        self.__descriptor_definition = {}
+        self.__parameter_list = {}
         self.__loaded = False
 
     @property
-    def descriptor_definition(self):
-        return self.__descriptor_definition
+    def parameter_list(self):
+        return self.__parameter_list
 
-    def _set_descriptor_definition(self, val):
+    def _set_parameter_list(self, val):
         """For use by subclasses alone"""
-        self.__descriptor_definition = val
+        self.__parameter_list = val
 
     @property
     def metadata(self):
@@ -103,33 +101,34 @@ class Store(object):
             self.__metadata = {}
         self.__metadata.update(keyval)
 
-    def get_full_descriptor(self, desc):
-        # FIXME: bad name!!!
+    def get_complete_descriptor(self, partial_desc):
         full_desc = dict()
-        for name, properties in self.descriptor_definition.items():
+        for name, properties in self.parameter_list.items():
             if properties.has_key("default"):
                 full_desc[name] = properties["default"]
-        full_desc.update(desc)
+        full_desc.update(partial_desc)
         return full_desc
 
-    def add_descriptor(self, name, properties):
-        """Add a descriptor.
+    def add_parameter(self, name, properties):
+        """Add a parameter.
 
-        :param name: Name for the descriptor.
+        :param name: Name for the parameter.
 
         :param properties: Keyword arguments can be used to associate miscellaneous
-        meta-data with this descriptor.
+        meta-data with this parameter.
         """
         #if self.__loaded:
-        #    raise RuntimeError("Updating descriptors after loading/creating a store is not supported.")
-        properties = self.validate_descriptor(name, properties)
-        self.__descriptor_definition[name] = properties
+        #    raise RuntimeError("Updating parameters after loading/creating a store is not supported.")
+        # TODO: except when it is, in the important case of adding new time steps to a collection
+        # probably can only add safely to outermost parameter (loop)
+        properties = self.validate_parameter(name, properties)
+        self.__parameter_list[name] = properties
 
-    def get_descriptor_properties(self, name):
-        return self.__descriptor_definition[name]
+    def get_parameter(self, name):
+        return self.__parameter_list[name]
 
-    def validate_descriptor(self, name, properties):
-        """Validates a  new descriptor and return updated descriptor properties.
+    def validate_parameter(self, name, properties):
+        """Validates a  new parameter and return updated parameter properties.
         Subclasses should override this as needed.
         """
         return properties
@@ -151,7 +150,7 @@ class Store(object):
         raise RuntimeError("Subclasses must define this method")
 
     def get_image_type(self):
-        return ".png"
+        return None
 
 class FileStore(Store):
     """Implementation of a store based on files and directories"""
@@ -167,14 +166,16 @@ class FileStore(Store):
         super(FileStore, self).load()
         with open(self.__dbfilename, mode="rb") as file:
             info_json = json.load(file)
-            self._set_descriptor_definition(info_json['arguments'])
+            #for legacy reasons, the parameters are called
+            #arguments" in the files
+            self._set_parameter_list(info_json['arguments'])
             self.metadata = info_json['metadata']
             self.__filename_pattern = info_json['name_pattern']
 
     def save(self):
         """ writes out a modified file store """
         info_json = dict(
-                arguments = self.descriptor_definition,
+                arguments = self.parameter_list,
                 name_pattern = self.filename_pattern,
                 metadata = self.metadata
                 )
@@ -191,6 +192,14 @@ class FileStore(Store):
 
     @property
     def filename_pattern(self):
+        """
+        Files corresponding to Documents are arranged on disk
+        according the the directory and filename structure described
+        by the filename_pattern. The format is a regular expression
+        consisting of parameter names enclosed in '{' and '}' and
+        separated by spacers. "/" spacer characters produce sub
+        directories.
+        """
         return self.__filename_pattern
 
     @filename_pattern.setter
@@ -219,13 +228,14 @@ class FileStore(Store):
 
 
     def get_filename(self, document):
-        desc = self.get_full_descriptor(document.descriptor)
+        desc = self.get_complete_descriptor(document.descriptor)
         suffix = self.filename_pattern.format(**desc)
         dirname = os.path.dirname(self.__dbfilename)
         return os.path.join(dirname, suffix)
 
     def find(self, q=None):
-        """Currently support empty query or direct values queries e.g.
+        """
+        Currently support empty query or direct values queries e.g.
         for doc in store.find({'phi': 0}):
             print doc.data
         for doc in store.find({'phi': 0, 'theta': 100}):
@@ -235,7 +245,7 @@ class FileStore(Store):
         p = q
 
         # build a file name match pattern based on the query.
-        for name, properties in self.descriptor_definition.items():
+        for name, properties in self.parameter_list.items():
             if not name in q:
                 p[name] = "*"
         dirname = os.path.dirname(self.__dbfilename)
@@ -259,7 +269,7 @@ class FileStore(Store):
         return doc
 
 
-def make_cinema_descriptor_properties(name, values, **kwargs):
+def make_parameter(name, values, **kwargs):
     default = kwargs['default'] if 'default' in kwargs else values[0]
     typechoice = kwargs['typechoice'] if 'typechoice' in kwargs else 'range'
     label = kwargs['label'] if 'label' in kwargs else name

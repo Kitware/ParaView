@@ -1,12 +1,21 @@
+"""
+    Module consisting of explorers and tracks that connect arbitrary paraview
+    pipelines to cinema stores.
+"""
+
 import explorers
 
 import paraview.simple as simple
 
 class ImageExplorer(explorers.Explorer):
+    """
+    An explorer that connects a paraview script's views to a store
+    and makes it save new images into the store.
+    """
     def __init__(self,
-                cinema_store, arguments, tracks,
+                cinema_store, parameters, tracks,
                 view=None):
-        super(ImageExplorer, self).__init__(cinema_store, arguments, tracks)
+        super(ImageExplorer, self).__init__(cinema_store, parameters, tracks)
         self.view = view
 
     def insert(self, document):
@@ -24,6 +33,11 @@ class ImageExplorer(explorers.Explorer):
         super(ImageExplorer, self).insert(document)
 
 class Camera(explorers.Track):
+    """
+    A track that connects a paraview script's camera to the phi and theta tracks.
+    This allows the creation of spherical camera stores where the user can
+    view the data from many points around it.
+    """
     def __init__(self, center, axis, distance, view):
         super(Camera, self).__init__()
         try:
@@ -74,11 +88,14 @@ class Camera(explorers.Track):
         return thetas, phis
 
 class Slice(explorers.Track):
+    """
+    A track that connects slice filters to a scalar valued parameter.
+    """
 
-    def __init__(self, argument, filt):
+    def __init__(self, parameter, filt):
         super(Slice, self).__init__()
 
-        self.argument = argument
+        self.parameter = parameter
         self.slice = filt
 
     def prepare(self, explorer):
@@ -86,14 +103,17 @@ class Slice(explorers.Track):
         explorer.cinema_store.add_metadata({'type' : 'parametric-image-stack'})
 
     def execute(self, doc):
-        o = doc.descriptor[self.argument]
+        o = doc.descriptor[self.parameter]
         self.slice.SliceOffsetValues=[o]
 
 class Contour(explorers.Track):
+    """
+    A track that connects contour filters to a scalar valued parameter.
+    """
 
-    def __init__(self, argument, filt):
+    def __init__(self, parameter, filt):
         super(Contour, self).__init__()
-        self.argument = argument
+        self.parameter = parameter
         self.contour = filt
         self.control = 'Isosurfaces'
 
@@ -102,20 +122,24 @@ class Contour(explorers.Track):
         explorer.cinema_store.add_metadata({'type': "parametric-image-stack"})
 
     def execute(self, doc):
-        o = doc.descriptor[self.argument]
+        o = doc.descriptor[self.parameter]
         self.contour.SetPropertyWithName(self.control,[o])
 
 class Templated(explorers.Track):
+    """
+    A track that connects any type of filter to a scalar valued
+    'control' parameter.
+    """
 
-    def __init__(self, argument, filt, control):
+    def __init__(self, parameter, filt, control):
         explorers.Track.__init__(self)
 
-        self.argument = argument
+        self.parameter = parameter
         self.filt = filt
         self.control = control
 
     def execute(self, doc):
-        o = doc.descriptor[self.argument]
+        o = doc.descriptor[self.parameter]
         self.filt.SetPropertyWithName(self.control,[o])
 
 class ColorList():
@@ -137,15 +161,18 @@ class ColorList():
         return self._dict[name]
 
 class Color(explorers.Track):
+    """
+    A track that connects a parameter to a choice of surface rendered color maps.
+    """
 
-    def __init__(self, argument, colorlist, rep):
+    def __init__(self, parameter, colorlist, rep):
         super(Color, self).__init__()
-        self.argument = argument
+        self.parameter = parameter
         self.colorlist = colorlist
         self.rep = rep
 
     def execute(self, doc):
-        o = doc.descriptor[self.argument]
+        o = doc.descriptor[self.parameter]
         spec = self.colorlist.getColor(o)
         if spec['type'] == 'rgb':
             self.rep.DiffuseColor = spec['content']

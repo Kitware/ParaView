@@ -470,13 +470,13 @@ class CoProcessor(object):
         view.ViewTime = time
         formatted_time = float_limiter(time)
         try:
-            tprop = fs.get_descriptor_properties('time')
+            tprop = fs.get_parameter('time')
             tprop['values'].append(formatted_time)
         except KeyError:
-            tprop = CS.make_cinema_descriptor_properties('time', [formatted_time])
-            fs.add_descriptor('time', tprop)
+            tprop = CS.make_parameter('time', [formatted_time])
+            fs.add_parameter('time', tprop)
 
-        descriptors = []
+        parameters = []
         tracks = []
 
         #fixed track for time
@@ -502,8 +502,8 @@ class CoProcessor(object):
             proxy = track['proxy']
             smproperty = track['smproperty']
             valrange = list(float_limiter(x for x in track['valrange']))
-            fs.add_descriptor(name, CS.make_cinema_descriptor_properties(name, valrange))
-            descriptors.append(name)
+            fs.add_parameter(name, CS.make_parameter(name, valrange))
+            parameters.append(name)
             tracks.append(pv_explorers.Templated(name, proxy, smproperty))
             #save off current value for later restoration
             vals.append([proxy, smproperty, list(proxy.GetPropertyValue(smproperty))])
@@ -514,8 +514,8 @@ class CoProcessor(object):
             fnpattern = fnpattern + "{phi}/{theta}/"
             phis = list(float_limiter(x for x in cinemaOptions['phi']))
             thetas = list(float_limiter(x for x in cinemaOptions['theta']))
-            fs.add_descriptor("phi", CS.make_cinema_descriptor_properties('phi', phis))
-            fs.add_descriptor("theta", CS.make_cinema_descriptor_properties('theta', thetas))
+            fs.add_parameter("phi", CS.make_parameter('phi', phis))
+            fs.add_parameter("theta", CS.make_parameter('theta', thetas))
             eye = view.CameraPosition
             at = view.CameraFocalPoint
             dist = math.sqrt(sum(math.pow(eye[x]-at[x],2) for x in [0,1,2]))
@@ -526,8 +526,8 @@ class CoProcessor(object):
             if up[2]>up[uppest]: uppest = 2
             cinup = [0,0,0]
             cinup[uppest]=1
-            descriptors.append("phi")
-            descriptors.append("theta")
+            parameters.append("phi")
+            parameters.append("theta")
             tracks.append(pv_explorers.Camera(at, cinup, dist, view))
             #save off current value for later restoration
             vals.append([view, 'CameraPosition', list(eye)])
@@ -540,7 +540,7 @@ class CoProcessor(object):
         fs.filename_pattern = fnpattern
 
         #at current time, run through parameters and dump files
-        e = pv_explorers.ImageExplorer(fs, descriptors, tracks, view=view)
+        e = pv_explorers.ImageExplorer(fs, parameters, tracks, view=view)
         e.explore({'time':formatted_time})
         fs.save()
 
