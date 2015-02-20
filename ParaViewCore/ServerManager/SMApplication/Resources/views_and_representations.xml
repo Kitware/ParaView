@@ -3254,6 +3254,8 @@
                       panel_visibility="never" />
             <Property name="BlockOpacity"
                       panel_visibility="never" />
+            <Property name="BlockColorsDistinctValues"
+                      panel_visibility="advanced" />
           </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
@@ -8357,6 +8359,24 @@
           Set the opacity for a block. Value is (index, alpha).
         </Documentation>
       </DoubleMapProperty>
+      <IntVectorProperty command="SetBlockColorsDistinctValues"
+                         default_values="7"
+                         name="BlockColorsDistinctValues"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <Documentation>
+          Determines the number of distinct values in
+          vtkBlockColors. This array is added to each block if
+          the dataset is a composite dataset. The array has one value
+          set to (blockIndex % BlockColorsDistinctValues)
+        </Documentation>
+        <IntRangeDomain min="2" name="range" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="GeneralSettings"
+                        property="BlockColorsDistinctValues"/>
+        </Hints>
+      </IntVectorProperty>
       <!-- End of SurfaceRepresentationBase -->
     </RepresentationProxy>
 

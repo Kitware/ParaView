@@ -59,10 +59,16 @@ enum ValueType
   USER_VALUE
 };
 
+enum Column
+{
+  NAME_COLUMN,
+  COLOR_COLUMN,
+  OPACITY_COLUMN,
+  COLUMN_COUNT
+};
+
 const int ICON_SIZE = 16;
-const int BETWEEN_ICONS = 0;
-const int BETWEEN_SQUARE_AND_CIRCLE = 1;
-const int PEN_WIDTH = 1;
+const int BETWEEN_SIZE = 3;
 void drawColorIcon(QPainter& painter, QColor& color,
                    ValueType valueType = SYSTEM_VALUE)
 {
@@ -70,48 +76,45 @@ void drawColorIcon(QPainter& painter, QColor& color,
   if (valueType == USER_VALUE)
     {
     painter.setBrush(Qt::black);
-    painter.drawRect(0, 0, ICON_SIZE-1, ICON_SIZE-1);
+    painter.drawRect(0, 0, ICON_SIZE, ICON_SIZE);
     }
   painter.setBrush(color);
-  painter.drawEllipse(BETWEEN_SQUARE_AND_CIRCLE, 
-                      BETWEEN_SQUARE_AND_CIRCLE, 
-                      ICON_SIZE - 2 * BETWEEN_SQUARE_AND_CIRCLE,
-                      ICON_SIZE - 2 * BETWEEN_SQUARE_AND_CIRCLE);
+  painter.drawEllipse(BETWEEN_SIZE,
+                      BETWEEN_SIZE,
+                      ICON_SIZE - 2*BETWEEN_SIZE,
+                      ICON_SIZE - 2*BETWEEN_SIZE);
 }
 
-void drawNullIcon(QPainter& painter, int xOffset)
+void drawNullIcon(QPainter& painter)
 {
   painter.setPen(Qt::black);
   painter.setBrush(Qt::white);
-  painter.drawEllipse(xOffset + BETWEEN_SQUARE_AND_CIRCLE,
-                      BETWEEN_SQUARE_AND_CIRCLE, 
-                      ICON_SIZE - 2 * BETWEEN_SQUARE_AND_CIRCLE,
-                      ICON_SIZE - 2 * BETWEEN_SQUARE_AND_CIRCLE);
-  painter.drawLine(xOffset + ICON_SIZE - 1, 0, xOffset, ICON_SIZE-1);
+  painter.drawEllipse(BETWEEN_SIZE, BETWEEN_SIZE, 
+                      ICON_SIZE - 2*BETWEEN_SIZE, ICON_SIZE - 2*BETWEEN_SIZE);
+  painter.drawLine(
+    ICON_SIZE - BETWEEN_SIZE - 1, BETWEEN_SIZE, 
+    BETWEEN_SIZE, ICON_SIZE - BETWEEN_SIZE - 1);
 }
 
 
 void drawOpacityIcon(QPainter& painter, double opacity,
                      ValueType valueType = SYSTEM_VALUE)
 {
-  int xStart = ICON_SIZE + BETWEEN_ICONS;
   if (valueType == USER_VALUE)
     {
     painter.setPen(Qt::black);
     painter.setBrush(Qt::black);
-    painter.drawRect(xStart, 0, ICON_SIZE, ICON_SIZE);
+    painter.drawRect(0, 0, ICON_SIZE, ICON_SIZE);
     }
   painter.setPen(Qt::black);
   int angle = 5760 * opacity;
   painter.setBrush(Qt::white);
-  painter.drawEllipse(xStart, BETWEEN_SQUARE_AND_CIRCLE, 
-                      ICON_SIZE - 2 * BETWEEN_SQUARE_AND_CIRCLE,
-                      ICON_SIZE - 2 * BETWEEN_SQUARE_AND_CIRCLE);
+  painter.drawEllipse(BETWEEN_SIZE, BETWEEN_SIZE, 
+                      ICON_SIZE - 2*BETWEEN_SIZE, ICON_SIZE - 2*BETWEEN_SIZE);
   painter.setBrush(Qt::lightGray);
-  painter.drawPie(xStart, BETWEEN_SQUARE_AND_CIRCLE, 
-                  ICON_SIZE - 2 * BETWEEN_SQUARE_AND_CIRCLE,
-                  ICON_SIZE - 2 * BETWEEN_SQUARE_AND_CIRCLE,
-                  0, angle);
+  painter.drawPie(BETWEEN_SIZE, BETWEEN_SIZE, 
+                  ICON_SIZE - 2*BETWEEN_SIZE,
+                  ICON_SIZE - 2*BETWEEN_SIZE, 0, angle);
 }
 
 
@@ -119,11 +122,13 @@ void drawOpacityIcon(QPainter& painter, double opacity,
 
 pqMultiBlockInspectorPanel::pqMultiBlockInspectorPanel(QWidget *parent_)
   : QWidget(parent_), ColorTransferProxy(NULL),
-    ColorTransferFunction(NULL), OpacityTransferFunction(NULL)
+    ColorTransferFunction(NULL), OpacityTransferFunction(NULL),
+    BlockColorsDistinctValues(7), CompositeWrap(0)
 {
   // setup tree widget
   this->TreeWidget = new QTreeWidget(this);
-  this->TreeWidget->setColumnCount(1);
+  this->TreeWidget->setColumnCount(COLUMN_COUNT);
+  this->TreeWidget->setExpandsOnDoubleClick(false);
   this->TreeWidget->header()->close();
 
   // create tree widget selection helper
@@ -135,7 +140,7 @@ pqMultiBlockInspectorPanel::pqMultiBlockInspectorPanel(QWidget *parent_)
     SIGNAL(customContextMenuRequested(const QPoint&)), 0, 0);
 
   this->connect(this->TreeWidget, SIGNAL(itemSelectionChanged()),
-                this, SLOT(currentTreeItemSelectionChanged()));
+                this, SLOT(onItemSelectionChanged()));
 
   this->PropertyListener = vtkEventQtSlotConnect::New();
 
@@ -163,9 +168,14 @@ pqMultiBlockInspectorPanel::pqMultiBlockInspectorPanel(QWidget *parent_)
   // connect to right-click signals in the tree widget
   this->TreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
   this->connect(this->TreeWidget, SIGNAL(customContextMenuRequested(QPoint)),
-                this, SLOT(treeWidgetCustomContextMenuRequested(QPoint)));
+                this, SLOT(onCustomContextMenuRequested(QPoint)));
   this->connect(this->TreeWidget, SIGNAL(itemChanged(QTreeWidgetItem*, int)),
-                this, SLOT(blockItemChanged(QTreeWidgetItem*, int)));
+                this, SLOT(onItemChanged(QTreeWidgetItem*, int)));
+
+  // setup double-click for colors and opacity
+  this->connect(this->TreeWidget, 
+                SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)),
+                this, SLOT(onItemDoubleClicked(QTreeWidgetItem*, int)));
 
   //  UpdateUITimer helps use collapse updates to the UI whenever the SM
   //  properties change.
@@ -250,13 +260,23 @@ void pqMultiBlockInspectorPanel::onRepresentationChanged(
                                       &this->UpdateUITimer,
                                       SLOT(start()));
       }
-    vtkSMProperty* colorArrayNameProperty = proxy->GetProperty("ColorArrayName");
+    vtkSMProperty* colorArrayNameProperty = 
+      proxy->GetProperty("ColorArrayName");
     if(colorArrayNameProperty)
       {
       this->PropertyListener->Connect(colorArrayNameProperty,
                                       vtkCommand::ModifiedEvent,
                                       this,
                                       SLOT(onColorArrayNameModified()));
+      }
+    vtkSMProperty* compositeWrapDistinctValuesProperty = 
+      proxy->GetProperty("BlockColorsDistinctValues");
+    if(compositeWrapDistinctValuesProperty)
+      {
+      this->PropertyListener->Connect(compositeWrapDistinctValuesProperty,
+                                      vtkCommand::ModifiedEvent,
+                                      &this->UpdateUITimer,
+                                      SLOT(start()));
       }
     onColorArrayNameModified();
     }
@@ -274,6 +294,9 @@ void pqMultiBlockInspectorPanel::buildTree(vtkPVCompositeDataInformation *info,
                                            QTreeWidgetItem *parent_,
                                            int& flatIndex)
 {
+  parent_->setTextAlignment(COLOR_COLUMN, Qt::AlignHCenter | Qt::AlignVCenter);
+  parent_->setTextAlignment(
+    OPACITY_COLUMN, Qt::AlignHCenter | Qt::AlignVCenter);
   for(unsigned int i = 0; i < info->GetNumberOfChildren(); i++)
     {
     vtkPVDataInformation *childInfo = info->GetDataInformation(i);
@@ -290,8 +313,8 @@ void pqMultiBlockInspectorPanel::buildTree(vtkPVCompositeDataInformation *info,
       }
 
     QTreeWidgetItem *item = new QTreeWidgetItem(parent_, QStringList() << text);
-    item->setData(0, Qt::UserRole, flatIndex);
-    item->setData(0, Qt::CheckStateRole, Qt::Checked);
+    item->setData(NAME_COLUMN, Qt::UserRole, flatIndex);
+    item->setData(NAME_COLUMN, Qt::CheckStateRole, Qt::Checked);
 
     flatIndex++;
 
@@ -349,24 +372,30 @@ void pqMultiBlockInspectorPanel::onDataUpdated()
     QTreeWidgetItem *rootItem =
       new QTreeWidgetItem(this->TreeWidget->invisibleRootItem(),
                           QStringList() << rootLabel);
-    rootItem->setData(0, Qt::UserRole, flatIndex++);
-    rootItem->setData(0, Qt::CheckStateRole, Qt::Checked);
+    rootItem->setData(NAME_COLUMN, Qt::UserRole, flatIndex++);
+    rootItem->setData(NAME_COLUMN, Qt::CheckStateRole, Qt::Checked);
 
     // build the rest of the tree
     this->buildTree(compositeInfo, rootItem, flatIndex);
+    this->TreeWidget->expandAll();
+    this->TreeWidget->resizeColumnToContents(NAME_COLUMN);
+
 
     // expand root item
     this->TreeWidget->expandItem(rootItem);
 
     // update visibilities
     this->updateTree();
+    this->TreeWidget->resizeColumnToContents(COLOR_COLUMN);
+    this->TreeWidget->resizeColumnToContents(OPACITY_COLUMN);
 
     this->TreeWidget->blockSignals(false);
     }
 }
 
 //-----------------------------------------------------------------------------
-void pqMultiBlockInspectorPanel::setBlockVisibility(unsigned int index, bool visible)
+void pqMultiBlockInspectorPanel::setBlockVisibility(
+  unsigned int index, bool visible)
 {
   QList<unsigned int> indices;
   indices.push_back(index);
@@ -440,7 +469,8 @@ void pqMultiBlockInspectorPanel::clearBlockColor(unsigned int index)
 
 
 //-----------------------------------------------------------------------------
-void pqMultiBlockInspectorPanel::clearBlockColor(const QList<unsigned int>& indices)
+void pqMultiBlockInspectorPanel::clearBlockColor(
+  const QList<unsigned int>& indices)
 {
   foreach(const unsigned int &index, indices)
     {
@@ -501,7 +531,8 @@ void pqMultiBlockInspectorPanel::promptAndSetBlockOpacity(unsigned int index)
 }
 
 //-----------------------------------------------------------------------------
-void pqMultiBlockInspectorPanel::promptAndSetBlockOpacity(const QList<unsigned int> &indices)
+void pqMultiBlockInspectorPanel::promptAndSetBlockOpacity(
+  const QList<unsigned int> &indices)
 {
   if(indices.isEmpty())
     {
@@ -554,8 +585,9 @@ void pqMultiBlockInspectorPanel::updateBlockVisibilities()
 {
   std::vector<int> vector;
 
-  for(QMap<unsigned int, bool>::const_iterator i = this->BlockVisibilites.begin();
-      i != this->BlockVisibilites.end(); i++)
+  for(
+    QMap<unsigned int, bool>::const_iterator i = this->BlockVisibilites.begin();
+    i != this->BlockVisibilites.end(); i++)
     {
     vector.push_back(static_cast<int>(i.key()));
     vector.push_back(static_cast<int>(i.value()));
@@ -665,7 +697,10 @@ void pqMultiBlockInspectorPanel::updateTree()
   this->ColorTransferFunction = NULL;
   this->OpacityTransferFunction = NULL;
   // field name setup in vtkPVGeometryFilter to contain the current block index
-  if (! strcmp(arrayName, "vtkCompositeIndex"))
+  bool isComposite = ! strcmp(arrayName, "vtkCompositeIndex");
+  bool isCompositeWrap = ! strcmp(arrayName, "vtkBlockColors");
+  this->CompositeWrap = isCompositeWrap;
+  if (isComposite || isCompositeWrap)
     {
     // get color/opacity transfer function
     vtkSMSessionProxyManager* activeSessionProxyManager = 
@@ -685,8 +720,10 @@ void pqMultiBlockInspectorPanel::updateTree()
     }
 
   // update BlockVisibility map from vtk property
-  vtkSMProperty *blockVisibilityProperty = representationProxy->GetProperty("BlockVisibility");
-  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(blockVisibilityProperty);
+  vtkSMProperty *blockVisibilityProperty = 
+    representationProxy->GetProperty("BlockVisibility");
+  vtkSMIntVectorProperty *ivp = 
+    vtkSMIntVectorProperty::SafeDownCast(blockVisibilityProperty);
   this->BlockVisibilites.clear();
 
   if(ivp)
@@ -699,9 +736,17 @@ void pqMultiBlockInspectorPanel::updateTree()
     }
 
   // update BlockColor map from vtk property
-  vtkSMProperty *blockColorProperty = representationProxy->GetProperty("BlockColor");
-  vtkSMDoubleMapProperty *dmp = vtkSMDoubleMapProperty::SafeDownCast(blockColorProperty);
+  vtkSMProperty *blockColorProperty = 
+    representationProxy->GetProperty("BlockColor");
+  vtkSMDoubleMapProperty *dmp = 
+    vtkSMDoubleMapProperty::SafeDownCast(blockColorProperty);
   this->BlockColors.clear();
+
+  // update BlockColorsDistinctValues
+  vtkSMProperty *distinctValuesProperty = 
+    representationProxy->GetProperty("BlockColorsDistinctValues");
+  ivp = vtkSMIntVectorProperty::SafeDownCast(distinctValuesProperty);
+  this->BlockColorsDistinctValues = ivp ? ivp->GetElement(0) : 2;
 
   if(dmp)
     {
@@ -718,7 +763,8 @@ void pqMultiBlockInspectorPanel::updateTree()
     }
 
   // update BlockOpacity map from vtk property
-  vtkSMProperty *blockOpacityProperty = representationProxy->GetProperty("BlockOpacity");
+  vtkSMProperty *blockOpacityProperty = 
+    representationProxy->GetProperty("BlockOpacity");
   dmp = vtkSMDoubleMapProperty::SafeDownCast(blockOpacityProperty);
   this->BlockOpacities.clear();
 
@@ -752,11 +798,13 @@ void pqMultiBlockInspectorPanel::updateTree()
     // get root item and set its visibility
     QTreeWidgetItem *rootItem =
       this->TreeWidget->invisibleRootItem()->child(0);
-    rootItem->setData(0,
+    rootItem->setData(NAME_COLUMN,
                       Qt::CheckStateRole,
                       root_visibility ? Qt::Checked : Qt::Unchecked);
-    rootItem->setData(0, Qt::DecorationRole,
-                      makeBlockIcon(0, INTERNAL_NODE, -1, -1));
+    rootItem->setData(COLOR_COLUMN, Qt::DecorationRole,
+                      makeColorIcon(0, INTERNAL_NODE, -1));
+    rootItem->setData(OPACITY_COLUMN, Qt::DecorationRole,
+                      makeOpacityIcon(0, INTERNAL_NODE, -1));
     
     // recurse down the tree updating child visibilities
     int flatIndex = 0;
@@ -781,7 +829,9 @@ void pqMultiBlockInspectorPanel::onColorArrayNameModified()
     }
 
   // field name setup in vtkPVGeometryFilter to contain the current block index
-  if (! strcmp(arrayName, "vtkCompositeIndex"))
+  bool isComposite = ! strcmp(arrayName, "vtkCompositeIndex");
+  bool isCompositeWrap = ! strcmp(arrayName, "vtkBlockColors");
+  if (isComposite || isCompositeWrap)
     {
     // get color/opacity transfer function
     vtkSMSessionProxyManager* activeSessionProxyManager = 
@@ -836,11 +886,17 @@ void pqMultiBlockInspectorPanel::updateTree(
         nodeType = INTERNAL_NODE;
         }
       }
-    item->setData(0, Qt::CheckStateRole, visibility ? 
+    item->setData(NAME_COLUMN, Qt::CheckStateRole, visibility ? 
                   Qt::Checked : Qt::Unchecked);
-    item->setData(0, Qt::DecorationRole, 
-                  makeBlockIcon(flatIndex, nodeType, inheritedColorIndex,
-                                inheritedOpacityIndex));
+    item->setData(COLOR_COLUMN, Qt::DecorationRole, 
+                  (item->isDisabled() ?
+                   makeNullIcon() :
+                   makeColorIcon(flatIndex, nodeType, inheritedColorIndex)));
+    item->setData(
+      OPACITY_COLUMN, Qt::DecorationRole, 
+      (item->isDisabled()? makeNullIcon() :
+       makeOpacityIcon(flatIndex, nodeType, inheritedOpacityIndex)));
+
 
     if(nodeType == INTERNAL_NODE)
       {
@@ -854,7 +910,7 @@ void pqMultiBlockInspectorPanel::updateTree(
     }
 }
 
-void pqMultiBlockInspectorPanel::treeWidgetCustomContextMenuRequested(
+void pqMultiBlockInspectorPanel::onCustomContextMenuRequested(
   const QPoint &)
 {
   // selected items
@@ -867,7 +923,7 @@ void pqMultiBlockInspectorPanel::treeWidgetCustomContextMenuRequested(
   int hiddenItemCount = 0;
   foreach(const QTreeWidgetItem *item, items)
     {
-    if(item->data(0, Qt::CheckStateRole).toBool() == false)
+    if(item->data(NAME_COLUMN, Qt::CheckStateRole).toBool() == false)
       {
       hiddenItemCount++;
       }
@@ -924,13 +980,13 @@ void pqMultiBlockInspectorPanel::treeWidgetCustomContextMenuRequested(
     foreach(QTreeWidgetItem *item, items)
       {
       unsigned int flat_index =
-        item->data(0, Qt::UserRole).value<unsigned int>();
+        item->data(NAME_COLUMN, Qt::UserRole).value<unsigned int>();
 
       // first unset any child item visibilites
       this->unsetChildVisibilities(item);
 
       this->setBlockVisibility(flat_index, false);
-      item->setData(0, Qt::CheckStateRole, Qt::Unchecked);
+      item->setData(NAME_COLUMN, Qt::CheckStateRole, Qt::Unchecked);
       }
     }
   else if(action == showAction)
@@ -938,13 +994,13 @@ void pqMultiBlockInspectorPanel::treeWidgetCustomContextMenuRequested(
     foreach(QTreeWidgetItem *item, items)
       {
       unsigned int flat_index =
-        item->data(0, Qt::UserRole).value<unsigned int>();
+        item->data(NAME_COLUMN, Qt::UserRole).value<unsigned int>();
 
       // first unset any child item visibilites
       this->unsetChildVisibilities(item);
 
       this->setBlockVisibility(flat_index, true);
-      item->setData(0, Qt::CheckStateRole, Qt::Checked);
+      item->setData(NAME_COLUMN, Qt::CheckStateRole, Qt::Checked);
       }
     }
   else if(action == unsetVisibilityAction)
@@ -952,11 +1008,12 @@ void pqMultiBlockInspectorPanel::treeWidgetCustomContextMenuRequested(
     foreach(QTreeWidgetItem *item, items)
       {
       unsigned int flat_index =
-        item->data(0, Qt::UserRole).value<unsigned int>();
+        item->data(NAME_COLUMN, Qt::UserRole).value<unsigned int>();
 
       this->clearBlockVisibility(flat_index);
       item->setData(
-        0, Qt::CheckStateRole, item->parent()->data(0, Qt::CheckStateRole));
+        NAME_COLUMN, Qt::CheckStateRole, 
+        item->parent()->data(NAME_COLUMN, Qt::CheckStateRole));
       }
     }
   else if(action == setColorAction)
@@ -968,7 +1025,7 @@ void pqMultiBlockInspectorPanel::treeWidgetCustomContextMenuRequested(
       foreach(QTreeWidgetItem *item, items)
         {
         unsigned int flat_index =
-          item->data(0, Qt::UserRole).value<unsigned int>();
+          item->data(NAME_COLUMN, Qt::UserRole).value<unsigned int>();
         this->setBlockColor(flat_index, color);
         }
       }
@@ -978,7 +1035,7 @@ void pqMultiBlockInspectorPanel::treeWidgetCustomContextMenuRequested(
     foreach(QTreeWidgetItem *item, items)
       {
       unsigned int flat_index =
-        item->data(0, Qt::UserRole).value<unsigned int>();
+        item->data(NAME_COLUMN, Qt::UserRole).value<unsigned int>();
       this->clearBlockColor(flat_index);
       }
     }
@@ -987,9 +1044,9 @@ void pqMultiBlockInspectorPanel::treeWidgetCustomContextMenuRequested(
     QList<unsigned int> indices;
     foreach(QTreeWidgetItem *item, items)
       {
-      indices.append(item->data(0, Qt::UserRole).value<unsigned int>());
+      indices.append(
+        item->data(NAME_COLUMN, Qt::UserRole).value<unsigned int>());
       }
-
     this->promptAndSetBlockOpacity(indices);
     }
   else if(action == unsetOpacityAction)
@@ -997,19 +1054,48 @@ void pqMultiBlockInspectorPanel::treeWidgetCustomContextMenuRequested(
     foreach(QTreeWidgetItem *item, items)
       {
       unsigned int flat_index =
-        item->data(0, Qt::UserRole).value<unsigned int>();
+        item->data(NAME_COLUMN, Qt::UserRole).value<unsigned int>();
 
       this->clearBlockOpacity(flat_index);
       }
     }
 }
 
-void pqMultiBlockInspectorPanel::blockItemChanged(QTreeWidgetItem *item, int column)
+void pqMultiBlockInspectorPanel::onItemDoubleClicked(
+  QTreeWidgetItem * item, int column)
+{
+  unsigned int flatIndex =
+    item->data(NAME_COLUMN, Qt::UserRole).value<unsigned int>();
+  // if (column == NAME_COLUMN)
+  //   {
+  //   QModelIndex mi(flatIndex, column);
+  //   this->TreeWidget->isExpanded(mi) ? 
+  //     this->TreeWidget->collapse(mi) : this->TreeWidget->expand(mi);
+  //   }
+  if (column == COLOR_COLUMN)
+    {
+    QColor color = QColorDialog::getColor(QColor(), this, "Select Color",
+                                          QColorDialog::DontUseNativeDialog);
+    if(color.isValid())
+      {
+      this->setBlockColor(flatIndex, color);
+      }
+    }
+  else if (column == OPACITY_COLUMN)
+    {
+    this->promptAndSetBlockOpacity(flatIndex);
+    }
+}
+
+
+void pqMultiBlockInspectorPanel::onItemChanged(
+  QTreeWidgetItem *item, int column)
 {
   Q_UNUSED(column);
 
-  unsigned int flat_index = item->data(0, Qt::UserRole).value<unsigned int>();
-  bool visible = item->data(0, Qt::CheckStateRole).toBool();
+  unsigned int flat_index = item->data(
+    NAME_COLUMN, Qt::UserRole).value<unsigned int>();
+  bool visible = item->data(NAME_COLUMN, Qt::CheckStateRole).toBool();
 
   // first unset any child item visibilites
   this->unsetChildVisibilities(item);
@@ -1018,12 +1104,15 @@ void pqMultiBlockInspectorPanel::blockItemChanged(QTreeWidgetItem *item, int col
   this->setBlockVisibility(flat_index, visible);
 }
 
-void pqMultiBlockInspectorPanel::unsetChildVisibilities(QTreeWidgetItem *parent_)
+
+void pqMultiBlockInspectorPanel::unsetChildVisibilities(
+  QTreeWidgetItem *parent_)
 {
   for(int i = 0; i < parent_->childCount(); i++)
     {
     QTreeWidgetItem *child = parent_->child(i);
-    unsigned int flatIndex = child->data(0, Qt::UserRole).value<unsigned int>();
+    unsigned int flatIndex = 
+      child->data(NAME_COLUMN, Qt::UserRole).value<unsigned int>();
     this->BlockVisibilites.remove(flatIndex);
     unsetChildVisibilities(child);
     }
@@ -1056,10 +1145,11 @@ void pqMultiBlockInspectorPanel::onSelectionChanged(pqOutputPort *port)
   this->TreeWidget->blockSignals(true);
 
   foreach(QTreeWidgetItem *item,
-          this->TreeWidget->findItems("", Qt::MatchContains | Qt::MatchRecursive))
+          this->TreeWidget->findItems(
+            "", Qt::MatchContains | Qt::MatchRecursive))
     {
     vtkIdType flatIndex =
-      item->data(0, Qt::UserRole).value<vtkIdType>();
+      item->data(NAME_COLUMN, Qt::UserRole).value<vtkIdType>();
 
     item->setSelected(
       std::binary_search(block_ids.begin(), block_ids.end(), flatIndex));
@@ -1068,14 +1158,14 @@ void pqMultiBlockInspectorPanel::onSelectionChanged(pqOutputPort *port)
   this->TreeWidget->blockSignals(false);
 }
 
-void pqMultiBlockInspectorPanel::currentTreeItemSelectionChanged()
+void pqMultiBlockInspectorPanel::onItemSelectionChanged()
 {
   // create vector of selected block ids
   std::vector<vtkIdType> blockIds;
   foreach(const QTreeWidgetItem *item, this->TreeWidget->selectedItems())
     {
     unsigned int flatIndex =
-      item->data(0, Qt::UserRole).value<unsigned int>();
+      item->data(NAME_COLUMN, Qt::UserRole).value<unsigned int>();
 
     blockIds.push_back(flatIndex);
     }
@@ -1127,13 +1217,15 @@ void pqMultiBlockInspectorPanel::currentTreeItemSelectionChanged()
     }
 }
 
-QString pqMultiBlockInspectorPanel::lookupBlockName(unsigned int flatIndex) const
+QString pqMultiBlockInspectorPanel::lookupBlockName(
+  unsigned int flatIndex) const
 {
-  foreach(QTreeWidgetItem *item,
-          this->TreeWidget->findItems("", Qt::MatchContains | Qt::MatchRecursive))
+  foreach(
+    QTreeWidgetItem *item,
+    this->TreeWidget->findItems("", Qt::MatchContains | Qt::MatchRecursive))
     {
     unsigned int itemFlatIndex =
-      item->data(0, Qt::UserRole).value<unsigned int>();
+      item->data(NAME_COLUMN, Qt::UserRole).value<unsigned int>();
 
     if(itemFlatIndex == flatIndex)
       {
@@ -1144,15 +1236,24 @@ QString pqMultiBlockInspectorPanel::lookupBlockName(unsigned int flatIndex) cons
   return QString();
 }
 
-QIcon pqMultiBlockInspectorPanel::makeBlockIcon(
-  int flatIndex, NodeType nodeType, int inheritedColorIndex,
-  int inheritedOpacityIndex) const
+QIcon pqMultiBlockInspectorPanel::makeNullIcon() const
 {
-  QPixmap pixmap(32, 16);
+  QPixmap pixmap(ICON_SIZE, ICON_SIZE);
+  pixmap.fill(Qt::transparent);
+  QPainter painter(&pixmap);
+  drawNullIcon(painter);
+  painter.end();
+  QIcon icon(pixmap);
+  return icon;
+}
+
+QIcon pqMultiBlockInspectorPanel::makeColorIcon(
+  int flatIndex, NodeType nodeType, int inheritedColorIndex) const
+{
+  QPixmap pixmap(ICON_SIZE, ICON_SIZE);
   pixmap.fill(Qt::transparent);
   QPainter painter(&pixmap);
 
-  // draw color circle
   int index = (inheritedColorIndex != -1) ? inheritedColorIndex : flatIndex;
   if(this->BlockColors.contains(index))
     {
@@ -1162,17 +1263,30 @@ QIcon pqMultiBlockInspectorPanel::makeBlockIcon(
     }
   else if (this->ColorTransferFunction && nodeType == LEAF_NODE)
     {
-    unsigned char* rgb = this->ColorTransferFunction->MapValue(flatIndex);
+    unsigned char* rgb = this->ColorTransferFunction->MapValue(
+      CompositeWrap ? 
+      (flatIndex % this->BlockColorsDistinctValues) : flatIndex);
     QColor color (rgb[0], rgb[1], rgb[2]);
     drawColorIcon(painter, color);
     }
   else
     {
-    drawNullIcon(painter, 0);
+    drawNullIcon(painter);
     }
 
-  // draw opacity circle
-  index = (inheritedOpacityIndex != -1) ? inheritedOpacityIndex : flatIndex;
+  painter.end();
+  QIcon icon(pixmap);
+  return icon;
+}
+
+QIcon pqMultiBlockInspectorPanel::makeOpacityIcon(
+  int flatIndex, NodeType nodeType, int inheritedOpacityIndex) const
+{
+  QPixmap pixmap(ICON_SIZE, ICON_SIZE);
+  pixmap.fill(Qt::transparent);
+  QPainter painter(&pixmap);
+
+  int index = (inheritedOpacityIndex != -1) ? inheritedOpacityIndex : flatIndex;
   if(this->BlockOpacities.contains(index))
     {
     double opacity = this->BlockOpacities[index];
@@ -1181,12 +1295,14 @@ QIcon pqMultiBlockInspectorPanel::makeBlockIcon(
     }
   else if (this->OpacityTransferFunction && nodeType == LEAF_NODE)
     {
-    double opacity = this->OpacityTransferFunction->GetValue(flatIndex);
+    double opacity = this->OpacityTransferFunction->GetValue(
+      CompositeWrap ? 
+      (flatIndex % this->BlockColorsDistinctValues) : flatIndex);
     drawOpacityIcon(painter, opacity);
     }
   else
     {
-    drawNullIcon(painter, ICON_SIZE + BETWEEN_ICONS);
+    drawNullIcon(painter);
     }
 
   painter.end();

@@ -40,7 +40,8 @@ vtkPVGeneralSettings* vtkPVGeneralSettings::New()
 
 //----------------------------------------------------------------------------
 vtkPVGeneralSettings::vtkPVGeneralSettings()
-  : AutoApply(false),
+  : BlockColorsDistinctValues(7),
+  AutoApply(false),
   AutoApplyActiveOnly(false),
   DefaultViewType(NULL),
   TransferFunctionResetMode(vtkPVGeneralSettings::GROW_ON_APPLY),

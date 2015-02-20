@@ -146,6 +146,7 @@ vtkPVGeometryFilter::vtkPVGeometryFilter ()
 {
   this->OutlineFlag = 0;
   this->UseOutline = 1;
+  this->BlockColorsDistinctValues = 7;
   this->UseStrips = 0;
 #ifdef VTKGL2
   // generating cell normals by default really slows down paraview
@@ -682,6 +683,20 @@ void vtkPVGeometryFilter::AddCompositeIndex(vtkPolyData* pd, unsigned int index)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVGeometryFilter::AddBlockColors(
+  vtkPolyData* pd, unsigned int index)
+{
+  vtkUnsignedIntArray* cindex = vtkUnsignedIntArray::New();
+  cindex->SetNumberOfComponents(1);
+  cindex->SetNumberOfTuples(1);
+  cindex->FillComponent(0, index % this->BlockColorsDistinctValues);
+  cindex->SetName("vtkBlockColors");
+  pd->GetFieldData()->AddArray(cindex);
+  cindex->FastDelete();
+}
+
+
+//----------------------------------------------------------------------------
 void vtkPVGeometryFilter::AddHierarchicalIndex(vtkPolyData* pd,
   unsigned int level, unsigned int index)
 {
@@ -840,6 +855,8 @@ int vtkPVGeometryFilter::RequestAMRData(
 
         this->CleanupOutputData(outputBlock.GetPointer(), /*doCommunicate=*/0);
         this->AddCompositeIndex(outputBlock.GetPointer(), amr->GetCompositeIndex(level,dataIdx));
+        this->AddBlockColors(outputBlock.GetPointer(), 
+                                    amr->GetCompositeIndex(level,dataIdx));
         this->AddHierarchicalIndex(outputBlock.GetPointer(), level, dataIdx);
         }
       amrDatasets->SetPiece(block_id, outputBlock.GetPointer());
@@ -920,6 +937,7 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
       tmpOut->FastDelete();
 
       this->AddCompositeIndex(tmpOut, current_flat_index);
+      this->AddBlockColors(tmpOut, current_flat_index);
       }
     else
       {

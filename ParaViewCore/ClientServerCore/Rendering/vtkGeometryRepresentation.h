@@ -66,6 +66,12 @@ public:
   virtual void SetVisibility(bool val);
 
   // Description:
+  // Determines the number of distinct values in vtkBlockColors
+  // See also vtkPVGeometryFilter
+  void SetBlockColorsDistinctValues(int distinctValues);
+  int GetBlockColorsDistinctValues();
+
+  // Description:
   // Enable/Disable LOD;
   virtual void SetSuppressLOD(bool suppress)
     { this->SuppressLOD = suppress; }
