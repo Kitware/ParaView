@@ -89,26 +89,39 @@ int vtkPGenericIOMultiBlockWriter::FillInputPortInformation(int port, vtkInforma
 static inline void addCoordinates(std::map< std::pair< int, std::string >, std::vector< char > >& dataArrays,
                                   gio::GenericIOWriter* writer, vtkUnstructuredGrid* grid, uint64_t blockId)
 {
-  std::pair< int, std::string > x(blockId,"x");
-  std::pair< int, std::string > y(blockId,"y");
-  std::pair< int, std::string > z(blockId,"z");
+  std::string xName = "x", yName = "y", zName = "z";
+  while (grid->GetPointData()->HasArray(xName.c_str()))
+    {
+    xName += "x";
+    }
+  while (grid->GetPointData()->HasArray(yName.c_str()))
+    {
+    yName += "y";
+    }
+  while (grid->GetPointData()->HasArray(zName.c_str()))
+    {
+    zName += "z";
+    }
+  std::pair< int, std::string > x(blockId,xName);
+  std::pair< int, std::string > y(blockId,yName);
+  std::pair< int, std::string > z(blockId,zName);
   dataArrays[x] = std::vector< char >();
   dataArrays[y] = std::vector< char >();
   dataArrays[z] = std::vector< char >();
   std::vector< char >& xData = dataArrays[x];
   std::vector< char >& yData = dataArrays[y];
   std::vector< char >& zData = dataArrays[z];
-  if (!writer->HasVariable("x"))
+  if (!writer->HasVariable(xName.c_str()))
     {
-    writer->AddVariable("x",gio::GENERIC_IO_DOUBLE_TYPE,gio::GenericIOWriter::ValueIsPhysCoordX);
+    writer->AddVariable(xName.c_str(),gio::GENERIC_IO_DOUBLE_TYPE,gio::GenericIOWriter::ValueIsPhysCoordX);
     }
-  if (!writer->HasVariable("y"))
+  if (!writer->HasVariable(yName.c_str()))
     {
-    writer->AddVariable("y",gio::GENERIC_IO_DOUBLE_TYPE,gio::GenericIOWriter::ValueIsPhysCoordY);
+    writer->AddVariable(yName.c_str(),gio::GENERIC_IO_DOUBLE_TYPE,gio::GenericIOWriter::ValueIsPhysCoordY);
     }
-  if (!writer->HasVariable("z"))
+  if (!writer->HasVariable(zName.c_str()))
     {
-    writer->AddVariable("z",gio::GENERIC_IO_DOUBLE_TYPE,gio::GenericIOWriter::ValueIsPhysCoordZ);
+    writer->AddVariable(zName.c_str(),gio::GENERIC_IO_DOUBLE_TYPE,gio::GenericIOWriter::ValueIsPhysCoordZ);
     }
   vtkIdType numPoints = grid->GetNumberOfPoints();
   xData.resize(numPoints * sizeof(double));
@@ -350,6 +363,32 @@ void vtkPGenericIOMultiBlockWriter::WriteData()
   else
     {
     vtkWarningMacro(<< "genericio_global_dimension field data array is missing, this data will not be encoded in the output file.");
+    }
+  if (this->Controller->GetNumberOfProcesses() > 1)
+    {
+    std::vector< char > hasBlock, duplicates;
+    hasBlock.resize(input->GetNumberOfBlocks(),0);
+    duplicates.resize(hasBlock.size());
+    for (unsigned i = 0; i < input->GetNumberOfBlocks(); ++i)
+      {
+      vtkUnstructuredGrid* grid = vtkUnstructuredGrid::SafeDownCast(input->GetBlock(i));
+      if (grid != NULL)
+        {
+        hasBlock[i] = 1;
+        }
+      }
+    this->Controller->AllReduce(&hasBlock[0],&duplicates[0],hasBlock.size(),
+        vtkCommunicator::LOGICAL_AND_OP);
+    for (size_t i = 0; i < duplicates.size(); ++i)
+      {
+      if (duplicates[i] != 0)
+        {
+        vtkErrorMacro(<< "Blocks are duplicated across processes, this writer expects"
+                      " each block to be present on exactly one process.  Aborting write operation.");
+        this->SetErrorCode(78); // I have no idea what to put here, so 78 it is!
+        return;
+        }
+      }
     }
   for (unsigned i = 0; i < input->GetNumberOfBlocks(); ++i)
     {

@@ -25,6 +25,7 @@ set_property(GLOBAL PROPERTY
     ${CMAKE_CURRENT_LIST_DIR}/resources/AdaptiveCosmoReader.xml
     ${CMAKE_CURRENT_LIST_DIR}/resources/CosmoReader.xml
     ${CMAKE_CURRENT_LIST_DIR}/resources/GenericIOReader.xml
+    ${CMAKE_CURRENT_LIST_DIR}/resources/GenericIOWriter.xml
     ${CMAKE_CURRENT_LIST_DIR}/resources/MultiResolutionGenericIOReader.xml
 
     ## CosmoTools Filters

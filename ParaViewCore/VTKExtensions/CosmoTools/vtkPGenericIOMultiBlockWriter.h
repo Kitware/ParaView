@@ -27,7 +27,7 @@ class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPGenericIOMultiBlockWriter : public
 {
 public:
   static vtkPGenericIOMultiBlockWriter* New();
-  vtkTypeMacro(vtkPGenericIOMultiBlockWriter, vtkObject);
+  vtkTypeMacro(vtkPGenericIOMultiBlockWriter, vtkWriter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkSetStringMacro(FileName);

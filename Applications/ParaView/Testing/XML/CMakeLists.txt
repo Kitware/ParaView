@@ -293,6 +293,23 @@ if (PARAVIEW_USE_MPI)
     # Test uses D3 which is available in MPI only builds.
     ${CMAKE_CURRENT_SOURCE_DIR}/GridConnectivity.xml
   )
+  if (PARAVIEW_ENABLE_COSMOTOOLS)
+    # Test the Generic IO file writer in VTKExtensions/CosmoTools
+    add_client_tests("pv"
+      --mpi
+      BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/GenericIOReadWrite.xml
+      )
+    add_client_server_tests("pvcs"
+      BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/GenericIOReadWrite.xml
+      )
+    add_client_render_server_tests("pvcrs"
+      BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/GenericIOReadWrite.xml
+      )
+
+  endif()
 endif()
 if(PARAVIEW_ENABLE_PYTHON)
   list(APPEND TESTS_WITH_BASELINES

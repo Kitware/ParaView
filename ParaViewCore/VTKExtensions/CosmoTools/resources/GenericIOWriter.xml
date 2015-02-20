@@ -1,0 +1,38 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="writers">
+   <WriterProxy name="GenericIOWriter"
+                class="vtkPGenericIOMultiBlockWriter"
+                requires_mpi="1"
+                supports_parallel="1">
+      <Documentation
+        short_help="Write GenericIO files from multiblock data.">
+        Writer to write GenericIO files from multiblock data, each block will
+        become one rank's data in the GenericIO file.
+      </Documentation>
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkMultiBlockDataSet"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+        <Documentation>
+          The name of the file to be written.
+        </Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+        <WriterFactory extensions="gio" file_description="Generic IO Files"/>
+      </Hints>
+    </WriterProxy>
+
+
+  </ProxyGroup>
+</ServerManagerConfiguration>
