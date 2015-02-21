@@ -149,12 +149,14 @@ class CoProcessor(object):
                 view.ViewTime = datadescription.GetTime()
                 if rescale_lookuptable:
                     self.RescaleDataRange(view, datadescription.GetTime())
-                simple.WriteImage(fname, view, Magnification=view.cpMagnification)
                 cinemaOptions = view.cpCinemaOptions
                 if cinemaOptions and 'camera' in cinemaOptions:
                     dirname = self.UpdateCinema(view, datadescription)
                     if dirname:
                         cinema_dirs.append(dirname)
+                else:
+                    simple.WriteImage(fname, view, Magnification=view.cpMagnification)
+
 
         if len(cinema_dirs) > 1:
             workspace = open('cinema/info.json', 'w')
