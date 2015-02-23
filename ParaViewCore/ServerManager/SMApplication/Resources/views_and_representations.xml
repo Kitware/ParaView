@@ -3885,7 +3885,9 @@
         rendering.</Documentation>
         <StringListDomain name="list">
           <String value="Projected tetra" />
+#ifndef VTKGL2
           <String value="HAVS" />
+#endif
           <String value="Z sweep" />
           <String value="Bunyk ray cast" />
         </StringListDomain>
@@ -3928,12 +3930,14 @@
                proxyname="ProjectedTetrahedraMapper"></Proxy>
         <ShareProperties subproxy="VolumeDummyMapper"></ShareProperties>
       </SubProxy>
+#ifndef VTKGL2
       <SubProxy>
         <Proxy name="VolumeHAVSMapper"
                proxygroup="mappers"
                proxyname="HAVSVolumeMapper"></Proxy>
         <ShareProperties subproxy="VolumeDummyMapper"></ShareProperties>
       </SubProxy>
+#endif
       <!-- end of UnstructuredGridVolumeRepresentation -->
     </RepresentationProxy>
 

@@ -37,6 +37,11 @@ SET_SOURCE_FILES_PROPERTIES(
   ABSTRACT
   )
 
+# OpenGL2 specific definitions
+if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
+  add_definitions(-DVTKGL2)
+endif()
+
 vtk_module_library(vtkPVServerManagerApplication ${Module_SRCS})
 
 #------------------------------------------------------------------------------
