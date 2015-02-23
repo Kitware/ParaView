@@ -23,7 +23,7 @@
     '<div class="opacity-editor-delete-all vtk-icon-trash opacity-editor-button buttons-right shift-right shift-down" data-toggle="tooltip" data-placement="left" title="Delete All"></div>' +
     '</div>' +
     '<div class="right-button-panel">' +
-    '<div class="opacity-editor-toggle-surface-opacity vtk-icon-cancel-squared opacity-editor-button buttons-right shift-left shift-up" data-toggle="tooltip" data-placement="left" title="Toggle Opacity Mapping for Surfaces"></div>' +
+    '<div class="opacity-editor-toggle-surface-opacity vtk-icon-ajust opacity-editor-button buttons-right shift-left shift-up" data-toggle="tooltip" data-placement="left" title="Enable Opacity Mapping for Surfaces"></div>' +
     '<div class="opacity-editor-toggle-interactive vtk-icon-lock opacity-editor-button buttons-right shift-left shift-up" data-toggle="tooltip" data-placement="left" title="Toggle Interactive Mode"></div>' +
     '<div class="opacity-editor-apply vtk-icon-ok opacity-editor-button buttons-right shift-left shift-up" data-toggle="tooltip" data-placement="left" title="Apply"></div>' +
     '</div>' +
@@ -443,7 +443,9 @@
             interactiveMode = opts.interactiveMode,
             surfaceOpacity = opts.surfaceOpacityEnabled,
             offset = {},
-            size = {};
+            size = {},
+            widgetKey = opts.widgetKey,
+            widgetData = $.extend(true, {}, opts.widgetData);
 
             buffer.push(TEMPLATE_OPACITY_EDIT);
 
@@ -525,8 +527,23 @@
                 newPointsEvent.gaussianPoints = gaussiansList;
                 newPointsEvent.linearPoints = linearPoints;
                 newPointsEvent.gaussianMode = gaussianMode;
-                newPointsEvent.interactiveMode = interactiveMode;
                 me.trigger(newPointsEvent);
+            }
+
+            /*
+             * Update the application data object and store it
+             */
+            function storeWidgetSettings(keyvals) {
+                for (var key in keyvals) {
+                    if (keyvals.hasOwnProperty(key)) {
+                        widgetData[key] = keyvals[key];
+                    }
+                }
+                me.trigger({
+                    type: 'store-widget-settings',
+                    widgetKey: widgetKey,
+                    widgetData: widgetData
+                });
             }
 
             /*
@@ -594,9 +611,11 @@
              */
             function updateSurfaceOpacityMode(element) {
                 if (surfaceOpacity === true) {
-                    element.removeClass('vtk-icon-cancel-squared').addClass('vtk-icon-ok-squared');
+                    // element.removeClass('vtk-icon-cancel-squared').addClass('vtk-icon-ok-squared');
+                    element.addClass('icon-toggled-on');
                 } else {
-                    element.removeClass('vtk-icon-ok-squared').addClass('vtk-icon-cancel-squared');
+                    // element.removeClass('vtk-icon-ok-squared').addClass('vtk-icon-cancel-squared');
+                    element.removeClass('icon-toggled-on');
                 }
                 me.trigger({
                     type: 'update-surface-opacity',
@@ -857,6 +876,7 @@
             $('.opacity-editor-toggle-interactive', me).click(function(evt) {
                 interactiveMode = !interactiveMode;
                 updateInteractiveMode($(this));
+                storeWidgetSettings({ 'interactiveMode': interactiveMode });
             });
 
             $('.opacity-editor-apply', me).click(function(evt) {
@@ -879,6 +899,9 @@
             $('[data-toggle="tooltip"]').tooltip({container: 'body'})
 
             // Finally draw the initial view
+            if (widgetData.hasOwnProperty('interactiveMode')) {
+                interactiveMode = widgetData.interactiveMode;
+            }
             updateInteractiveMode($('.opacity-editor-toggle-interactive', me));
             updateSurfaceOpacityMode($('.opacity-editor-toggle-surface-opacity', me));
             exposeCanvasForMode();
@@ -896,7 +919,9 @@
         bottomMargin: 10,
         leftMargin: 10,
         gaussiansList: [],
-        linearPoints: [ {'x': 0.0, 'y': 0.0}, {'x': 1.0, 'y': 1.0} ]
+        linearPoints: [ {'x': 0.0, 'y': 0.0}, {'x': 1.0, 'y': 1.0} ],
+        widgetKey: 'opacity-editor',
+        widgetData: {}
     };
 
     // ----------------------------------------------------------------------

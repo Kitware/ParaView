@@ -79,7 +79,7 @@ render view.  The currently selected component is active, and it is associated
 with a circle which is outlined in black and either filled or unfilled
 depending on its visibility.  In the imae below, "Contour1" is the active
 pipeline component, and it is also currently visible.  The properties
-displayed in the proxy property editor alwasy correspond to the currently
+displayed in the proxy property editor always correspond to the currently
 selected (active) pipeline component.
 
 {@img images/pvweb-pipeline.png Pipeline editor }
