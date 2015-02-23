@@ -4,29 +4,30 @@ import itertools
 class Explorer(object):
     """
     Middleman that connects an arbitrary producing codes to the CinemaStore.
-    The purpose of this class is to run through the argument sets, and tell a
-    set of tracks (in order) to do something with the arguments it cares about.
+    The purpose of this class is to run through the parameter sets, and tell a
+    set of tracks (in order) to do something with the parameter values
+    it cares about.
     """
 
     def __init__(self,
         cinema_store,
-        arguments, #these are the things that this explorer is responsible for and their ranges
-        tracks #the thing we pass off values to to do the work
+        parameters, #these are the things that this explorer is responsible for and their ranges
+        tracks #the things we pass off values to in order to do the work
         ):
 
         self.__cinema_store = cinema_store
-        self.arguments = arguments
+        self.parameters = parameters
         self.tracks = tracks
 
     @property
     def cinema_store(self):
         return self.__cinema_store
 
-    def list_arguments(self):
+    def list_parameters(self):
         """
-        arguments is an ordered list of parameters that the Explorer varies over
+        parameters is an ordered list of parameters that the Explorer varies over
         """
-        return self.arguments
+        return self.parameters
 
     def prepare(self):
         """ Give tracks a chance to get ready for a run """
@@ -45,11 +46,11 @@ class Explorer(object):
         """Explore the problem space to populate the store"""
         self.prepare()
 
-        ordered = self.list_arguments()
+        ordered = self.list_parameters()
         args = []
         values = []
         for name in ordered:
-            vals = self.cinema_store.get_descriptor_properties(name)['values']
+            vals = self.cinema_store.get_parameter(name)['values']
             args.append(name)
             values.append(vals)
 
@@ -76,7 +77,7 @@ class Track(object):
 
     to use this:
     caller should set up some visualization
-    then tie a particular set of arguments to an action with a track
+    then tie a particular set of parameters to an action with a track
     """
 
     def __init__(self):
@@ -91,5 +92,5 @@ class Track(object):
         pass
 
     def execute(self, document):
-        """ subclasses operate on arguments here"""
+        """ subclasses operate on parameters here"""
         pass
