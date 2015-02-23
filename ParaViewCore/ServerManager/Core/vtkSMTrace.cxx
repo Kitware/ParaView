@@ -580,9 +580,9 @@ vtkSMTrace::TraceItem::~TraceItem()
 void vtkSMTrace::TraceItem::operator=(const TraceItemArgs& arguments)
 {
   // Create the python object and pass the arguments to it.
+#ifdef PARAVIEW_ENABLE_PYTHON
   if (vtkSMTrace* tracer = vtkSMTrace::GetActiveTracer())
     {
-#ifdef PARAVIEW_ENABLE_PYTHON
     assert(tracer->GetTraceModule());
     assert(tracer->GetCreateItemFunction());
 
@@ -613,7 +613,7 @@ void vtkSMTrace::TraceItem::operator=(const TraceItemArgs& arguments)
     this->Internals->PyItem.TakeReference(
       PyObject_Call(tracer->GetCreateItemFunction(), args, NULL));
     tracer->CheckForError();
-#endif
     }
+#endif
   (void)arguments;
 }
