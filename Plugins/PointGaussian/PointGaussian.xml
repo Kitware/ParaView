@@ -1,0 +1,184 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="representations">
+    <RepresentationProxy base_proxyname="PVRepresentationBase"
+                         name="PointGaussianRepresentation"
+                         class="vtkPointGaussianRepresentation"
+                         processes="client|renderserver|dataserver">
+      <Documentation>
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_point_array"
+                          number_of_components="1"
+                          optional="1">
+        </InputArrayDomain>
+      </InputProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="ColorArrayName"
+                            number_of_elements="5">
+        <Documentation>
+          Set the array to color with. One must specify the field association and
+          the array name of the array. If the array is missing, scalar coloring will
+          automatically be disabled.
+        </Documentation>
+        <RepresentedArrayListDomain name="array_list"
+                         input_domain_name="input_array_any">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </RepresentedArrayListDomain>
+        <FieldDataDomain name="field_list"
+                         disable_update_domain_entries="1"
+                         force_point_cell_data="1">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="SetScaleArray"
+        command="SelectScaleArray"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        label="Gaussian Scale Array">
+        <ArrayListDomain name="array_list"
+          input_domain_name="input_point_array">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+
+        <Documentation>
+          This property specifies the name of the input array to scale the splats by.
+        </Documentation>
+      </StringVectorProperty>
+
+
+      <ProxyProperty command="SetLookupTable"
+                     name="LookupTable"
+                     skip_dependency="1">
+        <Documentation>Set the lookup-table to use to map data array to colors.
+        Lookuptable is only used with MapScalars to ON.</Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <IntVectorProperty command="SetScaleByArray"
+                         default_values="0"
+                         name="ScaleByArray"
+                         number_of_elements="1"
+                         label="Use Scale Array">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If this property is on, the Scale Array will be used to determine that radii
+          of the gaussians.  Otherwise the Default Radius will be used.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetOpacity"
+                            default_values="1.0"
+                            name="Opacity"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1" min="0" name="range" />
+        <Documentation>
+          The opacity to use when rendering the model.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetSplatSize"
+                            default_values="1.0"
+                            name="GaussianRadius"
+                            label="Gaussian Radius"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0" name="range" />
+        <Documentation>
+          The radius of the gaussian blur for each point.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetDiffuseColor"
+                            default_values="1.0 1.0 1.0"
+                            name="DiffuseColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <GlobalPropertyLink type="ColorPalette" property="SurfaceColor" />
+        </Hints>
+        <Documentation>
+          The diffuse color of the model
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetSpecularColor"
+                            default_values="1.0 1.0 1.0"
+                            name="SpecularColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Documentation>
+          The specular color of the model
+        </Documentation>
+      </DoubleVectorProperty>
+
+    </RepresentationProxy>
+
+    <Extension name="GeometryRepresentation">
+      <Documentation>
+        Extends standard GeometryRepresentation by adding
+        PointGaussianRepresentation as a new type of representation.
+      </Documentation>
+
+      <!-- this adds to what is already defined in PVRepresentationBase -->
+      <RepresentationType subproxy="PointGaussianRepresentation"
+        text="Point Gaussian" />
+
+      <SubProxy>
+        <Proxy name="PointGaussianRepresentation"
+          proxygroup="representations" proxyname="PointGaussianRepresentation">
+        </Proxy>
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+        <ExposedProperties>
+          <Property name="ScaleByArray" />
+          <Property name="GaussianRadius" />
+          <Property name="SetScaleArray" />
+        </ExposedProperties>
+      </SubProxy>
+    </Extension>
+
+    <Extension name="UnstructuredGridRepresentation">
+      <Documentation>
+        Extends standard UnstructuredGridRepresentation by adding
+        PointGaussianRepresentation as a new type of representation.
+      </Documentation>
+
+      <!-- this adds to what is already defined in PVRepresentationBase -->
+      <RepresentationType subproxy="PointGaussianRepresentation"
+        text="Point Gaussian" />
+
+      <SubProxy>
+        <Proxy name="PointGaussianRepresentation"
+          proxygroup="representations" proxyname="PointGaussianRepresentation">
+        </Proxy>
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+        <ExposedProperties>
+          <Property name="ScaleByArray" />
+          <Property name="GaussianRadius" />
+          <Property name="SetScaleArray" />
+        </ExposedProperties>
+      </SubProxy>
+    </Extension>
+
+
+  </ProxyGroup>
+</ServerManagerConfiguration>
