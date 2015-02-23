@@ -695,22 +695,21 @@ void vtkPVArrayInformation::CopyFromStream(const vtkClientServerStream* css)
     }
 
   // Number of tuples.
-  int num;
-  if (!css->GetArgument(0, 2, &num))
+  if (!css->GetArgument(0, 2, &this->NumberOfTuples))
     {
     vtkErrorMacro("Error parsing number of tuples from message.");
     return;
     }
-  this->SetNumberOfTuples(num);
 
   // Number of components.
+  int num;
   if (!css->GetArgument(0, 3, &num))
     {
     vtkErrorMacro("Error parsing number of components from message.");
     return;
     }
+  // This needs to be called since it allocates the this->Ranges array.
   this->SetNumberOfComponents(num);
-
   if (num > 1)
     {
     num++;
