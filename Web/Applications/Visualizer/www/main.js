@@ -227,6 +227,11 @@
                 propName = me.attr('data-property-name'),
                 value = me.hasClass('checkbox') ? (me.prop('checked') ? 1 : 0) : me.val();
             if(propName === 'ActiveRendererType') {
+                if (value === 'image') {
+                    $('.local-only').hide();
+                } else {
+                    $('.local-only').show();
+                }
                 viewport.setActiveRenderer(value);
                 viewport.invalidateScene();
             } else if(propName === 'Stats') {
@@ -250,6 +255,8 @@
         $('.vcr-play').click(onTimeAnimationPlay);
         $('.vcr-stop').hide().click(onTimeAnimationStop);
         $('.vcr-action').click(onTimeAnimationAction);
+        $('.vcr-fetch-times').click(onRetrieveTimesteps);
+        $('.vcr-clear-cache').click(onClearTimestepCache);
 
         // Handle visibility toggle
         $('.toggle-time-toolbar').click(function(){
@@ -306,6 +313,18 @@
                 setTimeout(runTimeAnimationLoop, 50);
             });
         }
+    }
+
+    // ------------------------------------------------------------------------
+
+    function onRetrieveTimesteps() {
+        viewport.downloadTimestepData();
+    }
+
+    // ------------------------------------------------------------------------
+
+    function onClearTimestepCache() {
+        viewport.clearGeometryCache();
     }
 
     // ========================================================================
