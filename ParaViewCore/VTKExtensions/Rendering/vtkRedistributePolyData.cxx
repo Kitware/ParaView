@@ -34,6 +34,7 @@
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataWriter.h"
+#include "vtkSetGet.h"
 #include "vtkShortArray.h"
 #include "vtkTimerLog.h"
 #include "vtkUnsignedCharArray.h"
@@ -826,193 +827,89 @@ void vtkRedistributePolyData::CopyCellBlockDataArrays
     } 
 
 }
+
+//------------------------------------------------------------------
+namespace {
+template< typename T>
+void CopyArraysTemplate(vtkDataArray* DataFrom, vtkDataArray* DataTo,
+                        vtkIdType numToCopy,vtkIdType* fromId, int myId,
+                        bool fillWithMyId)
+{
+  T* from = (T*) DataFrom->GetVoidPointer(0);
+  T* to = (T*) DataTo->GetVoidPointer(0);
+  int numComps = DataFrom->GetNumberOfComponents();
+  if (fillWithMyId)
+    {
+    for (vtkIdType i = 0; i < numToCopy; ++i)
+      {
+      for (int j = 0; j < numComps; ++j)
+        {
+        to[numComps * i + j] = myId;
+        }
+      }
+    }
+  else
+    {
+    for (vtkIdType i = 0; i < numToCopy; ++i)
+      {
+      for (int j = 0; j < numComps; ++j)
+        {
+        to[numComps * i + j] = from[numComps * fromId[i] + j];
+        }
+      }
+    }
+}
+}
 //******************************************************************
 void vtkRedistributePolyData::CopyArrays
 (vtkDataArray* DataFrom, vtkDataArray* DataTo, 
  vtkIdType numToCopy, vtkIdType* fromId, int myId)
 //******************************************************************
 {
-  char *cArrayFrom = 0, *cArrayTo = 0;
-  int *iArrayFrom = 0,  *iArrayTo = 0;
-  unsigned int *uiArrayFrom = 0,  *uiArrayTo = 0;
-  float *fArrayFrom = 0, *fArrayTo = 0;
-  long *lArrayFrom = 0,  *lArrayTo = 0;
-  vtkIdType *idArrayFrom = 0,  *idArrayTo = 0;
-  unsigned long *ulArrayFrom = 0, *ulArrayTo = 0;
-  unsigned char *ucArrayFrom = 0, *ucArrayTo = 0;
-  double *dArrayFrom = 0, *dArrayTo = 0;
-
-  vtkIdType i;
-  int j;
-  int numComps = DataFrom->GetNumberOfComponents();
   int dataType = DataFrom->GetDataType();
+
+  bool fillWithMyId = (dataType == VTK_DOUBLE) && this->ColorProc;
 
   switch (dataType)
     {
-    case VTK_CHAR:
-      cArrayFrom = ((vtkCharArray*)DataFrom)->GetPointer(0);
-      cArrayTo = ((vtkCharArray*)DataTo)->GetPointer(0);
-      for (i = 0; i < numToCopy; i++)
-        {
-        for (j = 0; j < numComps; j++)
-          {
-          cArrayTo[numComps*i+j]=
-            cArrayFrom[numComps*fromId[i]+j];
-          }
-        
-        }
 
-      break;
-
-    case VTK_UNSIGNED_CHAR:
-      ucArrayFrom = ((vtkUnsignedCharArray*)DataFrom)->
-        GetPointer(0);
-      ucArrayTo = ((vtkUnsignedCharArray*)DataTo)->GetPointer(0);
-      for (i = 0; i < numToCopy; i++)
-        {
-        for (j = 0; j < numComps; j++)
-          {
-          ucArrayTo[numComps*i+j]=
-            ucArrayFrom[numComps*fromId[i]+j];
-          }
-        }
-
-      break;
-
-    case VTK_INT:
-      iArrayFrom = ((vtkIntArray*)DataFrom)->GetPointer(0);
-      iArrayTo = ((vtkIntArray*)DataTo)->GetPointer(0);
-      for (i = 0; i < numToCopy; i++)
-        {
-        for (j = 0; j < numComps; j++)
-          {
-          iArrayTo[numComps*i+j]=
-            iArrayFrom[numComps*fromId[i]+j];
-          }
-        }
-
-      break;
-
-    case VTK_UNSIGNED_INT:
-      uiArrayFrom = ((vtkUnsignedIntArray*)DataFrom)->GetPointer(0);
-      uiArrayTo = ((vtkUnsignedIntArray*)DataTo)->GetPointer(0);
-      for (i = 0; i < numToCopy; i++)
-        {
-        for (j = 0; j < numComps; j++)
-          {
-          uiArrayTo[numComps*i+j]=
-            uiArrayFrom[numComps*fromId[i]+j];
-          }
-        }
-
-      break;
-
-    case VTK_UNSIGNED_LONG:
-      ulArrayFrom = ((vtkUnsignedLongArray*)DataFrom)->
-        GetPointer(0);
-      ulArrayTo = ((vtkUnsignedLongArray*)DataTo)->GetPointer(0);
-      for (i = 0; i < numToCopy; i++)
-        {
-        for (j = 0; j < numComps; j++)
-          {
-          ulArrayTo[numComps*i+j]=
-            ulArrayFrom[numComps*fromId[i]+j];
-          }
-        }
-      
-      break;
-
-    case VTK_FLOAT:
-      fArrayFrom = ((vtkFloatArray*)DataFrom)->GetPointer(0);
-      fArrayTo = ((vtkFloatArray*)DataTo)->GetPointer(0);
-      for (i = 0; i < numToCopy; i++)
-        {
-        for (j = 0; j < numComps; j++)
-          {
-          fArrayTo[numComps*i+j]=
-            fArrayFrom[numComps*fromId[i]+j];
-          }
-        }
-      break;
-
-    case VTK_DOUBLE:
-      dArrayFrom = ((vtkDoubleArray*)DataFrom)->GetPointer(0);
-      dArrayTo = ((vtkDoubleArray*)DataTo)->GetPointer(0);
-      if (!this->ColorProc)
-        {
-        for (i = 0; i < numToCopy; i++)
-          {
-          for (j = 0; j < numComps; j++)
-            {
-            dArrayTo[numComps*i+j]=
-              dArrayFrom[numComps*fromId[i]+j];
-            }
-          }
-        }
-      else
-        {
-        for (i = 0; i < numToCopy; i++)
-          {
-          for (j = 0; j < numComps; j++)
-            dArrayTo[numComps*i+j]= myId;
-          }
-        }
-
-      break;
-
-    case VTK_LONG:
-      lArrayFrom = ((vtkLongArray*)DataFrom)->GetPointer(0);
-      lArrayTo = ((vtkLongArray*)DataTo)->GetPointer(0);
-      for (i = 0; i < numToCopy; i++)
-        {
-        for (j = 0; j < numComps; j++)
-          {
-          lArrayTo[numComps*i+j]=
-            lArrayFrom[numComps*fromId[i]+j];
-          }
-        }
-
-      break;
-     
-    case VTK_ID_TYPE:
-      idArrayFrom = ((vtkIdTypeArray*)DataFrom)->GetPointer(0);
-      idArrayTo = ((vtkIdTypeArray*)DataTo)->GetPointer(0);
-      for (i = 0; i < numToCopy; i++)
-        {
-        for (j = 0; j < numComps; j++)
-          {
-          idArrayTo[numComps*i+j]=
-            idArrayFrom[numComps*fromId[i]+j];
-          }
-        }
-
-      break;
-       
+  // Only change is that vtk unsigned short is now allowed...
+  vtkTemplateMacro(CopyArraysTemplate<VTK_TT>(
+                     DataFrom,DataTo,numToCopy,fromId,myId,fillWithMyId));
     case VTK_BIT:
       vtkErrorMacro("VTK_BIT not allowed for copy");
       break;
-    case VTK_UNSIGNED_SHORT:
-      vtkErrorMacro("VTK_UNSIGNED_SHORT not allowed for copy")
-        break;
-    case VTK_SHORT:  
-      {
-      short* sArrayFrom = ((vtkShortArray*)DataFrom)->GetPointer(0);
-      short* sArrayTo = ((vtkShortArray*)DataTo)->GetPointer(0);
-      for (i = 0; i < numToCopy; i++)
-        {
-        for (j = 0; j < numComps; j++)
-          {
-          sArrayTo[numComps*i+j]=
-            sArrayFrom[numComps*fromId[i]+j];
-          }
-        }
-      break;
-      }
     default:
       vtkErrorMacro("datatype = "<<dataType<<" not allowed for copy");
     }
 }
 //------------------------------------------------------------------
+namespace {
+template <typename T>
+void CopyBlockArraysTemplate(vtkDataArray* DataFrom, vtkDataArray* DataTo,
+                             vtkIdType numToCopy, vtkIdType startCell,
+                             vtkIdType fromOffset, vtkIdType toOffset,
+                             int myId, bool fillToWithMyId)
+{
+  T* from = (T*) DataFrom->GetVoidPointer(fromOffset);
+  T* to = (T*) DataTo->GetVoidPointer(toOffset);
+
+  int numComps = DataFrom->GetNumberOfComponents();
+
+  vtkIdType  start = numComps*startCell;
+  vtkIdType  size = numToCopy*numComps;
+  vtkIdType  stop = start + size;
+
+  if (fillToWithMyId)
+    {
+    for (vtkIdType i=start; i<stop; i++) { to[i] = myId; }
+    }
+  else
+    {
+    for (vtkIdType i=start; i<stop; i++) { to[i] = from[i]; }
+    }
+}
+}
 //******************************************************************
 void vtkRedistributePolyData::CopyBlockArrays
 (vtkDataArray* DataFrom, vtkDataArray* DataTo, 
@@ -1020,98 +917,19 @@ void vtkRedistributePolyData::CopyBlockArrays
  vtkIdType fromOffset, vtkIdType toOffset, int myId)
 //******************************************************************
 {
-  char *cArrayTo =0, *cArrayFrom =0;
-  int *iArrayTo =0, *iArrayFrom =0;
-  unsigned int *uiArrayTo =0, *uiArrayFrom =0;
-  float *fArrayTo =0, *fArrayFrom =0;
-  long *lArrayTo =0, *lArrayFrom =0;
-  vtkIdType *idArrayTo =0, *idArrayFrom =0;
-  unsigned long *ulArrayTo =0, *ulArrayFrom =0;
-  unsigned char *ucArrayTo =0, *ucArrayFrom =0;
-  double *dArrayTo =0, *dArrayFrom =0;
-
-  int numComps = DataFrom->GetNumberOfComponents();
   int dataType = DataFrom->GetDataType();
 
-  vtkIdType  start = numComps*startCell;
-  vtkIdType  size = numToCopy*numComps;
-  vtkIdType  stop = start + size;
-  vtkIdType i;
+  bool fillWithMyId = (dataType == VTK_DOUBLE) && this->ColorProc;
 
   switch (dataType)
     {
-    case VTK_CHAR:
-      cArrayFrom = ((vtkCharArray*)DataFrom)->GetPointer(fromOffset);
-      cArrayTo = ((vtkCharArray*)DataTo)->GetPointer(toOffset);
-      for (i=start; i<stop; i++) { cArrayTo[i] = cArrayFrom[i]; }
-      break;
-
-    case VTK_UNSIGNED_CHAR:
-      ucArrayFrom = ((vtkUnsignedCharArray*)DataFrom)->GetPointer(fromOffset);
-      ucArrayTo = ((vtkUnsignedCharArray*)DataTo)->
-        GetPointer(toOffset);
-      for (i=start; i<stop; i++) { ucArrayTo[i] = ucArrayFrom[i]; }
-      break;
-
-    case VTK_INT:
-      iArrayFrom = ((vtkIntArray*)DataFrom)->GetPointer(fromOffset);
-      iArrayTo = ((vtkIntArray*)DataTo)->GetPointer(toOffset);
-      for (i=start; i<stop; i++) { iArrayTo[i] = iArrayFrom[i]; }
-      break;
-
-    case VTK_UNSIGNED_INT:
-      uiArrayFrom = ((vtkUnsignedIntArray*)DataFrom)->GetPointer(fromOffset);
-      uiArrayTo = ((vtkUnsignedIntArray*)DataTo)->GetPointer(toOffset);
-      for (i=start; i<stop; i++) { uiArrayTo[i] = uiArrayFrom[i]; }
-      break;
-
-    case VTK_UNSIGNED_LONG:
-      ulArrayFrom = ((vtkUnsignedLongArray*)DataFrom)->GetPointer(fromOffset);
-      ulArrayTo = ((vtkUnsignedLongArray*)DataTo)->
-        GetPointer(toOffset);
-      for (i=start; i<stop; i++) { ulArrayTo[i] = ulArrayFrom[i]; }
-      break;
-
-    case VTK_FLOAT:
-      fArrayFrom = ((vtkFloatArray*)DataFrom)->GetPointer(fromOffset);
-      fArrayTo = ((vtkFloatArray*)DataTo)->GetPointer(toOffset);
-      for (i=start; i<stop; i++) { fArrayTo[i] = fArrayFrom[i]; }
-      break;
-
-    case VTK_DOUBLE:
-      dArrayFrom = ((vtkDoubleArray*)DataFrom)->GetPointer(fromOffset);
-      dArrayTo = ((vtkDoubleArray*)DataTo)->GetPointer(toOffset);
-      if (!this->ColorProc)
-        for (i=start; i<stop; i++) { dArrayTo[i] = dArrayFrom[i]; }
-      else
-        for (i=start; i<stop; i++) { dArrayTo[i] = myId; }
-      break;
-
-    case VTK_LONG:
-      lArrayFrom = ((vtkLongArray*)DataFrom)->GetPointer(fromOffset);
-      lArrayTo = ((vtkLongArray*)DataTo)->GetPointer(toOffset);
-      for (i=start; i<stop; i++) { lArrayTo[i] = lArrayFrom[i]; }
-      break;
-        
-    case VTK_ID_TYPE:
-      idArrayFrom = ((vtkIdTypeArray*)DataFrom)->GetPointer(fromOffset);
-      idArrayTo = ((vtkIdTypeArray*)DataTo)->GetPointer(toOffset);
-      for (i=start; i<stop; i++) { idArrayTo[i] = idArrayFrom[i]; }
-      break;
-        
+  // Only change is that vtk unsigned short is now allowed...
+  vtkTemplateMacro(CopyBlockArraysTemplate<VTK_TT>(
+                     DataFrom,DataTo,numToCopy,startCell,
+                     fromOffset,toOffset,myId,fillWithMyId));
     case VTK_BIT:
       vtkErrorMacro("VTK_BIT not allowed for copy");
       break;
-    case VTK_UNSIGNED_SHORT:
-      vtkErrorMacro("VTK_UNSIGNED_SHORT not allowed for copy");
-      break;
-    case VTK_SHORT: 
-      {
-      short* sArrayFrom = ((vtkShortArray*)DataFrom)->GetPointer(fromOffset);
-      short* sArrayTo = ((vtkShortArray*)DataTo)->GetPointer(toOffset);
-      for (i=start; i<stop; i++) { sArrayTo[i] = sArrayFrom[i]; }
-      break;
-      }
     default:
       vtkErrorMacro
         ("datatype = "<<dataType<<" not allowed for copy");
@@ -1950,115 +1768,15 @@ void vtkRedistributePolyData::AllocateArrays
 (vtkDataArray* Data, vtkIdType numToCopyTotal )
 //****************************************************************
 {
-  int dataType = Data->GetDataType();
+  // loses some checks for "invalid" types like bit and unsigned short
   int numComp = Data->GetNumberOfComponents();
 
   if (numToCopyTotal >0)
     {
-    switch (dataType)
+    if (Data->WriteVoidPointer(0,numToCopyTotal*numComp) == 0)
       {
-      case VTK_CHAR:
-
-        if (((vtkCharArray*)Data)-> 
-            WritePointer(0,numToCopyTotal*numComp) ==0)
-          {
-          vtkErrorMacro("Error: can't alloc mem for data array");
-          }
-        break;
-
-      case VTK_UNSIGNED_CHAR:
-
-        if (((vtkUnsignedCharArray*)Data)-> 
-            WritePointer(0,numToCopyTotal*numComp) ==0)
-          {
-          vtkErrorMacro("Error: can't alloc mem for data array");
-          }
-        break;
-
-      case VTK_INT:
-
-        if (((vtkIntArray*)Data)->
-            WritePointer(0,numToCopyTotal*numComp) ==0)
-          {
-          vtkErrorMacro("Error: can't alloc mem for data array");
-          }
-        break;
-
-      case VTK_UNSIGNED_INT:
-
-        if (((vtkUnsignedIntArray*)Data)->
-            WritePointer(0,numToCopyTotal*numComp) ==0)
-          {
-          vtkErrorMacro("Error: can't alloc mem for data array");
-          }
-        break;
-
-      case VTK_UNSIGNED_LONG:
-
-        if (((vtkUnsignedLongArray*)Data)->
-            WritePointer(0,numToCopyTotal*numComp) ==0)
-          {
-          vtkErrorMacro("Error: can't alloc mem for data array");
-          }
-        break;
-
-      case VTK_FLOAT:
-
-        if (((vtkFloatArray*)Data)->
-            WritePointer(0,numToCopyTotal*numComp) ==0)
-          {
-          vtkErrorMacro("Error: can't alloc mem for data array");
-          }
-        break;
-
-      case VTK_DOUBLE:
-
-        if (((vtkDoubleArray*)Data)->
-            WritePointer(0,numToCopyTotal*numComp) ==0)
-          {
-          vtkErrorMacro("Error: can't alloc mem for data array");
-          }
-        break;
-
-      case VTK_LONG:
-
-        if (((vtkLongArray*)Data)->
-            WritePointer(0,numToCopyTotal*numComp) ==0)
-          {
-          vtkErrorMacro("Error: can't alloc mem for data array");
-          }
-        break;
-        
-      case VTK_ID_TYPE:
-
-        if (((vtkIdTypeArray*)Data)->
-            WritePointer(0,numToCopyTotal*numComp) ==0)
-          {
-          vtkErrorMacro("Error: can't alloc mem for data array");
-          }
-        break;
-        
-      case VTK_BIT:
-        vtkErrorMacro("VTK_BIT not allowed for Data Arrays");
-        break;
-      case VTK_UNSIGNED_SHORT:
-        vtkErrorMacro
-          ("VTK_UNSIGNED_SHORT not allowed for Data Arrays");
-        break;
-      case VTK_SHORT: 
-        {
-        if (((vtkShortArray*)Data)->
-            WritePointer(0,numToCopyTotal*numComp) ==0)
-          {
-          vtkErrorMacro("Error: can't alloc mem for data array");
-          }
-        break;
-        }
-      default:
-        vtkErrorMacro
-          ("datatype = "<<dataType<<" not allowed for Data Arrays"
-            );
-      } // end of switch
+      vtkErrorMacro("Error: can't alloc mem for data array");
+      }
     } // end of if numToCopyTotal>0
 }
 //----------------------------------------------------------------------
@@ -2171,205 +1889,42 @@ void vtkRedistributePolyData::SendCellBlockDataArrays
                            sendTag);
     } 
 }
+//------------------------------------------------------------------
+namespace {
+template< typename T>
+void SendArraysTemplate(vtkDataArray* Data, vtkIdType numToCopy,
+                        int sendTo, vtkIdType* fromId, int sendTag,
+                        vtkMultiProcessController* controller)
+{
+  T* array = (T*) Data->GetVoidPointer(0);
+  int numComps = Data->GetNumberOfComponents();
+  T* buf = new T[numToCopy * numComps];
+  vtkIdType size = numToCopy * numComps;
+  for (vtkIdType i = 0; i < numToCopy; ++i)
+    {
+    for (int j = 0; j < numComps; ++j)
+      {
+      buf[numComps * i + j] = array[numComps * fromId[i] + j];
+      }
+    }
+  controller->Send(buf, size, sendTo, sendTag);
+  delete [] buf;
+}
+}
 //******************************************************************
 void vtkRedistributePolyData::SendArrays
 (vtkDataArray* Data, vtkIdType numToCopy, int sendTo, 
  vtkIdType* fromId, int sendTag)
 //******************************************************************
 {
-  char* sc;
-  char *cArray;
-  int *iArray, *si;
-  unsigned int *uiArray, *sui;
-  float *fArray, *sf;
-  long *lArray, *sl;
-  vtkIdType *idArray, *sid;
-  unsigned long *ulArray, *sul;
-  unsigned char *ucArray, *suc;
-  double *dArray, *sd;
-  int dataSize;
-
-  vtkIdType i;
-  int j;
-  int numComps = Data->GetNumberOfComponents();
   int dataType = Data->GetDataType();
 
   switch (dataType)
     {
-    case VTK_CHAR:
-      cArray = ((vtkCharArray*)Data)->GetPointer(0);
-      sc = new char[numToCopy*numComps];
-      for (i = 0; i < numToCopy; i++)
-        {
-        for (j = 0; j < numComps; j++)
-          {
-          sc[numComps*i+j] = cArray[numComps*fromId[i]+j];
-          }
-        }
-
-      this->Controller->
-        Send(sc, numToCopy*numComps, sendTo, sendTag);
-      delete [] sc;
-      break;
-
-    case VTK_UNSIGNED_CHAR:
-      ucArray = ((vtkUnsignedCharArray*)Data)->GetPointer(0);
-      suc = new unsigned char[numToCopy*numComps];
-      for (i = 0; i < numToCopy; i++)
-        {
-        for (j = 0; j < numComps; j++)
-          {
-          suc[numComps*i+j] = ucArray[numComps*fromId[i]+j];
-          }
-        }
-
-      this->Controller->
-        Send((char*)suc, numToCopy*numComps, sendTo, sendTag);
-      delete [] suc;
-      break;
-
-    case VTK_INT:
-      iArray = ((vtkIntArray*)Data)->GetPointer(0);
-      si = new int[numToCopy*numComps];
-      for (i = 0; i < numToCopy; i++)
-        {
-        for (j = 0; j < numComps; j++)
-          {
-          si[numComps*i+j] = iArray[numComps*fromId[i]+j];
-          }
-        }
-
-      this->Controller->
-        Send(si, numToCopy*numComps, sendTo, sendTag);
-      delete [] si;
-      break;
-
-    case VTK_UNSIGNED_INT:
-      uiArray = ((vtkUnsignedIntArray*)Data)->GetPointer(0);
-      sui = new unsigned int[numToCopy*numComps];
-      for (i = 0; i < numToCopy; i++)
-        {
-        for (j = 0; j < numComps; j++)
-          {
-          sui[numComps*i+j] = uiArray[numComps*fromId[i]+j];
-          }
-        }
-
-      this->Controller->
-        Send(sui, numToCopy*numComps, sendTo, sendTag);
-      delete [] sui;
-      break;
-
-    case VTK_UNSIGNED_LONG:
-      ulArray = ((vtkUnsignedLongArray*)Data)->GetPointer(0);
-      sul = new unsigned long [numToCopy*numComps];
-      for (i = 0; i < numToCopy; i++)
-        {
-        for (j = 0; j < numComps; j++)
-          {
-          sul[numComps*i+j] = ulArray[numComps*fromId[i]+j];
-          }
-        }
-        
-      this->Controller->
-        Send(sul, numToCopy*numComps, sendTo, sendTag);
-      delete [] sul;
-      break;
-
-    case VTK_FLOAT:
-      fArray = ((vtkFloatArray*)Data)->GetPointer(0);
-      sf = new float[numToCopy*numComps];
-      for (i = 0; i < numToCopy; i++)
-        {
-        for (j = 0; j < numComps; j++)
-          {
-          sf[numComps*i+j] = fArray[numComps*fromId[i]+j]; 
-          }
-        }
-      this->Controller->
-        Send(sf, numToCopy*numComps, sendTo, sendTag);
-      delete [] sf;
-      break;
-
-    case VTK_DOUBLE:
-      dArray = ((vtkDoubleArray*)Data)->GetPointer(0);
-      dataSize = sizeof(double);
-      sc = (char*)new char[numToCopy*dataSize*numComps];
-      sd = (double*)sc;
-      for (i = 0; i < numToCopy; i++)
-        {
-        for (j = 0; j < numComps; j++)
-          {
-          sd[numComps*i+j] = dArray[numComps*fromId[i]+j];
-          }
-        }
-
-      this->Controller->
-        Send(sc, numToCopy*numComps*dataSize, sendTo, sendTag);
-      delete [] sc;
-      break;
-
-    case VTK_LONG:
-      lArray = ((vtkLongArray*)Data)->GetPointer(0);
-      dataSize = sizeof(long);
-      sc = (char*)new long[numToCopy*dataSize*numComps];
-      sl = (long*)sc;
-      for (i = 0; i < numToCopy; i++)
-        {
-        for (j = 0; j < numComps; j++)
-          {
-          sl[numComps*i+j] = lArray[numComps*fromId[i]+j];
-          }
-        }
-
-      this->Controller->
-        Send(sc, numToCopy*numComps*dataSize, sendTo, sendTag);
-      delete [] sc;
-      break;
-        
-    case VTK_ID_TYPE:
-      idArray = ((vtkIdTypeArray*)Data)->GetPointer(0);
-      dataSize = sizeof(vtkIdType);
-      sc = (char*)new vtkIdType[numToCopy*dataSize*numComps];
-      sid = (vtkIdType*)sc;
-      for (i = 0; i < numToCopy; i++)
-        {
-        for (j = 0; j < numComps; j++)
-          {
-          sid[numComps*i+j] = idArray[numComps*fromId[i]+j];
-          }
-        }
-
-      this->Controller->
-        Send(sc, numToCopy*numComps*dataSize, sendTo, sendTag);
-      delete [] sc;
-      break;
-      
+  vtkTemplateMacro(SendArraysTemplate<VTK_TT>(
+                     Data,numToCopy,sendTo,fromId,sendTag,this->Controller));
     case VTK_BIT:
       vtkErrorMacro("VTK_BIT not allowed for send");
-      break;
-    case VTK_UNSIGNED_SHORT:
-      vtkErrorMacro("VTK_UNSIGNED_SHORT not allowed for send");
-      break;
-    case VTK_SHORT: 
-      {
-      short* sArray = ((vtkShortArray*)Data)->GetPointer(0);
-      dataSize = sizeof(short);
-      sc = (char*)new short[numToCopy*dataSize*numComps];
-      short* ss = (short*)sc;
-      for (i = 0; i < numToCopy; i++)
-        {
-        for (j = 0; j < numComps; j++)
-          {
-          ss[numComps*i+j] = sArray[numComps*fromId[i]+j];
-          }
-        }
-
-      this->Controller->
-        Send(sc, numToCopy*numComps*dataSize, sendTo, sendTag);
-      delete [] sc;
-      break;
-      }
       break;
     default:
       vtkErrorMacro
@@ -2377,102 +1932,37 @@ void vtkRedistributePolyData::SendArrays
     }
 }
 //-----------------------------------------------------------------
+namespace {
+template< typename T >
+void SendBlockArraysTemplate(
+    vtkDataArray* Data, vtkIdType numToCopy, int sendTo,
+    vtkIdType startCell, int sendTag, vtkMultiProcessController* controller)
+{
+  int numComps = Data->GetNumberOfComponents();
+
+  vtkIdType start = numComps * startCell;
+  vtkIdType size = numToCopy * numComps;
+
+  T* array = (T*) Data->GetVoidPointer(0);
+  controller->Send((T*)&array[start], size, sendTo, sendTag);
+}
+}
 //******************************************************************
 void vtkRedistributePolyData::SendBlockArrays
 (vtkDataArray* Data, vtkIdType numToCopy, int sendTo, 
  vtkIdType startCell, int sendTag)
 //******************************************************************
 {
-  char *cArray;
-  int *iArray;
-  unsigned int *uiArray;
-  float *fArray;
-  long *lArray;
-  vtkIdType *idArray;
-  unsigned long *ulArray;
-  unsigned char *ucArray;
-  double *dArray;
-  int dataSize;
-
-  int numComps = Data->GetNumberOfComponents();
   int dataType = Data->GetDataType();
 
-  vtkIdType start = numComps*startCell;
-  vtkIdType size = numToCopy*numComps;
-
+  // again adds support for unsigned short...
   switch (dataType)
     {
-    case VTK_CHAR:
-      cArray = ((vtkCharArray*)Data)->GetPointer(0);
-      this->Controller->
-        Send((char*)&cArray[start], size, sendTo, sendTag);
-      break;
-
-    case VTK_UNSIGNED_CHAR:
-      ucArray = ((vtkUnsignedCharArray*)Data)->GetPointer(0);
-      this->Controller->
-        Send((char*)&ucArray[start], size, sendTo, sendTag);
-      break;
-
-    case VTK_INT:
-      iArray = ((vtkIntArray*)Data)->GetPointer(0);
-      this->Controller->
-        Send((int*)&iArray[start], size, sendTo, sendTag);
-      break;
-
-    case VTK_UNSIGNED_INT:
-      uiArray = ((vtkUnsignedIntArray*)Data)->GetPointer(0);
-      this->Controller->
-        Send((int*)&uiArray[start], size, sendTo, sendTag);
-      break;
-
-    case VTK_UNSIGNED_LONG:
-      ulArray = ((vtkUnsignedLongArray*)Data)->GetPointer(0);
-      this->Controller->
-        Send((unsigned long*)&ulArray[start], size, sendTo, sendTag);
-      break;
-
-    case VTK_FLOAT:
-      fArray = ((vtkFloatArray*)Data)->GetPointer(0);
-      this->Controller->
-        Send((float*)&fArray[start], size, sendTo, sendTag);
-      break;
-
-    case VTK_DOUBLE:
-      dArray = ((vtkDoubleArray*)Data)->GetPointer(0);
-      dataSize = sizeof(double);
-      this->Controller->
-        Send((char*)&dArray[start], size*dataSize, sendTo, sendTag);
-      break;
-
-    case VTK_LONG:
-      lArray = ((vtkLongArray*)Data)->GetPointer(0);
-      dataSize = sizeof(long);
-      this->Controller->
-        Send((char*)&lArray[start], size*dataSize, sendTo, sendTag);
-      break;
-        
-    case VTK_ID_TYPE:
-      idArray = ((vtkIdTypeArray*)Data)->GetPointer(0);
-      dataSize = sizeof(vtkIdType);
-      this->Controller->
-        Send((char*)&idArray[start], size*dataSize, sendTo, sendTag);
-      break;
-        
+  vtkTemplateMacro(SendBlockArraysTemplate<VTK_TT>(Data,numToCopy,sendTo,
+                                           startCell,sendTag,this->Controller));
     case VTK_BIT:
       vtkErrorMacro("VTK_BIT not allowed for send");
       break;
-    case VTK_UNSIGNED_SHORT:
-      vtkErrorMacro("VTK_UNSIGNED_SHORT not allowed for send");
-      break;
-    case VTK_SHORT: 
-      {
-      short* sArray = ((vtkShortArray*)Data)->GetPointer(0);
-      dataSize = sizeof(short);
-      this->Controller->
-        Send((char*)&sArray[start], size*dataSize, sendTo, sendTag);
-      break;
-      }
     default:
       vtkErrorMacro
         ("datatype = "<<dataType<<" not allowed for send");
@@ -2505,228 +1995,61 @@ void vtkRedistributePolyData::ReceiveDataArrays
     } 
 
 }
+//-------------------------------------------------------------------
+namespace {
+template< typename T >
+void ReceiveArraysTemplate(
+    vtkDataArray* Data, vtkIdType numToCopy, int recFrom,
+    vtkIdType* toId, int recTag, vtkMultiProcessController* controller,
+    bool setDataToRecFrom)
+{
+  int numComps = Data->GetNumberOfComponents();
+
+  T* array = (T*) Data->GetVoidPointer(0);
+  T* buf = new T[numToCopy * numComps];
+
+  controller->Receive(buf,numToCopy*numComps, recFrom, recTag);
+  if (setDataToRecFrom)
+    {
+    for (vtkIdType i = 0; i < numToCopy; ++i)
+      {
+      for (int j = 0; j < numComps; ++j)
+        {
+        array[toId[i] * numComps + j] = recFrom;
+        }
+      }
+    }
+  else
+    {
+    for (vtkIdType i = 0; i < numToCopy; ++i)
+      {
+      for (int j = 0; j < numComps; ++j)
+        {
+        array[toId[i] * numComps + j] = buf[numComps * i + j];
+        }
+      }
+    }
+  delete [] buf;
+}
+}
 //*******************************************************************
 void vtkRedistributePolyData::ReceiveArrays
 (vtkDataArray* Data, vtkIdType numToCopy, int recFrom,
  vtkIdType* toId, int recTag)
 //*******************************************************************
 {
-  char* sc;
-  char *cArray;
-  int *iArray, *si;
-  unsigned int *uiArray, *sui;
-  float *fArray, *sf;
-  long *lArray, *sl;
-  vtkIdType *idArray, *sid;
-  unsigned long *ulArray, *sul;
-  unsigned char *ucArray, *suc;
-  double *dArray, *sd;
-  int dataSize;
-  int numComps = Data->GetNumberOfComponents();
   int dataType = Data->GetDataType();
 
-  vtkIdType i;
-  int j;
+  bool setDataToRecFrom = (dataType == VTK_DOUBLE) && this->ColorProc;
 
   switch (dataType)
     {
-    case VTK_CHAR:
-      cArray = ((vtkCharArray*)Data)->GetPointer(0);
-      sc = new char[numToCopy*numComps];
-
-      this->Controller->
-        Receive(sc, numToCopy*numComps, recFrom, recTag);
-      for (i = 0; i < numToCopy; i++)
-        {
-        for (j = 0; j < numComps; j++)
-          {
-          cArray[toId[i]*numComps+j] = sc[numComps*i+j];
-          }
-        }
-
-      delete [] sc;
-      break;
-
-    case VTK_UNSIGNED_CHAR:
-      ucArray = ((vtkUnsignedCharArray*)Data)->GetPointer(0);
-      suc = new unsigned char[numToCopy*numComps];
-
-      this->Controller->
-        Receive((char*)suc, numToCopy*numComps, recFrom, recTag);
-      for (i = 0; i < numToCopy; i++)
-        {
-        for (j = 0; j < numComps; j++)
-          {
-          ucArray[toId[i]*numComps+j] = suc[numComps*i+j];
-          }
-        }
-
-      delete [] suc;
-      break;
-
-    case VTK_INT:
-      iArray = ((vtkIntArray*)Data)->GetPointer(0);
-      si = new int[numToCopy*numComps];
-
-      this->Controller->
-        Receive(si, numToCopy*numComps, recFrom, recTag);
-      for (i = 0; i < numToCopy; i++)
-        {
-        for (j = 0; j < numComps; j++)
-          {
-          iArray[toId[i]*numComps+j] = si[numComps*i+j];
-          }
-        }
-
-      delete [] si;
-      break;
-
-    case VTK_UNSIGNED_INT:
-      uiArray = ((vtkUnsignedIntArray*)Data)->GetPointer(0);
-      sui = new unsigned int[numToCopy*numComps];
-
-      this->Controller->
-        Receive(sui, numToCopy*numComps, recFrom, recTag);
-      for (i = 0; i < numToCopy; i++)
-        {
-        for (j = 0; j < numComps; j++)
-          {
-          uiArray[toId[i]*numComps+j] = sui[numComps*i+j];
-          }
-        }
-
-      delete [] sui;
-      break;
-
-    case VTK_UNSIGNED_LONG:
-      ulArray = 
-        ((vtkUnsignedLongArray*)Data)->GetPointer(0);
-      sul = new unsigned long [numToCopy*numComps];
-
-      this->Controller->
-        Receive(sul, numToCopy*numComps, recFrom, recTag);
-      for (i = 0; i < numToCopy; i++)
-        {
-        for (j = 0; j < numComps; j++)
-          {
-          ulArray[toId[i]*numComps+j] = sul[numComps*i+j];
-          }
-        }
-      delete [] sul;
-      break;
-
-    case VTK_FLOAT:
-      fArray = ((vtkFloatArray*)Data)->GetPointer(0); 
-      sf = new float[numToCopy*numComps];
-
-      this->Controller->
-        Receive(sf, numToCopy*numComps, recFrom, recTag);
-      for (i = 0; i < numToCopy; i++)
-        {
-        for (j = 0; j < numComps; j++)
-          {
-          fArray[toId[i]*numComps+j] = sf[numComps*i+j];
-          }
-        }
-      delete [] sf;
-      break;
-
-    case VTK_DOUBLE:
-      dArray = ((vtkDoubleArray*)Data)->GetPointer(0);
-      dataSize = sizeof(double);
-      sc = (char*)new char[numToCopy*numComps*dataSize];
-      sd = (double*)sc;
-
-      this->Controller->
-        Receive(sc, numToCopy*numComps*dataSize, recFrom, recTag);
-      if (!this->ColorProc)
-        {
-        for (i = 0; i < numToCopy; i++)
-          {
-          for (j = 0; j < numComps; j++)
-            {
-            dArray[toId[i]*numComps+j] = sd[numComps*i+j];
-            }
-          }
-        }
-      else
-        {
-        for (i = 0; i < numToCopy; i++)
-          {
-          for (j = 0; j < numComps; j++)
-            {
-            dArray[toId[i]*numComps+j] = recFrom;
-            }
-          }
-        }
-
-      delete [] sc;
-      break;
-
-    case VTK_LONG:
-      lArray = ((vtkLongArray*)Data)->GetPointer(0);
-      dataSize = sizeof(long);
-      sc = (char*)new long[numToCopy*numComps*dataSize];
-      sl = (long*)sc;
-
-      this->Controller->
-        Receive(sc, numToCopy*numComps*dataSize, recFrom, recTag);
-      for (i = 0; i < numToCopy; i++)
-        {
-        for (j = 0; j < numComps; j++)
-          {
-          lArray[toId[i]*numComps+j] = sl[numComps*i+j];
-          }
-        }
-
-      delete [] sc;
-      break;
-      
-    case VTK_ID_TYPE:
-      idArray = ((vtkIdTypeArray*)Data)->GetPointer(0);
-      dataSize = sizeof(vtkIdType);
-      sc = (char*)new vtkIdType[numToCopy*numComps*dataSize];
-      sid = (vtkIdType*)sc;
-
-      this->Controller->
-        Receive(sc, numToCopy*numComps*dataSize, recFrom, recTag);
-      for (i = 0; i < numToCopy; i++)
-        {
-        for (j = 0; j < numComps; j++)
-          {
-          idArray[toId[i]*numComps+j] = sid[numComps*i+j];
-          }
-        }
-
-      delete [] sc;
-      break;
-      
+    vtkTemplateMacro(ReceiveArraysTemplate<VTK_TT>(
+                       Data,numToCopy,recFrom,toId,recTag,
+                       this->Controller,setDataToRecFrom));
     case VTK_BIT:
       vtkErrorMacro("VTK_BIT not allowed for receive");
       break;
-    case VTK_UNSIGNED_SHORT:
-      vtkErrorMacro("VTK_UNSIGNED_SHORT not allowed for receive");
-      break;
-    case VTK_SHORT:
-      {
-      short* sArray = ((vtkShortArray*)Data)->GetPointer(0);
-      dataSize = sizeof(short);
-      sc = (char*)new short[numToCopy*numComps*dataSize];
-      short* ss = (short*)sc;
-
-      this->Controller->
-        Receive(sc, numToCopy*numComps*dataSize, recFrom, recTag);
-      for (i = 0; i < numToCopy; i++)
-        {
-        for (j = 0; j < numComps; j++)
-          {
-          sArray[toId[i]*numComps+j] = ss[numComps*i+j];
-          }
-        }
-
-      delete [] sc;
-      break;
-      }
     default:
       vtkErrorMacro
         ("datatype = "<<dataType<<" not allowed for receive");
@@ -2942,42 +2265,14 @@ void vtkRedistributePolyData::ReceiveInputArrays(vtkDataSetAttributes* attr,
   for (j = 0; j < num; ++j)
     {
     this->Controller->Receive(&type, 1, recFrom, 997245);
-    switch (type)
+    {
+    vtkAbstractArray* TempArray = vtkAbstractArray::CreateArray(type);
+    array = vtkDataArray::SafeDownCast(TempArray);
+    if (!array)
       {
-      case VTK_INT:
-        array = vtkIntArray::New();
-        break;
-      case VTK_FLOAT:
-        array = vtkFloatArray::New();
-        break;
-      case VTK_DOUBLE:
-        array = vtkDoubleArray::New();
-        break;
-      case VTK_CHAR:
-        array = vtkCharArray::New();
-        break;
-      case VTK_LONG:
-        array = vtkLongArray::New();
-        break;
-      case VTK_SHORT:
-        array = vtkShortArray::New();
-        break;
-      case VTK_UNSIGNED_CHAR:
-        array = vtkUnsignedCharArray::New();
-        break;
-      case VTK_UNSIGNED_INT:
-        array = vtkUnsignedIntArray::New();
-        break;
-      case VTK_UNSIGNED_LONG:
-        array = vtkUnsignedLongArray::New();
-        break;
-      case VTK_UNSIGNED_SHORT:
-        array = vtkUnsignedShortArray::New();
-        break;
-      case VTK_ID_TYPE:
-        array = vtkIdTypeArray::New();
-        break;
+      TempArray->Delete();
       }
+    }
     this->Controller->Receive(&numComps, 1, recFrom, 997246);
     this->Controller->Receive(&nameLength, 1, recFrom, 997247);
     if (array)
