@@ -31,6 +31,7 @@ vtkCxxSetObjectMacro(vtkAllToNRedistributeCompositePolyData, Controller,
 vtkAllToNRedistributeCompositePolyData::vtkAllToNRedistributeCompositePolyData()
 {
   this->Controller = 0;
+  this->NumberOfProcesses = 1;
 }
 
 //----------------------------------------------------------------------------
