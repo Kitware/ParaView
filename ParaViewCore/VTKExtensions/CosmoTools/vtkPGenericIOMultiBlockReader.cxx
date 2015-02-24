@@ -34,7 +34,7 @@
 #include "vtkType.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkDoubleArray.h"
-#include "vtkUnsignedLongLongArray.h"
+#include "vtkTypeUInt64Array.h"
 #include "vtkFieldData.h"
 
 #include "GenericIOReader.h"
@@ -46,6 +46,7 @@
 #include <utility>
 #include <vector>
 
+#include <unistd.h>
 
 // Uncomment the line below to get debugging information
 //#define DEBUG
@@ -779,13 +780,12 @@ vtkUnstructuredGrid* vtkPGenericIOMultiBlockReader::LoadBlock(int blockId)
 
   if (this->Reader->IsSpatiallyDecomposed())
     {
-    vtkSmartPointer< vtkUnsignedLongLongArray > coords =
-        vtkSmartPointer< vtkUnsignedLongLongArray >::New();
+    vtkSmartPointer< vtkTypeUInt64Array > coords =
+        vtkSmartPointer< vtkTypeUInt64Array >::New();
     coords->SetNumberOfComponents(3);
     coords->SetNumberOfTuples(1);
     coords->SetName("genericio_block_coords");
-    assert(sizeof(uint64_t) == sizeof(unsigned long long));
-    coords->SetTupleValue(0,(unsigned long long*)this->MetaData->Blocks[blockId].coords);
+    coords->SetTupleValue(0,(vtkTypeUInt64*)this->MetaData->Blocks[blockId].coords);
     grid->GetFieldData()->AddArray(coords);
     }
 
@@ -886,8 +886,8 @@ int vtkPGenericIOMultiBlockReader::RequestData(
   // the genericio file and add them to the dataset
   uint64_t tmpDims[3];
   double tmpDouble[3];
-  vtkSmartPointer< vtkUnsignedLongLongArray > dims =
-      vtkSmartPointer< vtkUnsignedLongLongArray >::New();
+  vtkSmartPointer< vtkTypeUInt64Array > dims =
+      vtkSmartPointer< vtkTypeUInt64Array >::New();
   vtkSmartPointer< vtkDoubleArray > origin =
       vtkSmartPointer< vtkDoubleArray >::New();
   vtkSmartPointer< vtkDoubleArray > scale =
@@ -900,8 +900,7 @@ int vtkPGenericIOMultiBlockReader::RequestData(
   scale->SetName("genericio_phys_scale");
 
   this->Reader->GetGlobalDimensions(tmpDims);
-  assert(sizeof(unsigned long long) == sizeof(uint64_t));
-  dims->InsertNextTupleValue((unsigned long long*)tmpDims);
+  dims->InsertNextTupleValue((vtkTypeUInt64*)tmpDims);
   this->Reader->GetPhysOrigin(tmpDouble);
   origin->InsertNextTupleValue(tmpDouble);
   this->Reader->GetPhysScale(tmpDouble);

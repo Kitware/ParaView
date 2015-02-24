@@ -56,24 +56,24 @@ vtkDataArray* GetVtkDataArray(
   switch( type )
     {
     case gio::GENERIC_IO_INT32_TYPE:
-     dataArray = vtkDataArray::CreateDataArray(VTK_INT);
-     dataSize  = sizeof(int32_t);
+     dataArray = vtkDataArray::CreateDataArray(VTK_TYPE_INT32);
+     dataSize  = sizeof(vtkTypeInt32);
      break;
     case gio::GENERIC_IO_INT64_TYPE:
-     dataArray = vtkDataArray::CreateDataArray(VTK_LONG_LONG);
+     dataArray = vtkDataArray::CreateDataArray(VTK_TYPE_INT64);
      // i.e., don't run this on windows
-     assert(sizeof(long long)==sizeof(int64_t));
-     dataSize = sizeof(int64_t);
+     assert(sizeof(vtkTypeInt64) == sizeof(uint64_t) );
+     dataSize = sizeof(vtkTypeInt64);
      break;
     case gio::GENERIC_IO_UINT32_TYPE:
-     dataArray = vtkDataArray::CreateDataArray(VTK_UNSIGNED_INT);
-     dataSize  = sizeof(uint32_t);
+     dataArray = vtkDataArray::CreateDataArray(VTK_TYPE_UINT32);
+     dataSize  = sizeof(vtkTypeUInt32);
      break;
     case gio::GENERIC_IO_UINT64_TYPE:
-     dataArray = vtkDataArray::CreateDataArray(VTK_UNSIGNED_LONG_LONG);
+     dataArray = vtkDataArray::CreateDataArray(VTK_TYPE_UINT64);
      // i.e., don't run this on windows
-     assert(sizeof(unsigned long long) == sizeof(uint64_t) );
-     dataSize = sizeof(uint64_t);
+     assert(sizeof(vtkTypeUInt64) == sizeof(uint64_t) );
+     dataSize = sizeof(vtkTypeUInt64);
      break;
     case gio::GENERIC_IO_DOUBLE_TYPE:
      dataArray = vtkDataArray::CreateDataArray(VTK_DOUBLE);

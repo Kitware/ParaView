@@ -23,9 +23,9 @@
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
 #include "vtkIntArray.h"
-#include "vtkLongLongArray.h"
+#include "vtkTypeUInt64Array.h"
 #include "vtkUnsignedIntArray.h"
-#include "vtkUnsignedLongLongArray.h"
+#include "vtkTypeInt64Array.h"
 #include "vtkInformation.h"
 #include "vtkFieldData.h"
 #include "vtkMultiProcessController.h"
@@ -158,7 +158,7 @@ static inline gio::GenericIOPrimitiveTypes getGIOTypeFor(vtkDataArray* array)
     {
     return gio::GENERIC_IO_INT32_TYPE;
     }
-  else if (vtkLongLongArray::FastDownCast(array) != NULL)
+  else if (vtkTypeInt64Array::FastDownCast(array) != NULL)
     {
     return gio::GENERIC_IO_INT64_TYPE;
     }
@@ -166,7 +166,7 @@ static inline gio::GenericIOPrimitiveTypes getGIOTypeFor(vtkDataArray* array)
     {
     return gio::GENERIC_IO_UINT32_TYPE;
     }
-  else if (vtkUnsignedLongLongArray::FastDownCast(array) != NULL)
+  else if (vtkTypeUInt64Array::FastDownCast(array) != NULL)
     {
     return gio::GENERIC_IO_UINT64_TYPE;
     }
@@ -212,7 +212,7 @@ static inline void computeDataForArray(vtkDataArray* array, char* data, int inde
     case gio::GENERIC_IO_INT64_TYPE:
       {
       long long* ptr = (long long*)data;
-      vtkDataArrayTemplate<long long>* darray = vtkLongLongArray::FastDownCast(array);
+      vtkDataArrayTemplate<vtkTypeInt64>* darray = vtkTypeInt64Array::FastDownCast(array);
       for (int j = 0; j < array->GetNumberOfTuples(); ++j)
         {
         ptr[j] = darray->GetTuple(j)[indexInTuple];
@@ -232,7 +232,7 @@ static inline void computeDataForArray(vtkDataArray* array, char* data, int inde
     case gio::GENERIC_IO_UINT64_TYPE:
       {
       unsigned long long* ptr = (unsigned long long*)data;
-      vtkDataArrayTemplate<unsigned long long>* darray = vtkUnsignedLongLongArray::FastDownCast(array);
+      vtkDataArrayTemplate<vtkTypeUInt64>* darray = vtkTypeUInt64Array::FastDownCast(array);
       for (int j = 0; j < array->GetNumberOfTuples(); ++j)
         {
         ptr[j] = darray->GetTuple(j)[indexInTuple];

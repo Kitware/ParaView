@@ -37,7 +37,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
 #include "vtkType.h"
-#include "vtkUnsignedLongLongArray.h"
+#include "vtkTypeUInt64Array.h"
 #include "vtkUnstructuredGrid.h"
 
 #include "vtkGenericIOUtilities.h"
@@ -752,7 +752,7 @@ void vtkPGenericIOReader::LoadData(vtkUnstructuredGrid *grid)
     } // END for all arrays
   if (this->AppendBlockCoordinates && this->Reader->IsSpatiallyDecomposed())
     {
-    vtkUnsignedLongLongArray* dataArray = vtkUnsignedLongLongArray::New();
+    vtkTypeUInt64Array* dataArray = vtkTypeUInt64Array::New();
     dataArray->SetNumberOfComponents(3);
     dataArray->SetNumberOfTuples(this->MetaData->NumberOfElements);
     dataArray->SetName("gio_block_indices");
