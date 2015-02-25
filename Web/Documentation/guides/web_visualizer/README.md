@@ -9,31 +9,6 @@ application.  The purpose of this guide is to familiarize users with the Web
 Visualizer and provided detailed instructions on its use that cannot be found
 elsewhere.
 
-### Table of Contents
-
-This guide is organized as follows:
-
-+ [Introduction](#introduction)
-    - [Table of Contents](#table-of-contents)
-    - [Quick Start Guide](#quick-start-guide)
-+ [Overview of the interface](#overview-of-the-interface)
-    - [Main toolbar](#main-toolbar)
-    - [Inspector Panel](#inspector-panel)
-        * [Pipeline editor](#pipeline-editor)
-        * [Proxy property editor](#proxy-property-editor)
-+ [Adding sources/filters and updating properties](#adding-sources/filters-and-updating-properties)
-+ [Loading data](#loading-data)
-+ [Color management](#color-management)
-    - [Colormap editor](#colormap-editor)
-    - [Opacity editor](#opacity-editor)
-    - [Color range editor](#color-range-editor)
-+ [Working with time dependent data](#working-with-time-dependent-data)
-+ [Saving data](#saving-data)
-    - [Saving screenshots](#saving-screenshots)
-    - [Saving data files](#saving-data-files)
-    - [Saving state](#saving-state)
-+ [Changing preferences and settings](#changing-preferences-and-settings)
-
 {@img images/pvweb-app-smaller.png The ParaViewWeb Visualizer application }
 
 ### Quick Start Guide
@@ -195,8 +170,63 @@ in the following subsections.
 ### Colormap editor
 
 The colormap editor widget is used to customize the colormap after a preset
-palette has been chosen as a starting point.  This widget is not implemented
-yet, but will be available soon.
+palette has been chosen as a starting point.  The image below shows the
+color editor with the main buttons labelled.
+
+{@img images/labelled-color-editor.png The color editor widget}
+
+The color editor widget allows you to add and remove colors from the
+color map, change existing colors, edit scalar values, and, when treating
+values as categories, edit text annotations associated with color values.
+
+Normally, all changes made using the color editor are immediately sent to
+the server and the render view is updated to reflect them.  However, by
+clicking the lock icon, you can toggle immediate mode off so that you may
+change the color map without sending updates to the server.  When you are
+not in immediate mode, you must click the apply button (the check mark icon)
+to send your updated color map to the server.
+
+When you add a new color/value to the color map list, it is normally inserted
+right after the first element, and it is given a value half way between the
+first and second values.  An exception is when you manually opt to interpret
+values as categories by clicking the "A" icon.  In this case, there are
+initially no color map entries, and the first two you add are given values
+0 and 1 (and colors white and black, respectively).  At any time you can
+choose to rescale the color map entries so that the values are evenly spaced
+between the min and max values.
+
+You may type in the scalar value text entry fields to assign a new scalar
+value to the associated color.  When you do this, the entries will be
+re-sorted so that they are always shown in increasing order of value.
+
+You may also click on a color to assign a new color to the associated scalar
+value.  Below the color map entry, you should see the swatches image appear,
+along with R, G, and B edit fields, as shown in the image below.
+
+{@img images/color-editor-swatches.png The color editor widget}
+
+You can click on any color in the swatches images to use that color for the
+associated scalar value in your color map.  You can also enter the red,
+green, and blue values into the text edit fields.  In either case, your
+choice of color should immediately appear in the color patch you clicked
+to show the swatches.  If you are in immediate mode, the new color should
+additionally be sent to the server and your render view updated.
+
+If you have chosen to interpret values as categories, one final option
+becomes available.  You can click the tags icon to toggle between showing
+scalar values and text annotations in the color map entry text fields.  In
+this way, you can edit both properties.  When you are editing text
+annotations, the associated scalar value is displayed as a tooltip, and
+when you are editing scalar values, the opposite is true.
+
+Any time you select a preset palette, the interpret values as categories
+option will be selected for you based on the type of the palette applied.
+If a palette is configured as a color map which has indexed colors, the
+interpret values as categories option will become selected.
+
+To delete any entry from your color map list, simply click the trash can
+icon to it's right.  You may delete any color map entries until there are
+only two left, at which point the trash can icons become disabled.
 
 ### Opacity editor
 
