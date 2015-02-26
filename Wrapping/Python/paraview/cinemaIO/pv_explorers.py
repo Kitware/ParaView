@@ -14,9 +14,11 @@ class ImageExplorer(explorers.Explorer):
     """
     def __init__(self,
                 cinema_store, parameters, tracks,
-                view=None):
+                view=None,
+                iSave=True):
         super(ImageExplorer, self).__init__(cinema_store, parameters, tracks)
         self.view = view
+        self.iSave = iSave
 
     def insert(self, document):
         # FIXME: for now we'll write a temporary image and read that in.
@@ -29,8 +31,8 @@ class ImageExplorer(explorers.Explorer):
         #alternatively if you are just writing out files and don't need them in memory
         ##fn = self.cinema_store.get_filename(document)
         ##simple.WriteImage(fn)
-
-        super(ImageExplorer, self).insert(document)
+        if self.iSave:
+            super(ImageExplorer, self).insert(document)
 
 class Camera(explorers.Track):
     """
