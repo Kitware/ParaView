@@ -106,3 +106,48 @@ select.pv-form-height  { font-size: 12px; }
 .hide-on-start { display: none; }
 .start-page-image { display: block; margin-left: auto; margin-right: auto }
 .start-page-busy-icon { font-size: 48px; margin-left: auto; margin-right: auto; display: block; width: 68px; }
+
+.download-progressbar-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 300px;
+    height: 80px;
+    z-index: 1000;
+    background-color: #222222;
+    border-radius: 3px;
+    box-shadow: 5px 5px 5px #333333;
+    text-align: center;
+}
+
+.progressbar-content-container {
+    position: absolute;
+    top: 25px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    border-radius: 0px 0px 3px 3px;
+    background-color: #dddddd;
+    text-align: center;
+}
+
+.progressbar-title {
+    color: whitesmoke;
+    line-height: 25px;
+}
+
+.progress-message-span {
+    position: absolute;
+    left: 4px;
+    top: 6px;
+}
+
+.progress-meter-container {
+    position: absolute;
+    bottom: 3px;
+    left: 3px;
+    right: 3px;
+    top: 30px;
+}
+
+.local-only { display: none; }

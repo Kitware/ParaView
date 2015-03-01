@@ -302,6 +302,11 @@ class ParaViewWebViewPortImageDelivery(ParaViewWebProtocol):
 
 class ParaViewWebViewPortGeometryDelivery(ParaViewWebProtocol):
 
+    def __init__(self):
+        super(ParaViewWebViewPortGeometryDelivery, self).__init__()
+
+        self.dataCache = {}
+
     # RpcName: getSceneMetaData => viewport.webgl.metadata
     @exportRpc("viewport.webgl.metadata")
     def getSceneMetaData(self, view_id):
@@ -315,6 +320,77 @@ class ParaViewWebViewPortGeometryDelivery(ParaViewWebProtocol):
         view  = self.getView(view_id)
         data = self.getApplication().GetWebGLBinaryData(view.SMProxy, str(object_id), part-1)
         return data
+
+    # RpcName: getCachedWebGLData => viewport.webgl.cached.data
+    @exportRpc("viewport.webgl.cached.data")
+    def getCachedWebGLData(self, sha):
+        if sha not in self.dataCache:
+            return { 'success': False, 'reason': 'Key %s not in data cache' % sha }
+        return { 'success': True, 'data': self.dataCache[sha] }
+
+    # RpcName: getSceneMetaDataAllTimesteps => viewport.webgl.metadata.alltimesteps
+    @exportRpc("viewport.webgl.metadata.alltimesteps")
+    def getSceneMetaDataAllTimesteps(self, view_id=-1):
+        animationScene = simple.GetAnimationScene()
+        timeKeeper = animationScene.TimeKeeper
+        tsVals = timeKeeper.TimestepValues.GetData()
+        currentTime = timeKeeper.Time
+
+        oldCache = self.dataCache
+        self.dataCache = {}
+        returnToClient = {}
+
+        view  = self.getView(view_id);
+        animationScene.GoToFirst()
+
+        # Iterate over all the timesteps, building up a list of unique shas
+        for i in xrange(len(tsVals)):
+            simple.Render()
+
+            mdString = self.getApplication().GetWebGLSceneMetaData(view.SMProxy)
+            timestepMetaData = json.loads(mdString)
+            objects = timestepMetaData['Objects']
+
+            # Iterate over the objects in the scene
+            for obj in objects:
+                sha = obj['md5']
+                objId = obj['id']
+                numParts = obj['parts']
+
+                if sha not in self.dataCache:
+                    if sha in oldCache:
+                        self.dataCache[sha] = oldCache[sha]
+                    else:
+                        transparency = obj['transparency']
+                        layer = obj['layer']
+                        partData = []
+
+                        # Ask for the binary data for each part of this object
+                        for part in xrange(numParts):
+                            partNumber = part
+                            data = self.getApplication().GetWebGLBinaryData(view.SMProxy, str(objId), partNumber)
+                            partData.append(data)
+
+                        # Now add object, with all its binary parts, to the cache
+                        self.dataCache[sha] = { 'md5': sha,
+                                                'id': objId,
+                                                'numParts': numParts,
+                                                'transparency': transparency,
+                                                'layer': layer,
+                                                'partsList': partData }
+
+                returnToClient[sha] = { 'id': objId, 'numParts': numParts }
+
+            # Now move time forward
+            animationScene.GoToNext()
+
+        # Set the time back to where it was when all timesteps were requested
+        timeKeeper.Time = currentTime
+        animationScene.AnimationTime = currentTime
+        simple.Render()
+
+        return { 'success': True, 'metaDataList': returnToClient }
+
 
 # =============================================================================
 #
