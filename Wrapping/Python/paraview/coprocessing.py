@@ -443,6 +443,9 @@ class CoProcessor(object):
         import paraview.cinemaIO.explorers as explorers
         import paraview.cinemaIO.pv_explorers as pv_explorers
 
+        pm = servermanager.vtkProcessModule.GetProcessModule()
+        pid = pm.GetPartitionId()
+
         #load or create the cinema store for this view
         import os.path
         vfname = view.cpFileName
@@ -542,9 +545,11 @@ class CoProcessor(object):
         fs.filename_pattern = fnpattern
 
         #at current time, run through parameters and dump files
-        e = pv_explorers.ImageExplorer(fs, parameters, tracks, view=view)
+        e = pv_explorers.ImageExplorer(fs, parameters, tracks, view=view, iSave=(pid==0))
         e.explore({'time':formatted_time})
-        fs.save()
+
+        if pid == 0:
+            fs.save()
 
         #restore values to what they were at beginning for next view
         for proxy, property, value in vals:
