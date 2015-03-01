@@ -786,13 +786,24 @@ class VectorProperty(Property):
             values = (values,)
         if not self.GetRepeatable() and len(values) != self.GetNumberOfElements():
             raise RuntimeError("This property requires %d values." % self.GetNumberOfElements())
+
+        convertedValues = map(self.ConvertValue, values)
+
         if self.GetRepeatable():
-            # Clean up first
-            self.SMProperty.SetNumberOfElements(0)
-        idx = 0
-        for val in values:
-            self.SMProperty.SetElement(idx, self.ConvertValue(val))
+          # Clean up first
+          self.SMProperty.SetNumberOfElements(len(convertedValues))
+
+        try:
+          # SetElements() isn't available for all VectorProperty values.
+          # Try to use it so that the proxies are updated only once.
+          # Otherwise, call SetElement() for each element.
+          self.SMProperty.SetElements(convertedValues)
+        except TypeError as e:
+          idx = 0
+          for val in convertedValues:
+            self.SMProperty.SetElement(idx, val)
             idx += 1
+
         self._UpdateProperty()
 
     def Clear(self):
