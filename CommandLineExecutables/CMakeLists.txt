@@ -180,11 +180,23 @@ if (PARAVIEW_USE_STATIC_NUMPY)
     ${extra_numpy_libs} "${STATIC_NUMPY_LIBRARY}")
 endif()
 
+
+# Cray ATP support
+set(PARAVIEW_USE_ATP OFF CACHE BOOL
+  "Link to Cray ATP library to enable debug features on Cray Systems")
+mark_as_advanced(PARAVIEW_USE_ATP)
+if (PARAVIEW_USE_ATP)
+  find_package(ATP)
+endif()
 foreach (name pvserver pvdataserver pvrenderserver)
   pv_add_executable(${name} ${name}.cxx)
   target_link_libraries(${name}
     vtkPVServerManagerApplication
     ${STATIC_LINK_PLUGINS})
+  if (ATP_FOUND)
+    target_link_libraries(${name} ${ATP_LIBRARIES})
+    set_target_properties(${name} PROPERTIES LINK_FLAGS "${ATP_LINK_FLAGS}")
+  endif()
 endforeach()
 
 if (PARAVIEW_ENABLE_PYTHON)
@@ -195,6 +207,10 @@ if (PARAVIEW_ENABLE_PYTHON)
       vtkUtilitiesPythonInitializer
       ${VTK_PYTHON_LIBRARIES}
       ${STATIC_LINK_PLUGINS})
+    if (ATP_FOUND)
+      target_link_libraries(${name} ${ATP_LIBRARIES})
+      set_target_properties(${name} PROPERTIES LINK_FLAGS "${ATP_LINK_FLAGS}")
+    endif()
   endforeach()
 
   # add python module dependencies to the server-executables for static builds.
