@@ -317,6 +317,7 @@ if(PARAVIEW_ENABLE_PYTHON)
   find_python_module(numpy numpy_found)
   if (numpy_found)
     list(APPEND TESTS_WITH_BASELINES
+      ${CMAKE_CURRENT_SOURCE_DIR}/StructuredGridCellBlanking.xml
       ${CMAKE_CURRENT_SOURCE_DIR}/TestFindDataMax.xml)
     list(APPEND TESTS_WITH_INLINE_COMPARES
       ${CMAKE_CURRENT_SOURCE_DIR}/FindDataDialog.xml)
