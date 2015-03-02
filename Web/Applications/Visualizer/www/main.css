@@ -151,3 +151,6 @@ select.pv-form-height  { font-size: 12px; }
 }
 
 .local-only { display: none; }
+
+table.viewport-stat                     { table-layout: fixed; overflow: hidden; }
+table.viewport-stat > tbody > tr > td   { width: 60px; text-align: right; }
