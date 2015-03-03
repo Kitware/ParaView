@@ -83,7 +83,7 @@ inline std::set< std::string > getHaloSummaryWithCenterInfoArrays()
 
 inline bool pointDataHasTheseArrays(vtkPointData* pd, const std::set< std::string >& arrays)
 {
-  if (pd->GetNumberOfArrays() != arrays.size())
+  if (static_cast<size_t>(pd->GetNumberOfArrays()) != arrays.size())
     {
     std::cerr << "Wrong number of arrays.  There should be " << arrays.size()
               << " and there are " << pd->GetNumberOfArrays() << std::endl;
