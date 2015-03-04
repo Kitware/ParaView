@@ -35,7 +35,7 @@ class vtkPolyData;
 class vtkFloatArray;
 class vtkIdList;
 
-class VTKFILTERSMODELING_EXPORT vtkPolyDataGeodesicDistance : public vtkPolyDataAlgorithm
+class VTK_EXPORT vtkPolyDataGeodesicDistance : public vtkPolyDataAlgorithm
 {
 public:
 

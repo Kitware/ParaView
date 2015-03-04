@@ -62,3 +62,8 @@ include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/gw_core
 add_library( ${PROJECT_NAME} SHARED
   ${${PROJECT_NAME}_SRCS}
   ${${PROJECT_NAME}_HDRS} )
+
+install(TARGETS ${PROJECT_NAME}
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+)

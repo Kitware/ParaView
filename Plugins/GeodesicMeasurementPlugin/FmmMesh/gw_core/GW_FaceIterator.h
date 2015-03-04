@@ -30,7 +30,7 @@ class GW_Vertex;
  */
 /*------------------------------------------------------------------------------*/
 
-class GW_FaceIterator
+class FMMMESH_EXPORT GW_FaceIterator
 {
 public:
 

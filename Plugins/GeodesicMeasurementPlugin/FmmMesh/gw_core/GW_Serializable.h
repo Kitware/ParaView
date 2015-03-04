@@ -14,7 +14,7 @@
 
 namespace GW {
 
-class GW_Ofstream: public std::ofstream
+class FMMMESH_EXPORT GW_Ofstream: public std::ofstream
 {
 
 public:

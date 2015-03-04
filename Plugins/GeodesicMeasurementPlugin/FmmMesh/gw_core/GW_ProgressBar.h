@@ -26,7 +26,7 @@ class GW_VoronoiVertex;
  */
 /*------------------------------------------------------------------------------*/
 
-class GW_ProgressBar
+class FMMMESH_EXPORT GW_ProgressBar
 {
 
 public:

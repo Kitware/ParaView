@@ -29,7 +29,7 @@ class GW_Vertex;
  */
 /*------------------------------------------------------------------------------*/
 
-class GW_VertexIterator
+class FMMMESH_EXPORT GW_VertexIterator
 {
 
 public:

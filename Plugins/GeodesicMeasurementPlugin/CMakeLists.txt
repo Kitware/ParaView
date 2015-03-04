@@ -23,4 +23,4 @@ add_paraview_plugin( GeodesicMeasurement "1.0"
     vtkGeodesicsBetweenPoints.cxx
 )
 
-target_link_libraries( GeodesicMeasurement PRIVATE FmmMesh )
+target_link_libraries( GeodesicMeasurement FmmMesh )

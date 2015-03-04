@@ -28,7 +28,7 @@ namespace GW {
  */
 /*------------------------------------------------------------------------------*/
 
-class GW_PolygonIntersector
+class FMMMESH_EXPORT GW_PolygonIntersector
 {
 
 public:

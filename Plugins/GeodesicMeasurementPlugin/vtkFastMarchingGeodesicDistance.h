@@ -79,7 +79,7 @@ class vtkPolyData;
 class vtkDataArray;
 class vtkGeodesicMeshInternals;
 
-class VTKFILTERSMODELING_EXPORT vtkFastMarchingGeodesicDistance : public vtkPolyDataGeodesicDistance
+class VTK_EXPORT vtkFastMarchingGeodesicDistance : public vtkPolyDataGeodesicDistance
 {
 public:
 

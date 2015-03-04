@@ -63,7 +63,7 @@ class vtkIdList;
 class vtkPoints;
 class vtkFastMarchingGeodesicDistance;
 
-class VTKFILTERSMODELING_EXPORT vtkFastMarchingGeodesicPath : public vtkGeodesicPath
+class VTK_EXPORT vtkFastMarchingGeodesicPath : public vtkGeodesicPath
 {
 public:
 
