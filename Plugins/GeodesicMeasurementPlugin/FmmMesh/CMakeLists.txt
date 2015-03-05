@@ -59,7 +59,7 @@ include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/gw_core
                      ${CMAKE_CURRENT_SOURCE_DIR}/gw_geodesic
                      ${CMAKE_CURRENT_BINARY_DIR} )
 
-add_library( ${PROJECT_NAME} SHARED
+add_library( ${PROJECT_NAME}
   ${${PROJECT_NAME}_SRCS}
   ${${PROJECT_NAME}_HDRS} )
 
