@@ -234,7 +234,7 @@ FUNCTION(add_pvweb_tests prefix)
     set(ACT_BROWSER "nobrowser")
   endif()
 
-  set(pvw_port_number 8080)
+  set(pvw_port_number 9743)
 
   while(ACT_BROWSER)
     # Pull another browser off the list
