@@ -199,6 +199,31 @@ void vtkGeometryRepresentation::SetupDefaults()
 }
 
 //----------------------------------------------------------------------------
+int vtkGeometryRepresentation::GetBlockColorsDistinctValues()
+{
+  vtkPVGeometryFilter *geomFilter = 
+    vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter);
+  if (geomFilter)
+    {
+    return geomFilter->GetBlockColorsDistinctValues();
+    }
+  return 2;
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetBlockColorsDistinctValues(
+  int distinctValues)
+{
+  vtkPVGeometryFilter *geomFilter = 
+    vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter);
+  if (geomFilter)
+    {
+    geomFilter->SetBlockColorsDistinctValues(distinctValues);
+    this->MarkModified();
+    }
+}
+
+//----------------------------------------------------------------------------
 int vtkGeometryRepresentation::FillInputPortInformation(
   int vtkNotUsed(port), vtkInformation* info)
 {

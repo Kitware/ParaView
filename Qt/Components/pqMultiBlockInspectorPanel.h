@@ -84,15 +84,16 @@ private slots:
   void onSelectionChanged(pqOutputPort *port);
   void onColorArrayNameModified();
 
-  void treeWidgetCustomContextMenuRequested(const QPoint &pos);
-  void blockItemChanged(QTreeWidgetItem *item, int column);
+  void onCustomContextMenuRequested(const QPoint &pos);
+  void onItemChanged(QTreeWidgetItem *item, int column);
   void updateTree();
   void updateTree(vtkPVCompositeDataInformation *iter,
                   QTreeWidgetItem *parent,
                   int& flatIndex, bool visibility,
                   int inheritedColorIndex,
                   int inheritedOpacityIndex);
-  void currentTreeItemSelectionChanged();
+  void onItemSelectionChanged();
+  void onItemDoubleClicked(QTreeWidgetItem * item, int column);
   void updateBlockVisibilities();
   void updateBlockColors();
   void updateBlockOpacities();
@@ -110,8 +111,13 @@ private:
                  QTreeWidgetItem *parent,
                  int& flatIndex);
   void unsetChildVisibilities(QTreeWidgetItem *parent);
-  QIcon makeBlockIcon(int flatIndex, NodeType nodeType, int inheritedColorIndex,
-                      int inheritedOpacityIndex) const;
+  QIcon makeColorIcon(int flatIndex, NodeType nodeType, 
+                      int inheritedColorIndex) const;
+  QIcon makeOpacityIcon(int flatIndex, NodeType nodeType, 
+                        int inheritedOpacityIndex) const;
+  QIcon makeNullIcon() const;
+
+
 
 private:
   QTreeWidget *TreeWidget;
@@ -124,6 +130,8 @@ private:
   vtkSMProxy *ColorTransferProxy;
   vtkDiscretizableColorTransferFunction* ColorTransferFunction;
   vtkPiecewiseFunction* OpacityTransferFunction;
+  unsigned int BlockColorsDistinctValues;
+  int CompositeWrap;
 
 
   pqTimer UpdateUITimer;
