@@ -3,19 +3,7 @@ project( FmmMesh )
 set( vtkFmmMesh_THIRD_PARTY 1)
 set(vtkFmmMesh_LIBRARIES FmmMesh)
 
-if(NOT LIBRARY_OUTPUT_PATH)
-  set(LIBRARY_OUTPUT_PATH ${FmmMesh_BINARY_DIR}/bin CACHE INTERNAL
-    "Single output directory for building all libraries.")
-endif(NOT LIBRARY_OUTPUT_PATH)
-set(FmmMesh_LIBRARY_DIRS ${LIBRARY_OUTPUT_PATH})
-set(FmmMesh_RUNTIME_DIRS ${LIBRARY_OUTPUT_PATH})
-
-if(NOT EXECUTABLE_OUTPUT_PATH)
-  set(EXECUTABLE_OUTPUT_PATH ${FmmMesh_BINARY_DIR}/bin CACHE INTERNAL
-    "Single output directory for building all executables.")
-endif(NOT EXECUTABLE_OUTPUT_PATH)
-
-set( VTKFMMMESH_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS} )
+set( VTKFMMMESH_BUILD_SHARED_LIBS OFF )
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/vtkFmmMeshConfig.h.in
                ${CMAKE_CURRENT_BINARY_DIR}/vtkFmmMeshConfig.h)
 
@@ -59,7 +47,7 @@ include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/gw_core
                      ${CMAKE_CURRENT_SOURCE_DIR}/gw_geodesic
                      ${CMAKE_CURRENT_BINARY_DIR} )
 
-add_library( ${PROJECT_NAME}
+add_library( ${PROJECT_NAME} STATIC
   ${${PROJECT_NAME}_SRCS}
   ${${PROJECT_NAME}_HDRS} )
 
