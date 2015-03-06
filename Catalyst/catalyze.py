@@ -34,6 +34,8 @@ def _get_argument_parser():
                         'The directory contain manifest.json and other resources')
   parser.add_argument('-o', dest='output_dir', action='store',
                         help='the directory where the modified sources will be written')
+  parser.add_argument('-t', dest='copy_tests', action='store_true',
+                        help='also copy over the test folders of the editions')
 
   usage = "Usage: %prog [options]"
 
@@ -346,6 +348,19 @@ def process(config):
 
   create_cmake_script(config, all_manifests)
 
+def copyTestTrees(config):
+  all_dirs = config.input_dirs
+  repo = config.repo
+  testingDst = os.path.join(config.output_dir, 'Testing')
+  os.makedirs(testingDst)
+  for input_dir in all_dirs:
+    testingSrc = os.path.join(input_dir, 'Testing')
+    for f in os.listdir(testingSrc):
+      print f
+      src = os.path.join(testingSrc,f)
+      dst = os.path.join(testingDst,f)
+      copy_path(src,dst,[])
+
 def main():
   parser = _get_argument_parser()
   config = parser.parse_args()
@@ -367,6 +382,8 @@ def main():
   shutil.rmtree(config.output_dir, ignore_errors=True)
 
   process(config)
+  if (config.copy_tests):
+    copyTestTrees(config)
 
 if __name__ == '__main__':
   main()
