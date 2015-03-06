@@ -253,7 +253,7 @@ private:
   void CreateGhostParticles();
   void ExecuteHaloFinder(vtkUnstructuredGrid* allParticles, vtkUnstructuredGrid* fofProperties);
   void ExecuteSubHaloFinder(vtkUnstructuredGrid* allParticles, vtkUnstructuredGrid* subFofProperties);
-  void FindCenters(vtkUnstructuredGrid* fofProperties);
+  void FindCenters(vtkUnstructuredGrid* allParticles, vtkUnstructuredGrid* fofProperties);
 };
 
 #endif // VTKPANLHALOFINDER_H

@@ -19,7 +19,6 @@
 #include "vtkFloatArray.h"
 #include "vtkInformation.h"
 #include "vtkIntArray.h"
-#include "vtkLongLongArray.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
@@ -27,6 +26,7 @@
 #include "vtkPoints.h"
 #include "vtkPointData.h"
 #include "vtkUnstructuredGrid.h"
+#include "vtkTypeInt64Array.h"
 
 #include "CosmoHaloFinderP.h"
 #include "FOFHaloProperties.h"
@@ -294,7 +294,7 @@ int vtkPANLHaloFinder::RequestData(vtkInformation *, vtkInformationVector **inVe
   this->DistributeInput();
   this->CreateGhostParticles();
   this->ExecuteHaloFinder(output,fofProperties);
-  this->FindCenters(fofProperties);
+  this->FindCenters(output,fofProperties);
   if (this->RunSubHaloFinder)
     {
     this->ExecuteSubHaloFinder(output,subFofProperties);
@@ -414,10 +414,10 @@ void vtkPANLHaloFinder::ExecuteHaloFinder(vtkUnstructuredGrid *allParticles,
   vtkNew< vtkFloatArray > velocityZ;
   velocityZ->SetName("vz");
   velocityZ->SetNumberOfTuples(this->Internal->xx.size());
-  vtkNew< vtkLongLongArray > particleId;
+  vtkNew< vtkTypeInt64Array > particleId;
   particleId->SetName("id");
   particleId->SetNumberOfTuples(this->Internal->xx.size());
-  vtkNew< vtkLongLongArray > haloTags;
+  vtkNew< vtkTypeInt64Array > haloTags;
   haloTags->SetName("fof_halo_tag");
   haloTags->SetNumberOfTuples(this->Internal->xx.size());
 
@@ -467,7 +467,7 @@ void vtkPANLHaloFinder::ExecuteHaloFinder(vtkUnstructuredGrid *allParticles,
   count->SetName("fof_halo_count");
   count->SetNumberOfTuples(numberOfFOFHalos);
   pointData->AddArray(count.GetPointer());
-  vtkNew< vtkLongLongArray > tag;
+  vtkNew< vtkTypeInt64Array > tag;
   tag->SetName("fof_halo_tag");
   tag->SetNumberOfTuples(numberOfFOFHalos);
   pointData->AddArray(tag.GetPointer());
@@ -507,7 +507,7 @@ void vtkPANLHaloFinder::ExecuteSubHaloFinder(vtkUnstructuredGrid *allParticles,
   std::vector< POSVEL_T > shX, shY, shZ, shVX, shVY, shVZ;
   std::vector< ID_T > shTag, shHID, shID;
 
-  vtkNew< vtkLongLongArray > subhaloId;
+  vtkNew< vtkTypeInt64Array > subhaloId;
   subhaloId->SetName("subhalo_tag");
   subhaloId->SetNumberOfTuples(this->Internal->xx.size());
   for (size_t i = 0; i < this->Internal->xx.size(); ++i)
@@ -635,11 +635,11 @@ void vtkPANLHaloFinder::ExecuteSubHaloFinder(vtkUnstructuredGrid *allParticles,
   subhaloCount->SetName("subhalo_count");
   subhaloCount->SetNumberOfTuples(subMass.size());
   pointData->AddArray(subhaloCount.GetPointer());
-  vtkNew< vtkLongLongArray > tag;
+  vtkNew< vtkTypeInt64Array > tag;
   tag->SetName("fof_halo_tag");
   tag->SetNumberOfTuples(subMass.size());
   pointData->AddArray(tag.GetPointer());
-  vtkNew< vtkLongLongArray > subtag;
+  vtkNew< vtkTypeInt64Array > subtag;
   subtag->SetName("subhalo_tag");
   subtag->SetNumberOfTuples(subMass.size());
   pointData->AddArray(subtag.GetPointer());
@@ -668,7 +668,8 @@ void vtkPANLHaloFinder::ExecuteSubHaloFinder(vtkUnstructuredGrid *allParticles,
 
 }
 
-void vtkPANLHaloFinder::FindCenters(vtkUnstructuredGrid *fofProperties)
+void vtkPANLHaloFinder::FindCenters(vtkUnstructuredGrid* allParticles,
+                                    vtkUnstructuredGrid *fofProperties)
 {
   if (this->CenterFindingMode == vtkPANLHaloFinder::NONE)
     {
@@ -730,7 +731,7 @@ void vtkPANLHaloFinder::FindCenters(vtkUnstructuredGrid *fofProperties)
     float center[] = { 0.0, 0.0, 0.0 };
     if (centerIndex >= 0)
       {
-      double* point = fofProperties->GetPoint(haloData.GetActualIndex(centerIndex));
+      double* point = allParticles->GetPoint(haloData.GetActualIndex(centerIndex));
       center[0] = point[0];
       center[1] = point[1];
       center[2] = point[2];

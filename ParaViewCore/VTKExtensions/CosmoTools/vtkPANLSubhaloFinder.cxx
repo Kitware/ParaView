@@ -19,7 +19,6 @@
 #include "vtkIdList.h"
 #include "vtkInformation.h"
 #include "vtkIntArray.h"
-#include "vtkLongLongArray.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
@@ -27,6 +26,7 @@
 #include "vtkPointData.h"
 #include "vtkPoints.h"
 #include "vtkUnstructuredGrid.h"
+#include "vtkTypeInt64Array.h"
 
 #include "SubHaloFinder.h"
 #include "FOFHaloProperties.h"
@@ -265,7 +265,7 @@ void vtkPANLSubhaloFinder::ExecuteSubHaloFinder(vtkUnstructuredGrid* input,
   std::vector< POSVEL_T > shX, shY, shZ, shVX, shVY, shVZ;
   std::vector< ID_T > shTag, shHID, shID;
 
-  vtkNew< vtkLongLongArray > subhaloId;
+  vtkNew< vtkTypeInt64Array > subhaloId;
   subhaloId->SetName("subhalo_tag");
   subhaloId->SetNumberOfTuples(input->GetNumberOfPoints());
   subhaloId->FillComponent(0,-1);
@@ -434,11 +434,11 @@ void vtkPANLSubhaloFinder::ExecuteSubHaloFinder(vtkUnstructuredGrid* input,
   subhaloCount->SetName("subhalo_count");
   subhaloCount->SetNumberOfTuples(subMass.size());
   pointData->AddArray(subhaloCount.GetPointer());
-  vtkNew< vtkLongLongArray > tag;
+  vtkNew< vtkTypeInt64Array > tag;
   tag->SetName("fof_halo_tag");
   tag->SetNumberOfTuples(subMass.size());
   pointData->AddArray(tag.GetPointer());
-  vtkNew< vtkLongLongArray > subtag;
+  vtkNew< vtkTypeInt64Array > subtag;
   subtag->SetName("subhalo_tag");
   subtag->SetNumberOfTuples(subMass.size());
   pointData->AddArray(subtag.GetPointer());
