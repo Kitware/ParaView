@@ -347,7 +347,10 @@ bool vtkPVHistogramChartRepresentation::MapSelectionToView(vtkSelection* sel)
   node->SetFieldType(vtkSelectionNode::POINT);
   vtkNew<vtkIdTypeArray> convertedSelectionList;
   convertedSelectionList->SetNumberOfTuples(static_cast<vtkIdType>(selectedBins.size()));
-  std::copy(selectedBins.begin(), selectedBins.end(), convertedSelectionList->GetPointer(0));
+  if (selectedBins.size())
+    {
+    std::copy(selectedBins.begin(), selectedBins.end(), convertedSelectionList->GetPointer(0));
+    }
   node->SetSelectionList(convertedSelectionList.GetPointer());
   sel->AddNode(node.GetPointer());
   return true;
