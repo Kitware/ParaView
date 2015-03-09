@@ -341,7 +341,9 @@ struct gw_basic_type_traits<int>
     /** must retrun a number at random between say [0,1] */
     static int Random(const int& min, const int& max)
     {
-        #pragma warning( disable : 4244 )
+#if defined(_MSC_VER)
+#pragma warning( disable : 4244 )
+#endif
         return (int) GW_RAND_RANGE(min,max+1);
     }
     static const char* GetBasicTypeName()

@@ -10,7 +10,9 @@
 #pragma once
 
 /* 'identifier' : identifier was truncated to 'number' characters in the debug information */
+#if defined(_MSC_VER)
 #pragma warning( disable : 4786 )
+#endif
 
 //-------------------------------------------------------------------------
 /** \name C++ STL */
