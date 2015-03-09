@@ -246,6 +246,7 @@
     { "path":"VTK/Copyright.txt" },
     { "path":"License_v1.2.txt" },
     { "path":"CMakeLists.txt" },
+    { "path":"CTestConfig.cmake" },
     { "path":"CMake" },
     { "path":"VTK/CMake" },
     { "path":"VTK/CMakeLists.txt" },

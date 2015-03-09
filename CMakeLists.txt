@@ -833,10 +833,8 @@ endif()
 
 #-----------------------------------------------------------------------------
 # Configure the CTestCustom.cmake file for exclusions.
-if (BUILD_TESTING)
-  configure_file("${ParaView_CMAKE_DIR}/CTestCustom.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/CTestCustom.cmake" @ONLY)
-endif()
+configure_file("${ParaView_CMAKE_DIR}/CTestCustom.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/CTestCustom.cmake" @ONLY)
 
 #-----------------------------------------------------------------------------
 # Create target to download data from the ParaViewData group.  This must come
