@@ -24,6 +24,8 @@
 #include "vtkUnstructuredGridAlgorithm.h" // Base class
 #include "vtkPVVTKExtensionsCosmoToolsModule.h" // For export macro
 
+#include <set> // for std::set in protected methods
+
 // Forward Declarations
 class vtkCallbackCommand;
 class vtkDataArray;
@@ -240,11 +242,13 @@ protected:
 
   // Description:
   // Loads the particle coordinates
-  void LoadCoordinates(vtkUnstructuredGrid *grid);
+  void LoadCoordinates(vtkUnstructuredGrid *grid,
+                       std::set< vtkIdType >& pointsInSelectedHalos);
 
   // Description:
   // Loads the particle data arrays
-  void LoadData(vtkUnstructuredGrid *grid);
+  void LoadData(vtkUnstructuredGrid *grid,
+                const std::set< vtkIdType >& pointsInSelectedHalos);
 
   // Description:
   // Finds the neighbors of the user-supplied rank
