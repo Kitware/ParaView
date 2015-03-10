@@ -136,17 +136,20 @@ FUNCTION(build_paraview_client BPC_NAME)
       "IDI_ICON1 ICON \"${BPC_APPLICATION_ICON}\"")
     SET(exe_icon "${CMAKE_CURRENT_BINARY_DIR}/Icon.rc")
 
-    set(dir "${CMAKE_CURRENT_BINARY_DIR}/${BPC_NAME}-icon")
-    set(rctarget "${BPC_NAME}rc")
-    file(MAKE_DIRECTORY "${dir}")
-    if (NOT EXISTS "${dir}/dummy.cxx")
-      file(WRITE "${dir}/dummy.cxx"
-        "int dummy_${BPC_NAME}(int a) { return a; }\n")
-    endif ()
-    file(WRITE "${dir}/CMakeLists.txt"
-      "set_property(DIRECTORY PROPERTY INCLUDE_DIRECTORIES)
+    if (NOT CMAKE_GENERATOR MATCHES "Visual Studio")
+      set(dir "${CMAKE_CURRENT_BINARY_DIR}/${BPC_NAME}-icon")
+      set(rctarget "${BPC_NAME}rc")
+      file(MAKE_DIRECTORY "${dir}")
+      if (NOT EXISTS "${dir}/dummy.cxx")
+        file(WRITE "${dir}/dummy.cxx"
+          "int dummy_${BPC_NAME}(int a) { return a; }\n")
+      endif ()
+      file(WRITE "${dir}/CMakeLists.txt"
+        "set_property(DIRECTORY PROPERTY INCLUDE_DIRECTORIES)
 add_library(${rctarget} STATIC dummy.cxx \"${exe_icon}\")\n")
-    add_subdirectory("${dir}" "${dir}/build")
+      add_subdirectory("${dir}" "${dir}/build")
+      unset(exe_icon)
+    endif ()
   ENDIF ()
 
   # executable_flags are used to pass options to add_executable(..) call such as
@@ -309,6 +312,7 @@ add_library(${rctarget} STATIC dummy.cxx \"${exe_icon}\")\n")
                  "${BPC_INSTALL_LIBRARY_DIR}"
                  ${BPC_NAME}
                  ${executable_flags}
+                 ${exe_icon}
                  ${BPC_NAME}_main.cxx
                  ${apple_bundle_sources}
                  ${EXE_SRCS}
