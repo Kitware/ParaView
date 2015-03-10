@@ -920,6 +920,9 @@ void pqMultiBlockInspectorPanel::onCustomContextMenuRequested(
     return;
     }
 
+  bool hasOverriddenVisibilities = false;
+  bool hasOverridenColor = false;
+  bool hasOverriddenOpacity = false;
   int hiddenItemCount = 0;
   foreach(const QTreeWidgetItem *item, items)
     {
@@ -927,6 +930,12 @@ void pqMultiBlockInspectorPanel::onCustomContextMenuRequested(
       {
       hiddenItemCount++;
       }
+
+    unsigned int flat_index =
+      item->data(NAME_COLUMN, Qt::UserRole).value<unsigned int>();
+    hasOverriddenVisibilities = hasOverriddenVisibilities || this->BlockVisibilites.contains(flat_index);
+    hasOverridenColor = hasOverridenColor || this->BlockColors.contains(flat_index);
+    hasOverriddenOpacity = hasOverriddenOpacity || this->BlockOpacities.contains(flat_index);
     }
   int visibleItemCount = items.size() - hiddenItemCount;
 
@@ -935,38 +944,30 @@ void pqMultiBlockInspectorPanel::onCustomContextMenuRequested(
   QAction *hideAction = 0;
   if(visibleItemCount > 0)
     {
-    QString label;
-    if(visibleItemCount > 1)
-      {
-      label = QString("Hide %1 Blocks").arg(visibleItemCount);
-      }
-    else
-      {
-      label = "Hide Block";
-      }
+    QString label = (visibleItemCount > 1)?
+      QString("Hide %1 Blocks").arg(visibleItemCount) : QString("Hide Block");
     hideAction = menu.addAction(label);
     }
   QAction *showAction = 0;
   if(hiddenItemCount > 0)
     {
-    QString label;
-    if(hiddenItemCount > 1)
-      {
-      label = QString("Show %1 Blocks").arg(hiddenItemCount);
-      }
-    else
-      {
-      label = "Show Block";
-      }
+    QString label = (hiddenItemCount > 1)?
+      QString("Show %1 Blocks").arg(hiddenItemCount) : QString("Show Block");
     showAction = menu.addAction(label);
     }
+
   QAction *unsetVisibilityAction = menu.addAction("Unset Visibility");
+  unsetVisibilityAction->setEnabled(hasOverriddenVisibilities);
+
   menu.addSeparator();
   QAction *setColorAction = menu.addAction("Set Color...");
   QAction *unsetColorAction = menu.addAction("Unset Color");
+  unsetColorAction->setEnabled(hasOverridenColor);
+
   menu.addSeparator();
   QAction *setOpacityAction = menu.addAction("Set Opacity...");
   QAction *unsetOpacityAction = menu.addAction("Unset Opacity");
+  unsetOpacityAction->setEnabled(hasOverriddenOpacity);
 
   // show menu
   QAction *action = menu.exec(QCursor::pos());
@@ -1012,8 +1013,10 @@ void pqMultiBlockInspectorPanel::onCustomContextMenuRequested(
 
       this->clearBlockVisibility(flat_index);
       item->setData(
-        NAME_COLUMN, Qt::CheckStateRole, 
-        item->parent()->data(NAME_COLUMN, Qt::CheckStateRole));
+        NAME_COLUMN, Qt::CheckStateRole,
+        item->parent()?
+        item->parent()->data(NAME_COLUMN, Qt::CheckStateRole):
+        Qt::Checked);
       }
     }
   else if(action == setColorAction)
