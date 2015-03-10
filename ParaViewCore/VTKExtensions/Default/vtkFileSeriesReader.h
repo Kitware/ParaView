@@ -154,6 +154,10 @@ protected:
   // Re-reads information from the metadata file, if necessary.
   virtual void UpdateMetaData();
 
+  // Description:
+  // Resets information about TimeRanges. Called in RequestInformation().
+  void ResetTimeRanges();
+
   // Add/Remove filenames without changing the MTime.
   void RemoveAllFileNamesInternal();
   void AddFileNameInternal(const char*);
