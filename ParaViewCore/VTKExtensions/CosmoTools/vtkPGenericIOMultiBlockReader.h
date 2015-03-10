@@ -20,10 +20,13 @@
 #include "vtkPVVTKExtensionsCosmoToolsModule.h"
 #include "vtkMultiBlockDataSetAlgorithm.h" // parent class
 
+#include <set>
+
 class vtkCallbackCommand;
 class vtkDataArraySelection;
 class vtkMultiProcessController;
 class vtkStringArray;
+class vtkIdList;
 class vtkUnstructuredGrid;
 class vtkInformationDoubleKey;
 
@@ -114,6 +117,58 @@ public:
   // Description:
   // Sets the status of the array corresponding to the given name.
   void SetPointArrayStatus(const char* name, int status);
+
+  // Description:
+  // Gets/Sets the variable name for the halo id of the particle.
+  // This is used by the requested halo selector to select only the
+  // points in the desired halos.
+  vtkSetStringMacro(HaloIdVariableName)
+  vtkGetStringMacro(HaloIdVariableName)
+
+  // Description:
+  // Gets the ith requested halo id.
+  // If the number of requested halo ids is
+  // greater than 0, only points with those halo ids will be read in.
+  // Otherwise all points will be read in.
+  vtkIdType GetRequestedHaloId(vtkIdType i);
+
+  // Description:
+  // Gets the number of requested halo ids.
+  // If the number of requested halo ids is
+  // greater than 0, only points with those halo ids will be read in.
+  // Otherwise all points will be read in.
+  vtkIdType GetNumberOfRequestedHaloIds();
+
+  // Description:
+  // Sets the number of requested halo ids.
+  // Use SetRequestedHaloId() to se the ids after this is called
+  // If the number of requested halo ids is
+  // greater than 0, only points with those halo ids will be read in.
+  // Otherwise all points will be read in.
+  void SetNumberOfRequestedHaloIds(vtkIdType numIds);
+
+  // Description:
+  // Adds the given halo id to the list of halo ids to request.
+  // If the number of requested halo ids is
+  // greater than 0, only points with those halo ids will be read in.
+  // Otherwise all points will be read in.
+  void AddRequestedHaloId(vtkIdType haloId);
+
+  // Description:
+  // Clears the list of requested halo ids.
+  // If the number of requested halo ids is
+  // greater than 0, only points with those halo ids will be read in.
+  // Otherwise all points will be read in.
+  void ClearRequestedHaloIds();
+
+  // Description:
+  // Sets the ith requested halo id to the given haloId.
+  // If the number of requested halo ids is
+  // greater than 0, only points with those halo ids will be read in.
+  // Otherwise all points will be read in.
+  void SetRequestedHaloId(vtkIdType i, vtkIdType haloId);
+
+
 protected:
   vtkPGenericIOMultiBlockReader();
   ~vtkPGenericIOMultiBlockReader();
@@ -121,6 +176,7 @@ protected:
   char* XAxisVariableName;
   char* YAxisVariableName;
   char* ZAxisVariableName;
+  char* HaloIdVariableName;
 
   char* FileName;
   int GenericIOType;
@@ -132,6 +188,7 @@ protected:
 
   vtkStringArray* ArrayList;
   vtkDataArraySelection* PointDataArraySelection;
+  vtkIdList* HaloList;
   vtkCallbackCommand* SelectionObserver;
 
   gio::GenericIOReader* Reader;
@@ -150,9 +207,13 @@ protected:
       int xType, void* xBuffer, int yType, void* yBuffer, int zType,
       void* zBuffer, vtkIdType id, double point[3]);
 
-  void LoadCoordinatesForBlock(vtkUnstructuredGrid* grid, int blockId);
+  void LoadCoordinatesForBlock(vtkUnstructuredGrid* grid,
+                               std::set< vtkIdType >& pointsInSelectedHalos,
+                               int blockId);
 
-  void LoadDataArraysForBlock(vtkUnstructuredGrid* grid, int blockId);
+  void LoadDataArraysForBlock(vtkUnstructuredGrid* grid,
+                              const std::set<vtkIdType>& pointsInSelectedHalos,
+                              int blockId);
 
   vtkUnstructuredGrid* LoadBlock(int blockId);
 
