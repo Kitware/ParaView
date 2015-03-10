@@ -85,6 +85,10 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
   "MantaView.VTK"
   "manta"
 
+  # exclude warning from GeodesicMeasurement plugin
+  "GeodesicMeasurementPlugin"
+  "FmmMesh"
+
   # exclude warnings from mpi4py
   ".*mpi4py.*"
 
