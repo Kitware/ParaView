@@ -35,13 +35,13 @@ vtkCxxSetObjectMacro(vtkPVLODActor, LODMapper, vtkMapper);
 vtkPVLODActor::vtkPVLODActor()
 {
   vtkMatrix4x4 *m;
-  
+
   // get a hardware dependent actor and mappers
   this->Device = vtkActor::New();
   m = vtkMatrix4x4::New();
   this->Device->SetUserMatrix(m);
   m->Delete();
-  
+
   this->LODMapper = NULL;
 
   this->EnableLOD = 0;
@@ -82,20 +82,20 @@ void vtkPVLODActor::Render(vtkRenderer *ren, vtkMapper *vtkNotUsed(m))
 {
   vtkMatrix4x4 *matrix;
   vtkMapper *mapper;
-  
+
   if (this->Mapper == NULL)
     {
     vtkErrorMacro("No mapper for actor.");
     return;
     }
-  
+
   mapper = this->SelectMapper();
 
   if (mapper == NULL)
     {
     return;
     }
-    
+
   /* render the property */
   if (!this->Property)
     {
@@ -109,8 +109,8 @@ void vtkPVLODActor::Render(vtkRenderer *ren, vtkMapper *vtkNotUsed(m))
     this->Device->SetBackfaceProperty(this->BackfaceProperty);
     }
   this->Device->SetProperty(this->Property);
-  
-  
+
+
   /* render the texture */
   if (this->Texture)
     {
@@ -119,13 +119,15 @@ void vtkPVLODActor::Render(vtkRenderer *ren, vtkMapper *vtkNotUsed(m))
 
   this->Device->SetTexture(this->Texture);
   this->Device->SetMapper(mapper);
-  
+
   // make sure the device has the same matrix
   matrix = this->Device->GetUserMatrix();
   this->GetMatrix(matrix);
-  
+
   // Store information on time it takes to render.
   // We might want to estimate time from the number of polygons in mapper.
+  vtkInformation *info = this->GetPropertyKeys();
+  this->Device->SetPropertyKeys(info);
   this->Device->Render(ren,mapper);
   this->Property->PostRender(this, ren);
   this->EstimatedRenderTime = mapper->GetTimeToDraw();
@@ -134,7 +136,7 @@ void vtkPVLODActor::Render(vtkRenderer *ren, vtkMapper *vtkNotUsed(m))
 
 int vtkPVLODActor::RenderOpaqueGeometry(vtkViewport *vp)
 {
-  int          renderedSomething = 0; 
+  int          renderedSomething = 0;
   vtkRenderer  *ren = static_cast<vtkRenderer*>(vp);
 
   if ( ! this->Mapper )
@@ -161,8 +163,8 @@ int vtkPVLODActor::RenderOpaqueGeometry(vtkViewport *vp)
       {
       this->BackfaceProperty->BackfaceRender(this, ren);
       }
-    
-    // render the texture 
+
+    // render the texture
     if (this->Texture)
       {
       this->Texture->Render(ren);
@@ -179,7 +181,7 @@ int vtkPVLODActor::RenderOpaqueGeometry(vtkViewport *vp)
 void vtkPVLODActor::ReleaseGraphicsResources(vtkWindow *renWin)
 {
   vtkActor::ReleaseGraphicsResources(renWin);
-  
+
   // broadcast the message down to the individual LOD mappers
   if (this->LODMapper)
     {
@@ -212,7 +214,7 @@ double *vtkPVLODActor::GetBounds()
 
   // Check for the special case when the actor is empty.
   if (bounds[0] > bounds[1])
-    { 
+    {
     memcpy( this->MapperBounds, bounds, 6*sizeof(double) );
     vtkMath::UninitializeBounds(this->Bounds);
     this->BoundsMTime.Modified();
@@ -240,21 +242,21 @@ double *vtkPVLODActor::GetBounds()
     bbox[15] = bounds[1]; bbox[16] = bounds[2]; bbox[17] = bounds[4];
     bbox[18] = bounds[0]; bbox[19] = bounds[2]; bbox[20] = bounds[4];
     bbox[21] = bounds[0]; bbox[22] = bounds[3]; bbox[23] = bounds[4];
-  
+
     // save the old transform
-    this->Transform->Push(); 
+    this->Transform->Push();
     this->Transform->SetMatrix(this->GetMatrix());
 
     // and transform into actors coordinates
     fptr = bbox;
-    for (n = 0; n < 8; n++) 
+    for (n = 0; n < 8; n++)
       {
       this->Transform->TransformPoint(fptr,fptr);
       fptr += 3;
       }
-  
-    this->Transform->Pop();  
-  
+
+    this->Transform->Pop();
+
     // now calc the new bounds
     this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_DOUBLE_MAX;
     this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_DOUBLE_MAX;
@@ -262,11 +264,11 @@ double *vtkPVLODActor::GetBounds()
       {
       for (n = 0; n < 3; n++)
         {
-        if (bbox[i*3+n] < this->Bounds[n*2]) 
+        if (bbox[i*3+n] < this->Bounds[n*2])
           {
           this->Bounds[n*2] = bbox[i*3+n];
           }
-        if (bbox[i*3+n] > this->Bounds[n*2+1]) 
+        if (bbox[i*3+n] > this->Bounds[n*2+1])
           {
           this->Bounds[n*2+1] = bbox[i*3+n];
           }
