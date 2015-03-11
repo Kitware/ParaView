@@ -1372,12 +1372,15 @@ void HaloCenterFinder::aStarEstimatedPart(
                 xNear = minRange[0] + (wi * chainSize);
                 yNear = minRange[1] + (wj * chainSize);
                 zNear = minRange[2] + (wk * chainSize);
-                if (this->xx[bp] > xNear)
-                  xNear += chainSize;
-                if (this->yy[bp] > yNear)
-                  yNear += chainSize;
-                if (this->zz[bp] > zNear)
-                  zNear += chainSize;
+                if (bp >= 0 && bp < this->particleCount)
+                  {
+                  if (this->xx[bp] > xNear)
+                    xNear += chainSize;
+                  if (this->yy[bp] > yNear)
+                    yNear += chainSize;
+                  if (this->zz[bp] > zNear)
+                    zNear += chainSize;
+                  }
 
                 // Iterate on all particles in the bucket doing the estimate
                 // to the near corner of the other buckets
