@@ -1336,6 +1336,8 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         timeKeeper = servermanager.ProxyManager().GetProxiesInGroup("timekeeper").values()[0]
         tsVals = timeKeeper.TimestepValues
         if tsVals:
+            if isinstance(tsVals, float):
+                tsVals = [ tsVals ]
             tValStrings = []
             for tsVal in tsVals:
                 tValStrings.append(str(tsVal))
