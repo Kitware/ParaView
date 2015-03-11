@@ -34,15 +34,15 @@
 // center of mass.
 
 #include "vtkPVVTKExtensionsCosmoToolsModule.h" // for export macro
-#include "vtkUnstructuredGridAlgorithm.h"
+#include "vtkPassInputTypeAlgorithm.h"
 #include "vtkNew.h" // for vtkNew
 
 class vtkMultiProcessController;
 class vtkIdList;
 
-class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPANLSubhaloFinder : public vtkUnstructuredGridAlgorithm
+class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPANLSubhaloFinder : public vtkPassInputTypeAlgorithm
 {
-  vtkTypeMacro(vtkPANLSubhaloFinder, vtkUnstructuredGridAlgorithm)
+  vtkTypeMacro(vtkPANLSubhaloFinder, vtkPassInputTypeAlgorithm)
 public:
   static vtkPANLSubhaloFinder* New();
   void PrintSelf(ostream &os, vtkIndent indent);
@@ -161,6 +161,7 @@ protected:
   vtkPANLSubhaloFinder();
   virtual ~vtkPANLSubhaloFinder();
 
+  int FillInputPortInformation(int port, vtkInformation *info);
   virtual int RequestInformation(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 

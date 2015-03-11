@@ -17,7 +17,9 @@
 #include "vtkCellType.h"
 #include "vtkFloatArray.h"
 #include "vtkIdList.h"
+#include "vtkInformation.h"
 #include "vtkIntArray.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
@@ -145,6 +147,13 @@ void vtkPANLSubhaloFinder::PrintSelf(ostream &os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 }
 
+int vtkPANLSubhaloFinder::FillInputPortInformation(int vtkNotUsed(port), vtkInformation *info)
+{
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkUnstructuredGrid");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMultiBlockDataSet");
+  return 1;
+}
+
 int vtkPANLSubhaloFinder::RequestInformation(vtkInformation *, vtkInformationVector **, vtkInformationVector *)
 {
   return 1;
@@ -153,15 +162,48 @@ int vtkPANLSubhaloFinder::RequestInformation(vtkInformation *, vtkInformationVec
 int vtkPANLSubhaloFinder::RequestData(
     vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector,
     vtkInformationVector *outputVector)
-{
-  vtkUnstructuredGrid* input = vtkUnstructuredGrid::GetData(inputVector[0],0);
-  assert(input);
+ {
+  vtkUnstructuredGrid* grid = vtkUnstructuredGrid::GetData(inputVector[0],0);
+  vtkMultiBlockDataSet* multiBlockIn = vtkMultiBlockDataSet::GetData(inputVector[0],0);
   vtkUnstructuredGrid* allParticlesOutput = vtkUnstructuredGrid::GetData(outputVector,0);
-  assert(allParticlesOutput);
-  allParticlesOutput->ShallowCopy(input);
+  vtkMultiBlockDataSet* multiBlockAllParticles = vtkMultiBlockDataSet::GetData(outputVector,0);
   vtkUnstructuredGrid* subFofProperties = vtkUnstructuredGrid::GetData(outputVector,1);
-  assert(subFofProperties);
-  this->ExecuteSubHaloFinder(input,allParticlesOutput,subFofProperties);
+  vtkMultiBlockDataSet* multiBlockSubProperties = vtkMultiBlockDataSet::GetData(outputVector,1);
+
+  if (grid != NULL)
+    {
+    assert(allParticlesOutput);
+    assert(subFofProperties);
+    allParticlesOutput->ShallowCopy(grid);
+    this->ExecuteSubHaloFinder(grid,allParticlesOutput,subFofProperties);
+    }
+  else if (multiBlockIn)
+    {
+    assert(multiBlockAllParticles);
+    assert(multiBlockSubProperties);
+    vtkIdType numberOfInputBlocks = multiBlockIn->GetNumberOfBlocks();
+    multiBlockAllParticles->SetNumberOfBlocks(numberOfInputBlocks);
+    multiBlockSubProperties->SetNumberOfBlocks(numberOfInputBlocks);
+    for (vtkIdType i = 0; i < numberOfInputBlocks; ++i)
+      {
+      vtkUnstructuredGrid* block = vtkUnstructuredGrid::SafeDownCast(
+                                     multiBlockIn->GetBlock(i));
+      if (block != NULL)
+        {
+        vtkNew< vtkUnstructuredGrid > blockAllParticles;
+        vtkNew< vtkUnstructuredGrid > blockSubProperties;
+        blockAllParticles->ShallowCopy(block);
+        this->ExecuteSubHaloFinder(block,blockAllParticles.GetPointer(),blockSubProperties.GetPointer());
+        multiBlockAllParticles->SetBlock(i,blockAllParticles.GetPointer());
+        multiBlockSubProperties->SetBlock(i,blockSubProperties.GetPointer());
+        }
+      }
+    }
+  else
+    {
+    vtkErrorMacro("No Input!");
+    return 0;
+    }
   return 1;
 }
 

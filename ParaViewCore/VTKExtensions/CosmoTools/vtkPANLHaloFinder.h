@@ -214,6 +214,7 @@ protected:
 
   virtual int RequestInformation(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  int FillInputPortInformation(int port, vtkInformation *info);
 
   double RL;
   double DistanceConvertFactor;
@@ -247,7 +248,8 @@ protected:
   class vtkInternals;
   vtkInternals* Internal;
 private:
-  void DistributeInput(vtkUnstructuredGrid* input);
+  void ExtractDataArrays(vtkUnstructuredGrid* input, vtkIdType offset);
+  void DistributeInput();
   void CreateGhostParticles();
   void ExecuteHaloFinder(vtkUnstructuredGrid* allParticles, vtkUnstructuredGrid* fofProperties);
   void ExecuteSubHaloFinder(vtkUnstructuredGrid* allParticles, vtkUnstructuredGrid* subFofProperties);
