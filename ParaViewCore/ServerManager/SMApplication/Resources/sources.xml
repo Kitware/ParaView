@@ -1110,6 +1110,41 @@
       <!-- End PointSource -->
     </SourceProxy>
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkPolyLineSource"
+                 label="Poly Line Source"
+                 name="PolyLineSource">
+      <Documentation long_help="Create a poly line from one or more points."
+                     short_help="Create a poly line from one or more points.">
+        The Poly Line Source creates a poly line from an arbitrary
+        number of specified points.
+      </Documentation>
+      <DoubleVectorProperty command="SetPoint"
+                            default_values="0 0 0 1 0 0"
+                            name="Points"
+                            number_of_elements="6"
+                            number_of_elements_per_command="3"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfPoints"
+                            use_index="1"
+                            panel_visibility="never">
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetClosed"
+                         default_values="0"
+                         name="Closed"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <Hints>
+        <PropertyGroup type="PolyLineSource">
+          <Property function="HandlePositions"
+                    name="Points" />
+          <Property function="Closed"
+                    name="Closed" />
+        </PropertyGroup>
+      </Hints>
+    </SourceProxy>
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkSphereSource"
                  label="Sphere"
                  name="SphereSource">
