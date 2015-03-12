@@ -122,7 +122,7 @@
      </Documentation>
     </IntVectorProperty>
 
-    <StringVectorProperty name="Halo Id"
+    <StringVectorProperty name="HaloId"
                           command="SetHaloIdVariableName"
                           number_of_elements="1"
                           panel_visibility="advanced">
@@ -254,7 +254,7 @@
        </Documentation>
     </IntVectorProperty>
 
-    <StringVectorProperty name="Halo Id"
+    <StringVectorProperty name="HaloId"
                           command="SetHaloIdVariableName"
                           number_of_elements="1"
                           panel_visibility="advanced">
@@ -318,7 +318,7 @@
         <Property name="zAxis" />
         <Property name="QueryRankNeighbors" />
         <Property name="RankInQuery" />
-        <Property name="Halo Id" />
+        <Property name="HaloId" />
         <Property name="HalosToLoad" />
       </ExposedProperties>
     </SubProxy>
@@ -376,7 +376,7 @@
         <Property name="zAxis" />
         <Property name="ReadMethod"/>
         <Property name="BlockAssignmentStrategy"/>
-        <Property name="Halo Id" />
+        <Property name="HaloId" />
         <Property name="HalosToLoad" />
       </ExposedProperties>
     </SubProxy>
