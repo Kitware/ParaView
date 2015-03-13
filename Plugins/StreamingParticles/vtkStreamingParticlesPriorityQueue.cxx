@@ -348,7 +348,9 @@ void vtkStreamingParticlesPriorityQueue::UpdatePriorities(
   for (std::deque<unsigned int>::iterator itr = toRequest.begin(); itr != toRequest.end(); ++itr)
     {
     std::map<unsigned,unsigned>::iterator keep = keepInRequest.find(*itr % num_block_per_level);
-    if (keep != keepInRequest.end() && keep->second == *itr)
+    std::set<unsigned>::iterator purge = this->Internals->BlocksToPurge.find(*itr);
+    if (keep != keepInRequest.end() && keep->second == *itr &&
+        (all_levels_have_same_block_count  || purge == this->Internals->BlocksToPurge.end()))
       {
       this->Internals->BlocksToRequest.push(*itr);
       }
