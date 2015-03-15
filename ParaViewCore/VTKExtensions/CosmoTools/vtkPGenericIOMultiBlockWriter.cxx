@@ -366,7 +366,7 @@ void vtkPGenericIOMultiBlockWriter::WriteData()
     }
   if (this->Controller->GetNumberOfProcesses() > 1)
     {
-    std::vector< char > hasBlock, duplicates;
+    std::vector< int > hasBlock, duplicates;
     hasBlock.resize(input->GetNumberOfBlocks(),0);
     duplicates.resize(hasBlock.size());
     for (unsigned i = 0; i < input->GetNumberOfBlocks(); ++i)
@@ -378,10 +378,10 @@ void vtkPGenericIOMultiBlockWriter::WriteData()
         }
       }
     this->Controller->AllReduce(&hasBlock[0],&duplicates[0],hasBlock.size(),
-        vtkCommunicator::LOGICAL_AND_OP);
+        vtkCommunicator::SUM_OP);
     for (size_t i = 0; i < duplicates.size(); ++i)
       {
-      if (duplicates[i] != 0)
+      if (duplicates[i] > 1)
         {
         vtkErrorMacro(<< "Blocks are duplicated across processes, this writer expects"
                       " each block to be present on exactly one process.  Aborting write operation.");
