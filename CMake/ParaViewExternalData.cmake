@@ -61,7 +61,7 @@ list(APPEND ExternalData_URL_TEMPLATES
   # Provided by VTK
   "http://midas3.kitware.com/midas/api/rest?method=midas.bitstream.download&checksum=%(hash)&algorithm=%(algo)"
 
-  # Data published by developers using git-gerrit-push.
+  # Data published by developers using git-gitlab-push
   "http://www.paraview.org/files/ExternalData/%(algo)/%(hash)"
   )
 
