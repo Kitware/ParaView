@@ -1,7 +1,7 @@
-Download VTK with Git
+Download ParaView with Git
 =====================
 
-This page documents how to download VTK source code through [Git][].
+This page documents how to download ParaView source code through [Git][].
 See the [README](README.md) for more information.
 
 [Git]: http://git-scm.com
@@ -9,10 +9,10 @@ See the [README](README.md) for more information.
 Clone
 -----
 
-Clone VTK using the commands:
+Clone ParaView using the commands:
 
-    $ git clone https://gitlab.kitware.com/vtk/vtk.git VTK
-    $ cd VTK
+    $ git clone --recursive https://gitlab.kitware.com/paraview/paraview.git ParaView
+    $ cd ParaView
 
 Update
 ------
@@ -21,6 +21,7 @@ Users that have made no local changes and simply want to update a
 clone with the latest changes may run:
 
     $ git pull
+    $ git submodule update --init
 
 Avoid making local changes unless you have read our [developer instructions][].
 
@@ -40,7 +41,7 @@ This local branch will always follow the latest release.
 Use the [above instructions](#update) to update it.
 Alternatively one may checkout a specific release tag:
 
-    $ git checkout v6.2.0
+    $ git checkout v4.3.1
 
 Release tags never move.  Repeat the command with a different tag to get a
 different release.  One may list available tags:

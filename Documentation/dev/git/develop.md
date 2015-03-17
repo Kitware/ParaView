@@ -1,14 +1,14 @@
-Develop VTK with Git
-====================
+Develop ParaView with Git
+=========================
 
-This page documents how to develop VTK through [Git][].
+This page documents how to develop ParaView through [Git][].
 See the [README](README.md) for more information.
 
 [Git]: http://git-scm.com
 
 Git is an extremely powerful version control tool that supports many
 different "workflows" for individual development and collaboration.
-Here we document procedures used by the VTK development community.
+Here we document procedures used by the ParaView development community.
 In the interest of simplicity and brevity we do *not* provide an
 explanation of why we use this approach.
 
@@ -20,22 +20,22 @@ Before you begin, perform initial setup:
 1.  Register [GitLab Access].
 
 2.  Follow the [download instructions](download.md#clone) to create a
-    local VTK clone:
+    local ParaView clone:
 
-        $ git clone https://gitlab.kitware.com/vtk/vtk.git VTK
-        $ cd VTK
+        $ git clone --recursive https://gitlab.kitware.com/paraview/paraview.git ParaView
+        $ cd ParaView
 
-3.  Run the [developer setup script][] to prepare your VTK work tree and
+3.  Run the [developer setup script][] to prepare your ParaView work tree and
     create Git command aliases used below:
 
         $ ./Utilities/SetupForDevelopment.sh
 
 4.  (Optional but highly recommended.)
-    [Register](https://open.cdash.org/register.php) with the VTK project
+    [Register](https://open.cdash.org/register.php) with the ParaView project
     on Kitware's CDash instance to better know how your code performs in
     regression tests.  After registering and signing in, click on
     "All Dashboards" link in the upper left corner, scroll down and click
-    "Subscribe to this project" on the right of VTK.
+    "Subscribe to this project" on the right of ParaView.
 
 [GitLab Access]: https://gitlab.kitware.com/users/sign_in
 [developer setup script]: /Utilities/SetupForDevelopment.sh
@@ -43,7 +43,7 @@ Before you begin, perform initial setup:
 Workflow
 --------
 
-VTK development uses a [branchy workflow][] based on topic branches.
+ParaView development uses a [branchy workflow][] based on topic branches.
 Our collaboration workflow consists of three main steps:
 
 1.  Local Development:
@@ -68,7 +68,7 @@ Update
 1.  Update your local `master` branch:
 
         $ git checkout master
-        $ git pull
+        $ git pullall
 
 Create a Topic
 --------------
@@ -90,6 +90,10 @@ A reader should have a general idea of the feature or fix to be developed given 
 
         $ git checkout -b release-my-topic origin/release
 
+    If subdmodules may have changed, the  run:
+
+        $ git submodule update
+
 3.  Edit files and create commits (repeat as needed):
 
         $ edit file1 file2 file3
@@ -98,13 +102,6 @@ A reader should have a general idea of the feature or fix to be developed given 
 
     Caveats:
     * To add data follow [these instructions](data.md).
-    * If your change modifies the `Utilities/KWSys/vtksys` directory please
-      contribute directly to [KWSys][] instead.
-    * If your change modifies the `Utilities/MetaIO/vtkmetaio` directory please
-      contribute directly to [MetaIO][] instead.
-
-[KWSys]: http://public.kitware.com/Wiki/KWSys/Git
-[MetaIO]: https://github.com/Kitware/MetaIO
 
 Share a Topic
 -------------
@@ -112,9 +109,9 @@ Share a Topic
 When a topic is ready for review and possible inclusion, share it by pushing
 to a fork of your repository in GitLab.  Be sure you have registered and
 signed in for [GitLab Access][] and created your fork by visiting the main
-[VTK GitLab][] repository page and using the "Fork" button in the upper right.
+[ParaView GitLab][] repository page and using the "Fork" button in the upper right.
 
-[VTK GitLab]: https://gitlab.kitware.com/vtk/vtk
+[ParaView GitLab]: https://gitlab.kitware.com/paraview/paraview
 
 1.  Checkout the topic if it is not your current branch:
 
@@ -147,14 +144,14 @@ left, and use the "**New Merge Request**" button in the upper right to
 reach the URL printed at the end of the [previous step](#share-a-topic).
 It should be of the form:
 
-    https://gitlab.kitware.com/<username>/vtk/merge_requests/new
+    https://gitlab.kitware.com/<username>/paraview/merge_requests/new
 
 Follow these steps:
 
-1.  In the "**Source branch**" box select the `<username>/vtk` repository
+1.  In the "**Source branch**" box select the `<username>/paraview` repository
     and the `my-topic` branch.
 
-2.  In the "**Target branch**" box select the `vtk/vtk` repository and
+2.  In the "**Target branch**" box select the `paraview/paraview` repository and
     the `master` branch.  It should be the default.
 
     If your change is a fix for the `release` branch, you should still
@@ -291,3 +288,14 @@ Now you may delete your copies of the branch.
     The `branch -d` command works only when the topic branch has been
     correctly merged.  Use `-D` instead of `-d` to force the deletion
     of an unmerged topic branch (warning - you could lose commits).
+
+Contribute VTK Changes
+----------------------
+
+If you have any VTK changes, then you are required to get your changes
+incorporated into VTK using [VTK's development workflow][]. Once your VTK topic has
+been approved and merged into VTK, add your VTK topic head (or the latest VTK
+origin/master which includes your VTK topic head) to commit in a
+[ParaView topic](#create-a-topic) and follow the process documented earlier.
+
+[VTK's development workflow]: https://gitlab.kitware.com/vtk/vtk/tree/master/Documentation/dev/git
