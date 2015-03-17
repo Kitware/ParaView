@@ -101,7 +101,8 @@ A reader should have a general idea of the feature or fix to be developed given 
         $ git commit
 
     Caveats:
-    * To add data follow [these instructions](data.md).
+    * To add data follow [these instructions](https://gitlab.kitware.com/vtk/vtk/blob/master/Documentation/dev/git/data.md),
+      from VTK.
 
 Share a Topic
 -------------
@@ -128,7 +129,7 @@ signed in for [GitLab Access][] and created your fork by visiting the main
     Notes:
     * If you are revising a previously pushed topic and have rewritten the
       topic history, add `-f` or `--force` to overwrite the destination.
-    * If the topic adds data see [this note](data.md#push).
+    * If the topic adds data see [this note](https://gitlab.kitware.com/vtk/vtk/blob/master/Documentation/dev/git/data.md#push).
 
     The output will include a link to the topic branch in your fork in GitLab
     and a link to a page for creating a Merge Request.
