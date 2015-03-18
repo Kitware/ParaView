@@ -21,3 +21,5 @@ pre-commit       crlf=input
 *.cmake          whitespace=tab-in-indent,-blank-at-eol
 
 *.c              hooks.MaxObjectKiB=0
+
+*.md             whitespace=tab-in-indent conflict-marker-size=30
