@@ -288,6 +288,13 @@ authorized developers may add a comment of the form
 
 to ask that the change be merged into the upstream repository.
 
+Caveats:
+* Currently, developers authorized to do a merge request will be limited to those
+who have **Master** privileges on the ParaView Gitlab repository. This preserves the
+spirit of **Gatekeeper Review** in the previous development workflow. This decision
+may be reevaluated in the future and lifted to encourage a more open development
+community.
+
 ### Merge Success ###
 
 If the merge succeeds the topic will appear in the upstream repository
