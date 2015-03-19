@@ -1,24 +1,25 @@
 #!/usr/bin/env bash
 
-# Centralize project variables for each script
-project="ParaView"
-projectUrl="paraview.org"
-
-GIT=git
-GITCONFIG="${GIT} config"
+echo "Setting up useful Git aliases..." &&
 
 # General aliases that could be global
-${GITCONFIG} alias.pullall "!sh -c \"git pull && git submodule update --init\""
-${GITCONFIG} alias.prepush 'log --graph --stat origin/master..'
+git config alias.pullall '!bash -c "git pull && git submodule update --init"' &&
+git config alias.prepush 'log --graph --stat origin/master..' &&
 
 # Staging aliases
-stage_cmd="ssh git@${projectUrl} stage ${project}"
-git_branch="\$(git symbolic-ref HEAD | sed -e 's|^refs/heads/||')"
-${GITCONFIG} alias.stage-cmd "!${stage_cmd}"
-${GITCONFIG} alias.stage-push "!sh -c \"git fetch stage --prune && git push stage HEAD && git gerrit-push --no-topic\""
-${GITCONFIG} alias.stage-branch "!sh -c \"${stage_cmd} print\""
-${GITCONFIG} alias.stage-merge-next "!sh -c \"${stage_cmd} merge -b next ${git_branch}\""
-${GITCONFIG} alias.stage-merge-master "!sh -c \"${stage_cmd} merge -b master ${git_branch}\""
-${GITCONFIG} alias.stage-merge "!sh -c \"${stage_cmd} merge ${git_branch}\""
-# Alias to push the current topic branch to Gerrit
-${GITCONFIG} alias.gerrit-push "!bash Utilities/Scripts/git-gerrit-push"
+stage_disabled="ParaView no longer uses the topic stage. Please use GitLab." &&
+git config alias.stage-cmd '!sh -c "echo '"${stage_disabled}"'"' &&
+git config alias.stage-push '!sh -c "echo '"${stage_disabled}"'"' &&
+git config alias.stage-branch '!sh -c "echo '"${stage_disabled}"'"' &&
+git config alias.stage-merge-next '!sh -c "echo '"${stage_disabled}"'"' &&
+git config alias.stage-merge-master '!sh -c "echo '"${stage_disabled}"'"' &&
+git config alias.stage-merge '!sh -c "echo '"${stage_disabled}"'"' &&
+
+# Gerrit aliases
+gerrit_disabled="ParaView no longer uses Gerrit. Please use GitLab." &&
+git config alias.gerrit-push '!sh -c "echo '"${gerrit_disabled}"'"' &&
+
+# Alias to push the current topic branch to GitLab
+git config alias.gitlab-push '!bash Utilities/GitSetup/git-gitlab-push' &&
+
+true

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #=============================================================================
-# Copyright 2010-2012 Kitware, Inc.
+# Copyright 2010-2015 Kitware, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,24 +45,25 @@ test -n "$remote" || remote="gerrit"
 
 if test -z "$no_topic"; then
 	# Identify and validate the topic branch name.
-	topic="$(git symbolic-ref HEAD | sed -e 's|^refs/heads/||')"
-	if test "$topic" = "master"; then
+	head="$(git symbolic-ref HEAD)" && topic="${head#refs/heads/}" || topic=''
+	if test -z "$topic" -o "$topic" = "master"; then
 		die 'Please name your topic:
 		git checkout -b descriptive-name'
 	fi
-	refspecs="HEAD:refs/for/master/$topic"
-fi
-
-# Exit early if we have nothing to push.
-if test -z "$refspecs"; then
-	echo "Nothing to push!"
-	exit 0
+	# The topic branch will be pushed by name.
+	refspecs="HEAD:refs/for/master/$topic $refspecs"
 fi
 
 # Fetch the current upstream master branch head.
-# This helps the computation of a minimal pack to push.
+# This helps computation of a minimal pack to push.
 echo "Fetching $remote master"
 fetch_out=$(git fetch "$remote" master 2>&1) || die "$fetch_out"
+
+# Exit early if we have nothing to push.
+if test -z "$refspecs"; then
+	echo 'Nothing to push!'
+	exit 0
+fi
 
 # Push.  Save output and exit code.
 echo "Pushing to $remote"
