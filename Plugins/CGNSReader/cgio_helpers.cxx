@@ -184,8 +184,8 @@ int readBaseCoreInfo(int cgioNum, double baseId,
     return 1;
     }
 
-  baseInfo.physicalDim = mdata[0];
-  baseInfo.cellDim = mdata[1];
+  baseInfo.cellDim = mdata[0];
+  baseInfo.physicalDim = mdata[1];
 
   return 0;
 }
