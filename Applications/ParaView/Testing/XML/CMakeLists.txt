@@ -85,19 +85,27 @@ SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/RenderNan.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ResetToVisibleRange.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SaveLargeScreenshot.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/SLACTools.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TestIsoVolume.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/UpdateTransferFunctionRanges.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/XYChart.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/XYHistogram.xml
 )
 
+if (PARAVIEW_BUILD_PLUGIN_SLACTools)
+  list(APPEND TESTS_WITH_INLINE_COMPARES
+    ${CMAKE_CURRENT_SOURCE_DIR}/SLACTools.xml
+  )
+endif()
+
+
 SET (TESTS_WITH_BASELINES)
 if(NOT PARAVIEW_USE_VISITBRIDGE)
   # Analyze reader test was conflicting with the reader from VisIt. So
   # disabling it.
-  list(APPEND TESTS_WITH_BASELINES
-    ${CMAKE_CURRENT_SOURCE_DIR}/AnalyzeReaderWriterPlugin.xml)
+  if (PARAVIEW_BUILD_PLUGIN_AnalyzeNIfTIIO)
+    list(APPEND TESTS_WITH_BASELINES
+      ${CMAKE_CURRENT_SOURCE_DIR}/AnalyzeReaderWriterPlugin.xml)
+  endif()
 else()
   list(APPEND TESTS_WITH_BASELINES
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeChombo.xml
@@ -213,10 +221,8 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/Flow2.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Fractal2D.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/FunctionalBagPlots.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/H5PartReaderPlugin.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ImageVolumeRendering.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadPartiallyUpdatedStateFiles.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/LoadPlugins.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadSaveStateAnimation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadState.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/MultiBlockAttributes1.xml
@@ -277,6 +283,18 @@ list(APPEND TESTS_WITH_BASELINES
   #  ${CMAKE_CURRENT_SOURCE_DIR}/XYBarChart.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RandomAttributes.xml
 )
+
+if(PARAVIEW_BUILD_PLUGIN_PacMan)
+  list(APPEND TESTS_WITH_BASELINES
+    ${CMAKE_CURRENT_SOURCE_DIR}/LoadPlugins.xml
+    )
+endif()
+
+if(PARAVIEW_BUILD_PLUGIN_H5PartReader)
+  list(APPEND TESTS_WITH_BASELINES
+    ${CMAKE_CURRENT_SOURCE_DIR}/H5PartReaderPlugin.xml
+    )
+endif()
 
 # The color dialog is different on MacOS X which makes this test fail.
 if(NOT APPLE)

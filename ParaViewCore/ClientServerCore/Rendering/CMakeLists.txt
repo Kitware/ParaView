@@ -32,6 +32,7 @@ set (Module_SRCS
   vtk3DWidgetRepresentation.cxx
   vtkAMROutlineRepresentation.cxx
   vtkAMRStreamingPriorityQueue.cxx
+  vtkAMRStreamingVolumeRepresentation.cxx
   vtkCacheSizeKeeper.cxx
   vtkCaveSynchronizedRenderers.cxx
   vtkChartRepresentation.cxx
@@ -98,12 +99,6 @@ set (Module_SRCS
   vtkXYChartRepresentation.cxx
 )
 
-# Disabled unless using the OpenGL backend.
-if ("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
-  list(APPEND Module_SRCS
-    vtkAMRStreamingVolumeRepresentation.cxx
-    )
-endif()
 if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
   add_definitions(-DVTKGL2)
 endif()
