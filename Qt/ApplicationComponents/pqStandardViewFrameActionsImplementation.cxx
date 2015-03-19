@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqInterfaceTracker.h"
 #include "pqObjectBuilder.h"
 #include "pqRenderView.h"
+#include "pqRenderViewDeselectReaction.h"
 #include "pqRenderViewSelectionReaction.h"
 #include "pqServer.h"
 #include "pqSpreadSheetViewDecorator.h"
@@ -302,6 +303,13 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
   actionSelect_Block->setCheckable (true);
   new pqRenderViewSelectionReaction(actionSelect_Block, renderView,
     pqRenderViewSelectionReaction::SELECT_BLOCKS);
+
+  QStyle* style = qApp->style();
+  QAction* deselectAction = frame->addTitleBarAction(
+    style->standardIcon(QStyle::SP_DialogDiscardButton),
+    "Deselect");
+  deselectAction->setObjectName("Deselect");
+  new pqRenderViewDeselectReaction(deselectAction, renderView);
 }
 
 //-----------------------------------------------------------------------------
