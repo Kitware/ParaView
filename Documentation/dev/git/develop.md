@@ -17,20 +17,25 @@ Setup
 
 Before you begin, perform initial setup:
 
-1.  Register [GitLab Access].
+1.  Register [GitLab Access] to create an account and select a user name.
 
-2.  Follow the [download instructions](download.md#clone) to create a
-    local ParaView clone:
+2.  [Fork ParaView][] into your user's namespace on GitLab.
 
-        $ git clone --recursive https://gitlab.kitware.com/paraview/paraview.git ParaView
+3.  Follow the [download instructions](download.md#clone) to create a
+    local clone of the main ParaView repository:
+
+        $ git clone https://gitlab.kitware.com/paraview/paraview.git ParaView
         $ cd ParaView
+    The main repository will be configured as your `origin` remote.
 
-3.  Run the [developer setup script][] to prepare your ParaView work tree and
+4.  Run the [developer setup script][] to prepare your ParaView work tree and
     create Git command aliases used below:
 
         $ ./Utilities/SetupForDevelopment.sh
+    This will prompt for your GitLab user name and configure a remote
+    called `gitlab` to refer to it.
 
-4.  (Optional but highly recommended.)
+5.  (Optional but highly recommended.)
     [Register](https://open.cdash.org/register.php) with the ParaView project
     on Kitware's CDash instance to better know how your code performs in
     regression tests.  After registering and signing in, click on
@@ -38,6 +43,7 @@ Before you begin, perform initial setup:
     "Subscribe to this project" on the right of ParaView.
 
 [GitLab Access]: https://gitlab.kitware.com/users/sign_in
+[Fork ParaView]: https://gitlab.kitware.com/paraview/paraview/fork/new
 [developer setup script]: /Utilities/SetupForDevelopment.sh
 
 Workflow
@@ -248,10 +254,7 @@ succeeds.
 ### Testing ###
 
 ParaView has a [buildbot](http://buildbot.net) instance watching for merge requests
-to test.  To enable testing, the `buildbot` label may be added to a merge
-request to be considered.  Merge requests by developers will be picked up
-automatically.  For other users, a developer must issue a command to buildbot
-to enable builds:
+to test.  A developer must issue a command to buildbot to enable builds:
 
     @buildbot test
 
