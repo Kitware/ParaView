@@ -1045,7 +1045,7 @@
 #endif
 #ifdef Module_vtkIOADIOS
     <!-- ================================================================= -->
-    <PWriterProxy class="vtkADIOSWriter"
+    <WriterProxy class="vtkADIOSWriter"
                   name="ADIOSWriter"
                   mpi_required="true">
       <Documentation short_help="Write ADIOS BP files using VTKs schema.">
@@ -1057,10 +1057,11 @@
           <Group name="sources" />
           <Group name="filters" />
         </ProxyGroupDomain>
-        <DataTypeDomain composite_data_supported="1"
+        <DataTypeDomain composite_data_supported="0"
                         name="input_type">
-          <DataType value="vtkCompositeDataSet" />
-          <DataType value="vtkDataSet" />
+          <DataType value="vtkImageData" />
+          <DataType value="vtkPolyData" />
+          <DataType value="vtkUnstructuredGrid" />
         </DataTypeDomain>
         <Documentation>The input filter/source whose output dataset is to
         written to the file.</Documentation>
@@ -1135,7 +1136,7 @@
                        file_description="VTK ADIOS File" />
       </Hints>
       <!-- End of ADIOSWriter -->
-    </PWriterProxy>
+    </WriterProxy>
 #endif
     <!-- ================================================================= -->
     <PWriterProxy base_proxygroup="internal_writers"
