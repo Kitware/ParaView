@@ -1,0 +1,15 @@
+INCLUDE(ParaViewTestingMacros)
+
+set(MODULE_TESTS
+  ${CMAKE_CURRENT_SOURCE_DIR}/AnalyzeReaderWriterPlugin.xml
+)
+
+IF (PARAVIEW_BUILD_QT_GUI AND BUILD_SHARED_LIBS)
+
+  add_client_tests("pv"
+    LOAD_PLUGIN "AnalyzeNIfTIIO"
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS ${MODULE_TESTS}
+  )
+
+ENDIF ()

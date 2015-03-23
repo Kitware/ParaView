@@ -68,3 +68,8 @@ ELSE ()
     SERVER_MANAGER_SOURCES ${SM_SRC}
     )
 ENDIF ()
+
+# Add testing if necessary
+if (BUILD_TESTING)
+  add_subdirectory(Testing)
+endif ()

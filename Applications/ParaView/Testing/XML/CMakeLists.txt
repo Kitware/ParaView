@@ -91,22 +91,8 @@ SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/XYHistogram.xml
 )
 
-if (PARAVIEW_BUILD_PLUGIN_SLACTools)
-  list(APPEND TESTS_WITH_INLINE_COMPARES
-    ${CMAKE_CURRENT_SOURCE_DIR}/SLACTools.xml
-  )
-endif()
-
-
 SET (TESTS_WITH_BASELINES)
-if(NOT PARAVIEW_USE_VISITBRIDGE)
-  # Analyze reader test was conflicting with the reader from VisIt. So
-  # disabling it.
-  if (PARAVIEW_BUILD_PLUGIN_AnalyzeNIfTIIO)
-    list(APPEND TESTS_WITH_BASELINES
-      ${CMAKE_CURRENT_SOURCE_DIR}/AnalyzeReaderWriterPlugin.xml)
-  endif()
-else()
+if(PARAVIEW_USE_VISITBRIDGE)
   list(APPEND TESTS_WITH_BASELINES
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeChombo.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeEnzo.xml
@@ -283,18 +269,6 @@ list(APPEND TESTS_WITH_BASELINES
   #  ${CMAKE_CURRENT_SOURCE_DIR}/XYBarChart.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RandomAttributes.xml
 )
-
-if(PARAVIEW_BUILD_PLUGIN_PacMan)
-  list(APPEND TESTS_WITH_BASELINES
-    ${CMAKE_CURRENT_SOURCE_DIR}/LoadPlugins.xml
-    )
-endif()
-
-if(PARAVIEW_BUILD_PLUGIN_H5PartReader)
-  list(APPEND TESTS_WITH_BASELINES
-    ${CMAKE_CURRENT_SOURCE_DIR}/H5PartReaderPlugin.xml
-    )
-endif()
 
 # The color dialog is different on MacOS X which makes this test fail.
 if(NOT APPLE)
@@ -474,10 +448,6 @@ set (ChartAxisRangeAndLabels_THRESHOLD 60)
 SET (ColorEditorControls_THRESHOLD 60)
 SET (ColorEditorVolumeControls_THRESHOLD 300)
 
-SET (SLACTools_DISABLE_CS TRUE)
-SET (SLACTools_DISABLE_CRS TRUE)
-set (SLACTools_THRESHOLD 70)
-
 # Plot image leeway.
 set (SpreadSheet2_THRESHOLD 50)
 set (PlotOverTimeAutoApply_THRESHOLD 50)
@@ -561,21 +531,10 @@ SET (MultiBlockAttributes1_DISABLE_CRS TRUE)
 
 # Plugins are only built as shared libraries.
 IF (NOT BUILD_SHARED_LIBS)
-  SET (AnalyzeReaderWriterPlugin_DISABLE_C TRUE)
-  SET (H5PartReaderPlugin_DISABLE_C TRUE)
-  SET (LoadPlugins_DISABLE_C TRUE)
   SET (NiftiReaderWriterPlugin_DISABLE_C TRUE)
-  SET (SLACTools_DISABLE_C TRUE)
 ENDIF ()
 # There should be a client server specific version of this test.
-SET (AnalyzeReaderWriterPlugin_DISABLE_CS TRUE)
-SET (H5PartReaderPlugin_DISABLE_CS TRUE)
-SET (LoadPlugins_DISABLE_CS TRUE)
 SET (NiftiReaderWriterPlugin_DISABLE_CS TRUE)
-SET (AnalyzeReaderWriterPlugin_DISABLE_CRS TRUE)
-SET (H5PartReaderPlugin_DISABLE_CRS TRUE)
-SET (LoadPlugins_DISABLE_CRS TRUE)
-SET (NiftiReaderWriterPlugin_DISABLE_CRS TRUE)
 
 # Set image threshold overrides for the tests.
 SET(SaveLargeScreenshot_THRESHOLD 10000)

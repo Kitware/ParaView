@@ -12,3 +12,8 @@ ENDIF ()
 
 ADD_PARAVIEW_PLUGIN(PacMan "1.0"
   SERVER_MANAGER_XML PacMan.xml)
+
+# Add testing if necessary
+if (BUILD_TESTING)
+  add_subdirectory(Testing)
+endif ()
