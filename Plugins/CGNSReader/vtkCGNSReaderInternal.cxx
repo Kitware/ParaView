@@ -801,16 +801,8 @@ static void BroadcastCGNSString(vtkMultiProcessController* ctrl,
                                 CGNSRead::char_33 & str)
 {
   int len = 33;
-  if ( str != NULL )
-    {
-    ctrl->Broadcast(&len, 1, 0);
-    ctrl->Broadcast(&str[0], len, 0);
-    }
-  else
-    {
-    len = 0;
-    ctrl->Broadcast(&len, 1, 0);
-    }
+  ctrl->Broadcast(&len, 1, 0);
+  ctrl->Broadcast(&str[0], len, 0);
 }
 
 //------------------------------------------------------------------------------
