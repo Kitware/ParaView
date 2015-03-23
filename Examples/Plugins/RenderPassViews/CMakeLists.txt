@@ -14,6 +14,8 @@ ELSE ()
   INCLUDE(${PARAVIEW_USE_FILE})
 ENDIF ()
 
+if (VTK_RENDERING_BACKEND STREQUAL "OpenGL")
+
 add_paraview_plugin(
   RenderPassViews "1.0"
   REQUIRED_ON_SERVER
@@ -24,3 +26,4 @@ add_paraview_plugin(
   SERVER_MANAGER_XML
     RenderPassViews.xml
 )
+endif()

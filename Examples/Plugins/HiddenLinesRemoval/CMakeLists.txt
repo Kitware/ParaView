@@ -18,6 +18,7 @@ endif()
 
 include(ParaViewPlugins)
 
+if (VTK_RENDERING_BACKEND STREQUAL "OpenGL")
 
 # Compile-in all GLSL files are strings.
 # const char* with the names same as that of the file then become available for
@@ -42,3 +43,4 @@ add_paraview_plugin(
           vtkVisibleLinesPainter.cxx
           ${ENCODED_STRING_FILES}
 )
+endif()
