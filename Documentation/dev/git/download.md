@@ -1,5 +1,5 @@
 Download ParaView with Git
-=====================
+==========================
 
 This page documents how to download ParaView source code through [Git][].
 See the [README](README.md) for more information.
