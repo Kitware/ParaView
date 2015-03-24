@@ -535,6 +535,7 @@ IF (NOT BUILD_SHARED_LIBS)
 ENDIF ()
 # There should be a client server specific version of this test.
 SET (NiftiReaderWriterPlugin_DISABLE_CS TRUE)
+SET (NiftiReaderWriterPlugin_DISABLE_CRS TRUE)
 
 # Set image threshold overrides for the tests.
 SET(SaveLargeScreenshot_THRESHOLD 10000)
