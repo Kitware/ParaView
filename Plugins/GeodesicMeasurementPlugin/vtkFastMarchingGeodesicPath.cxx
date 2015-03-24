@@ -286,11 +286,11 @@ void vtkFastMarchingGeodesicPath::ComputePath(vtkPolyData *pd)
 
   // Set this path on the output. Its an open polyline with a single cell.
 
-  int nUniquePoints = pathPoints->GetNumberOfPoints();
+  vtkIdType nUniquePoints = pathPoints->GetNumberOfPoints();
   pd->SetPoints(pathPoints);
   vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
   lines->InsertNextCell(nUniquePoints);
-  for (int i = 0; i < nUniquePoints; i++)
+  for (i = 0; i < nUniquePoints; i++)
     {
     lines->InsertCellPoint(i);
     }
