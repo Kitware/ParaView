@@ -17,12 +17,14 @@ Setup
 
 Before you begin, perform initial setup:
 
-1.  Register [GitLab Access] to create an account and select a user name.
+1.  Register [GitLab Access][] to create an account and select a user name.
 
 2.  [Fork ParaView][] into your user's namespace on GitLab.
 
 3.  Follow the [download instructions](download.md#clone) to create a
-    local clone of the main ParaView repository:
+    local clone of the main ParaView repository.  Optionally configure
+    Git to [use SSH instead of HTTPS](download.md#use-ssh-instead-of-https).
+    Then clone:
 
         $ git clone https://gitlab.kitware.com/paraview/paraview.git ParaView
         $ cd ParaView
