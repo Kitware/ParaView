@@ -17,7 +17,7 @@ Setup
 
 Before you begin, perform initial setup:
 
-1.  Register [GitLab Access] to create an account and select a user name.
+1.  Register [GitLab Access][] to create an account and select a user name.
 
 2.  [Fork ParaView][] into your user's namespace on GitLab.
 
