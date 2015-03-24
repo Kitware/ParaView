@@ -1531,6 +1531,8 @@ def _create_func(key, module):
         # these functions for pipeline proxies or animation proxies.
         if isinstance(px, servermanager.SourceProxy):
             controller.RegisterPipelineProxy(px, registrationName)
+        elif px.GetXMLGroup() == "animation":
+           controller.RegisterAnimationProxy(px)
         return px
 
     return CreateObject
