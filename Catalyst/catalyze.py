@@ -10,6 +10,7 @@
 #
 import sys
 import os
+import os.path
 import subprocess
 import shutil
 import fnmatch
@@ -355,11 +356,12 @@ def copyTestTrees(config):
   os.makedirs(testingDst)
   for input_dir in all_dirs:
     testingSrc = os.path.join(input_dir, 'Testing')
-    for f in os.listdir(testingSrc):
-      print f
-      src = os.path.join(testingSrc,f)
-      dst = os.path.join(testingDst,f)
-      copy_path(src,dst,[])
+    if os.path.isdir(testingSrc):
+        for f in os.listdir(testingSrc):
+          print f
+          src = os.path.join(testingSrc,f)
+          dst = os.path.join(testingDst,f)
+          copy_path(src,dst,[])
 
 def main():
   parser = _get_argument_parser()
