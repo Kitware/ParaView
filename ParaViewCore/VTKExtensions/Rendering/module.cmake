@@ -48,6 +48,7 @@ vtk_module(vtkPVVTKExtensionsRendering
     vtkRenderingParallel
     vtkIOExport
     ${__dependencies}
+    vtkRenderingVolumeAMR
   PRIVATE_DEPENDS
     vtkzlib
   COMPILE_DEPENDS

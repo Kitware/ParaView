@@ -76,7 +76,7 @@ public:
 
   // Description:
   // These three keys help identify the scalar array. If SCALAR_ARRAY_NAME is
-  // absent or NULL, SCALAR_ARRAY_INDEX is used. 
+  // absent or NULL, SCALAR_ARRAY_INDEX is used.
   // NOTE: We are deliberately not adding support to select a component to color
   // with. That is now a property of the lookup table and ideally must be set on
   // the lookup table.
@@ -124,7 +124,7 @@ public:
   vtkGetMacro(UseXYPlane, int);
 
   //BTX
-  enum 
+  enum
     {
     YZ_PLANE = 0,
     XZ_PLANE = 1,
@@ -149,11 +149,11 @@ protected:
   // Description:
   // Performs the actual rendering. Subclasses may override this method.
   // default implementation merely call a Render on the DelegatePainter,
-  // if any. When RenderInternal() is called, it is assured that the 
+  // if any. When RenderInternal() is called, it is assured that the
   // DelegatePainter is in sync with this painter i.e. UpdateDelegatePainter()
   // has been called.
   virtual void RenderInternal(vtkRenderer *renderer,
-                              vtkActor *actor, 
+                              vtkActor *actor,
                               unsigned long typeflags,
                               bool forceCompileOnly);
 

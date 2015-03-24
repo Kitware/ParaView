@@ -34,3 +34,12 @@ ADD_PARAVIEW_PLUGIN(AnalyzeNIfTIIO "1.0"
   REQUIRED_ON_SERVER)
 
 target_link_libraries(AnalyzeNIfTIIO LINK_PRIVATE ${vtkzlib_LIBRARIES})
+
+# Add testing if necessary
+if (BUILD_TESTING)
+  # Analyze reader test was conflicting with the reader from VisIt. So
+  # disabling it.
+  if(NOT PARAVIEW_USE_VISITBRIDGE)
+    add_subdirectory(Testing)
+  endif ()
+endif()
