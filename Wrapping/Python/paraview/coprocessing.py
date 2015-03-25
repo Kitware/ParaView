@@ -439,6 +439,36 @@ class CoProcessor(object):
         if not view.IsA("vtkSMRenderViewProxy") == True:
             return
 
+        def get_nearest(eye, at, up, phis, thetas):
+            """ returns phi and theta settings that most closely match current view """
+            #todo: derive it instead of this brute force search
+            best_phi = None
+            best_theta = None
+            best_dist = None
+            best_up = None
+            dist1 = math.sqrt(sum(math.pow(eye[x]-at[x],2) for x in [0,1,2]))
+            for t,p in ((x,y) for x in thetas for y in phis):
+                theta_rad = (float(t)) / 180.0 * math.pi
+                phi_rad = float(p) / 180.0 * math.pi
+                pos = [
+                    float(at[0]) - math.cos(phi_rad)   * dist1 * math.cos(theta_rad),
+                    float(at[1]) + math.sin(phi_rad)   * dist1 * math.cos(theta_rad),
+                    float(at[2]) + math.sin(theta_rad) * dist1
+                ]
+                nup = [
+                    + math.cos(phi_rad) * math.sin(theta_rad),
+                    - math.sin(phi_rad) * math.sin(theta_rad),
+                    + math.cos(theta_rad)
+                ]
+                dist = math.sqrt(sum(math.pow(eye[x]-pos[x],2) for x in [0,1,2]))
+                updiff = math.sqrt(sum(math.pow(up[x]-nup[x],2) for x in [0,1,2]))
+                if best_dist == None or (dist<best_dist and updiff<1.0):
+                    best_phi = p
+                    best_theta = t
+                    best_dist = dist
+                    best_up = updiff
+            return best_phi, best_theta
+
         import paraview.cinemaIO.cinema_store as CS
         import paraview.cinemaIO.explorers as explorers
         import paraview.cinemaIO.pv_explorers as pv_explorers
@@ -517,12 +547,22 @@ class CoProcessor(object):
         cinemaOptions = view.cpCinemaOptions
         if cinemaOptions['camera'] == 'Spherical':
             fnpattern = fnpattern + "{phi}/{theta}/"
-            phis = list(float_limiter(x for x in cinemaOptions['phi']))
-            thetas = list(float_limiter(x for x in cinemaOptions['theta']))
-            fs.add_parameter("phi", CS.make_parameter('phi', phis))
-            fs.add_parameter("theta", CS.make_parameter('theta', thetas))
-            eye = view.CameraPosition
-            at = view.CameraFocalPoint
+            if 'initial' in cinemaOptions:
+                eye = cinemaOptions['initial']['eye']
+                at = cinemaOptions['initial']['at']
+                up = cinemaOptions['initial']['up']
+                phis = list(float_limiter(x for x in cinemaOptions['phi']))
+                thetas = list(float_limiter(x for x in cinemaOptions['theta']))
+                best_phi, best_theta = get_nearest(eye, at, up, phis, thetas)
+                fs.add_parameter("phi", CS.make_parameter('phi', phis, default=best_phi))
+                fs.add_parameter("theta", CS.make_parameter('theta', thetas, default=best_theta))
+            else:
+                eye = view.CameraPosition
+                at = view.CameraFocalPoint
+                phis = list(float_limiter(x for x in cinemaOptions['phi']))
+                thetas = list(float_limiter(x for x in cinemaOptions['theta']))
+                fs.add_parameter("phi", CS.make_parameter('phi', phis))
+                fs.add_parameter("theta", CS.make_parameter('theta', thetas))
             dist = math.sqrt(sum(math.pow(eye[x]-at[x],2) for x in [0,1,2]))
             #rectify for cinema exporter
             up = [math.fabs(x) for x in view.CameraViewUp]

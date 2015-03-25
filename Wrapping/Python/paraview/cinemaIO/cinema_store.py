@@ -170,7 +170,7 @@ class FileStore(Store):
             #arguments" in the files
             self._set_parameter_list(info_json['arguments'])
             self.metadata = info_json['metadata']
-            self.__filename_pattern = info_json['name_pattern']
+            self.filename_pattern = info_json['name_pattern']
 
     def save(self):
         """ writes out a modified file store """
@@ -205,6 +205,14 @@ class FileStore(Store):
     @filename_pattern.setter
     def filename_pattern(self, val):
         self.__filename_pattern = val
+        #Now set up to be able to convert filenames into descriptors automatically
+        #break filename pattern up into an ordered list of parameter names
+        cp = re.sub("{[^}]+}", "(\S+)", self.__filename_pattern) #convert to a RE
+        #extract names
+        keyargs = re.match(cp, self.__filename_pattern).groups()
+        self.__fn_keys = list(x[1:-1] for x in keyargs) #strip "{" and "}"
+        #make an RE to get the values from full pathname, igoring leading directories
+        self.__fn_vals_RE = '(\S+)/'+cp
 
     def get_image_type(self):
         return self.filename_pattern[self.filename_pattern.rfind("."):]
@@ -220,11 +228,11 @@ class FileStore(Store):
             with open(fname, mode='w') as file:
                 file.write(document.data)
 
-        with open(fname + ".__data__", mode="w") as file:
-            info_json = dict(
-                    descriptor = document.descriptor,
-                    attributes = document.attributes)
-            json.dump(info_json, file)
+        #with open(fname + ".__data__", mode="w") as file:
+        #    info_json = dict(
+        #            descriptor = document.descriptor,
+        #            attributes = document.attributes)
+        #    json.dump(info_json, file)
 
 
     def get_filename(self, document):
@@ -254,18 +262,32 @@ class FileStore(Store):
         from fnmatch import fnmatch
         from os import walk
         for root, dirs, files in walk(os.path.dirname(self.__dbfilename)):
-            for file in files:
-                doc_file = os.path.join(root, file)
-                if file.find("__data__") == -1 and fnmatch(doc_file, match_pattern):
-                    yield self.load_document(doc_file)
+            for fn in files:
+                doc_file = os.path.join(root, fn)
+                #if file.find("__data__") == -1 and fnmatch(doc_file, match_pattern):
+                #    yield self.load_document(doc_file)
+                if fnmatch(doc_file, match_pattern):
+                    yield self.load_image(doc_file)
 
-    def load_document(self, doc_file):
-        with open(doc_file + ".__data__", "r") as file:
-            info_json = json.load(file)
+    # def load_document(self, doc_file):
+    #    with open(doc_file + ".__data__", "r") as file:
+    #        info_json = json.load(file)
+    #    with open(doc_file, "r") as file:
+    #        data = file.read()
+    #    doc = Document(info_json["descriptor"], data)
+    #    doc.attributes = info_json["attributes"]
+    #    return doc
+
+    def load_image(self, doc_file):
+        #with open(doc_file + ".__data__", "r") as file:
+        #    info_json = json.load(file)
         with open(doc_file, "r") as file:
             data = file.read()
-        doc = Document(info_json["descriptor"], data)
-        doc.attributes = info_json["attributes"]
+        # convert filename into a list of values
+        vals = re.match(self.__fn_vals_RE, doc_file).groups()[1:]
+        descriptor = dict(zip(self.__fn_keys, vals))
+        doc = Document(descriptor, data)
+        doc.attributes = None
         return doc
 
 

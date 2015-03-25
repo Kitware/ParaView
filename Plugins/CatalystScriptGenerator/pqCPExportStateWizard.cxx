@@ -31,7 +31,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqCPExportStateWizard.h"
 
+#include <vtkCamera.h>
 #include <vtkSMProxyManager.h>
+#include <vtkSMRenderViewProxy.h>
 #include <vtkSMSessionProxyManager.h>
 #include <vtkSMSourceProxy.h>
 #include <vtkSMViewProxy.h>
@@ -44,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqPipelineSource.h>
 #include <pqPythonDialog.h>
 #include <pqPythonManager.h>
+#include <pqRenderView.h>
 #include <pqServerManagerModel.h>
 #include <pqView.h>
 
@@ -153,28 +156,54 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
       pqView* view = viewInfo->getView();
       QSize viewSize = view->getSize();
       vtkSMViewProxy* viewProxy = view->getViewProxy();
-
+      vtkSMRenderViewProxy* rvp = vtkSMRenderViewProxy::SafeDownCast(viewProxy);
+      pqRenderView* rview = dynamic_cast<pqRenderView*>(view);
       //cinema camera parameters
       QString cinemaCam = "{}";
       QString camType = viewInfo->getCameraType();
-      if (camType != "None")
+      if (rvp && (camType != "None"))
         {
         cinemaCam = QString("{\"camera\":\"");
         cinemaCam += camType;
-        cinemaCam += "\", \"phi\":[";
-        int j;
-        for (j = -180; j < 180; j+= (360/viewInfo->getPhi()))
+        cinemaCam += "\"";
+        if (camType != "Static")
           {
-          cinemaCam += QString::number(j) + ",";
+          cinemaCam += ", ";
+
+          cinemaCam += "\"phi\":[";
+          int j;
+          for (j = -180; j < 180; j+= (360/viewInfo->getPhi()))
+            {
+            cinemaCam += QString::number(j) + ",";
+            }
+          cinemaCam.chop(1);
+          cinemaCam += "],";
+
+          cinemaCam += "\"theta\":[";
+          for (j = -180; j < 180; j+= (360/viewInfo->getTheta()))
+            {
+            cinemaCam += QString::number(j) + ",";
+            }
+          cinemaCam.chop(1);
+          cinemaCam += "], ";
+
+          vtkCamera *cam = rvp->GetActiveCamera();
+          double eye[3];
+          double at[3];
+          double up[3];
+          cam->GetPosition(eye);
+          rview->getCenterOfRotation(at);
+          cam->GetViewUp(up);
+          cinemaCam += "\"initial\":{ ";
+          cinemaCam += "\"eye\": [" +
+            QString::number(eye[0]) + "," + QString::number(eye[1]) + "," + QString::number(eye[2]) + "], ";
+          cinemaCam += "\"at\": [" +
+            QString::number(at[0]) + "," + QString::number(at[1]) + "," + QString::number(at[2]) + "], ";
+          cinemaCam += "\"up\": [" +
+            QString::number(up[0]) + "," + QString::number(up[1]) + "," + QString::number(up[2]) + "] ";
+          cinemaCam += "} ";
           }
-        cinemaCam.chop(1);
-        cinemaCam += "], \"theta\":[";
-        for (j = -180; j < 180; j+= (360/viewInfo->getTheta()))
-          {
-          cinemaCam += QString::number(j) + ",";
-          }
-        cinemaCam.chop(1);
-        cinemaCam += "] }";
+        cinemaCam += "}";
         }
 
       QString info = QString(" '%1' : ['%2', %3, '%4', '%5', '%6', '%7', '%8'],").

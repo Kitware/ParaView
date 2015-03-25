@@ -106,3 +106,8 @@ ENDIF ()
 if(PARAVIEW_USE_MPI)
   vtk_mpi_link(CatalystScriptGeneratorPlugin)
 endif()
+
+target_link_libraries (CatalystScriptGeneratorPlugin
+  LINK_PRIVATE
+    vtkPVServerManagerRendering
+)
