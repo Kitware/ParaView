@@ -38,9 +38,8 @@ class vtkRenderer;
 #ifdef VTKGL2
 class vtkOpenGLTexture;
 class vtkActor;
-#else
-class vtkPainter;
 #endif
+class vtkPainter;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVImageSliceMapper : public vtkMapper
 {
@@ -55,14 +54,10 @@ public:
 
   virtual void ReleaseGraphicsResources (vtkWindow *);
 
-//BTX
-#ifndef VTKGL2
   // Description:
   // Get/Set the painter that does the actual rendering.
   void SetPainter(vtkPainter*);
   vtkGetObjectMacro(Painter, vtkPainter);
-#endif
-//ETX
 
   // Description:
   // Specify the input data to map.
@@ -131,7 +126,6 @@ public:
   virtual void ShallowCopy(vtkAbstractMapper *m);
 
 
-//BTX
 protected:
   vtkPVImageSliceMapper();
   ~vtkPVImageSliceMapper();
@@ -157,11 +151,12 @@ protected:
 
   vtkInformation* PainterInformation;
   vtkTimeStamp PainterInformationUpdateTime;
-  vtkPainter* Painter;
 
   class vtkObserver;
   vtkObserver* Observer;
 #endif
+
+  vtkPainter* Painter;
 
   int Piece;
   int NumberOfSubPieces;
@@ -176,7 +171,6 @@ private:
   vtkPVImageSliceMapper(const vtkPVImageSliceMapper&); // Not implemented
   void operator=(const vtkPVImageSliceMapper&); // Not implemented
 
-//ETX
 };
 
 #endif
