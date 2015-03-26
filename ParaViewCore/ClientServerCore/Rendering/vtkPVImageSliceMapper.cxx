@@ -42,6 +42,14 @@
 # include "vtkTextureObject.h"
 # include "vtkTrivialProducer.h"
 
+
+// no-op  just here to shut up python wrapping
+class vtkPainter : public vtkObject {};
+//-----------------------------------------------------------------------------
+void vtkPVImageSliceMapper::SetPainter(vtkPainter* )
+{
+}
+
 #else
 
 # include "vtkTexturePainter.h"
