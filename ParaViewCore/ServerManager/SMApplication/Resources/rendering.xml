@@ -134,11 +134,6 @@
     <Proxy class="vtkProjectedTetrahedraMapper"
            name="ProjectedTetrahedraMapper"
            processes="client|renderserver|dataserver"></Proxy>
-#ifndef VTKGL2
-    <Proxy class="vtkHAVSVolumeMapper"
-           name="HAVSVolumeMapper"
-           processes="client|renderserver|dataserver"></Proxy>
-#endif
     <Proxy name="DummyVolumeMapper">
       <ProxyProperty command="SetRayCastFunction"
                      name="RayCastFunction">
