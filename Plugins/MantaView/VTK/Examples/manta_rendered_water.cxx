@@ -168,7 +168,6 @@ void addHills(vtkRenderer* renderer)
     hills->SetMaximumU(10);
     hills->SetMinimumV(-10);
     hills->SetMaximumV(10);
-    hills->GenerateTheHills();
 
     vtkParametricFunctionSource* hillsource=vtkParametricFunctionSource::New();
     hillsource->SetParametricFunction(hills);
@@ -392,7 +391,6 @@ vtkParametricFunctionSource* getRandomHill(double umin, double umax,
     // sampled over those ranges.
     vtkParametricRandomHills* hills = vtkParametricRandomHills::New();
     hills->SetRandomSeed(randomHillSeed);
-    hills->GenerateTheHills();
 
     vtkParametricFunctionSource* hillsource=vtkParametricFunctionSource::New();
     hillsource->SetParametricFunction(hills);
