@@ -1,0 +1,217 @@
+<ServerManagerConfiguration>
+  <!-- ******************************************************************** -->
+  <ProxyGroup name="internal_sources">
+    <SourceProxy name="Xdmf3ReaderCore" class="vtkXdmf3Reader">
+      <!--
+      <StringVectorProperty name="FileName"
+        command="SetFileName" number_of_elements="1">
+        <FileListDomain name="files"/>
+      </StringVectorProperty>
+      -->
+
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the
+        reader.</Documentation>
+      </StringVectorProperty>
+
+
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+
+      <StringVectorProperty information_only="1"
+                            name="PointArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Point" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPointArrayStatus"
+                            element_types="2 0"
+                            information_property="PointArrayInfo"
+                            label="Point Arrays"
+                            name="PointArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            panel_visibility="default"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which point-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="CellArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Cell" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetCellArrayStatus"
+                            element_types="2 0"
+                            information_property="CellArrayInfo"
+                            label="Cell Arrays"
+                            name="CellArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            panel_visibility="default"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="CellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which cell-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="SetInfo">
+        <ArraySelectionInformationHelper attribute_name="Set" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetSetStatus"
+                            element_types="2 0"
+                            information_property="SetInfo"
+                            label="Sets"
+                            name="SetStatus"
+                            number_of_elements="2"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="SetInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the sets to be loaded from the dataset, if
+        any.</Documentation>
+      </StringVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="xmf xdmf"
+                       file_description="Xdmf3 Reader" />
+      </Hints>
+      <!-- End of Xdmf3Reader -->
+    </SourceProxy>
+  </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="sources">
+    <SourceProxy base_proxygroup="internal_sources"
+                 base_proxyname="Xdmf3ReaderCore"
+                 class="vtkXdmf3Reader"
+                 name="Xdmf3ReaderT">
+      <Documentation short_help=
+                     "Reads XDMF data files so that they can be visualized using VTK.">
+Reads XDMF data files so that they can be visualized using VTK. The
+output data produced by this reader depends on the number of grids in
+the data file. If the data file has a single domain with a single
+grid, then the output type is a vtkDataSet subclass of the appropriate
+type, otherwise it's a vtkMultiBlockDataSet.
+      </Documentation>
+
+      <IntVectorProperty command="SetFileSeriesAsTime"
+                         default_values="1"
+                         name="AsTime"
+                         number_of_elements="1"
+                         panel_visibility="never" >
+        <BooleanDomain name="bool" />
+        <Documentation>This hidden property controls whether the reader should
+        treat a file series as a temporal or spatial partitioning.</Documentation>
+      </IntVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="xmf xdmf"
+                       file_description="Xdmf3 Reader" />
+      </Hints>
+      <!-- End of Xdmf3ReaderT -->
+    </SourceProxy>
+
+    <SourceProxy base_proxygroup="internal_sources"
+                 base_proxyname="Xdmf3ReaderCore"
+                 class="vtkXdmf3Reader"
+                 name="Xdmf3ReaderS">
+      <Documentation short_help=
+                     "Reads XDMF data files so that they can be visualized using VTK.">
+Reads XDMF data files so that they can be visualized using VTK. The
+output data produced by this reader depends on the number of grids in
+the data file. If the data file has a single domain with a single
+grid, then the output type is a vtkDataSet subclass of the appropriate
+type, otherwise it's a vtkMultiBlockDataSet.
+      </Documentation>
+
+      <IntVectorProperty command="SetFileSeriesAsTime"
+                         default_values="0"
+                         name="AsTime"
+                         number_of_elements="1"
+                         panel_visibility="never" >
+        <BooleanDomain name="bool" />
+        <Documentation>This hidden property controls whether the reader should
+        treat a file series as a temporal or spatial partitioning.</Documentation>
+      </IntVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="xmf xdmf"
+                       file_description="Xdmf3 Reader (Top Level Partition)" />
+      </Hints>
+      <!-- End of Xdmf3ReaderS -->
+    </SourceProxy>
+  </ProxyGroup>
+
+  <!-- ******************************************************************** -->
+  <ProxyGroup name="writers">
+    <!-- ================================================================= -->
+    <WriterProxy class="vtkXdmf3Writer"
+                 name="Xdmf3Writer">
+      <Documentation short_help="Write data in Xdmf files.">Writer to write
+      data in eXtensible Data Model and Format *(XDMF) files.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkGraph" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetWriteAllTimeSteps"
+                         default_values="0"
+                         name="WriteAllTimeSteps"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When WriteAllTimeSteps is turned ON, the writer is
+        executed once for each time step available from the
+        reader.</Documentation>
+      </IntVectorProperty>
+      <PropertyGroup label="File Series">
+        <Property name="WriteAllTimeSteps" />
+      </PropertyGroup>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <Property name="Input"
+                  show="0" />
+        <Property name="FileName"
+                  show="0" />
+        <WriterFactory extensions="xmf"
+                       file_description="Xdmf3 Data File" />
+      </Hints>
+      <!-- End of XdmfWriter -->
+    </WriterProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

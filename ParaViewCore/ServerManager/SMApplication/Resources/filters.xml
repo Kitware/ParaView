@@ -767,65 +767,6 @@
       <!-- End IntegrateFlowThroughSurface -->
     </SourceProxy>
     <!-- ==================================================================== -->
-#ifdef PARAVIEW_USE_MPI
-    <SourceProxy class="vtkAllToNRedistributePolyData"
-                 label="All to N"
-                 multiprocess_support="multiple_processes"
-                 name="AllToN">
-      <Documentation long_help="Redistribute data to a subset of available processes."
-                     short_help="Repartition data filter.">The All to N filter
-                     is available when ParaView is run in parallel. It
-                     redistributes the data so that it is located on the number
-                     of processes specified in the Number of Processes entry
-                     box. It also does load-balancing of the data among these
-                     processes. This filter operates on polygonal data and
-                     produces polygonal output.</Documentation>
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkPolyData" />
-        </DataTypeDomain>
-        <Documentation>Set the input to the All to N filter.</Documentation>
-      </InputProperty>
-      <IntVectorProperty command="SetNumberOfProcesses"
-                         default_values="1"
-                         label="Number of Processes"
-                         name="NumberOfProcesses"
-                         number_of_elements="1">
-        <Documentation>Set the number of processes across which to split the
-        input data.</Documentation>
-      </IntVectorProperty>
-      <!-- End AllToN -->
-    </SourceProxy>
-    <!-- ==================================================================== -->
-    <SourceProxy class="vtkBalancedRedistributePolyData"
-                 multiprocess_support="multiple_processes"
-                 name="Balance">
-      <Documentation long_help="Balance data among available processes."
-                     short_help="Load balance filter.">The Balance filter is
-                     available when ParaView is run in parallel. It does
-                     load-balancing so that all processes have the same number
-                     of cells. It operates on polygonal data sets and produces
-                     polygonal output.</Documentation>
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkPolyData" />
-        </DataTypeDomain>
-        <Documentation>Set the input to the Balance filter.</Documentation>
-      </InputProperty>
-      <!-- End Balance -->
-    </SourceProxy>
-#endif
-    <!-- ==================================================================== -->
     <SourceProxy class="vtkMergeArrays"
                  label="Append Attributes"
                  name="AppendAttributes">
@@ -1705,65 +1646,7 @@ found and the point will be rejected.</Documentation>
       </IntVectorProperty>
       <!-- End DecimatePro -->
     </SourceProxy>
-    <!-- ==================================================================== -->
-#ifdef PARAVIEW_USE_MPI
-    <SourceProxy class="vtkDistributedDataFilter"
-                 label="D3"
-                 multiprocess_support="multiple_processes"
-                 name="D3">
-      <Documentation long_help="Repartition a data set into load-balanced spatially convex regions.  Create ghost cells if requested."
-                     short_help="Repartition a data set.">The D3 filter is
-                     available when ParaView is run in parallel. It operates on
-                     any type of data set to evenly divide it across the
-                     processors into spatially contiguous regions. The output
-                     of this filter is of type unstructured
-                     grid.</Documentation>
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkDataSet" />
-        </DataTypeDomain>
-        <Documentation>This property specifies the input to the D3
-        filter.</Documentation>
-      </InputProperty>
-      <IntVectorProperty command="SetBoundaryMode"
-                         default_values="0"
-                         name="BoundaryMode"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="Assign cells uniquely"
-                 value="0" />
-          <Entry text="Duplicate cells"
-                 value="1" />
-          <Entry text="Divide cells"
-                 value="2" />
-        </EnumerationDomain>
-        <Documentation>This property determines how cells that lie on processor
-        boundaries are handled. The "Assign cells uniquely" option assigns each
-        boundary cell to exactly one process, which is useful for isosurfacing.
-        Selecting "Duplicate cells" causes the cells on the boundaries to be
-        copied to each process that shares that boundary. The "Divide cells"
-        option breaks cells across process boundary lines so that pieces of the
-        cell lie in different processes. This option is useful for volume
-        rendering.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetUseMinimalMemory"
-                         default_values="0"
-                         label="Minimal Memory"
-                         name="UseMinimalMemory"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>If this property is set to 1, the D3 filter requires
-        communication routines to use minimal memory than without this
-        restriction.</Documentation>
-      </IntVectorProperty>
-      <!-- End D3 -->
-    </SourceProxy>
-#endif
+
     <!-- ==================================================================== -->
     <SourceProxy class="vtkElevationFilter"
                  label="Elevation"

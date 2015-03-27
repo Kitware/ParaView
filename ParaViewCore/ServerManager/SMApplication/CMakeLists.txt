@@ -115,6 +115,33 @@ SET(requestedResourceFiles
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/writers.xml
   ${module_sm_xmls}
   )
+if (PARAVIEW_USE_MPI)
+  list(APPEND requestedResourceFiles
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/proxies_mpi.xml)
+endif()
+if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
+  list(APPEND requestedResourceFiles
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/proxies_opengl2.xml)
+else()
+  # Old OpenGL.
+  list(APPEND requestedResourceFiles
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/proxies_opengl1.xml)
+endif()
+
+#------------------------------------------------------------------------------
+# These checks are wrong. Module_vtk* flags are set to true only when the module
+# is explictly enabled, not when the module was enabled due to a dependency. I
+# am leaving that as is for now since I am only splitting the files up. We need
+# to revisit.
+if (Module_vtkIOXdmf3)
+  list(APPEND requestedResourceFiles
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/proxies_xdmf3.xml)
+endif()
+if (Module_vtkIOADIOS)
+  list(APPEND requestedResourceFiles
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/proxies_adios.xml)
+endif()
+#------------------------------------------------------------------------------
 
 if (PARAVIEW_ENABLE_PYTHON)
   list(APPEND requestedResourceFiles

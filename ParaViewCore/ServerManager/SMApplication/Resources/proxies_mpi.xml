@@ -1,0 +1,117 @@
+<ServerManagerConfiguration>
+  <!-- ********************************************************************** -->
+  <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkDistributedDataFilter"
+                 label="D3"
+                 multiprocess_support="multiple_processes"
+                 name="D3">
+      <Documentation long_help="Repartition a data set into load-balanced spatially convex regions.  Create ghost cells if requested."
+                     short_help="Repartition a data set.">The D3 filter is
+                     available when ParaView is run in parallel. It operates on
+                     any type of data set to evenly divide it across the
+                     processors into spatially contiguous regions. The output
+                     of this filter is of type unstructured
+                     grid.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the D3
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetBoundaryMode"
+                         default_values="0"
+                         name="BoundaryMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Assign cells uniquely"
+                 value="0" />
+          <Entry text="Duplicate cells"
+                 value="1" />
+          <Entry text="Divide cells"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>This property determines how cells that lie on processor
+        boundaries are handled. The "Assign cells uniquely" option assigns each
+        boundary cell to exactly one process, which is useful for isosurfacing.
+        Selecting "Duplicate cells" causes the cells on the boundaries to be
+        copied to each process that shares that boundary. The "Divide cells"
+        option breaks cells across process boundary lines so that pieces of the
+        cell lie in different processes. This option is useful for volume
+        rendering.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseMinimalMemory"
+                         default_values="0"
+                         label="Minimal Memory"
+                         name="UseMinimalMemory"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, the D3 filter requires
+        communication routines to use minimal memory than without this
+        restriction.</Documentation>
+      </IntVectorProperty>
+      <!-- End D3 -->
+    </SourceProxy>
+  </ProxyGroup>
+
+  <!-- ********************************************************************** -->
+  <ProxyGroup name="sources">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="Parallel NetCDF POP reader"
+                 mpi_required="true"
+                 name="PNetCDFPOPReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads rectilinear grid data from a NetCDF POP file in parallel."
+                     short_help="Read rectilinear grid data from a NetCDF file in the POP format in parallel.">
+      The reader reads regular rectilinear grid (image/volume) data from a
+      NetCDF file. Only a subset of the processes actually read the file and
+      these processes communicate the data to other processes.</Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="PNetCDFPOPReaderCore"></Proxy>
+        <ExposedProperties>
+          <Property name="VariableArrayInfo" />
+          <Property name="VariableArrayStatus" />
+          <Property name="Stride" />
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the
+        reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="pop.ncdf pop.nc"
+                       file_description="Parallel POP Ocean NetCDF (Rectilinear)" />
+      </Hints>
+    </SourceProxy>
+    <!-- End PNetCDFPOPReader -->
+  </ProxyGroup>
+</ServerManagerConfiguration>
