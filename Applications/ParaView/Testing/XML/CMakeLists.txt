@@ -303,6 +303,12 @@ if (PARAVIEW_USE_MPI)
       )
 
   endif()
+  if (PARAVIEW_ENABLE_CGNS)
+    list(APPEND TESTS_WITH_BASELINES
+      ${CMAKE_CURRENT_SOURCE_DIR}/CGNSReader-5blocks_cgns.xml
+    )
+    set(CGNSReader-5blocks_cgns_DISABLE_CRS TRUE)
+  endif()
 endif()
 if(PARAVIEW_ENABLE_PYTHON)
   list(APPEND TESTS_WITH_BASELINES
