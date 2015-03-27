@@ -29,6 +29,11 @@ if (UNIX AND PARAVIEW_ENABLE_COSMOTOOLS)
     )
 endif()
 
+if( PARAVIEW_ENABLE_CGNS )
+  list(APPEND _vtk_mpi_modules  vtkPVVTKExtensionsCGNSReader)
+endif()
+
+
 set(_vtk_modules
   # VTK modules which ParaView has a explicity compile
   # time dependency on

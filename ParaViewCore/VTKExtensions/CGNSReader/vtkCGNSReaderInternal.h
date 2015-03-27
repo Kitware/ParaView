@@ -471,3 +471,4 @@ int get_XYZ_mesh(const int cgioNum, const std::vector<double>& gridChildId,
 }
 
 #endif //__CGNS_READER_INTERNAL__
+// VTK-HeaderTest-Exclude: vtkCGNSReaderInternal.h

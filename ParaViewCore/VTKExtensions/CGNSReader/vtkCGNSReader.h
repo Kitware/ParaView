@@ -33,6 +33,7 @@
 #define __vtkCGNSReader_h
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
+#include "vtkPVVTKExtensionsCGNSReaderModule.h" // for export macro
 #include "vtkPVConfig.h"     // For PARAVIEW_USE_MPI
 
 #include "vtkCGNSReaderInternal.h" // For parsing information request
@@ -45,7 +46,7 @@ class vtkCallbackCommand;
 class vtkMultiProcessController;
 #endif
 
-class vtkCGNSReader : public vtkMultiBlockDataSetAlgorithm
+class VTKPVVTKEXTENSIONSCGNSREADER_EXPORT vtkCGNSReader : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   static vtkCGNSReader *New();
