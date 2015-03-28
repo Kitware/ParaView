@@ -1665,6 +1665,16 @@ vtkSMProperty* vtkSMProxy::SetupExposedProperty(vtkPVXMLElement* propertyElement
       return 0;
       }
     prop->SetXMLName(propertyName.c_str());
+
+    // Since we are not processing ExposedProperties elements on the SIProxy
+    // side, the SIProxy doesn't have the information about updated defaults for
+    // the properties. Hence, we need to push those values in the next
+    // UpdateVTKObjects(). To ensure that, we have to mark this Property
+    // modified.
+    int old_val = subproxy->DoNotModifyProperty;
+    subproxy->DoNotModifyProperty = 0;
+    prop->Modified();
+    subproxy->DoNotModifyProperty = old_val;
     }
   this->ExposeSubProxyProperty(subproxy_name, name, exposed_name, override);
 
