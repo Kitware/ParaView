@@ -275,7 +275,7 @@
     { "path":"ParaViewConfig.cmake.in" },
     { "path":"ParaViewCore/README.txt" },
     { "path":"VTK/vtkLogo.ico" },
-    { "path":"VTK/README.html" },
+    { "path":"VTK/README.md" },
     { "path":"VTK/ThirdParty/utf8" }
   ],
   "proxies":[
