@@ -84,6 +84,13 @@ If you have found a bug:
 
 [ParaView Issue Tracker]: http://www.paraview.org/Bug
 
+Contributing
+============
+
+See [CONTRIBUTING.md][] for instructions to contribute.
+
+[CONTRIBUTING.md]: CONTRIBUTING.md
+
 License
 =======
 
@@ -93,10 +100,3 @@ See [Copyright.txt][] for details. For additional licenses, refer to
 
 [Copyright.txt]: Copyright.txt
 [ParaView Licenses]: http://www.paraview.org/paraview-license/
-
-Contributing
-============
-
-See [CONTRIBUTING.md][] for instructions to contribute.
-
-[CONTRIBUTING.md]: CONTRIBUTING.md
