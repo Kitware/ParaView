@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>527</width>
-    <height>45</height>
+    <width>773</width>
+    <height>53</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,6 +24,33 @@
      </property>
      <property name="text">
       <string>Selection Color</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="pqColorChooserButton" name="interactiveSelectionColor">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="toolTip">
+      <string>&lt;p&gt;Set the color to use to show selected elements&lt;/p&gt;</string>
+     </property>
+     <property name="text">
+      <string>Interactive Selection Color</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QToolButton" name="labelPropertiesInteractiveSelection">
+     <property name="toolTip">
+      <string>Edit interactive selection label properties</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../pqComponents.qrc">
+       <normaloff>:/pqWidgets/Icons/pqAdvanced26.png</normaloff>:/pqWidgets/Icons/pqAdvanced26.png</iconset>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonIconOnly</enum>
      </property>
     </widget>
    </item>
@@ -73,7 +100,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QToolButton" name="showLabelPropertiesButton">
+    <widget class="QToolButton" name="labelPropertiesSelection">
      <property name="toolTip">
       <string>Edit selection label properties</string>
      </property>

@@ -5145,17 +5145,6 @@
                proxygroup="representations"
                proxyname="DataLabelRepresentation" />
         <ExposedProperties>
-          <Property name="PointFieldDataArrayName" />
-          <Property name="PointLabelBold" />
-          <Property name="PointLabelColor" />
-          <Property name="PointLabelFontFamily" />
-          <Property name="PointLabelFontSize" />
-          <Property name="PointLabelFormat" />
-          <Property name="PointLabelItalic" />
-          <Property name="PointLabelJustification" />
-          <Property name="PointLabelOpacity" />
-          <Property name="PointLabelShadow" />
-          <Property name="PointLabelVisibility" />
           <Property name="CellFieldDataArrayName" />
           <Property name="CellLabelBold" />
           <Property name="CellLabelColor" />
@@ -5167,8 +5156,42 @@
           <Property name="CellLabelOpacity" />
           <Property name="CellLabelShadow" />
           <Property name="CellLabelVisibility" />
+          <Property name="PointFieldDataArrayName" />
+          <Property name="PointLabelBold" />
+          <Property name="PointLabelColor" />
+          <Property name="PointLabelFontFamily" />
+          <Property name="PointLabelFontSize" />
+          <Property name="PointLabelFormat" />
+          <Property name="PointLabelItalic" />
+          <Property name="PointLabelJustification" />
+          <Property name="PointLabelOpacity" />
+          <Property name="PointLabelShadow" />
+          <Property name="PointLabelVisibility" />
         </ExposedProperties>
       </SubProxy>
+
+      <PropertyGroup label="Cell Label Font" panel_visibility="never" panel_widget="FontEditor">
+        <Property name="CellLabelBold" function="Bold"/>
+        <Property name="CellLabelColor" function="Color"/>
+        <Property name="CellLabelFontFamily" function="Family"/>
+        <Property name="CellLabelFontSize" function="Size"/>
+        <Property name="CellLabelItalic" function="Italics"/>
+        <Property name="CellLabelJustification" function="Justification"/>
+        <Property name="CellLabelOpacity" function="Opacity"/>
+        <Property name="CellLabelShadow" function="Shadow"/>
+      </PropertyGroup>
+
+      <PropertyGroup label="Point Label Font" panel_visibility="never" panel_widget="FontEditor">
+        <Property name="PointLabelBold" function="Bold"/>
+        <Property name="PointLabelColor" function="Color"/>
+        <Property name="PointLabelFontFamily" function="Family"/>
+        <Property name="PointLabelFontSize" function="Size"/>
+        <Property name="PointLabelItalic" function="Italics"/>
+        <Property name="PointLabelJustification" function="Justification"/>
+        <Property name="PointLabelOpacity" function="Opacity"/>
+        <Property name="PointLabelShadow" function="Shadow"/>
+      </PropertyGroup>
+
       <!-- End of SelectionRepresentation -->
     </RepresentationProxy>
     <!-- ================================================================== -->

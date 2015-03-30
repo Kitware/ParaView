@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include <QFile>
 #include <QFileInfo>
+#include <QMessageBox>
 
 class vtkObject;
 
@@ -122,16 +123,27 @@ public:
     QObject* qobject, const char* signal_or_slot,
     Qt::ConnectionType type = Qt::AutoConnection);
 
-  /// This provides a mechanism to prompt the user with a "Yes", "No", and "Yes,
+  /// This provides a mechanism to prompt the user to make a choice or
+  /// to show them some information. The user can decide to make their choice
+  /// persistent. Two configurations are supported:
+  /// 1. The method prompts the user with a "Yes", "No", and "Yes,
   /// and don't ask again" message box. Returns true for "Yes" and false for "No".
   /// If "Yes, and don't ask again" was clicked, the selection is remembered in
   /// pqSettings and next time this method is called with the same settingsKey
   /// it will simply return true.
+  /// 2. The method shows a message box with a "Ok" and "Ok and don't show again"
+  /// If "Ok, and don't show again" was clicked, the next time this method is 
+  /// called with the same settingsKey it will simply return.
+  /// The 'don't ask/show again' button is created by or-ing 'buttons' with
+  /// QMessageBox::Save.
   /// NOTE: due to issues with test recording and playback, currently, this
   /// dialog is not prompted (instead always returning true) when
   /// DASHBOARD_TEST_FROM_CTEST environment variable is set. This may change in future.
-  static bool promptUser(const QString& settingsKey,
-    const QString& title, const QString& message, QWidget* parentWdg=NULL);
+  static bool promptUser(
+    const QString& settingsKey, QMessageBox::Icon icon,
+    const QString& title, const QString& message, 
+    QMessageBox::StandardButtons buttons,
+    QWidget* parentWdg=NULL);
 
 private:
   static QWidget* findMainWindow();

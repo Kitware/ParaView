@@ -32,14 +32,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderViewSelectionReaction.h"
 
 #include "pqActiveObjects.h"
+#include "pqCoreUtilities.h"
+#include "pqPVApplicationCore.h"
 #include "pqRenderView.h"
+#include "pqSelectionManager.h"
 #include "pqUndoStack.h"
+#include "vtkCollection.h"
 #include "vtkCommand.h"
 #include "vtkIntArray.h"
+#include "vtkNew.h"
 #include "vtkPVRenderView.h"
 #include "vtkRenderWindowInteractor.h"
+#include "vtkSMInteractiveSelectionPipeline.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMSourceProxy.h"
+
+#include <cassert>
 
 #include "zoom.xpm"
 
@@ -52,9 +61,10 @@ pqRenderViewSelectionReaction::pqRenderViewSelectionReaction(
   View(view),
   Mode(mode),
   PreviousRenderViewMode(-1),
-  ObserverId(0),
   ZoomCursor(QCursor(QPixmap((const char **)zoom_xpm)))
 {
+  this->ObserverIds[0] = this->ObserverIds[1] = 0;
+
   QObject::connect(parentObject, SIGNAL(triggered(bool)),
     this, SLOT(actionTriggered(bool)));
 
@@ -67,16 +77,67 @@ pqRenderViewSelectionReaction::pqRenderViewSelectionReaction(
     // this ensure that the enabled-state is set correctly.
     this->setView(NULL);
     }
+
+  if (this->Mode == CLEAR_SELECTION)
+    {
+    if (pqPVApplicationCore* core = pqPVApplicationCore::instance())
+      {
+      this->connect(core->selectionManager(), SIGNAL(selectionChanged(pqOutputPort*)),
+        SLOT(updateEnableState()));
+      }
+    }
+  this->updateEnableState();
 }
 
 //-----------------------------------------------------------------------------
 pqRenderViewSelectionReaction::~pqRenderViewSelectionReaction()
 {
-  if (this->View && this->ObserverId > 0)
+  this->cleanupObservers();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderViewSelectionReaction::cleanupObservers()
+{
+  if (this->ObservedObject != NULL && this->ObserverIds[0] > 0)
     {
-    this->View->getProxy()->RemoveObserver(this->ObserverId);
+    this->ObservedObject->RemoveObserver(this->ObserverIds[0]);
     }
-  this->ObserverId = 0;
+  if (this->ObservedObject != NULL && this->ObserverIds[1] > 0)
+    {
+    this->ObservedObject->RemoveObserver(this->ObserverIds[1]);
+    }
+  this->ObserverIds[0] = this->ObserverIds[1] = 0;
+  this->ObservedObject = NULL;
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderViewSelectionReaction::actionTriggered(bool val)
+{
+  QAction* actn = this->parentAction();
+  if (actn->isCheckable())
+    {
+    if (val) { this->beginSelection(); }
+    else { this->endSelection(); }
+    }
+  else
+    {
+    this->beginSelection();
+    this->endSelection();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderViewSelectionReaction::updateEnableState()
+{
+  bool enabled = true;
+  if (this->Mode == CLEAR_SELECTION)
+    {
+    if (pqPVApplicationCore* core = pqPVApplicationCore::instance())
+      {
+      enabled = core->selectionManager()->getSelectedPort() != NULL;
+      }
+    }
+  this->parentAction()->setEnabled(enabled);
 }
 
 //-----------------------------------------------------------------------------
@@ -134,6 +195,25 @@ void pqRenderViewSelectionReaction::beginSelection()
       vtkPVRenderView::INTERACTION_MODE_SELECTION);
     break;
 
+  case SELECT_SURFACE_CELLS_INTERACTIVELY:
+  case SELECT_SURFACE_POINTS_INTERACTIVELY:
+    pqCoreUtilities::promptUser(
+      "pqInteractiveSelection",
+      QMessageBox::Information,
+      "Interactive Selection Information",
+      "You are entering interactive selection mode to highlight cells (or points). "
+      "Simply move the mouse point over "
+      "the dataset to interactively highlight elements. "
+      "Use the 'Selection Display Inspector' to choose the array to label with.\n\n"
+      "To add the currently "
+      "highlighted element to the active selection, simply click on that element.\n\n"
+      "Use the 'Esc' key or the same toolbar button to exit this mode.",
+      QMessageBox::Ok | QMessageBox::Save);
+    this->View->setCursor(Qt::CrossCursor);
+    vtkSMPropertyHelper(rmp, "InteractionMode").Set(
+      vtkPVRenderView::INTERACTION_MODE_SELECTION);
+    break;
+
   case ZOOM_TO_BOX:
     this->View->setCursor(this->ZoomCursor);
     vtkSMPropertyHelper(rmp, "InteractionMode").Set(
@@ -148,6 +228,13 @@ void pqRenderViewSelectionReaction::beginSelection()
       vtkPVRenderView::INTERACTION_MODE_POLYGON);
     break;
 
+  case CLEAR_SELECTION:
+    if (pqPVApplicationCore* core = pqPVApplicationCore::instance())
+      {
+      core->selectionManager()->clearSelection();
+      }
+    break;
+
   default:
     this->View->setCursor(QCursor());
     break;
@@ -155,19 +242,38 @@ void pqRenderViewSelectionReaction::beginSelection()
   rmp->UpdateVTKObjects();
 
   // Setup observer.
-  if (this->Mode == ZOOM_TO_BOX)
+  assert(this->ObserverIds[0] == 0 && this->ObservedObject == NULL &&
+    this->ObserverIds[1] == 0);
+  switch (this->Mode)
     {
-    this->ObserverId = rmp->GetInteractor()->AddObserver(
+  case ZOOM_TO_BOX:
+    this->ObservedObject = rmp->GetInteractor();
+    this->ObserverIds[0] = this->ObservedObject->AddObserver(
       vtkCommand::LeftButtonReleaseEvent,
       this, &pqRenderViewSelectionReaction::selectionChanged);
-    }
-  else
-    {
-    this->ObserverId = rmp->AddObserver(
+    break;
+
+  case CLEAR_SELECTION:
+    break;
+
+  case SELECT_SURFACE_CELLS_INTERACTIVELY:
+  case SELECT_SURFACE_POINTS_INTERACTIVELY:
+    this->ObservedObject = rmp->GetInteractor();
+    this->ObserverIds[0] = this->ObservedObject->AddObserver(
+      vtkCommand::MouseMoveEvent,
+      this, &pqRenderViewSelectionReaction::onMouseMove);
+    this->ObserverIds[1] = this->ObservedObject->AddObserver(
+      vtkCommand::LeftButtonReleaseEvent,
+      this, &pqRenderViewSelectionReaction::onLeftButtonPress);
+    break;
+
+  default:
+    this->ObservedObject = rmp;
+    this->ObserverIds[0] = this->ObservedObject->AddObserver(
       vtkCommand::SelectionChangedEvent,
       this, &pqRenderViewSelectionReaction::selectionChanged);
+    break;
     }
-
   this->parentAction()->setChecked(true);
 }
 
@@ -191,19 +297,10 @@ void pqRenderViewSelectionReaction::endSelection()
   this->PreviousRenderViewMode = -1;
   rmp->UpdateVTKObjects();
   this->View->setCursor(QCursor());
-  if (this->Mode == ZOOM_TO_BOX)
-    {
-    rmp->GetInteractor()->RemoveObserver(this->ObserverId);
-    }
-  else
-    {
-    rmp->RemoveObserver(this->ObserverId);
-    }
-  this->ObserverId = 0;
+  this->cleanupObservers();
   this->parentAction()->setChecked(false);
-
 }
-  
+
 //-----------------------------------------------------------------------------
 void pqRenderViewSelectionReaction::selectionChanged(
   vtkObject*, unsigned long, void* calldata)
@@ -272,4 +369,105 @@ void pqRenderViewSelectionReaction::selectionChanged(
   END_UNDO_EXCLUDE();
 
   this->endSelection();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderViewSelectionReaction::onMouseMove()
+{
+  if (pqRenderViewSelectionReaction::ActiveReaction != this)
+    {
+    qWarning("Unexpected call to onMouseMove.");
+    return;
+    }
+
+  vtkSMRenderViewProxy* rmp = this->View->getRenderViewProxy();
+  Q_ASSERT(rmp != NULL);
+
+  int x = rmp->GetInteractor()->GetEventPosition()[0];
+  int y = rmp->GetInteractor()->GetEventPosition()[1];
+  if (x < 0 || y < 0)
+    {
+    // sometimes when the cursor goes quickly out of the window we receive -1
+    // the rest of the code hangs in that case.
+    return;
+    }
+
+  int region[4] = {x, y, x, y};
+
+  vtkNew<vtkCollection> selectedRepresentations;
+  vtkNew<vtkCollection> selectionSources;
+  vtkSMInteractiveSelectionPipeline* iSelectionPipeline =
+    vtkSMInteractiveSelectionPipeline::GetInstance();
+
+  bool status = false;
+  switch (this->Mode)
+    {
+  case SELECT_SURFACE_CELLS_INTERACTIVELY:
+    status = rmp->SelectSurfaceCells(
+      region, selectedRepresentations.GetPointer(), selectionSources.GetPointer());
+    break;
+
+  case SELECT_SURFACE_POINTS_INTERACTIVELY:
+    status = rmp->SelectSurfacePoints(
+      region, selectedRepresentations.GetPointer(), selectionSources.GetPointer());
+    break;
+
+  default:
+    qCritical("Invalid call to pqRenderViewSelectionReaction::onMouseMove");
+    return;
+    }
+
+  if (status)
+    {
+    BEGIN_UNDO_EXCLUDE();
+    iSelectionPipeline->Show(
+      vtkSMSourceProxy::SafeDownCast(selectedRepresentations->GetItemAsObject(0)),
+      vtkSMSourceProxy::SafeDownCast(selectionSources->GetItemAsObject(0)),
+      rmp);
+    END_UNDO_EXCLUDE();
+    }
+  else
+    {
+    iSelectionPipeline->Hide(rmp);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderViewSelectionReaction::onLeftButtonPress()
+{
+  if (pqRenderViewSelectionReaction::ActiveReaction != this)
+    {
+    qWarning("Unexpected call to selectionChanged.");
+    return;
+    }
+
+  vtkSMRenderViewProxy* viewProxy = this->View->getRenderViewProxy();
+  Q_ASSERT(viewProxy != NULL);
+
+  int x = viewProxy->GetInteractor()->GetEventPosition()[0];
+  int y = viewProxy->GetInteractor()->GetEventPosition()[1];
+  if (x < 0 || y < 0)
+    {
+    // sometimes when the cursor goes quickly out of the window we receive -1
+    // the rest of the code hangs in that case.
+    return;
+    }
+
+  bool ctrl = true;
+  int region[4] = {x, y, x, y};
+
+  switch (this->Mode)
+    {
+  case SELECT_SURFACE_CELLS_INTERACTIVELY:
+    this->View->selectOnSurface(region, ctrl);
+    break;
+
+  case SELECT_SURFACE_POINTS_INTERACTIVELY:
+    this->View->selectPointsOnSurface(region, ctrl);
+    break;
+
+  default:
+    qCritical("Invalid call to pqRenderViewSelectionReaction::onLeftButtonPress");
+    break;
+    }
 }

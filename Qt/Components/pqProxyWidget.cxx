@@ -65,6 +65,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDomainIterator.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMNamedPropertyIterator.h"
 #include "vtkSMOrderedPropertyIterator.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMProperty.h"
@@ -76,6 +77,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSettings.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMTrace.h"
+#include "vtkStringList.h"
 
 #include <QHideEvent>
 #include <QLabel>
@@ -537,15 +539,28 @@ public:
   QList<QPointer<pqProxyWidgetItem> > Items;
   bool CachedShowAdvanced;
   QString CachedFilterText;
-  std::vector<std::string> Properties;
+  vtkStringList* Properties;
 
   pqInternals(vtkSMProxy* smproxy, QStringList properties):
     Proxy(smproxy), CachedShowAdvanced(false)
     {
-      this->Properties.reserve(properties.size());
-      for (int i = 0; i < properties.size(); ++i)
+      vtkNew<vtkSMPropertyIterator> propertyIter;
+      this->Properties = vtkStringList::New();
+      propertyIter->SetProxy(smproxy);
+      
+      for (propertyIter->Begin(); !propertyIter->IsAtEnd(); propertyIter->Next())
         {
-        this->Properties.push_back(properties[i].toStdString());
+        QString propertyKeyName = propertyIter->GetKey();
+        propertyKeyName.replace(" ", "");
+        if(properties.contains(propertyKeyName))
+          {
+          this->Properties->AddString(propertyKeyName.toStdString().c_str());
+          }
+        }
+      if (this->Properties->GetLength() == 0)
+        {
+        this->Properties->Delete();
+        this->Properties = NULL;
         }
     }
 
@@ -554,6 +569,10 @@ public:
     foreach (pqProxyWidgetItem* item, this->Items)
       {
       delete item;
+      }
+    if (this->Properties)
+      {
+      this->Properties->Delete();
       }
     }
 
@@ -1216,10 +1235,8 @@ bool pqProxyWidget::restoreDefaults()
       vtkSMProperty * smproperty = iter->GetProperty();
 
       // restore defaults only for properties listed
-      const std::vector<std::string>& properties = this->Internals->Properties;
-      if (properties.size () > 0 &&
-          std::find(properties.begin(), properties.end(),
-                    smproperty->GetXMLName()) == properties.end())
+      if (this->Internals->Properties &&
+          this->Internals->Properties->GetIndex(smproperty->GetXMLName()))
         {
         continue;
         }
@@ -1254,8 +1271,17 @@ bool pqProxyWidget::restoreDefaults()
 void pqProxyWidget::saveAsDefaults()
 {
   vtkSMSettings* settings = vtkSMSettings::GetInstance();
-  settings->SetProxySettings(this->Internals->Proxy,
-                             &this->Internals->Properties);
+  vtkSMNamedPropertyIterator* propertyIt = NULL;
+  if (this->Internals->Properties)
+    {
+    propertyIt = vtkSMNamedPropertyIterator::New();
+    propertyIt->SetPropertyNames(this->Internals->Properties);
+    }
+  settings->SetProxySettings(this->Internals->Proxy, propertyIt);
+  if (propertyIt)
+    {
+    propertyIt->Delete();
+    }
 }
 
 //-----------------------------------------------------------------------------

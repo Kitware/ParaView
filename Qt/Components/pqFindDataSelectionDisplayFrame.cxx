@@ -48,13 +48,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMInteractiveSelectionPipeline.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 
 #include <QMenu>
 #include <QPointer>
+
 
 class pqFindDataSelectionDisplayFrame::pqInternals
 {
@@ -78,6 +82,8 @@ public:
     this->PointLabelsMenu.setObjectName("PointLabelsMenu");
 
     this->Ui.setupUi(self);
+    this->Ui.interactiveSelectionColor->setVisible(false);
+    this->Ui.labelPropertiesInteractiveSelection->setVisible(false);
     this->Ui.horizontalLayout->setMargin(pqPropertiesPanel::suggestedMargin());
     this->Ui.horizontalLayout->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
 
@@ -91,8 +97,10 @@ public:
     self->connect(&this->PointLabelsMenu, SIGNAL(aboutToShow()), SLOT(fillPointLabels()));
     self->connect(&this->PointLabelsMenu, SIGNAL(triggered(QAction*)),
       SLOT(pointLabelSelected(QAction*)));
-    self->connect(this->Ui.showLabelPropertiesButton, SIGNAL(clicked()),
-      SLOT(editLabelProperties()));
+    self->connect(this->Ui.labelPropertiesSelection, SIGNAL(clicked()),
+      SLOT(editLabelPropertiesSelection()));
+    self->connect(this->Ui.labelPropertiesInteractiveSelection, SIGNAL(clicked()),
+                  SLOT(editLabelPropertiesInteractiveSelection()));
     self->connect(this->Ui.showFrustumButton, SIGNAL(clicked(bool)),
       SLOT(showFrustum(bool)));
     }
@@ -137,6 +145,10 @@ public:
         this->Ui.selectionColor, "chosenColorRgbF",
         SIGNAL(chosenColorChanged(const QColor&)),
         colorPalette, colorPalette->GetProperty("SelectionColor"));
+      this->Links.addPropertyLink(
+        this->Ui.interactiveSelectionColor, "chosenColorRgbF",
+        SIGNAL(chosenColorChanged(const QColor&)),
+        colorPalette, colorPalette->GetProperty("InteractiveSelectionColor"));
       }
     this->showFrustum(this->Ui.showFrustumButton->isChecked());
     }
@@ -148,7 +160,7 @@ public:
       this->Port->getDataInformation()->GetAttributeInformation(fieldAssociation)
       : NULL;
     }
-  
+
   //---------------------------------------------------------------------------
   // fill the menu with available arrays. Ensure that the menu shows the
   // currently selected label field correctly.
@@ -165,7 +177,7 @@ public:
       menu.addAction("(not available)");
       return;
       }
-      
+
     pqDataRepresentation* repr = this->Port->getRepresentation(this->View);
     Q_ASSERT(repr != NULL);
 
@@ -216,33 +228,76 @@ public:
   //---------------------------------------------------------------------------
   // Set the active representation  to label using the array mentioned.
   void labelBy(int fieldAssociation, QAction* action)
-    {
+  {
     Q_ASSERT(this->Port && this->View &&
-      this->Port->getRepresentation(this->View));
+             this->Port->getRepresentation(this->View));
     pqDataRepresentation* repr = this->Port->getRepresentation(this->View);
-    vtkSMProxy* proxy = repr->getProxy();
+    vtkSMProxy* selectionProxy = repr->getProxy();
+    vtkSMRenderViewProxy* viewProxy =
+      vtkSMRenderViewProxy::SafeDownCast(this->View->getProxy());
+    if (! viewProxy)
+      {
+      return;
+      }
+    vtkSMProxy* iSelectionProxy =
+      vtkSMInteractiveSelectionPipeline::GetInstance()->
+      GetSelectionRepresentation();
 
-    const char* pname = (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS)?
+    const char* selectionArrayName = (fieldAssociation ==
+                                      vtkDataObject::FIELD_ASSOCIATION_CELLS)?
       "SelectionCellFieldDataArrayName" : "SelectionPointFieldDataArrayName";
-    const char* vname = (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS)?
+    const char* selectionVisibilityName = (fieldAssociation ==
+                                           vtkDataObject::FIELD_ASSOCIATION_CELLS)?
       "SelectionCellLabelVisibility" : "SelectionPointLabelVisibility";
+    const char* iSelectionArrayName =
+      (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS)?
+      "CellFieldDataArrayName" : "PointFieldDataArrayName";
+    const char* iSelectionVisibilityName = (fieldAssociation ==
+                                            vtkDataObject::FIELD_ASSOCIATION_CELLS)?
+      "CellLabelVisibility" : "PointLabelVisibility";
+
 
     BEGIN_UNDO_SET("Change labels");
     if (action->isChecked())
       {
-      vtkSMPropertyHelper(proxy, vname, true).Set(1);
-      vtkSMPropertyHelper(proxy, pname, true).Set(action->data().toString().toLatin1().data());
+      // selection
+      vtkSMPropertyHelper(selectionProxy, selectionVisibilityName, true).Set(1);
+      vtkSMPropertyHelper(selectionProxy,
+                          selectionArrayName, true).Set(
+                            action->data().toString().toLatin1().data());
+      // interactive selection
+      if (iSelectionProxy)
+        {
+        vtkSMPropertyHelper(iSelectionProxy,
+                            iSelectionVisibilityName, true).Set(1);
+        vtkSMPropertyHelper(iSelectionProxy,
+                            iSelectionArrayName, true).Set(
+                              action->data().toString().toLatin1().data());
+        }
+
       }
     else
       {
-      vtkSMPropertyHelper(proxy, vname, true).Set(0);
-      vtkSMPropertyHelper(proxy, pname, true).Set("");
+      // selection
+      vtkSMPropertyHelper(selectionProxy, selectionVisibilityName, true).Set(0);
+      vtkSMPropertyHelper(selectionProxy, selectionArrayName, true).Set("");
+      // interactive selection
+      if (iSelectionProxy)
+        {
+        vtkSMPropertyHelper(iSelectionProxy,
+                            iSelectionVisibilityName, true).Set(0);
+        vtkSMPropertyHelper(iSelectionProxy, iSelectionArrayName, true).Set("");
+        }
       }
-    proxy->UpdateVTKObjects();
+    selectionProxy->UpdateVTKObjects();
+    if (iSelectionProxy)
+      {
+      iSelectionProxy->UpdateVTKObjects();
+      }
     END_UNDO_SET();
 
     this->View->render();
-    }
+  }
   //---------------------------------------------------------------------------
   void destroyFrustum()
     {
@@ -352,14 +407,10 @@ pqFindDataSelectionDisplayFrame::pqFindDataSelectionDisplayFrame(
     SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
   this->setView(pqActiveObjects::instance().activeView());
 
-  pqSelectionManager* smgr = qobject_cast<pqSelectionManager*>(
-    pqApplicationCore::instance()->manager("SELECTION_MANAGER"));
-  if (smgr)
-    {
-    this->connect(smgr, SIGNAL(selectionChanged(pqOutputPort*)),
-      SLOT(setSelectedPort(pqOutputPort*)));
-    this->setSelectedPort(smgr->getSelectedPort());
-    }
+  pqActiveObjects& activeObjects = pqActiveObjects::instance();
+  this->connect(&activeObjects, SIGNAL(portChanged(pqOutputPort*)),
+                SLOT(setSelectedPort(pqOutputPort*)));
+  this->setSelectedPort(activeObjects.activePort());
   // if no pqSelectionManager, then one must use public API to set the active
   // selection manually.
 }
@@ -450,6 +501,9 @@ void pqFindDataSelectionDisplayFrame::setUseVerticalLayout(bool vertical)
 
   if (vertical)
     {
+    this->Internals->Ui.interactiveSelectionColor->setVisible(true);
+    this->Internals->Ui.labelPropertiesInteractiveSelection->setVisible(true);
+
     QVBoxLayout* vbox = new QVBoxLayout(this);
     vbox->setMargin(pqPropertiesPanel::suggestedMargin());
     vbox->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
@@ -460,10 +514,17 @@ void pqFindDataSelectionDisplayFrame::setUseVerticalLayout(bool vertical)
     hbox->addWidget(ui.selectionColor);
     hbox->addStretch();
     hbox->addWidget(ui.showFrustumButton);
-    hbox->addWidget(ui.showLabelPropertiesButton);
+    hbox->addWidget(ui.labelPropertiesSelection);
+    vbox->addLayout(hbox);
 
+    hbox = new QHBoxLayout();
+    hbox->addWidget(ui.interactiveSelectionColor);
+    hbox->addStretch();
+    hbox->addWidget(ui.labelPropertiesInteractiveSelection);
     vbox->addLayout(hbox);
     vbox->addStretch();
+    
+
     }
   else
     {
@@ -474,7 +535,7 @@ void pqFindDataSelectionDisplayFrame::setUseVerticalLayout(bool vertical)
     hbox->addWidget(ui.cellLabelsButton);
     hbox->addWidget(ui.pointLabelsButton);
     hbox->addWidget(ui.showFrustumButton);
-    hbox->addWidget(ui.showLabelPropertiesButton);
+    hbox->addWidget(ui.labelPropertiesSelection);
     }
 }
 
@@ -484,8 +545,113 @@ bool pqFindDataSelectionDisplayFrame::useVerticalLayout() const
   return qobject_cast<QVBoxLayout*>(this->layout()) != NULL;
 }
 
+void pqFindDataSelectionDisplayFrame::updateInteractiveSelectionLabelProperties()
+{
+  vtkSMProxy* selectionProxy = this->Internals->Port->getRepresentation(
+    this->Internals->View)->getProxy();
+  vtkSMProxy* iSelectionProxy =
+    vtkSMInteractiveSelectionPipeline::GetInstance()->GetSelectionRepresentation();
+  if (! selectionProxy || ! iSelectionProxy)
+    {
+    return;
+    }
+
+  QList<QPair<QString, QString> > prop;
+  prop << QPair<QString, QString>("SelectionOpacity",
+                                  "Opacity")
+       << QPair<QString, QString>("SelectionPointSize",
+                                  "PointSize")
+       << QPair<QString, QString>("SelectionLineWidth",
+                                  "LineWidth")
+       << QPair<QString, QString>("SelectionCellLabelBold",
+                                  "CellLabelBold")
+       << QPair<QString, QString>("SelectionCellLabelColor",
+                                  "CellLabelColor")
+       << QPair<QString, QString>("SelectionCellLabelFontFamily",
+                                  "CellLabelFontFamily")
+       << QPair<QString, QString>("SelectionCellLabelFontSize",
+                                  "CellLabelFontSize")
+       << QPair<QString, QString>("SelectionCellLabelFormat",
+                                  "CellLabelFormat")
+       << QPair<QString, QString>("SelectionCellLabelItalic",
+                                  "CellLabelItalic")
+       << QPair<QString, QString>("SelectionCellLabelJustification",
+                                  "CellLabelJustification")
+       << QPair<QString, QString>("SelectionCellLabelOpacity",
+                                  "CellLabelOpacity")
+       << QPair<QString, QString>("SelectionCellLabelShadow",
+                                  "CellLabelShadow")
+       << QPair<QString, QString>("SelectionPointLabelBold",
+                                  "PointLabelBold")
+       << QPair<QString, QString>("SelectionPointLabelColor",
+                                  "PointLabelColor")
+       << QPair<QString, QString>("SelectionPointLabelFontFamily",
+                                  "PointLabelFontFamily")
+       << QPair<QString, QString>("SelectionPointLabelFontSize",
+                                  "PointLabelFontSize")
+       << QPair<QString, QString>("SelectionPointLabelFormat",
+                                  "PointLabelFormat")
+       << QPair<QString, QString>("SelectionPointLabelItalic",
+                                  "PointLabelItalic")
+       << QPair<QString, QString>("SelectionPointLabelJustification",
+                                  "PointLabelJustification")
+       << QPair<QString, QString>("SelectionPointLabelOpacity",
+                                  "PointLabelOpacity")
+       << QPair<QString, QString>("SelectionPointLabelShadow",
+                                  "PointLabelShadow");
+  for (int i = 0; i < prop.size(); ++i)
+    {
+    vtkSMProperty* selectionProperty = selectionProxy->GetProperty(
+      prop[i].first.toStdString().c_str());
+    vtkSMProperty* iSelectionProperty = iSelectionProxy->GetProperty(
+      prop[i].second.toStdString().c_str());
+    iSelectionProperty->Copy(selectionProperty);
+    }
+}
+
+
 //-----------------------------------------------------------------------------
-void pqFindDataSelectionDisplayFrame::editLabelProperties()
+void pqFindDataSelectionDisplayFrame::editLabelPropertiesInteractiveSelection()
+{
+  vtkSMProxy* proxyISelectionRepresentation = 
+    vtkSMInteractiveSelectionPipeline::GetInstance()->GetSelectionRepresentation();
+
+  QStringList properties;
+  properties << "Opacity"
+             << "PointSize"
+             << "LineWidth"
+             << "Cell Label Font"
+             << "CellLabelBold"
+             << "CellLabelColor"
+             << "CellLabelFontFamily"
+             << "CellLabelFontSize"
+             << "CellLabelFormat"
+             << "CellLabelItalic"
+             << "CellLabelJustification"
+             << "CellLabelOpacity"
+             << "CellLabelShadow"
+             << "Point Label Font"
+             << "PointLabelBold"
+             << "PointLabelColor"
+             << "PointLabelFontFamily"
+             << "PointLabelFontSize"
+             << "PointLabelFormat"
+             << "PointLabelItalic"
+             << "PointLabelJustification"
+             << "PointLabelOpacity"
+             << "PointLabelShadow";
+
+  BEGIN_UNDO_SET("Interactive selection label properties");
+  pqProxyWidgetDialog dialog(proxyISelectionRepresentation, properties,
+                             this);
+  dialog.setWindowTitle("Interactive Selection Label Properties");
+  this->Internals->View->connect(&dialog, SIGNAL(accepted()), SLOT(render()));
+  dialog.exec();
+  END_UNDO_SET();
+}
+
+//-----------------------------------------------------------------------------
+void pqFindDataSelectionDisplayFrame::editLabelPropertiesSelection()
 {
   pqDataRepresentation* repr = this->Internals->Port->getRepresentation(
     this->Internals->View);
@@ -517,8 +683,9 @@ void pqFindDataSelectionDisplayFrame::editLabelProperties()
 
   BEGIN_UNDO_SET("Change selection display properties");
   pqProxyWidgetDialog dialog(repr->getProxy(), properties, this);
-  dialog.setWindowTitle("Advanced Selection Display Properties");
+  dialog.setWindowTitle("Selection Label Properties");
   this->Internals->View->connect(&dialog, SIGNAL(accepted()), SLOT(render()));
   dialog.exec();
+  this->updateInteractiveSelectionLabelProperties();
   END_UNDO_SET();
 }

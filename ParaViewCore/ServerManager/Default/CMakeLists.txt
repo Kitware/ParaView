@@ -37,6 +37,7 @@ set (Module_SRCS
   vtkSMDirectoryProxy.cxx
   vtkSMExporterProxy.cxx
   vtkSMInteractionUndoStackBuilder.cxx
+  vtkSMInteractiveSelectionPipeline.cxx
   vtkSMMultiServerSourceProxy.cxx
   vtkSMPropertyModificationUndoElement.cxx
   vtkSMProxyConfigurationReader.cxx

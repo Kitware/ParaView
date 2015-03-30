@@ -62,6 +62,9 @@ public:
   /// NULL, indicating the frame has been assigned to an empty view. Frames are
   /// never reused (except a frame assigned to an empty view).
   virtual void frameConnected(pqViewFrame* frame, pqView* view);
+  /// Used to receive Esc key from main window. A shortcut stops delivering
+  /// Esc to any other window which interferes with 'Search for properties'
+  virtual bool eventFilter(QObject * watched, QEvent * event);
 
 protected slots:
   /// Called before the "Convert To" menu is shown. We populate the menu with
@@ -118,6 +121,8 @@ protected:
   /// Called when user clicks "Convert To" or create a view from the empty
   /// frame.
   virtual void handleCreateView(const ViewType& viewType);
+  /// Exit interactive selection
+  void exitInteractiveSelection();
 private:
   Q_DISABLE_COPY(pqStandardViewFrameActionsImplementation)
   QPointer<QShortcut> ShortCutSurfaceCells;
