@@ -63,19 +63,10 @@ void vtkPVMultiSliceView::SetModelTransformationMatrix(vtkMatrix4x4* matrix)
   if (matrix)
     {
     // Update this->ModelTransformationMatrix is matrix is indeed different.
-    bool equal = true;
-    for (int i=0; i < 4; ++i)
-      {
-      for (int j=0; j < 4; ++j)
-        {
-        if (matrix->Element[i][j] != this->ModelTransformationMatrix->Element[i][j])
-          {
-          equal = false;
-          break;
-          }
-        }
-      }
-    if (!equal)
+    if (!std::equal(
+        static_cast<const double*>(&matrix->Element[0][0]),
+        static_cast<const double*>(&matrix->Element[0][0]) + 16,
+        static_cast<const double*>(&this->ModelTransformationMatrix->Element[0][0])))
       {
       this->ModelTransformationMatrix->DeepCopy(matrix);
       }
