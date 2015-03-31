@@ -32,20 +32,49 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyWidgetDialog.h"
 #include "ui_pqProxyWidgetDialog.h"
 
+#include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqProxyWidget.h"
-
+#include "pqSettings.h"
 #include "vtkSMProxy.h"
 
+#include <QPointer>
 #include <QStyle>
 
 class pqProxyWidgetDialog::pqInternals
 {
+  QPointer<QWidget> Container;
+  QPointer<pqProxyWidget> ProxyWidget;
+  QString SettingsKey;
+  bool SearchEnabled;
+  bool Resized;
+  bool GeometryLoaded;
+
+  QString KEY_VALID()
+    {
+    Q_ASSERT(!this->SettingsKey.isEmpty());
+    return QString("%1.Valid").arg(this->SettingsKey);
+    }
+  QString KEY_GEOMETRY()
+    {
+    Q_ASSERT(!this->SettingsKey.isEmpty());
+    return QString("%1.Geometry").arg(this->SettingsKey);
+    }
+  QString KEY_SEARCHBOX()
+    {
+    Q_ASSERT(!this->SettingsKey.isEmpty());
+    return QString("%1.SearchBox").arg(this->SettingsKey);
+    }
 public:
   Ui::ProxyWidgetDialog Ui;
+  vtkSMProxy* Proxy;
+  bool HasVisibleWidgets;
 
   pqInternals(vtkSMProxy* proxy, pqProxyWidgetDialog* self,
     const QStringList& properties = QStringList()) :
+    SearchEnabled(false),
+    Resized(false),
+    GeometryLoaded(false),
     Proxy(proxy),
     HasVisibleWidgets(false)
     {
@@ -53,6 +82,11 @@ public:
 
     Ui::ProxyWidgetDialog& ui = this->Ui;
     ui.setupUi(self);
+    ui.SearchBox->setVisible(this->SearchEnabled);
+    ui.SearchBox->setAdvancedSearchEnabled(true);
+    ui.SearchBox->setAdvancedSearchActive(false);
+    self->connect(ui.SearchBox, SIGNAL(advancedSearchActivated(bool)), SLOT(filterWidgets()));
+    self->connect(ui.SearchBox, SIGNAL(textChanged(const QString&)), SLOT(filterWidgets()));
 
     // There should be no changes initially, so disable the Apply button
     ui.ApplyButton->setEnabled(false);
@@ -62,6 +96,7 @@ public:
     QVBoxLayout* vbox = new QVBoxLayout(container);
     vbox->setContentsMargins(0, 0, 0, 0);
     vbox->setSpacing(0);
+    this->Container = container;
 
     // Set up the widget for the proxy
     pqProxyWidget *widget = properties.size() > 0?
@@ -70,6 +105,7 @@ public:
     widget->setObjectName("ProxyWidget");
     this->HasVisibleWidgets = widget->filterWidgets(true);
     vbox->addWidget(widget);
+    this->ProxyWidget = widget;
 
     // Set some icons for the buttons
     QStyle* applicationStyle = QApplication::style();
@@ -111,6 +147,15 @@ public:
     QSpacerItem* spacer = new QSpacerItem(0, 6, QSizePolicy::Fixed,
       QSizePolicy::MinimumExpanding);
     vbox->addItem(spacer);
+    }
+
+  void resize(QWidget* self)
+    {
+    if (this->Resized) { return; }
+    this->Resized = true;
+
+    Ui::ProxyWidgetDialog& ui = this->Ui;
+    QWidget* container = this->Container;
 
     /// Setup the scroll area. Its minimum size is set to fully contain the
     /// proxy widget so we're sure it'll be completely displayed
@@ -127,11 +172,70 @@ public:
 
     // Finaly set the maximum and current dialog size
     self->setMaximumSize(pqCoreUtilities::mainWidget()->size());
-    self->resize(dialogSize);
+    if (this->GeometryLoaded == false)
+      {
+      self->resize(dialogSize);
+      }
     }
 
-  vtkSMProxy* Proxy;
-  bool HasVisibleWidgets;
+  void setEnableSearchBar(bool val)
+    {
+    if (val != this->SearchEnabled)
+      {
+      this->SearchEnabled = val;
+      Ui::ProxyWidgetDialog& ui = this->Ui;
+      ui.SearchBox->setVisible(val);
+      this->filterWidgets();
+      }
+    }
+  bool enableSearchBar() const
+    {
+    return this->SearchEnabled;
+    }
+
+  void filterWidgets()
+    {
+    Ui::ProxyWidgetDialog& ui = this->Ui;
+    if (this->SearchEnabled)
+      {
+      this->ProxyWidget->filterWidgets(
+        ui.SearchBox->isAdvancedSearchActive(),
+        ui.SearchBox->text());
+      }
+    else
+      {
+      this->ProxyWidget->filterWidgets(true);
+      }
+    }
+
+  QString setSettingsKey(QWidget* self, const QString& key)
+    {
+    QString old = this->SettingsKey;
+    this->SettingsKey = key;
+    pqSettings* settings = pqApplicationCore::instance()->settings();
+    if (!key.isEmpty() && settings->value(this->KEY_VALID(), false).toBool())
+      {
+      this->Ui.SearchBox->setSettingKey(this->KEY_SEARCHBOX());
+      this->filterWidgets();
+      this->GeometryLoaded = self->restoreGeometry(
+        settings->value(this->KEY_GEOMETRY()).toByteArray());
+      }
+    else
+      {
+      this->Ui.SearchBox->setSettingKey(key);
+      }
+    return old;
+    }
+
+  void saveSettings(QWidget* self)
+    {
+    if (!this->SettingsKey.isEmpty())
+      {
+      pqSettings* settings = pqApplicationCore::instance()->settings();
+      settings->setValue(this->KEY_VALID(), true);
+      settings->setValue(this->KEY_GEOMETRY(), self->saveGeometry());
+      }
+    }
 };
 
 //-----------------------------------------------------------------------------
@@ -157,6 +261,38 @@ pqProxyWidgetDialog::~pqProxyWidgetDialog()
 }
 
 //-----------------------------------------------------------------------------
+void pqProxyWidgetDialog::filterWidgets()
+{
+  this->Internals->filterWidgets();
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyWidgetDialog::setEnableSearchBar(bool val)
+{
+  this->Internals->setEnableSearchBar(val);
+}
+
+//-----------------------------------------------------------------------------
+bool pqProxyWidgetDialog::enableSearchBar() const
+{
+  return this->Internals->enableSearchBar();
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyWidgetDialog::showEvent(QShowEvent *evt)
+{
+  this->Internals->resize(this);
+  this->Superclass::showEvent(evt);
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyWidgetDialog::hideEvent(QHideEvent *evt)
+{
+  this->Internals->saveSettings(this);
+  this->Superclass::hideEvent(evt);
+}
+
+//-----------------------------------------------------------------------------
 bool pqProxyWidgetDialog::hasVisibleWidgets() const
 {
   return this->Internals->HasVisibleWidgets;
@@ -174,4 +310,16 @@ void pqProxyWidgetDialog::onAccepted()
 {
   Ui::ProxyWidgetDialog &ui = this->Internals->Ui;
   ui.ApplyButton->setEnabled(false);
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxy* pqProxyWidgetDialog::proxy() const
+{
+  return this->Internals->Proxy;
+}
+
+//-----------------------------------------------------------------------------
+QString pqProxyWidgetDialog::setSettingsKey(const QString& key)
+{
+  return this->Internals->setSettingsKey(this, key);
 }
