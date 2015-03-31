@@ -7543,6 +7543,18 @@
           argument_is_array="1"
           panel_visibility="never">
         </DoubleVectorProperty>
+        <StringVectorProperty name="XTitle"
+          number_of_elements="1"
+          default_values="X"
+          panel_visibility="never" />
+        <StringVectorProperty name="YTitle"
+          number_of_elements="1"
+          default_values="Y"
+          panel_visibility="never" />
+        <StringVectorProperty name="ZTitle"
+          number_of_elements="1"
+          default_values="Z"
+          panel_visibility="never" />
      </MultiSliceViewProxy>
 
      <!-- ================================================================== -->

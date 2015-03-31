@@ -35,35 +35,15 @@
 #include <string>
 #include <vector>
 
-class vtkSMMultiSliceViewProxy::vtkInternals
-{
-public:
-  std::pair<bool, std::string> AxisLabels[3];
-  bool AxisLabelsUpdated;
-  vtkInternals() :  AxisLabelsUpdated(false)
-    {
-    }
-};
-
 vtkStandardNewMacro(vtkSMMultiSliceViewProxy);
 //----------------------------------------------------------------------------
 vtkSMMultiSliceViewProxy::vtkSMMultiSliceViewProxy()
-  : Internals(new vtkSMMultiSliceViewProxy::vtkInternals())
 {
 }
 
 //----------------------------------------------------------------------------
 vtkSMMultiSliceViewProxy::~vtkSMMultiSliceViewProxy()
 {
-  delete this->Internals;
-  this->Internals = NULL;
-}
-
-//----------------------------------------------------------------------------
-void vtkSMMultiSliceViewProxy::PostUpdateData()
-{
-  this->Internals->AxisLabelsUpdated = false;
-  this->Superclass::PostUpdateData();
 }
 
 //----------------------------------------------------------------------------
@@ -75,54 +55,6 @@ void vtkSMMultiSliceViewProxy::GetDataBounds(double bounds[6])
     {
     view->GetDataBounds(bounds);
     }
-}
-
-//----------------------------------------------------------------------------
-const char* vtkSMMultiSliceViewProxy::GetAxisLabel(int axis)
-{
-  if (axis < 0 || axis > 2)
-    {
-    vtkErrorMacro("Invalid axis: " << axis);
-    return NULL;
-    }
-
-  if (this->Internals->AxisLabelsUpdated == false)
-    {
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-           << VTKOBJECT(this)
-           << "GetAxisLabels"
-           << vtkClientServerStream::End;
-    this->ExecuteStream(stream, false, vtkPVSession::DATA_SERVER_ROOT);
-    stream.Reset();
-
-    vtkClientServerStream result = this->GetLastResult(vtkPVSession::DATA_SERVER_ROOT);
-    if (result.GetArgument(0, 0, &stream))
-      {
-      for (int cc=0; cc < 3; cc++)
-        {
-        bool valid;
-        std::string name;
-        if (stream.GetArgument(0, 2*cc, &valid) && stream.GetArgument(0, 2*cc+1, &name))
-          {
-          this->Internals->AxisLabels[cc].first = valid;
-          this->Internals->AxisLabels[cc].second = name;
-          }
-        else
-          {
-          vtkErrorMacro("Invalid reply received for axis "<< cc);
-          this->Internals->AxisLabels[cc].first = false;
-          }
-        }
-      }
-    else
-      {
-      vtkErrorMacro("Invalid reply received!!");
-      }
-    this->Internals->AxisLabelsUpdated = true;
-    }
-  return this->Internals->AxisLabels[axis].first?
-    this->Internals->AxisLabels[axis].second.c_str() : NULL;
 }
 
 //----------------------------------------------------------------------------

@@ -22,6 +22,7 @@
 
 #include "pqDataRepresentation.h"
 #include "pqMultiSliceAxisWidget.h"
+#include "pqPropertyLinks.h"
 #include "pqRepresentation.h"
 
 #include "vtkAxis.h"
@@ -79,6 +80,9 @@ pqMultiSliceView::~pqMultiSliceView()
 //-----------------------------------------------------------------------------
 QWidget* pqMultiSliceView::createWidget()
 {
+  pqPropertyLinks *links = new pqPropertyLinks(this);
+  vtkSMProxy* smproxy = this->getProxy();
+
   // Get the internal widget that we want to decorate
   this->InternalWidget = qobject_cast<QVTKWidget*>(this->pqRenderView::createWidget());
 
@@ -117,6 +121,20 @@ QWidget* pqMultiSliceView::createWidget()
   this->AxisZ->SetActiveSize(MULTI_SLICE_AXIS_ACTIVE_SIZE);
   this->AxisZ->setFixedWidth(MULTI_SLICE_AXIS_THIKNESS);
   this->AxisZ->renderView();
+
+  // Setup links so the UI updates when the property changes.
+  links->addPropertyLink(this->AxisX, "title", SIGNAL(titleChanged(const QString&)),
+    smproxy, smproxy->GetProperty("XTitle"));
+  this->AxisX->connect(links, SIGNAL(smPropertyChanged()), SLOT(renderView()));
+
+  links->addPropertyLink(this->AxisY, "title", SIGNAL(titleChanged(const QString&)),
+    smproxy, smproxy->GetProperty("YTitle"));
+  this->AxisY->connect(links, SIGNAL(smPropertyChanged()), SLOT(renderView()));
+
+  links->addPropertyLink(this->AxisZ, "title", SIGNAL(titleChanged(const QString&)),
+    smproxy, smproxy->GetProperty("ZTitle"));
+  this->AxisZ->connect(links, SIGNAL(smPropertyChanged()), SLOT(renderView()));
+
 
   gridLayout->addWidget(this->AxisY, 0, 1);  // TOP
   gridLayout->addWidget(this->AxisX, 1, 0); // LEFT
@@ -175,13 +193,6 @@ void pqMultiSliceView::updateAxisBounds()
     this->AxisY->setRange(-10, 10);
     this->AxisZ->setRange(-10, 10);
     }
-
-  const char* xlabel = viewPxy->GetAxisLabel(0);
-  const char* ylabel = viewPxy->GetAxisLabel(1);
-  const char* zlabel = viewPxy->GetAxisLabel(2);
-  this->AxisX->setTitle(xlabel? xlabel : "X");
-  this->AxisY->setTitle(ylabel? ylabel : "Y");
-  this->AxisZ->setTitle(zlabel? zlabel : "Z");
 
   // Make sure we render the new range
   this->AxisX->renderView();
