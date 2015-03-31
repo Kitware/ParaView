@@ -33,15 +33,15 @@ set(Module_SRCS
   vtkAMRDualClip.cxx
   vtkAMRDualContour.cxx
   vtkAMRDualGridHelper.cxx
+  vtkAMRFileSeriesReader.cxx
   vtkAMRFragmentIntegration.cxx
   vtkAMRFragmentsFilter.cxx
-  vtkAMRFileSeriesReader.cxx
   vtkAppendArcLength.cxx
   vtkAppendRectilinearGrid.cxx
   vtkAttributeDataReductionFilter.cxx
   vtkCellIntegrator.cxx
-  vtkCleanUnstructuredGrid.cxx
   vtkCleanUnstructuredGridCells.cxx
+  vtkCleanUnstructuredGrid.cxx
   vtkCSVWriter.cxx
   vtkEnsembleReader.cxx
   vtkEquivalenceSet.cxx
@@ -53,6 +53,10 @@ set(Module_SRCS
   vtkFileSeriesReader.cxx
   vtkFileSeriesWriter.cxx
   vtkFlashContour.cxx
+  vtkGridAxes2DActor.cxx
+  vtkGridAxes3DActor.cxx
+  vtkGridAxesHelper.cxx
+  vtkGridAxesPlane2DActor.cxx
   vtkGridConnectivity.cxx
   vtkHierarchicalFractal.cxx
   vtkHybridProbeFilter.cxx
@@ -99,17 +103,18 @@ set(Module_SRCS
   vtkPVClipDataSet.cxx
   vtkPVConnectivityFilter.cxx
   vtkPVContourFilter.cxx
-  vtkPVDReader.cxx
   vtkPVDataSetAlgorithmSelectorFilter.cxx
-  vtkPVEnSightMasterServerReader.cxx
+  vtkPVDReader.cxx
   vtkPVEnSightMasterServerReader2.cxx
+  vtkPVEnSightMasterServerReader.cxx
   vtkPVEnSightMasterServerTranslator.cxx
   vtkPVExtractBagPlots.cxx
   vtkPVExtractVOI.cxx
   vtkPVFrustumActor.cxx
   vtkPVGlyphFilter.cxx
-  vtkPVLegacyGlyphFilter.cxx
+  vtkPVGridAxes3DActor.cxx
   vtkPVImageReader.cxx
+  vtkPVLegacyGlyphFilter.cxx
   vtkPVLinearExtrusionFilter.cxx
   vtkPVMetaClipDataSet.cxx
   vtkPVMetaSliceDataSet.cxx
@@ -148,6 +153,7 @@ endif()
 
 set_source_files_properties(
   vtkAMRDualGridHelper
+  vtkGridAxesHelper
   vtkMaterialInterfaceCommBuffer
   vtkMaterialInterfaceIdList
   vtkMaterialInterfacePieceLoading

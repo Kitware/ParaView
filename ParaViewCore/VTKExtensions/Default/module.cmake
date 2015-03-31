@@ -24,6 +24,7 @@ vtk_module(vtkPVVTKExtensionsDefault
     vtkIOInfovis
     vtknetcdf
     vtksys
+    vtkChartsCore
   KIT
     vtkPVExtensions
 )
