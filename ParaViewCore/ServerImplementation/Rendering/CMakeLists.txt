@@ -32,7 +32,6 @@ set (Module_SRCS
   vtkSIImageTextureProxy.cxx
   vtkSIPVRepresentationProxy.cxx
   vtkSIUnstructuredGridVolumeRepresentationProxy.cxx
-  vtkSICompositeOrthographicSliceRepresentationProxy.cxx
 )
 
 # OpenGL2 specific definitions

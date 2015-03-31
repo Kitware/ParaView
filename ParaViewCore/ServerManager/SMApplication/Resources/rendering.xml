@@ -319,7 +319,8 @@
   </ProxyGroup>
   <ProxyGroup name="properties">
     <Proxy class="vtkTextProperty"
-           name="TextProperty">
+           name="TextProperty"
+           processes="client|dataserver|renderserver" >
       <DoubleVectorProperty animateable="0"
                             argument_is_array="1"
                             command="SetColor"

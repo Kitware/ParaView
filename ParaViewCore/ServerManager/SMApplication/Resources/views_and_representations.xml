@@ -1694,6 +1694,19 @@
         </Hints>
       </StringVectorProperty>
 
+      <ProxyProperty name="AxesGrid"
+                     command="SetGridAxes3DActor"
+                     panel_widget="proxy_editor"
+                     skip_dependency="1">
+        <!-- We mark skip_dependency=1 since we don't want the view to
+             call Update() when the GridAxes3DActor changes. The GridAxes3DActor
+             is indeed going to change when the view updates when Change-Of-Basis matrix
+             is being used, for example. -->
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="annotations" name="GridAxes3DActor" />
+        </ProxyListDomain>
+      </ProxyProperty>
+
       <!-- Center and Orientation Axes -->
       <IntVectorProperty command="SetCenterAxesVisibility"
                          default_values="0"

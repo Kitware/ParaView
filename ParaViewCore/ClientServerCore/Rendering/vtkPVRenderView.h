@@ -33,16 +33,16 @@
 class vtkAlgorithmOutput;
 class vtkCamera;
 class vtkExtentTranslator;
+class vtkPVGridAxes3DActor;
 class vtkInformationDoubleKey;
 class vtkInformationDoubleVectorKey;
 class vtkInformationIntegerKey;
+class vtkInteractorStyleDrawPolygon;
 class vtkInteractorStyleRubberBand3D;
 class vtkInteractorStyleRubberBandZoom;
-class vtkInteractorStyleDrawPolygon;
 class vtkLight;
 class vtkLightKit;
 class vtkMatrix4x4;
-class vtkProp;
 class vtkPVAxesWidget;
 class vtkPVCenterAxesActor;
 class vtkPVDataDeliveryManager;
@@ -50,10 +50,11 @@ class vtkPVDataRepresentation;
 class vtkPVHardwareSelector;
 class vtkPVInteractorStyle;
 class vtkPVSynchronizedRenderer;
-class vtkRenderer;
+class vtkProp;
 class vtkRenderViewBase;
 class vtkRenderWindow;
 class vtkRenderWindowInteractor;
+class vtkRenderer;
 class vtkTextRepresentation;
 class vtkTexture;
 
@@ -414,6 +415,10 @@ public:
   // Enable/disable showing of annotation for developers.
   void SetShowAnnotation(bool val);
 
+  // Description:
+  // Set the vtkPVGridAxes3DActor to use for the view.
+  void SetGridAxes3DActor(vtkPVGridAxes3DActor*);
+
   //*****************************************************************
   // Forwarded to orientation axes widget.
   virtual void SetOrientationAxesInteractivity(bool);
@@ -671,6 +676,7 @@ protected:
   vtkPVAxesWidget* OrientationWidget;
   vtkPVHardwareSelector* Selector;
   vtkSelection* LastSelection;
+  vtkSmartPointer<vtkPVGridAxes3DActor> GridAxes3DActor;
 
   int StillRenderImageReductionFactor;
   int InteractiveRenderImageReductionFactor;
