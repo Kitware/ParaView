@@ -66,6 +66,8 @@ public:
   /// \li \c transfer_function_editor : pqTransferFunctionWidgetPropertyWidget
   /// \li \c viewtype_selector: pqViewTypePropertyWidget
   /// \li \c glyph_scale_factor: pqGlyphScaleFactorPropertyWidget
+  /// \li \c proxy_editor: pqProxyEditorPropertyWidget
+  /// \li \c int_mask: pqIntMaskPropertyWidget
   virtual pqPropertyWidget* createWidgetForProperty(
     vtkSMProxy *proxy, vtkSMProperty *property);
 
