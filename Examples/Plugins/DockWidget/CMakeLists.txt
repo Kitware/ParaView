@@ -9,6 +9,13 @@ IF(NOT ParaView_BINARY_DIR)
   INCLUDE(${PARAVIEW_USE_FILE})
 ENDIF()
 
+# Set a consistent MACOSX_RPATH default across all CMake versions.
+# When CMake 2.8.12 is required, change this default to 1.
+# When CMake 3.0.0 is required, remove this block (see CMP0042).
+if(NOT DEFINED CMAKE_MACOSX_RPATH)
+  set(CMAKE_MACOSX_RPATH 0)
+endif()
+
 IF(PARAVIEW_BUILD_QT_GUI)
   IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
     QT5_WRAP_CPP(MOC_SRCS ExampleDockPanel.h)
