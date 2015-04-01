@@ -59,6 +59,7 @@
 
 namespace
 {
+#ifdef PARAVIEW_USE_MPI
   // Returns true if the arguments has the specified boolean_arg.
   bool vtkFindArgument(const char* boolean_arg,
     int argc, char** &argv)
@@ -72,6 +73,7 @@ namespace
       }
     return false;
     }
+#endif
 
   // This is used to avoid creating vtkWin32OutputWindow on ParaView executables.
   // vtkWin32OutputWindow is not a useful window for any of the ParaView commandline
