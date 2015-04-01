@@ -3,7 +3,8 @@ Contributing to ParaView
 
 This page documents at a very high level how to contribute to ParaView.
 Please check our [developer instructions][] for a more detailed guide to
-developing and contributing to the project.
+developing and contributing to the project, and our [ParaView Git README][]
+for additional information.
 
 1.  Register [GitLab Access] to create an account and select a user name.
 
@@ -57,6 +58,7 @@ Our [Wiki][] is used to document features, flesh out designs and host other
 documentation. We have several [Mailing Lists][] to coordinate development and
 to provide support.
 
+[ParaView Git README]: Documentation/dev/git/README.md
 [developer instructions]: Documentation/dev/git/develop.md
 [GitLab Access]: https://gitlab.kitware.com/users/sign_in
 [Fork ParaView]: https://gitlab.kitware.com/paraview/paraview/fork/new
