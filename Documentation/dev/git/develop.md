@@ -77,6 +77,11 @@ Update
 
         $ git checkout master
         $ git pullall
+2.  Optionally push `master` to your fork in GitLab:
+
+        $ git push gitlab master
+    to keep it in sync.  The `git gitlab-push` script used to
+    [Share a Topic](#share-a-topic) below will also do this.
 
 Create a Topic
 --------------
@@ -138,6 +143,8 @@ signed in for [GitLab Access][] and created your fork by visiting the main
     * If you are revising a previously pushed topic and have rewritten the
       topic history, add `-f` or `--force` to overwrite the destination.
     * If the topic adds data see [this note](https://gitlab.kitware.com/vtk/vtk/blob/master/Documentation/dev/git/data.md#push).
+    * The `gitlab-push` script also pushes the `master` branch to your
+      fork in GitLab to keep it in sync with the upstream `master`.
 
     The output will include a link to the topic branch in your fork in GitLab
     and a link to a page for creating a Merge Request.
