@@ -868,7 +868,12 @@
     { "name": "vtkPVVTKExtensionsDefault",
       "path": "ParaViewCore/VTKExtensions/Default",
       "include": [
-        { "class": "vtkAppendRectilinearGrid" }
+        { "class": "vtkAppendRectilinearGrid" },
+        { "class": "vtkGridAxes2DActor" },
+        { "class": "vtkGridAxes3DActor" },
+        { "class": "vtkGridAxesHelper" },
+        { "class": "vtkGridAxesPlane2DActor" },
+        { "class": "vtkPVGridAxes3DActor" }
       ]
     },
     { "name": "vtkParallelMPI",
@@ -919,7 +924,8 @@
     },
     { "path":"ParaViewCore/ServerManager/SMApplication/Resources/rendering.xml",
       "proxies":[
-        "Camera"
+        "Camera",
+        "TextProperty"
       ]
     },
     { "path":"ParaViewCore/ServerManager/SMApplication/Resources/rendering.xml",
@@ -956,7 +962,8 @@
       "proxies":[
         "PiecewiseFunction",
         "PVLookupTable",
-        "ViewLayout"
+        "ViewLayout",
+        "GridAxes3DActor"
       ]
     }
   ]
