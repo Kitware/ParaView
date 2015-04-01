@@ -620,13 +620,8 @@
       "path": "ParaViewCore/ServerImplementation/Rendering",
       "include": [
         { "path": "module.cmake" },
-        { "class": "vtkSIChartRepresentationProxy" },
         { "class": "vtkSIImageTextureProxy" },
         { "class": "vtkSIPVRepresentationProxy" },
-        { "class": "vtkSIScalarBarActorProxy" },
-        { "class": "vtkSISelectionRepresentationProxy" },
-        { "class": "vtkSITextSourceRepresentationProxy" },
-        { "class": "vtkSIUniformGridVolumeRepresentationProxy" },
         { "class": "vtkSIUnstructuredGridVolumeRepresentationProxy" }
       ],
       "replace": [

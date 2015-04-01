@@ -836,8 +836,7 @@
       </IntVectorProperty>
     </Proxy>
     <Proxy class="vtkPVScalarBarActor"
-           name="ScalarBarActor"
-           si_class="vtkSIScalarBarActorProxy">
+           name="ScalarBarActor" >
       <ProxyProperty command="SetLookupTable"
                      name="LookupTable"
                      number_of_elements="1">
@@ -1017,7 +1016,7 @@
         <Documentation>Determines where the tick labels are drawn.</Documentation>
       </IntVectorProperty>
       <!--label text property -->
-      <SubProxy>
+      <SubProxy command="SetLabelTextProperty">
         <Proxy name="LabelTextProperty"
                proxygroup="properties"
                proxyname="TextProperty"></Proxy>
@@ -1039,7 +1038,7 @@
         </ExposedProperties>
       </SubProxy>
       <!--title text property -->
-      <SubProxy>
+      <SubProxy command="SetTitleTextProperty">
         <Proxy name="TitleTextProperty"
                proxygroup="properties"
                proxyname="TextProperty"></Proxy>

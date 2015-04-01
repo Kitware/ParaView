@@ -77,7 +77,8 @@ vtkTextSourceRepresentation::~vtkTextSourceRepresentation()
 void vtkTextSourceRepresentation::SetVisibility(bool val)
 {
   this->Superclass::SetVisibility(val);
-  if (this->TextWidgetRepresentation)
+  if (this->TextWidgetRepresentation &&
+    this->TextWidgetRepresentation->GetRepresentation())
     {
     this->TextWidgetRepresentation->GetRepresentation()->SetVisibility(val);
     this->TextWidgetRepresentation->SetEnabled(val);

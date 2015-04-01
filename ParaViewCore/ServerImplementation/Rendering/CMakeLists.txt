@@ -29,13 +29,8 @@
 #
 #==========================================================================
 set (Module_SRCS
-  vtkSIChartRepresentationProxy.cxx
   vtkSIImageTextureProxy.cxx
   vtkSIPVRepresentationProxy.cxx
-  vtkSIScalarBarActorProxy.cxx
-  vtkSISelectionRepresentationProxy.cxx
-  vtkSITextSourceRepresentationProxy.cxx
-  vtkSIUniformGridVolumeRepresentationProxy.cxx
   vtkSIUnstructuredGridVolumeRepresentationProxy.cxx
   vtkSICompositeOrthographicSliceRepresentationProxy.cxx
 )
