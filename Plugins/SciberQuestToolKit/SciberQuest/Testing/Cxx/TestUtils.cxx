@@ -92,6 +92,8 @@ vtkMultiProcessController *Initialize(int *argc, char ***argv)
   controller=vtkMPIController::New();
   controller->Initialize(argc,argv,0);
   #else
+  (void)argc;
+  (void)argv;
   controller=vtkDummyController::New();
   #endif
 
