@@ -26,7 +26,7 @@ Before you begin, perform initial setup:
     Git to [use SSH instead of HTTPS](download.md#use-ssh-instead-of-https).
     Then clone:
 
-        $ git clone https://gitlab.kitware.com/paraview/paraview.git ParaView
+        $ git clone --recursive https://gitlab.kitware.com/paraview/paraview.git ParaView
         $ cd ParaView
     The main repository will be configured as your `origin` remote.
 
