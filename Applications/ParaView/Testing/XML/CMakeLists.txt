@@ -114,6 +114,8 @@ if(PARAVIEW_ENABLE_CATALYST AND PARAVIEW_ENABLE_PYTHON)
     ${CMAKE_CURRENT_SOURCE_DIR}/CatalystLiveSetBreakpoint.xml)
   set (CATALYST_SIMULATION CatalystWaveletDriver.py)
   set (INSITU_SCRIPT CatalystWaveletCoprocessing 222)
+  # Since this test is too complex to run in parallel.
+  set (CatalystLiveSetBreakpoint_FORCE_SERIAL TRUE)
 
   foreach (tname ${catalyst_live_tests})
     add_pv_test("pv" "_DISABLE_C"
@@ -409,6 +411,7 @@ set (PolygonPointSelection_FORCE_SERIAL TRUE)
 set (Contour_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (Calculator_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (LogColorMap_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (ColorOpacityTableEditing_FORCE_SERIAL TRUE) # since this uses popup-menu
 
 # Set properties for CTH tests
 set(CTHAMRContour_DISABLE_CS TRUE)
