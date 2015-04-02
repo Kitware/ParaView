@@ -1,10 +1,9 @@
-// -*- c++ -*-
 /*=========================================================================
 
   Program:   Visualization Toolkit
   Module:    vtkCGNSReader.h
 
-  Copyright (c) 2013-2014 Mickael Philit
+  Copyright (c) Ken Martin, Will Schrodeder, Bill Lorensen
   All rights reserved.
   See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
 
@@ -13,6 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
   =========================================================================*/
+// Copyright 2013-2014 Mickael Philit.
+
 // .NAME vtkCGNSReader -- reads a dataset in "CGNS" format
 // .SECTION Description
 // vtkCGNSReader creates a multi-block dataset and reads unstructured grids,
