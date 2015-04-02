@@ -136,7 +136,7 @@ vtkSQRandomCells::~vtkSQRandomCells()
 int vtkSQRandomCells::RequestInformation(
     vtkInformation * /*req*/,
     vtkInformationVector ** /*inInfos*/,
-    vtkInformationVector *outInfos)
+    vtkInformationVector *)
 {
   #ifdef SQTK_DEBUG
   std::cerr << "=====vtkSQRandomCells::RequestInformation" << std::endl;

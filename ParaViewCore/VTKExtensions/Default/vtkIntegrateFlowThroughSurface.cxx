@@ -28,6 +28,7 @@
 #include "vtkPointData.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkSurfaceVectors.h"
+#include "vtkUnsignedCharArray.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkSmartPointer.h"
 
@@ -74,8 +75,7 @@ vtkDataSet* vtkIntegrateFlowThroughSurface::GenerateSurfaceVectors(
     {
     inputCopy->GetPointData()->SetVectors(vectors);
     }
-  inputCopy->GetCellData()->AddArray(
-    input->GetCellData()->GetArray("vtkGhostLevels"));
+  inputCopy->GetCellData()->AddArray(input->GetCellGhostArray());
 
   vtkSurfaceVectors* dot = vtkSurfaceVectors::New();
   dot->SetInputData(inputCopy);

@@ -1305,7 +1305,7 @@ void vtkPVGeometryFilter::StructuredGridExecute(vtkStructuredGrid* input,
     {
     if (input->GetNumberOfCells() > 0)
       {
-      if (input->GetCellBlanking())
+      if (input->HasAnyBlankCells())
         {
         this->DataSetSurfaceFilter->DataSetExecute(input, output);
         }
@@ -1472,9 +1472,7 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
 
     if (input->GetNumberOfCells() > 0)
       {
-      int updateghostlevel = vtkStreamingDemandDrivenPipeline::GetUpdateGhostLevel(
-        this->DataSetSurfaceFilter->GetOutputInformation(0));
-      this->DataSetSurfaceFilter->UnstructuredGridExecute(input, output, updateghostlevel);
+      this->DataSetSurfaceFilter->UnstructuredGridExecute(input, output);
       }
 
     if (this->Triangulate && (output->GetNumberOfPolys() > 0))
@@ -1572,7 +1570,7 @@ void vtkPVGeometryFilter::PolyDataExecute(
       stripper->SetPassThroughCellIds(this->PassThroughCellIds);
       //stripper->SetPassThroughPointIds(this->PassThroughPointIds);
       inCopy->ShallowCopy(input);
-      inCopy->RemoveGhostCells(1);
+      inCopy->RemoveGhostCells();
       stripper->SetInputData(inCopy);
       stripper->Update();
       output->CopyStructure(stripper->GetOutput());
@@ -1622,7 +1620,7 @@ void vtkPVGeometryFilter::PolyDataExecute(
           }
         }
 
-      output->RemoveGhostCells(1);
+      output->RemoveGhostCells();
 
       if (this->Triangulate)
         {
@@ -1848,10 +1846,11 @@ void vtkPVGeometryFilter::SetUseStrips(int newvalue)
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::RemoveGhostCells(vtkPolyData* output)
 {
-  vtkDataArray* ghost = output->GetCellData()->GetArray("vtkGhostLevels");
+  vtkDataArray* ghost = output->GetCellData()->GetArray(
+    vtkDataSetAttributes::GhostArrayName());
   if (ghost)
     {
-    output->RemoveGhostCells(1);
+    output->RemoveGhostCells();
     }
 }
 

@@ -317,8 +317,6 @@ int vtkPVGlyphFilter::RequestData(
   vtkInformationVector** inputVector,
   vtkInformationVector* outputVector)
 {
-  int requestedGhostLevel = outputVector->GetInformationObject(0)->Get(
-      vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS());
   vtkInformationVector* sourceVector = inputVector[1];
 
   this->Internals->Reset();
@@ -332,7 +330,7 @@ int vtkPVGlyphFilter::RequestData(
 
     vtkPolyData* outputPD = vtkPolyData::GetData(outputVector);
     assert(outputPD);
-    return this->Execute(ds, sourceVector, outputPD, requestedGhostLevel)? 1 : 0;
+    return this->Execute(ds, sourceVector, outputPD)? 1 : 0;
     }
   else if (cds)
     {
@@ -359,7 +357,7 @@ int vtkPVGlyphFilter::RequestData(
       if (currentDS)
         {
         vtkNew<vtkPolyData> outputPD;
-        if (!this->Execute(currentDS, sourceVector, outputPD.GetPointer(), requestedGhostLevel))
+        if (!this->Execute(currentDS, sourceVector, outputPD.GetPointer()))
           {
           vtkErrorMacro("Glyph generation failed for block: " << iter->GetCurrentFlatIndex());
           this->Internals->Reset();

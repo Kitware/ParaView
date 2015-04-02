@@ -927,9 +927,9 @@ int vtkRectilinearGridConnectivity::CheckVolumeDataArrays
     {
     for ( i = 0; i < numArays; i ++ )
       {
-      if (  strcmp( aryNames[i], "vtkGhostLevels" )  )
+      if (  strcmp( aryNames[i], vtkDataSetAttributes::GhostArrayName())  )
         {
-        // note that 'vtkGhostLevels' is a hidden data array
+        // note that the ghost array is a hidden data array
         this->Internal->VolumeDataAttributeNames.push_back( aryNames[i] );
 
         if (  !strstr( aryNames[i], "raction" ) &&

@@ -318,14 +318,13 @@ int vtkSQImageGhosts::RequestData(
   CartesianExtent outCells
      = CartesianExtent::NodeToCell(outPoints,this->Mode);
 
-  CartesianExtent domainCells
-     = CartesianExtent::NodeToCell(this->ProblemDomain,this->Mode);
-
   // construct the set of transactions needed to transfer the
   // ghost data from remote processes. if not a parallel build
   // or run then we need not do this
   std::vector<GhostTransaction> transactions;
   #ifndef SQTK_WITHOUT_MPI
+  CartesianExtent domainCells
+     = CartesianExtent::NodeToCell(this->ProblemDomain,this->Mode);
   if (this->WorldSize>1)
     {
     // gather input extents
@@ -411,7 +410,7 @@ int vtkSQImageGhosts::RequestData(
         transactions,
         false);
 
-  outIm->GenerateGhostLevelArray(inPoints.GetData());
+  outIm->GenerateGhostArray(inPoints.GetData());
 
   if ( this->LogLevel || globalLogLevel)
     {
@@ -552,6 +551,9 @@ void vtkSQImageGhosts::ExecuteTransactions(
           }
         }
       }
+    #else
+    (void)transactions;
+    (void)pointData;
     #endif
     }
 }

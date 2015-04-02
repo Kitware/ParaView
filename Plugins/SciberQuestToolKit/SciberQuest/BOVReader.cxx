@@ -144,6 +144,8 @@ void BOVReader::SetCommunicator(MPI_Comm comm)
     MPI_Comm_rank(this->Comm,&this->ProcId);
     MPI_Comm_size(this->Comm,&this->NProcs);
     }
+  #else
+  (void)comm;
   #endif
 }
 

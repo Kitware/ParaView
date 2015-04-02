@@ -22,7 +22,7 @@
 // arrays. If this filter has multiple input data sets attached to its
 // first input port, it will run the operation on each input data set in
 // turn, producing a global minimum value over all the inputs. In parallel 
-// runs this filter REQUIRES vtkGhostLevel arrays to skip redundant 
+// runs this filter REQUIRES ghost arrays to skip redundant 
 // information. The output of this filter will always be a single vtkPolyData 
 // that contains exactly one point and one cell (a VTK_VERTEX).
 
@@ -97,7 +97,7 @@ protected:
   char *FirstPasses;
 
   //for deciding what cells and points to ignore
-  vtkUnsignedCharArray *GhostLevels;
+  vtkUnsignedCharArray *GhostArray;
 
   //a flag that indicates if values computed could be inaccurate
   int MismatchOccurred;

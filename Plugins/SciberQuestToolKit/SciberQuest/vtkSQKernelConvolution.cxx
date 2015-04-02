@@ -21,19 +21,20 @@ Copyright 2012 SciberQuest Inc.
 #include "postream.h"
 #include "SQMacros.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
 
-#include "vtkImageData.h"
-#include "vtkRectilinearGrid.h"
-#include "vtkInformation.h"
-#include "vtkInformationVector.h"
+#include "vtkCellData.h"
 #include "vtkDataArray.h"
 #include "vtkDataSet.h"
-#include "vtkFloatArray.h"
 #include "vtkDoubleArray.h"
+#include "vtkFloatArray.h"
+#include "vtkImageData.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkObjectFactory.h"
 #include "vtkPointData.h"
-#include "vtkCellData.h"
+#include "vtkRectilinearGrid.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkUnsignedCharArray.h"
 
 #ifdef WIN32
   #include <Winsock2.h>
@@ -1046,19 +1047,8 @@ int vtkSQKernelConvolution::RequestData(
 
   if (outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()) > 1)
     {
-    vtkDataArray* gl = inData->GetCellData()->GetArray("vtkGhostLevels");
-    if (gl)
-      {
-      double range[2];
-      gl->GetRange(range);
-      if (range[1] < nGhost)
-        {
-        vtkErrorMacro("Did not receive " << nGhost << " ghost levels as requested."
-          " Received " << range[1] << " instead. Cannot execute.")
-        return 0;
-        }
-      }
-    else
+    vtkDataArray* gl = inData->GetCellGhostArray();
+    if (! gl)
       {
       vtkErrorMacro("Did not receive ghost levels. Cannot execute.");
       return 0;

@@ -35,6 +35,7 @@
 #include "vtkTable.h"
 #include "vtkTimerLog.h"
 #include "vtkUniformGrid.h"
+#include "vtkUnsignedCharArray.h"
 
 #include <map>
 
@@ -125,16 +126,16 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
       vtkErrorMacro ("No RegionID in volume.  Run Connectivity filter.");
       return 0;
       }
-    vtkDataArray* ghostLevels = grid->GetCellData ()->GetArray ("vtkGhostLevels");
-    if (!ghostLevels) 
+    vtkUnsignedCharArray* ghostArray = grid->GetCellGhostArray();
+    if (!ghostArray) 
       {
-      vtkErrorMacro ("No vtkGhostLevels array attached to the CTH volume data");
+      vtkErrorMacro ("No ghost array attached to the CTH volume data");
       return 0;
       }
     for (int c = 0; c < grid->GetNumberOfCells (); c ++)
       {
       vtkIdType fragId = static_cast<vtkIdType> (regionId->GetTuple1 (c));
-      if (ghostLevels->GetTuple1 (c) < 0.5)
+      if ((ghostArray->GetValue (c) & vtkDataSetAttributes::DUPLICATECELL) == 0)
         {
         vtkIdType index = fragIndices.size ();
         fragIndices[fragId] = index;
@@ -228,10 +229,10 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
       vtkErrorMacro ("NonOverlappingAMR not made up of UniformGrids");
       return 0;
       }
-    vtkDataArray* ghostLevels = grid->GetCellData ()->GetArray ("vtkGhostLevels");
-    if (!ghostLevels) 
+    vtkUnsignedCharArray* ghostArray = grid->GetCellGhostArray();
+    if (!ghostArray) 
       {
-      vtkErrorMacro ("No vtkGhostLevels array attached to the CTH volume data");
+      vtkErrorMacro ("No ghost array attached to the CTH volume data");
       return 0;
       }
     std::string regionName ("RegionId-");
@@ -266,7 +267,8 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
     double cellVol = spacing[0] * spacing[1] * spacing[2];
     for (int c = 0; c < grid->GetNumberOfCells (); c ++)
       {
-      if (regionId->GetTuple1 (c) > 0.0 && ghostLevels->GetTuple1 (c) < 0.5) 
+      if (regionId->GetTuple1 (c) > 0.0 && 
+          (ghostArray->GetValue (c) & vtkDataSetAttributes::DUPLICATECELL) == 0)
         {
         vtkIdType fragId = static_cast<vtkIdType> (regionId->GetTuple1 (c));
         std::map<vtkIdType, vtkIdType>::iterator loc = fragIndices.find (fragId);

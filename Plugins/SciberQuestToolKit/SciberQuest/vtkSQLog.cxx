@@ -379,7 +379,7 @@ int vtkSQLog::Write()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSQLog::PrintSelf(std::ostream& os, vtkIndent indent)
+void vtkSQLog::PrintSelf(std::ostream& os, vtkIndent)
 {
   time_t t;
   time(&t);

@@ -1404,13 +1404,13 @@ void vtkHierarchicalFractal::AddGhostLevelArray(vtkDataSet *grid,
           }
         else
           {
-          *ptr = iLevel;
+          *ptr = vtkDataSetAttributes::DUPLICATECELL;
           }
         ++ptr;
         }
       }
     }
-  array->SetName("vtkGhostLevels");
+  array->SetName(vtkDataSetAttributes::GhostArrayName());
 //      array->SetName("vtkNotGhostLevels");
   grid->GetCellData()->AddArray(array);
   array->Delete();

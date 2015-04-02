@@ -220,7 +220,7 @@ vtkPVDataSetAttributesInformation
     vtkAbstractArray* const array = da->GetAbstractArray( arrayIndx );
 
     if (array->GetName() &&
-        strcmp(array->GetName(),"vtkGhostLevels") != 0 &&
+        strcmp(array->GetName(), vtkDataSetAttributes::GhostArrayName()) != 0 &&
         strcmp(array->GetName(), "vtkOriginalCellIds") != 0 &&
         strcmp(array->GetName(), "vtkOriginalPointIds") != 0)
       {
@@ -266,7 +266,8 @@ CopyFromGenericAttributesOnPoints(vtkGenericAttributeCollection *da)
     array = da->GetAttribute(idx);
     if(array->GetCentering()==vtkPointCentered)
       {
-      if (array->GetName() && strcmp(array->GetName(),"vtkGhostLevels") != 0)
+      if (array->GetName() && strcmp(array->GetName(),
+                                     vtkDataSetAttributes::GhostArrayName()) != 0)
         {
         vtkPVGenericAttributeInformation *info = vtkPVGenericAttributeInformation::New();
         info->CopyFromObject(array);
@@ -311,7 +312,8 @@ CopyFromGenericAttributesOnCells(vtkGenericAttributeCollection *da)
     array = da->GetAttribute(idx);
     if(array->GetCentering()==vtkCellCentered)
       {
-      if (array->GetName() && strcmp(array->GetName(),"vtkGhostLevels") != 0)
+      if (array->GetName() && strcmp(array->GetName(),
+                                     vtkDataSetAttributes::GhostArrayName()) != 0)
         {
         vtkPVGenericAttributeInformation *info = vtkPVGenericAttributeInformation::New();
         info->CopyFromObject(array);
