@@ -85,7 +85,9 @@ def filter_proxies(fin, fout, proxies, all_proxies):
       removed_subproxies = []
       for subproxy in proxy.iter('SubProxy'):
         for p in subproxy.iter('Proxy'):
-          if p.attrib['proxyname'] not in all_proxies:
+          # p.attrib doesn't have proxyname it
+          # means the proxy definition is inline.
+          if p.attrib.has_key('proxyname') and (p.attrib['proxyname'] not in all_proxies):
             removed_subproxies.append(p.attrib['name'])
             proxy.remove(subproxy)
             break
