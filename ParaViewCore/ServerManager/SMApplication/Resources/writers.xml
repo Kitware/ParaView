@@ -985,6 +985,15 @@
                             number_of_elements="1">
         <Documentation>The name of the file to be written.</Documentation>
       </StringVectorProperty>
+      <IntVectorProperty name="WriteAllTimeSteps"
+                         command="SetWriteAllTimeSteps"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>When WriteAllTimeSteps is turned ON, the writer is
+        executed once for each timestep available from the reader.
+        </Documentation>
+      </IntVectorProperty>
       <Hints>
         <Property name="Input"
                   show="0" />
