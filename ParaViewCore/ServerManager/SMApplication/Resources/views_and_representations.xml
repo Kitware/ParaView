@@ -7544,7 +7544,7 @@
                              name="Script"
                              number_of_elements="1">
          <Hints>
-           <Widget type="multi_line" />
+           <Widget type="multi_line" syntax="python"/>
          </Hints>
          <Documentation>This property contains the text of a Python program used
          to generate a plot. Use the TAB key to end editing and generate the
