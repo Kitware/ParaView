@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMProxy.h"
 
 class pqProxyWidgetDialog;
+class QCheckBox;
 class QPushButton;
 
 /// Property widget that can be used to edit a proxy set as the value of a
@@ -45,6 +46,23 @@ class QPushButton;
 /// allows the users to edit the properties on this GridActor3D, when present.
 ///
 /// To use this widget, add 'panel_widget="proxy_editor"' to the property's XML.
+///
+/// Since it's common to have a property on the proxy being edited in the popup
+/// dialog which controls its visibility (or enabled state), we add support for
+/// putting that property as a checkbox in this pqProxyEditorPropertyWidget
+/// itself. For that, one can use `ProxyEditorPropertyWidget` hints.
+///
+/// Example XML:
+/// @code
+///   <ProxyProperty name="AxesGrid" ...  >
+///     <ProxyListDomain name="proxy_list">
+///       <Proxy group="annotations" name="GridAxes3DActor" />
+///     </ProxyListDomain>
+///     <Hints>
+///       <ProxyEditorPropertyWidget property="Visibility" />
+///     </Hints>
+///   </ProxyProperty>
+/// @endcode
 class PQCOMPONENTS_EXPORT pqProxyEditorPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
@@ -71,7 +89,10 @@ private:
 
   vtkWeakPointer<vtkSMProxy> ProxyToEdit;
   QPointer<QPushButton> Button;
+  QPointer<QCheckBox> Checkbox;
   QPointer<pqProxyWidgetDialog> Editor;
+  pqPropertyLinks CheckBoxLinks;
+  QString PropertyName;
 };
 
 #endif

@@ -1705,6 +1705,13 @@
         <ProxyListDomain name="proxy_list">
           <Proxy group="annotations" name="GridAxes3DActor" />
         </ProxyListDomain>
+        <Hints>
+          <ProxyEditorPropertyWidget property="Visibility">
+            <!-- tell pqProxyEditorPropertyWidget that use the "Visibility"
+                 property on the GridAxes3DActor proxy for a checkbox
+                 on the UI -->
+          </ProxyEditorPropertyWidget>
+        </Hints>
       </ProxyProperty>
 
       <!-- Center and Orientation Axes -->

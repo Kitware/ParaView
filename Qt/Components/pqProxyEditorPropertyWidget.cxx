@@ -31,9 +31,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqProxyEditorPropertyWidget.h"
 
+#include "pqPropertiesPanel.h"
 #include "pqPropertyLinks.h"
 #include "pqProxyWidgetDialog.h"
+#include "vtkPVXMLElement.h"
+#include "vtkSMProperty.h"
+#include "vtkSMProxy.h"
 
+#include <QCheckBox>
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QtDebug>
@@ -52,8 +57,26 @@ pqProxyEditorPropertyWidget::pqProxyEditorPropertyWidget(
   button->setEnabled(false);
   this->Button = button;
 
+  // If ProxyEditorPropertyWidget hints are present, we'll add a checkbox to
+  // control that property on the "other" proxy.
+  if (vtkPVXMLElement* hints = smproperty->GetHints()?
+    smproperty->GetHints()->FindNestedElementByName("ProxyEditorPropertyWidget") : NULL)
+    {
+    this->Checkbox = new QCheckBox(this);
+    this->Checkbox->setEnabled(false);
+    this->Checkbox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    this->PropertyName = hints->GetAttributeOrDefault("property", "");
+    this->connect(&this->CheckBoxLinks, SIGNAL(qtWidgetChanged()),
+      this, SIGNAL(changeAvailable()));
+    }
+
   QHBoxLayout *hbox= new QHBoxLayout(this);
   hbox->setMargin(0);
+  hbox->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
+  if (this->Checkbox)
+    {
+    hbox->addWidget(this->Checkbox);
+    }
   hbox->addWidget(button);
 
   this->addPropertyLink(this, "proxyToEdit", SIGNAL(dummySignal()), smproperty);
@@ -75,6 +98,24 @@ void pqProxyEditorPropertyWidget::setProxyToEdit(pqSMProxy smproxy)
   if (this->Editor && this->Editor->proxy() != smproxy)
     {
     delete this->Editor;
+    }
+
+  this->CheckBoxLinks.reset();
+  if (this->Checkbox)
+    {
+    if (vtkSMProperty* smproperty = smproxy?
+      smproxy->GetProperty(this->PropertyName.toStdString().c_str()) : NULL)
+      {
+      this->Checkbox->setEnabled(true);
+      this->Checkbox->setToolTip(pqPropertyWidget::getTooltip(smproperty));
+      this->CheckBoxLinks.addPropertyLink(
+        this->Checkbox, "checked", SIGNAL(toggled(bool)),
+        smproxy, smproperty);
+      }
+    else
+      {
+      this->Checkbox->setEnabled(false);
+      }
     }
 }
 
@@ -106,4 +147,5 @@ void pqProxyEditorPropertyWidget::buttonClicked()
   this->Editor->setWindowTitle(this->Button->text());
   this->Editor->setObjectName("EditProxy");
   this->Editor->show();
+  this->Editor->raise();
 }

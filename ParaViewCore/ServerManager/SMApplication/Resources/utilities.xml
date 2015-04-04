@@ -1043,7 +1043,7 @@
                          default_values="0">
         <BooleanDomain name="bool" />
         <Documentation>
-          Show/hide the grid.
+          Show/hide the axes grid.
         </Documentation>
       </IntVectorProperty>
 
