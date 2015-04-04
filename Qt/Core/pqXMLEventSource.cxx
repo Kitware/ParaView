@@ -167,9 +167,11 @@ int pqXMLEventSource::getNextEvent(
     widget->setMaximumSize(old_size);
     if (!retVal)
       {
-      return FAILURE;
+      cout << "ERROR: The following event FAILED !!! Yet will continue with the rest of the test." << endl;
+      cout << "----------------------------------------------------------------------------------" << endl;
+      elem->PrintXML(cout, vtkIndent());
+      cout << "----------------------------------------------------------------------------------" << endl;
       }
-
     return this->getNextEvent(object, command, arguments);
     }
   else if (elem->GetName() && strcmp(elem->GetName(), "pqcompareimage")==0 &&
@@ -199,7 +201,10 @@ int pqXMLEventSource::getNextEvent(
        options->GetCurrentImageThreshold(), std::cerr,
        pqCoreTestUtility::TestDirectory()))
       {
-      return FAILURE;
+      cout << "ERROR: The following event FAILED !!! Yet will continue with the rest of the test." << endl;
+      cout << "----------------------------------------------------------------------------------" << endl;
+      elem->PrintXML(cout, vtkIndent());
+      cout << "----------------------------------------------------------------------------------" << endl;
       }
     return this->getNextEvent(object, command, arguments);
     }
