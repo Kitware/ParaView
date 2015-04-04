@@ -147,6 +147,8 @@ vtkPVImageSliceMapper::~vtkPVImageSliceMapper()
 #ifdef VTKGL2
   this->Texture->Delete();
   this->Texture = NULL;
+  this->PolyDataActor->Delete();
+  this->PolyDataActor = NULL;
 #else
   this->SetPainter(NULL);
 
