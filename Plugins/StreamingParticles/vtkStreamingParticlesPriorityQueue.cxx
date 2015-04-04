@@ -162,17 +162,6 @@ static inline bool hasOneLikeXButLess(unsigned int x, unsigned int stride,
     }
 }
 
-static inline void printMap(std::map<unsigned, unsigned> map)
-{
-  cout << "{ ";
-  for (std::map<unsigned,unsigned>::iterator itr = map.begin();
-       itr != map.end(); ++itr)
-    {
-    cout << "(" << itr->first << ", " << itr->second << "), ";
-    }
-  cout << "}" << endl;
-}
-
 //----------------------------------------------------------------------------
 void vtkStreamingParticlesPriorityQueue::UpdatePriorities(
   const double view_planes[24])

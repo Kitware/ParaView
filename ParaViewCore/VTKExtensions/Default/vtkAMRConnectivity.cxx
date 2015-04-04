@@ -183,11 +183,12 @@ private:
 };
 
 
+#ifdef PARAVIEW_USE_MPI
+
 static const int BOUNDARY_TAG = 857089;
 static const int EQUIV_SIZE_TAG = 748957;
 static const int EQUIV_TAG = 357345;
 
-#ifdef PARAVIEW_USE_MPI
 //-----------------------------------------------------------------------------
 // Simple containers for managing asynchronous communication.
 struct vtkAMRConnectivityCommRequest

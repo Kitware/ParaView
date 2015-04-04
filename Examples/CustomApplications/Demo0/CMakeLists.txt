@@ -10,6 +10,13 @@ if (NOT PARAVIEW_BUILD_QT_GUI)
     "with PARAVIEW_BUILD_QT_GUI set to TRUE")
 endif()
 
+# Set a consistent MACOSX_RPATH default across all CMake versions.
+# When CMake 2.8.12 is required, change this default to 1.
+# When CMake 3.0.0 is required, remove this block (see CMP0042).
+if(NOT DEFINED CMAKE_MACOSX_RPATH)
+  set(CMAKE_MACOSX_RPATH 0)
+endif()
+
 add_executable(DemoApp0 DemoApp0.cxx)
 target_link_libraries(DemoApp0 pqCore)
 if(PARAVIEW_QT_VERSION VERSION_GREATER "4")
