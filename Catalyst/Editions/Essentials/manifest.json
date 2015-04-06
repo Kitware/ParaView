@@ -100,7 +100,6 @@
         "Contour",
         "Clip",
         "Cut",
-        "Glyph",
         "PassArrays"
       ]
     },

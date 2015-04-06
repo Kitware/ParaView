@@ -47,7 +47,6 @@ int main(int argc, char* argv[])
       "Contour",
       "Clip",
       "Cut",
-      "Glyph",
       NULL
   };
 
