@@ -31,16 +31,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqCoreUtilities.h"
 
-#include <QMainWindow>
+#include <QAbstractButton>
 #include <QApplication>
 #include <QDir>
-#include <QStringList>
-#include <QString>
 #include <QFile>
 #include <QFileInfo>
+#include <QMainWindow>
+#include <QMessageBox>
+#include <QString>
+#include <QStringList>
 
+#include "pqApplicationCore.h"
+#include "pqSettings.h"
 #include "vtkObject.h"
 #include "vtkWeakPointer.h"
+
+#include <cstdlib>
 
 QPointer<QWidget> pqCoreUtilities::MainWidget = 0;
 
@@ -226,4 +232,45 @@ unsigned long pqCoreUtilities::connect(
   // the pqCoreUtilitiesEventHelper is deleted, but since the vtk_object is
   // already deleted, it doesnt' do anything special.
   return eventid;
+}
+
+//-----------------------------------------------------------------------------
+bool pqCoreUtilities::promptUser(const QString& settingsKey,
+  const QString& title, const QString& message, QWidget* parentWdg)
+{
+  if (getenv("DASHBOARD_TEST_FROM_CTEST")!=NULL)
+    {
+    return true;
+    }
+  parentWdg = parentWdg? parentWdg : pqCoreUtilities::mainWidget();
+
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  if (settings->contains(settingsKey))
+    {
+    return true;
+    }
+
+  QMessageBox mbox(QMessageBox::Question,
+    title, message,
+    QMessageBox::Yes | QMessageBox::No | QMessageBox::YesToAll, parentWdg);
+  mbox.setObjectName("CoreUtilitiesPromptUser");
+
+  // Add a "Yes, and don't ask" button.
+  QAbstractButton* remember = mbox.button(QMessageBox::YesToAll);
+  remember->setText("Yes, and don't ask again");
+  remember->setObjectName("YesToAll");
+  remember->setIcon(mbox.button(QMessageBox::Yes)->icon());
+  mbox.exec();
+
+  switch (mbox.standardButton(mbox.clickedButton()))
+    {
+  case QMessageBox::YesToAll:
+    settings->setValue(settingsKey, true);
+    return true;
+  case QMessageBox::Yes:
+    return true;
+  case QMessageBox::No:
+  default:
+    return false;
+    }
 }

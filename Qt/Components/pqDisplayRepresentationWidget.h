@@ -66,6 +66,12 @@ public slots:
   /// set representation type.
   void setRepresentationText(const QString&);
 
+private slots:
+  /// Slot called when the combo-box is changed. If this change was due to
+  /// a UI interaction, we need to prompt the user if he really intended to make
+  /// that change (BUG #0015117).
+  void comboBoxChanged(const QString&);
+
 signals:
   void representationTextChanged(const QString&);
 

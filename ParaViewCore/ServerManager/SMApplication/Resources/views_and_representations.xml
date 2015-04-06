@@ -3521,6 +3521,15 @@
                     panel_visibility_default_for_representation="volume" />
         </ExposedProperties>
       </SubProxy>
+
+      <Hints>
+        <!-- pqDisplayRepresentationWidget respects this hint to put out
+             a warning for the user before switching to this type of Representation.
+             The user can then accept or reject the change.
+             BUG #15117
+        -->
+        <WarnOnRepresentationChange value="Volume" />
+      </Hints>
       <!-- End of UnstructuredGridBaseRepresentation -->
     </PVRepresentationProxy>
     <!-- ================================================================== -->
@@ -3569,6 +3578,15 @@
                     panel_visibility_default_for_representation="volume" />
         </ExposedProperties>
       </SubProxy>
+
+      <Hints>
+        <!-- pqDisplayRepresentationWidget respects this hint to put out
+             a warning for the user before switching to this type of Representation.
+             The user can then accept or reject the change.
+             BUG #15117
+        -->
+        <WarnOnRepresentationChange value="Volume" />
+      </Hints>
       <!-- End of UnstructuredGridRepresentation -->
     </PVRepresentationProxy>
 
@@ -3619,6 +3637,14 @@
           </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
+      <Hints>
+        <!-- pqDisplayRepresentationWidget respects this hint to put out
+             a warning for the user before switching to this type of Representation.
+             The user can then accept or reject the change.
+             BUG #15117
+        -->
+        <WarnOnRepresentationChange value="Volume" />
+      </Hints>
       <!-- End of StructuredGridRepresentation -->
     </PVRepresentationProxy>
     <PVRepresentationProxy base_proxygroup="internal_representations"
@@ -3691,6 +3717,14 @@
           </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
+      <Hints>
+        <!-- pqDisplayRepresentationWidget respects this hint to put out
+             a warning for the user before switching to this type of Representation.
+             The user can then accept or reject the change.
+             BUG #15117
+        -->
+        <WarnOnRepresentationChange value="Volume" />
+      </Hints>
       <!-- End of UniformGridRepresentation -->
     </PVRepresentationProxy>
     <!-- ================================================================== -->
@@ -3747,6 +3781,15 @@
           <Exception name="Input" />
         </ShareProperties>
       </SubProxy>
+
+      <Hints>
+        <!-- pqDisplayRepresentationWidget respects this hint to put out
+             a warning for the user before switching to this type of Representation.
+             The user can then accept or reject the change.
+             BUG #15117
+        -->
+        <WarnOnRepresentationChange value="Volume" />
+      </Hints>
 
       <!-- End of AMRRepresentation -->
     </PVRepresentationProxy>
