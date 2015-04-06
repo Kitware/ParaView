@@ -114,6 +114,10 @@ public:
   /// any other logic here.
   bool setProperty (const char *name, const QVariant &value)
     { return this->Superclass::setProperty(name, value); }
+
+  /// Returns the tooltip to use for the property. May return an empty string.
+  static QString getTooltip(vtkSMProperty* property);
+
 signals:
   /// This signal is emitted when the current view changes.
   void viewChanged(pqView *view);

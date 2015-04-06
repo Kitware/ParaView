@@ -20,6 +20,7 @@
 #include "vtkCamera.h"
 #include "vtkCommand.h"
 #include "vtkDataRepresentation.h"
+#include "vtkPVGridAxes3DActor.h"
 #include "vtkInformationDoubleKey.h"
 #include "vtkInformationDoubleVectorKey.h"
 #include "vtkInformation.h"
@@ -582,6 +583,31 @@ void vtkPVRenderView::SetInteractionMode(int mode)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::SetGridAxes3DActor(vtkPVGridAxes3DActor* gridActor)
+{
+  if (this->GridAxes3DActor != gridActor)
+    {
+    const bool in_tile_display_mode = this->InTileDisplayMode();
+    if (this->GridAxes3DActor)
+      {
+      this->GetNonCompositedRenderer()->RemoveViewProp(this->GridAxes3DActor);
+      this->GetRenderer()->RemoveViewProp(this->GridAxes3DActor);
+      }
+    this->GridAxes3DActor = gridActor;
+    if (this->GridAxes3DActor && !in_tile_display_mode)
+      {
+      this->GetNonCompositedRenderer()->AddViewProp(this->GridAxes3DActor);
+      this->GetRenderer()->AddViewProp(this->GridAxes3DActor);
+
+      this->GridAxes3DActor->SetEnableLayerSupport(true);
+      this->GridAxes3DActor->SetBackgroundLayer(this->GetRenderer()->GetLayer());
+      this->GridAxes3DActor->SetGeometryLayer(this->GetRenderer()->GetLayer());
+      this->GridAxes3DActor->SetForegroundLayer(this->GetNonCompositedRenderer()->GetLayer());
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::OnSelectionChangedEvent()
 {
   int region[4];
@@ -789,10 +815,17 @@ void vtkPVRenderView::SynchronizeGeometryBounds()
     // nodes.
 
     this->CenterAxes->SetUseBounds(0);
+    if (this->GridAxes3DActor)
+      {
+      this->GridAxes3DActor->SetUseBounds(0);
+      }
     double prop_bounds[6];
     this->GetRenderer()->ComputeVisiblePropBounds(prop_bounds);
     this->CenterAxes->SetUseBounds(1);
-
+    if (this->GridAxes3DActor)
+      {
+      this->GridAxes3DActor->SetUseBounds(1);
+      }
 
     bbox.AddBounds(prop_bounds);
     }
@@ -1692,6 +1725,13 @@ void vtkPVRenderView::UpdateCenterAxes()
   widths[1] *= 0.25;
   widths[2] *= 0.25;
   this->CenterAxes->SetScale(widths);
+
+  double bounds[6];
+  this->GeometryBounds.GetBounds(bounds);
+  if (this->GridAxes3DActor)
+    {
+    this->GridAxes3DActor->SetTransformedBounds(bounds);
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="sources">
-    <SourceProxy name="ShearedWavelet" class="vtkShearedWaveletSource">
+    <SourceProxy name="ShearedWavelet" label="Sheared Wavelet" class="vtkShearedWaveletSource">
       <DoubleVectorProperty
         name="U"
         command="SetBasisU"

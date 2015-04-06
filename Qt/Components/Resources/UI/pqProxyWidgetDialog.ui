@@ -15,6 +15,9 @@
   </property>
   <layout class="QVBoxLayout" name="Layout">
    <item>
+    <widget class="pqSearchBox" name="SearchBox" native="true"/>
+   </item>
+   <item>
     <widget class="QScrollArea" name="scrollArea">
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
@@ -28,7 +31,7 @@
         <x>0</x>
         <y>0</y>
         <width>412</width>
-        <height>95</height>
+        <height>79</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="scrollAreaLayout">
@@ -142,6 +145,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqSearchBox</class>
+   <extends>QWidget</extends>
+   <header>pqSearchBox.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

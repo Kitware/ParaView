@@ -167,7 +167,9 @@ public:
   bool canDisplay(pqOutputPort* opPort) const;
 
 signals:
-  /// Fired when the vtkSMViewProxy fire the vtkCommand::UpdateDataEvent
+  /// Fired when the vtkSMViewProxy fires the vtkCommand::UpdateDataEvent
+  /// The view proxy fires this event at the end of vtkSMViewProxy::Update()
+  /// when the update executes, not just when the method is called.
   void updateDataEvent();
 
   /// Fired after a representation has been added to this view.

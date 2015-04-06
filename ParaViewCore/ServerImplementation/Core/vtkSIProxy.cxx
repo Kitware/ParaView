@@ -65,6 +65,9 @@ public:
 
   typedef std::vector<SubProxyInfo> SubProxiesVectorType;
   SubProxiesVectorType SubProxyInfoVector;
+
+  typedef std::map<std::string, std::string> SubProxyCommandMapType;
+  SubProxyCommandMapType SubProxyCommands;
 };
 
 //****************************************************************************
@@ -421,17 +424,35 @@ bool vtkSIProxy::ReadXMLAttributes(vtkPVXMLElement* element)
         return false;
         }
       }
-    else
+    }
+
+  // Process sub-proxy commands.
+  for (vtkInternals::SubProxyCommandMapType::iterator iter=this->Internals->SubProxyCommands.begin();
+    iter != this->Internals->SubProxyCommands.end(); ++iter)
+    {
+    if (vtkSIProxy* subProxy = this->GetSubSIProxy(iter->first.c_str()))
       {
-      // read property xml
-      const char* name = propElement->GetAttribute("name");
-      std::string tagName = propElement->GetName();
-      if (name && tagName.find("Property") == (tagName.size()-8))
+      vtkClientServerStream stream;
+      stream << vtkClientServerStream::Invoke
+             << this->GetVTKObject()
+             << iter->second.c_str()
+             << subProxy->GetVTKObject()
+             << vtkClientServerStream::End;
+      this->Interpreter->ProcessStream(stream);
+      }
+    }
+
+  for (unsigned int i=0; i < element->GetNumberOfNestedElements(); ++i)
+    {
+    vtkPVXMLElement* propElement = element->GetNestedElement(i);
+    // read property xml
+    const char* name = propElement->GetAttribute("name");
+    std::string tagName = propElement->GetName();
+    if (name && tagName.find("Property") == (tagName.size()-8))
+      {
+      if (!this->ReadXMLProperty(propElement))
         {
-        if (!this->ReadXMLProperty(propElement))
-          {
-          return false;
-          }
+        return false;
         }
       }
     }
@@ -440,11 +461,24 @@ bool vtkSIProxy::ReadXMLAttributes(vtkPVXMLElement* element)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSIProxy::ReadXMLSubProxy(vtkPVXMLElement* )
+bool vtkSIProxy::ReadXMLSubProxy(vtkPVXMLElement* subproxyElement)
 {
-  // vtkErrorMacro("Not supported yet.");
+  // Process "command" for the sub proxy, if any. These are used in
+  // CreateVTKObjects() to pass the sub proxy's VTK object to this proxy's VTK
+  // object.
+  const char* command = subproxyElement? subproxyElement->GetAttribute("command") : NULL;
+  if (command)
+    {
+    vtkPVXMLElement* proxyElement = subproxyElement->GetNestedElement(0);
+    const char* name = proxyElement? proxyElement->GetAttribute("name") : NULL;
+    if (name)
+      {
+      this->Internals->SubProxyCommands[name] = command;
+      }
+    }
   return true;
 }
+
 //----------------------------------------------------------------------------
 bool vtkSIProxy::ReadXMLProperty(vtkPVXMLElement* propElement)
 {

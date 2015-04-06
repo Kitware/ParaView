@@ -28,7 +28,6 @@ vtkStandardNewMacro(vtkSMChartRepresentationProxy);
 //----------------------------------------------------------------------------
 vtkSMChartRepresentationProxy::vtkSMChartRepresentationProxy()
 {
-  this->SetSIClassName("vtkSIChartRepresentationProxy");
 }
 
 //----------------------------------------------------------------------------

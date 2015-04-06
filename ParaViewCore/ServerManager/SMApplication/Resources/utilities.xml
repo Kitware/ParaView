@@ -803,41 +803,8 @@
     </TransferFunctionProxy>
   </ProxyGroup>
   <ProxyGroup name="annotations">
-    <Proxy class="vtkCubeAxesActor2D"
-           name="CubeAxesActor2D">
-      <IntVectorProperty command="SetFlyMode"
-                         default_values="1"
-                         name="FlyMode"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="FlyToOuterEdges"
-                 value="0" />
-          <Entry text="FlyToClosetTriad"
-                 value="1" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetInertia"
-                         default_values="1"
-                         name="Inertia"
-                         number_of_elements="1">
-        <IntRangeDomain name="range" />
-      </IntVectorProperty>
-      <ProxyProperty command="SetCamera"
-                     name="Camera">
-        <ProxyGroupDomain name="groups">
-          <Group name="camera" />
-        </ProxyGroupDomain>
-      </ProxyProperty>
-      <IntVectorProperty command="SetVisibility"
-                         default_values="1"
-                         name="Visibility"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-    </Proxy>
     <Proxy class="vtkPVScalarBarActor"
-           name="ScalarBarActor"
-           si_class="vtkSIScalarBarActorProxy">
+           name="ScalarBarActor" >
       <ProxyProperty command="SetLookupTable"
                      name="LookupTable"
                      number_of_elements="1">
@@ -1017,7 +984,7 @@
         <Documentation>Determines where the tick labels are drawn.</Documentation>
       </IntVectorProperty>
       <!--label text property -->
-      <SubProxy>
+      <SubProxy command="SetLabelTextProperty">
         <Proxy name="LabelTextProperty"
                proxygroup="properties"
                proxyname="TextProperty"></Proxy>
@@ -1039,7 +1006,7 @@
         </ExposedProperties>
       </SubProxy>
       <!--title text property -->
-      <SubProxy>
+      <SubProxy command="SetTitleTextProperty">
         <Proxy name="TitleTextProperty"
                proxygroup="properties"
                proxyname="TextProperty"></Proxy>
@@ -1061,6 +1028,596 @@
         </ExposedProperties>
       </SubProxy>
     </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy name="GridAxes3DActor"
+           class="vtkPVGridAxes3DActor"
+           processes="client|dataserver|renderserver">
+      <Documentation>
+        GridAxes3DActor can be used to render a grid in a render view.
+      </Documentation>
+
+      <IntVectorProperty name="Visibility"
+                         command="SetVisibility"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Show/hide the axes grid.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="XTitle"
+                            command="SetXTitle"
+                            number_of_elements="1"
+                            default_values="X Axis">
+        <Documentation>
+          Set the title string for X axis.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="YTitle"
+                            command="SetYTitle"
+                            number_of_elements="1"
+                            default_values="Y Axis">
+        <Documentation>
+          Set the title string for Y axis.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ZTitle"
+                            command="SetZTitle"
+                            number_of_elements="1"
+                            default_values="Z Axis">
+        <Documentation>
+          Set the title string for Z axis.
+        </Documentation>
+      </StringVectorProperty>
+
+      <PropertyGroup label="Title Texts">
+        <Property name="XTitle"/>
+        <Property name="YTitle"/>
+        <Property name="ZTitle"/>
+      </PropertyGroup>
+
+      <SubProxy command="SetXTitleTextProperty">
+        <Proxy name="XTitleProperties" proxygroup="properties" proxyname="TextProperty" />
+        <ExposedProperties>
+          <Property exposed_name="XTitleColor" name="Color" />
+          <Property exposed_name="XTitleOpacity" name="Opacity" />
+          <Property exposed_name="XTitleFontFamily" name="FontFamily" />
+          <Property exposed_name="XTitleBold" name="Bold" />
+          <Property exposed_name="XTitleItalic" name="Italic" />
+          <Property exposed_name="XTitleShadow" name="Shadow" />
+          <Property exposed_name="XTitleFontSize" name="FontSize" default_values="12"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <PropertyGroup label="X Title Font Properties" panel_widget="FontEditor">
+        <Property name="XTitleColor" function="Color"/>
+        <Property name="XTitleFontFamily" function="Family"/>
+        <Property name="XTitleBold" function="Bold" />
+        <Property name="XTitleItalic" function="Italics"/>
+        <Property name="XTitleFontSize" function="Size" />
+        <Property name="XTitleShadow" function="Shadow" />
+        <Property name="XTitleOpacity" function="Opacity" />
+      </PropertyGroup>
+
+      <SubProxy command="SetYTitleTextProperty">
+        <Proxy name="YTitleProperties" proxygroup="properties" proxyname="TextProperty" />
+        <ExposedProperties>
+          <Property exposed_name="YTitleColor" name="Color" />
+          <Property exposed_name="YTitleOpacity" name="Opacity" />
+          <Property exposed_name="YTitleFontFamily" name="FontFamily" />
+          <Property exposed_name="YTitleBold" name="Bold" />
+          <Property exposed_name="YTitleItalic" name="Italic" />
+          <Property exposed_name="YTitleShadow" name="Shadow" />
+          <Property exposed_name="YTitleFontSize" name="FontSize" default_values="12"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <PropertyGroup label="Y Title Font Properties" panel_widget="FontEditor">
+        <Property name="YTitleColor" function="Color"/>
+        <Property name="YTitleFontFamily" function="Family"/>
+        <Property name="YTitleBold" function="Bold" />
+        <Property name="YTitleItalic" function="Italics"/>
+        <Property name="YTitleFontSize" function="Size" />
+        <Property name="YTitleShadow" function="Shadow" />
+        <Property name="YTitleOpacity" function="Opacity" />
+      </PropertyGroup>
+
+      <SubProxy command="SetZTitleTextProperty">
+        <Proxy name="ZTitleProperties" proxygroup="properties" proxyname="TextProperty" />
+        <ExposedProperties>
+          <Property exposed_name="ZTitleColor" name="Color" />
+          <Property exposed_name="ZTitleOpacity" name="Opacity" />
+          <Property exposed_name="ZTitleFontFamily" name="FontFamily" />
+          <Property exposed_name="ZTitleBold" name="Bold" />
+          <Property exposed_name="ZTitleItalic" name="Italic" />
+          <Property exposed_name="ZTitleShadow" name="Shadow" />
+          <Property exposed_name="ZTitleFontSize" name="FontSize" default_values="12"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <PropertyGroup label="Z Title Font Properties" panel_widget="FontEditor">
+        <Property name="ZTitleColor" function="Color"/>
+        <Property name="ZTitleFontFamily" function="Family"/>
+        <Property name="ZTitleBold" function="Bold" />
+        <Property name="ZTitleItalic" function="Italics"/>
+        <Property name="ZTitleFontSize" function="Size" />
+        <Property name="ZTitleShadow" function="Shadow" />
+        <Property name="ZTitleOpacity" function="Opacity" />
+      </PropertyGroup>
+
+      <IntVectorProperty name="FacesToRender"
+                         command="SetFaceMask"
+                         number_of_elements="1"
+                         default_values="63"
+                         panel_widget="int_mask"
+                         panel_visibility="advanced">
+        <Documentation>
+          Set the mask to select faces. The faces rendered will be a subset of the
+          faces selected depending on the status of **CullBackface** and
+          **CullFrontface** properties.
+        </Documentation>
+        <IntRangeDomain name="range" min="0" />
+        <Hints>
+          <Mask>
+            <Item name="Min-YZ" value="1" />
+            <Item name="Min-ZX" value="2" />
+            <Item name="Min-XY" value="4" />
+            <Item name="Max-YZ" value="8" />
+            <Item name="Max-ZX" value="16" />
+            <Item name="Max-XY" value="32" />
+          </Mask>
+        </Hints>
+      </IntVectorProperty>
+
+      <SubProxy command="SetProperty">
+        <Proxy name="Property" class="vtkProperty" processes="client|dataserver|renderserver" >
+          <IntVectorProperty name="CullBackface"
+                             command="SetBackfaceCulling"
+                             number_of_elements="1"
+                             default_values="0"
+                             panel_visibility="advanced">
+            <BooleanDomain name="bool" />
+            <Documentation>
+              Set to true to hide faces of the grid facing away from the camera i.e. hide all
+              back faces.
+            </Documentation>
+          </IntVectorProperty>
+
+          <IntVectorProperty name="CullFrontface"
+                             command="SetFrontfaceCulling"
+                             number_of_elements="1"
+                             default_values="1"
+                             panel_visibility="advanced">
+            <BooleanDomain name="bool" />
+            <Documentation>
+              Set to true to hide faces of the grid facing towards from the camera i.e. hide all
+              front faces.
+            </Documentation>
+          </IntVectorProperty>
+
+          <IntVectorProperty name="Representation"
+                             command="SetRepresentation"
+                             number_of_elements="1"
+                             default_values="1">
+          </IntVectorProperty>
+
+          <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                                name="GridColor"
+                                command="SetColor"
+                                number_of_elements="3"
+                                panel_widget="color_selector">
+            <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+            <Documentation>Color used when coloring the grid wireframe</Documentation>
+            <Hints>
+              <GlobalPropertyLink type="ColorPalette" property="ForegroundColor" />
+            </Hints>
+          </DoubleVectorProperty>
+        </Proxy>
+        <ExposedProperties>
+          <Property name="CullBackface" panel_visibility="advanced"/>
+          <Property name="CullFrontface" panel_visibility="advanced"/>
+          <Property name="GridColor" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <PropertyGroup label="Face Properties">
+        <Property name="FacesToRender" />
+        <Property name="CullBackface" />
+        <Property name="CullFrontface" />
+        <Property name="GridColor"/>
+      </PropertyGroup>
+
+      <IntVectorProperty name="ShowGrid"
+                         command="SetGenerateGrid"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Turn off to not render the plane grids.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ShowEdges"
+                         command="SetGenerateEdges"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Turn off to not render the plane edges.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ShowTicks"
+                         command="SetGenerateTicks"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Turn off to not render the tick marks.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="AxesToLabel"
+                         command="SetLabelMask"
+                         number_of_elements="1"
+                         default_values="63"
+                         panel_widget="int_mask"
+                         panel_visibility="advanced">
+        <Documentation>
+          Set the mask to select the axes to label. The axes labelled will be a subset of the
+          axes selected depending on which faces are also being rendered.
+        </Documentation>
+        <IntRangeDomain name="range" min="0" />
+        <Hints>
+          <Mask>
+            <Item name="Min-X" value="1" />
+            <Item name="Min-Y" value="2" />
+            <Item name="Min-Z" value="4" />
+            <Item name="Max-X" value="8" />
+            <Item name="Max-Y" value="16" />
+            <Item name="Max-Z" value="32" />
+          </Mask>
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="LabelUniqueEdgesOnly"
+                         command="SetLabelUniqueEdgesOnly"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set to true to only label edges shared with 1 face. Note that
+          if all faces are being rendered, this will generate no labels.
+        </Documentation>
+      </IntVectorProperty>
+
+      <PropertyGroup label="Label Properties">
+        <Property name="LabelUniqueEdgesOnly" />
+        <Property name="AxesToLabel" />
+      </PropertyGroup>
+
+      <SubProxy command="SetXLabelTextProperty">
+        <Proxy name="XLabelProperties" proxygroup="properties" proxyname="TextProperty" />
+        <ExposedProperties>
+          <Property exposed_name="XLabelColor" name="Color" />
+          <Property exposed_name="XLabelOpacity" name="Opacity" />
+          <Property exposed_name="XLabelFontFamily" name="FontFamily" />
+          <Property exposed_name="XLabelBold" name="Bold" />
+          <Property exposed_name="XLabelItalic" name="Italic" />
+          <Property exposed_name="XLabelShadow" name="Shadow" />
+          <Property exposed_name="XLabelFontSize" name="FontSize" default_values="12"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <PropertyGroup label="X Axis Label Font Properties" panel_widget="FontEditor">
+        <Property name="XLabelColor" function="Color"/>
+        <Property name="XLabelFontFamily" function="Family"/>
+        <Property name="XLabelBold" function="Bold" />
+        <Property name="XLabelItalic" function="Italics"/>
+        <Property name="XLabelFontSize" function="Size" />
+        <Property name="XLabelShadow" function="Shadow" />
+        <Property name="XLabelOpacity" function="Opacity" />
+      </PropertyGroup>
+
+      <SubProxy command="SetYLabelTextProperty">
+        <Proxy name="YLabelProperties" proxygroup="properties" proxyname="TextProperty" />
+        <ExposedProperties>
+          <Property exposed_name="YLabelColor" name="Color" />
+          <Property exposed_name="YLabelOpacity" name="Opacity" />
+          <Property exposed_name="YLabelFontFamily" name="FontFamily" />
+          <Property exposed_name="YLabelBold" name="Bold" />
+          <Property exposed_name="YLabelItalic" name="Italic" />
+          <Property exposed_name="YLabelShadow" name="Shadow" />
+          <Property exposed_name="YLabelFontSize" name="FontSize" default_values="12"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <PropertyGroup label="Y Axis Label Font Properties" panel_widget="FontEditor">
+        <Property name="YLabelColor" function="Color"/>
+        <Property name="YLabelFontFamily" function="Family"/>
+        <Property name="YLabelBold" function="Bold" />
+        <Property name="YLabelItalic" function="Italics"/>
+        <Property name="YLabelFontSize" function="Size" />
+        <Property name="YLabelShadow" function="Shadow" />
+        <Property name="YLabelOpacity" function="Opacity" />
+      </PropertyGroup>
+
+      <SubProxy command="SetZLabelTextProperty">
+        <Proxy name="ZLabelProperties" proxygroup="properties" proxyname="TextProperty" />
+        <ExposedProperties>
+          <Property exposed_name="ZLabelColor" name="Color" />
+          <Property exposed_name="ZLabelOpacity" name="Opacity" />
+          <Property exposed_name="ZLabelFontFamily" name="FontFamily" />
+          <Property exposed_name="ZLabelBold" name="Bold" />
+          <Property exposed_name="ZLabelItalic" name="Italic" />
+          <Property exposed_name="ZLabelShadow" name="Shadow" />
+          <Property exposed_name="ZLabelFontSize" name="FontSize" default_values="12"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <PropertyGroup label="Z Axis Label Font Properties" panel_widget="FontEditor">
+        <Property name="ZLabelColor" function="Color"/>
+        <Property name="ZLabelFontFamily" function="Family"/>
+        <Property name="ZLabelBold" function="Bold" />
+        <Property name="ZLabelItalic" function="Italics"/>
+        <Property name="ZLabelFontSize" function="Size" />
+        <Property name="ZLabelShadow" function="Shadow" />
+        <Property name="ZLabelOpacity" function="Opacity" />
+      </PropertyGroup>
+
+      <IntVectorProperty name="XAxisNotation"
+                         command="SetXNotation"
+                         default_values="0"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <Documentation>
+          Get/set the numerical notation, standard, scientific or mixed (0, 1, 2) for X Axis.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Mixed" value="0" />
+          <Entry text="Scientific" value="1" />
+          <Entry text="Fixed" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetXPrecision"
+                         default_values="2"
+                         panel_visibility="advanced"
+                         name="XAxisPrecision"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" min="0"/>
+        <Documentation>
+          Get/set the numerical precision to use for the X Axis, default is 2.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetXUseCustomLabels"
+                         default_values="0"
+                         name="XAxisUseCustomLabels"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether to use custom labels for the X axis. Labels
+          specified by **XAxisLabels** are used only when
+          this flag is set to 1.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="XAxisLabels"
+                            command="SetXLabel"
+                            set_number_command="SetNumberOfXLabels"
+                            number_of_elements="0"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            use_index="1" >
+        <!-- used to trigger the display pqScalarValueListPropertyWidget -->
+        <ArrayRangeDomain name="scalar_range"/>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="XAxisUseCustomLabels" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="X Axis Label Properties">
+        <Property name="XAxisNotation" />
+        <Property name="XAxisPrecision" />
+        <Property name="XAxisUseCustomLabels" />
+        <Property name="XAxisLabels" />
+      </PropertyGroup>
+
+      <IntVectorProperty name="YAxisNotation"
+                         command="SetYNotation"
+                         default_values="0"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <Documentation>
+          Get/set the numerical notation, standard, scientific or mixed (0, 1, 2) for Y Axis.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Mixed" value="0" />
+          <Entry text="Scientific" value="1" />
+          <Entry text="Fixed" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetYPrecision"
+                         default_values="2"
+                         panel_visibility="advanced"
+                         name="YAxisPrecision"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" min="0"/>
+        <Documentation>
+          Get/set the numerical precision to use for the Y Axis, default is 2.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetYUseCustomLabels"
+                         default_values="0"
+                         name="YAxisUseCustomLabels"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether to use custom labels for the Y axis. Labels
+          specified by **YAxisLabels** are used only when
+          this flag is set to 1.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetYLabels"
+                            set_number_command="SetNumberOfYLabels"
+                            name="YAxisLabels"
+                            number_of_elements="0"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            use_index="1">
+        <!-- used to trigger the display pqScalarValueListPropertyWidget -->
+        <ArrayRangeDomain name="scalar_range"/>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="YAxisUseCustomLabels" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="Y Axis Label Properties">
+        <Property name="YAxisNotation" />
+        <Property name="YAxisPrecision" />
+        <Property name="YAxisUseCustomLabels" />
+        <Property name="YAxisLabels" />
+      </PropertyGroup>
+
+      <IntVectorProperty name="ZAxisNotation"
+                         command="SetZNotation"
+                         default_values="0"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <Documentation>
+          Get/set the numerical notation, standard, scientific or mixed (0, 1, 2) for Z Axis.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Mixed" value="0" />
+          <Entry text="Scientific" value="1" />
+          <Entry text="Fixed" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetZPrecision"
+                         default_values="2"
+                         panel_visibility="advanced"
+                         name="ZAxisPrecision"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" min="0"/>
+        <Documentation>
+          Get/set the numerical precision to use for the Z Axis, default is 2.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetZUseCustomLabels"
+                         default_values="0"
+                         name="ZAxisUseCustomLabels"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether to use custom labels for the Z axis. Labels
+          specified by **ZAxisLabels** are used only when
+          this flag is set to 1.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetZLabel"
+                            set_number_command="SetNumberOfZLabels"
+                            name="ZAxisLabels"
+                            number_of_elements="0"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            use_index="1" >
+        <!-- used to trigger the display pqScalarValueListPropertyWidget -->
+        <ArrayRangeDomain name="scalar_range"/>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="ZAxisUseCustomLabels" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="Z Axis Label Properties">
+        <Property name="ZAxisNotation" />
+        <Property name="ZAxisPrecision" />
+        <Property name="ZAxisUseCustomLabels" />
+        <Property name="ZAxisLabels" />
+      </PropertyGroup>
+
+      <DoubleVectorProperty name="DataScale"
+                            command="SetDataScale"
+                            number_of_elements="3"
+                            default_values="1 1 1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          If data is being scaled, you can show the original data bounds for the axes
+          instead of the scaled bounds by setting the DataScale to match the scaling applied
+          to the dataset.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="UseModelTransform"
+                                   value="0"/>
+          <!-- disable this when UseModelTransform is true -->
+        </Hints>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="DataPosition"
+                            command="SetDataPosition"
+                            number_of_elements="3"
+                            default_values="0 0 0"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          If data is being translated, you can show the original data bounds for the axes
+          instead of the translated bounds by setting the DataPosition to match the
+          translation applied to the dataset.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="UseModelTransform"
+                                   value="0"/>
+          <!-- disable this when UseModelTransform is true -->
+        </Hints>
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="Data Transform">
+        <Property name="DataScale" />
+        <Property name="DataPosition" />
+      </PropertyGroup>
+
+      <DoubleVectorProperty name="ModelTransformMatrix"
+                            command="SetModelTransformMatrix"
+                            number_of_elements="16"
+                            default_values="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"
+                            argument_is_array="1"
+                            panel_visibility="never">
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="ModelBounds"
+                            command="SetModelBounds"
+                            number_of_elements="6"
+                            default_values="0 1 0 1 0 1"
+                            panel_visibility="never">
+      </DoubleVectorProperty>
+      <IntVectorProperty name="UseModelTransform"
+                         command="SetUseModelTransform"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="never">
+        <BooleanDomain name="range" />
+      </IntVectorProperty>
+      <!-- End of 'GridAxes3DActor' -->
+    </Proxy>
+
+    <!-- ================================================================== -->
     <!-- End of ProxyGroup annotations -->
   </ProxyGroup>
   <ProxyGroup name="file_listing">

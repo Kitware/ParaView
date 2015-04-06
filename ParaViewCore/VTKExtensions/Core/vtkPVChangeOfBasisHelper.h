@@ -130,6 +130,7 @@ public:
       uAxisTitle->SetNumberOfComponents(1);
       uAxisTitle->SetNumberOfTuples(1);
       uAxisTitle->SetValue(0, utitle);
+      uAxisTitle->SetComponentName(0, utitle);
       dataObject->GetFieldData()->AddArray(uAxisTitle.GetPointer());
       }
     if (vtitle)
@@ -139,6 +140,7 @@ public:
       vAxisTitle->SetNumberOfComponents(1);
       vAxisTitle->SetNumberOfTuples(1);
       vAxisTitle->SetValue(0, vtitle);
+      vAxisTitle->SetComponentName(0, vtitle);
       dataObject->GetFieldData()->AddArray(vAxisTitle.GetPointer());
       }
     if (wtitle)
@@ -148,6 +150,7 @@ public:
       wAxisTitle->SetNumberOfComponents(1);
       wAxisTitle->SetNumberOfTuples(1);
       wAxisTitle->SetValue(0, wtitle);
+      wAxisTitle->SetComponentName(0, wtitle);
       dataObject->GetFieldData()->AddArray(wAxisTitle.GetPointer());
       }
     return (utitle || vtitle || wtitle);

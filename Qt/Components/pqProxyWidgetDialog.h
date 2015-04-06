@@ -54,6 +54,29 @@ public:
   /// Returns whether that dialog has any visible widgets.
   bool hasVisibleWidgets() const;
 
+  /// Returns the proxy.
+  vtkSMProxy* proxy() const;
+
+  /// Get/set whether the search-bar should be shown on the dialog.
+  /// Default is false. If search-bar is not show, the dialog cannot support
+  /// default/advanced viewing modes either and hence it will simply show all
+  /// property widgets.
+  void setEnableSearchBar(bool val);
+  bool enableSearchBar() const;
+
+  /// Set the new setting key that will be used to restore/save the advanced
+  /// button check state. If the given key is valid (i.e. not empty), the
+  /// button state will be restored from the key value.
+  /// The old key is left unchanged in the setting to whatever its last value
+  /// was. Although returned, removing (or not) the old key is up to the user.
+  /// \sa settingKey property
+  QString setSettingsKey(const QString& key);
+
+protected:
+  /// Overridden to resize widget before showing it the first time.
+  virtual void showEvent(QShowEvent * event);
+  virtual void hideEvent(QHideEvent *event);
+
 protected slots:
   /// slot to enable appropriate buttons when changes are available
   virtual void onChangeAvailable();
@@ -61,9 +84,13 @@ protected slots:
   /// slot to handle accepted() signals
   virtual void onAccepted();
 
+private slots:
+  void filterWidgets();
+
 private:
   Q_DISABLE_COPY(pqProxyWidgetDialog)
 
+  friend class pqInternals;
   class pqInternals;
   pqInternals* Internals;
 };

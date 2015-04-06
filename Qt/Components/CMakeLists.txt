@@ -156,6 +156,8 @@ set (Module_SRCS
   pqImageTip.h
   pqImplicitPlaneWidget.cxx
   pqImplicitPlaneWidget.h
+  pqIntMaskPropertyWidget.cxx
+  pqIntMaskPropertyWidget.h
   pqIntRangeWidget.cxx
   pqIntRangeWidget.h
   pqIntVectorPropertyWidget.cxx
@@ -243,6 +245,8 @@ set (Module_SRCS
   pqPropertyWidgetInterface.h
   pqProxiesWidget.cxx
   pqProxiesWidget.h
+  pqProxyEditorPropertyWidget.cxx
+  pqProxyEditorPropertyWidget.h
   pqProxyInformationWidget.cxx
   pqProxyInformationWidget.h
   pqProxyPanel.cxx
@@ -414,6 +418,7 @@ set (Module_MOC_HDRS
   pqHighlightItemDelegate.h
   pqImageTip.h
   pqImplicitPlaneWidget.h
+  pqIntMaskPropertyWidget.h
   pqIntRangeWidget.h
   pqIntVectorPropertyWidget.h
   pqItemViewSearchWidgetEventPlayer.h
@@ -455,6 +460,7 @@ set (Module_MOC_HDRS
   pqPropertyWidgetDecorator.h
   pqPropertyWidget.h
   pqProxiesWidget.h
+  pqProxyEditorPropertyWidget.h
   pqProxyInformationWidget.h
   pqProxyPanel.h
   pqProxyPropertyWidget.h

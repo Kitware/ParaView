@@ -53,6 +53,12 @@ protected:
   ~vtkPVClientServerSynchronizedRenderers();
 
   // Description:
+  // Overridden to not clear the color buffer before pasting back image from
+  // the server. This ensures that any annotations rendered on the back of any
+  // 3D geometry will be preserved.
+  virtual void PushImageToScreen();
+
+  // Description:
   // Set/Get the compressor object, it's setting can be manipulated directly.
   void SetCompressor(vtkImageCompressor *comp);
   vtkGetObjectMacro(Compressor,vtkImageCompressor);

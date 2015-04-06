@@ -50,11 +50,6 @@ public:
     vtkSMSourceProxy* producer, int outputPort);
 
   // Description:
-  // Access the axis label (0: xaxis, 1: yaxis, 2: zaxis).
-  // Returns NULL if no custom label was specified.
-  const char* GetAxisLabel(int axis);
-
-  // Description:
   // Fetchs data bounds from the client-side object. We simply fetch the
   // client-side data bounds since vtkPVMultiSliceView ensures that they are
   // synced among all ranks in Update().
@@ -72,10 +67,6 @@ public:
 protected:
   vtkSMMultiSliceViewProxy();
   ~vtkSMMultiSliceViewProxy();
-
-  // Overridden to collect information from server-side about data-bounds and
-  // axis labels.
-  virtual void PostUpdateData();
 
   // Description:
   // Use the center of the source to initialize the view with three orthogonal

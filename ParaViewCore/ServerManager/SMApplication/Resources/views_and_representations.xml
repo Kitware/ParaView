@@ -1694,6 +1694,26 @@
         </Hints>
       </StringVectorProperty>
 
+      <ProxyProperty name="AxesGrid"
+                     command="SetGridAxes3DActor"
+                     panel_widget="proxy_editor"
+                     skip_dependency="1">
+        <!-- We mark skip_dependency=1 since we don't want the view to
+             call Update() when the GridAxes3DActor changes. The GridAxes3DActor
+             is indeed going to change when the view updates when Change-Of-Basis matrix
+             is being used, for example. -->
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="annotations" name="GridAxes3DActor" />
+        </ProxyListDomain>
+        <Hints>
+          <ProxyEditorPropertyWidget property="Visibility">
+            <!-- tell pqProxyEditorPropertyWidget that use the "Visibility"
+                 property on the GridAxes3DActor proxy for a checkbox
+                 on the UI -->
+          </ProxyEditorPropertyWidget>
+        </Hints>
+      </ProxyProperty>
+
       <!-- Center and Orientation Axes -->
       <IntVectorProperty command="SetCenterAxesVisibility"
                          default_values="0"
@@ -3751,7 +3771,7 @@
     <RepresentationProxy class="vtkImageVolumeRepresentation"
                          name="UniformGridVolumeRepresentation"
                          processes="client|renderserver|dataserver"
-                         si_class="vtkSIUniformGridVolumeRepresentationProxy">
+                         si_class="vtkSIProxy">
       <Documentation>Representation for rendering a vtkImageData as
       volume.</Documentation>
       <InputProperty command="SetInputConnection"
@@ -4943,7 +4963,7 @@
     <RepresentationProxy class="vtkSelectionRepresentation"
                          name="SelectionRepresentation"
                          processes="client|renderserver|dataserver"
-                         si_class="vtkSISelectionRepresentationProxy">
+                         si_class="vtkSIProxy">
       <Documentation>Proxy to show a selection as geometry.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
@@ -5077,7 +5097,7 @@
         </Documentation>
       </DoubleVectorProperty>
 
-      <SubProxy>
+      <SubProxy command="SetLabelRepresentation">
         <Proxy name="LabelRepresentation"
                proxygroup="representations"
                proxyname="DataLabelRepresentation" />
@@ -5339,7 +5359,7 @@
           <GlobalPropertyLink type="ColorPalette" property="SelectionColor" />
         </Hints>
       </DoubleVectorProperty>
-      <SubProxy>
+      <SubProxy command="SetSelectionRepresentation">
         <!--
           SelectionRepresentation proxy is used to convey the selection to view.
           We keep this separate as subproxy so that when the selection is
@@ -5459,7 +5479,7 @@
           <Group name="lookup_tables" />
         </ProxyGroupDomain>
       </ProxyProperty>
-      <SubProxy>
+      <SubProxy command="SetSelectionRepresentation">
         <!--
           SelectionRepresentation proxy is used to convey the selection to view.
           We keep this separate as subproxy so that when the selection is
@@ -5704,7 +5724,7 @@
         <Property name="LineStyle" />
       </PropertyGroup>
 
-      <SubProxy>
+      <SubProxy command="SetSelectionRepresentation">
         <!--
           SelectionRepresentation proxy is used to convey the selection to view.
           We keep this separate as subproxy so that when the selection is
@@ -5891,7 +5911,7 @@
         <Property name="Legend" />
       </PropertyGroup>
 
-      <SubProxy>
+      <SubProxy command="SetSelectionRepresentation">
         <!--
           SelectionRepresentation proxy is used to convey the selection to view.
           We keep this separate as subproxy so that when the selection is
@@ -6088,7 +6108,7 @@
         <DoubleRangeDomain name="range" min="1" max="20" />
       </DoubleVectorProperty>
 
-      <SubProxy>
+      <SubProxy command="SetSelectionRepresentation">
         <!--
           SelectionRepresentation proxy is used to convey the selection to view.
           We keep this separate as subproxy so that when the selection is
@@ -6459,7 +6479,7 @@
           <GlobalPropertyLink type="ColorPalette" property="SelectionColor" />
         </Hints>
       </DoubleVectorProperty>
-      <SubProxy>
+      <SubProxy command="SetSelectionRepresentation">
         <!--
           SelectionRepresentation proxy is used to convey the selection to view.
           We keep this separate as subproxy so that when the selection is
@@ -6691,7 +6711,7 @@
           <GlobalPropertyLink type="ColorPalette" property="SelectionColor" />
         </Hints>
       </DoubleVectorProperty>
-      <SubProxy>
+      <SubProxy command="SetSelectionRepresentation">
         <!--
           SelectionRepresentation proxy is used to convey the selection to view.
           We keep this separate as subproxy so that when the selection is
@@ -6803,7 +6823,7 @@
     <RepresentationProxy class="vtkTextSourceRepresentation"
                          name="TextSourceRepresentation"
                          processes="client|dataserver|renderserver"
-                         si_class="vtkSITextSourceRepresentationProxy">
+                         si_class="vtkSIProxy">
       <Documentation>Representation proxy used to show text.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
@@ -6855,7 +6875,7 @@
           Set whether user should be able to interactively place the text in the view.
         </Documentation>
       </IntVectorProperty>
-      <SubProxy>
+      <SubProxy command="SetTextWidgetRepresentation">
         <Proxy name="TextWidgetRepresentation"
                proxygroup="representations"
                proxyname="TextWidgetRepresentation"></Proxy>
@@ -7026,9 +7046,8 @@
                            base_proxygroup="representations"
                            base_proxyname="CompositeMultiSliceRepresentation"
                            class="vtkPVCompositeOrthographicSliceRepresentation"
-                           si_class="vtkSICompositeOrthographicSliceRepresentationProxy"
                            processes="client|renderserver|dataserver">
-      <SubProxy>
+      <SubProxy command="SetSliceRepresentation0">
         <Proxy name="GeometrySliceRepresentationX"
                proxygroup="representations"
                proxyname="GeometrySliceRepresentation">
@@ -7038,7 +7057,7 @@
           <Exception name="Visibility" />
         </ShareProperties>
       </SubProxy>
-      <SubProxy>
+      <SubProxy command="SetSliceRepresentation1">
         <Proxy name="GeometrySliceRepresentationY"
                proxygroup="representations"
                proxyname="GeometrySliceRepresentation">
@@ -7048,7 +7067,7 @@
           <Exception name="Visibility" />
         </ShareProperties>
       </SubProxy>
-      <SubProxy>
+      <SubProxy command="SetSliceRepresentation2">
         <Proxy name="GeometrySliceRepresentationZ"
                proxygroup="representations"
                proxyname="GeometrySliceRepresentation">
@@ -7531,6 +7550,18 @@
           argument_is_array="1"
           panel_visibility="never">
         </DoubleVectorProperty>
+        <StringVectorProperty name="XTitle"
+          number_of_elements="1"
+          default_values="X"
+          panel_visibility="never" />
+        <StringVectorProperty name="YTitle"
+          number_of_elements="1"
+          default_values="Y"
+          panel_visibility="never" />
+        <StringVectorProperty name="ZTitle"
+          number_of_elements="1"
+          default_values="Z"
+          panel_visibility="never" />
      </MultiSliceViewProxy>
 
      <!-- ================================================================== -->

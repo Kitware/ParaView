@@ -166,6 +166,8 @@ set (Module_SRCS
   pqManagePluginsReaction.h
   pqMasterOnlyReaction.cxx
   pqMasterOnlyReaction.h
+  pqModelTransformSupportBehavior.cxx
+  pqModelTransformSupportBehavior.h
   pqObjectPickingBehavior.cxx
   pqObjectPickingBehavior.h
   pqOpacityTableModel.cxx
@@ -338,6 +340,7 @@ set (Module_MOC_HDRS
   pqManageLinksReaction.h
   pqManagePluginsReaction.h
   pqMasterOnlyReaction.h
+  pqModelTransformSupportBehavior.h
   pqObjectPickingBehavior.h
   pqOpacityTableModel.h
   pqParaViewBehaviors.h

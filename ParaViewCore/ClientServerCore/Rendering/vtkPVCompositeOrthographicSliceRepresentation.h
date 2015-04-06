@@ -34,6 +34,12 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   void SetSliceRepresentation(int index, vtkPVDataRepresentation*);
+  void SetSliceRepresentation0(vtkPVDataRepresentation* repr)
+    { this->SetSliceRepresentation(0, repr); }
+  void SetSliceRepresentation1(vtkPVDataRepresentation* repr)
+    { this->SetSliceRepresentation(1, repr); }
+  void SetSliceRepresentation2(vtkPVDataRepresentation* repr)
+    { this->SetSliceRepresentation(2, repr); }
 
   // Description:
   // Set visibility of the representation.
