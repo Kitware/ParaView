@@ -33,12 +33,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqDisplayRepresentationWidget.h"
 
 #include "pqComboBoxDomain.h"
+#include "pqCoreUtilities.h"
 #include "pqDataRepresentation.h"
 #include "pqPropertyLinks.h"
 #include "pqUndoStack.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSMRepresentationProxy.h"
 
 #include <QPointer>
+#include <QSet>
+
+#include <cstdlib>
 
 //=============================================================================
 class pqDisplayRepresentationWidget::PropertyLinksConnection : public pqPropertyLinksConnection
@@ -80,10 +85,33 @@ private:
 class pqDisplayRepresentationWidget::pqInternals :
   public Ui::displayRepresentationWidget
 {
+  QString RepresentationText;
 public:
   pqPropertyLinks Links;
   QPointer<pqComboBoxDomain> Domain;
   QPointer<pqDataRepresentation> PQRepr;
+  QSet<QString> WarnOnRepresentationChange;
+  pqInternals()
+    {
+    }
+
+  bool setRepresentationText(const QString& text)
+    {
+    int idx = this->comboBox->findText(text);
+    if (idx != -1)
+      {
+      bool prev = this->comboBox->blockSignals(true);
+      this->comboBox->setCurrentIndex(idx);
+      this->RepresentationText = text;
+      this->comboBox->blockSignals(prev);
+      }
+    return (idx != -1);
+    }
+
+  const QString& representationText() const
+    {
+    return this->RepresentationText;
+    }
 };
 
 //-----------------------------------------------------------------------------
@@ -94,7 +122,7 @@ pqDisplayRepresentationWidget::pqDisplayRepresentationWidget(
   this->Internal->setupUi(this);
   this->connect(this->Internal->comboBox,
     SIGNAL(currentIndexChanged(const QString&)),
-    SIGNAL(representationTextChanged(const QString&)));
+    SLOT(comboBoxChanged(const QString&)));
 }
 
 //-----------------------------------------------------------------------------
@@ -125,6 +153,7 @@ void pqDisplayRepresentationWidget::setRepresentation(vtkSMProxy* proxy)
 {
   // break old links.
   this->Internal->Links.clear();
+  this->Internal->WarnOnRepresentationChange.clear();
   delete this->Internal->Domain;
   bool prev = this->Internal->comboBox->blockSignals(true);
   this->Internal->comboBox->clear();
@@ -142,24 +171,56 @@ void pqDisplayRepresentationWidget::setRepresentation(vtkSMProxy* proxy)
     this, "representationText", SIGNAL(representationTextChanged(const QString&)),
     proxy, smproperty);
   this->Internal->comboBox->blockSignals(prev);
+
+  // process hints to see which representation types we need to warn the user
+  // about.
+  vtkPVXMLElement* hints = proxy->GetHints();
+  for (unsigned int cc=0; cc < (hints? hints->GetNumberOfNestedElements() : 0); cc++)
+    {
+    vtkPVXMLElement* child = hints->GetNestedElement(cc);
+    if (child && child->GetName() && strcmp(child->GetName(), "WarnOnRepresentationChange") == 0)
+      {
+      this->Internal->WarnOnRepresentationChange.insert(child->GetAttributeOrEmpty("value"));
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
 void pqDisplayRepresentationWidget::setRepresentationText(const QString& text)
 {
-  int idx = this->Internal->comboBox->findText(text);
-  if (idx != -1)
-    {
-    this->Internal->comboBox->setCurrentIndex(idx);
-    }
+  this->Internal->setRepresentationText(text);
 }
 
 //-----------------------------------------------------------------------------
 QString pqDisplayRepresentationWidget::representationText() const
 {
-  int idx = this->Internal->comboBox->isEnabled()?
-    this->Internal->comboBox->currentIndex() : -1;
-  return (idx != -1)? this->Internal->comboBox->currentText() : QString();
+  return this->Internal->comboBox->isEnabled()?
+    this->Internal->representationText() : QString();
+}
+
+//-----------------------------------------------------------------------------
+void pqDisplayRepresentationWidget::comboBoxChanged(const QString& text)
+{
+  // NOTE: this method doesn't get called when
+  // pqDisplayRepresentationWidget::setRepresentationText() is called.
+  if (this->Internal->WarnOnRepresentationChange.contains(text))
+    {
+    bool confirmed = pqCoreUtilities::promptUser(
+      QString("pqDisplayRepresentationWidget_type_%1").arg(text),
+      "Are you sure?",
+      QString("This will change the representation type to \"%1\".\n"
+        "That may take a while, depending on your dataset.\n"
+        " Are you sure?").arg(text));
+
+    if (!confirmed)
+      {
+      this->Internal->setRepresentationText(
+        this->Internal->representationText());
+      return;
+      }
+    }
+  this->Internal->setRepresentationText(text);
+  emit this->representationTextChanged(text);
 }
 
 //=============================================================================

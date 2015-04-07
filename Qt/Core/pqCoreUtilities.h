@@ -122,6 +122,17 @@ public:
     QObject* qobject, const char* signal_or_slot,
     Qt::ConnectionType type = Qt::AutoConnection);
 
+  /// This provides a mechanism to prompt the user with a "Yes", "No", and "Yes,
+  /// and don't ask again" message box. Returns true for "Yes" and false for "No".
+  /// If "Yes, and don't ask again" was clicked, the selection is remembered in
+  /// pqSettings and next time this method is called with the same settingsKey
+  /// it will simply return true.
+  /// NOTE: due to issues with test recording and playback, currently, this
+  /// dialog is not prompted (instead always returning true) when
+  /// DASHBOARD_TEST_FROM_CTEST environment variable is set. This may change in future.
+  static bool promptUser(const QString& settingsKey,
+    const QString& title, const QString& message, QWidget* parentWdg=NULL);
+
 private:
   static QWidget* findMainWindow();
   static QPointer<QWidget> MainWidget;
