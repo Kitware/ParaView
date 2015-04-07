@@ -74,11 +74,19 @@ pqSettings::pqSettings(const QString& filename, bool temporary, QObject* parentO
     }
 }
 
+//-----------------------------------------------------------------------------
+pqSettings::pqSettings(const QString& fname, Format fmt, QObject* parentObject)
+  : Superclass(fname, fmt, parentObject)
+{
+}
+
+//-----------------------------------------------------------------------------
 void pqSettings::alertSettingsModified()
 {
   emit this->modified();
 }
 
+//-----------------------------------------------------------------------------
 void pqSettings::saveState(const QMainWindow& window, const QString& key)
 {
   this->beginGroup(key);
@@ -88,6 +96,7 @@ void pqSettings::saveState(const QMainWindow& window, const QString& key)
   this->endGroup();
 }
 
+//-----------------------------------------------------------------------------
 void pqSettings::saveState(const QDialog& dialog, const QString& key)
 {
   this->beginGroup(key);
@@ -96,6 +105,7 @@ void pqSettings::saveState(const QDialog& dialog, const QString& key)
   this->endGroup();
 }
 
+//-----------------------------------------------------------------------------
 void pqSettings::restoreState(const QString& key, QMainWindow& window)
 {
   this->beginGroup(key);
@@ -143,6 +153,7 @@ void pqSettings::restoreState(const QString& key, QMainWindow& window)
   this->endGroup();
 }
 
+//-----------------------------------------------------------------------------
 void pqSettings::restoreState(const QString& key, QDialog& dialog)
 {
   this->beginGroup(key);
@@ -160,6 +171,7 @@ void pqSettings::restoreState(const QString& key, QDialog& dialog)
   this->endGroup();
 }
 
+//-----------------------------------------------------------------------------
 void pqSettings::sanityCheckDock(QDockWidget* dock_widget)
 {
   QDesktopWidget desktop;
@@ -264,6 +276,4 @@ void pqSettings::sanityCheckDock(QDockWidget* dock_widget)
        }
     }
   }
-
 }
-
