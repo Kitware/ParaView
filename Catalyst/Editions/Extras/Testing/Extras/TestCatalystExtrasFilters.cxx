@@ -45,6 +45,7 @@ int main(int argc, char* argv[])
   static const char* const filters[] = {
       "PVExtractSelection",
       "ExtractHistogram",
+      "Glyph",
       "WarpScalar",
       "WarpVector",
       "IntegrateAttributes",

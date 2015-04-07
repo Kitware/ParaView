@@ -238,6 +238,7 @@
       "proxies":[
         "PVExtractSelection",
         "ExtractHistogram",
+        "Glyph",
         "WarpScalar",
         "WarpVector",
         "IntegrateAttributes",
