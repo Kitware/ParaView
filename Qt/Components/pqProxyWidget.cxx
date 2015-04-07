@@ -83,6 +83,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QShowEvent>
 #include <QVBoxLayout>
 
+#include <vector>
+
 //-----------------------------------------------------------------------------------
 namespace
 {
@@ -535,9 +537,16 @@ public:
   QList<QPointer<pqProxyWidgetItem> > Items;
   bool CachedShowAdvanced;
   QString CachedFilterText;
+  std::vector<std::string> Properties;
 
-  pqInternals(vtkSMProxy* smproxy): Proxy(smproxy), CachedShowAdvanced(false)
+  pqInternals(vtkSMProxy* smproxy, QStringList properties):
+    Proxy(smproxy), CachedShowAdvanced(false)
     {
+      this->Properties.reserve(properties.size());
+      for (int i = 0; i < properties.size(); ++i)
+        {
+        this->Properties.push_back(properties[i].toStdString());
+        }
     }
 
   ~pqInternals()
@@ -575,7 +584,8 @@ pqProxyWidget::pqProxyWidget(
 
 //-----------------------------------------------------------------------------
 pqProxyWidget::pqProxyWidget(
-  vtkSMProxy* smproxy, const QStringList &properties, QWidget *parentObject, Qt::WindowFlags wflags)
+  vtkSMProxy* smproxy, const QStringList &properties, QWidget *parentObject, 
+  Qt::WindowFlags wflags)
   : Superclass(parentObject, wflags)
 {
   this->constructor(smproxy, properties, parentObject, wflags);
@@ -593,7 +603,7 @@ void pqProxyWidget::constructor(
   this->ApplyChangesImmediately = false;
   // if the proxy wants a more descriptive layout for the panel, use it.
   this->UseDocumentationForLabels = pqProxyWidget::useDocumentationForLabels(smproxy);
-  this->Internals = new pqProxyWidget::pqInternals(smproxy);
+  this->Internals = new pqProxyWidget::pqInternals(smproxy, properties);
 
   QGridLayout* gridLayout = new QGridLayout(this);
   gridLayout->setMargin(pqPropertiesPanel::suggestedMargin());
@@ -1204,6 +1214,16 @@ bool pqProxyWidget::restoreDefaults()
     for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
       {
       vtkSMProperty * smproperty = iter->GetProperty();
+
+      // restore defaults only for properties listed
+      const std::vector<std::string>& properties = this->Internals->Properties;
+      if (properties.size () > 0 &&
+          std::find(properties.begin(), properties.end(),
+                    smproperty->GetXMLName()) == properties.end())
+        {
+        continue;
+        }
+
       // Restore only basic type properties.
       if (vtkSMVectorProperty::SafeDownCast(smproperty) &&
           !smproperty->GetNoCustomDefault() &&
@@ -1234,7 +1254,8 @@ bool pqProxyWidget::restoreDefaults()
 void pqProxyWidget::saveAsDefaults()
 {
   vtkSMSettings* settings = vtkSMSettings::GetInstance();
-  settings->SetProxySettings(this->Internals->Proxy);
+  settings->SetProxySettings(this->Internals->Proxy,
+                             &this->Internals->Properties);
 }
 
 //-----------------------------------------------------------------------------

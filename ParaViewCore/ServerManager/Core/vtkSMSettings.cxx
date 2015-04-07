@@ -621,7 +621,8 @@ public:
   //----------------------------------------------------------------------------
   // Description:
   // Set proxy settings to the highest-priority collection.
-  bool SetProxySettings(vtkSMProxy* proxy)
+  bool SetProxySettings(vtkSMProxy* proxy,
+                        const std::vector<std::string>* properties)
   {
     if (!proxy)
       {
@@ -631,14 +632,15 @@ public:
     std::string jsonPrefix(".");
     jsonPrefix.append(proxy->GetXMLGroup());
 
-    return this->SetProxySettings(jsonPrefix.c_str(), proxy);
+    return this->SetProxySettings(jsonPrefix.c_str(), proxy, properties);
   }
 
   //----------------------------------------------------------------------------
   // Description:
   // Set proxy settings in the highest-priority collection under
   // the setting prefix.
-  bool SetProxySettings(const char* settingPrefix, vtkSMProxy* proxy)
+  bool SetProxySettings(const char* settingPrefix, vtkSMProxy* proxy,
+                        const std::vector<std::string>* properties)
   {
     if (!proxy)
       {
@@ -666,6 +668,13 @@ public:
       {
       vtkSMProperty* property = iter->GetProperty();
       if (!property) continue;
+      // save defaults only for properties listed
+      if (properties && properties->size () > 0 &&
+          std::find(properties->begin(), properties->end(),
+                    property->GetXMLName()) == properties->end())
+        {
+        continue;
+        }
 
       // Check to see if we save only to QSettings or to both QSettings
       // and the JSON file.
@@ -1214,15 +1223,17 @@ void vtkSMSettings::SetSetting(const char* settingName, unsigned int index, cons
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSettings::SetProxySettings(vtkSMProxy* proxy)
+void vtkSMSettings::SetProxySettings(vtkSMProxy* proxy,
+                                     const std::vector<std::string>* properties)
 {
-  this->Internal->SetProxySettings(proxy);
+  this->Internal->SetProxySettings(proxy, properties);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSettings::SetProxySettings(const char* prefix, vtkSMProxy* proxy)
+void vtkSMSettings::SetProxySettings(const char* prefix, vtkSMProxy* proxy,
+                                     const std::vector<std::string>* properties)
 {
-  this->Internal->SetProxySettings(prefix, proxy);
+  this->Internal->SetProxySettings(prefix, proxy, properties);
 }
 
 //----------------------------------------------------------------------------

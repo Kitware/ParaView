@@ -176,11 +176,17 @@ public:
 
   // Description:
   // Save non-default settings in the current user settings.
-  void SetProxySettings(vtkSMProxy* proxy);
+  // If 'properties' is not NULL and not empty, only the listed
+  // properties are saved
+  void SetProxySettings(vtkSMProxy* proxy,
+                        const std::vector<std::string>* properties = NULL);
 
   // Description:
   // Save non-default settings in the current user settings under the given prefix.
-  void SetProxySettings(const char* prefix, vtkSMProxy* proxy);
+  // If 'properties' is not NULL and not empty, only the listed
+  // properties are saved
+  void SetProxySettings(const char* prefix, vtkSMProxy* proxy, 
+                        const std::vector<std::string>* properties = NULL);
 
   // Description:
   // Set the description of a setting.
