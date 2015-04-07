@@ -163,7 +163,7 @@ void vtkFastMarchingGeodesicPath::ComputePath(vtkPolyData *pd)
   float parametricPos;
   GW::GW_GeodesicVertex *endVert1, *endVert2;
   GW::GW_Vector3D endPt1, endPt2;
-  double pathPt[3], lastPathPt[3];
+  double pathPt[3] = {0.0, 0.0, 0.0}, lastPathPt[3];
   vtkIdType endPtId1, endPtId2, lastInsertedPtId = -1;
   vtkIdType i = 0, i0 = 0;
 

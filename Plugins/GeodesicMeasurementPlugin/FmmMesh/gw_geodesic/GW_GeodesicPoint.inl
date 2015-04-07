@@ -22,9 +22,9 @@ namespace GW {
 /*------------------------------------------------------------------------------*/
 GW_INLINE
 GW_GeodesicPoint::GW_GeodesicPoint()
-:    rCoord_        ( 0 ),
-    pVert1_        ( NULL ),
+:   pVert1_        ( NULL ),
     pVert2_        ( NULL ),
+    rCoord_        ( 0 ),
     pCurFace_    ( NULL )
 {
     /* NOTHING */
