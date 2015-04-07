@@ -47,8 +47,9 @@ class PQCOMPONENTS_EXPORT pqProxyWidgetDialog : public QDialog
   Q_OBJECT
   typedef QDialog Superclass;
 public:
-  pqProxyWidgetDialog(vtkSMProxy* proxy, QWidget* parent=0);
-  pqProxyWidgetDialog(vtkSMProxy* proxy, const QStringList& properties, QWidget* parent=0);
+  pqProxyWidgetDialog(vtkSMProxy* proxy, QWidget* parent=0, Qt::WindowFlags f = 0);
+  pqProxyWidgetDialog(vtkSMProxy* proxy, const QStringList& properties, QWidget* parent=0,
+    Qt::WindowFlags f = 0);
   virtual ~pqProxyWidgetDialog();
 
   /// Returns whether that dialog has any visible widgets.
@@ -76,16 +77,17 @@ protected:
   /// Overridden to resize widget before showing it the first time.
   virtual void showEvent(QShowEvent * event);
   virtual void hideEvent(QHideEvent *event);
-
-protected slots:
-  /// slot to enable appropriate buttons when changes are available
-  virtual void onChangeAvailable();
-
-  /// slot to handle accepted() signals
-  virtual void onAccepted();
+  virtual void done(int r);
 
 private slots:
   void filterWidgets();
+  void onChangeAvailable();
+
+  /// Callbacks for buttons on the UI.
+  void onApply();
+  void onReset();
+  void onRestoreDefaults();
+  void onSaveAsDefaults();
 
 private:
   Q_DISABLE_COPY(pqProxyWidgetDialog)

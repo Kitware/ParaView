@@ -529,9 +529,6 @@ void pqPropertiesPanel::updatePropertiesPanel(pqPipelineSource *source)
     {
     this->Internals->Ui.PropertiesButton->setText("Properties");
     }
-
-  this->Internals->Ui.PropertiesRestoreDefaults->setEnabled(source != NULL);
-  this->Internals->Ui.PropertiesSaveAsDefaults->setEnabled(source != NULL);
 }
 
 //-----------------------------------------------------------------------------
@@ -762,6 +759,16 @@ void pqPropertiesPanel::updateButtonState()
     // only modified proxy is deleted.
     this->Internals->ReceivedChangeAvailable = false;
     }
+
+  // Update PropertiesSaveAsDefaults and PropertiesRestoreDefaults state.
+  // If the source's properties are yet to be applied, we disable the two
+  // buttons (see BUG #15338).
+  bool canSaveRestoreSourcePropertyDefaults =
+    this->Internals->Source != NULL?
+    (this->Internals->Source->modifiedState() == pqProxy::UNMODIFIED) :
+    false;
+  this->Internals->Ui.PropertiesSaveAsDefaults->setEnabled(canSaveRestoreSourcePropertyDefaults);
+  this->Internals->Ui.PropertiesRestoreDefaults->setEnabled(canSaveRestoreSourcePropertyDefaults);
 }
 
 //-----------------------------------------------------------------------------
@@ -860,7 +867,15 @@ void pqPropertiesPanel::propertiesRestoreDefaults()
     this->Internals->SourceWidgets[this->Internals->Source] : NULL;
   if (widgets && widgets->Panel)
     {
-    widgets->Panel->onRestoreDefaults();
+    if (widgets->Panel->restoreDefaults())
+      {
+      // If defaults were restored, we're going to pretend that the user hit
+      // apply for the source, so that the property changes are "accepted" and
+      // rest of the application updates.
+      widgets->apply(this->view());
+      emit this->applied(widgets->Proxy);
+      emit this->applied();
+      }
     }
 }
 
@@ -871,7 +886,7 @@ void pqPropertiesPanel::propertiesSaveAsDefaults()
     this->Internals->SourceWidgets[this->Internals->Source] : NULL;
   if (widgets && widgets->Panel)
     {
-    widgets->Panel->onSaveAsDefaults();
+    widgets->Panel->saveAsDefaults();
     }
 }
 
@@ -880,8 +895,10 @@ void pqPropertiesPanel::displayRestoreDefaults()
 {
   if (this->Internals->DisplayWidgets)
     {
-    this->Internals->DisplayWidgets->Panel->onRestoreDefaults();
-    this->Internals->DisplayWidgets->Panel->apply();
+    if (this->Internals->DisplayWidgets->Panel->restoreDefaults())
+      {
+      this->Internals->DisplayWidgets->Panel->apply();
+      }
     }
 }
 
@@ -890,7 +907,7 @@ void pqPropertiesPanel::displaySaveAsDefaults()
 {
   if (this->Internals->DisplayWidgets)
     {
-    this->Internals->DisplayWidgets->Panel->onSaveAsDefaults();
+    this->Internals->DisplayWidgets->Panel->saveAsDefaults();
     }
 }
 
@@ -899,8 +916,10 @@ void pqPropertiesPanel::viewRestoreDefaults()
 {
   if (this->Internals->ViewWidgets)
     {
-    this->Internals->ViewWidgets->Panel->onRestoreDefaults();
-    this->Internals->ViewWidgets->Panel->apply();
+    if (this->Internals->ViewWidgets->Panel->restoreDefaults())
+      {
+      this->Internals->ViewWidgets->Panel->apply();
+      }
     }
 }
 
@@ -909,7 +928,7 @@ void pqPropertiesPanel::viewSaveAsDefaults()
 {
   if (this->Internals->ViewWidgets)
     {
-    this->Internals->ViewWidgets->Panel->onSaveAsDefaults();
+    this->Internals->ViewWidgets->Panel->saveAsDefaults();
     }
 }
 
