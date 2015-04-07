@@ -219,7 +219,7 @@ int vtkThreeSliceFilter::RequestData( vtkInformation *,
   if(inputComposite)
     {
     //FIXME:UDA
-    abort();
+    // vtkWarningMacro("We're not supporting this use case anymore!");
     // Composite DS
     vtkCompositeDataSet* innerOutputs[4];
     for(int i=0;i<4;++i)

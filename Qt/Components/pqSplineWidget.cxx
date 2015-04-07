@@ -167,18 +167,18 @@ void pqSplineWidget::removePoints()
 }
 
 //-----------------------------------------------------------------------------
-void pqSplineWidget::pick(double x, double y, double z)
+void pqSplineWidget::pick(double argx, double argy, double argz)
 {
   vtkSMProxy* widget = this->getWidgetProxy();
 
   QList<QTreeWidgetItem*> items =
-    this->Internals->HandlePositions->selectedItems(); 
+    this->Internals->HandlePositions->selectedItems();
   if (items.size() > 0)
     {
     QTreeWidgetItem* item = items.front();
-    item->setText(0, QString("%1").arg(x));
-    item->setText(1, QString("%1").arg(y));
-    item->setText(2, QString("%1").arg(z));
+    item->setText(0, QString("%1").arg(argx));
+    item->setText(1, QString("%1").arg(argy));
+    item->setText(2, QString("%1").arg(argz));
     }
 
   widget->UpdateVTKObjects();

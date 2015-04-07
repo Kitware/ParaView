@@ -272,17 +272,17 @@ public:
 
 //-----------------------------------------------------------------------------
 pqProxyWidgetDialog::pqProxyWidgetDialog(
-  vtkSMProxy* proxy, QWidget* parentObject, Qt::WindowFlags f)
+  vtkSMProxy* smproxy, QWidget* parentObject, Qt::WindowFlags f)
   : Superclass(parentObject, f),
-  Internals(new pqProxyWidgetDialog::pqInternals(proxy, this))
+  Internals(new pqProxyWidgetDialog::pqInternals(smproxy, this))
 {
 }
 
 //-----------------------------------------------------------------------------
-pqProxyWidgetDialog::pqProxyWidgetDialog(vtkSMProxy* proxy,
+pqProxyWidgetDialog::pqProxyWidgetDialog(vtkSMProxy* smproxy,
   const QStringList& properties, QWidget* parentObject, Qt::WindowFlags f)
   : Superclass(parentObject, f),
-  Internals(new pqProxyWidgetDialog::pqInternals(proxy, this, properties))
+  Internals(new pqProxyWidgetDialog::pqInternals(smproxy, this, properties))
 {
 }
 

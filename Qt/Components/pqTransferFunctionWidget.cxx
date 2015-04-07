@@ -293,7 +293,6 @@ void pqTransferFunctionWidget::initialize(
     this->Internals->TransferFunctionItem = item.GetPointer();
     if (pwf_editable && stc_editable)
       {
-      abort();
       // NOTE: this hasn't been tested yet.
       vtkNew<vtkCompositeControlPointsItem> cpItem;
       cpItem->SetPointsFunction(vtkCompositeControlPointsItem::ColorAndOpacityPointsFunction);

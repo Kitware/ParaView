@@ -2713,7 +2713,7 @@ vtkTimerLogSmartMarkEvent markevent("ComputeGlobalMetaData", this->Controller);
   //int    largestLevel = 0;
   double largestOrigin[3];
   double largestSpacing[3];
-  int    largestDims[3];
+  int    largestDims[3] = {0, 0, 0};
   int    largestNumCells;
 
   double globalBounds[6];

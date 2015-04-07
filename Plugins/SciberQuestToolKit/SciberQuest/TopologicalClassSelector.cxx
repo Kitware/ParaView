@@ -19,7 +19,6 @@ Copyright 2012 SciberQuest Inc.
 TopologicalClassSelector::TopologicalClassSelector()
     :
   Input(0),
-  Threshold(0),
   Append(0)
 {
   this->Initialize();
