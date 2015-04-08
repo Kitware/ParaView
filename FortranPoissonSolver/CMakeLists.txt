@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
-PROJECT(CatalystFortranPoissonSolver CXX Fortran)
+project(CatalystFortranPoissonSolver CXX Fortran)
 
 set(SOURCES
   FEDriver.F90
@@ -25,11 +25,13 @@ else()
   include_directories(${MPI_Fortran_INCLUDE_PATH})
 endif()
 
-ADD_EXECUTABLE(FortranPoissonSolver ${SOURCES})
-TARGET_LINK_LIBRARIES(FortranPoissonSolver ${MPI_Fortran_LIBRARIES})
+add_executable(FortranPoissonSolver ${SOURCES})
+target_link_libraries(FortranPoissonSolver ${MPI_Fortran_LIBRARIES})
 if(USE_CATALYST)
-  TARGET_LINK_LIBRARIES(FortranPoissonSolver vtkPVPythonCatalyst vtkParallelMPI)
+  target_link_libraries(FortranPoissonSolver vtkPVPythonCatalyst vtkParallelMPI)
 endif()
+set_target_properties(FortranPoissonSolver PROPERTIES
+  LINKER_LANGUAGE Fortran)
 
 option(BUILD_TESTING "Build Testing" OFF)
 # Setup testing.
