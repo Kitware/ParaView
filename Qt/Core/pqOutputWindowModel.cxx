@@ -45,13 +45,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace
 {
 const int EXPANDED_ROW_EXTRA = 1;
-// WARNING: The string order has to match the order in pqOutputWindow::MessageType
-const QStyle::StandardPixmap MessageTypeIcon[] =
-{
-  QStyle::SP_MessageBoxCritical,
-  QStyle::SP_MessageBoxWarning,
-  QStyle::SP_MessageBoxInformation
-};
 enum ColumnLocation
 {
   COLUMN_EXPANDED,

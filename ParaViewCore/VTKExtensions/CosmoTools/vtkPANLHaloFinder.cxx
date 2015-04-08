@@ -177,7 +177,7 @@ public:
 
   void reserveForInputData(vtkIdType numPts)
   {
-    if (this->xx.capacity() < numPts)
+    if (numPts > 0 && this->xx.capacity() < static_cast<size_t>(numPts))
       {
       this->xx.resize(numPts);
       this->yy.resize(numPts);
@@ -252,6 +252,7 @@ int vtkPANLHaloFinder::FillInputPortInformation(int port, vtkInformation *info)
 {
   this->Superclass::FillInputPortInformation(port,info);
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMultiBlockDataSet");
+  return 1;
 }
 
 int vtkPANLHaloFinder::RequestData(vtkInformation *, vtkInformationVector **inVector, vtkInformationVector *outVector)

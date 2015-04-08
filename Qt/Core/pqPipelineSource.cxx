@@ -241,7 +241,6 @@ pqOutputPort* pqPipelineSource::getOutputPort(int outputport) const
         << outputport
         << "). Available number of output ports: "
         << this->Internal->OutputPorts.size();
-    abort();
     return NULL;
     }
   return this->Internal->OutputPorts[outputport];

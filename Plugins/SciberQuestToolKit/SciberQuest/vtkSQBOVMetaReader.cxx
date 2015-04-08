@@ -55,6 +55,7 @@ Copyright 2012 SciberQuest Inc.
 #endif
 
 // ****************************************************************************
+#ifndef SQTK_WITHOUT_MPI
 static
 unsigned long hash(const unsigned char *str)
 {
@@ -66,6 +67,7 @@ unsigned long hash(const unsigned char *str)
 
   return hash;
 }
+#endif
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSQBOVMetaReader);

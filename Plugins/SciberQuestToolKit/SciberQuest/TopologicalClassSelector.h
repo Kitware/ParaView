@@ -11,7 +11,6 @@ Copyright 2012 SciberQuest Inc.
 #define __TopologicalClassSelector_h
 
 class vtkDataSet;
-class vtkThreshold;
 class vtkAppendFilter;
 class vtkUnstructuredGrid;
 
@@ -31,7 +30,6 @@ public:
 
 private:
   vtkDataSet *Input;
-  vtkThreshold *Threshold;
   vtkAppendFilter *Append;
 };
 
