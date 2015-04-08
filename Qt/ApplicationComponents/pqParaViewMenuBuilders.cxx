@@ -61,6 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqHelpReaction.h"
 #include "pqIgnoreSourceTimeReaction.h"
 #include "pqLoadDataReaction.h"
+#include "pqLoadRestoreWindowLayoutReaction.h"
 #include "pqLoadStateReaction.h"
 #include "pqMainControlsToolbar.h"
 #include "pqManageCustomFiltersReaction.h"
@@ -126,6 +127,9 @@ void pqParaViewMenuBuilders::buildFileMenu(QMenu& menu)
 
   new pqExportReaction(ui.actionExport);
   new pqSaveDataReaction(ui.actionFileSaveData);
+
+  new pqLoadRestoreWindowLayoutReaction(true, ui.actionFileLoadWindowLayout);
+  new pqLoadRestoreWindowLayoutReaction(false, ui.actionFileSaveWindowLayout);
 }
 
 //-----------------------------------------------------------------------------
