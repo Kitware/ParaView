@@ -120,11 +120,12 @@ public slots:
   /// recent call to filterWidgets().
   void updatePanel();
 
-  /// restores application default proxy settings
-  virtual void onRestoreDefaults();
+  /// Restores application default proxy settings.
+  /// Returns true if any properties were modified.
+  virtual bool restoreDefaults();
 
-  /// saves settings as defaults for proxy
-  void onSaveAsDefaults();
+  /// Saves settings as defaults for proxy
+  void saveAsDefaults();
 
 protected:
   void showEvent(QShowEvent *event);

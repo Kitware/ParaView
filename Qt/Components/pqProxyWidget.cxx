@@ -1194,7 +1194,7 @@ void pqProxyWidget::updatePanel()
 }
 
 //-----------------------------------------------------------------------------
-void pqProxyWidget::onRestoreDefaults()
+bool pqProxyWidget::restoreDefaults()
 {
   bool anyReset = false;
   if (this->Internals->Proxy)
@@ -1227,10 +1227,11 @@ void pqProxyWidget::onRestoreDefaults()
     emit changeAvailable();
     emit changeFinished();
     }
+  return anyReset;
 }
 
 //-----------------------------------------------------------------------------
-void pqProxyWidget::onSaveAsDefaults()
+void pqProxyWidget::saveAsDefaults()
 {
   vtkSMSettings* settings = vtkSMSettings::GetInstance();
   settings->SetProxySettings(this->Internals->Proxy);

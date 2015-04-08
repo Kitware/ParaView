@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyWidget.h"
 #include "pqSettings.h"
 #include "vtkSMProxy.h"
+#include "vtkWeakPointer.h"
 
 #include <QPointer>
 #include <QStyle>
@@ -67,7 +68,7 @@ class pqProxyWidgetDialog::pqInternals
     }
 public:
   Ui::ProxyWidgetDialog Ui;
-  vtkSMProxy* Proxy;
+  vtkWeakPointer<vtkSMProxy> Proxy;
   bool HasVisibleWidgets;
 
   pqInternals(vtkSMProxy* proxy, pqProxyWidgetDialog* self,
@@ -89,7 +90,7 @@ public:
     self->connect(ui.SearchBox, SIGNAL(textChanged(const QString&)), SLOT(filterWidgets()));
 
     // There should be no changes initially, so disable the Apply button
-    ui.ApplyButton->setEnabled(false);
+    this->updateButtons(/*dirty*/false);
 
     QWidget *container = new QWidget(self);
     container->setObjectName("Container");
@@ -115,34 +116,20 @@ public:
       setIcon(applicationStyle->standardIcon(QStyle::SP_DialogSaveButton));
     ui.ApplyButton->
       setIcon(applicationStyle->standardIcon(QStyle::SP_DialogApplyButton));
+    ui.ResetButton->
+      setIcon(applicationStyle->standardIcon(QStyle::SP_DialogResetButton));
     ui.CancelButton->
       setIcon(applicationStyle->standardIcon(QStyle::SP_DialogCancelButton));
     ui.OKButton->
       setIcon(applicationStyle->standardIcon(QStyle::SP_DialogOkButton));
 
-    QObject::connect(self, SIGNAL(accepted()), widget, SLOT(apply()));
-    QObject::connect(self, SIGNAL(accepted()), self, SLOT(onAccepted()));
-    QObject::connect(widget, SIGNAL(changeAvailable()),
-       self, SLOT(onChangeAvailable()));
-
-    // When restoring defaults, first restore the defaults in the
-    // server manager, then reset the values from the server manager
-    // after the defaults have been restored.
-    QObject::connect(ui.RestoreDefaultsButton, SIGNAL(clicked()),
-      widget, SLOT(onRestoreDefaults()));
-    QObject::connect(ui.RestoreDefaultsButton, SIGNAL(clicked()),
-      widget, SLOT(reset()));
-
-    QObject::connect(ui.SaveButton, SIGNAL(clicked()),
-      widget, SLOT(onSaveAsDefaults()));
-
-    QObject::connect(ui.ApplyButton, SIGNAL(clicked()), self, SIGNAL(accepted()));
-    QObject::connect(ui.ApplyButton, SIGNAL(clicked()), widget, SLOT(apply()));
-
-    QObject::connect(ui.CancelButton, SIGNAL(clicked()), widget, SLOT(reset()));
-    QObject::connect(ui.CancelButton, SIGNAL(clicked()), self, SLOT(reject()));
-
-    QObject::connect(ui.OKButton, SIGNAL(clicked()), self, SLOT(accept()));
+    self->connect(ui.RestoreDefaultsButton, SIGNAL(clicked()), SLOT(onRestoreDefaults()));
+    self->connect(ui.SaveButton, SIGNAL(clicked()), SLOT(onSaveAsDefaults()));
+    self->connect(ui.ApplyButton, SIGNAL(clicked()), SLOT(onApply()));
+    self->connect(ui.ResetButton, SIGNAL(clicked()), SLOT(onReset()));
+    self->connect(ui.OKButton, SIGNAL(clicked()), SLOT(accept()));
+    self->connect(ui.CancelButton, SIGNAL(clicked()), SLOT(reject()));
+    self->connect(widget, SIGNAL(changeAvailable()), SLOT(onChangeAvailable()));
 
     QSpacerItem* spacer = new QSpacerItem(0, 6, QSizePolicy::Fixed,
       QSizePolicy::MinimumExpanding);
@@ -236,19 +223,65 @@ public:
       settings->setValue(this->KEY_GEOMETRY(), self->saveGeometry());
       }
     }
+
+  /// update the buttons based on whether any property/widget on the panel is
+  /// modified.
+  void updateButtons(bool dirty)
+    {
+    Ui::ProxyWidgetDialog &ui = this->Ui;
+    ui.ApplyButton->setEnabled(dirty);
+    ui.ResetButton->setEnabled(dirty);
+
+    ui.RestoreDefaultsButton->setEnabled(!dirty);
+    ui.SaveButton->setEnabled(!dirty);
+    ui.OKButton->setEnabled(true);
+    ui.CancelButton->setEnabled(true);
+    }
+
+  /// accept all changes and update buttons.
+  void acceptChanges()
+    {
+    this->ProxyWidget->apply();
+    this->updateButtons(false);
+    }
+
+  /// reject all changes and update buttons.
+  void rejectChanges()
+    {
+    this->ProxyWidget->reset();
+    this->updateButtons(false);
+    }
+
+  /// load values from settings.
+  bool restoreDefaults()
+    {
+    if (this->ProxyWidget->restoreDefaults())
+      {
+      // If values changed, we pretend the user accepted those changes.
+      this->acceptChanges();
+      return true;
+      }
+    return false;
+    }
+
+  void saveAsDefaults()
+    {
+    this->ProxyWidget->saveAsDefaults();
+    }
 };
 
 //-----------------------------------------------------------------------------
-pqProxyWidgetDialog::pqProxyWidgetDialog(vtkSMProxy* proxy, QWidget* parentObject)
-  : Superclass(parentObject),
+pqProxyWidgetDialog::pqProxyWidgetDialog(
+  vtkSMProxy* proxy, QWidget* parentObject, Qt::WindowFlags f)
+  : Superclass(parentObject, f),
   Internals(new pqProxyWidgetDialog::pqInternals(proxy, this))
 {
 }
 
 //-----------------------------------------------------------------------------
 pqProxyWidgetDialog::pqProxyWidgetDialog(vtkSMProxy* proxy,
-  const QStringList& properties, QWidget* parentObject)
-  : Superclass(parentObject),
+  const QStringList& properties, QWidget* parentObject, Qt::WindowFlags f)
+  : Superclass(parentObject, f),
   Internals(new pqProxyWidgetDialog::pqInternals(proxy, this, properties))
 {
 }
@@ -301,15 +334,52 @@ bool pqProxyWidgetDialog::hasVisibleWidgets() const
 //-----------------------------------------------------------------------------
 void pqProxyWidgetDialog::onChangeAvailable()
 {
-  Ui::ProxyWidgetDialog &ui = this->Internals->Ui;
-  ui.ApplyButton->setEnabled(true);
+  this->Internals->updateButtons(/*dirty=*/true);
 }
 
 //-----------------------------------------------------------------------------
-void pqProxyWidgetDialog::onAccepted()
+void pqProxyWidgetDialog::onApply()
 {
-  Ui::ProxyWidgetDialog &ui = this->Internals->Ui;
-  ui.ApplyButton->setEnabled(false);
+  this->Internals->acceptChanges();
+  emit this->accepted();
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyWidgetDialog::onReset()
+{
+  this->Internals->rejectChanges();
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyWidgetDialog::done(int status)
+{
+  // this gets called when user presses the Esc key.
+  switch (status)
+    {
+  case QDialog::Accepted:
+    this->Internals->acceptChanges();
+    break;
+
+  case QDialog::Rejected:
+    this->Internals->rejectChanges();
+    break;
+    }
+  this->Superclass::done(status);
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyWidgetDialog::onRestoreDefaults()
+{
+  if (this->Internals->restoreDefaults())
+    {
+    emit this->accepted();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyWidgetDialog::onSaveAsDefaults()
+{
+  this->Internals->saveAsDefaults();
 }
 
 //-----------------------------------------------------------------------------
