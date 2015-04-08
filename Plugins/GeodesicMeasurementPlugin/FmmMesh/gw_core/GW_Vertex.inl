@@ -26,9 +26,9 @@ GW_Vertex::GW_Vertex()
     Normal_        ( 0,0,1 ),
     CurvDirMin_    ( 1,0,0 ),
     CurvDirMax_    ( 0,1,0 ),
-    pFace_        ( NULL ),
     rMinCurv_    ( 0 ),
     rMaxCurv_    ( 0 ),
+    pFace_        ( NULL ),
     nID_        ( 0 ),
     pUserData_    ( NULL )
 {

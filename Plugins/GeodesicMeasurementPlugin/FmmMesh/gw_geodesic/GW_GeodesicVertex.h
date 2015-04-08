@@ -58,8 +58,8 @@ public:
     {
     public:
         GW_GeodesicVertex* pFront1_;
-        GW_Float rDist1_;
         GW_GeodesicVertex* pFront2_;
+        GW_Float rDist1_;
         GW_Float rDist2_;
         T_FrontOverlapInfo( GW_GeodesicVertex* pFront1 = NULL, GW_Float rDist1 = GW_INFINITE )
             :    pFront1_        ( pFront1 ),

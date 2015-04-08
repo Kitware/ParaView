@@ -24,9 +24,9 @@ GW_INLINE
 GW_GeodesicMesh::GW_GeodesicMesh()
 :    GW_Mesh(),
     WeightCallback_        ( GW_GeodesicMesh::BasicWeightCallback ),
-    VertexInsersionCallback_    ( NULL ),
     ForceStopCallback_            ( NULL ),
     NewDeadVertexCallback_        ( NULL ),
+    VertexInsersionCallback_    ( NULL ),
     HeuristicToGoalCallbackFunction_    ( NULL ),
     bIsMarchingBegin_            ( GW_False ),
     bIsMarchingEnd_                ( GW_False ),

@@ -225,8 +225,6 @@ void vtkFastMarchingGeodesicDistance::SetupGeodesicMesh( vtkPolyData *in )
       this->Internals->Mesh->SetCallbackData(this);
       }
 
-    typedef GW::GW_GeodesicVertex Vertex;
-
     // Setup the GW_GeodesicMesh mesh
     GW::GW_GeodesicMesh *mesh = this->Internals->Mesh;
 
@@ -445,7 +443,7 @@ void vtkFastMarchingGeodesicDistance::SetupCallbacks()
   // Setup callback to get the propagation weights
   // The WeightCallbackFunction is used to define the metric on the mesh.
   if (this->PropagationWeights &&
-        this->PropagationWeights->GetNumberOfTuples() ==
+        static_cast<GW::GW_U32>(this->PropagationWeights->GetNumberOfTuples()) ==
             this->Internals->Mesh->GetNbrVertex())
     {
     this->Internals->Mesh->RegisterWeightCallbackFunction(
