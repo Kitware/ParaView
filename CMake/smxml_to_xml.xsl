@@ -124,7 +124,7 @@
 <xsl:template match="InputArrayDomain">
   <domain>
     <text>
-      The dataset much contain a field array (<xsl:value-of select="@attribute_type"/>)
+      The dataset must contain a field array (<xsl:value-of select="@attribute_type"/>)
       <xsl:if test="@number_of_components">
         with <xsl:value-of select="@number_of_components"/> component(s).
       </xsl:if>
