@@ -14,7 +14,7 @@
 =========================================================================*/
 // .NAME vtkSMAnimationSceneProxy
 // .SECTION Description
-// vtkSMAnimationSceneProxy observes vtkCommand::ModifiedEvent on the
+// vtkSMAnimationSceneProxy observe vtkCommand::ModifiedEvent on the
 // client-side VTK-object to call UpdatePropertyInformation() every time that
 // happens.
 
@@ -59,6 +59,11 @@ protected:
   ~vtkSMAnimationSceneProxy();
 
   // Description:
+  // Overridden to prune start/end time properties if not applicable to the
+  // state being loaded.
+  virtual int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator);
+
+  // Description:
   // Given a class name (by setting VTKClassName) and server ids (by
   // setting ServerIDs), this methods instantiates the objects on the
   // server(s)
@@ -67,6 +72,9 @@ protected:
 private:
   vtkSMAnimationSceneProxy(const vtkSMAnimationSceneProxy&); // Not implemented
   void operator=(const vtkSMAnimationSceneProxy&); // Not implemented
+
+  // Called when vtkSMAnimationScene::UpdateStartEndTimesEvent is fired.
+  void OnUpdateStartEndTimesEvent(vtkObject*, unsigned long, void*);
 //ETX
 };
 

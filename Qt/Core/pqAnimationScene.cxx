@@ -109,10 +109,10 @@ pqAnimationScene::pqAnimationScene(const QString& group, const QString& name,
     this, SIGNAL(frameCountChanged()));
 
   connector->Connect(
-    proxy->GetProperty("StartTimeInfo"), vtkCommand::ModifiedEvent,
+    proxy->GetProperty("StartTime"), vtkCommand::ModifiedEvent,
     this, SIGNAL(clockTimeRangesChanged()));
   connector->Connect(
-    proxy->GetProperty("EndTimeInfo"), vtkCommand::ModifiedEvent,
+    proxy->GetProperty("EndTime"), vtkCommand::ModifiedEvent,
     this, SIGNAL(clockTimeRangesChanged()));
   connector->Connect(
     proxy->GetProperty("AnimationTime"), vtkCommand::ModifiedEvent,
@@ -144,9 +144,9 @@ QList<double> pqAnimationScene::getTimeSteps() const
 QPair<double, double> pqAnimationScene::getClockTimeRange() const
 {
   double start = pqSMAdaptor::getElementProperty(
-    this->getProxy()->GetProperty("StartTimeInfo")).toDouble();
+    this->getProxy()->GetProperty("StartTime")).toDouble();
   double end = pqSMAdaptor::getElementProperty(
-    this->getProxy()->GetProperty("EndTimeInfo")).toDouble();
+    this->getProxy()->GetProperty("EndTime")).toDouble();
   return QPair<double,double>(start, end);
 }
 

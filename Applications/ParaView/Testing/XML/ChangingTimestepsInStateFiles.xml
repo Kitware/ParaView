@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- BUG #0015407 -->
+  <!-- open dataset with 4 timesteps, with end time = 4 -->
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/1QToolButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/dualSphereAnimation4.pvd" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton4" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveServerState" />
+  <!-- save this state file -->
+  <pqevent object="pqClientMainWindow/FileSaveServerStateDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/ChangingTimestepsInStateFiles_4.pvsm" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionDelete_All" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileLoadServerState" />
+  <pqevent object="pqClientMainWindow/FileLoadServerStateDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/ChangingTimestepsInStateFiles_4.pvsm" />
+  <pqevent object="pqClientMainWindow/FixStateFilenamesDialog/1pqCollapsedGroup0/FileName/FileButton" command="activate" arguments="" />
+  <!-- change to dataset with 10 timesteps, with end time > 4 -->
+  <pqevent object="pqClientMainWindow/FixStateFilenamesDialog/1pqCollapsedGroup0/FileName/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/dualSphereAnimation.pvd" />
+  <pqevent object="pqClientMainWindow/FixStateFilenamesDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton4" command="activate" arguments="" />
+</pqevents>
