@@ -31,6 +31,7 @@ paraview_test_load_data(""
   combxyz.bin
   CubeStringArray.vtk
   disk_out_ref.ex2
+  dualSphereAnimation4.pvd
   dualSphereAnimation.clone.pvd
   dualSphereAnimation.pvd
   "iron protein.vtk"
@@ -178,6 +179,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/CalcParens.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Calculator.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CameraLink.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChangingTimestepsInStateFiles.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ChartAxisRangeAndLabels.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CheckableHeader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Clip.xml
