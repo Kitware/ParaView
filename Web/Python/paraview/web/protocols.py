@@ -266,7 +266,8 @@ class ParaViewWebViewPortImageDelivery(ParaViewWebProtocol):
         beginTime = int(round(time() * 1000))
         view = self.getView(options["view"])
         size = [view.ViewSize[0], view.ViewSize[1]]
-        if options and options.has_key("size"):
+        resize = size != options.get("size", size)
+        if resize:
             size = options["size"]
             view.ViewSize = size
         t = 0
@@ -281,6 +282,16 @@ class ParaViewWebViewPortImageDelivery(ParaViewWebProtocol):
         reply = {}
         app = self.getApplication()
         reply["image"] = app.StillRenderToString(view.SMProxy, t, quality)
+
+        # Check that we are getting image size we have set if not wait until we
+        # do.
+        tries = 10;
+        while resize and list(app.GetLastStillRenderImageSize()) != size \
+              and size != [0, 0] and tries > 0:
+            app.InvalidateCache(view.SMProxy)
+            reply["image"] = app.StillRenderToString(view.SMProxy, t, quality)
+            tries -= 1
+
         reply["stale"] = app.GetHasImagesBeingProcessed(view.SMProxy)
         reply["mtime"] = app.GetLastStillRenderToStringMTime()
         reply["size"] = [view.ViewSize[0], view.ViewSize[1]]
