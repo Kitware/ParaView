@@ -66,7 +66,7 @@ pqProxyEditorPropertyWidget::pqProxyEditorPropertyWidget(
     this->Checkbox->setEnabled(false);
     this->Checkbox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     this->PropertyName = hints->GetAttributeOrDefault("property", "");
-    this->connect(&this->CheckBoxLinks, SIGNAL(qtWidgetChanged()),
+    this->connect(&this->links(), SIGNAL(qtWidgetChanged()),
       this, SIGNAL(changeAvailable()));
     }
 
@@ -93,6 +93,14 @@ pqProxyEditorPropertyWidget::~pqProxyEditorPropertyWidget()
 //-----------------------------------------------------------------------------
 void pqProxyEditorPropertyWidget::setProxyToEdit(pqSMProxy smproxy)
 {
+  if (this->ProxyToEdit && this->Checkbox &&
+      this->ProxyToEdit->GetProperty(this->PropertyName.toStdString().c_str()))
+    {
+    this->links().removePropertyLink(
+      this->Checkbox, "checked", SIGNAL(toggled(bool)),
+      this->ProxyToEdit, this->ProxyToEdit->GetProperty(
+          this->PropertyName.toStdString().c_str()));
+    }
   this->ProxyToEdit = smproxy;
   this->Button->setEnabled(smproxy != NULL);
   if (this->Editor && this->Editor->proxy() != smproxy)
@@ -100,7 +108,6 @@ void pqProxyEditorPropertyWidget::setProxyToEdit(pqSMProxy smproxy)
     delete this->Editor;
     }
 
-  this->CheckBoxLinks.reset();
   if (this->Checkbox)
     {
     if (vtkSMProperty* smproperty = smproxy?
@@ -108,7 +115,7 @@ void pqProxyEditorPropertyWidget::setProxyToEdit(pqSMProxy smproxy)
       {
       this->Checkbox->setEnabled(true);
       this->Checkbox->setToolTip(pqPropertyWidget::getTooltip(smproperty));
-      this->CheckBoxLinks.addPropertyLink(
+      this->links().addPropertyLink(
         this->Checkbox, "checked", SIGNAL(toggled(bool)),
         smproxy, smproperty);
       }

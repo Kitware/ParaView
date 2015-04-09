@@ -91,7 +91,6 @@ private:
   QPointer<QPushButton> Button;
   QPointer<QCheckBox> Checkbox;
   QPointer<pqProxyWidgetDialog> Editor;
-  pqPropertyLinks CheckBoxLinks;
   QString PropertyName;
 };
 
