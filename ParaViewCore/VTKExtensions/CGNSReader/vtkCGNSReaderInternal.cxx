@@ -1,10 +1,9 @@
-// -*- c++ -*-
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkCGNSReaderInternal.h
+  Module:    vtkCGNSReaderInternal.cxx
 
-  Copyright (c) 2013-2014 Mickael Philit
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
   See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
 
@@ -12,7 +11,9 @@
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notice for more information.
 
-  =========================================================================*/
+=========================================================================*/
+// Copyright 2013-2014 Mickael Philit.
+
 #include "vtkCGNSReaderInternal.h"
 
 #include <algorithm>

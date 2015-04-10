@@ -248,6 +248,12 @@ if (UNIX)
     "Build ParaView with CosmoTools VTK Extensions" OFF
     "PARAVIEW_USE_MPI" OFF)
   mark_as_advanced(PARAVIEW_ENABLE_COSMOTOOLS)
+
+  cmake_dependent_option(PARAVIEW_ENABLE_CGNS
+  "Enable the CGNS file reader" OFF
+  "PARAVIEW_USE_MPI" OFF)
+  mark_as_advanced(PARAVIEW_ENABLE_CGNS)
+
 endif()
 
 # Is this a 32 bit or 64bit build. Display this in about dialog.

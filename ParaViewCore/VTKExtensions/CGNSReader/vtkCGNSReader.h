@@ -1,10 +1,9 @@
-// -*- c++ -*-
 /*=========================================================================
 
   Program:   Visualization Toolkit
   Module:    vtkCGNSReader.h
 
-  Copyright (c) 2013-2014 Mickael Philit
+  Copyright (c) Ken Martin, Will Schrodeder, Bill Lorensen
   All rights reserved.
   See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
 
@@ -13,6 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
   =========================================================================*/
+// Copyright 2013-2014 Mickael Philit.
+
 // .NAME vtkCGNSReader -- reads a dataset in "CGNS" format
 // .SECTION Description
 // vtkCGNSReader creates a multi-block dataset and reads unstructured grids,
@@ -33,6 +34,7 @@
 #define __vtkCGNSReader_h
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
+#include "vtkPVVTKExtensionsCGNSReaderModule.h" // for export macro
 #include "vtkPVConfig.h"     // For PARAVIEW_USE_MPI
 
 #include "vtkCGNSReaderInternal.h" // For parsing information request
@@ -45,7 +47,7 @@ class vtkCallbackCommand;
 class vtkMultiProcessController;
 #endif
 
-class vtkCGNSReader : public vtkMultiBlockDataSetAlgorithm
+class VTKPVVTKEXTENSIONSCGNSREADER_EXPORT vtkCGNSReader : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   static vtkCGNSReader *New();

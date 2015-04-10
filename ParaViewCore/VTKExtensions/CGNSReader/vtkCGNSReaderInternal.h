@@ -1,10 +1,9 @@
-// -*- c++ -*-
 /*=========================================================================
 
   Program:   Visualization Toolkit
   Module:    vtkCGNSReaderInternal.h
 
-  Copyright (c) 2013-2014 Mickael Philit
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
   See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
 
@@ -12,7 +11,9 @@
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notice for more information.
 
-  =========================================================================*/
+=========================================================================*/
+//  Copyright (c) 2013-2014 Mickael Philit
+
 // .NAME vtkCGNSReaderInternal -- class(es) used by vtkCGNSReader
 // .SECTION Description
 //     parse a file in "CGNS" format
@@ -471,3 +472,4 @@ int get_XYZ_mesh(const int cgioNum, const std::vector<double>& gridChildId,
 }
 
 #endif //__CGNS_READER_INTERNAL__
+// VTK-HeaderTest-Exclude: vtkCGNSReaderInternal.h
