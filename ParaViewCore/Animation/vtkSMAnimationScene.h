@@ -33,6 +33,7 @@
 
 #include "vtkPVAnimationModule.h" //needed for exports
 #include "vtkAnimationCue.h"
+#include "vtkCommand.h" // needed for vtkCommand::UserEvent
 
 class vtkCompositeAnimationPlayer;
 class vtkEventForwarderCommand;
@@ -136,10 +137,18 @@ public:
   void GoToFirst();
   void GoToLast();
   void SetPlayMode(int val);
+  int GetPlayMode();
   void SetNumberOfFrames(int val);
   void SetDuration(int val);
   void SetFramesPerTimestep(int val);
 
+  enum
+    {
+    // Fired whenever the vtkAnimationScene wants to request the
+    // vtkSMAnimationSceneProxy to update the start/end times.
+    // The calldata is a vtkVector2d with the suggested time-range.
+    UpdateStartEndTimesEvent = vtkCommand::UserEvent
+    };
 //BTX
 protected:
   vtkSMAnimationScene();

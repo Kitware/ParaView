@@ -13,19 +13,20 @@
 
 =========================================================================*/
 #include "vtkSMAnimationScene.h"
+#include "vtkPVConfig.h" // needed for PARAVIEW_ENABLE_PYTHON
 
 #include "vtkCompositeAnimationPlayer.h"
 #include "vtkEventForwarderCommand.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVCameraAnimationCue.h"
-#include "vtkPVConfig.h" // needed for PARAVIEW_ENABLE_PYTHON
 #include "vtkPVGeneralSettings.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMViewProxy.h"
+#include "vtkVector.h"
 
 #ifdef PARAVIEW_ENABLE_PYTHON
 # include "vtkPythonAnimationCue.h"
@@ -347,18 +348,12 @@ void vtkSMAnimationScene::TimeKeeperTimeRangeChanged()
 {
   // If time keeper has a non-trivial time range and the times are not locked,
   // then we change the times to match the time range.
-  double min = vtkSMPropertyHelper(this->TimeKeeper,"TimeRange").GetAsDouble(0);
-  double max = vtkSMPropertyHelper(this->TimeKeeper,"TimeRange").GetAsDouble(1);
-  if (max > min)
+  vtkVector2d range(
+    vtkSMPropertyHelper(this->TimeKeeper,"TimeRange").GetAsDouble(0),
+    vtkSMPropertyHelper(this->TimeKeeper,"TimeRange").GetAsDouble(1));
+  if (range[1] > range[0])
     {
-    if (!this->LockStartTime)
-      {
-      this->SetStartTime(min);
-      }
-    if (!this->LockEndTime)
-      {
-      this->SetEndTime(max);
-      }
+    this->InvokeEvent(vtkSMAnimationScene::UpdateStartEndTimesEvent, &range);
     }
 }
 
@@ -558,6 +553,12 @@ void vtkSMAnimationScene::GoToLast()
 void vtkSMAnimationScene::SetPlayMode(int val)
 {
   this->AnimationPlayer->SetPlayMode(val);
+}
+
+//----------------------------------------------------------------------------
+int vtkSMAnimationScene::GetPlayMode()
+{
+  return this->AnimationPlayer->GetPlayMode();
 }
 
 //----------------------------------------------------------------------------

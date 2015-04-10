@@ -195,7 +195,6 @@
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetStartTime"
                             default_values="0.0"
-                            information_property="StartTimeInfo"
                             label="Start Time"
                             name="StartTime"
                             number_of_elements="1"
@@ -205,23 +204,12 @@
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetEndTime"
                             default_values="1.0"
-                            information_property="EndTimeInfo"
                             label="End Time"
                             name="EndTime"
                             number_of_elements="1"
                             precision="16">
         <Documentation>Set the end time for the animation
         scene.</Documentation>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="GetStartTime"
-                            information_only="1"
-                            name="StartTimeInfo">
-        <SimpleDoubleInformationHelper />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="GetEndTime"
-                            information_only="1"
-                            name="EndTimeInfo">
-        <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
       <IntVectorProperty command="SetLockStartTime"
                          default_values="0"
