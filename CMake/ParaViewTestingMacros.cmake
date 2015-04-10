@@ -362,11 +362,8 @@ FUNCTION(add_multi_client_tests prefix)
         ${extra_args}
         --exit
         )
-      if (${test_name}_FORCE_SERIAL)
-        set_tests_properties("${prefix}.${test_name}" PROPERTIES RUN_SERIAL ON)
-        message(STATUS "Running in serial \"${prefix}.${test_name}\"")
-      endif ()
-
+      # all 'collab' tests are always run in serial i.e. one at a time.
+      set_tests_properties("${prefix}.${test_name}" PROPERTIES RUN_SERIAL ON)
       set_tests_properties("${prefix}.${test_name}" PROPERTIES LABELS "PARAVIEW")
     endif()
   endforeach()
