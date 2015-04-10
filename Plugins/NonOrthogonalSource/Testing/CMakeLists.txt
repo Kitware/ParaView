@@ -8,6 +8,8 @@ set (xmls
   ${CMAKE_CURRENT_SOURCE_DIR}/NonOrthographicOrthographicView.xml
 )
 
+set (NonOrthogonalSliceView_FORCE_SERIAL TRUE)
+
 add_client_tests("pv"
   LOAD_PLUGIN "NonOrthogonalSource"
   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}

@@ -17,6 +17,12 @@ fname = smtesting.TempDir+"/stlfile.stl"
 writer = servermanager.writers.PSTLWriter(Input=sphere, FileName=fname)
 writer.UpdatePipeline()
 
+pm = servermanager.vtkProcessModule.GetProcessModule()
+if pm.GetSymmetricMPIMode() == True:
+    # need to barrier to ensure that all ranks have updated.
+    controller = pm.GetGlobalController()
+    controller.Barrier()
+
 reader = servermanager.sources.stlreader(FileNames=(fname,))
 
 view = servermanager.CreateRenderView();

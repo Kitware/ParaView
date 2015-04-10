@@ -27,6 +27,11 @@ Wavelet1 = Wavelet()
 w = XMLPImageDataWriter(FileName=fname)
 w.UpdatePipeline()
 
+if pm.GetSymmetricMPIMode() == True:
+    # need to barrier to ensure that all ranks have updated.
+    controller = pm.GetGlobalController()
+    controller.Barrier()
+
 r = XMLPartitionedImageDataReader(FileName = fname)
 r.UpdatePipeline()
 
