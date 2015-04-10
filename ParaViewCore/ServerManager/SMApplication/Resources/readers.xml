@@ -5004,7 +5004,7 @@
       </StringVectorProperty>
     </SourceProxy>
       <!-- End DICOMReaderDirectory -->
-    <SourceProxy class="vtkFileSeriesReader"
+    <SourceProxy class="vtkImageFileSeriesReader"
                  file_name_method="SetFileName"
                  label="PNG Series Reader"
                  name="PNGSeriesReader"
@@ -5033,6 +5033,16 @@
         <TimeStepsInformationHelper />
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
+      <IntVectorProperty name="ReadAsImageStack"
+                         command="SetReadAsImageStack"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, the reader will read the set of files as an image stack, rather than
+          a temporal file series.
+        </Documentation>
+      </IntVectorProperty>
       <SubProxy>
         <Proxy name="Reader"
                proxygroup="internal_sources"
@@ -5044,7 +5054,7 @@
       </Hints>
       <!-- End PNGSeriesReader -->
     </SourceProxy>
-    <SourceProxy class="vtkFileSeriesReader"
+    <SourceProxy class="vtkImageFileSeriesReader"
                  file_name_method="SetFileName"
                  label="JPEG Series Reader"
                  name="JPEGSeriesReader"
@@ -5073,6 +5083,16 @@
         <TimeStepsInformationHelper />
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
+      <IntVectorProperty name="ReadAsImageStack"
+                         command="SetReadAsImageStack"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, the reader will read the set of files as an image stack, rather than
+          a temporal file series.
+        </Documentation>
+      </IntVectorProperty>
       <SubProxy>
         <Proxy name="Reader"
                proxygroup="internal_sources"
@@ -5084,7 +5104,7 @@
       </Hints>
       <!-- End JPEGSeriesReader -->
     </SourceProxy>
-    <SourceProxy class="vtkFileSeriesReader"
+    <SourceProxy class="vtkImageFileSeriesReader"
                  file_name_method="SetFileName"
                  label="TIFF Series Reader"
                  name="TIFFSeriesReader"
@@ -5113,6 +5133,16 @@
         <TimeStepsInformationHelper />
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
+      <IntVectorProperty name="ReadAsImageStack"
+                         command="SetReadAsImageStack"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, the reader will read the set of files as an image stack, rather than
+          a temporal file series.
+        </Documentation>
+      </IntVectorProperty>
       <SubProxy>
         <Proxy name="Reader"
                proxygroup="internal_sources"

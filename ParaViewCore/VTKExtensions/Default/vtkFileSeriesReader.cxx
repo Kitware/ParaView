@@ -532,15 +532,20 @@ int vtkFileSeriesReader::ProcessRequest(vtkInformation* request,
 }
 
 //----------------------------------------------------------------------------
+void vtkFileSeriesReader::ResetTimeRanges()
+{
+  this->Internal->TimeRanges->Reset();
+}
+
+//----------------------------------------------------------------------------
 int vtkFileSeriesReader::RequestInformation(
                                  vtkInformation* request,
                                  vtkInformationVector** vtkNotUsed(inputVector),
                                  vtkInformationVector* outputVector)
 {
+  this->ResetTimeRanges();
+
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
-
-  this->Internal->TimeRanges->Reset();
-
   int numFiles = (int)this->GetNumberOfFileNames();
   if (numFiles < 1)
     {
