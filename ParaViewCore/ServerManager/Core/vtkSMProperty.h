@@ -336,7 +336,9 @@ public:
   // the first one returns true i.e. indicate that it can set a default value
   // and did so. Returns true if any domain can setup a default value for this
   // property. Otherwise false.
-  bool ResetToDomainDefaults(bool use_unchecked_values=false);
+  // vtkSMVectorProperty overrides this method to add support for settting
+  // default values using information_property.
+  virtual bool ResetToDomainDefaults(bool use_unchecked_values=false);
 
   // Description:
   // The label assigned by the xml parser.

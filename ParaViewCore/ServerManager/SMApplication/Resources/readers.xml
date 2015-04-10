@@ -7149,7 +7149,6 @@
       <StringVectorProperty animateable="0"
                             clean_command="RemoveAllFileNames"
                             command="AddFileName"
-                            information_property="FileNameInfo"
                             name="QFileName"
                             number_of_elements="1"
                             repeat_command="1">

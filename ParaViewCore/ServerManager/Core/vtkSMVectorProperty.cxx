@@ -16,7 +16,6 @@
 
 #include "vtkPVXMLElement.h"
 
-
 //---------------------------------------------------------------------------
 vtkSMVectorProperty::vtkSMVectorProperty()
 {
@@ -106,8 +105,25 @@ void vtkSMVectorProperty::Copy(vtkSMProperty* src)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMVectorProperty::ClearUncheckedElements()
+bool vtkSMVectorProperty::ResetToDomainDefaults(bool use_unchecked_values)
 {
+  if (this->Superclass::ResetToDomainDefaults(use_unchecked_values))
+    {
+    return true;
+    }
+
+  // If none of the domains picked a default, maybe there's an information
+  // property that wants to provide use with a default.
+  if (vtkSMVectorProperty* infoProp = vtkSMVectorProperty::SafeDownCast(this->GetInformationProperty()))
+    {
+    if (infoProp->GetNumberOfElements()  > 0)
+      {
+      this->Copy(infoProp);
+      return true;
+      }
+    }
+
+  return false;
 }
 
 //---------------------------------------------------------------------------
