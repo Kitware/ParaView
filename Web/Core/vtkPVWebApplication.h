@@ -94,6 +94,10 @@ public:
   const char* GetWebGLBinaryData(
     vtkSMViewProxy* view, const char* id, int partIndex);
 
+  // Description:
+  // Return the size of the last image exported.
+  vtkGetVector2Macro(LastStillRenderImageSize, int);
+
 //BTX
 protected:
   vtkPVWebApplication();
@@ -102,6 +106,7 @@ protected:
   int ImageEncoding;
   int ImageCompression;
   unsigned long LastStillRenderToStringMTime;
+  int LastStillRenderImageSize[3];
 
 private:
   vtkPVWebApplication(const vtkPVWebApplication&); // Not implemented

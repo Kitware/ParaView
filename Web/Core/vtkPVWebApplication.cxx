@@ -180,6 +180,7 @@ vtkUnsignedCharArray* vtkPVWebApplication::StillRender(vtkSMViewProxy* view, int
   // TODO: We should add logic to check if a new rendering needs to be done and
   // then alone do a new rendering otherwise use the cached image.
   vtkImageData* image = view->CaptureWindow(1);
+  image->GetDimensions(this->LastStillRenderImageSize);
   //vtkTimerLog::MarkEndEvent("CaptureWindow");
 
   //vtkTimerLog::MarkEndEvent("StillRenderToString");
@@ -402,7 +403,6 @@ const char* vtkPVWebApplication::GetWebGLBinaryData(
 
   return NULL;
 }
-
 //----------------------------------------------------------------------------
 void vtkPVWebApplication::PrintSelf(ostream& os, vtkIndent indent)
 {
