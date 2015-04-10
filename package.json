@@ -1,0 +1,23 @@
+{
+    "name"          : "paraview",
+    "version"       : "4.3.1",
+    "description"   : "Data analysis and visualization framework for large data.",
+    "author"        : "Kitware Inc.",
+    "repository"    : {
+        "type"  : "git",
+        "url"   : "https://gitlab.kitware.com/paraview/paraview.git"
+    },
+    "bugs": {
+        "url"   : "http://www.paraview.org/Bug/my_view_page.php"
+    },
+    "keywords": [
+        "Large data visualization",
+        "c++",
+        "vtk",
+        "mpi",
+        "3d",
+        "remote rendering",
+        "ParaViewWeb"
+    ],
+    "license": "BSD-3-Clause"
+}
