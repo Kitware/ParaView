@@ -40,8 +40,12 @@ public:
   // Sets the size of the vector.
   virtual void SetNumberOfElements(unsigned int num) = 0;
 
-  virtual unsigned int GetNumberOfUncheckedElements() { return 0; }
-  virtual void SetNumberOfUncheckedElements(unsigned int num) { (void) num; }
+  // Description:
+  // API for setting unchecked element values.
+  virtual unsigned int GetNumberOfUncheckedElements() = 0;
+  virtual void SetNumberOfUncheckedElements(unsigned int num) = 0;
+  virtual void ClearUncheckedElements() = 0;
+
 
   // Description:
   // If RepeatCommand is true, the command is invoked multiple times,
@@ -104,13 +108,16 @@ public:
   vtkSetStringMacro(SetNumberCommand);
   vtkGetStringMacro(SetNumberCommand);
 
-  virtual void ClearUncheckedElements();
-
-  char* SetNumberCommand;
-  
   vtkSetStringMacro(InitialString);
   vtkGetStringMacro(InitialString);
 
+  // Description:
+  // Overridden to add support to load defaults from
+  // this->GetInformationProperty(), if one exists. If the superclass (which
+  // checks for defaults from all domains) doesn't end up picking a default, as
+  // a last resort, we check if the property has a non-empty \c information_property.
+  // If so, we copy its values to this property as the default.
+  virtual bool ResetToDomainDefaults(bool use_unchecked_values=false);
 
 protected:
   vtkSMVectorProperty();
@@ -121,7 +128,7 @@ protected:
   int UseIndex;
 
   char* CleanCommand;
-  
+  char* SetNumberCommand;
   char* InitialString;
 
   // Description:

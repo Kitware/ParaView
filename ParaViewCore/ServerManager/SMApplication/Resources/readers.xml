@@ -2398,6 +2398,20 @@
         <Documentation>This property specifies the file name for the PNG
         reader.</Documentation>
       </StringVectorProperty>
+      <DoubleVectorProperty name="DataSpacing"
+                            command="SetDataSpacing"
+                            number_of_elements="3"
+                            default_values="1 1 1">
+        <DoubleRangeDomain name="range" min="0 0 0" />
+        <Documentation>
+          Set the spacing to use for the image output by this reader.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseCustomDataSpacing" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
       <Hints>
         <ReaderFactory extensions="png"
                        file_description="PNG Image Files" />
@@ -2421,6 +2435,20 @@
         <Documentation>This property specifies the file name for the PNG
         reader.</Documentation>
       </StringVectorProperty>
+      <DoubleVectorProperty name="DataSpacing"
+                            command="SetDataSpacing"
+                            number_of_elements="3"
+                            default_values="1 1 1">
+        <DoubleRangeDomain name="range" min="0 0 0" />
+        <Documentation>
+          Set the spacing to use for the image output by this reader.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseCustomDataSpacing" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
       <Hints>
         <ReaderFactory extensions="jpg jpeg"
                        file_description="JPEG Image Files" />
@@ -2444,6 +2472,36 @@
         <Documentation>This property specifies the file name for the TIFF
         reader.</Documentation>
       </StringVectorProperty>
+      <IntVectorProperty name="UseCustomDataSpacing"
+                         command="SetSpacingSpecifiedFlag"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          To manually specify a custom spacing using **CustomDataSpacing**, set this property to 1 (checked).
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="CustomDataSpacing"
+                            command="SetDataSpacing"
+                            information_property="CustomDataSpacingInfo"
+                            number_of_elements="3"
+                            default_values="1 1 1">
+        <DoubleRangeDomain name="range" min="0 0 0" />
+        <Documentation>
+          Set the spacing to use for the image output by this reader. This is used only when
+          **UseCustomDataSpacing** is set to true.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseCustomDataSpacing" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="CustomDataSpacingInfo"
+                            command="GetDataSpacing"
+                            information_only="1">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
       <Hints>
         <ReaderFactory extensions="tif tiff"
                        file_description="TIFF Image Files" />
@@ -5047,6 +5105,9 @@
         <Proxy name="Reader"
                proxygroup="internal_sources"
                proxyname="PNGReader"></Proxy>
+        <ExposedProperties>
+          <Property name="DataSpacing" />
+        </ExposedProperties>
       </SubProxy>
       <Hints>
         <ReaderFactory extensions="png"
@@ -5097,6 +5158,9 @@
         <Proxy name="Reader"
                proxygroup="internal_sources"
                proxyname="JPEGReader"></Proxy>
+        <ExposedProperties>
+          <Property name="DataSpacing" />
+        </ExposedProperties>
       </SubProxy>
       <Hints>
         <ReaderFactory extensions="jpg jpeg"
@@ -5147,6 +5211,11 @@
         <Proxy name="Reader"
                proxygroup="internal_sources"
                proxyname="TIFFReader"></Proxy>
+        <ExposedProperties>
+          <Property name="UseCustomDataSpacing" />
+          <Property name="CustomDataSpacing" />
+          <Property name="CustomDataSpacingInfo" />
+        </ExposedProperties>
       </SubProxy>
       <Hints>
         <ReaderFactory extensions="tif tiff"
@@ -7149,7 +7218,6 @@
       <StringVectorProperty animateable="0"
                             clean_command="RemoveAllFileNames"
                             command="AddFileName"
-                            information_property="FileNameInfo"
                             name="QFileName"
                             number_of_elements="1"
                             repeat_command="1">
