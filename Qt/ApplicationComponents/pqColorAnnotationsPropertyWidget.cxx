@@ -31,11 +31,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqColorAnnotationsPropertyWidget.h"
 #include "ui_pqColorAnnotationsPropertyWidget.h"
+#include "ui_pqSavePresetOptions.h"
 
 #include "pqActiveObjects.h"
-#include "pqColorMapModel.h"
-#include "pqColorPresetManager.h"
 #include "pqDataRepresentation.h"
+#include "pqPresetDialog.h"
 #include "pqPropertiesPanel.h"
 #include "pqPropertyWidgetDecorator.h"
 #include "pqUndoStack.h"
@@ -54,9 +54,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMTransferFunctionPresets.h"
 #include "vtkSMTransferFunctionProxy.h"
 #include "vtkTuple.h"
 #include "vtkVariant.h"
+
+#include <vtk_jsoncpp.h>
 
 #include <QAbstractTableModel>
 #include <QColorDialog>
@@ -818,46 +821,65 @@ void pqColorAnnotationsPropertyWidget::removeAllAnnotations()
 }
 
 //-----------------------------------------------------------------------------
-void pqColorAnnotationsPropertyWidget::choosePreset(const pqColorMapModel* add_new/*=NULL*/)
+void pqColorAnnotationsPropertyWidget::choosePreset(const char* presetName)
 {
-  pqColorPresetManager preset(this,
-    pqColorPresetManager::SHOW_INDEXED_COLORS_ONLY);
-  preset.setUsingCloseButton(true);
-  preset.loadBuiltinColorPresets();
-  preset.restoreSettings();
-  if (add_new)
-    {
-    preset.addColorMap(*add_new, "New Color Preset");
-    }
-
-  QObject::connect(&preset, SIGNAL(currentChanged(const pqColorMapModel*)),
-    this, SLOT(applyPreset(const pqColorMapModel*)));
-  preset.exec();
-  preset.saveSettings(); 
+  pqPresetDialog dialog(this, pqPresetDialog::SHOW_INDEXED_COLORS_ONLY);
+  dialog.setCurrentPreset(presetName);
+  dialog.setCustomizableLoadColors(false);
+  dialog.setCustomizableLoadOpacities(false);
+  dialog.setCustomizableUsePresetRange(false);
+  dialog.setCustomizableLoadAnnotations(true);
+  this->connect(&dialog, SIGNAL(applyPreset(const Json::Value&)), SLOT(applyCurrentPreset()));
+  dialog.exec();
 }
 
 //-----------------------------------------------------------------------------
-void pqColorAnnotationsPropertyWidget::applyPreset(const pqColorMapModel* preset)
+void pqColorAnnotationsPropertyWidget::applyCurrentPreset()
 {
-  vtkNew<vtkPVXMLElement> xml;
-  xml->SetName("ColorMap");
-  if (pqColorPresetManager::saveColorMapToXML(preset, xml.GetPointer()))
-    {
-    BEGIN_UNDO_SET("Apply color preset");
-    vtkSMTransferFunctionProxy::ApplyColorMap(this->proxy(), xml.GetPointer());
-    emit this->changeFinished();
-    END_UNDO_SET();
-    }
+  pqPresetDialog* dialog = qobject_cast<pqPresetDialog*>(this->sender());
+  Q_ASSERT(dialog);
+
+  BEGIN_UNDO_SET("Apply color preset");
+  vtkSMTransferFunctionProxy::ApplyPreset(this->proxy(),
+    dialog->currentPreset(), !dialog->loadAnnotations());
+  END_UNDO_SET();
+  emit this->changeFinished();
 }
 
 //-----------------------------------------------------------------------------
 void pqColorAnnotationsPropertyWidget::saveAsPreset()
 {
-  vtkNew<vtkPVXMLElement> xml;
-  if (vtkSMTransferFunctionProxy::SaveColorMap(this->proxy(), xml.GetPointer()))
+  QDialog dialog(this);
+  Ui::SavePresetOptions ui;
+  ui.setupUi(&dialog);
+  ui.saveOpacities->setVisible(false);
+  ui.saveAnnotations->setEnabled(
+    vtkSMPropertyHelper(this->proxy(), "Annotations", true).GetNumberOfElements() > 0);
+
+  // For now, let's not provide an option to not save colors. We'll need to fix
+  // the pqPresetToPixmap to support rendering only opacities.
+  ui.saveColors->setChecked(true);
+  ui.saveColors->setEnabled(false);
+  ui.saveColors->hide();
+
+  if (dialog.exec() != QDialog::Accepted)
     {
-    pqColorMapModel colorMap =
-      pqColorPresetManager::createColorMapFromXML(xml.GetPointer());
-    this->choosePreset(&colorMap);
+    return;
     }
+
+  Json::Value cpreset = vtkSMTransferFunctionProxy::GetStateAsPreset(this->proxy());
+  if (!ui.saveAnnotations->isChecked())
+    {
+    cpreset.removeMember("Annotations");
+    }
+  vtkStdString presetName;
+  if (!cpreset.isNull())
+    {
+    // This scoping is necessary to ensure that the vtkSMTransferFunctionPresets
+    // saves the new preset to the "settings" before the choosePreset dialog is
+    // shown.
+    vtkNew<vtkSMTransferFunctionPresets> presets;
+    presetName = presets->AddUniquePreset(cpreset);
+    }
+  this->choosePreset(presetName);
 }

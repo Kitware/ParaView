@@ -204,6 +204,34 @@ void pqPropertyWidget::addPropertyLink(QObject *qobject,
 }
 
 //-----------------------------------------------------------------------------
+void pqPropertyWidget::removePropertyLink(QObject *qobject,
+                                       const char *qproperty,
+                                       const char *qsignal,
+                                       vtkSMProperty *smproperty,
+                                       int smindex)
+{
+  this->Links.removePropertyLink(qobject,
+                              qproperty,
+                              qsignal,
+                              this->Proxy,
+                              smproperty,
+                              smindex);
+}
+
+//-----------------------------------------------------------------------------
+void pqPropertyWidget::removePropertyLink(QObject *qobject,
+                                       const char *qproperty,
+                                       const char *qsignal,
+                                       vtkSMProxy* smproxy,
+                                       vtkSMProperty *smproperty,
+                                       int smindex)
+{
+  this->Links.removePropertyLink(qobject, qproperty, qsignal,
+    smproxy, smproperty, smindex);
+}
+
+
+//-----------------------------------------------------------------------------
 void pqPropertyWidget::addDecorator(pqPropertyWidgetDecorator* decorator)
 {
   if (!decorator || decorator->parent() != this)

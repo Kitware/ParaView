@@ -98,7 +98,8 @@ file (COPY "${ParaView_SOURCE_DIR}/VTK/Wrapping/Python/vtk/util/numpy_support.py
       USE_SOURCE_PERMISSIONS)
 
 # copy ParaView's default lookup tables
-file(COPY "${CMAKE_SOURCE_DIR}/Qt/Components/Resources/XML/ColorMaps.xml"
+# This is temporary t
+file(COPY "${CMAKE_SOURCE_DIR}/ParaViewCore/ServerManager/Rendering/ColorMaps.xml"
   DESTINATION "${PV_PYTHON_MODULE_BINARY_DIR}"
   USE_SOURCE_PERMISSIONS)
 

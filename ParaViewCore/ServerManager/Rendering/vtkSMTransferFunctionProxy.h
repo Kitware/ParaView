@@ -25,8 +25,12 @@
 #include "vtkSMProxy.h"
 #include "vtkPVServerManagerRenderingModule.h" // needed for export macro
 
-class vtkPVArrayInformation;
+namespace Json
+{
+  class Value;
+}
 
+class vtkPVArrayInformation;
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMTransferFunctionProxy : public vtkSMProxy
 {
 public:
@@ -103,6 +107,35 @@ public:
     {
     return vtkSMTransferFunctionProxy::MapControlPointsToLogSpace(proxy, true);
     }
+
+  // Description:
+  // Apply a preset. If \c rescale is true (default), then apply loading the
+  // preset, the transfer function range will be preserved (if originally
+  // valid). If not valid, or \c rescale is false, then the range provided by
+  // the preset is used. When using indexed color maps, the \c rescale implies
+  // loading of annotations since the "range" for indexed color maps is
+  // described by the annotations.
+  virtual bool ApplyPreset(const Json::Value& value, bool rescale=true);
+  static bool ApplyPreset(vtkSMProxy* proxy, const Json::Value& value, bool rescale=true)
+    {
+    vtkSMTransferFunctionProxy* self =
+      vtkSMTransferFunctionProxy::SafeDownCast(proxy);
+    return self? self->ApplyPreset(value, rescale) : false;
+    }
+
+  virtual bool ApplyPreset(const char* presetname, bool rescale=true);
+  static bool ApplyPreset(vtkSMProxy* proxy, const char* presetname, bool rescale=true)
+    {
+    vtkSMTransferFunctionProxy* self =
+      vtkSMTransferFunctionProxy::SafeDownCast(proxy);
+    return self? self->ApplyPreset(presetname, rescale) : false;
+    }
+
+  // Description:
+  // Saves the transfer function state as a preset. This is simply a subset of the
+  // state of the transfer function proxy.
+  virtual Json::Value GetStateAsPreset();
+  static Json::Value GetStateAsPreset(vtkSMProxy* proxy);
 
   // Description:
   // Load a ColorMap XML. This will update a transfer function using the
@@ -219,6 +252,34 @@ public:
       }
     }
   using Superclass::ResetPropertiesToXMLDefaults;
+
+  // Description:
+  // Method to convert legacy color map preset XML to JSON. Use this to convert
+  // a single ColorMap xml. To convert a collection of color maps, use
+  // ConvertMultipleLegacyColorMapXMLToJSON().
+  static Json::Value ConvertLegacyColorMapXMLToJSON(vtkPVXMLElement* xml);
+  static Json::Value ConvertLegacyColorMapXMLToJSON(const char* xmlcontents);
+
+  // Description:
+  // Method to convert legacy "ColorMaps" preset XML to JSON. This converts all
+  // colormaps in the XML.
+  static Json::Value ConvertMultipleLegacyColorMapXMLToJSON(vtkPVXMLElement* xml);
+  static Json::Value ConvertMultipleLegacyColorMapXMLToJSON(const char* xmlcontents);
+
+  // Description:
+  // Converts legacy xml file to json.
+  static bool ConvertLegacyColorMapsToJSON(const char* inxmlfile, const char* outjsonfile);
+
+  // Description:
+  // Returns current transfer function data range. Returns false is a valid
+  // range could not be determined.
+  virtual bool GetRange(double range[2]);
+  static bool GetRange(vtkSMProxy* proxy, double range[2])
+    {
+    vtkSMTransferFunctionProxy* self =
+      vtkSMTransferFunctionProxy::SafeDownCast(proxy);
+    return self? self->GetRange(range) : false;
+    }
 
 //BTX
 protected:

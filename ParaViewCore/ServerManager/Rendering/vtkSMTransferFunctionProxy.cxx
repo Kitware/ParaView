@@ -21,14 +21,19 @@
 #include "vtkPVXMLParser.h"
 #include "vtkScalarsToColors.h"
 #include "vtkSMCoreUtilities.h"
+#include "vtkSMNamedPropertyIterator.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMScalarBarWidgetRepresentationProxy.h"
+#include "vtkSMSettings.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMTrace.h"
 #include "vtkSMTransferFunctionManager.h"
+#include "vtkSMTransferFunctionPresets.h"
+#include "vtkStringList.h"
 #include "vtkTuple.h"
+#include "vtk_jsoncpp.h"
 
 #include <algorithm>
 #include <math.h>
@@ -95,6 +100,37 @@ namespace
 
     return controlPointsProperty;
     }
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMTransferFunctionProxy::GetRange(double range[2])
+{
+  range[0] = VTK_DOUBLE_MAX;
+  range[1] = VTK_DOUBLE_MIN;
+
+  vtkSMProperty* controlPointsProperty = GetControlPointsProperty(this);
+  if (!controlPointsProperty)
+    {
+    return false;
+    }
+
+  vtkSMPropertyHelper cntrlPoints(controlPointsProperty);
+  unsigned int num_elements = cntrlPoints.GetNumberOfElements();
+  if (num_elements < 4)
+    {
+    return false;
+    }
+
+  std::vector<vtkTuple<double, 4> > points;
+  points.resize(num_elements/4);
+  cntrlPoints.Get(points[0].GetData(), num_elements);
+
+  // sort the points by x, just in case user didn't add them correctly.
+  std::sort(points.begin(), points.end(), StrictWeakOrdering());
+
+  range[0] = points.front().GetData()[0];
+  range[1] = points.back().GetData()[0];
+  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -428,181 +464,115 @@ bool vtkSMTransferFunctionProxy::MapControlPointsToLogSpace(
 //----------------------------------------------------------------------------
 bool vtkSMTransferFunctionProxy::ApplyColorMap(const char* text)
 {
-  vtkNew<vtkPVXMLParser> parser;
-  if (!parser->Parse(text))
-    {
-    return false;
-    }
-
-  return this->ApplyColorMap(parser->GetRootElement());
+  Json::Value json = this->ConvertLegacyColorMapXMLToJSON(text);
+  return this->ApplyPreset(json);
 }
 
 //----------------------------------------------------------------------------
 bool vtkSMTransferFunctionProxy::ApplyColorMap(vtkPVXMLElement* xml)
 {
-  if (!xml || !xml->GetName() || strcmp(xml->GetName(), "ColorMap") != 0)
+  Json::Value json = this->ConvertLegacyColorMapXMLToJSON(xml);
+  return this->ApplyPreset(json);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMTransferFunctionProxy::ApplyPreset(const Json::Value& arg, bool rescale)
+{
+  if (arg.isNull())
     {
-    vtkWarningMacro("'ColorMap' XML expected.");
-    return false;
+    return true;
     }
 
-  bool indexedLookup =
-    (strcmp(xml->GetAttributeOrDefault("indexedLookup", "false"), "true") == 0);
-  vtkSMPropertyHelper(this, "IndexedLookup").Set(indexedLookup? 1 : 0);
+  SM_SCOPED_TRACE(CallMethod)
+    .arg(this)
+    .arg("ApplyPreset")
+    .arg(arg.get("Name", "-PresetName-").asString().c_str())
+    .arg(rescale)
+    .arg("comment", "Apply a preset using its name. "
+      "Note this may not work as expected when presets have duplicate names.");
 
-  if (!indexedLookup)
+  bool usingIndexedColors = arg.isMember("IndexedColors");
+
+  double range[2];
+  bool valid_range = (rescale && !usingIndexedColors)? this->GetRange(range) : false;
+
+  // Fill up preset with defaults for missing values.
+  Json::Value preset(arg);
+  preset["IndexedLookup"] = usingIndexedColors? 1 : 0;
+  if (usingIndexedColors && rescale)
     {
-    // load color-space for only for non-categorical color maps
-    std::string colorSpace = xml->GetAttributeOrDefault("space", "NoChange");
-    if (colorSpace == "Wrapped")
-      {
-      vtkSMPropertyHelper(this, "HSVWrap").Set(1);
-      vtkSMPropertyHelper(this, "ColorSpace").Set("HSV");
-      }
-    else if (colorSpace != "NoChange")
-      {
-      vtkSMPropertyHelper(this, "HSVWrap").Set(0);
-      vtkSMPropertyHelper(this, "ColorSpace").Set(colorSpace.c_str());
-      }
+    // if rescaling, for indexed colors, it means we need to preserve the
+    // current annotations.
+    preset.removeMember("Annotations");
     }
 
-  vtkPVXMLElement* nanElement = xml->FindNestedElementByName("NaN");
-  if (nanElement && nanElement->GetAttribute("r") &&
-    nanElement->GetAttribute("g") && nanElement->GetAttribute("b"))
+  if (!preset.isMember("HSVWrap"))
     {
-    double rgb[3];
-    nanElement->GetScalarAttribute("r", &rgb[0]);
-    nanElement->GetScalarAttribute("g", &rgb[1]);
-    nanElement->GetScalarAttribute("b", &rgb[2]);
-    vtkSMPropertyHelper(this, "NanColor").Set(rgb, 3);
+    preset["HSVWrap"] = 0;
     }
-
-  // Read the control points from the XML.
-  std::vector<vtkTuple<double, 4> > new_points;
-  std::vector<vtkTuple<const char*, 2> > new_annotations;
-
-  for (unsigned int cc=0; cc < xml->GetNumberOfNestedElements(); cc++)
+  if (vtkSMSettings::DeserializeFromJSON(this, preset))
     {
-    vtkPVXMLElement* pointElement = xml->GetNestedElement(cc);
-    double xrgb[4];
-    if (pointElement && pointElement->GetName() &&
-      strcmp(pointElement->GetName(), "Point") == 0 &&
-      pointElement->GetScalarAttribute("r", &xrgb[1]) &&
-      pointElement->GetScalarAttribute("g", &xrgb[2]) &&
-      pointElement->GetScalarAttribute("b", &xrgb[3]))
+    if (valid_range)
       {
-      if (!indexedLookup &&
-        pointElement->GetScalarAttribute("x", &xrgb[0]))
-        {
-        // "x" attribute is only needed for non-categorical color maps.
-        new_points.push_back(vtkTuple<double, 4>(xrgb));
-        }
-      else if (indexedLookup)
-        {
-        // since "x" attribute is only needed for non-categorical color maps, we
-        // make up one. This will be ignored when setting the "IndexedColors"
-        // property.
-        xrgb[0] = cc;
-        new_points.push_back(vtkTuple<double, 4>(xrgb));
-        }
+      this->RescaleTransferFunction(range[0], range[1], /*extend=*/false);
       }
-    else if (pointElement && pointElement->GetName() &&
-      strcmp(pointElement->GetName()," Annotation") &&
-      pointElement->GetAttribute("v") &&
-      pointElement->GetAttribute("t"))
-      {
-      const char* value[2] = {
-          pointElement->GetAttribute("v"),
-          pointElement->GetAttribute("t")};
-      new_annotations.push_back(vtkTuple<const char*, 2>(value));
-      }
+    this->UpdateVTKObjects();
+    return true;
     }
-
-  if (new_annotations.size() > 0)
-    {
-    vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
-      this->GetProperty("Annotations"));
-    if (svp)
-      {
-      svp->SetElements(new_annotations[0].GetData(),
-        static_cast<unsigned int>(new_annotations.size()*2));
-      }
-    }
-
-  if (new_points.size() > 0 && indexedLookup)
-    {
-    std::vector<vtkTuple<double, 3> > rgbColors;
-    rgbColors.resize(new_points.size());
-    for (size_t cc=0; cc < new_points.size(); cc++)
-      {
-      rgbColors[cc].GetData()[0] = new_points[cc].GetData()[1];
-      rgbColors[cc].GetData()[1] = new_points[cc].GetData()[2];
-      rgbColors[cc].GetData()[2] = new_points[cc].GetData()[3];
-      }
-
-    vtkSMPropertyHelper indexedColors(this->GetProperty("IndexedColors"));
-    indexedColors.Set(rgbColors[0].GetData(),
-      static_cast<unsigned int>(rgbColors.size() * 3));
-    }
-  else if (new_points.size() > 0 && !indexedLookup)
-    {
-    vtkSMProperty* controlPointsProperty = GetControlPointsProperty(this);
-    if (!controlPointsProperty)
-      {
-      return false;
-      }
-
-    vtkSMPropertyHelper cntrlPoints(controlPointsProperty);
-
-    // sort the points by x, just in case user didn't add them correctly.
-    std::sort(new_points.begin(), new_points.end(), StrictWeakOrdering());
-
-    if (new_points.front().GetData()[0] == 0.0 &&
-      new_points.back().GetData()[0] == 1.0)
-      {
-      // normalized LUT, we will rescale it using the current range.
-      unsigned int num_elements = cntrlPoints.GetNumberOfElements();
-      if (num_elements != 0 || num_elements == 4)
-        {
-        std::vector<vtkTuple<double, 4> > points;
-        points.resize(num_elements/4);
-        cntrlPoints.Get(points[0].GetData(), num_elements);
-        std::sort(points.begin(), points.end(), StrictWeakOrdering());
-        double range[2] = {points.front().GetData()[0], points.back().GetData()[0]};
-
-        // determine if the interpolation has to happen in log-space.
-        bool log_space =
-          (vtkSMPropertyHelper(this, "UseLogScale", true).GetAsInt() != 0);
-        if (range[0] <= 0.0 || range[1] <= 0.0)
-          {
-          // ranges not valid for log-space. Switch to linear space.
-          log_space = false;
-          }
-
-        for (size_t cc=0; cc < new_points.size(); cc++)
-          {
-          double &x = new_points[cc].GetData()[0];
-          if (log_space)
-            {
-            double logx = log10(range[0]) + x*log10(range[1]/range[0]);
-              /// ==== log10(range[0]) + (log10(range[1] - log10(range[0])) * x;
-            x = pow(10.0, logx);
-            }
-          else
-            {
-            // since x is in [0, 1].
-            x = range[0] + (range[1] - range[0]) * x;
-            }
-          }
-        }
-      }
-    // TODO: we may need to handle normalized/non-normalized color-map more
-    // elegantly.
-    cntrlPoints.Set(new_points[0].GetData(),
-      static_cast<unsigned int>(new_points.size() * 4));
-    }
+  vtkErrorMacro("Failed to load preset properly");
   this->UpdateVTKObjects();
-  return true;
+  return false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMTransferFunctionProxy::ApplyPreset(const char* presetname, bool rescale)
+{
+  vtkNew<vtkSMTransferFunctionPresets> presets;
+  return this->ApplyPreset(presets->GetFirstPresetWithName(presetname), rescale);
+}
+
+//----------------------------------------------------------------------------
+Json::Value vtkSMTransferFunctionProxy::GetStateAsPreset()
+{
+  vtkNew<vtkStringList> toSave;
+  if (this->GetProperty("RGBPoints"))
+    {
+    if (vtkSMPropertyHelper(this, "IndexedLookup", /*quiet=*/true).GetAsInt() == 0)
+      {
+      toSave->AddString("ColorSpace");
+      toSave->AddString("RGBPoints");
+      if (vtkSMPropertyHelper(this, "HSVWrap", true).GetAsInt() != 0)
+        {
+        toSave->AddString("HSVWrap");
+        }
+      }
+    else
+      {
+      toSave->AddString("IndexedColors");
+
+      // Annotations are only saved with indexed colors.
+      if (vtkSMPropertyHelper(this, "Annotations", true).GetNumberOfElements() > 0)
+        {
+        toSave->AddString("Annotations");
+        }
+      }
+    }
+  else
+    {
+    toSave->AddString("Points");
+    }
+
+  vtkNew<vtkSMNamedPropertyIterator> iter;
+  iter->SetProxy(this);
+  iter->SetPropertyNames(toSave.GetPointer());
+  return vtkSMSettings::SerializeAsJSON(this, iter.GetPointer());
+}
+
+//----------------------------------------------------------------------------
+Json::Value vtkSMTransferFunctionProxy::GetStateAsPreset(vtkSMProxy* proxy)
+{
+  vtkSMTransferFunctionProxy* self = vtkSMTransferFunctionProxy::SafeDownCast(proxy);
+  return self? self->GetStateAsPreset() : Json::Value();
 }
 
 //----------------------------------------------------------------------------
@@ -805,6 +775,216 @@ void vtkSMTransferFunctionProxy::ResetPropertiesToXMLDefaults(
       }
     }
 }
+
+//----------------------------------------------------------------------------
+Json::Value vtkSMTransferFunctionProxy::ConvertLegacyColorMapXMLToJSON(vtkPVXMLElement* xml)
+{
+  if (!xml || !xml->GetName() || strcmp(xml->GetName(), "ColorMap") != 0)
+    {
+    vtkGenericWarningMacro("'ColorMap' XML expected.");
+    return Json::Value();
+    }
+
+  Json::Value json(Json::objectValue);
+
+  bool indexedLookup =
+    (strcmp(xml->GetAttributeOrDefault("indexedLookup", "false"), "true") == 0);
+  if (!indexedLookup)
+    {
+    // load color-space for only for non-categorical color maps
+    std::string colorSpace = xml->GetAttributeOrDefault("space", "NoChange");
+    if (colorSpace == "Wrapped")
+      {
+      json["HSVWrap"] = 1;
+      json["ColorSpace"] = "HSV";
+      }
+    else if (colorSpace != "NoChange")
+      {
+      json["ColorSpace"] = colorSpace;
+      }
+    }
+
+  vtkPVXMLElement* nanElement = xml->FindNestedElementByName("NaN");
+  if (nanElement && nanElement->GetAttribute("r") &&
+    nanElement->GetAttribute("g") && nanElement->GetAttribute("b"))
+    {
+    double rgb[3];
+    nanElement->GetScalarAttribute("r", &rgb[0]);
+    nanElement->GetScalarAttribute("g", &rgb[1]);
+    nanElement->GetScalarAttribute("b", &rgb[2]);
+
+    Json::Value nancolor(Json::arrayValue);
+    nancolor[0] = rgb[0];
+    nancolor[1] = rgb[1];
+    nancolor[2] = rgb[2];
+    json["NanColor"] = nancolor;
+    }
+
+  // Read the control points from the XML.
+  std::vector<vtkTuple<double, 4> > new_points;
+  std::vector<vtkTuple<const char*, 2> > new_annotations;
+
+  for (unsigned int cc=0; cc < xml->GetNumberOfNestedElements(); cc++)
+    {
+    vtkPVXMLElement* pointElement = xml->GetNestedElement(cc);
+    double xrgb[4];
+    if (pointElement && pointElement->GetName() &&
+      strcmp(pointElement->GetName(), "Point") == 0 &&
+      pointElement->GetScalarAttribute("r", &xrgb[1]) &&
+      pointElement->GetScalarAttribute("g", &xrgb[2]) &&
+      pointElement->GetScalarAttribute("b", &xrgb[3]))
+      {
+      if (!indexedLookup &&
+        pointElement->GetScalarAttribute("x", &xrgb[0]))
+        {
+        // "x" attribute is only needed for non-categorical color maps.
+        new_points.push_back(vtkTuple<double, 4>(xrgb));
+        }
+      else if (indexedLookup)
+        {
+        // since "x" attribute is only needed for non-categorical color maps, we
+        // make up one. This will be ignored when setting the "IndexedColors"
+        // property.
+        xrgb[0] = cc;
+        new_points.push_back(vtkTuple<double, 4>(xrgb));
+        }
+      }
+    else if (pointElement && pointElement->GetName() &&
+      strcmp(pointElement->GetName(),"Annotation") &&
+      pointElement->GetAttribute("v") &&
+      pointElement->GetAttribute("t"))
+      {
+      const char* value[2] = {
+          pointElement->GetAttribute("v"),
+          pointElement->GetAttribute("t")};
+      new_annotations.push_back(vtkTuple<const char*, 2>(value));
+      }
+    }
+
+  if (new_annotations.size() > 0)
+    {
+    Json::Value annotations(Json::arrayValue);
+    for (int cc=0, max = static_cast<int>(new_annotations.size()); cc < max; cc++)
+      {
+      annotations[2*cc] = new_annotations[cc][0];
+      annotations[2*cc+1] = new_annotations[cc][1];
+      }
+    json["Annotations"] = annotations;
+    }
+
+  if (new_points.size() > 0 && indexedLookup)
+    {
+    Json::Value rgbColors(Json::arrayValue);
+    for (int cc=0, max = static_cast<int>(new_points.size()); cc < max; cc++)
+      {
+      rgbColors[3*cc] = new_points[cc].GetData()[1];
+      rgbColors[3*cc + 1] = new_points[cc].GetData()[2];
+      rgbColors[3*cc + 2] = new_points[cc].GetData()[3];
+      }
+    json["IndexedColors"] = rgbColors;
+    }
+  else if (new_points.size() > 0 && !indexedLookup)
+    {
+    // sort the points by x, just in case user didn't add them correctly.
+    std::sort(new_points.begin(), new_points.end(), StrictWeakOrdering());
+
+    Json::Value rgbColors(Json::arrayValue);
+    for (int cc=0, max = static_cast<int>(new_points.size()); cc < max; cc++)
+      {
+      rgbColors[4*cc] = new_points[cc].GetData()[0];
+      rgbColors[4*cc + 1] = new_points[cc].GetData()[1];
+      rgbColors[4*cc + 2] = new_points[cc].GetData()[2];
+      rgbColors[4*cc + 3] = new_points[cc].GetData()[3];
+      }
+    json["RGBPoints"] = rgbColors;
+    }
+
+  // add name.
+  json["Name"] = xml->GetAttribute("name");
+  if (const char* creator= xml->GetAttribute("creator"))
+    {
+    json["Creator"] = creator;
+    }
+  return json;
+}
+
+//----------------------------------------------------------------------------
+Json::Value vtkSMTransferFunctionProxy::ConvertLegacyColorMapXMLToJSON(const char* xmlcontents)
+{
+  vtkNew<vtkPVXMLParser> parser;
+  if (!parser->Parse(xmlcontents))
+    {
+    return Json::Value();
+    }
+  return vtkSMTransferFunctionProxy::ConvertLegacyColorMapXMLToJSON(parser->GetRootElement());
+}
+
+//----------------------------------------------------------------------------
+Json::Value vtkSMTransferFunctionProxy::ConvertMultipleLegacyColorMapXMLToJSON(vtkPVXMLElement* xml)
+{
+  if (!xml || !xml->GetName() || strcmp(xml->GetName(), "ColorMaps") != 0)
+    {
+    vtkGenericWarningMacro("'ColorMaps' XML expected.");
+    return Json::Value();
+    }
+
+  Json::Value json(Json::arrayValue);
+  for (unsigned int cc=0, max=xml->GetNumberOfNestedElements(); cc < max; ++cc)
+    {
+    vtkPVXMLElement* elem = xml->GetNestedElement(cc);
+    if (elem && elem->GetName() && strcmp(elem->GetName(), "ColorMap") == 0 && elem->GetAttribute("name"))
+      {
+      Json::Value cmap = vtkSMTransferFunctionProxy::ConvertLegacyColorMapXMLToJSON(elem);
+      if (!cmap.empty())
+        {
+        json.append(cmap);
+        }
+      }
+    }
+
+  return json;
+}
+
+//----------------------------------------------------------------------------
+Json::Value vtkSMTransferFunctionProxy::ConvertMultipleLegacyColorMapXMLToJSON(const char* xmlcontents)
+{
+  vtkNew<vtkPVXMLParser> parser;
+  if (!parser->Parse(xmlcontents))
+    {
+    return Json::Value();
+    }
+  return vtkSMTransferFunctionProxy::ConvertMultipleLegacyColorMapXMLToJSON(parser->GetRootElement());
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMTransferFunctionProxy::ConvertLegacyColorMapsToJSON(
+  const char* inxmlfile, const char* outjsonfile)
+{
+  vtkNew<vtkPVXMLParser> parser;
+  parser->SetFileName(inxmlfile);
+  if (!parser->Parse())
+    {
+    vtkGenericWarningMacro("Failed to parse XML!");
+    return false;
+    }
+
+  Json::Value json = vtkSMTransferFunctionProxy::ConvertMultipleLegacyColorMapXMLToJSON(parser->GetRootElement());
+  if (json.empty())
+    {
+    return false;
+    }
+
+  ofstream file;
+  file.open(outjsonfile);
+  if (file)
+    {
+    file << json.toStyledString().c_str();
+    file.close();
+    return true;
+    }
+  return false;
+}
+
 
 //----------------------------------------------------------------------------
 void vtkSMTransferFunctionProxy::PrintSelf(ostream& os, vtkIndent indent)

@@ -972,6 +972,13 @@ def GetOpacityTransferFunction(arrayname, **params):
     return otf
 
 # -----------------------------------------------------------------------------
+def ImportPresets(filename):
+    """Import presets from a file. The file can be in the legacy color map xml
+    format or in the new JSON format. Returns True on success."""
+    presets = servermanager.vtkSMTransferFunctionPresets()
+    return presets.ImportPresets(filename)
+
+# -----------------------------------------------------------------------------
 def CreateLookupTable(**params):
     """Create and return a lookup table.  Optionally, parameters can be given
     to assign to the lookup table.

@@ -233,6 +233,10 @@ set (Module_SRCS
   pqPolyLineWidget.h
   pqPopOutWidget.cxx
   pqPopOutWidget.h
+  pqPresetDialog.cxx
+  pqPresetDialog.h
+  pqPresetToPixmap.cxx
+  pqPresetToPixmap.h
   pqPropertiesPanel.cxx
   pqPropertiesPanel.h
   pqPropertyGroupWidget.cxx
@@ -455,6 +459,8 @@ set (Module_MOC_HDRS
   pqPointSourceWidget.h
   pqPolyLineWidget.h
   pqPopOutWidget.h
+  pqPresetDialog.h
+  pqPresetToPixmap.h
   pqPropertiesPanel.h
   pqPropertyGroupWidget.h
   pqPropertyWidgetDecorator.h
@@ -559,6 +565,7 @@ set (Module_UI_FILES
   Resources/UI/pqPluginDialog.ui
   Resources/UI/pqPointSourceControls.ui
   Resources/UI/pqPolyLineWidget.ui
+  Resources/UI/pqPresetDialog.ui
   Resources/UI/pqPropertiesPanel.ui
   Resources/UI/pqProxyInformationWidget.ui
   Resources/UI/pqProxyWidgetDialog.ui
