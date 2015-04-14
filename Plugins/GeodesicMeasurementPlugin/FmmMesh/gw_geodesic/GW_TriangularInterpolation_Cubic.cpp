@@ -198,9 +198,6 @@ void GW_TriangularInterpolation_Cubic::SetUpTriangularInterpolation( GW_Geodesic
 
     /* compute the coefficients, given in that order : 0->cst, 1->X, 2->Y, 3->XY, 4->X^2, 5->Y^2. */
     GW_Maths::Fit2ndOrderPolynomial2D( Points, Values, Coeffs );
-
-    GW_Float r1 = this->ComputeValue( *pV0, *pV1, *pV2, 0.33, 0.33 );
-    GW_Float r2 = this->ComputeValue( *pV0, *pV1, *pV2, 0, 0.5 );
 }
 
 

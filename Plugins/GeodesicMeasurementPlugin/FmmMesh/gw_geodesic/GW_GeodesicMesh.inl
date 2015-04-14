@@ -594,10 +594,10 @@ GW_GeodesicVertex* GW_GeodesicMesh::UnfoldTriangle( GW_GeodesicFace& CurFace, GW
         GW_ASSERT( pV!=NULL );
 
         e1 = pV2->GetPosition() - pV1->GetPosition();
-        GW_Float rNorm1 = ~e1;
+        rNorm1 = ~e1;
         e1 /= rNorm1;
         e2 = pV->GetPosition() - pV1->GetPosition();
-        GW_Float rNorm2 = ~e2;
+        rNorm2 = ~e2;
         e2 /= rNorm2;
         /* compute the position of the new point x on the unfolding plane (via a rotation of -alpha on (x2-x1)/rNorm1 )
                 | cos(alpha) sin(alpha)|

@@ -25,6 +25,7 @@ public:
 
     GW_GeodesicVertex();
     virtual ~GW_GeodesicVertex();
+    using GW_Vertex::operator=;
     GW_Float GetDistance();
     void SetDistance( GW_Float rDistance );
     void SetState( T_GeodesicVertexState nState );
