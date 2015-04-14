@@ -161,7 +161,7 @@ void vtkPVClientServerSynchronizedRenderers::ConfigureCompressor(const char *str
       {
       comp=vtkZlibImageCompressor::New();
       }
-    else if (className=="NULL")
+    else if (className=="NULL" || className.empty())
       {
       this->SetCompressor(0);
       return;
