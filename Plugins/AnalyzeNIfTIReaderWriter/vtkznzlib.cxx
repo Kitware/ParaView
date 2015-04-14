@@ -153,9 +153,6 @@ int vtkznzlib::Xznzclose(znzFile * file)
 
 size_t vtkznzlib::znzread(void* buf, size_t size, size_t nmemb, znzFile file)
 {
-  size_t     remain = size*nmemb;
-  char     * cbuf = (char *)buf;
-
   if (file==NULL) { return 0; }
 #ifdef HAVE_ZLIB
   unsigned   n2read;
@@ -187,9 +184,6 @@ size_t vtkznzlib::znzread(void* buf, size_t size, size_t nmemb, znzFile file)
 
 size_t vtkznzlib::znzwrite(const void* buf, size_t size, size_t nmemb, znzFile file)
 {
-  size_t     remain = size*nmemb;
-  char     * cbuf = (char *)buf;
-
   if (file==NULL) { return 0; }
 #ifdef HAVE_ZLIB
   unsigned   n2write;
