@@ -40,6 +40,9 @@ using namespace GW;
 /*------------------------------------------------------------------------------*/
 void GW_TriangularInterpolation_Linear::ComputeGradient( GW_GeodesicVertex& v0, GW_GeodesicVertex& v1, GW_GeodesicVertex& v2, GW_Float x, GW_Float y, GW_Float& dx, GW_Float& dy )
 {
+    (void) x;
+    (void) y;
+
     GW_Float d0 = v0.GetDistance();
     GW_Float d1 = v1.GetDistance();
     GW_Float d2 = v2.GetDistance();
