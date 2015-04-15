@@ -264,9 +264,6 @@ void GW_Mesh::BuildCurvatureData()
         GW_ASSERT( pVert!=NULL );
         pVert->BuildCurvatureData();
     }
-
-    GW_Float rArea = this->GetArea();
-    GW_Float rTotalArea = GW_Vertex::rTotalArea_;
 }
 
 

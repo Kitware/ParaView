@@ -389,7 +389,7 @@ public:
     /*------------------------------------------------------------------------------*/
     void SetData(GW_I32 i, v_type rVal)
     {
-        GW_ASSERT( i<v_size );
+        GW_ASSERT( static_cast<v_type>(i)<v_size );
         aCoords_[i] = rVal;
     }
 

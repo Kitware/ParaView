@@ -62,6 +62,7 @@ public:
     //@{
     GW_VoronoiVertex();
     virtual ~GW_VoronoiVertex();
+    using GW_Vertex::operator=;
     //@}
 
     GW_GeodesicVertex* GetBaseVertex();

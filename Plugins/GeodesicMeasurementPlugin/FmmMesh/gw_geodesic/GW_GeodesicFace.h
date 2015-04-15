@@ -36,7 +36,7 @@ public:
 
     GW_GeodesicFace();
     virtual ~GW_GeodesicFace();
-
+    using GW_Face::operator=;
     void SetUpTriangularInterpolation();
     void ComputeGradient( GW_GeodesicVertex& v0, GW_GeodesicVertex& v1, GW_GeodesicVertex& v2,
                           GW_Float x, GW_Float y, GW_Float& dx, GW_Float& dy );
