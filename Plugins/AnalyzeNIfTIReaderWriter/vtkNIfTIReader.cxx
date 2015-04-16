@@ -347,11 +347,8 @@ void vtkNIfTIReader::ExecuteInformation()
     }
 
   int inDim[3];
-  int outDim[3];
   double inOriginOffset[3];
   double flippedOriginOffset[3];
-  double outPreFlippedOriginOffset[3];
-  double outPostFlippedOriginOffset[3];
   double outNoFlipOriginOffset[3];
   double outOriginOffset[3];
   
@@ -532,18 +529,8 @@ void vtkNIfTIReader::ExecuteInformation()
     }
 
   for (count=0;count<3;count++){
-    outDim[count]          = inDim[InPlaceFilteredAxes[count]];
     outOriginOffset[count] = flippedOriginOffset[InPlaceFilteredAxes[count]];
     outNoFlipOriginOffset[count] = inOriginOffset[InPlaceFilteredAxes[count]];
-    outPreFlippedOriginOffset[count] = flippedOriginOffset[InPlaceFilteredAxes[count]];
-    }
-
-  for (count=0;count<3;count++){
-    if(flipAxis[count]){
-      outPostFlippedOriginOffset[count] = outNoFlipOriginOffset[count] - outDim[count];
-      } else {
-      outPostFlippedOriginOffset[count] = outNoFlipOriginOffset[count];
-      }
     }
 
   for (count=0;count<3;count++){
@@ -766,7 +753,6 @@ void vtkNIfTIReader::ExecuteDataWithInformation(vtkDataObject *output, vtkInform
   int inIncrements[3];
   int outIncrements[3];
   double inOriginOffset[3];
-  double outOriginOffset[3];
   double inSpacing[3];
   double outSpacing[3];
   double inOrigin[3];
@@ -973,7 +959,6 @@ void vtkNIfTIReader::ExecuteDataWithInformation(vtkDataObject *output, vtkInform
     outExtent[count*2]     = inExtent[InPlaceFilteredAxes[count]*2];
     outExtent[(count*2)+1] = inExtent[(InPlaceFilteredAxes[count]*2)+1];
     outOrigin[count]       = inOrigin[InPlaceFilteredAxes[count]];
-    outOriginOffset[count] = inOriginOffset[InPlaceFilteredAxes[count]];
     }
 
   for (count=0;count<3;count++){
@@ -1067,7 +1052,6 @@ void vtkNIfTIReader::ExecuteDataWithInformation(vtkDataObject *output, vtkInform
     }
 
   // Loop through output voxels
-  int errorNumber = 0;
   count = 0;
   for (idZ = 0 ; idZ < outDim[2] ; idZ++){
     outSliceOffset = idZ * outSliceSize;
@@ -1077,10 +1061,9 @@ void vtkNIfTIReader::ExecuteDataWithInformation(vtkDataObject *output, vtkInform
         outOffset = outSliceOffset + outRowOffset + (idX * scalarSize);
         for (idSize = 0; idSize < scalarSize ; idSize++){
           charOutOffset = outOffset + idSize;
-          if((charOutOffset < tempUnsignedCharDataSize) && (charOutOffset >=0) && (count >=0) && (count < outPtrSize) ){
+          if( (count >=0) && (static_cast<size_t>(count) < outPtrSize) &&
+              (charOutOffset >=0) && (static_cast<size_t>(charOutOffset) < tempUnsignedCharDataSize) ){
             outUnsignedCharPtr[charOutOffset] = tempUnsignedCharData[count];
-            } else {
-            errorNumber = 1;
             }
           count++;
           }
