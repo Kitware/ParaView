@@ -283,6 +283,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadPartiallyUpdatedStateFiles.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadSaveStateAnimation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadState.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/LoadSaveStateVolume.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/MultiBlockAttributes1.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/MultiBlockSingleBlock.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/MultiSliceMultiBlock.xml
@@ -592,6 +593,10 @@ set (Contour_FORCE_SERIAL TRUE) # Uses inline edit popups
 set (SaveColorMap_FORCE_SERIAL TRUE) # Uses inline edit popups
 set (CategoricalColors_FORCE_SERIAL TRUE) # Uses inline edit popups
 set (ChartAxisRangeAndLabels_FORCE_SERIAL TRUE) # Uses inline edit popups
+
+set (LoadSaveStateVolume_FORCE_SERIAL TRUE)
+# We don't support volume rendering of image data in data server & render server mode
+set(LoadSaveStateVolume_DISABLE_CRS TRUE)
 
 # Set properties for CTH tests
 set(CTHAMRContour_DISABLE_CS TRUE)
