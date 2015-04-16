@@ -361,8 +361,6 @@ vtkPVProminentValuesInformation* vtkSMRepresentationProxy::GetProminentValuesInf
 
     // Ask the server to fill out the rest of the information:
     this->GatherInformation(this->ProminentValuesInformation);
-    std::cout << "gathering prominent values information" << std::endl;
-    //std::cout << "this->VTKRepresentationUpdated: " << this->VTKRepresentationUpdated << std::endl;
     vtkTimerLog::MarkEndEvent(
       "vtkSMRepresentationProxy::GetProminentValues");
     this->ProminentValuesFraction = fraction;

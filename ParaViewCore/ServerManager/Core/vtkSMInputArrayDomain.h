@@ -15,7 +15,7 @@
 // .NAME vtkSMInputArrayDomain - domain to ensure that input has required types
 // of arrays.
 // .SECTION Description
-// vtkSMInputArrayDomain is domain that can be used on a vtkSMInputProperty to
+// vtkSMInputArrayDomain is a domain that can be used on a vtkSMInputProperty to
 // check if the pipeline input provides attribute arrays of the required types
 // e.g. if a filter can only work if the input data set has cell data arrays,
 // then one can use this domain.
