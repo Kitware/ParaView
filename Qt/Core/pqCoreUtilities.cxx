@@ -235,8 +235,11 @@ unsigned long pqCoreUtilities::connect(
 }
 
 //-----------------------------------------------------------------------------
-bool pqCoreUtilities::promptUser(const QString& settingsKey,
-  const QString& title, const QString& message, QWidget* parentWdg)
+bool pqCoreUtilities::promptUser(
+  const QString& settingsKey,
+  QMessageBox::Icon icon,
+  const QString& title, const QString& message,
+  QMessageBox::StandardButtons buttons, QWidget* parentWdg)
 {
   if (getenv("DASHBOARD_TEST_FROM_CTEST")!=NULL)
     {
@@ -250,21 +253,30 @@ bool pqCoreUtilities::promptUser(const QString& settingsKey,
     return true;
     }
 
-  QMessageBox mbox(QMessageBox::Question,
-    title, message,
-    QMessageBox::Yes | QMessageBox::No | QMessageBox::YesToAll, parentWdg);
+  QMessageBox mbox(icon, title, message, buttons, parentWdg);
   mbox.setObjectName("CoreUtilitiesPromptUser");
 
   // Add a "Yes, and don't ask" button.
-  QAbstractButton* remember = mbox.button(QMessageBox::YesToAll);
-  remember->setText("Yes, and don't ask again");
-  remember->setObjectName("YesToAll");
-  remember->setIcon(mbox.button(QMessageBox::Yes)->icon());
+  QAbstractButton* remember = mbox.button(QMessageBox::Save);
+  QAbstractButton* yesButton = mbox.button(QMessageBox::Yes);
+  QAbstractButton* okButton = mbox.button(QMessageBox::Ok);
+  if (yesButton)
+    {
+    remember->setText("Yes, and don't ask again");
+    remember->setObjectName("YesAndSave");
+    remember->setIcon(mbox.button(QMessageBox::Yes)->icon());
+    }
+  else if (okButton)
+    {
+    remember->setText("OK, and don't ask again");
+    remember->setObjectName("OkAndSave");
+    remember->setIcon(mbox.button(QMessageBox::Ok)->icon());
+    }
   mbox.exec();
 
   switch (mbox.standardButton(mbox.clickedButton()))
     {
-  case QMessageBox::YesToAll:
+  case QMessageBox::Save:
     settings->setValue(settingsKey, true);
     return true;
   case QMessageBox::Yes:

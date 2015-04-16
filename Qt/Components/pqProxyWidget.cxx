@@ -65,6 +65,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDomainIterator.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMNamedPropertyIterator.h"
 #include "vtkSMOrderedPropertyIterator.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMProperty.h"
@@ -76,12 +77,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSettings.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMTrace.h"
+#include "vtkStringList.h"
 
 #include <QHideEvent>
 #include <QLabel>
 #include <QPointer>
 #include <QShowEvent>
 #include <QVBoxLayout>
+
+#include <vector>
 
 //-----------------------------------------------------------------------------------
 namespace
@@ -535,9 +539,29 @@ public:
   QList<QPointer<pqProxyWidgetItem> > Items;
   bool CachedShowAdvanced;
   QString CachedFilterText;
+  vtkStringList* Properties;
 
-  pqInternals(vtkSMProxy* smproxy): Proxy(smproxy), CachedShowAdvanced(false)
+  pqInternals(vtkSMProxy* smproxy, QStringList properties):
+    Proxy(smproxy), CachedShowAdvanced(false)
     {
+      vtkNew<vtkSMPropertyIterator> propertyIter;
+      this->Properties = vtkStringList::New();
+      propertyIter->SetProxy(smproxy);
+      
+      for (propertyIter->Begin(); !propertyIter->IsAtEnd(); propertyIter->Next())
+        {
+        QString propertyKeyName = propertyIter->GetKey();
+        propertyKeyName.replace(" ", "");
+        if(properties.contains(propertyKeyName))
+          {
+          this->Properties->AddString(propertyKeyName.toStdString().c_str());
+          }
+        }
+      if (this->Properties->GetLength() == 0)
+        {
+        this->Properties->Delete();
+        this->Properties = NULL;
+        }
     }
 
   ~pqInternals()
@@ -545,6 +569,10 @@ public:
     foreach (pqProxyWidgetItem* item, this->Items)
       {
       delete item;
+      }
+    if (this->Properties)
+      {
+      this->Properties->Delete();
       }
     }
 
@@ -575,7 +603,8 @@ pqProxyWidget::pqProxyWidget(
 
 //-----------------------------------------------------------------------------
 pqProxyWidget::pqProxyWidget(
-  vtkSMProxy* smproxy, const QStringList &properties, QWidget *parentObject, Qt::WindowFlags wflags)
+  vtkSMProxy* smproxy, const QStringList &properties, QWidget *parentObject, 
+  Qt::WindowFlags wflags)
   : Superclass(parentObject, wflags)
 {
   this->constructor(smproxy, properties, parentObject, wflags);
@@ -593,7 +622,7 @@ void pqProxyWidget::constructor(
   this->ApplyChangesImmediately = false;
   // if the proxy wants a more descriptive layout for the panel, use it.
   this->UseDocumentationForLabels = pqProxyWidget::useDocumentationForLabels(smproxy);
-  this->Internals = new pqProxyWidget::pqInternals(smproxy);
+  this->Internals = new pqProxyWidget::pqInternals(smproxy, properties);
 
   QGridLayout* gridLayout = new QGridLayout(this);
   gridLayout->setMargin(pqPropertiesPanel::suggestedMargin());
@@ -1204,6 +1233,14 @@ bool pqProxyWidget::restoreDefaults()
     for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
       {
       vtkSMProperty * smproperty = iter->GetProperty();
+
+      // restore defaults only for properties listed
+      if (this->Internals->Properties &&
+          this->Internals->Properties->GetIndex(smproperty->GetXMLName()))
+        {
+        continue;
+        }
+
       // Restore only basic type properties.
       if (vtkSMVectorProperty::SafeDownCast(smproperty) &&
           !smproperty->GetNoCustomDefault() &&
@@ -1234,7 +1271,17 @@ bool pqProxyWidget::restoreDefaults()
 void pqProxyWidget::saveAsDefaults()
 {
   vtkSMSettings* settings = vtkSMSettings::GetInstance();
-  settings->SetProxySettings(this->Internals->Proxy);
+  vtkSMNamedPropertyIterator* propertyIt = NULL;
+  if (this->Internals->Properties)
+    {
+    propertyIt = vtkSMNamedPropertyIterator::New();
+    propertyIt->SetPropertyNames(this->Internals->Properties);
+    }
+  settings->SetProxySettings(this->Internals->Proxy, propertyIt);
+  if (propertyIt)
+    {
+    propertyIt->Delete();
+    }
 }
 
 //-----------------------------------------------------------------------------

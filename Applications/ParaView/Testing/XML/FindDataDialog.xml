@@ -87,7 +87,7 @@
 
   <pqevent object="pqClientMainWindow/FindDataDialog/selectionDisplayFrame/pointLabelsButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FindDataDialog/selectionDisplayFrame/PointLabelsMenu" command="activate" arguments="Pres" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/selectionDisplayFrame/showLabelPropertiesButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/selectionDisplayFrame/labelPropertiesSelection" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FindDataDialog/selectionDisplayFrame/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/FontEditor/FontFamily" command="set_string" arguments="Courier" />
   <pqevent object="pqClientMainWindow/FindDataDialog/selectionDisplayFrame/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/FontEditor/FontFamily" command="set_string" arguments="Courier" />
   <pqevent object="pqClientMainWindow/FindDataDialog/selectionDisplayFrame/ProxyWidgetDialog/widget/OKButton" command="activate" arguments="" />

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqRenderViewSelectionReaction.h
+   Module:  pqRenderViewOneSelectionReaction.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,30 +29,31 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqRenderViewSelectionReaction_h
-#define __pqRenderViewSelectionReaction_h
+#ifndef __pqRenderViewOneSelectionReaction_h
+#define __pqRenderViewOneSelectionReaction_h
 
-#include "pqReaction.h"
+#include "pqRenderViewSelectionReaction.h"
 #include <QPointer>
 #include <QCursor>
-#include "vtkWeakPointer.h"
 
 class pqRenderView;
 class pqView;
 class vtkIntArray;
 class vtkObject;
 
-/// pqRenderViewSelectionReaction handles various selection modes available on
-/// RenderViews. Simply create multiple instances of
-/// pqRenderViewSelectionReaction to handle selection modes for that RenderView.
-/// pqRenderViewSelectionReaction uses internal static members to ensure that
+/// pqRenderViewOneSelectionReaction handles various selection modes available on
+/// RenderViews. This class handles only one selection at a time.
+/// For interactive selection see pqRenderViewInteractiveSelectionReaction.
+/// Simply create multiple instances of
+/// pqRenderViewOneSelectionReaction to handle selection modes for that RenderView.
+/// pqRenderViewOneSelectionReaction uses internal static members to ensure that
 /// at most 1 view (and 1 type of selection) is in selection-mode at any given
 /// time.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqRenderViewSelectionReaction :
-  public pqReaction
+class PQAPPLICATIONCOMPONENTS_EXPORT pqRenderViewOneSelectionReaction :
+  public pqRenderViewSelectionReaction
 {
   Q_OBJECT
-  typedef pqReaction Superclass;
+  typedef pqRenderViewSelectionReaction Superclass;
 public:
   enum SelectionMode
     {
@@ -65,69 +66,37 @@ public:
     SELECT_BLOCKS,
     SELECT_CUSTOM_BOX,
     SELECT_CUSTOM_POLYGON,
-    ZOOM_TO_BOX,
-    CLEAR_SELECTION,
-    SELECT_SURFACE_CELLS_INTERACTIVELY,
-    SELECT_SURFACE_POINTS_INTERACTIVELY
+    ZOOM_TO_BOX
     };
 
   /// If \c view is NULL, this reaction will track the active-view maintained by
   /// pqActiveObjects.
-  pqRenderViewSelectionReaction(
+  pqRenderViewOneSelectionReaction(
     QAction* parentAction, pqRenderView* view, SelectionMode mode);
-  virtual ~pqRenderViewSelectionReaction();
+  virtual ~pqRenderViewOneSelectionReaction();
 
 signals:
   void selectedCustomBox(int xmin, int ymin, int xmax, int ymax);
   void selectedCustomBox(const int region[4]);
   void selectedCustomPolygon(vtkIntArray* polygon);
 
-private slots:
-  /// For checkable actions, this calls this->beginSelection() or
-  /// this->endSelection() is val is true or false, respectively. For
-  /// non-checkable actions, this call this->beginSelection() and
-  /// this->endSelection() in that order.
-  virtual void actionTriggered(bool val);
-
-  /// Handles enable state for the "CLEAR_SELECTION" mode.
-  virtual void updateEnableState();
-
-  /// Called when this object was created with NULL as the view and the active
-  /// view changes.
-  void setView(pqView* view);
-
+public slots:
   /// starts the selection i.e. setup render view in selection mode.
-  void beginSelection();
+  virtual bool beginSelection();
 
   /// finishes the selection. Doesn't cause the selection, just returns the
   /// render view to previous interaction mode.
-  void endSelection();
+  virtual bool endSelection();
 
 private:
   /// callback called when the vtkPVRenderView is done with selection.
   void selectionChanged(vtkObject*, unsigned long, void* calldata);
 
-  /// callback called for mouse move events when in 'interactive selection'
-  /// modes.
-  void onMouseMove();
-
-  /// callback called for click events when in 'interactive selection'
-  /// modes.
-  void onLeftButtonPress();
-
 private:
-  Q_DISABLE_COPY(pqRenderViewSelectionReaction);
-  QPointer<pqRenderView> View;
+  Q_DISABLE_COPY(pqRenderViewOneSelectionReaction);
   SelectionMode Mode;
-  int PreviousRenderViewMode;
-  vtkWeakPointer<vtkObject> ObservedObject;
-  unsigned long ObserverIds[2];
+  unsigned long ObserverId;
   QCursor ZoomCursor;
-
-  static QPointer<pqRenderViewSelectionReaction> ActiveReaction;
-
-  /// cleans up observers.
-  void cleanupObservers();
 };
 
 #endif

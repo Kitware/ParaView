@@ -78,11 +78,14 @@ private slots:
   void fillPointLabels();
   void cellLabelSelected(QAction*);
   void pointLabelSelected(QAction*);
-  void editLabelProperties();
+  void editLabelPropertiesSelection();
+  void editLabelPropertiesInteractiveSelection();
   void showFrustum(bool);
 
 private:
   Q_DISABLE_COPY(pqFindDataSelectionDisplayFrame);
+
+  void updateInteractiveSelectionLabelProperties();
 
   class pqInternals;
   friend class pqInternals;

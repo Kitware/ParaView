@@ -54,10 +54,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkContextScene.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMInteractiveSelectionPipeline.h"
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxy.h"
 #include "vtkSMSessionProxyManager.h"
 
+#include <QKeyEvent>
 #include <QMenu>
 #include <QPushButton>
 #include <QSet>
@@ -73,6 +75,7 @@ pqStandardViewFrameActionsImplementation::pqStandardViewFrameActionsImplementati
   this->ShortCutFrustumCells = new QShortcut(QKeySequence(tr("f")), mainWindow);
   this->ShortCutFrustumPoints = new QShortcut(QKeySequence(tr("g")), mainWindow);
   this->ShortCutBlocks = new QShortcut(QKeySequence("b"), mainWindow);
+  mainWindow->installEventFilter(this);
 
   QObject::connect(this->ShortCutSurfaceCells, SIGNAL(activated()),
     this, SLOT(selectSurfaceCellsTrigerred()));
@@ -250,15 +253,17 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
   cameraAction->setObjectName("CameraButton");
   new pqEditCameraReaction(cameraAction, renderView);
 
-  QAction* actionSelectionMode = frame->addTitleBarAction(
-    QIcon(":/pqWidgets/Icons/pqSurfaceSelectionCell24.png"), "Select Cells On (s)");
-  actionSelectionMode->setObjectName("actionSelectionMode");
-  actionSelectionMode->setCheckable (true);
-  new pqRenderViewSelectionReaction(actionSelectionMode, renderView,
+  QAction* actionSelectSurfaceCells = frame->addTitleBarAction(
+    QIcon(":/pqWidgets/Icons/pqSurfaceSelectionCell24.png"),
+    "Select Cells On (s)");
+  actionSelectSurfaceCells->setObjectName("actionSelectSurfaceCells");
+  actionSelectSurfaceCells->setCheckable (true);
+  new pqRenderViewSelectionReaction(actionSelectSurfaceCells, renderView,
     pqRenderViewSelectionReaction::SELECT_SURFACE_CELLS);
 
   QAction* actionSelectSurfacePoints = frame->addTitleBarAction(
-    QIcon(":/pqWidgets/Icons/pqSurfaceSelectionPoint24.png"), "Select Points On (d)");
+    QIcon(":/pqWidgets/Icons/pqSurfaceSelectionPoint24.png"), 
+    "Select Points On (d)");
   actionSelectSurfacePoints->setObjectName("actionSelectSurfacePoints");
   actionSelectSurfacePoints->setCheckable (true);
   new pqRenderViewSelectionReaction(actionSelectSurfacePoints, renderView,
@@ -302,6 +307,32 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
   actionSelect_Block->setCheckable (true);
   new pqRenderViewSelectionReaction(actionSelect_Block, renderView,
     pqRenderViewSelectionReaction::SELECT_BLOCKS);
+
+  QAction* actionInteractiveSelectSurfaceCells = frame->addTitleBarAction(
+    QIcon(":/pqWidgets/Icons/pqSurfaceSelectionCellInteractive.png"),
+    "Interactive Select Cells On");
+  actionInteractiveSelectSurfaceCells->setObjectName(
+    "actionInteractiveSelectSurfaceCells");
+  actionInteractiveSelectSurfaceCells->setCheckable (true);
+  new pqRenderViewSelectionReaction(actionInteractiveSelectSurfaceCells, renderView,
+    pqRenderViewSelectionReaction::SELECT_SURFACE_CELLS_INTERACTIVELY);
+
+  QAction* actionInteractiveSelectSurfacePoints = frame->addTitleBarAction(
+    QIcon(":/pqWidgets/Icons/pqSurfaceSelectionPointInteractive.png"),
+    "Interactive Select Points On");
+  actionInteractiveSelectSurfacePoints->setObjectName(
+    "actionInteractiveSelectSurfacePoints");
+  actionInteractiveSelectSurfacePoints->setCheckable (true);
+  new pqRenderViewSelectionReaction(actionInteractiveSelectSurfacePoints, renderView,
+    pqRenderViewSelectionReaction::SELECT_SURFACE_POINTS_INTERACTIVELY);
+
+  QStyle* style = qApp->style();
+  QAction* deselectAction = frame->addTitleBarAction(
+    style->standardIcon(QStyle::SP_DialogDiscardButton),
+    "Clear selection");
+  deselectAction->setObjectName("Deselect");
+  new pqRenderViewSelectionReaction(deselectAction, renderView,
+    pqRenderViewSelectionReaction::CLEAR_SELECTION);
 }
 
 //-----------------------------------------------------------------------------
@@ -481,7 +512,7 @@ void pqStandardViewFrameActionsImplementation::selectSurfaceCellsTrigerred()
   else
     {
     // else trigger the render view selection
-    triggerAction("actionSelectionMode");
+    triggerAction("actionSelectSurfaceCells");
     }
 }
 
@@ -519,6 +550,54 @@ void pqStandardViewFrameActionsImplementation::selectFrustumPointsTriggered()
 void pqStandardViewFrameActionsImplementation::selectBlocksTriggered()
 {
   triggerAction("actionSelect_Block");
+}
+
+//-----------------------------------------------------------------------------
+bool pqStandardViewFrameActionsImplementation::eventFilter(
+  QObject* watched, QEvent* _event)
+{
+  if (watched == pqCoreUtilities::mainWidget() &&
+      _event->type() == QEvent::KeyPress)
+    {
+    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(_event);
+    if (keyEvent->key() == Qt::Key_Escape)
+      {
+      exitInteractiveSelection();
+      return true;
+      }
+    }
+  return this->QObject::eventFilter(watched, _event);
+}
+
+//-----------------------------------------------------------------------------
+void pqStandardViewFrameActionsImplementation::exitInteractiveSelection()
+{
+  const char* names[] =
+    {
+      "actionInteractiveSelectSurfacePoints",
+      "actionInteractiveSelectSurfaceCells"
+    };
+  QAction* actions[] = 
+    {
+      findActiveAction(names[0]),
+      findActiveAction(names[1])
+    };
+  for (size_t i = 0; i < sizeof(actions) / sizeof(actions[0]);
+       ++i)
+    {
+    if (actions[i] && actions[i]->isChecked())
+      {
+      actions[i]->trigger();
+      pqRenderView* activeView = qobject_cast<pqRenderView*>(
+        pqActiveObjects::instance().activeView());
+      if (activeView)
+        {
+        vtkSMRenderViewProxy* viewProxy = activeView->getRenderViewProxy();
+        vtkSMInteractiveSelectionPipeline::GetInstance()->Hide(viewProxy);
+        }
+      break;
+      }
+    }
 }
 
 

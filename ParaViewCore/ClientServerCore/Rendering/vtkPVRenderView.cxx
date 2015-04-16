@@ -704,7 +704,10 @@ void vtkPVRenderView::Select(int fieldAssociation, int region[4])
   if (this->SynchronizedWindows->GetEnabled() ||
     this->SynchronizedWindows->GetLocalProcessIsDriver())
     {
+    // we don't render labels for hardware selection
+    this->NonCompositedRenderer->SetDraw(false);
     sel.TakeReference(this->Selector->Select(region));
+    this->NonCompositedRenderer->SetDraw(true);
     }
   this->PostSelect(sel);
 }

@@ -7749,6 +7749,7 @@ source.</Documentation>
 
       <Hints>
         <Visibility replace_input="0" />
+        <View type="SpreadSheetView" />
       </Hints>
       <!-- End ProbePoint -->
     </SourceProxy>

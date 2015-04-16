@@ -213,6 +213,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/Fractal2D.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/FunctionalBagPlots.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ImageVolumeRendering.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/InteractiveSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadPartiallyUpdatedStateFiles.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadSaveStateAnimation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadState.xml
@@ -409,6 +410,8 @@ set(MultiSliceMultiBlock_DISABLE_CRS TRUE)
 set(PolygonCellSelection_DISABLE_CRS TRUE)
 set(PolygonPointSelection_DISABLE_CRS TRUE)
 set(NonlinearSubdivisionDisplay_DISABLE_CRS TRUE)
+set(InteractiveSelection_DISABLE_CRS TRUE)
+
 
 # These tests cannot be run using ctest -j since they are affected by focus
 # changed events.
