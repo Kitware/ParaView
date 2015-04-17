@@ -14,7 +14,7 @@ vtk_module(vtkInteractionWidgets
     vtkIOLegacy
     vtkIOXML
     vtkRenderingVolumeOpenGL
-    vtkRenderingFreeTypeOpenGL
+    vtkRenderingFreeType
     vtkTestingRendering
     vtkInteractionStyle
     vtkFiltersModeling

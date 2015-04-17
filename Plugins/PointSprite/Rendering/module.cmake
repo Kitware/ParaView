@@ -4,7 +4,7 @@ vtk_module(vtkPointSpriteRendering
     vtkRenderingOpenGL
     vtkImagingCore
     vtkInteractionStyle
-    vtkRenderingFreeTypeOpenGL
+    vtkRenderingFreeType
   COMPILE_DEPENDS
     vtkUtilitiesEncodeString
   EXCLUDE_FROM_WRAP_HIERARCHY
