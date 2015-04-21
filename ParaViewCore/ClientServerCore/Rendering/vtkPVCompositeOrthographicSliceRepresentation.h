@@ -26,6 +26,9 @@
 #include "vtkPVCompositeRepresentation.h"
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer.
 
+class vtkCubeAxesRepresentation;
+class vtkGeometrySliceRepresentation;
+
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVCompositeOrthographicSliceRepresentation : public vtkPVCompositeRepresentation
 {
 public:
@@ -33,18 +36,31 @@ public:
   vtkTypeMacro(vtkPVCompositeOrthographicSliceRepresentation, vtkPVCompositeRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  void SetSliceRepresentation(int index, vtkPVDataRepresentation*);
-  void SetSliceRepresentation0(vtkPVDataRepresentation* repr)
+  void SetSliceRepresentation(int index, vtkGeometrySliceRepresentation*);
+  void SetSliceRepresentation0(vtkGeometrySliceRepresentation* repr)
     { this->SetSliceRepresentation(0, repr); }
-  void SetSliceRepresentation1(vtkPVDataRepresentation* repr)
+  void SetSliceRepresentation1(vtkGeometrySliceRepresentation* repr)
     { this->SetSliceRepresentation(1, repr); }
-  void SetSliceRepresentation2(vtkPVDataRepresentation* repr)
+  void SetSliceRepresentation2(vtkGeometrySliceRepresentation* repr)
     { this->SetSliceRepresentation(2, repr); }
+
+  void SetCubeAxesRepresentation(int index, vtkCubeAxesRepresentation*);
+  void SetCubeAxesRepresentation0(vtkCubeAxesRepresentation* repr)
+    { this->SetCubeAxesRepresentation(0, repr); }
+  void SetCubeAxesRepresentation1(vtkCubeAxesRepresentation* repr)
+    { this->SetCubeAxesRepresentation(1, repr); }
+  void SetCubeAxesRepresentation2(vtkCubeAxesRepresentation* repr)
+    { this->SetCubeAxesRepresentation(2, repr); }
+
 
   // Description:
   // Set visibility of the representation.
   // Overridden to update the cube-axes and selection visibilities.
   virtual void SetVisibility(bool visible);
+
+  // Description:
+  // Overidden to pass to the orthographic representations.
+  virtual void SetCubeAxesVisibility(bool visible);
 
   // Description:
   // Overridden to simply pass the input to the internal representations. We
@@ -83,7 +99,8 @@ protected:
   // Returns true if the removal succeeds.
   virtual bool RemoveFromView(vtkView* view);
 
-  vtkSmartPointer<vtkPVDataRepresentation> SliceRepresentations[3];
+  vtkSmartPointer<vtkGeometrySliceRepresentation> SliceRepresentations[3];
+  vtkSmartPointer<vtkCubeAxesRepresentation> CubeAxesRepresentations[3];
 
 private:
   vtkPVCompositeOrthographicSliceRepresentation(const vtkPVCompositeOrthographicSliceRepresentation&); // Not implemented

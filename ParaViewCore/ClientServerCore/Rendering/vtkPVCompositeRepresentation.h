@@ -66,7 +66,7 @@ public:
 
   // Description:
   // Set the visibility for the cube-axis.
-  void SetCubeAxesVisibility(bool visible);
+  virtual void SetCubeAxesVisibility(bool visible);
 
   // Description:
   // Set the selection visibility.

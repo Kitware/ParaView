@@ -55,23 +55,14 @@ public:
 
   enum
     {
-    SIDE_VIEW = 0,
-    TOP_VIEW = 1,
-    FRONT_VIEW = 2,
-
-    YZ_PLANE = SIDE_VIEW,
-    ZX_PLANE = TOP_VIEW,
-    XY_PLANE = FRONT_VIEW,
-
-    AXIAL_VIEW = TOP_VIEW,
-    CORONAL_VIEW = FRONT_VIEW,
-    SAGITTAL_VIEW = SIDE_VIEW,
-
-    RIGHT_SIDE_VIEW = SIDE_VIEW
+    SAGITTAL_VIEW_RENDERER = vtkPVRenderView::NON_COMPOSITED_RENDERER + 1,
+    AXIAL_VIEW_RENDERER,
+    CORONAL_VIEW_RENDERER,
     };
 
-  vtkRenderer* GetRenderer(int index);
-  using Superclass::GetRenderer;
+  // Description:
+  // Overridden to add support for new types of renderers.
+  virtual vtkRenderer* GetRenderer(int rendererType=vtkPVRenderView::DEFAULT_RENDERER);
 
   virtual void ResetCamera();
   virtual void ResetCamera(double bounds[6]);
@@ -112,6 +103,23 @@ protected:
 
   virtual void AboutToRenderOnLocalProcess(bool interactive);
   virtual void UpdateCenterAxes();
+
+  enum
+    {
+    SIDE_VIEW = 0,
+    TOP_VIEW = 1,
+    FRONT_VIEW = 2,
+
+    YZ_PLANE = SIDE_VIEW,
+    ZX_PLANE = TOP_VIEW,
+    XY_PLANE = FRONT_VIEW,
+
+    AXIAL_VIEW = TOP_VIEW,
+    CORONAL_VIEW = FRONT_VIEW,
+    SAGITTAL_VIEW = SIDE_VIEW,
+
+    RIGHT_SIDE_VIEW = SIDE_VIEW
+    };
 
   vtkNew<vtkRenderer> Renderers[3];
   vtkNew<vtkPVOrthographicSliceViewInteractorStyle> OrthographicInteractorStyle;
