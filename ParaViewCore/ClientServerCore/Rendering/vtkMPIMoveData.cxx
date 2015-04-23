@@ -16,6 +16,7 @@
 
 #include "vtkCellData.h"
 #include "vtkCharArray.h"
+#include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkDataSetReader.h"
 #include "vtkDirectedGraph.h"
@@ -63,11 +64,38 @@ bool vtkMPIMoveData::UseZLibCompression = false;
 
 namespace
 {
-  static bool vtkMPIMoveDataMerge(std::vector<vtkSmartPointer<vtkDataObject> >& pieces,
-    vtkDataObject* result)
-    {
+  bool vtkMPIMoveDataMerge(std::vector<vtkSmartPointer<vtkDataObject> >& pieces,
+                           vtkDataObject* result)
+  {
     return vtkMultiProcessControllerHelper::MergePieces(pieces, result);
-    }
+  }
+
+  void unsetGlobalIdsAttribute(vtkDataObject* piece)
+  {
+    vtkDataSet* ds = vtkDataSet::SafeDownCast(piece);
+    vtkMultiBlockDataSet* mb = vtkMultiBlockDataSet::SafeDownCast(piece);
+    if (ds)
+      {
+      ds->GetCellData()->SetActiveAttribute(-1, vtkDataSetAttributes::GLOBALIDS);
+      ds->GetPointData()->SetActiveAttribute(-1, vtkDataSetAttributes::GLOBALIDS);
+      }
+    else if (mb)
+      {
+      vtkCompositeDataIterator* it = mb->NewIterator();
+      for (it->InitTraversal(); ! it->IsDoneWithTraversal(); it->GoToNextItem())
+        {
+        vtkDataSet* leaf = vtkDataSet::SafeDownCast(it->GetCurrentDataObject());
+        if (leaf)
+          {
+          leaf->GetCellData()->SetActiveAttribute(
+            -1, vtkDataSetAttributes::GLOBALIDS);
+          leaf->GetPointData()->SetActiveAttribute(
+            -1, vtkDataSetAttributes::GLOBALIDS);
+          }
+        }
+      it->Delete();
+      }
+  }
 };
 
 
@@ -1173,14 +1201,20 @@ void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataObject* data)
       clone->ShallowCopy(reader->GetOutputDataObject(0));
       clone->SetOrigin(origin[0], origin[1], origin[2]);
       clone->SetExtent(extent);
+      // reconstructing data distributted on MPI node, so global ids are valid
+      // global ids attributes are removed when appending data so we set
+      // the active global ids attribute to null which keeps the global ids array.
+      unsetGlobalIdsAttribute(clone);
       pieces.push_back(clone);
       clone->Delete();
       }
     else
       {
-      pieces.push_back(reader->GetOutputDataObject(0));
-      }
-
+      vtkDataObject* output = reader->GetOutputDataObject(0);
+      //reconstructing data distributted on MPI node, so global ids are valid
+      unsetGlobalIdsAttribute(output);
+      pieces.push_back(output);
+      }    
     mystring->Delete();
     mystring = 0;
     reader->Delete();
