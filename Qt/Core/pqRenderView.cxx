@@ -64,7 +64,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMouseEvent>
 #include <QMenu>
 #include <QSet>
-#include <QPrinter>
 #include <QPainter>
 #include <QGridLayout>
 

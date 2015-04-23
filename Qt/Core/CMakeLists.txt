@@ -328,12 +328,6 @@ endif()
 
 #-------------------------------------------------------------------------
 if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  # import Qt5 build settings
-  set(Qt5_FIND_COMPONENTS
-      Widgets
-      UiTools
-      Xml)
-  include (ParaViewQt5)
   # Setting this variable ensures that any module depending on pqWidgets
   # automatically inherits the Qt include dirs.
   set (${vtk-module}_INCLUDE_DIRS

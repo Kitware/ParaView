@@ -435,7 +435,13 @@ if (PARAVIEW_ENABLE_QT_SUPPORT)
 
   include (ParaViewQtVersion)
   if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    set (Qt5_FIND_COMPONENTS Widgets)
+    set (Qt5_FIND_COMPONENTS
+      Help
+      Network
+      Test
+      UiTools
+      Widgets
+      Xml)
     include (ParaViewQt5)
     if (NOT QT5_FOUND)
       message( SEND_ERROR "Qt ${QT_MIN_VERSION} or greater not found. "

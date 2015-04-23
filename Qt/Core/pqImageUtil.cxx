@@ -36,10 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageData.h"
 #include "vtkSMUtilities.h"
 
-#include <QFileInfo>
 #include <QImage>
-#include <QPainter>
-#include <QPrinter>
 
 // NOTES:
 // - QImage pixel data is 32 bit aligned, whereas vtkImageData's pixel data 
@@ -131,25 +128,8 @@ int pqImageUtil::saveImage(vtkImageData* vtkimage, const QString& filename,
     return vtkErrorCode::NoFileNameError;
     }
 
-  const QFileInfo file(filename);
-  if (file.suffix() == "pdf")
-    {
-    // For pdf saving, we need to use Qt.
-    QImage qimage;
-    if (pqImageUtil::fromImageData(vtkimage, qimage))
-      {
-      error_code = pqImageUtil::saveImage(qimage, filename);
-      }
-    else
-      {
-      error_code = vtkErrorCode::UnknownError;
-      }
-    }
-  else
-    {
-    error_code = vtkSMUtilities::SaveImage(vtkimage, filename.toLatin1().data(),
-      quality);
-    }
+  error_code = vtkSMUtilities::SaveImage(vtkimage, filename.toLatin1().data(),
+    quality);
 
   return error_code;
 }
@@ -169,39 +149,16 @@ int pqImageUtil::saveImage(const QImage& qimage, const QString& filename,
     return vtkErrorCode::NoFileNameError;
     }
 
-  const QFileInfo file(filename);
-  if (file.suffix() == "pdf")
+  // Use VTK for saving image, so that 3 component images are saved as needed
+  // by vtk for testing etc.
+  vtkImageData* vtkimage = vtkImageData::New();
+  if (pqImageUtil::toImageData(qimage, vtkimage))
     {
-    QPrinter printer(QPrinter::HighResolution);
-    printer.setOutputFormat(QPrinter::PdfFormat);
-    printer.setOutputFileName(filename);
-
-    QPainter painter;
-    painter.begin(&printer);
-    QSize viewport_size(qimage.size());
-    viewport_size.scale(printer.pageRect().size(), Qt::KeepAspectRatio);
-    painter.setWindow(qimage.rect());
-    painter.setViewport(QRect(0,0, viewport_size.width(),
-        viewport_size.height()));
-    painter.drawImage(QPointF(0.0, 0.0), qimage);
-    painter.end();
-
-    // TODO: add some error checking.
-    error_code = vtkErrorCode::NoError;
+    error_code = pqImageUtil::saveImage(vtkimage, filename, quality);
     }
   else
     {
-    // Use VTK for saving image, so that 3 component images are saved as needed
-    // by vtk for testing etc.
-    vtkImageData* vtkimage = vtkImageData::New();
-    if (pqImageUtil::toImageData(qimage, vtkimage))
-      {
-      error_code = pqImageUtil::saveImage(vtkimage, filename, quality);
-      }
-    else
-      {
-      error_code = vtkErrorCode::UnknownError;
-      }
+    error_code = vtkErrorCode::UnknownError;
     }
 
   return error_code;
