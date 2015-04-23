@@ -114,7 +114,6 @@ void pqSaveScreenshotReaction::saveScreenshot()
   filters += ";;TIFF image (*.tif)";
   filters += ";;PPM image (*.ppm)";
   filters += ";;JPG image (*.jpg)";
-  filters += ";;PDF file (*.pdf)";
   pqFileDialog file_dialog(NULL,
     pqCoreUtilities::mainWidget(),
     tr("Save Screenshot:"), QString(), filters);

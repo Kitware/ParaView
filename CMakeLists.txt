@@ -438,7 +438,6 @@ if (PARAVIEW_ENABLE_QT_SUPPORT)
     set (Qt5_FIND_COMPONENTS
       Help
       Network
-      PrintSupport
       Test
       UiTools
       Widgets
