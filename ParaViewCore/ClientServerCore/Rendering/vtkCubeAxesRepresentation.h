@@ -168,8 +168,14 @@ public:
   virtual void SetZLabelFormat(const char* format);
 
   virtual void SetStickyAxes(int val);
-
   virtual void SetCenterStickyAxes(int val);
+
+  // Description:
+  // Set the renderer to use. Default is to use the
+  // vtkPVRenderView::DEFAULT_RENDERER.
+  vtkSetMacro(RendererType, int);
+  vtkGetMacro(RendererType, int);
+
 //BTX
 protected:
   vtkCubeAxesRepresentation();
@@ -226,6 +232,8 @@ protected:
 private:
   vtkCubeAxesRepresentation(const vtkCubeAxesRepresentation&); // Not implemented
   void operator=(const vtkCubeAxesRepresentation&); // Not implemented
+
+  int RendererType;
 //ETX
 };
 

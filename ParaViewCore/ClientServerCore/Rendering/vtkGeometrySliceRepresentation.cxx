@@ -366,7 +366,7 @@ bool vtkGeometrySliceRepresentation::AddToView(vtkView* view)
   vtkPVOrthographicSliceView* rview = vtkPVOrthographicSliceView::SafeDownCast(view);
   if (rview && this->Mode != ALL_SLICES)
     {
-    rview->GetRenderer(this->Mode)->AddActor(this->Actor);
+    rview->GetRenderer(this->Mode + vtkPVOrthographicSliceView::SAGITTAL_VIEW_RENDERER)->AddActor(this->Actor);
     return true;
     }
 
@@ -383,7 +383,7 @@ bool vtkGeometrySliceRepresentation::RemoveFromView(vtkView* view)
   vtkPVOrthographicSliceView* rview = vtkPVOrthographicSliceView::SafeDownCast(view);
   if (rview && this->Mode != ALL_SLICES)
     {
-    rview->GetRenderer(this->Mode)->RemoveActor(this->Actor);
+    rview->GetRenderer(this->Mode + vtkPVOrthographicSliceView::SAGITTAL_VIEW_RENDERER)->RemoveActor(this->Actor);
     return true;
     }
   if (vtkPVRenderView* rvview = vtkPVRenderView::SafeDownCast(view))

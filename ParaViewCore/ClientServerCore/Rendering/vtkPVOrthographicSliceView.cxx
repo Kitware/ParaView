@@ -298,10 +298,21 @@ void vtkPVOrthographicSliceView::ResetCamera(double bounds[6])
     }
 }
 //----------------------------------------------------------------------------
-vtkRenderer* vtkPVOrthographicSliceView::GetRenderer(int index)
+vtkRenderer* vtkPVOrthographicSliceView::GetRenderer(int rendererType)
 {
-  assert(index>=0 && index <=2);
-  return this->Renderers[index].GetPointer();
+  switch (rendererType)
+    {
+  case SAGITTAL_VIEW_RENDERER:
+  case AXIAL_VIEW_RENDERER:
+  case CORONAL_VIEW_RENDERER:
+      {
+      int index = rendererType - vtkPVRenderView::NON_COMPOSITED_RENDERER - 1;
+      assert(index >=0 && index < 3);
+      return this->Renderers[index].GetPointer();
+      }
+  default:
+    return this->Superclass::GetRenderer(rendererType);
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -98,7 +98,20 @@ public:
   // labels, 2D annotations etc.
   // @CallOnAllProcessess
   vtkGetObjectMacro(NonCompositedRenderer, vtkRenderer);
-  vtkRenderer* GetRenderer();
+
+  // Description:
+  // Defines various renderer types.
+  enum
+    {
+    DEFAULT_RENDERER = 0,
+    NON_COMPOSITED_RENDERER = 1,
+    };
+
+  // Description:
+  // Returns the renderer given an int identifying its type.
+  // \li DEFAULT_RENDERER: returns the 3D renderer.
+  // \li NON_COMPOSITED_RENDERER: returns the NonCompositedRenderer.
+  virtual vtkRenderer* GetRenderer(int rendererType=DEFAULT_RENDERER);
 
   // Description:
   // Get/Set the active camera. The active camera is set on both the composited

@@ -471,9 +471,17 @@ void vtkPVRenderView::RemovePropFromRenderer(vtkProp* prop)
 }
 
 //----------------------------------------------------------------------------
-vtkRenderer* vtkPVRenderView::GetRenderer()
+vtkRenderer* vtkPVRenderView::GetRenderer(int rendererType)
 {
-  return this->RenderView->GetRenderer();
+  switch (rendererType)
+    {
+  case NON_COMPOSITED_RENDERER:
+    return this->GetNonCompositedRenderer();
+  case DEFAULT_RENDERER:
+    return this->RenderView->GetRenderer();
+  default:
+    return NULL;
+    }
 }
 
 //----------------------------------------------------------------------------

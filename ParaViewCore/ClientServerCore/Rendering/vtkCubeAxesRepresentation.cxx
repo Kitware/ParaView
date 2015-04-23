@@ -71,6 +71,8 @@ vtkCubeAxesRepresentation::vtkCubeAxesRepresentation()
   this->OriginalBoundsRangeActive[0] = 0;
   this->OriginalBoundsRangeActive[1] = 0;
   this->OriginalBoundsRangeActive[2] = 0;
+
+  this->RendererType = vtkPVRenderView::DEFAULT_RENDERER;
 }
 
 //----------------------------------------------------------------------------
@@ -123,10 +125,13 @@ bool vtkCubeAxesRepresentation::AddToView(vtkView* view)
   vtkPVRenderView* pvview = vtkPVRenderView::SafeDownCast(view);
   if (pvview)
     {
-    pvview->GetRenderer()->AddActor(this->CubeAxesActor);
-    this->CubeAxesActor->SetCamera(pvview->GetActiveCamera());
-    this->View = pvview;
-    return true;
+    if (vtkRenderer* renderer = pvview->GetRenderer(this->RendererType))
+      {
+      renderer->AddActor(this->CubeAxesActor);
+      this->CubeAxesActor->SetCamera(renderer->GetActiveCamera());
+      this->View = pvview;
+      return true;
+      }
     }
   return false;
 }
@@ -137,10 +142,13 @@ bool vtkCubeAxesRepresentation::RemoveFromView(vtkView* view)
   vtkPVRenderView* pvview = vtkPVRenderView::SafeDownCast(view);
   if (pvview)
     {
-    pvview->GetRenderer()->RemoveActor(this->CubeAxesActor);
-    this->CubeAxesActor->SetCamera(NULL);
-    this->View = NULL;
-    return true;
+    if (vtkRenderer* renderer = pvview->GetRenderer(this->RendererType))
+      {
+      renderer->RemoveActor(this->CubeAxesActor);
+      this->CubeAxesActor->SetCamera(NULL);
+      this->View = NULL;
+      return true;
+      }
     }
   this->View = NULL;
   return false;
