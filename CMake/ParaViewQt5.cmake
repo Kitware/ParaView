@@ -22,21 +22,11 @@ FIND_PACKAGE( Qt5Core QUIET )
 
 IF( NOT Qt5_FIND_COMPONENTS )
   SET (Qt5_FIND_COMPONENTS
-    Concurrent
     Core
-    Declarative
-    Designer
-    Gui
     Help
     Network
-    OpenGL
-    PrintSupport
-    Script
-    ScriptTools
-    Svg
     Test
     UiTools
-    WebKitWidgets
     Widgets
     Xml
     )
