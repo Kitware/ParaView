@@ -61,6 +61,14 @@ endif()
 option(BUILD_SHARED_LIBS "Build VTK with shared libraries." ON)
 set(VTK_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
 
+#------------------------------------------------------------------------------
+# Protect against a stampede of static links at the same time.
+if (NOT BUILD_SHARED_LIBS)
+  set(PV_EXE_JOB_LINK_POOL static_exe_link)
+  set_property(GLOBAL APPEND PROPERTY
+    JOB_POOLS static_exe_link=1)
+endif ()
+
 #-------------------------------------------------------------------------------
 set (ParaView_CMAKE_DIR "${ParaView_SOURCE_DIR}/CMake")
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ParaView_CMAKE_DIR})
