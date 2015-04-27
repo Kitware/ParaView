@@ -95,6 +95,21 @@ protected:
   // by this domain.
   virtual std::vector<vtkStdString> GetDefaultValue(const char* series);
 
+  // Description:
+  // Build up the domain with available series names.
+  // Add arrays from dataInfo to strings. If blockName is non-empty, then it's
+  // used to "uniquify" the array names.
+  virtual void PopulateAvailableArrays(
+    const std::string& blockName,
+    std::vector<vtkStdString>& strings,
+    vtkPVDataInformation* dataInfo, int fieldAssociation, bool flattenTable);
+
+  // Description:
+  // Call this method in PopulateAvailableArrays() to override a specific array's
+  // default visibility. Used for hiding array components, by default, for
+  // example.
+ virtual void SetDefaultVisibilityOverride(const vtkStdString& arrayname, bool visibility);
+
   int DefaultMode;
 
   // Description:
