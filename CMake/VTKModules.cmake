@@ -40,7 +40,6 @@ set(_vtk_modules
   vtkRenderingVolume
   vtkRenderingLabel
   vtkRenderingFreeType
-  vtkRenderingFreeType${VTK_RENDERING_BACKEND}
   vtkRenderingVolume${VTK_RENDERING_BACKEND}
   vtkRendering${VTK_RENDERING_BACKEND}
   vtkRenderingLOD

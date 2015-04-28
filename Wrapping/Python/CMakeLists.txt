@@ -75,7 +75,9 @@ add_custom_command(
   # Touch the OUTPUT file, otherwise this command will always be dirty.
   COMMAND ${CMAKE_COMMAND} ARGS -E touch "${CMAKE_CURRENT_BINARY_DIR}/vtk_py_copy_completed"
 
-  DEPENDS ${_vtkpy_modules}
+  DEPENDS
+    ${_vtkpy_modules}
+    "${VTK_BINARY_DIR}/Wrapping/Python/vtk/__init__.py"
 )
 
 add_custom_target(copy_vtk_py_files ALL

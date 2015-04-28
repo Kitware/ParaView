@@ -733,10 +733,12 @@ add_tile_display_tests("pvcs-tile-display" 2 2
    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/TileDisplayScatterPlot-2x2.xml)
 
-set (TileDisplay3DTesting-1x2_THRESHOLD 270)
-add_tile_display_tests("pvcs-tile-display" 1 2
-   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-   TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/TileDisplay3DTesting-1x2.xml)
+# This test has been behaving badly across many platforms and needs to be fixed
+# before it can be useful. Disabling for now, see bug #15424.
+#set (TileDisplay3DTesting-1x2_THRESHOLD 270)
+#add_tile_display_tests("pvcs-tile-display" 1 2
+#   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+#   TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/TileDisplay3DTesting-1x2.xml)
 
 set (TileDisplay3DTesting-2x1_THRESHOLD 270)
 add_tile_display_tests("pvcs-tile-display" 2 1
