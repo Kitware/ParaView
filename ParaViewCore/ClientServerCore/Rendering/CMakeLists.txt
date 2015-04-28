@@ -87,6 +87,7 @@ set (Module_SRCS
   vtkPVSynchronizedRenderWindows.cxx
   vtkPVView.cxx
   vtkPVXYChartView.cxx
+  vtkQuartileChartRepresentation.cxx
   vtkSelectionDeliveryFilter.cxx
   vtkSelectionRepresentation.cxx
   vtkSpreadSheetRepresentation.cxx

@@ -114,7 +114,7 @@ namespace
       return new pqComparativeRenderView(
         group, name, proxy, server, parent);
       }
-    if (xmlname == "XYChartView")
+    if (xmlname == "XYChartView" || xmlname == "QuartileChartView")
       {
       return new pqXYChartView(group, name,
         vtkSMContextViewProxy::SafeDownCast(proxy),

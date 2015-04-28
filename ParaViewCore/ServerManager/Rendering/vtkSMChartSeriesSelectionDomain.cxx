@@ -269,6 +269,7 @@ void vtkSMChartSeriesSelectionDomain::Update(vtkSMProperty*)
   this->SetStrings(column_names);
 }
 
+//----------------------------------------------------------------------------
 // Add arrays from dataInfo to strings. If blockName is non-empty, then it's
 // used to "uniquify" the array names.
 void vtkSMChartSeriesSelectionDomain::PopulateAvailableArrays(
@@ -279,6 +280,16 @@ void vtkSMChartSeriesSelectionDomain::PopulateAvailableArrays(
   // this method is typically called for leaf nodes (or multi-piece).
   // assert((dataInfo->GetCompositeDataInformation()->GetDataIsComposite() == 0) ||
   //   (dataInfo->GetCompositeDataInformation()->GetDataIsMultiPiece() == 0));
+  vtkChartRepresentation* chartRepr = vtkChartRepresentation::SafeDownCast(
+    this->GetProperty()->GetParent()->GetClientSideObject());
+  if (!chartRepr)
+    {
+    return;
+    }
+
+  // helps use avoid duplicates. duplicates may arise for plot types that treat
+  // multiple columns as a single series/plot e.g. quartile plots.
+  std::set<vtkStdString> uniquestrings;
 
   vtkPVDataSetAttributesInformation* dsa =
     dataInfo->GetAttributeInformation(fieldAssociation);
@@ -303,10 +314,12 @@ void vtkSMChartSeriesSelectionDomain::PopulateAvailableArrays(
       for (int kk=0; kk <= arrayInfo->GetNumberOfComponents(); kk++)
         {
         std::string component_name = vtkSMArrayListDomain::CreateMangledName(arrayInfo, kk);
-        component_name = vtkChartRepresentation::GetDefaultSeriesLabel(
-          blockName, component_name);
-
-        strings.push_back(component_name);
+        component_name = chartRepr->GetDefaultSeriesLabel(blockName, component_name);
+        if (uniquestrings.find(component_name) == uniquestrings.end())
+          {
+          strings.push_back(component_name);
+          uniquestrings.insert(component_name);
+          }
         if (kk != arrayInfo->GetNumberOfComponents())
           {
           // save component names so we can detect them when setting defaults
@@ -317,8 +330,12 @@ void vtkSMChartSeriesSelectionDomain::PopulateAvailableArrays(
       }
     else
       {
-      strings.push_back(
-        vtkChartRepresentation::GetDefaultSeriesLabel(blockName, arrayInfo->GetName()));
+      std::string seriesName = chartRepr->GetDefaultSeriesLabel(blockName, arrayInfo->GetName());
+      if (uniquestrings.find(seriesName) == uniquestrings.end())
+        {
+        strings.push_back(seriesName);
+        uniquestrings.insert(seriesName);
+        }
       }
     }
 }

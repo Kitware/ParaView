@@ -94,7 +94,7 @@ protected:
   // Description:
   // Call to set the strings. Will fire DomainModifiedEvent if the domain values
   // have indeed changed.
-  void SetStrings(const std::vector<vtkStdString>& strings);
+  virtual void SetStrings(const std::vector<vtkStdString>& strings);
   const std::vector<vtkStdString>& GetStrings();
 
 private:

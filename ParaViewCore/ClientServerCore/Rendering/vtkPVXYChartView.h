@@ -99,6 +99,7 @@ public:
   void SetChartTypeToBar() { this->SetChartType("Bar"); }
   void SetChartTypeToBag() { this->SetChartType("Bag"); }
   void SetChartTypeToBox() { this->SetChartType("Box"); }
+  void SetChartTypeToArea() { this->SetChartType("Area"); }
   void SetChartTypeToFunctionalBag() { this->SetChartType("FunctionalBag"); }
   void SetChartTypeToParallelCoordinates()
     { this->SetChartType("ParallelCoordinates"); }
