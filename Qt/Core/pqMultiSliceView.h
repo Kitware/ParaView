@@ -42,9 +42,18 @@ public:
                     QObject* p);
   virtual ~pqMultiSliceView();
 
-  /// Provide access to slices positions for any axis.
-  /// 0 <= axisIndex <= 2
-  const double* GetSlices(int axisIndex, int &numberOfSlices);
+  /// Provide access to visible slices positions for any axis.
+  /// Precondition: 0 <= axisIndex <= 2
+  const double* GetVisibleSlices(int axisIndex, int &numberOfSlices);
+
+  /// @deprecated. Use GetVisibleSlices() or GetAllSlices(). This method simply
+  /// calls GetVisibleSlices().
+  const double* GetSlices(int axisIndex, int &numberOfSlices)
+    { return this->GetVisibleSlices(axisIndex, numberOfSlices); }
+
+  /// Provides access to all (visible and invisible) slice positions for any
+  /// Precondition: 0 <= axisIndex <= 2
+  const double* GetAllSlices(int axisIndex, int &numberOfSlices);
 
   /// Provide access to slices normal for any axis.
   /// 0 <= axisIndex <= 2
@@ -62,7 +71,16 @@ public:
   void setOutlineVisibility(bool visible);
 
 signals:
-  void slicesChanged();
+  // Fired when the slices are changed by user interaction.
+  // Provides information about which slice is being
+  // changed. axisIndex is the index of axis [0,2], while sliceIndex is the
+  // index for the slice in the slices returned by GetAllSlices(). If a slice is
+  // deleted, the sliceIndex will point to its index before the slice was
+  // deleted.
+  void sliceAdded(int axisIndex, int sliceIndex);
+  void sliceRemoved(int axisIndex, int sliceIndex);
+  void sliceModified(int axisIndex, int sliceIndex);
+
   void sliceClicked(int axisIndex, double sliceOffsetOnAxis, int button, int modifier);
 
 public slots:
@@ -70,6 +88,9 @@ public slots:
 
 private slots:
   void updateAxisBounds();
+  void onSliceAdded(int activeSliceIndex);
+  void onSliceRemoved(int activeSliceIndex);
+  void onSliceModified(int activeSliceIndex);
 
 protected:
   void updateViewModelCallBack(vtkObject*,unsigned long, void*);
@@ -80,11 +101,15 @@ protected:
   /// Helper method to get the concreate 3D widget
   QVTKWidget* getInternalWidget();
 
+  /// Get axis index.
+  int getAxisIndex(QObject*);
+
   QPointer<QVTKWidget> InternalWidget;
   bool UserIsInteracting;
   QPointer<pqMultiSliceAxisWidget> AxisX;
   QPointer<pqMultiSliceAxisWidget> AxisY;
   QPointer<pqMultiSliceAxisWidget> AxisZ;
+  QPointer<pqMultiSliceAxisWidget> AxisXYZ[3];
 
   QMap<pqRepresentation*, unsigned int> ObserverIdX;
   QMap<pqRepresentation*, unsigned int> ObserverIdY;

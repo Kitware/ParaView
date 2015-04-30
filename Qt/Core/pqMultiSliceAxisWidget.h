@@ -68,6 +68,9 @@ public:
   /// the number of values that can be read from the pointer
   const double* getVisibleSlices(int &nbSlices) const;
 
+  /// Returns the locations for all slices (visible or otherwise).
+  const double* getSlices(int &nbSlices) const;
+
   /// Update our internal model to reflect the proxy state
   void updateSlices(double* values, bool* visibility, int numberOfValues);
 
@@ -83,7 +86,9 @@ public slots:
 
 signals:
   /// Signal emitted when the model has changed internally
-  void modelUpdated();
+  void sliceAdded(int index);
+  void sliceRemoved(int index);
+  void sliceModified(int index);
 
   /// Signal emitted when a mark is clicked. The value is inside the provided range
   void markClicked(int button, int modifier, double value);
