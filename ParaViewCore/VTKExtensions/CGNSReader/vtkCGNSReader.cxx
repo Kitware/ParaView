@@ -44,6 +44,7 @@
 #include "vtkPVInformationKeys.h"
 
 #include <algorithm>
+#include <functional>
 #include <iterator>
 #include <string>
 #include <string.h>
