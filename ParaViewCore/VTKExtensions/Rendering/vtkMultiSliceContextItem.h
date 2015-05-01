@@ -19,6 +19,7 @@
 
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 #include "vtkContextItem.h"
+#include "vtkCommand.h" // needed for vtkCommand::UserEvent.
 
 class vtkAxis;
 
@@ -49,6 +50,11 @@ public:
   // Description:
   // The margin used on the side of the Axis.
   void SetEdgeMargin(int margin);
+
+  // Description:
+  // Returns the active slice index. Active slice is only valid when the slice
+  // is being updated between mouse-press/release events.
+  int GetActiveSliceIndex();
 
 //BTX
   // Description:
@@ -85,7 +91,12 @@ public:
   const double* GetVisibleSlices(int &nbSlices) const;
 
   // Description:
-  // Allow user to programatically update the data model
+  // Returns access to slices.
+  const double* GetSlices(int &nbSlices) const;
+
+  // Description:
+  // Allow user to programatically update the data model. Note, this does not
+  // fire any of the slice modification/addition/deletion events.
   void SetSlices(double* values, bool* visibility, int numberOfSlices);
 
   // Description:
@@ -95,6 +106,14 @@ public:
   // Description:
   // Return the number of slices
   int GetNumberOfSlices();
+
+  // Events files when slices are modified by interaction.
+  enum
+    {
+    AddSliceEvent = vtkCommand::UserEvent + 1,
+    RemoveSliceEvent = vtkCommand::UserEvent + 2,
+    ModifySliceEvent = vtkCommand::UserEvent + 3
+    };
 
 protected:
   double ScreenToRange(float position);

@@ -284,7 +284,7 @@ bool vtkMultiSliceContextItem::MouseButtonReleaseEvent(const vtkContextMouseEven
     {
     this->Internal->SlicesVisibility[Internal->ActiveSliceIndex] =
         !this->Internal->SlicesVisibility[Internal->ActiveSliceIndex];
-    this->InvokeEvent(vtkCommand::ModifiedEvent);
+    this->InvokeEvent(vtkMultiSliceContextItem::ModifySliceEvent);
     }
 
   // Notify any release action to the user
@@ -320,8 +320,13 @@ bool vtkMultiSliceContextItem::MouseDoubleClickEvent(const vtkContextMouseEvent 
   if((index = this->Internal->FindSliceIndex(value, this->ComputeEpsilon())) == -1)
     {
     // Create
+    index = static_cast<int>(this->Internal->Slices.size());
     this->Internal->Slices.push_back(value);
     this->Internal->SlicesVisibility.push_back(true);
+
+    this->Internal->ActiveSliceIndex = index;
+    this->InvokeEvent(vtkMultiSliceContextItem::AddSliceEvent);
+    this->Internal->ActiveSliceIndex = -1;
     }
   else
     {
@@ -332,12 +337,14 @@ bool vtkMultiSliceContextItem::MouseDoubleClickEvent(const vtkContextMouseEvent 
     posV += index;
     this->Internal->Slices.erase(pos);
     this->Internal->SlicesVisibility.erase(posV);
-    }
 
+    this->Internal->ActiveSliceIndex = index;
+    this->InvokeEvent(vtkMultiSliceContextItem::RemoveSliceEvent);
+    this->Internal->ActiveSliceIndex = -1;
+    }
 
   // Make sure we paint that new slice
   this->forceRender();
-  this->InvokeEvent(vtkCommand::ModifiedEvent);
   return true;
 }
 
@@ -360,7 +367,7 @@ bool vtkMultiSliceContextItem::MouseMoveEvent(const vtkContextMouseEvent &mouse)
       }
     this->Internal->Slices[Internal->ActiveSliceIndex] = value;
     this->forceRender();
-    this->InvokeEvent(vtkCommand::ModifiedEvent);
+    this->InvokeEvent(vtkMultiSliceContextItem::ModifySliceEvent);
     }
 
    return true;
@@ -410,6 +417,13 @@ const double* vtkMultiSliceContextItem::GetVisibleSlices(int &nbSlices) const
 }
 
 //-----------------------------------------------------------------------------
+const double* vtkMultiSliceContextItem::GetSlices(int &nbSlices) const
+{
+  nbSlices = static_cast<int>(this->Internal->Slices.size());
+  return nbSlices > 0? (&this->Internal->Slices[0]) : NULL;
+}
+
+//-----------------------------------------------------------------------------
 void vtkMultiSliceContextItem::SetSlices(double *values, bool *visibility, int numberOfSlices)
 {
   this->Internal->Slices.clear();
@@ -448,4 +462,10 @@ double vtkMultiSliceContextItem::GetSliceValue(int sliceIndex)
 int vtkMultiSliceContextItem::GetNumberOfSlices()
 {
   return static_cast<int>(this->Internal->Slices.size());
+}
+
+//-----------------------------------------------------------------------------
+int vtkMultiSliceContextItem::GetActiveSliceIndex()
+{
+  return this->Internal->ActiveSliceIndex;
 }

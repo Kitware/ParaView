@@ -115,7 +115,13 @@ pqMultiSliceAxisWidget::pqMultiSliceAxisWidget(
   vLayout->addWidget(this->Internal->View);
 
   this->Internal->SliceItem->AddObserver(
-        vtkCommand::ModifiedEvent, this,
+        vtkMultiSliceContextItem::AddSliceEvent, this,
+        &pqMultiSliceAxisWidget::invalidateCallback);
+  this->Internal->SliceItem->AddObserver(
+        vtkMultiSliceContextItem::RemoveSliceEvent, this,
+        &pqMultiSliceAxisWidget::invalidateCallback);
+  this->Internal->SliceItem->AddObserver(
+        vtkMultiSliceContextItem::ModifySliceEvent, this,
         &pqMultiSliceAxisWidget::invalidateCallback);
 }
 
@@ -187,15 +193,35 @@ void pqMultiSliceAxisWidget::setRange(double min, double max)
 }
 
 // ----------------------------------------------------------------------------
-void pqMultiSliceAxisWidget::invalidateCallback(vtkObject*, unsigned long, void*)
+void pqMultiSliceAxisWidget::invalidateCallback(vtkObject*, unsigned long eventid, void*)
 {
-  emit this->modelUpdated();
+  int index = this->Internal->SliceItem->GetActiveSliceIndex();
+  switch (eventid)
+    {
+  case vtkMultiSliceContextItem::AddSliceEvent:
+    emit this->sliceAdded(index);
+    break;
+
+  case vtkMultiSliceContextItem::RemoveSliceEvent:
+    emit this->sliceRemoved(index);
+    break;
+
+  case vtkMultiSliceContextItem::ModifySliceEvent:
+    emit this->sliceModified(index);
+    break;
+    }
 }
 
 // ----------------------------------------------------------------------------
 const double* pqMultiSliceAxisWidget::getVisibleSlices(int &nbSlices) const
 {
   return this->Internal->SliceItem->GetVisibleSlices(nbSlices);
+}
+
+// ----------------------------------------------------------------------------
+const double* pqMultiSliceAxisWidget::getSlices(int &nbSlices) const
+{
+  return this->Internal->SliceItem->GetSlices(nbSlices);
 }
 
 // ----------------------------------------------------------------------------
