@@ -36,12 +36,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqServerManagerModel.h"
 #include "pqView.h"
+#include "vtkDataObject.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
-#include "vtkSMSourceProxy.h"
-#include "vtkDataObject.h"
-#include "vtkTuple.h"
+#include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkTuple.h"
 
 #include <QtDebug>
 
@@ -68,6 +69,34 @@ namespace
         }
       }
     return NULL;
+    }
+
+  /// Changes the title property iff its value wasn't explicitly changed by the user.
+  /// If value is NULL, we restore the property default else the property is set to
+  /// the specified value.
+  void SafeSetAxisTitle(vtkSMProxy* gridAxis, const char* pname, const char* value)
+    {
+    vtkSMProperty* prop = gridAxis->GetProperty(pname);
+    Q_ASSERT(prop);
+
+    vtkSMPropertyHelper helper(prop);
+
+    QString key = QString("MTSBAutoTitle.%1").arg(pname);
+    if (prop->IsValueDefault() ||
+      gridAxis->HasAnnotation(key.toLatin1().data()) &&
+      strcmp(gridAxis->GetAnnotation(key.toLatin1().data()), helper.GetAsString()) == 0)
+      {
+      if (value)
+        {
+        helper.Set(value);
+        gridAxis->SetAnnotation(key.toLatin1().data(), value);
+        }
+      else
+        {
+        prop->ResetToDefault();
+        gridAxis->RemoveAnnotation(key.toLatin1().data());
+        }
+      }
     }
 
 }
@@ -124,7 +153,7 @@ void pqModelTransformSupportBehavior::enableModelTransform(
   vtkTuple<vtkStdString, 3> titles = this->getAxisTitles(producer, 0, &are_titles_valid);
 
   if (vtkSMProxy* gridAxes3DActor = vtkSMPropertyHelper(
-    view->getProxy(), "GridActor", /*quiet*/ true).GetAsProxy())
+    view->getProxy(), "AxesGrid", /*quiet*/ true).GetAsProxy())
     {
     vtkSMPropertyHelper(gridAxes3DActor, "UseModelTransform").Set(1);
     vtkTuple<double, 16> cobm = this->getChangeOfBasisMatrix(producer);
@@ -134,9 +163,16 @@ void pqModelTransformSupportBehavior::enableModelTransform(
 
     if (are_titles_valid)
       {
-      vtkSMPropertyHelper(gridAxes3DActor, "XTitle").Set(titles[0].c_str());
-      vtkSMPropertyHelper(gridAxes3DActor, "YTitle").Set(titles[1].c_str());
-      vtkSMPropertyHelper(gridAxes3DActor, "ZTitle").Set(titles[2].c_str());
+      SafeSetAxisTitle(gridAxes3DActor, "XTitle", titles[0].c_str());
+      SafeSetAxisTitle(gridAxes3DActor, "YTitle", titles[1].c_str());
+      SafeSetAxisTitle(gridAxes3DActor, "ZTitle", titles[2].c_str());
+      }
+    else
+      {
+      // clear data-dependent axis titles.
+      SafeSetAxisTitle(gridAxes3DActor, "XTitle", NULL);
+      SafeSetAxisTitle(gridAxes3DActor, "YTitle", NULL);
+      SafeSetAxisTitle(gridAxes3DActor, "ZTitle", NULL);
       }
     gridAxes3DActor->UpdateVTKObjects();
     }
@@ -155,14 +191,17 @@ void pqModelTransformSupportBehavior::enableModelTransform(
 void pqModelTransformSupportBehavior::disableModelTransform(pqView* view)
 {
   if (vtkSMProxy* gridAxes3DActor = vtkSMPropertyHelper(
-    view->getProxy(), "GridActor", /*quiet*/ true).GetAsProxy())
+    view->getProxy(), "AxesGrid", /*quiet*/ true).GetAsProxy())
     {
     vtkSMPropertyHelper helper(gridAxes3DActor, "UseModelTransform");
     if (helper.GetAsInt() != 0)
       {
       helper.Set(0);
-      gridAxes3DActor->UpdateVTKObjects();
       }
+    SafeSetAxisTitle(gridAxes3DActor, "XTitle", NULL);
+    SafeSetAxisTitle(gridAxes3DActor, "YTitle", NULL);
+    SafeSetAxisTitle(gridAxes3DActor, "ZTitle", NULL);
+    gridAxes3DActor->UpdateVTKObjects();
     }
 }
 
