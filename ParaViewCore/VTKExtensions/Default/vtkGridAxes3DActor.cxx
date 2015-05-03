@@ -524,7 +524,6 @@ void vtkGridAxes3DActor::Update(vtkViewport* viewport)
         this->GridAxes2DActors[cc]->SetCustomTickPositions(axis,
           this->UseCustomLabels[axis]? this->CustomLabels[axis].GetPointer() : NULL);
         }
-      this->CustomLabelsMTime = this->GetMTime();
       }
 
     // FIXME: We call vtkGridAxes2DActor::Update() here and then
@@ -532,6 +531,7 @@ void vtkGridAxes3DActor::Update(vtkViewport* viewport)
     // method. We can avoid the second call to speed things up.
     faces_to_render[cc] = this->GridAxes2DActors[cc]->Update(viewport);
     }
+  this->CustomLabelsMTime = this->GetMTime();
 
   // Now determine which labels to hide based on this->LabelUniqueEdgesOnly.
   if (!this->LabelUniqueEdgesOnly)

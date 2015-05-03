@@ -1467,7 +1467,7 @@
           this flag is set to 1.
         </Documentation>
       </IntVectorProperty>
-      <DoubleVectorProperty command="SetYLabels"
+      <DoubleVectorProperty command="SetYLabel"
                             set_number_command="SetNumberOfYLabels"
                             name="YAxisLabels"
                             number_of_elements="0"
