@@ -742,7 +742,30 @@ void vtkPVXYChartView::Render(bool interactive)
       }
     }
 
-  // handle custom labels. We specify custom labels in render since vtkAxis will
+  // For now we only handle X-axis time. If needed we can add support for Y-axis.
+  this->Superclass::Render(interactive);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SelectionChanged()
+{
+  this->InvokeEvent(vtkCommand::SelectionChangedEvent);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::Update()
+{
+  this->Superclass::Update();
+
+  // At this point, all representations must have updated which series are
+  // visible, etc. So we can now recalculate the axes bounds to pick a good
+  // value.
+  if (this->Chart == NULL)
+    {
+    return;
+    }
+
+  // handle custom labels. We specify custom labels in here since vtkAxis will
   // discard the custom labels when the mode was set to not use custom labels,
   // so we need to provide the labels each time to the chart.
   for (int axis=0; axis < 4 && axis < this->Chart->GetNumberOfAxes(); axis++)
@@ -776,34 +799,12 @@ void vtkPVXYChartView::Render(bool interactive)
     chartAxis->Update();
     }
 
-  // For now we only handle X-axis time. If needed we can add support for Y-axis.
-  this->Superclass::Render(interactive);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVXYChartView::SelectionChanged()
-{
-  this->InvokeEvent(vtkCommand::SelectionChangedEvent);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVXYChartView::Update()
-{
-  this->Superclass::Update();
-
-  // At this point, all representations must have updated which series are
-  // visible, etc. So we can now recalculate the axes bounds to pick a good
-  // value.
-  if (this->Chart == NULL)
-    {
-    return;
-    }
-
   // This will recompute the bounds for each of the axes as appropriate.
   // Note, this doesn't happen immediately. vtkChartXY recomputes the bounds
   // on the subsequent "paint" or the next time vtkPVXYChartView::Render()
   // is called.
   this->Chart->RecalculateBounds();
+
 
   // Things to remember:
   // When any property on the chart representations change, including series
