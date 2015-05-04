@@ -6461,6 +6461,28 @@ array.
         set to 0, the output will not contain this array.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty animateable="0"
+                         command="SetOutputPointsPrecision"
+                         default_values="0"
+                         name="OutputPointsPrecision"
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
+        <EnumerationDomain name="enum">
+          <Entry text="Single"
+                 value="0" />
+          <Entry text="Double"
+                 value="1" />
+          <Entry text="Same as input"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>
+Select the output precision of the coordinates. **Single** sets the
+output to single-precision floating-point (i.e., float), **Double**
+sets it to double-precision floating-point (i.e., double), and
+**Default** sets it to the same precision as the precision of the
+points in the input. Defaults to ***Single***.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
                          command="SetGenerateTriangles"
                          default_values="1"
                          name="GenerateTriangles"
