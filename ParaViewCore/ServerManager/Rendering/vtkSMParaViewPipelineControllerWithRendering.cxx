@@ -41,7 +41,7 @@
 namespace
 {
   //---------------------------------------------------------------------------
-  const char* vtkFindViewTypeFromHints(vtkPVXMLElement* hints, const int outputPort)
+  const char* vtkFindTypeFromHints(vtkPVXMLElement* hints, const int outputPort, const char* type)
     {
     if (!hints)
       {
@@ -50,7 +50,7 @@ namespace
     for (unsigned int cc=0, max=hints->GetNumberOfNestedElements(); cc < max; cc++)
       {
       vtkPVXMLElement* child = hints->GetNestedElement(cc);
-      if (child && child->GetName() && strcmp(child->GetName(), "View") == 0)
+      if (child && child->GetName() && strcmp(child->GetName(), type) == 0)
         {
         int port;
         // If port exists, then it must match the port number for this port.
@@ -174,8 +174,13 @@ namespace
       {
       repr->SetRepresentationType(vtkSMPropertyHelper(smproperty).GetAsString());
       }
+ 
+    // 2. Check if there's a hint for the producer. If so, use that.
+    if (const char* reprtype = vtkFindTypeFromHints(producer->GetHints(), outputPort, "Representation"))
+      {
+      repr->SetRepresentationType(reprtype);
+      }
     }
-
 }
 
 bool vtkSMParaViewPipelineControllerWithRendering::HideScalarBarOnHide = true;
@@ -516,7 +521,7 @@ const char* vtkSMParaViewPipelineControllerWithRendering::GetPreferredViewType(
   vtkSMSourceProxy* producer, int outputPort)
 {
   // 1. Check if there's a hint for the producer. If so, use that.
-  if (const char* viewType = vtkFindViewTypeFromHints(producer->GetHints(), outputPort))
+  if (const char* viewType = vtkFindTypeFromHints(producer->GetHints(), outputPort, "View"))
     {
     return viewType;
     }
