@@ -8058,6 +8058,15 @@ source.</Documentation>
         second is more robust in locating cells during streamline
         integration.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetSurfaceStreamlines"
+                         default_values="0"
+                         name="Surface Streamlines"
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>Specify whether or not to compute surface
+        streamlines.</Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetIntegrationDirection"
                          default_values="2"
                          name="IntegrationDirection"
@@ -8198,7 +8207,6 @@ source.</Documentation>
         <Documentation>Specify whether or not to compute
         vorticity.</Documentation>
       </IntVectorProperty>
-
       <InputProperty command="SetSourceConnection"
                      label="Seed Type"
                      name="Source"
@@ -8290,6 +8298,15 @@ source.</Documentation>
         <Documentation>This property contains the name of the vector array from
         which to generate streamlines.</Documentation>
       </StringVectorProperty>
+      <IntVectorProperty command="SetSurfaceStreamlines"
+                         default_values="0"
+                         name="Surface Streamlines"
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>Specify whether or not to compute surface
+        streamlines.</Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetIntegrationDirection"
                          default_values="2"
                          name="IntegrationDirection"
