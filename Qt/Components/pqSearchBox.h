@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqSearchBox_h
 
 #include <QWidget>
+#include <QScopedPointer>
 #include "pqComponentsModule.h"
 
 class QSettings;
@@ -180,7 +181,7 @@ private:
   class pqInternals;
   friend class pqInternals;
 
-  pqInternals* Internals;
+  const QScopedPointer<pqInternals> Internals;
   QString SettingKey;
 };
 
