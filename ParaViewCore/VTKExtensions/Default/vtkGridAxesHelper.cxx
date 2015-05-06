@@ -66,7 +66,7 @@ vtkGridAxesHelper::~vtkGridAxesHelper()
 }
 
 //----------------------------------------------------------------------------
-const vtkTuple<vtkVector3d, 4>& vtkGridAxesHelper::GetPoints()
+vtkTuple<vtkVector3d, 4> vtkGridAxesHelper::GetPoints()
 {
   unsigned long mtime = this->GetMTime();
   if (mtime == this->GetPointsMTime)
@@ -166,13 +166,13 @@ const vtkTuple<vtkVector3d, 4>& vtkGridAxesHelper::GetPoints()
 }
 
 //----------------------------------------------------------------------------
-const vtkVector2i& vtkGridAxesHelper::GetActiveAxes()
+vtkVector2i vtkGridAxesHelper::GetActiveAxes()
 {
   this->GetPoints();
   return this->ActiveAxes;
 }
 //----------------------------------------------------------------------------
-const vtkTuple<bool, 4>& vtkGridAxesHelper::GetLabelVisibilities()
+vtkTuple<bool, 4> vtkGridAxesHelper::GetLabelVisibilities()
 {
   this->GetPoints();
 
@@ -185,7 +185,7 @@ const vtkTuple<bool, 4>& vtkGridAxesHelper::GetLabelVisibilities()
 }
 
 //----------------------------------------------------------------------------
-const vtkTuple<vtkVector3d, 4>& vtkGridAxesHelper::GetTransformedPoints()
+vtkTuple<vtkVector3d, 4> vtkGridAxesHelper::GetTransformedPoints()
 {
   const vtkTuple<vtkVector3d, 4> &points = this->GetPoints();
   unsigned long mtime =
@@ -223,7 +223,7 @@ vtkVector3d vtkGridAxesHelper::TransformPoint(const vtkVector3d& point)
 }
 
 //----------------------------------------------------------------------------
-const vtkVector3d& vtkGridAxesHelper::GetTransformedFaceNormal()
+vtkVector3d vtkGridAxesHelper::GetTransformedFaceNormal()
 {
   // This ensures that the normal is recomputed, if needed.
   this->GetTransformedPoints();
