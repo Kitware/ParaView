@@ -44,7 +44,6 @@ set(Module_SRCS
   vtkCleanUnstructuredGrid.cxx
   vtkCSVWriter.cxx
   vtkEnsembleDataReader.cxx
-  vtkEnsembleReader.cxx
   vtkEquivalenceSet.cxx
   vtkExodusFileSeriesReader.cxx
   vtkExtractHistogram.cxx
