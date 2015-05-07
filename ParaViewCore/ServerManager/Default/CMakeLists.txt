@@ -35,6 +35,7 @@ set (Module_SRCS
   vtkSMCameraConfigurationWriter.cxx
   vtkSMCSVExporterProxy.cxx
   vtkSMDirectoryProxy.cxx
+  vtkSMEnsembleDataReaderProxy.cxx
   vtkSMExporterProxy.cxx
   vtkSMInteractionUndoStackBuilder.cxx
   vtkSMInteractiveSelectionPipeline.cxx
