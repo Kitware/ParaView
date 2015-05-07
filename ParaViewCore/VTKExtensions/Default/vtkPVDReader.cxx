@@ -69,7 +69,7 @@ void vtkPVDReader::ReadXMLData()
     return;
     }
 
-  vtkInformation* outInfo = this->GetExecutive()->GetOutputInformation(0);
+  vtkInformation* outInfo = this->GetCurrentOutputInformation();
 
   int tsLength = 0;
   double* steps = 0;
