@@ -23,8 +23,6 @@
 #include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
 #include "vtkPVInformation.h"
 
-struct vtkPVEnsembleDataReaderInformationInternal;
-
 class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkPVEnsembleDataReaderInformation
   : public vtkPVInformation
 {
@@ -46,21 +44,22 @@ public:
 
   // Description:
   // Get number of files contained in the ensemble.
-  virtual int GetFileCount();
+  virtual unsigned int GetFileCount();
 
   // Description:
   // Get the file path for the input row index.
-  virtual vtkStdString GetFilePath(const int);
+  virtual vtkStdString GetFilePath(const unsigned int);
 
 protected:
   vtkPVEnsembleDataReaderInformation();
   ~vtkPVEnsembleDataReaderInformation();
 
 private:
-  vtkPVEnsembleDataReaderInformationInternal *Internal;
-
   vtkPVEnsembleDataReaderInformation(const vtkPVEnsembleDataReaderInformation&); // Not implemented.
   void operator=(const vtkPVEnsembleDataReaderInformation&); // Not implemented.
+
+  class vtkInternal;
+  vtkInternal *Internal;
 };
 
 #endif

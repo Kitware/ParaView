@@ -16,19 +16,19 @@
 // .SECTION Description
 // vtkEnsembleDataReader reads a collection of data sources from a metadata
 // file (of extension .pve).
-
+// 'pve' a simply CSV file with the last column being the relative filename and
+// other columns for each of the variables in the ensemble.
 #ifndef __vtkEnsembleDataReader_h
 #define __vtkEnsembleDataReader_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
-#include "vtkAlgorithm.h"
+#include "vtkDataObjectAlgorithm.h"
 
-struct vtkEnsembleDataReaderInternal;
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkEnsembleDataReader : public vtkAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkEnsembleDataReader : public vtkDataObjectAlgorithm
 {
 public:
   static vtkEnsembleDataReader *New();
-  vtkTypeMacro(vtkEnsembleDataReader, vtkAlgorithm);
+  vtkTypeMacro(vtkEnsembleDataReader, vtkDataObjectAlgorithm);
   void PrintSelf(ostream &os, vtkIndent indent);
 
   // Description:
@@ -38,39 +38,46 @@ public:
 
   // Description:
   // Set/Get the current ensemble member to process.
-  vtkSetMacro(CurrentMember, int);
-  vtkGetMacro(CurrentMember, int);
+  vtkSetMacro(CurrentMember, unsigned int);
+  vtkGetMacro(CurrentMember, unsigned int);
 
   // Description:
   // Returns the number of ensemble members
-  int GetNumberOfMembers() const;
+  unsigned int GetNumberOfMembers() const;
+  vtkGetVector2Macro(CurrentMemberRange, unsigned int);
 
   // Description:
   // Get the file path associated with the specified row of the meta data
-  vtkStdString GetFilePath(const int rowIndex) const;
+  vtkStdString GetFilePath(unsigned int rowIndex) const;
 
   // Description:
   // Set the file reader for the specified row of data
-  bool SetReader(const int rowIndex, vtkAlgorithm *reader);
+  void SetReader(unsigned int rowIndex, vtkAlgorithm *reader);
+
+  // Description:
+  // Removes all readers set using SetReader().
+  void ResetReaders();
+
+  // Description:
+  // Use this method to update the meta data, if needed. This will only read the
+  // file again if cache is obsolete.
+  bool UpdateMetaData();
 
 protected:
   vtkEnsembleDataReader();
   ~vtkEnsembleDataReader();
 
-  virtual int ProcessRequest(vtkInformation*, vtkInformationVector**,
-    vtkInformationVector*);
-
-  virtual int FillOutputPortInformation(int, vtkInformation *info);
-
+  virtual int ProcessRequest(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*);
   vtkAlgorithm *GetCurrentReader();
-
-  bool ReadMetaData();
 
 private:
   char *FileName;
-  int CurrentMember;
+  unsigned int CurrentMember;
+  unsigned int CurrentMemberRange[2];
 
-  vtkEnsembleDataReaderInternal *Internal;
+  class vtkInternal;
+  vtkInternal *Internal;
 
   vtkEnsembleDataReader(const vtkEnsembleDataReader&); // Not implemented
   void operator=(const vtkEnsembleDataReader&); // Not implemented

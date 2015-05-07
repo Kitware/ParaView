@@ -23,8 +23,6 @@
 #include "vtkPVServerManagerDefaultModule.h" // for export
 #include "vtkSMSourceProxy.h"
 
-struct vtkSMEnsembleDataReaderProxyInternal;
-
 class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMEnsembleDataReaderProxy : public vtkSMSourceProxy
 {
 public:
@@ -40,9 +38,8 @@ protected:
 
   virtual void SetPropertyModifiedFlag(const char *name, int flag);
 
+  bool FileNamePotentiallyModified;
 private:
-  vtkSMEnsembleDataReaderProxyInternal *Internal;
-
   bool FetchFileNames();
 
   vtkSMEnsembleDataReaderProxy(const vtkSMEnsembleDataReaderProxy&); // Not implemented.

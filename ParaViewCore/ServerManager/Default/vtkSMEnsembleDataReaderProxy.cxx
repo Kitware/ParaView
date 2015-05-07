@@ -1,78 +1,55 @@
 #include "vtkSMEnsembleDataReaderProxy.h"
 
-#include "vtkAlgorithm.h"
 #include "vtkClientServerStream.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkSmartPointer.h"
-
-#include "vtkSMCoreUtilities.h"
-#include "vtkSMProperty.h"
-#include "vtkSMPropertyHelper.h"
-#include "vtkSMSession.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMSessionProxyManager.h"
-#include "vtkSMStringVectorProperty.h"
-#include "vtkSMReaderFactory.h"
-
 #include "vtkPVEnsembleDataReaderInformation.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMCoreUtilities.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMReaderFactory.h"
+#include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 
 #include <cassert>
 #include <vector>
 
-struct vtkSMEnsembleDataReaderProxyInternal
-{
-  bool FileNamePotentiallyModified;
-};
-
 vtkStandardNewMacro(vtkSMEnsembleDataReaderProxy);
-
+//-----------------------------------------------------------------------------
 vtkSMEnsembleDataReaderProxy::vtkSMEnsembleDataReaderProxy()
 {
-  this->Internal = new vtkSMEnsembleDataReaderProxyInternal;
-  this->Internal->FileNamePotentiallyModified = false;
+  this->FileNamePotentiallyModified = false;
 }
 
+//-----------------------------------------------------------------------------
 vtkSMEnsembleDataReaderProxy::~vtkSMEnsembleDataReaderProxy()
 {
-  delete this->Internal;
 }
 
-void vtkSMEnsembleDataReaderProxy::SetPropertyModifiedFlag(const char *name,
-                                                           int flag)
+//-----------------------------------------------------------------------------
+void vtkSMEnsembleDataReaderProxy::SetPropertyModifiedFlag(
+  const char *name, int flag)
 {
   this->Superclass::SetPropertyModifiedFlag(name, flag);
-
   if (strcmp(name, "FileName") == 0)
     {
-    vtkSMProperty *property = this->GetProperty("FileName");
-    if (property->IsA("vtkSMStringVectorProperty"))
-      {
-      vtkSMStringVectorProperty *pv =
-        vtkSMStringVectorProperty::SafeDownCast(property);
-      if (pv->GetNumberOfElements() > 0)
-        {
-        const char *fileName = pv->GetElement(0);
-        if (fileName && fileName[0])
-          {
-            this->Internal->FileNamePotentiallyModified = true;
-          }
-        }
-      }
+    this->FileNamePotentiallyModified = true;
     }
 }
 
+//-----------------------------------------------------------------------------
 void vtkSMEnsembleDataReaderProxy::UpdateVTKObjects()
 {
   this->Superclass::UpdateVTKObjects();
-
-  if (this->Internal->FileNamePotentiallyModified)
+  if (this->FileNamePotentiallyModified)
     {
     this->FetchFileNames();
-    this->Internal->FileNamePotentiallyModified = false;
+    this->FileNamePotentiallyModified = false;
     }
 }
 
+//-----------------------------------------------------------------------------
 bool vtkSMEnsembleDataReaderProxy::FetchFileNames()
 {
   // Gather information
@@ -81,10 +58,17 @@ bool vtkSMEnsembleDataReaderProxy::FetchFileNames()
   this->GatherInformation(info.GetPointer());
 
   // Create reader factory
-  vtkSMReaderFactory *readerFactory =
-    vtkSMProxyManager::GetProxyManager()->GetReaderFactory();
-  assert(readerFactory &&
-         readerFactory->GetNumberOfRegisteredPrototypes() > 0);
+  vtkSMReaderFactory *readerFactory = vtkSMProxyManager::GetProxyManager()->GetReaderFactory();
+  if (!readerFactory || readerFactory->GetNumberOfRegisteredPrototypes() == 0)
+    {
+    vtkErrorMacro("No reader factory found. Cannot determine reader types!!!");
+    return false;
+    }
+
+  if (info->GetFileCount() == 0)
+    {
+    return false;
+    }
 
   // Get session and session proxy manager
   vtkSMSession *session = this->GetSession();
@@ -93,9 +77,13 @@ bool vtkSMEnsembleDataReaderProxy::FetchFileNames()
   assert(spm);
 
   // Stream reader proxies to VTK object
-  vtkClientServerStream stream;
   std::vector<vtkSmartPointer<vtkSMProxy> > proxies;
-  for (int i = 0; i < info->GetFileCount(); ++i)
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << VTKOBJECT(this)
+         << "ResetReaders"
+         << vtkClientServerStream::End;
+  for (unsigned int i = 0, max = info->GetFileCount(); i < max; ++i)
     {
     vtkStdString filePath = info->GetFilePath(i);
     if (readerFactory->CanReadFile(filePath.c_str(), session))
@@ -109,6 +97,8 @@ bool vtkSMEnsembleDataReaderProxy::FetchFileNames()
         return false;
         }
       const char *fileNameProperty = vtkSMCoreUtilities::GetFileNameProperty(proxy);
+      assert(fileNameProperty);
+
       vtkSMPropertyHelper(proxy, fileNameProperty).Set(filePath);
       proxy->UpdateVTKObjects();
 
@@ -116,27 +106,20 @@ bool vtkSMEnsembleDataReaderProxy::FetchFileNames()
       stream << vtkClientServerStream::Invoke
              << VTKOBJECT(this) << "SetReader" << i << VTKOBJECT(proxy)
              << vtkClientServerStream::End;
-
       proxies.push_back(proxy);
       proxy->Delete();
+      }
+    else
+      {
+      vtkErrorMacro("Cannot create a reader for: " << filePath.c_str());
       }
     }
   this->ExecuteStream(stream);
   return true;
 }
 
+//-----------------------------------------------------------------------------
 void vtkSMEnsembleDataReaderProxy::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-
-  // FileNamePotentiallyModified
-  os << indent << "FileNamePotentiallyModified: ";
-  if (this->Internal)
-    {
-    os << this->Internal->FileNamePotentiallyModified << endl;
-    }
-  else
-    {
-    os << "(NULL)" << endl;
-    }
 }

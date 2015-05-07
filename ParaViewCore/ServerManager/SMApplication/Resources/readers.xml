@@ -7328,7 +7328,6 @@ series.
 
     <!-- Begin Ensemble Data Reader -->
     <EnsembleDataReaderProxy class="vtkEnsembleDataReader"
-                             file_name_method="SetFileName"
                              label="Ensemble Data Reader"
                              name="EnsembleDataReader">
       <Documentation long_help="Reads ensemble data organized in CSV files."
@@ -7347,16 +7346,34 @@ series.
           This property specifies the PVE file name
         </Documentation>
       </StringVectorProperty>
-      <IntVectorProperty name="CurrentMember"
+      <IntVectorProperty name="CurrentEnsembleMember"
                          command="SetCurrentMember"
                          animatable="1"
                          default_values="0"
                          number_of_elements="1">
-        <IntRangeDomain name="range"/>
+        <IntRangeDomain name="range" default_mode="min">
+          <RequiredProperties>
+            <Property name="EnsembleMemberRange" function="Range" />
+          </RequiredProperties>
+        </IntRangeDomain>
         <Documentation>
           The index of the dataset in the ensemble.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty name="EnsembleMemberRange"
+                         command="GetCurrentMemberRange"
+                         information_only="1"
+                         number_of_elements="2"
+                         default_values="0 0">
+      </IntVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>
+          Reports time values to the GUI.
+        </Documentation>
+      </DoubleVectorProperty>
       <Hints>
         <ReaderFactory extensions="pve"
                        file_description="ParaView Ensemble Data" />

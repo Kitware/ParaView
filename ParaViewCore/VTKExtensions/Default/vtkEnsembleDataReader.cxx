@@ -1,173 +1,158 @@
 #include "vtkEnsembleDataReader.h"
 
-#include "vtkDataObject.h"
-#include "vtkInformation.h"
-#include "vtkObjectFactory.h"
-#include "vtkNew.h"
-#include "vtkSmartPointer.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkInformationVector.h"
-
-#include "vtkTable.h"
-#include "vtkVariantArray.h"
-#include "vtkVariant.h"
-#include "vtkStdString.h"
-
+#include "vtkDataSetAttributes.h"
 #include "vtkDelimitedTextReader.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkNew.h"
+#include "vtkObjectFactory.h"
+#include "vtkSmartPointer.h"
+#include "vtkStdString.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStringArray.h"
+#include "vtkTable.h"
 
-#include <vector>
-#include <cassert>
 #include <algorithm>
-#include <functional>
+#include <cassert>
 #include <ctype.h>
+#include <functional>
+#include <vector>
+#include <vtksys/SystemTools.hxx>
 
-struct vtkEnsembleDataReaderInternal
+//-----------------------------------------------------------------------------
+class vtkEnsembleDataReader::vtkInternal
 {
-  vtkEnsembleDataReaderInternal() : LastRecordedFileName(0) {}
-  ~vtkEnsembleDataReaderInternal() { delete LastRecordedFileName; }
+public:
+  typedef std::vector<vtkSmartPointer<vtkAlgorithm> > VectorOfReaders;
+  VectorOfReaders Readers;
 
-  void RecordFileName(const char *fileName)
-  {
-    delete LastRecordedFileName;
-    size_t length = strlen(fileName);
-    LastRecordedFileName = new char[length + 1];
-    strncpy(LastRecordedFileName, fileName, length);
-  }
-
-  std::vector<vtkSmartPointer<vtkAlgorithm> > Readers;
   std::vector<vtkStdString> FilePaths;
   vtkSmartPointer<vtkTable> MetaData;
-  char *LastRecordedFileName;
+
+  vtkTimeStamp ReadMetaDataMTime;
+  std::string PreviousFileName;
 };
 
 vtkStandardNewMacro(vtkEnsembleDataReader);
-
+//-----------------------------------------------------------------------------
 vtkEnsembleDataReader::vtkEnsembleDataReader()
   : FileName(0)
-  , CurrentMember(0)
+  , CurrentMember(0),
+  Internal(new vtkEnsembleDataReader::vtkInternal())
 {
+  this->CurrentMemberRange[0] = this->CurrentMemberRange[1] = 0;
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
-
-  this->Internal = new vtkEnsembleDataReaderInternal;
 }
 
+//-----------------------------------------------------------------------------
 vtkEnsembleDataReader::~vtkEnsembleDataReader()
 {
   delete this->Internal;
+  this->Internal = NULL;
 }
 
-int vtkEnsembleDataReader::GetNumberOfMembers() const
+//-----------------------------------------------------------------------------
+unsigned int vtkEnsembleDataReader::GetNumberOfMembers() const
 {
-  assert(this->Internal->Readers.size() ==
-         this->Internal->FilePaths.size()); // Sanity check
-  return static_cast<int>(this->Internal->Readers.size());
+  return this->Internal->MetaData != NULL?
+    static_cast<unsigned int>(this->Internal->FilePaths.size()) : 0;
 }
 
-vtkStdString vtkEnsembleDataReader::GetFilePath(const int member) const
+//-----------------------------------------------------------------------------
+vtkStdString vtkEnsembleDataReader::GetFilePath(unsigned int member) const
 {
-  int count = static_cast<int>(this->Internal->FilePaths.size());
-  if (member < 0 || member >= count)
+  if (member < static_cast<unsigned int>(this->Internal->FilePaths.size()))
     {
-      //vtkWarningMacro("Requested member outside of range.");
-    return "";
+    return this->Internal->FilePaths[member];
     }
-  return this->Internal->FilePaths[member];
+  return vtkStdString();
 }
 
-bool vtkEnsembleDataReader::SetReader(const int rowIndex, vtkAlgorithm *reader)
+//-----------------------------------------------------------------------------
+void vtkEnsembleDataReader::SetReader(unsigned int rowIndex, vtkAlgorithm *reader)
 {
-  int count = static_cast<int>(this->Internal->Readers.size());
-  if (rowIndex < 0 || rowIndex >= count)
+  bool modified = false;
+  if (rowIndex >= static_cast<unsigned int>(this->Internal->Readers.size()))
     {
-    vtkWarningMacro("Tried to set out of range reader.");
+    this->Internal->Readers.resize(rowIndex + 1);
+    modified = true;
+    }
+  if (modified || (this->Internal->Readers[rowIndex] != reader))
+    {
+    this->Internal->Readers[rowIndex] = reader;
+    this->Modified();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkEnsembleDataReader::ResetReaders()
+{
+  if (this->Internal->Readers.size() > 0)
+    {
+    this->Internal->Readers.clear();
+    this->Modified();
+    }
+}
+
+//-----------------------------------------------------------------------------
+int vtkEnsembleDataReader::ProcessRequest(vtkInformation *request,
+  vtkInformationVector **inputVector, vtkInformationVector *outputVector)
+{
+  if (!this->FileName)
+    {
+    vtkErrorMacro("No filename is set!");
     return false;
     }
-  this->Internal->Readers[rowIndex] = reader;
-  this->Modified();
-  return true;
-}
 
-int vtkEnsembleDataReader::ProcessRequest(vtkInformation *request,
-                                          vtkInformationVector **inputVector,
-                                          vtkInformationVector *outputVector)
-{
-  char *fileName = this->GetFileName();
-  if (fileName == NULL)
+  if (this->Internal->Readers.size() == 0)
     {
-    vtkWarningMacro(<< "FileName must be set");
-    return 0;
+    vtkErrorMacro("No reader have been specified! Things may not work as expected.");
     }
 
   // Read meta data if it hasn't already been read or if FileName has changed
-  if (!this->Internal->MetaData ||
-      (this->Internal->LastRecordedFileName &&
-      strcmp(fileName, this->Internal->LastRecordedFileName) != 0))
+  if (!this->UpdateMetaData())
     {
-    // Read the meta data
-    if (!this->ReadMetaData())
-      {
-      return 0;
-      }
+    return 0;
+    }
 
-    // Update the recorded file name
-    this->Internal->RecordFileName(fileName);
+  if (!this->Superclass::ProcessRequest(request, inputVector, outputVector))
+    {
+    return 0;
     }
 
   vtkAlgorithm *currentReader = this->GetCurrentReader();
-  if (currentReader)
+  if (!currentReader)
     {
-    if (request->Has(vtkDemandDrivenPipeline::REQUEST_DATA_OBJECT()))
-      {
-      currentReader->UpdateDataObject();
-      vtkDataObject *rOutput = currentReader->GetOutputDataObject(0);
-      if (rOutput)
-        {
-          vtkDataObject *output = rOutput->NewInstance();
-          outputVector->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(),
-                                                     output);
-          output->Delete();
-        }
-      return 1;
-      }
-    if (request->Has(vtkDemandDrivenPipeline::REQUEST_INFORMATION()))
-      {
-      // Just keep metadata internal
-      //if (this->Internal->MetaData)
-      //{
-      //outputVector->GetInformationObject(0)->Set(META_DATA(), this->MetaData);
-      //}
-
-      // Call RequestInformation on all readers as they may initialize data
-      // structures there. Note that this has to be done here because current
-      // reader can be changed with a pipeline request which does not cause
-      // REQUEST_INFORMATION to happen again.
-      std::vector<vtkSmartPointer<vtkAlgorithm> >::iterator iter =
-        this->Internal->Readers.begin();
-      std::vector<vtkSmartPointer<vtkAlgorithm> >::iterator end =
-        this->Internal->Readers.end();
-      for (; iter != end; ++iter)
-        {
-        int result = (*iter)->ProcessRequest(request, inputVector, outputVector);
-        if (!result)
-          {
-          return result;
-          }
-        }
-      return 1;
-      }
-    return currentReader->ProcessRequest(request, inputVector, outputVector);
+    vtkErrorMacro("Cannot determine reader to use for member: " << this->CurrentMember);
+    return 0;
     }
-  return this->Superclass::ProcessRequest(request, inputVector, outputVector);
-}
+  if (!currentReader->ProcessRequest(request, inputVector, outputVector))
+    {
+    return 0;
+    }
 
-int vtkEnsembleDataReader::FillOutputPortInformation(int, vtkInformation *info)
-{
-  assert(info);
-  info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkDataObject");
+  if (request->Has(vtkDemandDrivenPipeline::REQUEST_DATA()))
+    {
+    // Add ensemble information to the data object.
+    vtkDataObject* output = vtkDataObject::GetData(outputVector, 0);
+    vtkFieldData* outputFD = output->GetFieldData();
+
+    // Use a temporary to attempt to preserve field data generated by the internal reader.
+    vtkNew<vtkFieldData> tmp;
+    tmp->CopyStructure(this->Internal->MetaData->GetRowData());
+    tmp->InsertNextTuple(static_cast<vtkIdType>(this->CurrentMember),
+      this->Internal->MetaData->GetRowData());
+    for (int cc=0; cc < tmp->GetNumberOfArrays(); ++cc)
+      {
+      outputFD->AddArray(tmp->GetAbstractArray(cc));
+      }
+    }
+
   return 1;
 }
 
+//-----------------------------------------------------------------------------
 // string trimmin'
 static void ltrim(std::string &s)
 {
@@ -189,28 +174,48 @@ static void trim(std::string &s)
   rtrim(s);
 }
 
+//-----------------------------------------------------------------------------
 vtkAlgorithm *vtkEnsembleDataReader::GetCurrentReader()
 {
-  if (this->CurrentMember < 0 ||
-      this->CurrentMember >= this->GetNumberOfMembers())
+  if (this->CurrentMember >= static_cast<unsigned int>(this->Internal->Readers.size()))
     {
-    return 0;
+    return NULL;
     }
   return this->Internal->Readers[this->CurrentMember];
 }
 
-bool vtkEnsembleDataReader::ReadMetaData()
+//-----------------------------------------------------------------------------
+bool vtkEnsembleDataReader::UpdateMetaData()
 {
   if (!this->FileName)
     {
     return false;
     }
 
+  if (this->Internal->MetaData != NULL &&
+      this->Internal->PreviousFileName == this->FileName)
+    {
+    return true;
+    }
+
+  if (this->GetMTime() < this->Internal->ReadMetaDataMTime)
+    {
+    // Nothing has changed since the last time we did this; no reason why the reading of meta-data
+    // is going to succeed now.
+    return false;
+    }
+
+  this->Internal->FilePaths.clear();
+  this->Internal->MetaData = NULL;
+  this->Internal->PreviousFileName = this->FileName;
+  this->Internal->ReadMetaDataMTime.Modified();
+  this->CurrentMemberRange[0] = this->CurrentMemberRange[1] = 0;
+
   // Read CSV -- Just pick sensible defaults for now
   vtkNew<vtkDelimitedTextReader> csvReader;
   assert(csvReader.GetPointer());
   csvReader->SetFieldDelimiterCharacters(",");
-  csvReader->SetHaveHeaders(false);
+  csvReader->SetHaveHeaders(true);
   csvReader->SetDetectNumericColumns(true);
   csvReader->SetFileName(FileName);
   csvReader->Update();
@@ -218,79 +223,68 @@ bool vtkEnsembleDataReader::ReadMetaData()
   // Initialize a reader for each row in the CSV
   vtkTable *table = csvReader->GetOutput();
   assert(table);
-  this->Internal->MetaData = table;
-
-  // Clear then resize the internal containers
-  this->Internal->FilePaths.clear();
-  this->Internal->Readers.clear();
   vtkIdType rowCount = table->GetNumberOfRows();
+  vtkIdType columnCount = table->GetNumberOfColumns();
+  if (rowCount <= 0 || columnCount <= 0)
+    {
+    vtkErrorMacro("Empty table loaded.");
+    return false;
+    }
+
   this->Internal->FilePaths.resize(rowCount);
-  this->Internal->Readers.resize(rowCount, NULL);
 
   // Read the file names
-  for (int r = 0; r < rowCount; ++r)
+
+  // For now, the last column contains a file path.
+  vtkStringArray* fileColumn = vtkStringArray::SafeDownCast(table->GetColumn(columnCount - 1));
+  if (!fileColumn)
     {
-    vtkVariantArray *row = table->GetRow(r);
-    assert(row);
-    vtkIdType valueCount = row->GetNumberOfValues();
-    for (int c = 0; c < valueCount; ++c)
-      {
-      vtkVariant variant = row->GetValue(c);
-
-      // For now, the last column contains a file path.
-      if (c == valueCount - 1)
-        {
-        vtkStdString filePath = variant.ToString();
-        trim(filePath); // fileName may have leading & trailing whitespace
-
-        // Internal file paths should be relative to the .pve file
-        vtkStdString pvePath = vtkStdString(FileName);
-        size_t lastSlash = pvePath.find_last_of('/');
-        if (lastSlash == std::string::npos)
-        {
-          // Windows
-          lastSlash = pvePath.find_last_of('\\');
-        }
-        if (lastSlash == std::string::npos)
-          {
-          this->Internal->FilePaths[r] = filePath;
-          }
-        else
-          {
-          vtkStdString directory = pvePath.substr(0, lastSlash + 1);
-          this->Internal->FilePaths[r] = directory + filePath;
-          }
-        }
-      }
+    vtkErrorMacro("The last column must contain file names.");
+    return false;
     }
+
+  std::string fdir = vtksys::SystemTools::GetFilenamePath(this->FileName);
+  for (vtkIdType row = 0; row < rowCount; ++row)
+    {
+    vtkStdString filePath = fileColumn->GetValue(row);
+    trim(filePath); // fileName may have leading & trailing whitespace
+
+    std::vector<std::string> components;
+    components.push_back(fdir);
+    components.push_back(filePath);
+
+    // Internal file paths should be relative to the .pve file
+    std::string curFileName = fdir + "/" + filePath;
+    this->Internal->FilePaths[row] = curFileName;
+    }
+
+  this->Internal->MetaData = table;
+
+  this->CurrentMemberRange[1] = this->GetNumberOfMembers() > 0?
+    (this->GetNumberOfMembers() - 1) : 0;
   return true;
 }
 
+//-----------------------------------------------------------------------------
 void vtkEnsembleDataReader::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
   // File name
-  os << indent << "FileName: ";
-  if (this->FileName)
-    {
-    os << this->FileName << endl;
-    }
-  else
-    {
-    os << "(NULL)" << endl;
-    }
+  os << indent << "FileName: " << (this->FileName? this->FileName : "(none)") << endl;
 
   // Current member
   os << indent << "Current member: " << this->CurrentMember << endl;
 
   // Meta data
+  os << indent << "MetaData: ";
   if (this->Internal->MetaData)
     {
+    os << endl;
     this->Internal->MetaData->PrintSelf(os, indent.GetNextIndent());
     }
   else
     {
-    os << indent << "(NULL)" << endl;
+    os << "(none)" << endl;
     }
 }
