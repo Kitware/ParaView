@@ -456,6 +456,9 @@ void vtkPVGeometryFilter::ExecuteBlock(
   vtkDataObject* input, vtkPolyData* output, int doCommunicate,
   int updatePiece, int updateNumPieces, int updateGhosts, const int* wholeExtent)
 {
+  // Copy field data from the input block to the output block
+  output->GetFieldData()->PassData(input->GetFieldData());
+
   if (input->IsA("vtkImageData"))
     {
     this->ImageDataExecute(static_cast<vtkImageData*>(input), output, doCommunicate,
