@@ -16,7 +16,7 @@
 
 #include "vtkActor.h"
 #include "vtkAlgorithmOutput.h"
-#include "vtkOutlineSource.h"
+#include "vtkCompositePolyDataMapper2.h"
 #include "vtkDataArray.h"
 #include "vtkDataObject.h"
 #include "vtkDoubleArray.h"
@@ -27,13 +27,14 @@
 #include "vtkMatrix4x4.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPolyDataMapper.h"
+#include "vtkOutlineSource.h"
 #include "vtkPVCacheKeeper.h"
 #include "vtkPVChangeOfBasisHelper.h"
 #include "vtkPVGeometryFilter.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVMultiSliceView.h"
 #include "vtkPVOrthographicSliceView.h"
+#include "vtkPolyDataMapper.h"
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
 #include "vtkStringArray.h"
@@ -41,7 +42,6 @@
 #include "vtkVector.h"
 
 #ifndef VTKGL2
-# include "vtkCompositePolyDataMapper2.h"
 # include "vtkHardwareSelectionPolyDataPainter.h"
 #endif
 #include <vector>
@@ -226,9 +226,13 @@ void vtkGeometrySliceRepresentation::SetupDefaults()
 {
   vtkMath::UninitializeBounds(this->Internals->OriginalDataBounds);
   this->Superclass::SetupDefaults();
-#ifndef VTKGL2
   vtkCompositePolyDataMapper2* mapper =
       vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper);
+#ifdef VTKGL2
+  mapper->SetPointIdArrayName("-");
+  mapper->SetCellIdArrayName("vtkSliceOriginalCellIds");
+  mapper->SetCompositeIdArrayName("vtkSliceCompositeIndex");
+#else
   vtkHardwareSelectionPolyDataPainter* selPainter =
       vtkHardwareSelectionPolyDataPainter::SafeDownCast(
         mapper->GetSelectionPainter()->GetDelegatePainter());
