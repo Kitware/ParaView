@@ -83,19 +83,19 @@ public:
   // Get the 4 points in world coordinates that define the grid plane. The
   // points are in anticlockwise anticlockwise order with the face normal
   // pointing outward from the box defined by the GridBounds.
-  const vtkTuple<vtkVector3d, 4>& GetPoints();
+  vtkTuple<vtkVector3d, 4> GetPoints();
 
   // Description:
   // Returns which of the 3 coordinate axes for the 2 axes for this plane: 0 for
   // X axis, 1, for Y axis, and 3 for Z axis. The two axes are specified in
   // order so that together with the face normal (which is point outwards from
   // the box defined by GridBounds), they form a right-handed coordinate system.
-  const vtkVector2i& GetActiveAxes();
+  vtkVector2i GetActiveAxes();
 
   // Description:
   // Returns the visibility for labels for each of the 4 axis defined by the
   // face points based on the LabelMask.
-  const vtkTuple<bool, 4>& GetLabelVisibilities();
+  vtkTuple<bool, 4> GetLabelVisibilities();
 
   // Description:
   // Set the transform matrix to use to transform the points. The matrix's MTime
@@ -109,7 +109,7 @@ public:
   // set using SetMatrix(), if any. This method to compute the transformed
   // points the first time its called since the plane points or the
   // transformation matrix was set.
-  const vtkTuple<vtkVector3d, 4>& GetTransformedPoints();
+  vtkTuple<vtkVector3d, 4> GetTransformedPoints();
 
   // Description:
   // Transforms the give point using the Matrix.
@@ -120,7 +120,7 @@ public:
   // specified using transformation matrix.
   // Similar to GetTransformedPoints(), this method will only compute when
   // input parameters have changed since the last time this method was called.
-  const vtkVector3d& GetTransformedFaceNormal();
+  vtkVector3d GetTransformedFaceNormal();
 
   // Description:
   // Call this method before accessing any of the attributes in viewport space.
@@ -130,20 +130,20 @@ public:
 
   // Description:
   // Get the positions for the plane points in viewport coordinates.
-  const vtkTuple<vtkVector2i, 4>& GetViewportPoints() const { return this->ViewportPoints; }
-  const vtkTuple<vtkVector2d, 4>& GetViewportPointsAsDouble() const
+  vtkTuple<vtkVector2i, 4> GetViewportPoints() const { return this->ViewportPoints; }
+  vtkTuple<vtkVector2d, 4> GetViewportPointsAsDouble() const
     { return this->ViewportPointsAsDouble; }
 
   // Description:
   // Get the axis vectors formed using the points returned by
   // GetViewportPoints(). These are in non-normalized form.
-  const vtkTuple<vtkVector2d, 4> GetViewportVectors() const
+  vtkTuple<vtkVector2d, 4> GetViewportVectors() const
     { return this->ViewportVectors; }
 
   // Description:
   // Get the normals to the axis vectors in viewport space. There are not true
   // normals to the axis vector. These are normalized.
-  const vtkTuple<vtkVector2d, 4> GetViewportNormals() const
+  vtkTuple<vtkVector2d, 4> GetViewportNormals() const
     { return this->ViewportNormals; }
 
   // Description:
@@ -162,7 +162,7 @@ protected:
   // makes that possible.
   void SetLabelVisibilityOverrides(const vtkTuple<bool, 4>& overrides)
     { this->LabelVisibilityOverrides = overrides; }
-  const vtkTuple<bool, 4>& GetLabelVisibilityOverrides()
+  vtkTuple<bool, 4> GetLabelVisibilityOverrides()
     { return this->LabelVisibilityOverrides; }
   friend class vtkGridAxes3DActor;
 

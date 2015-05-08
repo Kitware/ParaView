@@ -1380,7 +1380,7 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
     {
     this->OutlineFlag = 0;
 
-    bool handleSubdivision = (this->Triangulate != 0);
+    bool handleSubdivision = (this->Triangulate != 0) && (input->GetNumberOfCells() > 0);
     if (!handleSubdivision && (this->NonlinearSubdivisionLevel > 0))
       {
       // Check to see if the data actually has nonlinear cells.  Handling
@@ -1452,21 +1452,11 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
 
       if (this->PassThroughPointIds)
         {
-        if (this->NonlinearSubdivisionLevel <= 1)
-          {
-          // Do not allow the vtkDataSetSurfaceFilter create an array of
-          // original cell ids; it will overwrite the correct array from the
-          // vtkUnstructuredGridGeometryFilter.
-          this->DataSetSurfaceFilter->PassThroughPointIdsOff();
-          }
-        else
-          {
-          // vtkDataSetSurfaceFilter is going to strip the vtkOriginalPointIds
-          // created by the vtkPVUnstructuredGridGeometryFilter because it
-          // cannot interpolate the ids.  Make the vtkDataSetSurfaceFilter make
-          // its own original ids array.  We will resolve them later.
-          this->DataSetSurfaceFilter->PassThroughPointIdsOn();
-          }
+        // vtkDataSetSurfaceFilter is going to strip the vtkOriginalPointIds
+        // created by the vtkPVUnstructuredGridGeometryFilter because it
+        // cannot interpolate the ids.  Make the vtkDataSetSurfaceFilter make
+        // its own original ids array.  We will resolve them later.
+        this->DataSetSurfaceFilter->PassThroughPointIdsOn();
         }
       }
 
@@ -1516,7 +1506,7 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
       // Get what should be the final output.
       output->ShallowCopy(this->RecoverWireframeFilter->GetOutput());
 
-      if (this->PassThroughPointIds && (this->NonlinearSubdivisionLevel > 1))
+      if (this->PassThroughPointIds)
         {
         // The output currently has a vtkOriginalPointIds array that maps points
         // to the data containing only the faces.  Correct this to point to the

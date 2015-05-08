@@ -42,6 +42,7 @@ paraview_test_load_data(""
   multicomb_1.vts
   multicomb_2.vts
   NE2_ps_bath.png
+  non_convex_polygon.vtu
   office.binary.vtk
   PropertyLink.pvsm
   quadraticTetra01.vtu
@@ -222,6 +223,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/MultiSliceWavelet.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/NormalGlyphs.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/NiftiReaderWriterPlugin.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/NonConvexPolygon.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/OpenSaveData.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/OrthographicView.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/OutOfRangeColors.xml
@@ -411,7 +413,7 @@ set(PolygonCellSelection_DISABLE_CRS TRUE)
 set(PolygonPointSelection_DISABLE_CRS TRUE)
 set(NonlinearSubdivisionDisplay_DISABLE_CRS TRUE)
 set(InteractiveSelection_DISABLE_CRS TRUE)
-
+set(NonConvexPolygon_DISABLE_CRS TRUE)
 
 # These tests cannot be run using ctest -j since they are affected by focus
 # changed events.
