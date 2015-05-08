@@ -1380,7 +1380,7 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
     {
     this->OutlineFlag = 0;
 
-    bool handleSubdivision = (this->Triangulate != 0);
+    bool handleSubdivision = (this->Triangulate != 0) && (input->GetNumberOfCells() > 0);
     if (!handleSubdivision && (this->NonlinearSubdivisionLevel > 0))
       {
       // Check to see if the data actually has nonlinear cells.  Handling
