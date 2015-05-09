@@ -30,6 +30,7 @@
 #==========================================================================
 set (Module_SRCS
   vtkNetworkImageSource.cxx
+  vtkPVEnsembleDataReaderInformation.cxx
   vtkPVEnvironmentInformation.cxx
   vtkPVEnvironmentInformationHelper.cxx
   vtkPVFileInformation.cxx
