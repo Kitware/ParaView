@@ -165,7 +165,9 @@ bool vtkMultiProcessControllerHelper::MergePieces(
     {
     // this only supports composite datasets of polydata and unstructured
     // grids.
-    appender = vtkAppendCompositeDataLeaves::New();
+    vtkAppendCompositeDataLeaves* cdl = vtkAppendCompositeDataLeaves::New();
+    cdl->AppendFieldDataOn();
+    appender = cdl;
     }
   else
     {

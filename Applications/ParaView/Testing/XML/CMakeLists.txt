@@ -6,6 +6,8 @@ paraview_test_load_data_dirs(""
   dualSphereAnimation
   EnSight
   ExRestarts
+  FieldDataBlocks
+  FieldDataBlocks/FieldDataBlocks
   FileSeries
   GMV
   GMV/invalid
@@ -209,6 +211,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/ExtractBlock.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExtractLevel.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/FFTOverTime.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/FieldDataBlocks.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Flow.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Flow2.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Fractal2D.xml
