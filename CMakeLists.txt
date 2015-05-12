@@ -196,7 +196,12 @@ endif()
 #------------------------------------------------------------------------------
 # Define ParaView specific options.
 #------------------------------------------------------------------------------
-option(BUILD_TESTING "Build ParaView Testing" ON)
+set(default_testing ON)
+if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.ExternalData/README.rst")
+  # Source tarball without the data, so turn off testing.
+  set(default_testing OFF)
+endif ()
+option(BUILD_TESTING "Build ParaView Testing" ${default_testing})
 option(BUILD_EXAMPLES "Build ParaView examples" OFF)
 option(BUILD_SHARED_LIBS "Build ParaView using shared libraries" ON)
 option(PARAVIEW_BUILD_QT_GUI "Enable ParaView Qt-based client" ON)
