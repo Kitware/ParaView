@@ -8207,6 +8207,7 @@ source.</Documentation>
         <Documentation>Specify whether or not to compute
         vorticity.</Documentation>
       </IntVectorProperty>
+
       <InputProperty command="SetSourceConnection"
                      label="Seed Type"
                      name="Source"
