@@ -115,7 +115,7 @@ void pqPluginDocumentationBehavior::updatePlugin(vtkPVPlugin* plugin)
     {
     const std::string& str = resources[cc];
     unsigned char* decoded_stream = new unsigned char[str.size()];
-    unsigned long length = vtksysBase64_Decode(
+    size_t length = vtksysBase64_Decode(
       reinterpret_cast<const unsigned char*>(str.c_str()),
       static_cast<unsigned long>(str.size()),
       decoded_stream,
@@ -130,8 +130,8 @@ void pqPluginDocumentationBehavior::updatePlugin(vtkPVPlugin* plugin)
       decoded_stream = NULL;
       continue;
       }
-    qint64 written = file->write(reinterpret_cast<char*>(decoded_stream), length);
-    Q_ASSERT(written == (qint64)length);
+    qint64 written = file->write(reinterpret_cast<char*>(decoded_stream), static_cast<qint64>(length));
+    Q_ASSERT(written == static_cast<qint64>(length));
     (void)written;
     engine->registerDocumentation(file->fileName());
 
