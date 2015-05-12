@@ -876,3 +876,27 @@ if(PARAVIEW_DATA_EXCLUDE_FROM_ALL)
     add_dependencies(ParaViewData VTKData)
   endif()
 endif()
+
+set(is_git FALSE)
+if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.git")
+  set(is_git TRUE)
+endif ()
+
+if (NOT WIN32 AND is_git)
+  set(source_all)
+  if (PARAVIEW_SOURCE_TARBALL_TARGETS)
+    set(source_all ALL)
+  endif ()
+
+  add_custom_target(paraview-source ${source_all})
+  foreach (format tgz txz zip)
+    add_custom_target("paraview-source-${format}" ALL
+      COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/Utilities/Maintenance/create_tarballs.bash"
+              "--${format}"
+      WORKING_DIRECTORY
+              "${CMAKE_CURRENT_BINARY_DIR}"
+      COMMENT "Creating source tarball in ${format} format")
+    add_dependencies(paraview-source
+      "paraview-source-${format}")
+  endforeach ()
+endif ()
