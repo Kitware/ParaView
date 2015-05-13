@@ -435,7 +435,7 @@
 
       <DoubleVectorProperty name="LODThreshold"
         label="LOD Threshold"
-        default_values="5.0"
+        default_values="20.0"
         number_of_elements="1">
         <DoubleRangeDomain name="range" min="0.0" max="102400.0" />
         <Documentation>
