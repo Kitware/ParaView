@@ -86,7 +86,7 @@ public:
       ifs.close();
 
       char* encoded_buffer = new char[static_cast<int>(1.5 * length + 8)];
-      unsigned long end = vtksysBase64_Encode(buffer,
+      size_t end = vtksysBase64_Encode(buffer,
         static_cast<unsigned long>(length),
         reinterpret_cast<unsigned char*>(encoded_buffer),
         0);
