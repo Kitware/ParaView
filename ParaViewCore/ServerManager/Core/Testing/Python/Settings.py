@@ -42,30 +42,19 @@ settings.ClearAllSettings()
 settings.AddCollectionFromString(settingsString, 2000000.0)
 settings.AddCollectionFromString("{}", 1500000.0)
 
-sourcesComment = settings.GetSettingDescription(".sources")
-if sourcesComment != "// Default settings for sources.":
-  print "Comment for .sources was not what was expected"
-  sys.exit(-1)
+def check_comment(expected, settings, field):
+  actual = settings.GetSettingDescription(field)
+  if actual != expected:
+    print "Comment for %s was not what was expected" % field
+    print "expected:", expected
+    print "actual  :", actual
+    sys.exit(-1)
 
-sourcesSphereSourceComment = settings.GetSettingDescription(".sources.SphereSource")
-if sourcesSphereSourceComment != "// A sphere source":
-  print "Comment for .sources.SphereSource was not what was expected"
-  sys.exit(-1)
-
-sourcesSphereSourceRadiusComment = settings.GetSettingDescription(".sources.SphereSource.Radius")
-if sourcesSphereSourceRadiusComment != "/* New comment\n         New comment 2 */":
-  print "Comment for .sources.SphereSource.Radius was not what was expected"
-  sys.exit(-1)
-
-sourcesSphereSourceThetaResolution = settings.GetSettingDescription(".sources.SphereSource.ThetaResolution")
-if sourcesSphereSourceThetaResolution != "// Theta resolution\n// Theta resolution 2":
-  print "Comment for .sources.SphereSource.ThetaResolution was not what was expected"
-  sys.exit(-1)
-
-sourcesSphereSourceCenter = settings.GetSettingDescription(".sources.SphereSource.Center")
-if sourcesSphereSourceCenter != "// Center comment":
-  print "Comment for .sources.SphereSource.Center was not what was expected"
-  sys.exit(-1)
+check_comment("// Default settings for sources.", settings, ".sources")
+check_comment("// A sphere source", settings, ".sources.SphereSource")
+check_comment("/* New comment\n         New comment 2 */", settings, ".sources.SphereSource.Radius")
+check_comment("// Theta resolution\n// Theta resolution 2", settings, ".sources.SphereSource.ThetaResolution")
+check_comment("// Center comment", settings, ".sources.SphereSource.Center")
 
 # Check the setting directly
 settingPath = ".sources.SphereSource.Radius"
