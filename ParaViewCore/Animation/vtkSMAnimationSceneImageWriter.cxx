@@ -45,10 +45,9 @@
 
 #ifdef _WIN32
 # include "vtkAVIWriter.h"
-#else
-# ifdef PARAVIEW_ENABLE_FFMPEG
-#   include "vtkFFMPEGWriter.h"
-# endif
+#endif
+#ifdef PARAVIEW_ENABLE_FFMPEG
+#  include "vtkFFMPEGWriter.h"
 #endif
 
 #include "vtkIOMovieConfigure.h" // for VTK_HAS_OGGTHEORA_SUPPORT
