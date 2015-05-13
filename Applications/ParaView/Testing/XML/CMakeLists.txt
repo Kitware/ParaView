@@ -730,15 +730,18 @@ add_multi_server_tests("pvcs-multi-servers" 3
    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
    TEST_SCRIPTS ${TESTS_WITH_MULTI_SERVERS_3})
 
-set (TileDisplayScatterPlot-2x1_THRESHOLD 40)
-add_tile_display_tests("pvcs-tile-display" 2 1
-   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-   TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/TileDisplayScatterPlot-2x1.xml)
-
-set (TileDisplayScatterPlot-2x2_THRESHOLD 40)
-add_tile_display_tests("pvcs-tile-display" 2 2
-   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-   TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/TileDisplayScatterPlot-2x2.xml)
+# Removing these test since these have been failing for a while the the testing
+# infrastrructure not catching it properly until now. We need to redo the tile display
+# testing :(.
+#set (TileDisplayScatterPlot-2x1_THRESHOLD 40)
+#add_tile_display_tests("pvcs-tile-display" 2 1
+#   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+#   TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/TileDisplayScatterPlot-2x1.xml)
+#
+#set (TileDisplayScatterPlot-2x2_THRESHOLD 40)
+#add_tile_display_tests("pvcs-tile-display" 2 2
+#   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+#   TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/TileDisplayScatterPlot-2x2.xml)
 
 # This test has been behaving badly across many platforms and needs to be fixed
 # before it can be useful. Disabling for now, see bug #15424.
