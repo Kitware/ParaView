@@ -442,36 +442,32 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::WaitForConnection(
 
 //----------------------------------------------------------------------------
 bool vtkTCPNetworkAccessManager::ParaViewHandshake(
-  vtkMultiProcessController* controller, bool server_side, const char* handshake)
+  vtkMultiProcessController* controller, bool server_side, const char* _handshake)
 {
+  const std::string handshake = _handshake? _handshake : "";
+  int size = static_cast<int>(handshake.size() + 1);
   if (server_side)
     {
-    int size = handshake? static_cast<int>(strlen(handshake)+1) : -1;
-
+    std::string other_handshake;
     int othersize;
-    char* other_handshake = NULL;
-
     controller->Receive(&othersize, 1, 1, 99991);
-
     if (othersize > 0)
       {
-      other_handshake = new char[othersize];
-      controller->Receive(other_handshake, othersize, 1, 99991);
+      char* _other_handshake = new char[othersize];
+      controller->Receive(_other_handshake, othersize, 1, 99991);
+      other_handshake = _other_handshake;
+      delete [] _other_handshake;
       }
-
-    int accept = (size == othersize &&
-     (size == -1 || strcmp(handshake, other_handshake) == 0))? 1 : 0;
+    int accept = (handshake == other_handshake)? 1 : 0;
     controller->Send(&accept, 1, 1, 99990);
-    delete []other_handshake;
     return (accept == 1);
     }
   else
     {
-    int size = handshake? static_cast<int>(strlen(handshake)+1) : -1;
     controller->Send(&size, 1, 1, 99991);
     if (size > 0)
       {
-      controller->Send(handshake, size, 1, 99991);
+      controller->Send(handshake.c_str(), size, 1, 99991);
       }
     int accept;
     controller->Receive(&accept, 1, 1, 99990);

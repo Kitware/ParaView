@@ -68,12 +68,7 @@ public:
 
   const char* GetUserName(int userId)
     {
-    std::string &name = this->UserNames[userId];
-    if(name.empty())
-      {
-
-      }
-    return name.c_str();
+    return this->UserNames[userId].c_str();
     }
 
   bool UpdateMaster(int newMaster)

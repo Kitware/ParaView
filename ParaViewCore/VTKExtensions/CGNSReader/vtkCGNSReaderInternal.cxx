@@ -129,7 +129,7 @@ int get_section_connectivity(const int cgioNum, const double cgioSectionId,
   const char *connectivityPath = "ElementConnectivity";
   double cgioElemConnectId;
   char dataType[3];
-  std::size_t sizeOfCnt;
+  std::size_t sizeOfCnt = 0;
 
   cgio_get_node_id(cgioNum, cgioSectionId, connectivityPath, &cgioElemConnectId);
   cgio_get_data_type(cgioNum, cgioElemConnectId, dataType);

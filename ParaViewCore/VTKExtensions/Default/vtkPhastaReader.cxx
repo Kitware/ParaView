@@ -154,8 +154,8 @@ size_t vtkPhastaReader::typeSize( const char typestring[] )
     }
   else
     {
-    delete [] ts1;
     fprintf(stderr,"unknown type : %s\n",ts1);
+    delete [] ts1;
     return 0;
     }
 }
@@ -705,6 +705,7 @@ void vtkPhastaReader::ReadGeomFile(char* geomFileName,
   if(pos == NULL)
     {
     vtkErrorMacro(<<"Unable to allocate memory for nodal info");
+    delete [] coordinates;
     return;
     }
   
@@ -797,8 +798,9 @@ void vtkPhastaReader::ReadGeomFile(char* geomFileName,
 
           break;
         default:
-          vtkErrorMacro(<<"Unrecognized CELL_TYPE in "<< geomFileName)
-            return;
+          delete [] nodes;
+          vtkErrorMacro(<<"Unrecognized CELL_TYPE in "<< geomFileName);
+          return;
         }
 
       /* insert the element */

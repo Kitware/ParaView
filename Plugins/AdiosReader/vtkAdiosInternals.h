@@ -110,6 +110,11 @@ public:
         {
         comm = mpiComm->GetMPIComm()->GetHandle();
         }
+      if (!comm)
+        {
+        cerr << "Adios needs a valid MPI communicator." << endl;
+        return;
+        }
 
       // Properly initialize Adios method
       AdiosGlobal::MPIController[method] = comm;

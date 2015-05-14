@@ -151,6 +151,7 @@ static PyObject* MakeArrayOf(const vtkClientServerStream& msg, int arg, vtkTypeU
   if (!msg.GetArgument(0, arg, argArray, length))
     {
     delete [] argArray;
+    argArray = NULL;
     Py_RETURN_NONE;
     }
 
