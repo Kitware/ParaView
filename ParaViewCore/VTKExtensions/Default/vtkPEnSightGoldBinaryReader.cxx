@@ -1694,7 +1694,7 @@ int vtkPEnSightGoldBinaryReader::ReadVectorsPerNode(
         vectors->GetTupleValue(i,vec);
         this->InsertVariableComponent(localVectors,i,0, vec,partId,0,VECTOR_PER_NODE);
         }
-      delete vec;
+      delete [] vec;
       localVectors->SetName(description);
       output->GetPointData()->AddArray(localVectors);
       if (!output->GetPointData()->GetVectors())
