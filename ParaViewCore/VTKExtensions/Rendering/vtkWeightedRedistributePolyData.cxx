@@ -248,12 +248,14 @@ void vtkWeightedRedistributePolyData::MakeSchedule (vtkPolyData* input,
 
     int *sendToTemp = 0;
     vtkIdType *sendNumTemp = 0;
+    sendToTemp  = new int[numProcs];
+    sendNumTemp = new vtkIdType[numProcs];
 
-    int *order = 0;
+
     int id2;
     for (type=0; type<NUM_CELL_TYPES; type++)
       {
-      order = new int[numProcs];
+      int* order = new int[numProcs];
       for (id = 0; id < numProcs; id++) {order[id] = id;}
       for (id = 0; id < numProcs; id++)
         {
@@ -272,9 +274,6 @@ void vtkWeightedRedistributePolyData::MakeSchedule (vtkPolyData* input,
         }
     
       // now figure out what processors to send cells between
-      sendToTemp  = new int[numProcs];
-      sendNumTemp = new vtkIdType[numProcs];
-
       vtkIdType numToSend, numToReceive;
 
       int start = 0;
@@ -361,6 +360,7 @@ void vtkWeightedRedistributePolyData::MakeSchedule (vtkPolyData* input,
 
         start++;
         } // end while start<last loop 
+      delete [] order;
       } // end loop over type
 
     // ... combine results for all types ...
@@ -624,7 +624,6 @@ void vtkWeightedRedistributePolyData::MakeSchedule (vtkPolyData* input,
         }
       }
 
-    delete [] order;
     delete [] sendToTemp;
     delete [] sendNumTemp;
     for (type=0; type<NUM_CELL_TYPES; type++) 
