@@ -546,9 +546,7 @@
       </IntVectorProperty>
       <Hints>
         <!-- View can be used to specify the preferred view for the proxy -->
-        <View type="XYChartView" />
-        <!-- Temporary hint to allow the output of this filter to be plotted -->
-        <Plotable />
+        <View type="QuartileChartView" />
       </Hints>
       <!-- End of ExtractSelectionOverTime -->
     </SourceProxy>

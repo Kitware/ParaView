@@ -83,8 +83,8 @@ namespace
 
     QString key = QString("MTSBAutoTitle.%1").arg(pname);
     if (prop->IsValueDefault() ||
-      gridAxis->HasAnnotation(key.toLatin1().data()) &&
-      strcmp(gridAxis->GetAnnotation(key.toLatin1().data()), helper.GetAsString()) == 0)
+      (gridAxis->HasAnnotation(key.toLatin1().data()) &&
+       strcmp(gridAxis->GetAnnotation(key.toLatin1().data()), helper.GetAsString()) == 0))
       {
       if (value)
         {

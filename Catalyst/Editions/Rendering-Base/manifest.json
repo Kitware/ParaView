@@ -771,6 +771,7 @@
         { "class": "vtkContextPolygon" },
         { "class": "vtkPlot" },
         { "class": "vtkPlot3D" },
+        { "class": "vtkPlotArea" },
         { "class": "vtkPlotBag" },
         { "class": "vtkPlotBar" },
         { "class": "vtkPlotFunctionalBag" },

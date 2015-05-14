@@ -94,8 +94,11 @@ public:
 
   // Description:
   // Method to provide the default name given the name of a table and a column
-  // in that table.
-  static vtkStdString GetDefaultSeriesLabel(
+  // in that table. When overriding this method, ensure that the implementation
+  // does not depend on the instance being initialized or have valid data. This
+  // method is called on the client-side when filling up the domains for the
+  // properties.
+  virtual vtkStdString GetDefaultSeriesLabel(
     const vtkStdString& tableName, const vtkStdString& columnName);
 
   // Description:

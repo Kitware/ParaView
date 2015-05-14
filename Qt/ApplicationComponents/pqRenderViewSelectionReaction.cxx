@@ -364,6 +364,9 @@ void pqRenderViewSelectionReaction::selectionChanged(
   case ZOOM_TO_BOX:
     this->View->resetCenterOfRotationIfNeeded();
     break;
+
+  default:
+    break;
     }
 
   END_UNDO_EXCLUDE();

@@ -2363,6 +2363,17 @@
     </ContextViewProxy>
     <!-- ================================================================== -->
     <ContextViewProxy base_proxygroup="internal_views"
+                      base_proxyname="XYChartViewBase4Axes"
+                      class="vtkPVXYChartView"
+                      name="QuartileChartView"
+                      label="Quartile Chart View"
+                      processes="client|renderserver|dataserver"
+                      representation_name="QuartileChartRepresentation"
+                      post_creation="SetChartTypeToArea" >
+      <Documentation>This is the proxy for the Quartile chart view.</Documentation>
+    </ContextViewProxy>
+    <!-- ================================================================== -->
+    <ContextViewProxy base_proxygroup="internal_views"
                       base_proxyname="XYChartViewBase"
                       class="vtkPVXYChartView"
                       name="XYBarChartView"
@@ -6282,6 +6293,34 @@
         <Property name="SeriesPlotCorner"
                   function="SeriesPlotCorner"/>
       </PropertyGroup>
+    </ChartRepresentationProxy>
+
+    <!-- =================================================================== -->
+    <ChartRepresentationProxy base_proxygroup="representations"
+                              base_proxyname="XYChartRepresentation"
+                              class="vtkQuartileChartRepresentation"
+                              name="QuartileChartRepresentation"
+                              processes="client|dataserver|renderserver"
+                              post_creation="SetChartTypeToArea">
+      <Documentation>Representation used by Quartile Chart View.</Documentation>
+      <IntVectorProperty name="ShowQuartiles"
+                         command="SetQuartileVisibility"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether to render the area for the q1/q3 quartiles, if available.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="ShowRanges"
+                         command="SetRangeVisibility"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether to render the area for the min/max range, if available.
+        </Documentation>
+      </IntVectorProperty>
     </ChartRepresentationProxy>
 
     <!-- =================================================================== -->

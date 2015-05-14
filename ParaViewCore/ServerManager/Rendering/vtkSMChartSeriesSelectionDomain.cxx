@@ -101,7 +101,7 @@ class vtkSMChartSeriesSelectionDomain::vtkInternals
   int ColorCounter;
   vtkNew<vtkColorSeries> Colors;
 public:
-  std::set<std::string> ComponentNames;
+  std::map<std::string, bool> VisibilityOverrides;
 
   vtkInternals() : ColorCounter(0)
     {
@@ -110,59 +110,6 @@ public:
   vtkColor3ub GetNextColor()
     {
     return this->Colors->GetColorRepeating(this->ColorCounter++);
-    }
-
-  // Add arrays from dataInfo to strings. If blockName is non-empty, then it's
-  // used to "uniquify" the array names.
-  void PopulateAvailableArrays(const std::string& blockName,
-    std::vector<vtkStdString>& strings,
-    vtkPVDataInformation* dataInfo, int fieldAssociation, bool flattenTable)
-    {
-    // this method is typically called for leaf nodes (or multi-piece).
-    // assert((dataInfo->GetCompositeDataInformation()->GetDataIsComposite() == 0) ||
-    //   (dataInfo->GetCompositeDataInformation()->GetDataIsMultiPiece() == 0));
-
-    vtkPVDataSetAttributesInformation* dsa =
-      dataInfo->GetAttributeInformation(fieldAssociation);
-    for (int cc=0; dsa != NULL && cc < dsa->GetNumberOfArrays(); cc++)
-      {
-      vtkPVArrayInformation* arrayInfo = dsa->GetArrayInformation(cc);
-      if (arrayInfo == NULL || arrayInfo->GetIsPartial() == 1)
-        {
-        continue;
-        }
-
-      if (arrayInfo->GetName() &&
-        strcmp(arrayInfo->GetName(), "vtkValidPointMask") == 0)
-        {
-        // Skip vtkValidPointMask since that's an internal array used for masking,
-        // not really meant to be plotted.
-        continue;
-        }
-
-      if (arrayInfo->GetNumberOfComponents() > 1 && flattenTable)
-        {
-        for (int kk=0; kk <= arrayInfo->GetNumberOfComponents(); kk++)
-          {
-          std::string component_name = vtkSMArrayListDomain::CreateMangledName(arrayInfo, kk);
-          component_name = vtkChartRepresentation::GetDefaultSeriesLabel(
-            blockName, component_name);
-
-          strings.push_back(component_name);
-          if (kk != arrayInfo->GetNumberOfComponents())
-            {
-            // save component names so we can detect them when setting defaults
-            // later.
-            this->ComponentNames.insert(component_name);
-            }
-          }
-        }
-      else
-        {
-        strings.push_back(
-          vtkChartRepresentation::GetDefaultSeriesLabel(blockName, arrayInfo->GetName()));
-        }
-      }
     }
 };
 
@@ -270,7 +217,7 @@ void vtkSMChartSeriesSelectionDomain::Update(vtkSMProperty*)
     }
 
   // clear old component names.
-  this->Internals->ComponentNames.clear();
+  this->Internals->VisibilityOverrides.clear();
 
   if (compositeIndex == NULL ||
     dataInfo->GetCompositeDataInformation()->GetDataIsComposite() == 0)
@@ -279,7 +226,7 @@ void vtkSMChartSeriesSelectionDomain::Update(vtkSMProperty*)
     // just look at the top-level array information (skipping partial arrays).
     std::vector<vtkStdString> column_names;
     int fieldAssociation = vtkSMUncheckedPropertyHelper(fieldDataSelection).GetAsInt(0);
-    this->Internals->PopulateAvailableArrays(std::string(),
+    this->PopulateAvailableArrays(std::string(),
       column_names, dataInfo, fieldAssociation, this->FlattenTable);
     this->SetStrings(column_names);
     return;
@@ -315,11 +262,82 @@ void vtkSMChartSeriesSelectionDomain::Update(vtkSMProperty*)
     // if there is only 1 element, use the element to avoid having partial data.
     vtkPVDataInformation* dataInfoWithArrays =
       numElems == 1 ? childInfo : dataInfo;
-    this->Internals->PopulateAvailableArrays(blockNameStream.str(),
+    this->PopulateAvailableArrays(blockNameStream.str(),
       column_names, dataInfoWithArrays, fieldAssociation,
       this->FlattenTable);
     }
   this->SetStrings(column_names);
+}
+
+//----------------------------------------------------------------------------
+// Add arrays from dataInfo to strings. If blockName is non-empty, then it's
+// used to "uniquify" the array names.
+void vtkSMChartSeriesSelectionDomain::PopulateAvailableArrays(
+  const std::string& blockName,
+  std::vector<vtkStdString>& strings,
+  vtkPVDataInformation* dataInfo, int fieldAssociation, bool flattenTable)
+{
+  // this method is typically called for leaf nodes (or multi-piece).
+  // assert((dataInfo->GetCompositeDataInformation()->GetDataIsComposite() == 0) ||
+  //   (dataInfo->GetCompositeDataInformation()->GetDataIsMultiPiece() == 0));
+  vtkChartRepresentation* chartRepr = vtkChartRepresentation::SafeDownCast(
+    this->GetProperty()->GetParent()->GetClientSideObject());
+  if (!chartRepr)
+    {
+    return;
+    }
+
+  // helps use avoid duplicates. duplicates may arise for plot types that treat
+  // multiple columns as a single series/plot e.g. quartile plots.
+  std::set<vtkStdString> uniquestrings;
+
+  vtkPVDataSetAttributesInformation* dsa =
+    dataInfo->GetAttributeInformation(fieldAssociation);
+  for (int cc=0; dsa != NULL && cc < dsa->GetNumberOfArrays(); cc++)
+    {
+    vtkPVArrayInformation* arrayInfo = dsa->GetArrayInformation(cc);
+    if (arrayInfo == NULL || arrayInfo->GetIsPartial() == 1)
+      {
+      continue;
+      }
+
+    if (arrayInfo->GetName() &&
+      strcmp(arrayInfo->GetName(), "vtkValidPointMask") == 0)
+      {
+      // Skip vtkValidPointMask since that's an internal array used for masking,
+      // not really meant to be plotted.
+      continue;
+      }
+
+    if (arrayInfo->GetNumberOfComponents() > 1 && flattenTable)
+      {
+      for (int kk=0; kk <= arrayInfo->GetNumberOfComponents(); kk++)
+        {
+        std::string component_name = vtkSMArrayListDomain::CreateMangledName(arrayInfo, kk);
+        component_name = chartRepr->GetDefaultSeriesLabel(blockName, component_name);
+        if (uniquestrings.find(component_name) == uniquestrings.end())
+          {
+          strings.push_back(component_name);
+          uniquestrings.insert(component_name);
+          }
+        if (kk != arrayInfo->GetNumberOfComponents())
+          {
+          // save component names so we can detect them when setting defaults
+          // later.
+          this->SetDefaultVisibilityOverride(component_name, false);
+          }
+        }
+      }
+    else
+      {
+      std::string seriesName = chartRepr->GetDefaultSeriesLabel(blockName, arrayInfo->GetName());
+      if (uniquestrings.find(seriesName) == uniquestrings.end())
+        {
+        strings.push_back(seriesName);
+        uniquestrings.insert(seriesName);
+        }
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -440,11 +458,11 @@ bool vtkSMChartSeriesSelectionDomain::GetDefaultSeriesVisibility(const char* nam
     return result;
     }
 
-  if (this->Internals->ComponentNames.find(name) !=
-    this->Internals->ComponentNames.end())
+  if (this->Internals->VisibilityOverrides.find(name) !=
+    this->Internals->VisibilityOverrides.end())
     {
     //  hide components by default, we'll show the magnitudes for them.
-    return false;
+    return this->Internals->VisibilityOverrides[name];
     }
 
   return true;
@@ -461,6 +479,13 @@ void vtkSMChartSeriesSelectionDomain::OnDomainModified()
     // prop->GetParent()->UpdateProperty(prop);
     prop->GetParent()->UpdateVTKObjects();
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMChartSeriesSelectionDomain::SetDefaultVisibilityOverride(
+  const vtkStdString& arrayname, bool visibility)
+{
+  this->Internals->VisibilityOverrides[arrayname] = visibility;
 }
 
 //----------------------------------------------------------------------------
