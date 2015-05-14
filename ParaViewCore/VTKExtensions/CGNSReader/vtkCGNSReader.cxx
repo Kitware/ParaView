@@ -42,6 +42,7 @@
 #include "vtkLongArray.h"
 #include "vtkInformationStringKey.h"
 #include "vtkPVInformationKeys.h"
+#include "vtkNew.h"
 
 #include <algorithm>
 #include <functional>
@@ -1382,7 +1383,7 @@ int vtkCGNSReader::GetUnstructuredZone(int base, int zone,
   int nsections = 0;
   nsections = elemIdList.size();
 
-  SectionInformation* sectionInfoList = new SectionInformation[nsections];
+  std::vector<SectionInformation> sectionInfoList(nsections);
 
   // Find section layout
   // Section is composed of => 1 Volume + bnd surfaces
@@ -1518,7 +1519,7 @@ int vtkCGNSReader::GetUnstructuredZone(int base, int zone,
     //
     }
   //
-  vtkIdType* startArraySec =  new vtkIdType[coreSec.size()];
+  std::vector<vtkIdType> startArraySec(coreSec);
   for (std::size_t sec = 0; sec < coreSec.size(); sec++)
     {
     int curStart = startSec[sec];
@@ -1534,9 +1535,9 @@ int vtkCGNSReader::GetUnstructuredZone(int base, int zone,
     }
 
   // Create Cell Array
-  vtkCellArray* cells = vtkCellArray::New();
+  vtkNew<vtkCellArray> cells;
   // Modification for memory reliability
-  vtkIdTypeArray *cellLocations = vtkIdTypeArray::New();
+  vtkNew<vtkIdTypeArray> cellLocations;
   cellLocations->SetNumberOfValues(elementCoreSize);
   vtkIdType* elements = cellLocations->GetPointer(0);
 
@@ -1710,10 +1711,8 @@ int vtkCGNSReader::GetUnstructuredZone(int base, int zone,
       }
     cgio_release_id(this->cgioNum, cgioSectionId);
     }
-  delete[] startArraySec;
 
-  cells->SetCells(numCoreCells , cellLocations);
-  cellLocations->Delete();
+  cells->SetCells(numCoreCells , cellLocations.GetPointer());
   //
   bool requiredPatch = (this->LoadBndPatch != 0);
   // SetUp zone Blocks
@@ -1733,9 +1732,8 @@ int vtkCGNSReader::GetUnstructuredZone(int base, int zone,
   vtkUnstructuredGrid *ugrid = vtkUnstructuredGrid::New();
   ugrid->SetPoints(points);
 
-  ugrid->SetCells(cellsTypes, cells);
+  ugrid->SetCells(cellsTypes, cells.GetPointer());
 
-  cells->Delete();
   delete [] cellsTypes;
 
   //----------------------------------------------------------------------------
@@ -2136,7 +2134,6 @@ int vtkCGNSReader::GetUnstructuredZone(int base, int zone,
     }
   //
   points->Delete();
-  delete [] sectionInfoList;
   if (bndSec.size() > 0  && requiredPatch)
     {
     mbase->SetBlock(zone, mzone);
