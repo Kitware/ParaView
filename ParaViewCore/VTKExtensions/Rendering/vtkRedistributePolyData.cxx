@@ -576,6 +576,9 @@ int vtkRedistributePolyData::RequestData(vtkInformation* vtkNotUsed(request),
     }
 #endif
 
+  delete [] numPointsRec;
+  delete [] cellptCntr;
+  delete [] cellArraySize;
   return 1;
 }
 
