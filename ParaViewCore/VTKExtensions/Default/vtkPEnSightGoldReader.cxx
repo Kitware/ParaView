@@ -204,11 +204,11 @@ int vtkPEnSightGoldReader::ReadGeometryFile(const char* fileName, int timeStep,
     realId = this->InsertNewPartId(partId);
 
     this->ReadNextDataLine(line); // part description line
-    char *name = strdup(line);
     if (strncmp(line, "interface", 9) == 0)
       {
       return 1; // ignore it and move on
       }
+    char *name = strdup(line);
 
     this->ReadNextDataLine(line);
 
