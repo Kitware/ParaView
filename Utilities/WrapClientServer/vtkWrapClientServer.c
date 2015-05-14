@@ -1251,5 +1251,6 @@ int main(int argc, char *argv[])
   free(classData);
 
   vtkParse_Free(fileInfo);
+  fclose(fp);
   return 0;
 }
