@@ -1236,7 +1236,7 @@ bool pqProxyWidget::restoreDefaults()
 
       // restore defaults only for properties listed
       if (this->Internals->Properties &&
-          this->Internals->Properties->GetIndex(smproperty->GetXMLName()))
+          this->Internals->Properties->GetIndex(smproperty->GetXMLName()) == -1)
         {
         continue;
         }
