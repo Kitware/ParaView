@@ -47,8 +47,10 @@ INPUT                = \
           "@CMAKE_CURRENT_BINARY_DIR@/dox/doc_ParaView_index.dox" \
           @PV_MODULE_DIRS_DOXYGEN_ESCAPED@
 
-
-EXCLUDE_PATTERNS     =
+# Since vtk.*.h header files are prepreprocessed using perl and placed under the "dox"
+# sub-directory, we don't want them to get processed twice. Hence, we exlcude the original
+# vtk* headers from the source dir.
+EXCLUDE_PATTERNS     = "@ParaView_SOURCE_DIR@/*/vtk*.h"
 EXCLUDE              = \
     "@ParaView_SOURCE_DIR@/Web/Documentation" \
     "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/Core/vtkSetGet.h" \
