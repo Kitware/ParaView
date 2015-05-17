@@ -15,17 +15,18 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkInitializationHelper.h"
 #include "vtkNew.h"
 #include "vtkProcessModule.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMParaViewPipelineController.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSettings.h"
-#include "vtkSmartPointer.h"
 
 #include <vtksys/ios/sstream>
 #include <assert.h>
-
+#include <vtk_jsoncpp.h>
 int TestSettings(int argc, char* argv[])
 {
   (void) argc;
@@ -125,6 +126,17 @@ int TestSettings(int argc, char* argv[])
   contourValuesProperty->SetElement(1, -3.0);
   settings->SetProxySettings(contour);
 
+  vtkSMPropertyHelper(sphere, "Radius").Set(12);
+  Json::Value state = vtkSMSettings::SerializeAsJSON(sphere);
+  cout << state.toStyledString() << endl;
+
+  vtkSMPropertyHelper(sphere, "Radius").Set(1);
+  if (!vtkSMSettings::DeserializeFromJSON(sphere, state) ||
+    vtkSMPropertyHelper(sphere, "Radius").GetAsInt() != 12)
+    {
+    cerr << "Failed to DeserializeFromJSON." << endl;
+    return EXIT_FAILURE;
+    }
   session->Delete();
   vtkInitializationHelper::Finalize();
   return EXIT_SUCCESS;

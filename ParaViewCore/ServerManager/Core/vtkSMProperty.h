@@ -566,4 +566,17 @@ private:
 //ETX
 };
 
+#define vtkSMPropertyTemplateMacroCase(typeSMProperty, type, prop, call) \
+  if (typeSMProperty::SafeDownCast(prop)) \
+    { \
+    typedef typeSMProperty SMPROPERTY_TT; \
+    typedef type SM_TT; \
+    call; \
+    }
+#define vtkSMVectorPropertyTemplateMacro(prop, call) \
+  vtkSMPropertyTemplateMacroCase(vtkSMDoubleVectorProperty, double, prop, call)       \
+  vtkSMPropertyTemplateMacroCase(vtkSMIntVectorProperty, int, prop, call)             \
+  vtkSMPropertyTemplateMacroCase(vtkSMIdTypeVectorProperty, vtkIdType, prop, call)    \
+  vtkSMPropertyTemplateMacroCase(vtkSMStringVectorProperty, vtkStdString, prop, call) \
+
 #endif

@@ -14,12 +14,14 @@
 #include "vtkSMSettings.h"
 
 #include "vtkMultiProcessController.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMEnumerationDomain.h"
+#include "vtkSMIdTypeVectorProperty.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMNamedPropertyIterator.h"
@@ -1295,6 +1297,182 @@ void vtkSMSettings::SetSettingDescription(const char* settingName, const char* d
   Json::Path settingPath(settingName);
   Json::Value & settingValue = settingPath.make(this->Internal->SettingCollections[0].Value);
   settingValue.setComment(description, Json::commentBefore);
+}
+
+//----------------------------------------------------------------------------
+template <class T>
+Json::Value vtkConvertXMLElementToJSON(
+  vtkSMVectorProperty* vp,
+  const std::vector<vtkSmartPointer<vtkPVXMLElement> >& elements)
+{
+  // Since we need to handle enumeration domain :/.
+  vtkSMEnumerationDomain* enumDomain = vtkSMEnumerationDomain::SafeDownCast(
+    vp->FindDomain("vtkSMEnumerationDomain"));
+  Json::Value value(Json::arrayValue);
+  for (size_t cc=0; cc < elements.size(); ++cc)
+    {
+    T xmlValue;
+    elements[cc]->GetScalarAttribute("value", &xmlValue);
+    const char* txt = enumDomain? enumDomain->GetEntryTextForValue(xmlValue) : NULL;
+    if (txt)
+      {
+      value[static_cast<unsigned int>(cc)] = Json::Value(txt);
+      }
+    else
+      {
+      value[static_cast<unsigned int>(cc)] = Json::Value(xmlValue);
+      }
+    }
+  if (vp->GetNumberOfElements()==1 && vp->GetRepeatCommand()==0 && value.size()==1)
+    {
+    return value[0];
+    }
+  return value
+  ;
+}
+
+template <>
+Json::Value vtkConvertXMLElementToJSON<vtkStdString>(
+  vtkSMVectorProperty* vp,
+  const std::vector<vtkSmartPointer<vtkPVXMLElement> >& elements)
+{
+  Json::Value value(Json::arrayValue);
+  for (size_t cc=0; cc < elements.size(); ++cc)
+    {
+    value[static_cast<unsigned int>(cc)] = Json::Value(elements[cc]->GetAttribute("value"));
+    }
+  if (vp->GetNumberOfElements()==1 && vp->GetRepeatCommand()==0 && value.size()==1)
+    {
+    return value[0];
+    }
+  return value;
+}
+
+//---------------------------------------------------------------------------
+Json::Value vtkSMSettings::SerializeAsJSON(
+  vtkSMProxy* proxy, vtkSMPropertyIterator* iter/*=NULL*/)
+{
+  if (proxy == NULL)
+    {
+    return Json::Value();
+    }
+  vtkSmartPointer<vtkPVXMLElement> xml;
+  xml.TakeReference(proxy->SaveXMLState(/*parent=*/NULL, iter));
+  Json::Value root(Json::objectValue);
+  for (unsigned int cc=0, max=xml->GetNumberOfNestedElements(); cc < max; ++cc)
+    {
+    vtkPVXMLElement* propXML = xml->GetNestedElement(cc);
+    if (propXML && propXML->GetName() && strcmp(propXML->GetName(), "Property") == 0)
+      {
+      const char* pname = propXML->GetAttribute("name");
+      int number_of_elements = 0;
+      if (!pname || !propXML->GetScalarAttribute("number_of_elements", &number_of_elements))
+        {
+        continue;
+        }
+
+      vtkSMProperty* prop = proxy->GetProperty(pname);
+      if (prop == NULL || prop->GetInformationOnly())
+        {
+        continue;
+        }
+
+      // parse "Element".
+      std::vector<vtkSmartPointer<vtkPVXMLElement> > valueElements;
+      valueElements.resize(number_of_elements);
+      for (unsigned int kk=0, maxkk=propXML->GetNumberOfNestedElements(); kk<maxkk; ++kk)
+        {
+        int index = 0;
+        vtkPVXMLElement* elemXML = propXML->GetNestedElement(kk);
+        if (elemXML && elemXML->GetName() && strcmp(elemXML->GetName(), "Element") == 0 &&
+          elemXML->GetScalarAttribute("index", &index) &&
+          index >= 0 &&
+          index <= number_of_elements)
+          {
+          valueElements[index] = elemXML;
+          }
+        }
+      vtkSMVectorPropertyTemplateMacro(prop,
+        root[pname] = vtkConvertXMLElementToJSON<SM_TT>(
+          vtkSMVectorProperty::SafeDownCast(prop), valueElements);
+        );
+      }
+    }
+  return root;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSettings::DeserializeFromJSON(
+    vtkSMProxy* proxy, const Json::Value& value)
+{
+  if (!proxy || !value)
+    {
+    return true;
+    }
+
+  if (!value.isObject())
+    {
+    vtkGenericWarningMacro("Invalid JSON type. Expected an 'object'.");
+    return false;
+    }
+
+  vtkNew<vtkPVXMLElement> xml;
+  xml->SetName("Proxy");
+  xml->AddAttribute("group", proxy->GetXMLGroup());
+  xml->AddAttribute("name", proxy->GetXMLName());
+  for (Json::Value::const_iterator iter = value.begin(); iter != value.end(); ++iter)
+    {
+    vtkSMProperty* prop = proxy->GetProperty(iter.memberName());
+    if (!prop)
+      {
+      continue;
+      }
+    // Since we need to handle enumeration domain :/.
+    vtkSMEnumerationDomain* enumDomain = vtkSMEnumerationDomain::SafeDownCast(
+      prop->FindDomain("vtkSMEnumerationDomain"));
+
+    vtkNew<vtkPVXMLElement> propXML;
+    propXML->SetName("Property");
+    propXML->AddAttribute("name", iter.memberName());
+    if ((*iter).isArray() || (*iter).isObject())
+      {
+      propXML->AddAttribute("number_of_elements", static_cast<int>((*iter).size()));
+      int index = 0;
+      for (Json::Value::const_iterator elemIter = (*iter).begin(); elemIter != (*iter).end(); ++elemIter, ++index)
+        {
+        vtkNew<vtkPVXMLElement> elemXML;
+        elemXML->SetName("Element");
+        elemXML->AddAttribute("index", index);
+        std::string elemValue = (*elemIter).asString();
+        if (enumDomain && enumDomain->HasEntryText(elemValue.c_str()))
+          {
+          std::ostringstream stream;
+          stream << enumDomain->GetEntryValueForText(elemValue.c_str());
+          elemValue = stream.str();
+          }
+        elemXML->AddAttribute("value", elemValue.c_str());
+        propXML->AddNestedElement(elemXML.GetPointer());
+        }
+      }
+    else
+      {
+      propXML->AddAttribute("number_of_elements", "1");
+      vtkNew<vtkPVXMLElement> elemXML;
+      elemXML->SetName("Element");
+      elemXML->AddAttribute("index", "0");
+      std::string elemValue = (*iter).asString();
+      if (enumDomain && enumDomain->HasEntryText(elemValue.c_str()))
+        {
+        std::ostringstream stream;
+        stream << enumDomain->GetEntryValueForText(elemValue.c_str());
+        elemValue = stream.str();
+        }
+      elemXML->AddAttribute("value", elemValue.c_str());
+      propXML->AddNestedElement(elemXML.GetPointer());
+      }
+    xml->AddNestedElement(propXML.GetPointer());
+    }
+  return (proxy->LoadXMLState(xml.GetPointer(), NULL) != 0);
 }
 
 //----------------------------------------------------------------------------
