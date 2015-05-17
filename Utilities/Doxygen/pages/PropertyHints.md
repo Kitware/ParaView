@@ -91,3 +91,24 @@ To indicate to the UI that this input is a selection input, use the
         <SelectionInput />
       </Hints>
     </InputProperty>
+
+WidgetHeight
+------------
+Specify height in rows for tabular/tree widgets.
+
+Certain widgets that show a tablular widget of rows and columns i.e. any property widget
+that uses a `pqTreeWidget` including the ones for  `ArrayListDomain`, `ArraySelectionDomain`,
+`EnumerationDomain`, `CompositeTreeDomain`, respect this hint to setup the default size for the
+tabular/tree widget.
+
+    <IntVectorProperty command="..." name="...">
+      <CompositeTreeDomain mode="all" name="tree">
+        <RequiredProperties>
+          <Property function="Input" name="Input" />
+        </RequiredProperties>
+      </CompositeTreeDomain>
+      <Hints>
+        <!-- This tag sets the height of the CompositeTreeDomain -->
+        <WidgetHeight number_of_rows="20" />
+      </Hints>
+    </IntVectorProperty>
