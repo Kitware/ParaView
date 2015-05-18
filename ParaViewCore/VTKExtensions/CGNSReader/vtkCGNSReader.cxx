@@ -1519,7 +1519,7 @@ int vtkCGNSReader::GetUnstructuredZone(int base, int zone,
     //
     }
   //
-  std::vector<vtkIdType> startArraySec(coreSec);
+  std::vector<vtkIdType> startArraySec(coreSec.size());
   for (std::size_t sec = 0; sec < coreSec.size(); sec++)
     {
     int curStart = startSec[sec];
