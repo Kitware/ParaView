@@ -146,9 +146,11 @@ void vtkIntegrateAttributes::ExecuteBlock(
   for (cellId = 0; cellId < numCells; ++cellId)
     {
     cellType = input->GetCellType(cellId);
-    // Make sure we are not integrating ghost cells.
-    if (ghostArray && 
-        ghostArray->GetValue(cellId) & vtkDataSetAttributes::DUPLICATECELL)
+    // Make sure we are not integrating ghost/blanked cells.
+    if (ghostArray &&
+        (ghostArray->GetValue(cellId) &
+         (vtkDataSetAttributes::DUPLICATECELL |
+          vtkDataSetAttributes::HIDDENCELL)))
       {
       continue;
       }
