@@ -77,6 +77,16 @@ namespace
     private:
       int pair[2];
   };
+
+  class SectionInformation
+  {
+  public:
+    CGNSRead::char_33 name;
+    CGNS_ENUMT(ElementType_t) elemType;
+    cgsize_t range[2];
+    int bound;
+    cgsize_t eDataSize;
+  };
 }
 
 //----------------------------------------------------------------------------
@@ -1369,16 +1379,6 @@ int vtkCGNSReader::GetUnstructuredZone(int base, int zone,
   //---------------------------------------------------------------------
   //  Handle connectivities
   //---------------------------------------------------------------------
-  class SectionInformation
-  {
-  public:
-    CGNSRead::char_33 name;
-    CGNS_ENUMT(ElementType_t) elemType;
-    cgsize_t range[2];
-    int bound;
-    cgsize_t eDataSize;
-  };
-
   // Read the number of sections, for the zone.
   int nsections = 0;
   nsections = elemIdList.size();
@@ -1519,7 +1519,7 @@ int vtkCGNSReader::GetUnstructuredZone(int base, int zone,
     //
     }
   //
-  std::vector<vtkIdType> startArraySec(coreSec);
+  std::vector<vtkIdType> startArraySec(coreSec.size());
   for (std::size_t sec = 0; sec < coreSec.size(); sec++)
     {
     int curStart = startSec[sec];
