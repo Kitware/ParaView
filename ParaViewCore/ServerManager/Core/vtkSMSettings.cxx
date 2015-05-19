@@ -511,6 +511,13 @@ public:
     Json::Value & jsonValue = valuePath.make(this->SettingCollections[0].Value);
     if (property->GetNumberOfElements() == 1)
       {
+      if (jsonValue.isArray())
+        {
+        // Reset to null so that we aren't setting a value on a Json::Value array
+        jsonValue = Json::Value::null;
+        this->Modified();
+        }
+
       if (jsonValue.isNull() || jsonValue.asInt() != property->GetElement(0))
         {
         jsonValue = property->GetElement(0);
@@ -519,6 +526,13 @@ public:
       }
     else
       {
+      if (!jsonValue.isArray() && !jsonValue.isNull())
+        {
+        // Reset to null so that the jsonValue.resize() operation works
+        jsonValue = Json::Value::null;
+        this->Modified();
+        }
+
       jsonValue.resize(property->GetNumberOfElements());
       for (unsigned int i = 0; i < property->GetNumberOfElements(); ++i)
         {
@@ -541,6 +555,13 @@ public:
     Json::Value & jsonValue = valuePath.make(this->SettingCollections[0].Value);
     if (property->GetNumberOfElements() == 1)
       {
+      if (jsonValue.isArray())
+        {
+        // Reset to null so that we aren't setting a value on a Json::Value array
+        jsonValue = Json::Value::null;
+        this->Modified();
+        }
+
       if (jsonValue.isNull() || jsonValue.asDouble() != property->GetElement(0))
         {
         jsonValue = property->GetElement(0);
@@ -549,6 +570,13 @@ public:
       }
     else
       {
+      if (!jsonValue.isArray() && !jsonValue.isNull())
+        {
+        // Reset to null so that the jsonValue.resize() operation works
+        jsonValue = Json::Value::null;
+        this->Modified();
+        }
+
       jsonValue.resize(property->GetNumberOfElements());
       for (unsigned int i = 0; i < property->GetNumberOfElements(); ++i)
         {
@@ -571,6 +599,13 @@ public:
     Json::Value & jsonValue = valuePath.make(this->SettingCollections[0].Value);
     if (property->GetNumberOfElements() == 1)
       {
+      if (jsonValue.isArray())
+        {
+        // Reset to null so that we aren't setting a value on a Json::Value array
+        jsonValue = Json::Value::null;
+        this->Modified();
+        }
+
       if (jsonValue.isNull() || strcmp(jsonValue.asCString(), property->GetElement(0)) != 0)
         {
         jsonValue = property->GetElement(0);
@@ -579,6 +614,13 @@ public:
       }
     else
       {
+      if (!jsonValue.isArray() && !jsonValue.isNull())
+        {
+        // Reset to null so that the jsonValue.resize() operation works
+        jsonValue = Json::Value::null;
+        this->Modified();
+        }
+
       jsonValue.resize(property->GetNumberOfElements());
       for (unsigned int i = 0; i < property->GetNumberOfElements(); ++i)
         {

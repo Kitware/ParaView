@@ -101,6 +101,30 @@ int TestSettings(int argc, char* argv[])
     cerr << "Could not get Radius property\n";
     }
 
+  // Test saving different number of repeatable property values
+  vtkSmartPointer<vtkSMProxy> contour;
+  contour.TakeReference(pxm->NewProxy("filters", "GenericContour"));
+  controller->PreInitializeProxy(contour);
+  controller->PostInitializeProxy(contour);
+
+  vtkSMDoubleVectorProperty* contourValuesProperty =
+    vtkSMDoubleVectorProperty::SafeDownCast(contour->GetProperty("ContourValues"));
+  if (!contourValuesProperty)
+    {
+    std::cerr << "No contour values property in GenericContour\n";
+    return EXIT_FAILURE;
+    }
+
+  // Double vector property resize
+  contourValuesProperty->SetNumberOfElements(1);
+  contourValuesProperty->SetElement(0, -1.0);
+  settings->SetProxySettings(contour);
+
+  contourValuesProperty->SetNumberOfElements(2);
+  contourValuesProperty->SetElement(0, -2.0);
+  contourValuesProperty->SetElement(1, -3.0);
+  settings->SetProxySettings(contour);
+
   session->Delete();
   vtkInitializationHelper::Finalize();
   return EXIT_SUCCESS;
