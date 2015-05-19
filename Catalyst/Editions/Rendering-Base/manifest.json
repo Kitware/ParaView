@@ -639,6 +639,7 @@
         { "path": "module.cmake" },
         { "class": "vtkPVComparativeAnimationCue" },
         { "class": "vtkPVComparativeView" },
+        { "class": "vtkPVRepresentedArrayListSettings" },
         { "class": "vtkSMBagChartSeriesListDomain" },
         { "class": "vtkSMBoxRepresentationProxy" },
         { "class": "vtkSMCameraLink" },

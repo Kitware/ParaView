@@ -265,6 +265,12 @@ void vtkSMArrayListDomainInternals::BuildArrayList(
         continue;
         }
 
+      // Then, check if the array name is acceptable
+      if (self->IsFilteredArrayName(arrayInfo->GetName()))
+        {
+        continue;
+        }
+
       // Next, check if the array is acceptable based on the data-type
       // limitations specified on self.
       if (!this->IsArrayDataTypeAcceptable(arrayInfo))
@@ -916,4 +922,10 @@ int vtkSMArrayListDomain::ComponentIndexFromMangledName(
       }
     }
   return -1;
+}
+
+//---------------------------------------------------------------------------
+bool vtkSMArrayListDomain::IsFilteredArrayName(const char*)
+{
+  return false;
 }

@@ -17,8 +17,37 @@
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVRepresentedArrayListSettings.h"
 #include "vtkSMProperty.h"
 #include "vtkSMRepresentationProxy.h"
+
+#include <vtksys/RegularExpression.hxx>
+
+// Callback to update the RepresentedArrayListDomain
+class vtkSMRepresentedArrayListDomainUpdateCommand : public vtkCommand
+{
+public:
+  vtkWeakPointer<vtkSMRepresentedArrayListDomain> Domain;
+  typedef vtkCommand Superclass;
+  vtkSMRepresentedArrayListDomainUpdateCommand()
+    {
+      this->Domain = NULL;
+    }
+  virtual const char* GetClassNameInternal() const
+    { return "vtkSMRepresentedArrayListDomainUpdateCommand"; }
+  static vtkSMRepresentedArrayListDomainUpdateCommand* New()
+    {
+      return new vtkSMRepresentedArrayListDomainUpdateCommand();
+    }
+  virtual void Execute(vtkObject*, unsigned long, void*)
+  {
+    if (this->Domain)
+      {
+      this->Domain->Update(NULL);
+      }
+  }
+};
+
 
 vtkStandardNewMacro(vtkSMRepresentedArrayListDomain);
 //----------------------------------------------------------------------------
@@ -30,6 +59,16 @@ vtkSMRepresentedArrayListDomain::vtkSMRepresentedArrayListDomain()
   // from ending up scalar coloring random data arrays by default. This logic
   // may need to be reconsidered.
   this->PickFirstAvailableArrayByDefault = false;
+
+  // Set up observer on vtkPVRepresentedArrayListSettings so that the domain
+  // updates whenever the settings are changed.
+  vtkSMRepresentedArrayListDomainUpdateCommand* observer =
+    vtkSMRepresentedArrayListDomainUpdateCommand::New();
+  observer->Domain = this;
+
+  vtkPVRepresentedArrayListSettings* arrayListSettings = vtkPVRepresentedArrayListSettings::GetInstance();
+  arrayListSettings->AddObserver(vtkCommand::ModifiedEvent, observer);
+  observer->FastDelete();
 }
 
 //----------------------------------------------------------------------------
@@ -79,6 +118,24 @@ void vtkSMRepresentedArrayListDomain::SetRepresentationProxy(
 void vtkSMRepresentedArrayListDomain::OnRepresentationDataUpdated()
 {
   this->Update(NULL);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMRepresentedArrayListDomain::IsFilteredArrayName(const char* name)
+{
+  vtkPVRepresentedArrayListSettings* colorArraySettings = vtkPVRepresentedArrayListSettings::GetInstance();
+  for (int idx = 0; idx < colorArraySettings->GetNumberOfFilterExpressions(); ++idx)
+    {
+    std::string filterExpression = colorArraySettings->GetFilterExpression(idx);
+    vtksys::RegularExpression re(filterExpression);
+    bool matches = re.find(name);
+    if (matches)
+      {
+      return true;
+      }
+    }
+
+  return false;
 }
 
 //----------------------------------------------------------------------------

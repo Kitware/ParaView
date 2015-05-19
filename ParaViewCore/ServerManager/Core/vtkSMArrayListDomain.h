@@ -200,6 +200,12 @@ public:
   static vtkStdString ArrayNameFromMangledName(const char* name);
   static int ComponentIndexFromMangledName(vtkPVArrayInformation *info, const char* name);
 
+  // Description:
+  // Returns true if an array should be filtered out based on its
+  // name alone. This implementation always returns false, but subclasses
+  // may override.
+  virtual bool IsFilteredArrayName(const char* name);
+
 protected:
   vtkSMArrayListDomain();
   ~vtkSMArrayListDomain();
