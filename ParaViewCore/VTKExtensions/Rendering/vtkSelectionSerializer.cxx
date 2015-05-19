@@ -31,6 +31,9 @@
 #include "vtkSelectionNode.h"
 #include "vtkStringArray.h"
 
+
+//----------------------------------------------------------------------------
+
 vtkStandardNewMacro(vtkSelectionSerializer);
 
 vtkInformationKeyMacro(vtkSelectionSerializer,ORIGINAL_SOURCE_ID,Integer);
@@ -197,11 +200,28 @@ void vtkSelectionSerializer::WriteSelectionData(
 //----------------------------------------------------------------------------
 void vtkSelectionSerializer::Parse(const char* xml, vtkSelection* root)
 {
-  root->Initialize();
-
   vtkPVXMLParser* parser = vtkPVXMLParser::New();
   parser->Parse(xml);
   vtkPVXMLElement* rootElem = parser->GetRootElement();
+  vtkSelectionSerializer::Parse(rootElem, root);
+  parser->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkSelectionSerializer::Parse(const char* xml, unsigned int length, 
+                                   vtkSelection* root)
+{
+  vtkPVXMLParser* parser = vtkPVXMLParser::New();
+  parser->Parse(xml, length);
+  vtkPVXMLElement* rootElem = parser->GetRootElement();
+  vtkSelectionSerializer::Parse(rootElem, root);
+  parser->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkSelectionSerializer::Parse(vtkPVXMLElement* rootElem, vtkSelection* root)
+{
+  root->Initialize();
   if (rootElem)
     {
     unsigned int numNested = rootElem->GetNumberOfNestedElements();
@@ -222,7 +242,6 @@ void vtkSelectionSerializer::Parse(const char* xml, vtkSelection* root)
         }
       }
     }
-  parser->Delete();
 }
 
 //----------------------------------------------------------------------------

@@ -51,9 +51,14 @@ public:
 
   // Description:
   // Parse an xml string to create a new selection tree.
+  // The string is 0 terminated for the first version of this function,
+  // or we specify the length of the string for the second version.
   // Currently, this supports only a subset of
   // properties: CONTENT_TYPE, SOURCE_ID, PROP_ID, PROCESS_ID
   static void Parse(const char* xml, vtkSelection* root);
+  static void Parse(const char* xml, unsigned int length, 
+                    vtkSelection* root);
+
 
   // Description:
   // ID of the dataset or algorithm that the selection belongs to. What
@@ -71,6 +76,7 @@ private:
   static void WriteSelectionData(ostream& os, 
                                  vtkIndent indent, 
                                  vtkSelectionNode* selection);
+  static void Parse(vtkPVXMLElement* rootElem, vtkSelection* root);
   static void ParseNode(
     vtkPVXMLElement* nodeXML, vtkSelectionNode* node);
 };

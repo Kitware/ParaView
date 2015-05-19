@@ -123,6 +123,11 @@ int vtkPExtractHistogram::RequestData(vtkInformation *request,
     // We save the old bin_extents and then revert to be restored later since
     // the reduction reduces the bin_extents as well.
     output->ShallowCopy(reduceFilter->GetOutput());
+    if (output->GetRowData()->GetNumberOfArrays() == 0)
+      {
+      vtkErrorMacro(<<"Reduced data has 0 arrays");
+      return 0;
+      }
     output->GetRowData()->GetArray((int)0)->DeepCopy(oldExtents);
     if (this->CalculateAverages)
       {
