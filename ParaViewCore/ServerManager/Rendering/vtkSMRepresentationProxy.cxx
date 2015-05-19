@@ -24,6 +24,7 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyInternals.h"
 #include "vtkSMSession.h"
+#include "vtkSMStringListDomain.h"
 #include "vtkSMTrace.h"
 #include "vtkTimerLog.h"
 
@@ -414,15 +415,27 @@ vtkTypeUInt32 vtkSMRepresentationProxy::GetGlobalID()
 //---------------------------------------------------------------------------
 bool vtkSMRepresentationProxy::SetRepresentationType(const char* type)
 {
-  if (this->GetProperty("Representation"))
+  if (vtkSMProperty* property = this->GetProperty("Representation"))
     {
+    vtkSMStringListDomain* sld = vtkSMStringListDomain::SafeDownCast(
+      property->FindDomain("vtkSMStringListDomain"));
+
+    unsigned int tmp;
+    if (sld != NULL && sld->IsInDomain(type, tmp) == 0)
+      {
+      // Let's not warn about this. Let the caller decide if this is an
+      // error/warning.
+      // vtkWarningMacro("Requested type not available: " << type);
+      return false;
+      }
+
     SM_SCOPED_TRACE(CallMethod)
       .arg(this)
       .arg("SetRepresentationType")
       .arg(type)
       .arg("comment", "change representation type");
 
-    vtkSMPropertyHelper(this, "Representation").Set(type? type : "");
+    vtkSMPropertyHelper(property).Set(type? type : "");
     this->UpdateVTKObjects();
     return true;
     }
