@@ -12,14 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __vtk_protobuf_h
-#define __vtk_protobuf_h
+#ifndef vtk_protobuf_h
+#define vtk_protobuf_h
 
 /* Use the protobuf library configured for VTK.  */
 #cmakedefine VTK_USE_SYSTEM_PROTOBUF
-#ifdef VTK_USE_SYSTEM_PROTOBUF
-# error "Using System protobuf is not supported by ParaView"
-#else
+#ifndef VTK_USE_SYSTEM_PROTOBUF
 # include "vtkConfigure.h"
 # if defined(_MSC_VER) && defined(VTK_BUILD_SHARED_LIBS)
 // When building on Windows with shared libraries enabled, any VTK/ParaView code
