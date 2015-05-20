@@ -49,11 +49,8 @@ Specify the default view to use for showing the output produced by a
 source/filter.
 
 This hint is used to indicate the name of the view to use by default for showing
-the output of this source/filter on first *Apply*.
-
-**CAVEAT**: Currently, it only supports filters/sources with a single output
-port i.e. if there are several outputs to the filter, than all of them will be
-shown in the same type of view sepecified using this hint.
+the output of this source/filter on first *Apply*. To sepecify the view type for
+a specific output port, you can use the optional attribute **port**.
 
     <SourceProxy ...>
       ...
@@ -76,5 +73,24 @@ indeed be plotted by such views, one can use this hint.
     <SourceProxy ...>
       <Hints>
         <Plotable />
+      </Hints>
+    </SourceProxy>
+
+Representation
+--------------
+Specify the representation type to use by default when showing the output from a
+source/filter in a particular view.
+
+This hint is used to indicate the default representation type in any/all views.
+The **view** attribute is optional. When not specified it matches all views.
+Likewise, **port** attribute is optional. When not specified it matches all
+output ports. The hints are processed in order. Hence when specifying multiple
+Representation elements, start with most restrictive to least restrictive.
+
+    <SourceProxy ...>
+      ...
+      <Hints>
+        <Representation view="ComparativeRenderView" type="Surface" port="1"/>
+        <Representation view="RenderView" type="Wireframe" />
       </Hints>
     </SourceProxy>

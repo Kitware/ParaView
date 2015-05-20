@@ -41,7 +41,10 @@
 namespace
 {
   //---------------------------------------------------------------------------
-  const char* vtkFindViewTypeFromHints(vtkPVXMLElement* hints, const int outputPort)
+  const char* vtkFindTypeFromHints(vtkPVXMLElement* hints, const int outputPort,
+    const char* xmlTag,
+    const char* xmlAttributeName=NULL,
+    const char* xmlAttributeValue=NULL)
     {
     if (!hints)
       {
@@ -50,7 +53,7 @@ namespace
     for (unsigned int cc=0, max=hints->GetNumberOfNestedElements(); cc < max; cc++)
       {
       vtkPVXMLElement* child = hints->GetNestedElement(cc);
-      if (child && child->GetName() && strcmp(child->GetName(), "View") == 0)
+      if (child && child->GetName() && strcmp(child->GetName(), xmlTag) == 0)
         {
         int port;
         // If port exists, then it must match the port number for this port.
@@ -58,9 +61,18 @@ namespace
           {
           continue;
           }
-        if (const char* viewtype = child->GetAttribute("type"))
+        // if xmlAttributeName and xmlAttributeValue are provided, the XML must match the
+        // (name,value) pair, if present.
+        if (xmlAttributeValue && xmlAttributeName && child->GetAttribute(xmlAttributeName))
           {
-          return viewtype;
+          if (strcmp(child->GetAttribute(xmlAttributeName), xmlAttributeValue) != 0)
+            {
+            continue;
+            }
+          }
+        if (const char* type = child->GetAttribute("type"))
+          {
+          return type;
           }
         }
       }
@@ -162,10 +174,21 @@ namespace
 
   //---------------------------------------------------------------------------
   void vtkPickRepresentationType(
-    vtkSMRepresentationProxy* repr, vtkSMSourceProxy* producer, unsigned int outputPort)
+    vtkSMRepresentationProxy* repr, vtkSMSourceProxy* producer, unsigned int outputPort,
+    vtkSMViewProxy* view)
     {
     (void)producer;
     (void)outputPort;
+
+    // Check if there's a hint for the producer. If so, use that.
+    if (const char* reprtype = vtkFindTypeFromHints(
+        producer->GetHints(), outputPort, "Representation", "view", view->GetXMLName()))
+      {
+      if (repr->SetRepresentationType(reprtype))
+        {
+        return;
+        }
+      }
     // currently, this just ensures that the "Representation" type chosen has
     // proper color type etc. setup. At some point, we could deprecate
     // vtkSMRepresentationTypeDomain and let this logic pick the default
@@ -175,7 +198,6 @@ namespace
       repr->SetRepresentationType(vtkSMPropertyHelper(smproperty).GetAsString());
       }
     }
-
 }
 
 bool vtkSMParaViewPipelineControllerWithRendering::HideScalarBarOnHide = true;
@@ -337,7 +359,7 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
     vtkInheritRepresentationProperties(repr, producer, outputPort, view, ts);
 
     // pick good representation type.
-    vtkPickRepresentationType(repr, producer, outputPort);
+    vtkPickRepresentationType(repr, producer, outputPort, view);
 
     this->RegisterRepresentationProxy(repr);
     repr->UpdateVTKObjects();
@@ -516,7 +538,7 @@ const char* vtkSMParaViewPipelineControllerWithRendering::GetPreferredViewType(
   vtkSMSourceProxy* producer, int outputPort)
 {
   // 1. Check if there's a hint for the producer. If so, use that.
-  if (const char* viewType = vtkFindViewTypeFromHints(producer->GetHints(), outputPort))
+  if (const char* viewType = vtkFindTypeFromHints(producer->GetHints(), outputPort, "View"))
     {
     return viewType;
     }
