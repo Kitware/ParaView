@@ -13,15 +13,11 @@ saveImage = False
 rw = vtk.vtkRenderWindow()
 rw.SetSize(1,1)
 rw.Render()
-em = rw.GetExtensionManager()
 ptm = vtk.vtkProjectedTetrahedraMapper()
 ok = ptm.IsSupported(rw)
 print
-print 'ProjectedTetrahedraMapper %s supported by:\n  %s\n  %s\n  %s\n'%(
-      'is' if(ok) else 'is not',
-      em.GetDriverGLVersion(),
-      em.GetDriverGLVendor(),
-      em.GetDriverGLRenderer())
+print 'ProjectedTetrahedraMapper %s supported '%(
+      'is' if(ok) else 'is not')
 del ptm
 del rw
 

@@ -108,7 +108,12 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   // setup the selection mapper so that we don't need to make any selection
   // conversions after rendering.
   vtkCompositePolyDataMapper2* mapper = vtkCompositePolyDataMapper2::New();
-#ifndef VTKGL2
+#ifdef VTKGL2
+  mapper->SetPointIdArrayName("vtkOriginalPointIds");
+  mapper->SetCellIdArrayName("vtkOriginalCellIds");
+  mapper->SetProcessIdArrayName("vtkProcessId");
+  mapper->SetCompositeIdArrayName("vtkCompositeIndex");
+#else
   vtkHardwareSelectionPolyDataPainter* selPainter =
     vtkHardwareSelectionPolyDataPainter::SafeDownCast(
       mapper->GetSelectionPainter()->GetDelegatePainter());
@@ -201,7 +206,7 @@ void vtkGeometryRepresentation::SetupDefaults()
 //----------------------------------------------------------------------------
 int vtkGeometryRepresentation::GetBlockColorsDistinctValues()
 {
-  vtkPVGeometryFilter *geomFilter = 
+  vtkPVGeometryFilter *geomFilter =
     vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter);
   if (geomFilter)
     {
@@ -214,7 +219,7 @@ int vtkGeometryRepresentation::GetBlockColorsDistinctValues()
 void vtkGeometryRepresentation::SetBlockColorsDistinctValues(
   int distinctValues)
 {
-  vtkPVGeometryFilter *geomFilter = 
+  vtkPVGeometryFilter *geomFilter =
     vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter);
   if (geomFilter)
     {
