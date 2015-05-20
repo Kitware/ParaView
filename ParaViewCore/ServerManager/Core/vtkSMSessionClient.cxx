@@ -998,8 +998,8 @@ void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int messa
   this->GetProxyLocator()->Clear();
 }
 //-----------------------------------------------------------------------------
-bool vtkSMSessionClient::OnWrongTagEvent( vtkObject* obj, unsigned long event,
-                                          void* calldata )
+bool vtkSMSessionClient::OnWrongTagEvent(
+  vtkObject* vtkNotUsed(obj), unsigned long vtkNotUsed(event), void* calldata)
 {
   int tag = -1;
   const char* data = reinterpret_cast<const char*>(calldata);
@@ -1012,15 +1012,15 @@ bool vtkSMSessionClient::OnWrongTagEvent( vtkObject* obj, unsigned long event,
     {
     vtkSocketCommunicator::SafeDownCast(
         this->DataServerController->GetCommunicator())->BufferCurrentMessage();
-    return true; // Need to keep trying to receive.
     }
-
-  cout << "Wrong tag but don't know how to handle it... " << tag << endl;
-  abort();
-
-  // We was not able to handle it localy
-  this->Superclass::OnWrongTagEvent(obj, event, calldata);
-  return false;
+  else
+    {
+    cout << "Wrong tag but don't know how to handle it... " << tag << endl;
+    abort();
+    // We was not able to handle it localy
+    // return this->Superclass::OnWrongTagEvent(obj, event, calldata);
+    }
+  return true; // Need to keep trying to receive.
 }
 
 //-----------------------------------------------------------------------------
