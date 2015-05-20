@@ -99,7 +99,7 @@ public:
 
   virtual QVariant data(const QModelIndex& idx, int role=Qt::DisplayRole) const
     {
-    if (role == Qt::DisplayRole || role == Qt::ToolTipRole)
+    if (role == Qt::DisplayRole || role == Qt::ToolTipRole || role == Qt::EditRole)
       {
       if (idx.isValid() &&
         idx.row() < this->rowCount() &&
@@ -107,7 +107,7 @@ public:
         {
         int offset = this->computeOffset(idx);
         return (offset < this->Values.size()?
-          this->Values[offset] : QVariant());
+          this->Values[offset].toString() : QVariant());
         }
       }
     return QVariant();
