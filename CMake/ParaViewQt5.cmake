@@ -36,14 +36,18 @@ IF( Qt5Core_FOUND )
   # Check if Qtversion is >=QT_OFFICIAL_VERSION. If so, we are good. Otherwise we will post a
   # warning of versions (<QT_OFFICIAL_VERSION).
 
+  if (POLICY CMP0020)
+    cmake_policy(SET CMP0020 NEW)
+  endif ()
+
   STRING( REGEX MATCH "^5\\.[0]\\.[0-1]+" QT_VERSION_MATCH
     "${Qt5Core_VERSION_STRING}" )
   IF( QT_VERSION_MATCH )
     MESSAGE( WARNING "Warning: You are using Qt ${Qt5Core_VERSION_STRING}. "
       "Officially supported version is Qt ${QT_OFFICIAL_VERSION}" )
   ENDIF()
+  FIND_PACKAGE( Qt5 REQUIRED COMPONENTS ${Qt5_FIND_COMPONENTS} )
   FOREACH( _COMPONENT ${Qt5_FIND_COMPONENTS} )
-    FIND_PACKAGE( Qt5${_COMPONENT} REQUIRED )
     INCLUDE_DIRECTORIES( ${Qt5${_COMPONENT}_INCLUDE_DIRS} )
     ADD_DEFINITIONS( ${Qt5${_COMPONENT}_DEFINITIONS} )
     LIST( APPEND QT_LIBRARIES ${Qt5${_COMPONENT}_LIBRARIES} )
