@@ -90,6 +90,13 @@ if ("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
     )
 endif()
 
+if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
+  set_source_files_properties(
+    vtkPVDefaultPass.cxx
+    vtkPVGeometryFilter.cxx
+    PROPERTIES COMPILE_FLAGS -DVTKGL2)
+endif()
+
 if (PARAVIEW_USE_MPI)
   list(APPEND Module_SRCS
     vtkAllToNRedistributeCompositePolyData.cxx
@@ -105,7 +112,7 @@ if (PARAVIEW_USE_MPI)
       vtkIceTCompositePass.cxx
       vtkIceTContext.cxx)
     if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
-      set_source_files_properties(vtkIceTCompositePass.cxx vtkPVGeometryFilter.cxx
+      set_source_files_properties(vtkIceTCompositePass.cxx
         PROPERTIES COMPILE_FLAGS -DVTKGL2)
     endif()
   endif()

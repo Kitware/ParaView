@@ -41,16 +41,21 @@ void vtkPVDefaultPass::Render(const vtkRenderState* render_state)
   this->UpdateLights(renderer);
 
   //// set matrix mode for actors
+  #ifndef VTKGL2
   GLint saved_matrix_mode;
   glGetIntegerv(GL_MATRIX_MODE, &saved_matrix_mode);
   glMatrixMode(GL_MODELVIEW);
+  #endif
 
   // initialize to false
   this->SetLastRenderingUsedDepthPeeling(
     render_state->GetRenderer(), false);
 
   this->UpdateGeometry(renderer);
+
+  #ifndef VTKGL2
   glMatrixMode(saved_matrix_mode);
+  #endif
 
   vtkOpenGLCheckErrorMacro("failed after Render");
 }
