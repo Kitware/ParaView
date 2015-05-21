@@ -693,7 +693,8 @@ void vtkIceTCompositePass::Draw(const vtkRenderState* render_state,
   vtkOpenGLCheckErrorMacro("failed after Draw");
 }
 #else
-void vtkIceTCompositePass::Draw(const vtkRenderState* render_state,
+void vtkIceTCompositePass::Draw(
+  const vtkRenderState* vtkNotUsed(render_state),
   const IceTDouble *vtkNotUsed(proj_matrix),
   const IceTDouble *vtkNotUsed(mv_matrix),
   const IceTFloat *vtkNotUsed(background_color),
