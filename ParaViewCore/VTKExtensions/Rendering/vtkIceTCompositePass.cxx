@@ -20,26 +20,26 @@
 #include "vtkFrameBufferObject.h"
 #include "vtkIceTContext.h"
 #include "vtkIntArray.h"
+#include "vtkMatrix3x3.h"
+#include "vtkMatrix4x4.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkOpenGLCamera.h"
+#include "vtkOpenGLError.h"
+#include "vtkOpenGLRenderWindow.h"
 #include "vtkPKdTree.h"
 #include "vtkPixelBufferObject.h"
 #include "vtkRenderState.h"
 #include "vtkRenderWindow.h"
-#include "vtkOpenGLRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
 #include "vtkTextureObject.h"
 #include "vtkTilesHelper.h"
-#include "vtkOpenGLError.h"
 
 #include <assert.h>
 #include "vtk_icet.h"
 
 #ifdef VTKGL2
-# include "vtkMatrix3x3.h"
-# include "vtkMatrix4x4.h"
-# include "vtkOpenGLCamera.h"
 # include "vtkOpenGLShaderCache.h"
 # include "vtkShaderProgram.h"
 # include "vtkglVBOHelper.h"
@@ -620,6 +620,7 @@ void vtkIceTCompositePass::GLDraw(const vtkRenderState* render_state)
 
 //----------------------------------------------------------------------------
 // for OpenGL 2+
+#ifdef VTKGL2
 void vtkIceTCompositePass::Draw(const vtkRenderState* render_state,
   const IceTDouble *proj_matrix,
   const IceTDouble *mv_matrix,
@@ -691,6 +692,16 @@ void vtkIceTCompositePass::Draw(const vtkRenderState* render_state,
 
   vtkOpenGLCheckErrorMacro("failed after Draw");
 }
+#else
+void vtkIceTCompositePass::Draw(const vtkRenderState* render_state,
+  const IceTDouble *vtkNotUsed(proj_matrix),
+  const IceTDouble *vtkNotUsed(mv_matrix),
+  const IceTFloat *vtkNotUsed(background_color),
+  const IceTInt *vtkNotUsed(readback_viewport),
+  IceTImage vtkNotUsed(result))
+{
+}
+#endif
 
 //----------------------------------------------------------------------------
 void vtkIceTCompositePass::UpdateTileInformation(
