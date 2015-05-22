@@ -58,6 +58,7 @@ class vtkRenderWindowInteractor;
 class vtkRenderer;
 class vtkTextRepresentation;
 class vtkTexture;
+class vtkTimerLog;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVRenderView : public vtkPVView
 {
@@ -776,8 +777,8 @@ private:
   int StereoType;
   int ServerStereoType;
   void UpdateStereoProperties();
-
   vtkSmartPointer<vtkCuller> Culler;
+  vtkNew<vtkTimerLog> Timer;
 //ETX
 };
 

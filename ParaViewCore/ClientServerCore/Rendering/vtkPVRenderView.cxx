@@ -1411,7 +1411,15 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     vtkProcessModule::GetProcessType() != vtkProcessModule::PROCESS_DATA_SERVER)
     {
     this->AboutToRenderOnLocalProcess(interactive);
+    if (!this->MakingSelection)
+      {
+      this->Timer->StartTimer();
+      }
     this->GetRenderWindow()->Render();
+    if (!this->MakingSelection)
+      {
+      this->Timer->StopTimer();
+      }
     }
 
   if (!this->MakingSelection)
@@ -2398,7 +2406,7 @@ void vtkPVRenderView::SetShowAnnotation(bool val)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::UpdateAnnotationText()
 {
-  if (this->ShowAnnotation)
+  if (this->ShowAnnotation && !this->MakingSelection)
     {
     std::ostringstream stream;
     stream << this->Annotation->GetText();
@@ -2410,6 +2418,7 @@ void vtkPVRenderView::UpdateAnnotationText()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::BuildAnnotationText(ostream& str)
 {
-  double time = this->RenderView->GetRenderer()->GetLastRenderTimeInSeconds();
-  str << "Frame rate: " << (time > 0.0? 1.0/time : 100000.0) << " fps\n";
+  this->Timer->StopTimer();
+  double time = this->Timer->GetElapsedTime();
+  str << "Frame rate (approx): " << (time > 0.0? 1.0/time : 100000.0) << " fps\n";
 }
