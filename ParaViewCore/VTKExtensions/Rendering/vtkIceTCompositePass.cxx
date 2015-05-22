@@ -20,26 +20,26 @@
 #include "vtkFrameBufferObject.h"
 #include "vtkIceTContext.h"
 #include "vtkIntArray.h"
+#include "vtkMatrix3x3.h"
+#include "vtkMatrix4x4.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkOpenGLCamera.h"
+#include "vtkOpenGLError.h"
+#include "vtkOpenGLRenderWindow.h"
 #include "vtkPKdTree.h"
 #include "vtkPixelBufferObject.h"
 #include "vtkRenderState.h"
 #include "vtkRenderWindow.h"
-#include "vtkOpenGLRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
 #include "vtkTextureObject.h"
 #include "vtkTilesHelper.h"
-#include "vtkOpenGLError.h"
 
 #include <assert.h>
 #include "vtk_icet.h"
 
 #ifdef VTKGL2
-# include "vtkMatrix3x3.h"
-# include "vtkMatrix4x4.h"
-# include "vtkOpenGLCamera.h"
 # include "vtkOpenGLShaderCache.h"
 # include "vtkShaderProgram.h"
 # include "vtkglVBOHelper.h"
@@ -61,11 +61,26 @@ namespace
 {
   static vtkIceTCompositePass* IceTDrawCallbackHandle = NULL;
   static const vtkRenderState* IceTDrawCallbackState = NULL;
-  void IceTDrawCallback()
+  void IceTGLDrawCallback()
     {
     if (IceTDrawCallbackState && IceTDrawCallbackHandle)
       {
-      IceTDrawCallbackHandle->Draw(IceTDrawCallbackState);
+      IceTDrawCallbackHandle->GLDraw(IceTDrawCallbackState);
+      }
+    }
+
+  void IceTDrawCallback(
+    const IceTDouble * projection_matrix,
+    const IceTDouble * modelview_matrix,
+    const IceTFloat * background_color,
+    const IceTInt * readback_viewport,
+    IceTImage result )
+    {
+    if (IceTDrawCallbackState && IceTDrawCallbackHandle)
+      {
+      IceTDrawCallbackHandle->Draw(IceTDrawCallbackState,
+        projection_matrix, modelview_matrix,
+        background_color, readback_viewport, result);
       }
     }
 
@@ -219,19 +234,6 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
   vtkOpenGLClearErrorMacro();
 
   //icetDiagnostics(ICET_DIAG_DEBUG | ICET_DIAG_ALL_NODES);
-
-#ifdef VTKGL2
-  vtkOpenGLCamera *cam = vtkOpenGLCamera::SafeDownCast(render_state->GetRenderer()->GetActiveCamera());
-  vtkMatrix4x4 *wcvc;
-  vtkMatrix3x3 *norms;
-  vtkMatrix4x4 *vcdc;
-  vtkMatrix4x4 *unused;
-  cam->GetKeyMatrices(render_state->GetRenderer(), wcvc, norms, vcdc, unused);
-  glMatrixMode(GL_PROJECTION);
-  glLoadMatrixd(vcdc->Element[0]);
-  glMatrixMode(GL_MODELVIEW);
-  glLoadMatrixd(wcvc->Element[0]);
-#endif
 
   // Irrespective of whether we are rendering in tile/display mode or not, we
   // need to pass appropriate tile parameters to IceT.
@@ -460,12 +462,32 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
   this->IceTContext->MakeCurrent();
   this->SetupContext(render_state);
 
-  icetGLDrawCallback(IceTDrawCallback);
+#ifdef VTKGL2
+  icetDrawCallback(IceTDrawCallback);
+  IceTDrawCallbackHandle = this;
+  IceTDrawCallbackState = render_state;
+  vtkOpenGLCamera *cam = vtkOpenGLCamera::SafeDownCast(
+    render_state->GetRenderer()->GetActiveCamera());
+  vtkMatrix4x4 *wcvc;
+  vtkMatrix3x3 *norms;
+  vtkMatrix4x4 *vcdc;
+  vtkMatrix4x4 *unused;
+  cam->GetKeyMatrices(render_state->GetRenderer(), wcvc, norms, vcdc, unused);
+  float background[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+  IceTImage renderedImage =
+    icetDrawFrame(vcdc->Element[0],
+                  wcvc->Element[0],
+                  background);
+  IceTDrawCallbackHandle = NULL;
+  IceTDrawCallbackState = NULL;
+#else
+  icetGLDrawCallback(IceTGLDrawCallback);
   IceTDrawCallbackHandle = this;
   IceTDrawCallbackState = render_state;
   IceTImage renderedImage = icetGLDrawFrame();
   IceTDrawCallbackHandle = NULL;
   IceTDrawCallbackState = NULL;
+#endif
 
   // isolate vtk from IceT OpenGL errors
   vtkOpenGLClearErrorMacro();
@@ -558,7 +580,8 @@ void vtkIceTCompositePass::CreateProgram(vtkOpenGLRenderWindow *context)
 }
 
 //----------------------------------------------------------------------------
-void vtkIceTCompositePass::Draw(const vtkRenderState* render_state)
+// for the old OpenGL
+void vtkIceTCompositePass::GLDraw(const vtkRenderState* render_state)
 {
   vtkOpenGLClearErrorMacro();
 
@@ -585,26 +608,7 @@ void vtkIceTCompositePass::Draw(const vtkRenderState* render_state)
   glClear(clear_mask);
   if (this->RenderPass)
     {
-#ifdef VTKGL2
-    // IceT messes with the old fixed pipeline matrices
-    // so we need to get the updated ones and pass them
-    // on to thecamera for use
-
-    vtkOpenGLCamera *cam = vtkOpenGLCamera::SafeDownCast(render_state->GetRenderer()->GetActiveCamera());
-    vtkMatrix4x4 *wcvc;
-    vtkMatrix3x3 *norms;
-    vtkMatrix4x4 *vcdc;
-    vtkMatrix4x4 *unused;
-    cam->GetKeyMatrices(render_state->GetRenderer(), wcvc, norms, vcdc, unused);
-    // double projection_matrix[16];
-    // double modelview_matrix[16];
-    glGetDoublev(GL_PROJECTION_MATRIX, vcdc->Element[0]);
-    glGetDoublev(GL_MODELVIEW_MATRIX, wcvc->Element[0]);
     this->RenderPass->Render(render_state);
-    cam->Modified();
-#else
-    this->RenderPass->Render(render_state);
-#endif
     }
   if(this->DepthOnly)
     {
@@ -613,6 +617,92 @@ void vtkIceTCompositePass::Draw(const vtkRenderState* render_state)
 
   vtkOpenGLCheckErrorMacro("failed after Draw");
 }
+
+//----------------------------------------------------------------------------
+// for OpenGL 2+
+#ifdef VTKGL2
+void vtkIceTCompositePass::Draw(const vtkRenderState* render_state,
+  const IceTDouble *proj_matrix,
+  const IceTDouble *mv_matrix,
+  const IceTFloat *vtkNotUsed(background_color),
+  const IceTInt *vtkNotUsed(readback_viewport),
+  IceTImage result)
+{
+  vtkOpenGLClearErrorMacro();
+
+  GLbitfield clear_mask = 0;
+  if (!this->DepthOnly)
+    {
+    if (!render_state->GetRenderer()->Transparent())
+      {
+      clear_mask |= GL_COLOR_BUFFER_BIT;
+      }
+    if (!render_state->GetRenderer()->GetPreserveDepthBuffer())
+      {
+      clear_mask |= GL_DEPTH_BUFFER_BIT;
+      }
+    }
+  else
+    {
+    if (!render_state->GetRenderer()->GetPreserveDepthBuffer())
+      {
+      clear_mask |= GL_DEPTH_BUFFER_BIT;
+      }
+    glColorMask(GL_FALSE,GL_FALSE,GL_FALSE,GL_FALSE);
+    }
+  glClear(clear_mask);
+  if (this->RenderPass)
+    {
+    vtkOpenGLCamera *cam = vtkOpenGLCamera::SafeDownCast(render_state->GetRenderer()->GetActiveCamera());
+    vtkMatrix4x4 *wcvc;
+    vtkMatrix3x3 *norms;
+    vtkMatrix4x4 *vcdc;
+    vtkMatrix4x4 *unused;
+    cam->GetKeyMatrices(render_state->GetRenderer(), wcvc, norms, vcdc, unused);
+    for (int i = 0; i < 16; i++)
+      {
+      *(vcdc->Element[0] + i) = proj_matrix[i];
+      *(wcvc->Element[0] + i) = mv_matrix[i];
+      }
+    this->RenderPass->Render(render_state);
+    cam->Modified();
+
+    // copy the results
+    if (icetImageGetColorFormat(result) != ICET_IMAGE_COLOR_NONE)
+      {
+      glReadPixels(0,0,
+        icetImageGetWidth(result),
+        icetImageGetHeight(result),
+        GL_RGBA, GL_UNSIGNED_BYTE,
+        icetImageGetColorub(result));
+      }
+    if (icetImageGetDepthFormat(result) != ICET_IMAGE_DEPTH_NONE)
+      {
+      glReadPixels(0,0,
+        icetImageGetWidth(result),
+        icetImageGetHeight(result),
+        GL_DEPTH_COMPONENT, GL_FLOAT,
+        icetImageGetDepthf(result));
+      }
+    }
+  if(this->DepthOnly)
+    {
+    glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
+    }
+
+  vtkOpenGLCheckErrorMacro("failed after Draw");
+}
+#else
+void vtkIceTCompositePass::Draw(
+  const vtkRenderState* vtkNotUsed(render_state),
+  const IceTDouble *vtkNotUsed(proj_matrix),
+  const IceTDouble *vtkNotUsed(mv_matrix),
+  const IceTFloat *vtkNotUsed(background_color),
+  const IceTInt *vtkNotUsed(readback_viewport),
+  IceTImage vtkNotUsed(result))
+{
+}
+#endif
 
 //----------------------------------------------------------------------------
 void vtkIceTCompositePass::UpdateTileInformation(

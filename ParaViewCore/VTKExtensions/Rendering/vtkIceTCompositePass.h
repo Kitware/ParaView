@@ -35,6 +35,7 @@
 #include "vtkSynchronizedRenderers.h" //  needed for vtkRawImage.
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 #include "vtkNew.h" // needed for vtkWeakPointer.
+#include <IceT.h> // for icet types
 
 class vtkMultiProcessController;
 class vtkPKdTree;
@@ -185,7 +186,12 @@ public:
 
   // Description:
   // Internal callback. Don't use.
-  virtual void Draw(const vtkRenderState*);
+  virtual void GLDraw(const vtkRenderState*);
+  virtual void Draw(const vtkRenderState*,
+    const IceTDouble *proj_matrix, const IceTDouble *mv_matrix,
+    const IceTFloat *background_color, const IceTInt *viewport,
+    IceTImage result);
+
 protected:
   vtkIceTCompositePass();
   ~vtkIceTCompositePass();
