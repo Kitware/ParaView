@@ -90,6 +90,12 @@ else()
   endif()
 endif()
 
+
+paraview_add_test_driven(
+  JUST_VALID
+  TestCompositedGeometryCulling.py
+)
+
 # Python Multi-servers test
 # => Only for shared build as we dynamically load plugins
 if(BUILD_SHARED_LIBS)
