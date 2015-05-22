@@ -18,8 +18,8 @@
 // include vtkSMMessage.h to see the full definition of the protobuf message
 // classes as well as other operators.
 
-#ifndef __vtkSMMessageMinimal_h
-#define __vtkSMMessageMinimal_h
+#ifndef vtkSMMessageMinimal_h
+#define vtkSMMessageMinimal_h
 
 #include "vtkSystemIncludes.h"
 #include "vtkPVServerImplementationCoreModule.h"

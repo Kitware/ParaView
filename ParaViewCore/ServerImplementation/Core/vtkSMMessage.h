@@ -17,8 +17,8 @@
 // Header class that setup every thing in order to use Protobuf messages in
 // a transparent manner
 
-#ifndef __vtkSMMessage_h
-#define __vtkSMMessage_h
+#ifndef vtkSMMessage_h
+#define vtkSMMessage_h
 
 #include "vtkSMMessageMinimal.h"
 
@@ -27,6 +27,7 @@
 # pragma GCC diagnostic ignored "-Wsign-compare"
 #endif
 #include "vtkSystemIncludes.h"
+#include "vtk_protobuf.h"
 #include "vtkPVMessage.pb.h"
 #if __GNUC__
 # pragma GCC diagnostic warning "-Wsign-compare"
