@@ -194,6 +194,12 @@ bool vtkPVView::InTileDisplayMode()
 }
 
 //----------------------------------------------------------------------------
+bool vtkPVView::InCaveDisplayMode()
+{
+  return this->SynchronizedWindows->GetIsInCave();
+}
+
+//----------------------------------------------------------------------------
 bool vtkPVView::GetLocalProcessSupportsInteraction()
 {
   return this->SynchronizedWindows->GetLocalProcessIsDriver();

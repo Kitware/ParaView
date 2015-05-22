@@ -79,6 +79,7 @@ public:
   // to minimize communications since data is available on all process. Off by
   // default.
   void SetDataReplicatedOnAllProcesses(bool);
+  vtkGetMacro(DataReplicatedOnAllProcesses, bool);
   vtkBooleanMacro(DataReplicatedOnAllProcesses, bool);
 
   // Description:
@@ -158,6 +159,7 @@ protected:
 
   bool UseDepthBuffer;
   bool RenderEmptyImages;
+  bool DataReplicatedOnAllProcesses;
 private:
   vtkPVSynchronizedRenderer(const vtkPVSynchronizedRenderer&); // Not implemented
   void operator=(const vtkPVSynchronizedRenderer&); // Not implemented

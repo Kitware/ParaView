@@ -152,6 +152,11 @@ public:
   bool InTileDisplayMode();
 
   // Description:
+  // Returns true if the application is currently in cave/immersive display
+  // mode.
+  bool InCaveDisplayMode();
+
+  // Description:
   // Returns true if the local process can support interaction. This will return
   // true only on the client node e.g. Qt client (or pvpython)
   // when connected to builtin or remote server. On server nodes this will return false.

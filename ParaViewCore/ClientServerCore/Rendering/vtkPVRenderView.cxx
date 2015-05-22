@@ -19,6 +19,7 @@
 #include "vtkBoundingBox.h"
 #include "vtkCamera.h"
 #include "vtkCommand.h"
+#include "vtkCuller.h"
 #include "vtkDataRepresentation.h"
 #include "vtkPVGridAxes3DActor.h"
 #include "vtkInformationDoubleKey.h"
@@ -132,9 +133,103 @@ public:
     {
     }
 #endif // PARAVIEW_USE_PISTON
-
 };
 
+namespace
+{
+  // In multi-process rendering modes, data delivered to a set of ranks is not
+  // not cleared until the data pipeline updates. This avoids having to
+  // redeliver data when simply switching between remote and local rendering
+  // modes. Now consider this case. You're rendering a Sphere in client-server
+  // mode with remote rendering disabled; the geometry is delivered to the
+  // client. Next, you switch to force remote-rendering; the geometry delivered
+  // to the client is still there and hence will get rendered, even through
+  // we'll replace the pixels with those obtained from the server. Hence, we
+  // need to cull the props in the composited renderer on the local process when
+  // it's not participating in the compositing. This culler enables us to do
+  // that. We also add support to add props to the DoNotCullList since the
+  // vtkPVGridAxes3DActor is an exception to this rule.
+  class vtkPVRendererCuller : public vtkCuller
+  {
+public:
+  static vtkPVRendererCuller* New();
+  vtkTypeMacro(vtkPVRendererCuller, vtkCuller);
+
+  virtual double Cull(vtkRenderer *vtkNotUsed(ren), vtkProp **propList,
+                      int& listLength, int& initialized)
+    {
+    double total_time = 0;
+    double *allocatedTimeList = new double[listLength];
+    for (int propLoop = 0; propLoop < listLength; ++propLoop)
+      {
+      // Get the prop out of the list
+      vtkProp* prop = propList[propLoop];
+      double prop_time = initialized? prop->GetRenderTimeMultiplier() : 1.0;
+      if (this->RenderOnLocalProcess == false &&
+          this->DoNotCullList.find(prop) == this->DoNotCullList.end())
+        {
+        prop_time = 0;
+        }
+      prop->SetRenderTimeMultiplier(prop_time);
+      allocatedTimeList[propLoop] = prop_time;
+      total_time += prop_time;
+      }
+
+    // ========================================================================
+    // The following code is borrowed from vtkFrustumCoverageCuller.
+    // ========================================================================
+    // Now traverse the list from the beginning, swapping any zero entries back
+    // in the list, while preserving the order of the non-zero entries. This
+    // requires two indices for the two items we are comparing at any step.
+    // The second index always moves back by one, but the first index moves back
+    // by one only when it is pointing to something that has a non-zero value.
+    int index1 = 0, index2 = 0;
+    for ( index2 = 1; index2 < listLength; index2++ )
+      {
+      if ( allocatedTimeList[index1] == 0.0 )
+        {
+        if ( allocatedTimeList[index2] != 0.0 )
+          {
+          allocatedTimeList[index1] = allocatedTimeList[index2];
+          propList[index1]          = propList[index2];
+          propList[index2]          = NULL;
+          allocatedTimeList[index2] = 0.0;
+          }
+        else
+          {
+          propList[index1]          = propList[index2]           = NULL;
+          allocatedTimeList[index1] = allocatedTimeList[index2]  = 0.0;
+          }
+        }
+      if (allocatedTimeList[index1] != 0.0)
+        {
+        index1++;
+        }
+      }
+    // Compute the new list length - index1 is always pointing to the
+    // first 0.0 entry or the last entry if none were zero (in which case
+    // we won't change the list length)
+    listLength = (allocatedTimeList[index1] == 0.0)?(index1):listLength;
+    delete[] allocatedTimeList;
+    return total_time;
+    }
+
+  vtkSetMacro(RenderOnLocalProcess, bool);
+  vtkGetMacro(RenderOnLocalProcess, bool);
+
+  // List of props to never cull.
+  std::set<void*> DoNotCullList;
+private:
+  vtkPVRendererCuller() : RenderOnLocalProcess(false)
+    {
+    }
+  ~vtkPVRendererCuller()
+    {
+    }
+  bool RenderOnLocalProcess;
+  };
+  vtkStandardNewMacro(vtkPVRendererCuller);
+}
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
@@ -206,6 +301,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->NonDistributedRenderingRequired = false;
   this->DistributedRenderingRequiredLOD = false;
   this->NonDistributedRenderingRequiredLOD = false;
+  this->Culler = vtkSmartPointer<vtkPVRendererCuller>::New();
 
   this->SynchronizedRenderers = vtkPVSynchronizedRenderer::New();
 
@@ -235,6 +331,7 @@ vtkPVRenderView::vtkPVRenderView()
   observer->FastDelete();
 
   this->GetRenderer()->SetUseDepthPeeling(1);
+  this->GetRenderer()->AddCuller(this->Culler);
 
   this->Light = vtkLight::New();
   this->Light->SetAmbientColor(1, 1, 1);
@@ -595,11 +692,13 @@ void vtkPVRenderView::SetGridAxes3DActor(vtkPVGridAxes3DActor* gridActor)
 {
   if (this->GridAxes3DActor != gridActor)
     {
+    vtkPVRendererCuller* culler = vtkPVRendererCuller::SafeDownCast(this->Culler.GetPointer());
     const bool in_tile_display_mode = this->InTileDisplayMode();
     if (this->GridAxes3DActor)
       {
       this->GetNonCompositedRenderer()->RemoveViewProp(this->GridAxes3DActor);
       this->GetRenderer()->RemoveViewProp(this->GridAxes3DActor);
+      culler->DoNotCullList.erase(this->GridAxes3DActor);
       }
     this->GridAxes3DActor = gridActor;
     if (this->GridAxes3DActor && !in_tile_display_mode)
@@ -611,6 +710,7 @@ void vtkPVRenderView::SetGridAxes3DActor(vtkPVGridAxes3DActor* gridActor)
       this->GridAxes3DActor->SetBackgroundLayer(this->GetRenderer()->GetLayer());
       this->GridAxes3DActor->SetGeometryLayer(this->GetRenderer()->GetLayer());
       this->GridAxes3DActor->SetForegroundLayer(this->GetNonCompositedRenderer()->GetLayer());
+      culler->DoNotCullList.insert(this->GridAxes3DActor);
       }
     }
 }
@@ -874,7 +974,7 @@ bool vtkPVRenderView::GetLocalProcessDoesRendering(bool using_distributed_render
   default:
     return using_distributed_rendering ||
       this->InTileDisplayMode() ||
-      this->SynchronizedWindows->GetIsInCave();
+      this->InCaveDisplayMode();
     }
 }
 
@@ -1074,7 +1174,7 @@ void vtkPVRenderView::Update()
   this->StillRenderProcesses = this->InteractiveRenderProcesses =
     vtkPVSession::CLIENT;
   bool in_tile_display_mode = this->InTileDisplayMode();
-  bool in_cave_mode = this->SynchronizedWindows->GetIsInCave();
+  bool in_cave_mode = this->InCaveDisplayMode();
   if (in_tile_display_mode || in_cave_mode ||
     this->UseDistributedRenderingForStillRender)
     {
@@ -1136,7 +1236,7 @@ void vtkPVRenderView::UpdateLOD()
 
   this->InteractiveRenderProcesses = vtkPVSession::CLIENT;
   bool in_tile_display_mode = this->InTileDisplayMode();
-  bool in_cave_mode = this->SynchronizedWindows->GetIsInCave();
+  bool in_cave_mode = this->InCaveDisplayMode();
   if (in_tile_display_mode || in_cave_mode ||
     this->UseDistributedRenderingForInteractiveRender)
     {
@@ -1201,7 +1301,7 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
   this->ResetCameraClippingRange();
 
   bool in_tile_display_mode = this->InTileDisplayMode();
-  bool in_cave_mode = this->SynchronizedWindows->GetIsInCave();
+  bool in_cave_mode = this->InCaveDisplayMode();
   if (in_cave_mode && !this->RemoteRenderingAvailable)
     {
     static bool warned_once = false;
@@ -1283,9 +1383,14 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     stream
       << "Mode: " << (interactive? "interactive" : "still") << "\n"
       << "Level-of-detail: " << (use_lod_rendering? "yes" : "no") << "\n"
-      << "Remote/parallel rendering (if applicable): " << (use_distributed_rendering? "yes" : "no") << "\n";
+      << "Remote/parallel rendering: " << (use_distributed_rendering? "yes" : "no") << "\n";
     this->Annotation->SetText(stream.str().c_str());
     }
+
+  // Determine if local process is rendering data for the composited renderer.
+  vtkPVRendererCuller* culler = vtkPVRendererCuller::SafeDownCast(this->Culler.GetPointer());
+  culler->SetRenderOnLocalProcess(
+    this->IsProcessRenderingGeometriesForCompositing(use_distributed_rendering));
 
   // When in batch mode, we are using the same render window for all views. That
   // makes it impossible for vtkPVSynchronizedRenderWindows to identify which
@@ -1342,7 +1447,7 @@ void vtkPVRenderView::Deliver(int use_lod,
 int vtkPVRenderView::GetDataDistributionMode(bool use_remote_rendering)
 {
   bool in_tile_display_mode = this->InTileDisplayMode();
-  bool in_cave_mode = this->SynchronizedWindows->GetIsInCave();
+  bool in_cave_mode = this->InCaveDisplayMode();
   if (in_cave_mode)
     {
     return vtkMPIMoveData::CLONE;
@@ -1610,29 +1715,58 @@ bool vtkPVRenderView::ShouldUseDistributedRendering(
   const bool &nonDistributedRenderingRequired = using_lod?
     this->NonDistributedRenderingRequiredLOD :
     this->NonDistributedRenderingRequired;
-  if (distributedRenderingRequired == true && remote_rendering_available == false)
-    {
-    vtkErrorMacro("Some of the representations in this view require remote rendering "
-      "which, however, is not available. Rendering may not work as expected.");
-    }
-  else if (distributedRenderingRequired || nonDistributedRenderingRequired)
-    {
-    // implies that at least a representation requested a specific mode.
-    return distributedRenderingRequired? true : false;
-    }
 
-  if (remote_rendering_available == false)
+  try
     {
-    return false;
-    }
+    if (distributedRenderingRequired == true && remote_rendering_available == false)
+      {
+      vtkErrorMacro("Some of the representations in this view require remote rendering "
+        "which, however, is not available. Rendering may not work as expected.");
+      }
+    else if (distributedRenderingRequired || nonDistributedRenderingRequired)
+      {
+      // implies that at least a representation requested a specific mode.
+      throw (distributedRenderingRequired? true : false);
+      }
 
-  if (vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_BATCH)
+    if (remote_rendering_available == false)
+      {
+      throw false;
+      }
+
+    if (vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_BATCH)
+      {
+      // currently, we only support parallel rendering in batch mode.
+      throw true;
+      }
+
+    throw (this->RemoteRenderingThreshold <= geometry_size);
+    }
+  catch (bool val)
     {
-    // currently, we only support parallel rendering in batch mode.
-    return true;
+    //----------------------------------------------------------------------------
+    // This helps us further condition the "ShouldUseDistributedRendering"
+    // response based on whether distributed rendering makes sense in the current
+    // configuration e.g. it doesn't make sense in builtin mode, or in batch mode
+    // with 1 process.
+    //----------------------------------------------------------------------------
+    if (val)
+      {
+      // distributed rendering is requested. ensure that we're running in a mode
+      // where distributed rendering has any effect i.e client-server or parallel
+      // batch.
+      switch (this->SynchronizedWindows->GetMode())
+        {
+      case vtkPVSynchronizedRenderWindows::BUILTIN:
+        return false;
+      case vtkPVSynchronizedRenderWindows::BATCH:
+        return (this->SynchronizedWindows->GetParallelController()->GetNumberOfProcesses() > 1);
+      default:
+        break;
+        }
+      }
+    return val;
     }
-
-  return this->RemoteRenderingThreshold <= geometry_size;
 }
 
 //----------------------------------------------------------------------------
@@ -1643,9 +1777,38 @@ bool vtkPVRenderView::ShouldUseLODRendering(double geometry_size)
 }
 
 //----------------------------------------------------------------------------
+bool vtkPVRenderView::IsProcessRenderingGeometriesForCompositing(
+  bool using_distributed_rendering)
+{
+  if (this->InTileDisplayMode() || this->InCaveDisplayMode())
+    {
+    return true;
+    }
+
+  vtkProcessModule::ProcessTypes processType = vtkProcessModule::GetProcessType();
+
+  if (using_distributed_rendering)
+    {
+    // using distributed rendering.
+    return (processType != vtkProcessModule::PROCESS_CLIENT);
+    }
+  else
+    {
+    // **not** using distributed rendering.
+    if ( (processType == vtkProcessModule::PROCESS_CLIENT) ||
+      (processType == vtkProcessModule::PROCESS_BATCH &&
+       this->SynchronizedWindows->GetParallelController()->GetLocalProcessId() == 0))
+      {
+      return true;
+      }
+    }
+  return false;
+}
+
+//----------------------------------------------------------------------------
 bool vtkPVRenderView::GetUseOrderedCompositing()
 {
-  if (this->SynchronizedWindows->GetIsInCave())
+  if (this->InCaveDisplayMode())
     {
     return false;
     }
@@ -1749,7 +1912,7 @@ void vtkPVRenderView::UpdateCenterAxes()
 double vtkPVRenderView::GetZbufferDataAtPoint(int x, int y)
 {
   bool in_tile_display_mode = this->InTileDisplayMode();
-  bool in_cave_mode = this->SynchronizedWindows->GetIsInCave();
+  bool in_cave_mode = this->InCaveDisplayMode();
   if (in_tile_display_mode || in_cave_mode)
     {
     return this->GetRenderWindow()->GetZbufferDataAtPoint(x, y);

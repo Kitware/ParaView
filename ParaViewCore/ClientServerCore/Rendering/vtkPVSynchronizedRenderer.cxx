@@ -52,6 +52,7 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
   this->CSSynchronizer = 0;
   this->ParallelSynchronizer = 0;
   this->DisableIceT = false;
+  this->DataReplicatedOnAllProcesses = false;
 }
 
 //----------------------------------------------------------------------------
@@ -466,7 +467,7 @@ void vtkPVSynchronizedRenderer::SetDataReplicatedOnAllProcesses(bool replicated)
     sync->SetDataReplicatedOnAllProcesses(replicated);
     }
 #endif
-  (void)replicated;
+  this->DataReplicatedOnAllProcesses = replicated;
 }
 
 //----------------------------------------------------------------------------
