@@ -83,6 +83,9 @@ set(TESTAPP_WEB_TESTS_WITH_CHROME
   ${pv_pymodule_build_dir}/paraview/web/test/test_pv_web_testapp_all.py
   )
 
+# Make sure any tests that pop up a browser are run in serial
+set (TestApp-all_FORCE_SERIAL TRUE)
+
 add_pvweb_tests("pvweb"
   APP          TestApp
   COMMAND      $<TARGET_FILE:pvpython>

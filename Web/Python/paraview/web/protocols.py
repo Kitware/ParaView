@@ -20,6 +20,10 @@ from decorators import *
 
 from vtkWebCorePython import vtkWebInteractionEvent
 
+from vtk import vtkImageData
+from vtk import vtkUnsignedCharArray
+from vtk import vtkDataEncoder
+
 # Needed for:
 #    vtkSMPVRepresentationProxy
 #    vtkSMTransferFunctionProxy
@@ -793,6 +797,41 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
             lutProxy.InterpretValuesAsCategories = 1
 
         simple.Render();
+
+    # RpcName: getLutImage => pv.color.manager.lut.image.get
+    @exportRpc("pv.color.manager.lut.image.get")
+    def getLutImage(self, representation, numSamples, customRange=None):
+        repProxy = self.mapIdToProxy(representation)
+        lut = repProxy.LookupTable.GetClientSideObject()
+
+        dataRange = customRange
+        if not dataRange:
+            dataRange = lut.GetRange()
+
+        delta = (dataRange[1] - dataRange[0]) / float(numSamples)
+
+        colorArray = vtkUnsignedCharArray()
+        colorArray.SetNumberOfComponents(3)
+        colorArray.SetNumberOfTuples(numSamples)
+
+        rgb = [ 0, 0, 0 ]
+        for i in range(numSamples):
+            lut.GetColor(dataRange[0] + float(i) * delta, rgb)
+            r = int(round(rgb[0] * 255))
+            g = int(round(rgb[1] * 255))
+            b = int(round(rgb[2] * 255))
+            colorArray.SetTuple3(i, r, g, b)
+
+        # Add the color array to an image data
+        imgData = vtkImageData()
+        imgData.SetDimensions(numSamples, 1, 1)
+        aIdx = imgData.GetPointData().SetScalars(colorArray)
+
+        # Use the vtk data encoder to base-64 encode the image as png, using no compression
+        encoder = vtkDataEncoder()
+        b64Str = encoder.EncodeAsBase64Png(imgData, 0)
+
+        return { 'range': dataRange, 'image': b64Str }
 
     # RpcName: setSurfaceOpacity => pv.color.manager.surface.opacity.set
     @exportRpc("pv.color.manager.surface.opacity.set")
