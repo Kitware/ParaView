@@ -180,6 +180,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/CTHDerivedDensity2DClyinder.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/AddActiveValuesFromVisibleObjects.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/AnimatePipelineTime.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/AngularPeriodicFilter.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/3DWidgetInCustomFilter.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CalcParens.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Calculator.xml
