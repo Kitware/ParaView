@@ -675,7 +675,7 @@ protected:
   bool NeedsUpdate;
   
   // Description:
-  // Creates a new proxy and initializes it by calling ReadXMLAttributes()
+  // Creates a new property and initializes it by calling ReadXMLAttributes()
   // with the right XML element.
   vtkSMProperty* NewProperty(const char* name);
   vtkSMProperty* NewProperty(const char* name, vtkPVXMLElement* propElement);

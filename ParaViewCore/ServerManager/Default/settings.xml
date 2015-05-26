@@ -654,5 +654,28 @@
         <UseDocumentationForLabels />
       </Hints>
     </SettingsProxy>
+
+    <!-- ================================================================== -->
+    <SettingsProxy name="RepresentedArrayListSettings"
+                   label="Color Arrays"
+                   processes="client"
+                   class="vtkPVRepresentedArrayListSettings">
+      <StringVectorProperty command="SetFilterExpression"
+                            name="FilterExpressions"
+                            label="Filter Expressions"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfFilterExpressions"
+                            use_index="1">
+        <Documentation>
+          List of expressions used to filter out arrays you do not want to display in the color array list.
+        </Documentation>
+        <!--<StringListDomain name="blah">
+        </StringListDomain>-->
+      </StringVectorProperty>
+      <Hints>
+        <UseDocumentationForLabels />
+      </Hints>
+    </SettingsProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

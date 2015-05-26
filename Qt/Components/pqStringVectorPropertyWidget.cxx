@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileChooserWidget.h"
 #include "pqPopOutWidget.h"
 #include "pqProxySILModel.h"
+#include "pqScalarValueListPropertyWidget.h"
 #include "pqServerManagerModel.h"
 #include "pqSILModel.h"
 #include "pqSILWidget.h"
@@ -360,7 +361,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
     vbox->addWidget(comboBox);
 
     PV_DEBUG_PANELS() << "QComboBox for a StringVectorProperty with a "
-                  << "StringListDomain (" << stringListDomain->GetXMLName() << ")";
+                      << "StringListDomain (" << stringListDomain->GetXMLName() << ")";
     }
   else if (multiline_text)
     {
@@ -441,23 +442,36 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
     }
   else
     {
-    // add a single line edit.
-    QLineEdit* lineEdit = new pqLineEdit(this);
-    lineEdit->setObjectName(smProxy->GetPropertyName(smProperty));
-    this->addPropertyLink(lineEdit, "text",
-      SIGNAL(textChanged(const QString&)), smProperty);
-    this->connect(lineEdit, SIGNAL(textChangedAndEditingFinished()),
-                  this, SIGNAL(changeFinished()));
-    this->setChangeAvailableAsChangeFinished(false);
-
-    if (!placeholderText.isEmpty())
+    if(smProperty->GetRepeatable())
       {
-      lineEdit->setPlaceholderText(placeholderText);
+      pqScalarValueListPropertyWidget* widget =
+        new pqScalarValueListPropertyWidget(smProperty, smProxy, this);
+      widget->setObjectName("ScalarValueList");
+      this->addPropertyLink(widget, "scalars", SIGNAL(scalarsChanged()), smProperty);
+      this->setChangeAvailableAsChangeFinished(true);
+      vbox->addWidget(widget);
+      this->setShowLabel(true);
       }
+    else
+      {
+      // add a single line edit.
+      QLineEdit* lineEdit = new pqLineEdit(this);
+      lineEdit->setObjectName(smProxy->GetPropertyName(smProperty));
+      this->addPropertyLink(lineEdit, "text",
+                            SIGNAL(textChanged(const QString&)), smProperty);
+      this->connect(lineEdit, SIGNAL(textChangedAndEditingFinished()),
+                    this, SIGNAL(changeFinished()));
+      this->setChangeAvailableAsChangeFinished(false);
 
-    vbox->addWidget(lineEdit);
+      if (!placeholderText.isEmpty())
+        {
+        lineEdit->setPlaceholderText(placeholderText);
+        }
 
-    PV_DEBUG_PANELS() << "QLineEdit for a StringVectorProperty with no domain";
+      vbox->addWidget(lineEdit);
+
+      PV_DEBUG_PANELS() << "QLineEdit for a StringVectorProperty with no domain";
+      }
     }
   this->setLayout(vbox);
 }

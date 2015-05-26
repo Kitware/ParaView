@@ -31,6 +31,7 @@
 set (Module_SRCS
   vtkPVComparativeAnimationCue.cxx
   vtkPVComparativeView.cxx
+  vtkPVRepresentedArrayListSettings.cxx
   vtkSMBagChartSeriesListDomain.cxx
   vtkSMBoxRepresentationProxy.cxx
   vtkSMCameraLink.cxx

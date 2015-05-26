@@ -99,7 +99,7 @@ public:
 
   virtual QVariant data(const QModelIndex& idx, int role=Qt::DisplayRole) const
     {
-    if (role == Qt::DisplayRole || role == Qt::ToolTipRole)
+    if (role == Qt::DisplayRole || role == Qt::ToolTipRole || role == Qt::EditRole)
       {
       if (idx.isValid() &&
         idx.row() < this->rowCount() &&
@@ -107,7 +107,7 @@ public:
         {
         int offset = this->computeOffset(idx);
         return (offset < this->Values.size()?
-          this->Values[offset] : QVariant());
+          this->Values[offset].toString() : QVariant());
         }
       }
     return QVariant();
@@ -384,6 +384,11 @@ pqScalarValueListPropertyWidget::pqScalarValueListPropertyWidget(
     this, SIGNAL(scalarsChanged()));
 
   Ui::ScalarValueListPropertyWidget &ui = this->Internals->Ui;
+
+  // Hide the AddRange button initially. If there is a range domain,
+  // this will be added back.
+  ui.AddRange->hide();
+
   QObject::connect(ui.Add, SIGNAL(clicked()), this, SLOT(add()));
   QObject::connect(ui.AddRange, SIGNAL(clicked()), this, SLOT(addRange()));
   QObject::connect(ui.Remove, SIGNAL(clicked()), this, SLOT(remove()));
@@ -492,11 +497,13 @@ void pqScalarValueListPropertyWidget::setRangeDomain(
       smRangeDomain, vtkCommand::DomainModifiedEvent,
       this, SLOT(smRangeModified()));
     this->Internals->Ui.ScalarRangeLabel->show();
+    this->Internals->Ui.AddRange->show();
     this->smRangeModified();
     }
   else
     {
     this->Internals->Ui.ScalarRangeLabel->hide();
+    this->Internals->Ui.AddRange->hide();
     }
 }
 //-----------------------------------------------------------------------------
@@ -515,11 +522,13 @@ void pqScalarValueListPropertyWidget::setRangeDomain(
       smRangeDomain, vtkCommand::DomainModifiedEvent,
       this, SLOT(smRangeModified()));
     this->Internals->Ui.ScalarRangeLabel->show();
+    this->Internals->Ui.AddRange->show();
     this->smRangeModified();
     }
   else
     {
     this->Internals->Ui.ScalarRangeLabel->hide();
+    this->Internals->Ui.AddRange->hide();
     }
 }
 

@@ -818,6 +818,7 @@ void vtkPVArrayInformation::DetermineDefaultComponentName(
   this->DefaultComponentName->assign(vtkPVPostFilter::DefaultComponentName(component_no, num_components));
 }
 
+//----------------------------------------------------------------------------
 void vtkPVArrayInformation::AddInformationKeys(vtkPVArrayInformation *info)
 {
   for (int k = 0; k < info->GetNumberOfInformationKeys(); k++)
@@ -827,6 +828,7 @@ void vtkPVArrayInformation::AddInformationKeys(vtkPVArrayInformation *info)
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVArrayInformation::AddInformationKey(const char* location,
     const char* name)
 {
@@ -840,6 +842,7 @@ void vtkPVArrayInformation::AddInformationKey(const char* location,
   this->InformationKeys->push_back(info);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVArrayInformation::AddUniqueInformationKey(const char* location,
     const char* name)
 {
@@ -849,11 +852,13 @@ void vtkPVArrayInformation::AddUniqueInformationKey(const char* location,
     }
 }
 
+//----------------------------------------------------------------------------
 int vtkPVArrayInformation::GetNumberOfInformationKeys()
 {
   return static_cast<int>(this->InformationKeys ? this->InformationKeys->size() : 0);
 }
 
+//----------------------------------------------------------------------------
 const char* vtkPVArrayInformation::GetInformationKeyLocation(int index)
 {
   if (index < 0 || index >= this->GetNumberOfInformationKeys())
@@ -862,6 +867,7 @@ const char* vtkPVArrayInformation::GetInformationKeyLocation(int index)
   return this->InformationKeys->at(index).Location;
 }
 
+//----------------------------------------------------------------------------
 const char* vtkPVArrayInformation::GetInformationKeyName(int index)
 {
   if (index < 0 || index >= this->GetNumberOfInformationKeys())
@@ -870,6 +876,7 @@ const char* vtkPVArrayInformation::GetInformationKeyName(int index)
   return this->InformationKeys->at(index).Name;
 }
 
+//----------------------------------------------------------------------------
 int vtkPVArrayInformation::HasInformationKey(const char* location,
     const char* name)
 {

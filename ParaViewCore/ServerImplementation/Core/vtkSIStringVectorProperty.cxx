@@ -196,11 +196,6 @@ bool vtkSIStringVectorProperty::Push(const vtkVectorOfStrings &values)
       << vtkClientServerStream::End;
     }
 
-  if (values.size() == 0)
-    {
-    return this->ProcessMessage(stream);
-    }
-
   if (!this->Repeatable)
     {
     stream << vtkClientServerStream::Invoke << object << this->Command;
