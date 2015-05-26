@@ -43,6 +43,7 @@ set(Module_SRCS
   vtkUndoElement.cxx
   vtkUndoSet.cxx
   vtkUndoStack.cxx
+  vtkMemberFunctionCommand.h
 )
 
 set_source_files_properties(
