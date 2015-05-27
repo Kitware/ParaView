@@ -32,6 +32,7 @@
 
 class vtkAlgorithmOutput;
 class vtkCamera;
+class vtkCuller;
 class vtkExtentTranslator;
 class vtkPVGridAxes3DActor;
 class vtkInformationDoubleKey;
@@ -57,6 +58,7 @@ class vtkRenderWindowInteractor;
 class vtkRenderer;
 class vtkTextRepresentation;
 class vtkTexture;
+class vtkTimerLog;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVRenderView : public vtkPVView
 {
@@ -625,6 +627,11 @@ protected:
   bool ShouldUseLODRendering(double geometry);
 
   // Description:
+  // Returns true if the local process is invovled in rendering composited
+  // geometry i.e. geometry rendered in view that is composited together.
+  bool IsProcessRenderingGeometriesForCompositing(bool using_distributed_rendering);
+
+  // Description:
   // Synchronizes bounds information on all nodes.
   // @CallOnAllProcessess
   void SynchronizeGeometryBounds();
@@ -770,7 +777,8 @@ private:
   int StereoType;
   int ServerStereoType;
   void UpdateStereoProperties();
-
+  vtkSmartPointer<vtkCuller> Culler;
+  vtkNew<vtkTimerLog> Timer;
 //ETX
 };
 
