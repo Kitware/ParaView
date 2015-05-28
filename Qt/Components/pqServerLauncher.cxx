@@ -96,14 +96,6 @@ pqServerLauncher* pqServerLauncher::newInstance(
 }
 
 //----------------------------------------------------------------------------
-class pqServerLauncher::pqInternals
-{
-public:
-  pqServerConfiguration Configuration;
-  QProcessEnvironment Options;
-  QPointer<pqServer> Server;
-};
-
 namespace
 {
   /// pqWidget is used to make it easier to get and set values from different
@@ -500,16 +492,25 @@ namespace
     }
 }
 
+class pqServerLauncher::pqInternals
+{
+public:
+  pqServerConfiguration Configuration;
+  QProcessEnvironment Options;
+  QPointer<pqServer> Server;
+  QMap<QString, pqWidget*> ActiveWidgets; // map to save the widgets in promptOptions().
+};
+
 //-----------------------------------------------------------------------------
 pqServerLauncher::pqServerLauncher(
-  const pqServerConfiguration& configuration,
+  const pqServerConfiguration& _configuration,
   QObject* parentObject)
   : Superclass(parentObject)
 {
   this->Internals = new pqInternals();
 
   // we create a clone so that we can change the values in place.
-  this->Internals->Configuration = configuration.clone();
+  this->Internals->Configuration = _configuration.clone();
 }
 
 //-----------------------------------------------------------------------------
@@ -517,6 +518,12 @@ pqServerLauncher::~pqServerLauncher()
 {
   delete this->Internals;
   this->Internals = NULL;
+}
+
+//-----------------------------------------------------------------------------
+pqServerConfiguration& pqServerLauncher::configuration() const
+{
+  return this->Internals->Configuration;
 }
 
 //-----------------------------------------------------------------------------
@@ -613,22 +620,19 @@ bool pqServerLauncher::promptOptions()
   QDialog dialog(pqCoreUtilities::mainWidget());
 
   // setup the dialog using the configuration's XML.
-  QMap<QString, pqWidget*> widgets; // map to save the widgets.
+  QMap<QString, pqWidget*> &widgets = this->Internals->ActiveWidgets;; // map to save the widgets.
   // note: all pqWidget instances created are set with parent as the dialog, so
   // we don't need to clean them up explicitly.
   createWidgets(widgets, dialog, this->Internals->Configuration, options);
+  // give subclasses an opportunity to fine-tune the dialog.
+  this->prepareDialogForPromptOptions(dialog);
   if (dialog.exec() != QDialog::Accepted)
     {
+    widgets.clear();
     return false;
     }
 
-  /// now based on user-chosen values, update the options.
-  updateEnvironment(widgets, this->Internals->Configuration, options);
-
-  // Now that user entered options have been processes, handle the <Switch />
-  // elements.  This has to happen after the Options have been updated with
-  // user-selected values so that we can pick the right case.
-  handleSwitchCases(this->Internals->Configuration, options);
+  this->updateOptionsUsingUserSelections();
 
   // if options contains PV_CONNECT_ID. We need to update the pqOptions to
   // give it the correct connection-id.
@@ -644,8 +648,26 @@ bool pqServerLauncher::promptOptions()
       }
     }
 
+  widgets.clear();
   // Now we have the environment filled up correctly.
   return true;
+}
+
+//-----------------------------------------------------------------------------
+void pqServerLauncher::updateOptionsUsingUserSelections()
+{
+  if (this->Internals->ActiveWidgets.size() > 0)
+    {
+    /// now based on user-chosen values, update the options.
+    updateEnvironment(this->Internals->ActiveWidgets,
+      this->Internals->Configuration,
+      this->Internals->Options);
+
+    // Now that user entered options have been processes, handle the <Switch />
+    // elements.  This has to happen after the Options have been updated with
+    // user-selected values so that we can pick the right case.
+    handleSwitchCases(this->Internals->Configuration, this->Internals->Options);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -788,7 +810,7 @@ void pqServerLauncher::readStandardOutput()
   QProcess* process = qobject_cast<QProcess*>(this->sender());
   if (process)
     {
-    qDebug() << process->readAllStandardOutput().data();
+    this->handleProcessStandardOutput(process->readAllStandardOutput());
     pqEventDispatcher::processEvents();
     }
 }
@@ -799,7 +821,25 @@ void pqServerLauncher::readStandardError()
   QProcess* process = qobject_cast<QProcess*>(this->sender());
   if (process)
     {
-    qCritical() << process->readAllStandardError().data();
+    this->handleProcessErrorOutput(process->readAllStandardError());
     pqEventDispatcher::processEvents();
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqServerLauncher::handleProcessStandardOutput(const QByteArray& data)
+{
+  qDebug() << data.data();
+}
+
+//-----------------------------------------------------------------------------
+void pqServerLauncher::handleProcessErrorOutput(const QByteArray& data)
+{
+  qCritical() << data.data();
+}
+
+//-----------------------------------------------------------------------------
+QProcessEnvironment& pqServerLauncher::options() const
+{
+  return this->Internals->Options;
 }

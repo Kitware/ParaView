@@ -36,8 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QProcess> // needed for QProcess::ProcessError.
 #include "pqComponentsModule.h"
 
-class pqServerConfiguration;
 class pqServer;
+class pqServerConfiguration;
+class QDialog;
+class QProcessEnvironment;
 
 /// pqServerLauncher manages launching of server process using the details
 /// specified in the server configuration.
@@ -93,11 +95,35 @@ protected:
   /// are not user-configurable options or the user has accepted the values.
   bool promptOptions();
 
-  bool launchServer(bool show_status_dialog);
+  /// Called when starting a server processes using a command-startup.
+  /// Returns true if launch was successful else returns false.
+  virtual bool launchServer(bool show_status_dialog);
 
   bool connectToPrelaunchedServer();
 
   bool isReverseConnection() const;
+
+  /// Subclasses can override this method to further customize the dialog being
+  /// shown to the user to prompt for options in
+  /// pqServerLauncher::promptOptions.
+  virtual void prepareDialogForPromptOptions(QDialog&) {}
+
+  /// Provides access to the pqServerConfiguration passed to the constructor.
+  /// Note this is clone of the pqServerConfiguration passed to the constuctor and
+  /// not the same instance.
+  pqServerConfiguration& configuration() const;
+
+  /// Provide access to the QProcessEnvironment.
+  QProcessEnvironment& options() const;
+
+  /// Use this method to update the process environment using current user selections.
+  virtual void updateOptionsUsingUserSelections();
+
+  /// Subclasses can override this to handle output and error messages from the
+  /// QProcess launched for command-startup configurations. Default
+  /// implementation simply dumps the text to the debug/error console.
+  virtual void handleProcessStandardOutput(const QByteArray& data);
+  virtual void handleProcessErrorOutput(const QByteArray& data);
 
 private:
   Q_DISABLE_COPY(pqServerLauncher)
