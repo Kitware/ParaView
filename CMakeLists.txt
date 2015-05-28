@@ -895,7 +895,7 @@ if (NOT WIN32 AND is_git)
 
   add_custom_target(paraview-source ${source_all})
   foreach (format tgz txz zip)
-    add_custom_target("paraview-source-${format}" ALL
+    add_custom_target("paraview-source-${format}" ${source_all}
       COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/Utilities/Maintenance/create_tarballs.bash"
               "--${format}"
       WORKING_DIRECTORY
