@@ -59,6 +59,19 @@ public:
     QObject* parent=0);
   virtual ~pqServerLauncher();
 
+  /// Custom applications may want to extend the pqServerLauncher to customize
+  /// connecting to servers. Such application can set the QMetaObject to use
+  /// using this method. If none is set, pqServerLauncher will be created, by
+  /// default.
+  /// Returns the previous QMetaObject instance set, if any.
+  static const QMetaObject* setServerDefaultLauncherType(const QMetaObject*);
+  static const QMetaObject* defaultServerLauncherType();
+
+  /// Creates a new instance using the default launcher type specified. If none
+  /// is specified, pqServerLauncher is created.
+  static pqServerLauncher* newInstance(
+    const pqServerConfiguration& configuration, QObject* parent=NULL);
+
   /// This method will launch the server process based on the configuration and
   /// connect to the server. Returns true if the connection was successful,
   /// otherwise returns false.
@@ -91,6 +104,7 @@ private:
 
   class pqInternals;
   pqInternals* Internals;
+  static const QMetaObject* DefaultServerLauncherType;
 };
 
 #endif

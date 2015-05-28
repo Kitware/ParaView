@@ -64,6 +64,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 #include <QTimer>
 
+//----------------------------------------------------------------------------
+const QMetaObject* pqServerLauncher::DefaultServerLauncherType = NULL;
+const QMetaObject* pqServerLauncher::setServerDefaultLauncherType(const QMetaObject* other)
+{
+  const QMetaObject* old = pqServerLauncher::DefaultServerLauncherType;
+  pqServerLauncher::DefaultServerLauncherType = other;
+  return old;
+}
+
+const QMetaObject* pqServerLauncher::defaultServerLauncherType()
+{
+  return pqServerLauncher::DefaultServerLauncherType;
+}
+
+pqServerLauncher* pqServerLauncher::newInstance(
+  const pqServerConfiguration& configuration, QObject* parentObject)
+{
+  if (pqServerLauncher::DefaultServerLauncherType)
+    {
+    QObject* aObject = pqServerLauncher::DefaultServerLauncherType->newInstance(
+      Q_ARG(const pqServerConfiguration&, configuration),
+      Q_ARG(QObject*, parentObject));
+    if (pqServerLauncher* aLauncher = qobject_cast<pqServerLauncher*>(aObject))
+      {
+      return aLauncher;
+      }
+    delete aObject;
+    }
+  return new pqServerLauncher(configuration, parentObject);
+}
+
+//----------------------------------------------------------------------------
 class pqServerLauncher::pqInternals
 {
 public:

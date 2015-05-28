@@ -50,7 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 #include <QtDebug>
 #include <QMessageBox>
-
+#include <QScopedPointer>
 #include <algorithm>
 
 /////////////////////////////////////////////////////////////////////////////
@@ -244,10 +244,10 @@ void pqRecentFilesMenu::onOpenResource()
     if (pqServerConnectDialog::selectServer(config_to_connect,
         pqCoreUtilities::mainWidget(), server))
       {
-      pqServerLauncher launcher(config_to_connect);
-      if (launcher.connectToServer())
+      QScopedPointer<pqServerLauncher> launcher(pqServerLauncher::newInstance(config_to_connect));
+      if (launcher->connectToServer())
         {
-        pq_server = launcher.connectedServer();
+        pq_server = launcher->connectedServer();
         }
       }
     }
