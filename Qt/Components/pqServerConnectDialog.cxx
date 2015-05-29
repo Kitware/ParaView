@@ -713,6 +713,12 @@ bool pqServerConnectDialog::selectServer(
       selected_configuration = configs[0];
       return true;
       }
+    else if( configs.size() == 0)
+      {
+      // Ne configs found, still add resource so config can be used somehow
+      selected_configuration.setResource(selector);
+      return true;
+      }
     }
 
   pqServerConnectDialog dialog(dialogParent, selector);
