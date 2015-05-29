@@ -230,11 +230,11 @@ void vtkMantaActor::Render( vtkRenderer * ren, vtkMapper * mapper )
 
     //check if anything that affect appearence has changed, if so, rebuild manta
     //object so we see it. Don't do it every frame, since it is costly.
-    if (mapper->GetInput() &&
-        mapper->GetInput()->GetMTime() > this->MeshMTime ||
-        mapper->GetMTime() > this->MeshMTime ||
-        this->GetProperty()->GetMTime() > this->MeshMTime ||
-        this->GetMTime() > this->MeshMTime)
+    if ((mapper->GetInput() &&
+        (mapper->GetInput()->GetMTime() > this->MeshMTime)) ||
+        (mapper->GetMTime() > this->MeshMTime) ||
+        (this->GetProperty()->GetMTime() > this->MeshMTime) ||
+        (this->GetMTime() > this->MeshMTime))
       {
       // update pipeline to get up to date data to show
       mapper->Render(ren, this);
