@@ -64,14 +64,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 #include <QTimer>
 
-class pqServerLauncher::pqInternals
+//----------------------------------------------------------------------------
+const QMetaObject* pqServerLauncher::DefaultServerLauncherType = NULL;
+const QMetaObject* pqServerLauncher::setServerDefaultLauncherType(const QMetaObject* other)
 {
-public:
-  pqServerConfiguration Configuration;
-  QProcessEnvironment Options;
-  QPointer<pqServer> Server;
-};
+  const QMetaObject* old = pqServerLauncher::DefaultServerLauncherType;
+  pqServerLauncher::DefaultServerLauncherType = other;
+  return old;
+}
 
+const QMetaObject* pqServerLauncher::defaultServerLauncherType()
+{
+  return pqServerLauncher::DefaultServerLauncherType;
+}
+
+pqServerLauncher* pqServerLauncher::newInstance(
+  const pqServerConfiguration& configuration, QObject* parentObject)
+{
+  if (pqServerLauncher::DefaultServerLauncherType)
+    {
+    QObject* aObject = pqServerLauncher::DefaultServerLauncherType->newInstance(
+      Q_ARG(const pqServerConfiguration&, configuration),
+      Q_ARG(QObject*, parentObject));
+    if (pqServerLauncher* aLauncher = qobject_cast<pqServerLauncher*>(aObject))
+      {
+      return aLauncher;
+      }
+    delete aObject;
+    }
+  return new pqServerLauncher(configuration, parentObject);
+}
+
+//----------------------------------------------------------------------------
 namespace
 {
   /// pqWidget is used to make it easier to get and set values from different
@@ -368,8 +392,6 @@ namespace
       {
       QString name = item->Widget->objectName();
       QVariant chosen_value = item->get();
-      cout << name.toLatin1().data() << "=" << chosen_value.toString().toLatin1().data() <<
-        endl;
       if (item->ToSave)
         {
         // save the chosen value in settings if requested.
@@ -378,8 +400,6 @@ namespace
         settings->setValue(settingsKey, chosen_value);
         }
       options.insert(name, chosen_value.toString());
-      //cout << name.toLatin1().data() << " = " <<
-      //  chosen_value.toString().toLatin1().data() << endl;
 
       // Some options can affect the server resource itself e.g. PV_SERVER_PORT etc.
       // So if those were changed using the config XML, we need to update the
@@ -468,16 +488,25 @@ namespace
     }
 }
 
+class pqServerLauncher::pqInternals
+{
+public:
+  pqServerConfiguration Configuration;
+  QProcessEnvironment Options;
+  QPointer<pqServer> Server;
+  QMap<QString, pqWidget*> ActiveWidgets; // map to save the widgets in promptOptions().
+};
+
 //-----------------------------------------------------------------------------
 pqServerLauncher::pqServerLauncher(
-  const pqServerConfiguration& configuration,
+  const pqServerConfiguration& _configuration,
   QObject* parentObject)
   : Superclass(parentObject)
 {
   this->Internals = new pqInternals();
 
   // we create a clone so that we can change the values in place.
-  this->Internals->Configuration = configuration.clone();
+  this->Internals->Configuration = _configuration.clone();
 }
 
 //-----------------------------------------------------------------------------
@@ -485,6 +514,12 @@ pqServerLauncher::~pqServerLauncher()
 {
   delete this->Internals;
   this->Internals = NULL;
+}
+
+//-----------------------------------------------------------------------------
+pqServerConfiguration& pqServerLauncher::configuration() const
+{
+  return this->Internals->Configuration;
 }
 
 //-----------------------------------------------------------------------------
@@ -581,22 +616,19 @@ bool pqServerLauncher::promptOptions()
   QDialog dialog(pqCoreUtilities::mainWidget());
 
   // setup the dialog using the configuration's XML.
-  QMap<QString, pqWidget*> widgets; // map to save the widgets.
+  QMap<QString, pqWidget*> &widgets = this->Internals->ActiveWidgets;; // map to save the widgets.
   // note: all pqWidget instances created are set with parent as the dialog, so
   // we don't need to clean them up explicitly.
   createWidgets(widgets, dialog, this->Internals->Configuration, options);
+  // give subclasses an opportunity to fine-tune the dialog.
+  this->prepareDialogForPromptOptions(dialog);
   if (dialog.exec() != QDialog::Accepted)
     {
+    widgets.clear();
     return false;
     }
 
-  /// now based on user-chosen values, update the options.
-  updateEnvironment(widgets, this->Internals->Configuration, options);
-
-  // Now that user entered options have been processes, handle the <Switch />
-  // elements.  This has to happen after the Options have been updated with
-  // user-selected values so that we can pick the right case.
-  handleSwitchCases(this->Internals->Configuration, options);
+  this->updateOptionsUsingUserSelections();
 
   // if options contains PV_CONNECT_ID. We need to update the pqOptions to
   // give it the correct connection-id.
@@ -607,13 +639,29 @@ bool pqServerLauncher::promptOptions()
     if (pvoptions)
       {
       pvoptions->SetConnectID(options.value("PV_CONNECT_ID").toInt());
-      cout << "Setting ConnectID: " << 
-        options.value("PV_CONNECT_ID").toInt() << endl;
       }
     }
 
+  widgets.clear();
   // Now we have the environment filled up correctly.
   return true;
+}
+
+//-----------------------------------------------------------------------------
+void pqServerLauncher::updateOptionsUsingUserSelections()
+{
+  if (this->Internals->ActiveWidgets.size() > 0)
+    {
+    /// now based on user-chosen values, update the options.
+    updateEnvironment(this->Internals->ActiveWidgets,
+      this->Internals->Configuration,
+      this->Internals->Options);
+
+    // Now that user entered options have been processes, handle the <Switch />
+    // elements.  This has to happen after the Options have been updated with
+    // user-selected values so that we can pick the right case.
+    handleSwitchCases(this->Internals->Configuration, this->Internals->Options);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -666,45 +714,64 @@ bool pqServerLauncher::launchServer(bool show_status_dialog)
     command.replace(before, after);
     }
 
-  cout << "Server launch command is : " << command.toLatin1().data() << endl;
+  return this->processCommand(command, timeout, delay, &this->Internals->Options);
+}
+
+//-----------------------------------------------------------------------------
+bool pqServerLauncher::processCommand(QString command, double timeout, double delay, const QProcessEnvironment* options)
+{
   QProcess* process = new QProcess(pqApplicationCore::instance());
-  process->setProcessEnvironment(this->Internals->Options);
+
+  if (options != NULL )
+    {
+    process->setProcessEnvironment(*options);
+    }
 
   QObject::connect(process, SIGNAL(error(QProcess::ProcessError)),
-    this, SLOT(processFailed(QProcess::ProcessError)));
+                   this, SLOT(processFailed(QProcess::ProcessError)));
   QObject::connect(process, SIGNAL(readyReadStandardError()),
-    this, SLOT(readStandardError()));
+                   this, SLOT(readStandardError()));
   QObject::connect(process, SIGNAL(readyReadStandardOutput()),
-    this, SLOT(readStandardOutput()));
+                   this, SLOT(readStandardOutput()));
 
-  //don't forward channels, doesn't produce outputs on Windows, etc.
-  //process->setProcessChannelMode(QProcess::ForwardedChannels);
   process->start(command);
-  //process->closeWriteChannel();
 
   // wait for process to start.
   // waitForStarted() may block until the process starts. That is generally a short
   // span of time, hence we don't worry about it too much.
-  if (process->waitForStarted(timeout>0? static_cast<int>(timeout*1000) : -1) == false)
+  if (process->waitForStarted(timeout > 0. ? static_cast<int>(timeout * 1000.) : -1) == false)
     {
-    qCritical() << "Server launch timed out.";
+    qCritical() << "Command launch timed out.";
     process->kill();
     delete process;
     return false;
     }
 
-  // wait for delay before attempting to connect to the server.
-  pqEventDispatcher::processEventsAndWait(static_cast<int>(delay * 1000));
+  if (delay == -1)
+    {
+    // Wait for process to be finished
+    while(process->state() == QProcess::Running)
+      {
+      process->waitForFinished(100);
+      }
+    }
+  else
+    {
+    // wait for delay before attempting to connect to the server.
+    pqEventDispatcher::processEventsAndWait(static_cast<int>(delay * 1000));
+    }
+
+  // Check process state
   if (process->state() != QProcess::Running)
     {
-    if (process->exitStatus() != QProcess::NormalExit	|| process->exitCode() != 0)
+    if (process->exitStatus() != QProcess::NormalExit || process->exitCode() != 0)
       {
-      // if the launched code exited with error, we consider that the server launch
-      // failed and we cancel the connection. If the process quits with success, we
+      // if the launched code exited with error, we consider that the process
+      // failed. If the process quits with success, we
       // still assume that the script has launched the server successfully (it's
       // just treated as non-blocking).
       qCritical()
-        << "Server launched aborted before attempting to connect to it.";
+        << "Command aborted.";
       process->deleteLater();
       return false;
       }
@@ -718,9 +785,8 @@ bool pqServerLauncher::launchServer(bool show_status_dialog)
     {
     // setup slot to delete the QProcess instance when the process exits.
     QObject::connect(process, SIGNAL(finished(int, QProcess::ExitStatus)),
-      process, SLOT(deleteLater()));
+                     process, SLOT(deleteLater()));
     }
-
   return true;
 }
 
@@ -756,7 +822,7 @@ void pqServerLauncher::readStandardOutput()
   QProcess* process = qobject_cast<QProcess*>(this->sender());
   if (process)
     {
-    qDebug() << process->readAllStandardOutput().data();
+    this->handleProcessStandardOutput(process->readAllStandardOutput());
     pqEventDispatcher::processEvents();
     }
 }
@@ -767,7 +833,25 @@ void pqServerLauncher::readStandardError()
   QProcess* process = qobject_cast<QProcess*>(this->sender());
   if (process)
     {
-    qCritical() << process->readAllStandardError().data();
+    this->handleProcessErrorOutput(process->readAllStandardError());
     pqEventDispatcher::processEvents();
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqServerLauncher::handleProcessStandardOutput(const QByteArray& data)
+{
+  qDebug() << data.data();
+}
+
+//-----------------------------------------------------------------------------
+void pqServerLauncher::handleProcessErrorOutput(const QByteArray& data)
+{
+  qCritical() << data.data();
+}
+
+//-----------------------------------------------------------------------------
+QProcessEnvironment& pqServerLauncher::options() const
+{
+  return this->Internals->Options;
 }

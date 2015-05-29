@@ -36,8 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QProcess> // needed for QProcess::ProcessError.
 #include "pqComponentsModule.h"
 
-class pqServerConfiguration;
 class pqServer;
+class pqServerConfiguration;
+class QDialog;
+class QProcessEnvironment;
 
 /// pqServerLauncher manages launching of server process using the details
 /// specified in the server configuration.
@@ -58,6 +60,19 @@ public:
     const pqServerConfiguration& configuration,
     QObject* parent=0);
   virtual ~pqServerLauncher();
+
+  /// Custom applications may want to extend the pqServerLauncher to customize
+  /// connecting to servers. Such application can set the QMetaObject to use
+  /// using this method. If none is set, pqServerLauncher will be created, by
+  /// default.
+  /// Returns the previous QMetaObject instance set, if any.
+  static const QMetaObject* setServerDefaultLauncherType(const QMetaObject*);
+  static const QMetaObject* defaultServerLauncherType();
+
+  /// Creates a new instance using the default launcher type specified. If none
+  /// is specified, pqServerLauncher is created.
+  static pqServerLauncher* newInstance(
+    const pqServerConfiguration& configuration, QObject* parent=NULL);
 
   /// This method will launch the server process based on the configuration and
   /// connect to the server. Returns true if the connection was successful,
@@ -80,17 +95,45 @@ protected:
   /// are not user-configurable options or the user has accepted the values.
   bool promptOptions();
 
-  bool launchServer(bool show_status_dialog);
+  /// Called when starting a server processes using a command-startup.
+  /// Returns true if launch was successful else returns false.
+  virtual bool launchServer(bool show_status_dialog);
 
-  bool connectToPrelaunchedServer();
+  /// An utility method to execute a command using a QProcess
+  bool processCommand(QString command, double timeout, double delay, const QProcessEnvironment* options = NULL);
+
+  virtual bool connectToPrelaunchedServer();
 
   bool isReverseConnection() const;
+
+  /// Subclasses can override this method to further customize the dialog being
+  /// shown to the user to prompt for options in
+  /// pqServerLauncher::promptOptions.
+  virtual void prepareDialogForPromptOptions(QDialog&) {}
+
+  /// Provides access to the pqServerConfiguration passed to the constructor.
+  /// Note this is clone of the pqServerConfiguration passed to the constuctor and
+  /// not the same instance.
+  pqServerConfiguration& configuration() const;
+
+  /// Provide access to the QProcessEnvironment.
+  QProcessEnvironment& options() const;
+
+  /// Use this method to update the process environment using current user selections.
+  virtual void updateOptionsUsingUserSelections();
+
+  /// Subclasses can override this to handle output and error messages from the
+  /// QProcess launched for command-startup configurations. Default
+  /// implementation simply dumps the text to the debug/error console.
+  virtual void handleProcessStandardOutput(const QByteArray& data);
+  virtual void handleProcessErrorOutput(const QByteArray& data);
 
 private:
   Q_DISABLE_COPY(pqServerLauncher)
 
   class pqInternals;
   pqInternals* Internals;
+  static const QMetaObject* DefaultServerLauncherType;
 };
 
 #endif

@@ -46,8 +46,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 
 #include <QMessageBox>
+#include <QScopedPointer>
 #include <QtDebug>
-
 //-----------------------------------------------------------------------------
 pqServerConnectReaction::pqServerConnectReaction(QAction* parentObject)
   : Superclass(parentObject)
@@ -118,6 +118,6 @@ bool pqServerConnectReaction::connectToServer(const pqServerResource& resource)
 bool pqServerConnectReaction::connectToServerUsingConfiguration(
   const pqServerConfiguration& config)
 {
-  pqServerLauncher launcher(config);
-  return launcher.connectToServer();
+  QScopedPointer<pqServerLauncher> launcher(pqServerLauncher::newInstance(config));
+  return launcher->connectToServer();
 }
