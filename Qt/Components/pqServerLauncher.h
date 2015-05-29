@@ -102,7 +102,7 @@ protected:
   /// An utility method to execute a command using a QProcess
   bool processCommand(QString command, double timeout, double delay, const QProcessEnvironment* options = NULL);
 
-  bool connectToPrelaunchedServer();
+  virtual bool connectToPrelaunchedServer();
 
   bool isReverseConnection() const;
 
