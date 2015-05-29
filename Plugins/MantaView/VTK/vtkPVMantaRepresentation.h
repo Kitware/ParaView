@@ -79,6 +79,10 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Overridden to participate in manta state maintenence
+  virtual void SetUpdateTime(double time);
+
+  // Description:
   // control that ray traced rendering characteristics of this object
   void SetMaterialType(char *);
   char *GetMaterialType();
