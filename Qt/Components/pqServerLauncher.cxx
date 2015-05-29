@@ -392,8 +392,6 @@ namespace
       {
       QString name = item->Widget->objectName();
       QVariant chosen_value = item->get();
-      cout << name.toLatin1().data() << "=" << chosen_value.toString().toLatin1().data() <<
-        endl;
       if (item->ToSave)
         {
         // save the chosen value in settings if requested.
@@ -402,8 +400,6 @@ namespace
         settings->setValue(settingsKey, chosen_value);
         }
       options.insert(name, chosen_value.toString());
-      //cout << name.toLatin1().data() << " = " <<
-      //  chosen_value.toString().toLatin1().data() << endl;
 
       // Some options can affect the server resource itself e.g. PV_SERVER_PORT etc.
       // So if those were changed using the config XML, we need to update the
@@ -643,8 +639,6 @@ bool pqServerLauncher::promptOptions()
     if (pvoptions)
       {
       pvoptions->SetConnectID(options.value("PV_CONNECT_ID").toInt());
-      cout << "Setting ConnectID: " << 
-        options.value("PV_CONNECT_ID").toInt() << endl;
       }
     }
 
@@ -720,7 +714,6 @@ bool pqServerLauncher::launchServer(bool show_status_dialog)
     command.replace(before, after);
     }
 
-  cout << "Server launch command is : " << command.toLatin1().data() << endl;
   return this->processCommand(command, timeout, delay, this->Internals->Options);
 }
 
