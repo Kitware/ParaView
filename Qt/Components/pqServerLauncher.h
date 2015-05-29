@@ -100,7 +100,7 @@ protected:
   virtual bool launchServer(bool show_status_dialog);
 
   /// An utility method to execute a command using a QProcess
-  bool processCommand(QString command, double timeout, double delay, const QProcessEnvironment& options);
+  bool processCommand(QString command, double timeout, double delay, const QProcessEnvironment* options = NULL);
 
   bool connectToPrelaunchedServer();
 

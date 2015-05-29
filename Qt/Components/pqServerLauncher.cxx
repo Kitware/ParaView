@@ -714,14 +714,18 @@ bool pqServerLauncher::launchServer(bool show_status_dialog)
     command.replace(before, after);
     }
 
-  return this->processCommand(command, timeout, delay, this->Internals->Options);
+  return this->processCommand(command, timeout, delay, &this->Internals->Options);
 }
 
 //-----------------------------------------------------------------------------
-bool pqServerLauncher::processCommand(QString command, double timeout, double delay, const QProcessEnvironment& options)
+bool pqServerLauncher::processCommand(QString command, double timeout, double delay, const QProcessEnvironment* options)
 {
   QProcess* process = new QProcess(pqApplicationCore::instance());
-  process->setProcessEnvironment(options);
+
+  if (options != NULL )
+    {
+    process->setProcessEnvironment(*options);
+    }
 
   QObject::connect(process, SIGNAL(error(QProcess::ProcessError)),
                    this, SLOT(processFailed(QProcess::ProcessError)));
