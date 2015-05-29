@@ -721,44 +721,60 @@ bool pqServerLauncher::launchServer(bool show_status_dialog)
     }
 
   cout << "Server launch command is : " << command.toLatin1().data() << endl;
+  return this->processCommand(command, timeout, delay, this->Internals->Options);
+}
+
+//-----------------------------------------------------------------------------
+bool pqServerLauncher::processCommand(QString command, double timeout, double delay, const QProcessEnvironment& options)
+{
   QProcess* process = new QProcess(pqApplicationCore::instance());
-  process->setProcessEnvironment(this->Internals->Options);
+  process->setProcessEnvironment(options);
 
   QObject::connect(process, SIGNAL(error(QProcess::ProcessError)),
-    this, SLOT(processFailed(QProcess::ProcessError)));
+                   this, SLOT(processFailed(QProcess::ProcessError)));
   QObject::connect(process, SIGNAL(readyReadStandardError()),
-    this, SLOT(readStandardError()));
+                   this, SLOT(readStandardError()));
   QObject::connect(process, SIGNAL(readyReadStandardOutput()),
-    this, SLOT(readStandardOutput()));
+                   this, SLOT(readStandardOutput()));
 
-  //don't forward channels, doesn't produce outputs on Windows, etc.
-  //process->setProcessChannelMode(QProcess::ForwardedChannels);
   process->start(command);
-  //process->closeWriteChannel();
 
   // wait for process to start.
   // waitForStarted() may block until the process starts. That is generally a short
   // span of time, hence we don't worry about it too much.
-  if (process->waitForStarted(timeout>0? static_cast<int>(timeout*1000) : -1) == false)
+  if (process->waitForStarted(timeout > 0. ? static_cast<int>(timeout * 1000.) : -1) == false)
     {
-    qCritical() << "Server launch timed out.";
+    qCritical() << "Command launch timed out.";
     process->kill();
     delete process;
     return false;
     }
 
-  // wait for delay before attempting to connect to the server.
-  pqEventDispatcher::processEventsAndWait(static_cast<int>(delay * 1000));
+  if (delay == -1)
+    {
+    // Wait for process to be finished
+    while(process->state() == QProcess::Running)
+      {
+      process->waitForFinished(100);
+      }
+    }
+  else
+    {
+    // wait for delay before attempting to connect to the server.
+    pqEventDispatcher::processEventsAndWait(static_cast<int>(delay * 1000));
+    }
+
+  // Check process state
   if (process->state() != QProcess::Running)
     {
-    if (process->exitStatus() != QProcess::NormalExit	|| process->exitCode() != 0)
+    if (process->exitStatus() != QProcess::NormalExit || process->exitCode() != 0)
       {
-      // if the launched code exited with error, we consider that the server launch
-      // failed and we cancel the connection. If the process quits with success, we
+      // if the launched code exited with error, we consider that the process
+      // failed. If the process quits with success, we
       // still assume that the script has launched the server successfully (it's
       // just treated as non-blocking).
       qCritical()
-        << "Server launched aborted before attempting to connect to it.";
+        << "Command aborted.";
       process->deleteLater();
       return false;
       }
@@ -772,9 +788,8 @@ bool pqServerLauncher::launchServer(bool show_status_dialog)
     {
     // setup slot to delete the QProcess instance when the process exits.
     QObject::connect(process, SIGNAL(finished(int, QProcess::ExitStatus)),
-      process, SLOT(deleteLater()));
+                     process, SLOT(deleteLater()));
     }
-
   return true;
 }
 

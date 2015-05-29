@@ -99,6 +99,9 @@ protected:
   /// Returns true if launch was successful else returns false.
   virtual bool launchServer(bool show_status_dialog);
 
+  /// An utility method to execute a command using a QProcess
+  bool processCommand(QString command, double timeout, double delay, const QProcessEnvironment& options);
+
   bool connectToPrelaunchedServer();
 
   bool isReverseConnection() const;
