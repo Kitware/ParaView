@@ -1210,6 +1210,52 @@ function ParaViewWebTestFunctions(connection) {
                                  'success': false,
                                  'message': error });
             }
+        },
+
+        /**
+         * This function exercises the following protocol rpc methods:
+         *
+         * 'pv.color.manager.lut.image.get'
+         *
+         * This function checks that the correct Base64 image is returned
+         * assuming the Wavelet and default color map.
+         */
+        protocolGetLutImageTests: function(testName, resultCallback) {
+            var s = connection.session;
+
+            try {
+                var waveletArgs = ['Wavelet', -1];
+                s.call('pv.proxy.manager.create', waveletArgs).then(function(waveletProxy) {
+                    var waveletPid = waveletProxy['id'];
+                    s.call('pv.test.repr.get', [waveletPid]).then(function(reprStruct) {
+                        var reprId = reprStruct['reprProxyId'],
+                            args = [reprId, 'ARRAY'],
+                            kwargs = { 'arrayLocation': 'POINTS', 'arrayName': 'RTData'};
+                        s.call('pv.color.manager.color.by', args, kwargs).then(function(empty) {
+                            s.call('pv.color.manager.lut.image.get', [reprId, 10]).then(function(lutResult) {
+                                var m = "protocolGetLutImageTests succeeded",
+                                    success = true;
+                                if (lutResult.image.indexOf("iVBOR") !== 0) {
+                                    m = "protocolGetLutImageTests failed due problem with returned Base64 image " +
+                                        "string (lutResult.image = '" + lutResult.image + "')";
+                                    success = false;
+                                }
+                                pipelineCleanup();
+                                resultCallback({ 'name': testName,
+                                                 'success': success,
+                                                 'message': m });
+                            }, function(e) { protocolError(e, testName, resultCallback); });
+                        }, function(e) { protocolError(e, testName, resultCallback); });
+                    }, function(e) { protocolError(e, testName, resultCallback); });
+                }, function(e) { protocolError(e, testName, resultCallback); });
+            } catch(error) {
+                console.log("Caught exception running test sequence for protocolGetLutImageTests");
+                console.log(error);
+                pipelineCleanup();
+                resultCallback({ 'name': testName,
+                                 'success': false,
+                                 'message': error });
+            }
         }
     };
 }
