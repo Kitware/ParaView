@@ -334,17 +334,25 @@ public:
           {
           // Functional bag plots shall be stacked under the other plots.
           vtkPlotFunctionalBag* plotBag = vtkPlotFunctionalBag::SafeDownCast(plot);
-          if (plotBag && plotBag->IsBag())
+          if (plotBag)
             {
-            if (!lastFunctionalBagPlot)
+            // We can't select the median line as it may not exist in other dataset.
+            if (columnName == "QMedianLine")
               {
-              chartXY->LowerPlot(plotBag);
+              plotBag->SelectableOff();
               }
-            else
+            if (plotBag->IsBag())
               {
-              chartXY->StackPlotAbove(plotBag, lastFunctionalBagPlot);
+              if (!lastFunctionalBagPlot)
+                {
+                chartXY->LowerPlot(plotBag);
+                }
+              else
+                {
+                chartXY->StackPlotAbove(plotBag, lastFunctionalBagPlot);
+                }
+              lastFunctionalBagPlot = plotBag;
               }
-            lastFunctionalBagPlot = plotBag;
             }
           }
         }

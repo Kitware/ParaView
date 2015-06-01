@@ -10954,6 +10954,15 @@ source.</Documentation>
         <Documentation>Specify the smoothing parameter of the
         HDR.</Documentation>
       </DoubleVectorProperty>
+      <IntVectorProperty command="SetGridSize"
+                         default_values="100"
+                         name="GridSize"
+                         number_of_elements="1">
+        <IntRangeDomain min="1" name="grid_range"/>
+        <Documentation>
+          Width and height of the grid image to perform the PCA on.
+        </Documentation>
+      </IntVectorProperty>
       <!-- View can be used to specify the preferred view for the proxy -->
       <Hints>
         <Visibility replace_input="0" />

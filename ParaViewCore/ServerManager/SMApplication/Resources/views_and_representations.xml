@@ -6356,7 +6356,7 @@
         <Documentation>Data input for the representation.</Documentation>
         <DataTypeDomain composite_data_supported="1"
                         name="input_type">
-          <DataType value="vtkTable" />
+          <DataType value="vtkDataObject" />
         </DataTypeDomain>
       </InputProperty>
       <IntVectorProperty command="SetVisibility"
@@ -6393,22 +6393,23 @@
         set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
         Instead, ForcedCacheKey is used.</Documentation>
       </DoubleVectorProperty>
-      <IntVectorProperty command="SetCompositeDataSetIndex"
-                         default_values="2"
-                         name="CompositeDataSetIndex"
-                         number_of_elements="1">
-        <Documentation>
-          In case of Composite datasets, set the flat index of the
-          dataset to pass. The flat index must point to a non-empty,
-          non-composite dataset for anything to be passed through. If the input
-          is not a composite dataset, then this index is ignored.
-        </Documentation>
-        <CompositeTreeDomain mode="leaves"
-                             name="tree">
+      <IntVectorProperty clean_command="ResetCompositeDataSetIndices"
+                   command="AddCompositeDataSetIndex"
+                   default_values="2 3"
+                   number_of_elements="2"
+                   name="CompositeDataSetIndex"
+                   number_of_elements_per_command="1"
+                   panel_visibility="default"
+                   repeat_command="1">
+        <CompositeTreeDomain mode="leaves" name="tree">
           <RequiredProperties>
             <Property function="Input" name="Input" />
           </RequiredProperties>
         </CompositeTreeDomain>
+        <Documentation>
+          This property lists the ids of the blocks to extract
+          from the input multiblock dataset.
+        </Documentation>
         <Hints>
           <NoDefault/>
         </Hints>
@@ -6492,7 +6493,13 @@
           </RequiredProperties>
         </BagChartSeriesListDomain>
       </StringVectorProperty>
-
+      <IntVectorProperty command="SetBagVisibility"
+                         default_values="0"
+                         name="BagVisibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Visibility of the bag.</Documentation>
+      </IntVectorProperty>
       <DoubleVectorProperty command="SetBagColor"
                             name="BagColor"
                             number_of_elements="3"
@@ -6551,7 +6558,47 @@
         <Documentation>Set the size of the points.</Documentation>
         <IntRangeDomain name="range" min="1" max="10" />
       </IntVectorProperty>
-
+      <DoubleVectorProperty command="SetP99Color"
+                                  name="P99Color"
+                                  number_of_elements="3"
+                                  default_values="0.5 0.0 0.5"
+                                  panel_widget="color_selector"
+                                  panel_visibility="advanced">
+        <Documentation>Set the series P99 color.</Documentation>
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetP50Color"
+                            name="P50Color"
+                            number_of_elements="3"
+                            default_values="0.2 0.0 0.2"
+                            panel_widget="color_selector"
+                            panel_visibility="advanced">
+        <Documentation>Set the series P50 color.</Documentation>
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetGridLineThickness"
+                         name="GridLineThickness"
+                         number_of_elements="1"
+                         default_values="2"
+                         panel_visibility="advanced">
+        <Documentation>Set the series line thickness.</Documentation>
+        <IntRangeDomain name="range" min="1" max="10" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetGridLineStyle"
+                         name="GridLineStyle"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="advanced">
+        <Documentation>Set the series line style.</Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="None" value="0" />
+          <Entry text="Solid" value="1" />
+          <Entry text="Dash" value="2" />
+          <Entry text="Dot" value="3" />
+          <Entry text="Dash Dot" value="4" />
+          <Entry text="Dash Dot Dot" value="5" />
+        </EnumerationDomain>
+      </IntVectorProperty>
       <PropertyGroup label="Plot Axis"
                      panel_visibility="default" >
         <Property name="UseIndexForXAxis" />
@@ -6559,15 +6606,22 @@
         <Property name="YArrayName" />
         <Property name="DensityArrayName" />
       </PropertyGroup>
-
       <PropertyGroup label="Bag Styling"
                      panel_visibility="default" >
+        <Property name="BagVisibility" />
         <Property name="BagColor" />
         <Property name="LineThickness" />
         <Property name="LineStyle" />
         <Property name="LineColor" />
         <Property name="PointSize" />
         <Property name="PointColor" />
+      </PropertyGroup>
+      <PropertyGroup label="Grid Styling"
+                     panel_visibility="default" >
+        <Property name="P99Color" />
+        <Property name="P50Color" />
+        <Property name="GridLineThickness" />
+        <Property name="GridLineStyle" />
       </PropertyGroup>
       <!--
           Set the palette SelectionColor color to all the plots in the chart.
@@ -6611,7 +6665,7 @@
         <Documentation>Data input for the representation.</Documentation>
         <DataTypeDomain composite_data_supported="1"
                         name="input_type">
-          <DataType value="vtkTable" />
+          <DataType value="vtkDataObject" />
         </DataTypeDomain>
       </InputProperty>
       <IntVectorProperty command="SetVisibility"
