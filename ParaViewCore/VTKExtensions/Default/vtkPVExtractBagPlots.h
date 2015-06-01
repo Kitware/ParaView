@@ -53,6 +53,12 @@ public:
   vtkGetMacro(Sigma, double);
   vtkSetMacro(Sigma, double);
 
+  // Description:
+  // Set/get the size of the grid to compute the PCA on.
+  // 100 by default.
+  vtkGetMacro(GridSize, int);
+  vtkSetMacro(GridSize, int);
+
 protected:
   vtkPVExtractBagPlots();
   virtual ~vtkPVExtractBagPlots();
@@ -68,6 +74,7 @@ protected:
   bool TransposeTable;
   bool RobustPCA;
   double Sigma;
+  int GridSize;
 
 private:
   vtkPVExtractBagPlots( const vtkPVExtractBagPlots& ); // Not implemented.

@@ -195,7 +195,7 @@ int vtkChartRepresentation::RequestData(vtkInformation* request,
         }
 
       // Prune input dataset to only process blocks on interest.
-      // In input is not a multiblock dataset, we make it one so the rest of the
+      // If input is not a multiblock dataset, we make it one so the rest of the
       // pipeline is simple.
       if (data->IsA("vtkMultiBlockDataSet"))
         {
@@ -231,7 +231,7 @@ int vtkChartRepresentation::RequestData(vtkInformation* request,
       data = preprocessor->GetOutputDataObject(0);
 
 
-      // data must be a mutliblock dataset, no matter what.
+      // data must be a multiblock dataset, no matter what.
       assert(data->IsA("vtkMultiBlockDataSet"));
 
       // now deliver data to the rendering sides:
