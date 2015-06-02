@@ -39,33 +39,9 @@
 #include <math.h>
 #include <vector>
 
-vtkStandardNewMacro(vtkSMTransferFunctionProxy);
-//----------------------------------------------------------------------------
-vtkSMTransferFunctionProxy::vtkSMTransferFunctionProxy()
-{
-}
-
-//----------------------------------------------------------------------------
-vtkSMTransferFunctionProxy::~vtkSMTransferFunctionProxy()
-{
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMTransferFunctionProxy::RescaleTransferFunction(
-  vtkSMProxy* proxy, double rangeMin, double rangeMax, bool extend)
-{
-  vtkSMTransferFunctionProxy* tfp =
-    vtkSMTransferFunctionProxy::SafeDownCast(proxy);
-  if (tfp)
-    {
-    return tfp->RescaleTransferFunction(rangeMin, rangeMax, extend);
-    }
-  return false;
-}
-
-//----------------------------------------------------------------------------
 namespace
 {
+  //----------------------------------------------------------------------------
   class StrictWeakOrdering
     {
   public:
@@ -76,6 +52,7 @@ namespace
       }
     };
 
+  //----------------------------------------------------------------------------
   inline vtkSMProperty* GetControlPointsProperty(vtkSMProxy* self)
     {
     vtkSMProperty* controlPointsProperty = self->GetProperty("RGBPoints");
@@ -100,6 +77,150 @@ namespace
 
     return controlPointsProperty;
     }
+
+  //----------------------------------------------------------------------------
+  // Normalize cntrlPoints so that the range goes from (0, 1). The cntrlPoints
+  // are assumed to be using log-space interpolation if "log_space" is true.
+  // The result is always in linear space irrespective of the original
+  // interpolation space.
+  // originalRange is filled with the original range of the cntrlPoints before
+  // rescaling.
+  bool vtkNormalize(std::vector<vtkTuple<double, 4> >& cntrlPoints, bool log_space,
+    vtkTuple<double, 2>* originalRange=NULL)
+    {
+    if (cntrlPoints.size() == 0)
+      {
+      // nothing to do, but not an error, so return true.
+      return true;
+      }
+    if (cntrlPoints.size() == 1)
+      {
+      if (originalRange)
+        {
+        (*originalRange)[0] = cntrlPoints[0][0];
+        (*originalRange)[1] = cntrlPoints[0][0];
+        }
+
+      // Only 1 control point in the property. We'll add 2 points, however.
+      cntrlPoints.resize(2);
+      cntrlPoints[1] = cntrlPoints[0];
+      cntrlPoints[0][0] = 0.0;
+      cntrlPoints[1][0] = 1.0;
+      return true;
+      }
+
+    // sort the points by x, just in case user didn't add them correctly.
+    std::sort(cntrlPoints.begin(), cntrlPoints.end(), StrictWeakOrdering());
+
+    const double old_range[2] = {cntrlPoints.front().GetData()[0],
+                                 cntrlPoints.back().GetData()[0]};
+    if (log_space && (old_range[0] <=0 || old_range[1] <= 0))
+      {
+      vtkGenericWarningMacro("Range not valid for log. Assuming control points "
+        "are not specified in log space.");
+      log_space = false;
+      }
+    if (originalRange)
+      {
+      (*originalRange)[0] = old_range[0];
+      (*originalRange)[1] = old_range[1];
+      }
+
+    // if in log_space, let's convert all the control point values to
+    // log.
+    if (log_space)
+      {
+      for (size_t cc = 0; cc < cntrlPoints.size(); ++cc)
+        {
+        cntrlPoints[cc][0] = log10(cntrlPoints[cc][0]);
+        }
+      }
+
+    // now simply normalize the cntrlPoints.
+    const double range[2] = {cntrlPoints.front()[0], cntrlPoints.back()[0]};
+    if (range[0] == 0.0 && range[1] == 1.0)
+      {
+      // nothing to do.
+      return true;
+      }
+    const double denominator = (range[1] - range[0]);
+    assert(denominator > 0);
+    for (size_t cc = 0; cc < cntrlPoints.size(); ++cc)
+      {
+      cntrlPoints[cc][0] = (cntrlPoints[cc][0] - range[0]) / denominator;
+      }
+    return true;
+    }
+
+  //----------------------------------------------------------------------------
+  // Rescale normalize control points to the given range. If "log_space" is
+  // true, the log interpolation is used between rangeMin and rangeMax. If that
+  // case too, rangeMin/rangeMax should be still specified as the original data
+  // values (and not log of the data values).
+  bool vtkRescaleNormalizedControlPoints(
+    std::vector<vtkTuple<double, 4> >& cntrlPoints, double rangeMin, double rangeMax, bool log_space)
+    {
+    assert(cntrlPoints.size() >= 2);
+    assert(cntrlPoints.front()[0]  == 0.0 && cntrlPoints.back()[0] == 1.0);
+    assert(rangeMin < rangeMax);
+    if (log_space && (rangeMin <= 0.0 || rangeMax <= 0.0))
+      {
+      // ensure the range is valid for log space.
+      double range[2] = {rangeMin, rangeMax};
+      if (vtkSMCoreUtilities::AdjustRangeForLog(range))
+        {
+        // ranges not valid for log-space. Will convert them.
+        vtkGenericWarningMacro(
+          "Ranges not valid for log-space. "
+          "Changed the range to (" << range[0] <<", " << range[1] << ").");
+        }
+      rangeMin = range[0];
+      rangeMax = range[1];
+      }
+
+    double scale = (rangeMax - rangeMin);
+    if (log_space)
+      {
+      rangeMin = log10(rangeMin);
+      rangeMax = log10(rangeMax);
+      scale = (rangeMax - rangeMin);
+      }
+    assert(scale > 0);
+    for (size_t cc=0; cc < cntrlPoints.size(); ++cc)
+      {
+      double &x = cntrlPoints[cc][0];
+      x = x * scale + rangeMin;
+      if (log_space)
+        {
+        x = pow(10.0, x);
+        }
+      }
+    return true;
+    }
+}
+
+vtkStandardNewMacro(vtkSMTransferFunctionProxy);
+//----------------------------------------------------------------------------
+vtkSMTransferFunctionProxy::vtkSMTransferFunctionProxy()
+{
+}
+
+//----------------------------------------------------------------------------
+vtkSMTransferFunctionProxy::~vtkSMTransferFunctionProxy()
+{
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMTransferFunctionProxy::RescaleTransferFunction(
+  vtkSMProxy* proxy, double rangeMin, double rangeMax, bool extend)
+{
+  vtkSMTransferFunctionProxy* tfp =
+    vtkSMTransferFunctionProxy::SafeDownCast(proxy);
+  if (tfp)
+    {
+    return tfp->RescaleTransferFunction(rangeMin, rangeMax, extend);
+    }
+  return false;
 }
 
 //----------------------------------------------------------------------------
@@ -164,100 +285,34 @@ bool vtkSMTransferFunctionProxy::RescaleTransferFunction(
       }
     }
 
-  if (num_elements == 4)
-    {
-    // Only 1 control point in the property. We'll add 2 points, however.
-    vtkTuple<double, 4> points[2];
-    cntrlPoints.Get(points[0].GetData(), 4);
-    points[1] = points[0];
-    if (extend)
-      {
-      rangeMin = std::min(rangeMin, points[0].GetData()[0]);
-      rangeMax = std::max(rangeMax, points[0].GetData()[0]);
-      }
-    points[0].GetData()[0] = rangeMin;
-    points[1].GetData()[0] = rangeMax;
-    cntrlPoints.Set(points[0].GetData(), 8);
-    this->UpdateVTKObjects();
+  bool log_space = (vtkSMPropertyHelper(this, "UseLogScale", true).GetAsInt() != 0);
 
-    SM_SCOPED_TRACE(CallMethod)
-      .arg(this)
-      .arg("RescaleTransferFunction")
-      .arg(rangeMin)
-      .arg(rangeMax)
-      .arg("comment", "Rescale transfer function");
-    return true;
-    }
-
+  // just in case the num_elements is not a perfect multiple of 4.
+  num_elements = 4*(num_elements / 4);
   std::vector<vtkTuple<double, 4> > points;
   points.resize(num_elements/4);
   cntrlPoints.Get(points[0].GetData(), num_elements);
 
-  // sort the points by x, just in case user didn't add them correctly.
-  std::sort(points.begin(), points.end(), StrictWeakOrdering());
-
-  double old_range[2] = {points.front().GetData()[0],
-                         points.back().GetData()[0]};
-
+  vtkTuple<double, 2> preNormalizationRange;
+  vtkNormalize(points, log_space, &preNormalizationRange);
   if (extend)
     {
-    rangeMin = std::min(rangeMin, old_range[0]);
-    rangeMax = std::max(rangeMax, old_range[1]);
+    rangeMin = std::min(rangeMin, preNormalizationRange[0]);
+    rangeMax = std::max(rangeMax, preNormalizationRange[1]);
     }
-
-  if (old_range[0] == rangeMin && old_range[1] == rangeMax)
+  if (points.front()[0] == rangeMin && points.back()[0] == rangeMax)
     {
-    // nothing to do.
+    // current range is same as the new range. Nothing to do here.
     return true;
     }
 
+  vtkRescaleNormalizedControlPoints(points, rangeMin, rangeMax, log_space);
   SM_SCOPED_TRACE(CallMethod)
     .arg(this)
     .arg("RescaleTransferFunction")
     .arg(rangeMin)
     .arg(rangeMax)
     .arg("comment", "Rescale transfer function");
-
-  // determine if the interpolation has to happen in log-space.
-  bool log_space =
-    (vtkSMPropertyHelper(this, "UseLogScale", true).GetAsInt() != 0);
-  if (log_space)
-    {
-    // ensure the range is valid for log space.
-    double range[2] = {rangeMin, rangeMax};
-    if (vtkSMCoreUtilities::AdjustRangeForLog(range))
-      {
-      // ranges not valid for log-space. Will convert them.
-      vtkWarningMacro(
-        "Ranges not valid for log-space. "
-        "Changed the range to (" << range[0] <<", " << range[1] << ").");
-      }
-    rangeMin = range[0];
-    rangeMax = range[1];
-    }
-  double dnew = log_space? log10(rangeMax/rangeMin) :
-                           (rangeMax - rangeMin);
-  // don't set empty ranges. Tweak it a bit.
-  dnew = (dnew > 0)? dnew : 1.0;
-
-  double dold = log_space?  log10(old_range[1]/old_range[0]) :
-                            (old_range[1] - old_range[0]);
-  dold = (dold > 0)? dold : 1.0;
-
-  double scale = dnew / dold;
-  for (size_t cc=0; cc < points.size(); cc++)
-    {
-    double &x = points[cc].GetData()[0];
-    if (log_space)
-      {
-      double logx = log10(x/old_range[0]) * scale + log10(rangeMin);
-      x = pow(10.0, logx);
-      }
-    else
-      {
-      x = (x - old_range[0])*scale + rangeMin;
-      }
-    }
   cntrlPoints.Set(points[0].GetData(), num_elements);
   this->UpdateVTKObjects();
   return true;
@@ -355,34 +410,17 @@ bool vtkSMTransferFunctionProxy::InvertTransferFunction()
   points.resize(num_elements/4);
   cntrlPoints.Get(points[0].GetData(), num_elements);
 
-  // sort the points by x, just in case user didn't add them correctly.
-  std::sort(points.begin(), points.end(), StrictWeakOrdering());
-
-  double range[2] = {points.front().GetData()[0],
-                     points.back().GetData()[0]};
-  if (range[0] <= 0.0 || range[1] <= 0.0)
-    {
-    // ranges not valid for log-space. Switch to linear space.
-    log_space = false;
-    }
-
+  vtkTuple<double, 2> range;
+  vtkNormalize(points, log_space, &range);
   for (size_t cc=0; cc < points.size(); cc++)
     {
     double &x = points[cc].GetData()[0];
-    if (log_space)
-      {
-      // inverting needs to happen in log-space
-      double logxprime = log10(range[0]*range[1] / x);
-                       /* ^-- == log10(range[1]) - (log10(x) - log10(range[0])) */
-      x = pow(10.0, logxprime);
-      }
-    else
-      {
-      x = range[1] - (x - range[0]);
-      }
+    x = (1.0 - x);
     }
   // sort again to ensure that the property value is set as min->max.
   std::sort(points.begin(), points.end(), StrictWeakOrdering());
+  vtkRescaleNormalizedControlPoints(points, range[0], range[1], log_space);
+
   cntrlPoints.Set(points[0].GetData(), num_elements);
   this->UpdateVTKObjects();
   return true;
@@ -404,7 +442,6 @@ bool vtkSMTransferFunctionProxy::MapControlPointsToLogSpace(
     .arg("comment",
       inverse? "convert from log to linear" : "convert to log space");
 
-
   vtkSMPropertyHelper cntrlPoints(controlPointsProperty);
   unsigned int num_elements = cntrlPoints.GetNumberOfElements();
   if (num_elements == 0 || num_elements == 4)
@@ -417,45 +454,14 @@ bool vtkSMTransferFunctionProxy::MapControlPointsToLogSpace(
   points.resize(num_elements/4);
   cntrlPoints.Get(points[0].GetData(), num_elements);
 
-  // sort the points by x, just in case user didn't add them correctly.
-  std::sort(points.begin(), points.end(), StrictWeakOrdering());
-
-  double range[2] = {points.front().GetData()[0],
-                     points.back().GetData()[0]};
-
-  if (inverse == false)
-    {
-    if (vtkSMCoreUtilities::AdjustRangeForLog(range))
-      {
-      // ranges not valid for log-space. Will convert them.
-      vtkWarningMacro(
-        "Ranges not valid for log-space. "
-        "Changed the range to (" << range[0] <<", " << range[1] << ").");
-      }
-    }
+  vtkTuple<double, 2> range;
+  vtkNormalize(points, inverse, &range); // if inverse==true, we're in log-space currently.
   if (range[0] >= range[1])
     {
     vtkWarningMacro("Empty range! Cannot map control points.");
     return false;
     }
-
-  for (size_t cc=0; cc < points.size(); cc++)
-    {
-    double &x = points[cc].GetData()[0];
-    if (inverse)
-      {
-      // log-to-linear
-      double norm = log10(x/range[0]) / log10(range[1]/range[0]);
-      x = range[0] + norm * (range[1] - range[0]);
-      }
-    else
-      {
-      // linear-to-log
-      double norm = (x - range[0])/(range[1] - range[0]);
-      double logx = log10(range[0]) + norm * (log10(range[1]/range[0]));
-      x = pow(10.0, logx);
-      }
-    }
+  vtkRescaleNormalizedControlPoints(points, range[0], range[1], !inverse);
   cntrlPoints.Set(points[0].GetData(), num_elements);
   this->UpdateVTKObjects();
   return true;
@@ -506,16 +512,56 @@ bool vtkSMTransferFunctionProxy::ApplyPreset(const Json::Value& arg, bool rescal
     preset.removeMember("Annotations");
     }
 
+  if (rescale && valid_range)
+    {
+    assert(usingIndexedColors == false);
+
+    // Since rescaling gets tricky especially when log scaling is involved
+    // either in the preset or in the proxy we're loading the preset values on,
+    // we will just "rescale" the range in the preset itself.
+    Json::Value& pointsValue = preset.isMember("RGBPoints")?
+      preset["RGBPoints"] : preset["Points"];
+    if (pointsValue.isNull() || !pointsValue.isArray() ||
+      (pointsValue.size()  % 4) != 0 || pointsValue.size() == 0)
+      {
+      vtkErrorMacro("Preset may not be valid. Please validate the preset:\n"
+        << arg.toStyledString().c_str());
+      return false;
+      }
+
+    std::vector<vtkTuple<double, 4> > cntrlPoints;
+    cntrlPoints.resize(pointsValue.size() / 4);
+    for (Json::ArrayIndex cc=0, max = pointsValue.size()/4; cc < max; ++cc)
+      {
+      cntrlPoints[cc][0] = pointsValue[4*cc].asDouble();
+      cntrlPoints[cc][1] = pointsValue[4*cc+1].asDouble();
+      cntrlPoints[cc][2] = pointsValue[4*cc+2].asDouble();
+      cntrlPoints[cc][3] = pointsValue[4*cc+3].asDouble();
+      }
+
+    bool presetIsLog = preset.get("UseLogScale", Json::Value(false)).asBool();
+    vtkNormalize(cntrlPoints, presetIsLog);
+    preset.removeMember("UseLogScale");
+
+    bool proxyIsLog = (vtkSMPropertyHelper(this, "UseLogScale", true).GetAsInt() == 1);
+    vtkRescaleNormalizedControlPoints(cntrlPoints, range[0], range[1], proxyIsLog);
+
+    pointsValue.resize(cntrlPoints.size()*4);
+    for (size_t cc=0; cc < cntrlPoints.size(); cc++)
+      {
+      pointsValue[static_cast<Json::ArrayIndex>(4*cc)]   = Json::Value(cntrlPoints[cc][0]);
+      pointsValue[static_cast<Json::ArrayIndex>(4*cc)+1] = Json::Value(cntrlPoints[cc][1]);
+      pointsValue[static_cast<Json::ArrayIndex>(4*cc)+2] = Json::Value(cntrlPoints[cc][2]);
+      pointsValue[static_cast<Json::ArrayIndex>(4*cc)+3] = Json::Value(cntrlPoints[cc][3]);
+      }
+    }
+
   if (!preset.isMember("HSVWrap"))
     {
     preset["HSVWrap"] = 0;
     }
   if (vtkSMSettings::DeserializeFromJSON(this, preset))
     {
-    if (valid_range)
-      {
-      this->RescaleTransferFunction(range[0], range[1], /*extend=*/false);
-      }
     this->UpdateVTKObjects();
     return true;
     }
@@ -560,6 +606,11 @@ Json::Value vtkSMTransferFunctionProxy::GetStateAsPreset()
   else
     {
     toSave->AddString("Points");
+    }
+  if (vtkSMPropertyHelper(this, "UseLogScale", true).GetAsInt() == 1)
+    {
+    // save log-space only if using log space.
+    toSave->AddString("UseLogScale");
     }
 
   vtkNew<vtkSMNamedPropertyIterator> iter;
