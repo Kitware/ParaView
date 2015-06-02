@@ -51,6 +51,7 @@ vtkCxxSetObjectMacro(vtkPVBagChartRepresentation,LookupTable,vtkScalarsToColors)
 vtkPVBagChartRepresentation::vtkPVBagChartRepresentation() :
   LineThickness(1),
   LineStyle(0),
+  LookupTable(NULL),
   BagVisibility(0),
   Opacity(1.),
   PointSize(5),
@@ -59,8 +60,7 @@ vtkPVBagChartRepresentation::vtkPVBagChartRepresentation() :
   XAxisSeriesName(NULL),
   YAxisSeriesName(NULL),
   DensitySeriesName(NULL),
-  UseIndexForXAxis(true),
-  LookupTable(NULL)
+  UseIndexForXAxis(true)
 {
   this->BagColor[0] = 1.0;
   this->BagColor[1] = this->BagColor[2] = 0.0;
