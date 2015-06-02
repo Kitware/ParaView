@@ -8156,7 +8156,8 @@
       <DoubleVectorProperty command="SetDiffuseColor"
                             default_values="1.0 1.0 1.0"
                             name="DiffuseColor"
-                            number_of_elements="3">
+                            number_of_elements="3"
+                            panel_widget="color_selector_with_palette">
         <DoubleRangeDomain max="1 1 1"
                            min="0 0 0"
                            name="range" />
