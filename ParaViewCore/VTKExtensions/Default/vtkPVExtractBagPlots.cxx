@@ -189,7 +189,6 @@ int vtkPVExtractBagPlots::RequestData(vtkInformation*,
 
   vtkDataArray* xArray = NULL;
   vtkDataArray* yArray = NULL;
-  std::string x, y;
   for (vtkIdType i = 0; i < outputPCATable->GetNumberOfColumns(); i++)
     {
     vtkAbstractArray* arr = outputPCATable->GetColumn(i);
@@ -198,13 +197,11 @@ int vtkPVExtractBagPlots::RequestData(vtkInformation*,
       {
       if (strstr(str, "(0)"))
         {
-        x = std::string(str);
         arr->SetName("x");
         xArray = vtkDataArray::SafeDownCast(arr);
         }
       else
         {
-        y = std::string(str);
         arr->SetName("y");
         yArray = vtkDataArray::SafeDownCast(arr);
         }
