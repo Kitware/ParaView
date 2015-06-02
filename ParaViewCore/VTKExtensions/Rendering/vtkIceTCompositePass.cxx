@@ -61,14 +61,8 @@ namespace
 {
   static vtkIceTCompositePass* IceTDrawCallbackHandle = NULL;
   static const vtkRenderState* IceTDrawCallbackState = NULL;
-  void IceTGLDrawCallback()
-    {
-    if (IceTDrawCallbackState && IceTDrawCallbackHandle)
-      {
-      IceTDrawCallbackHandle->GLDraw(IceTDrawCallbackState);
-      }
-    }
 
+#ifdef VTKGL2
   void IceTDrawCallback(
     const IceTDouble * projection_matrix,
     const IceTDouble * modelview_matrix,
@@ -83,6 +77,15 @@ namespace
         background_color, readback_viewport, result);
       }
     }
+#else
+  void IceTGLDrawCallback()
+    {
+    if (IceTDrawCallbackState && IceTDrawCallbackHandle)
+      {
+      IceTDrawCallbackHandle->GLDraw(IceTDrawCallbackState);
+      }
+    }
+#endif
 
   void MergeCubeAxesBounds(double bounds[6], const vtkRenderState* rState)
     {
