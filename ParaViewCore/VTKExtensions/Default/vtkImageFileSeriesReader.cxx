@@ -90,7 +90,19 @@ void vtkImageFileSeriesReader::UpdateFileNames()
     }
 
   this->BeforeFileNameMTime = this->GetMTime();
-  if (this->ReadAsImageStack)
+
+  // vtkImageReader2 reader is terrible in the way it exposes the DataExtent API.
+  // I clear it here (to the defaults in the reader) to pretend that the user never set it
+  // so that the class/subclass can set it up appropriately. Since ensures that
+  // if we toggle ReadAsImageStack, the reader doesn't end up trying to read
+  // obsolete extents.
+  int ext[6] = {0, 0, 0, 0, 0, 0};
+  imageReader->SetDataExtent(ext);
+
+  // vtkImageReader2's are funky. Using SetFileNames to set a single file is
+  // not same as SetFileName! This was causing BUG #15505. This fixes that
+  // issue.
+  if (this->ReadAsImageStack && this->GetNumberOfFileNames() > 1)
     {
     vtkNew<vtkStringArray> filenames;
     filenames->SetNumberOfTuples(this->GetNumberOfFileNames());
@@ -103,7 +115,7 @@ void vtkImageFileSeriesReader::UpdateFileNames()
       imageReader->SetFileNames(filenames.GetPointer());
       }
     else if (vtkEqual(imageReader->GetFileNames(), filenames.GetPointer()) == false)
-            // check if filenames indeed changed.
+      // check if filenames indeed changed.
       {
       imageReader->SetFileNames(filenames.GetPointer());
       }
@@ -111,11 +123,8 @@ void vtkImageFileSeriesReader::UpdateFileNames()
   else
     {
     imageReader->SetFileName(this->GetFileName(this->_FileIndex));
-    int ext[6];
-    imageReader->GetDataExtent(ext);
-    ext[4] = ext[5] = 0;
-    imageReader->SetDataExtent(ext);
     }
+
   this->FileNameMTime = this->Reader->GetMTime();
 }
 
