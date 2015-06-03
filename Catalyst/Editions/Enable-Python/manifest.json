@@ -28,11 +28,7 @@
         { "path": "ClientServerCore-remove-extraction.patch" }
       ]
     },
-    { "path":"VTK/Wrapping/Python",
-      "patches": [
-        { "path": "remove-references-to-ColorMaps.xml.patch" }
-      ]
-    },
+    { "path":"VTK/Wrapping/Python" },
     { "name":"vtkFiltersProgrammable",
       "path":"VTK/Filters/Programmable",
       "exclude":[
