@@ -109,10 +109,11 @@ private:
 
   void buildTree(vtkPVCompositeDataInformation *iter,
                  QTreeWidgetItem *parent,
-                 int& flatIndex);
+                 int& flatIndex, // composite-data id
+                 int& leafIndex); // leaf-only index.
   void unsetChildVisibilities(QTreeWidgetItem *parent);
   QIcon makeColorIcon(int flatIndex, NodeType nodeType, 
-                      int inheritedColorIndex) const;
+                      int inheritedColorIndex, int leafIndex=-1) const;
   QIcon makeOpacityIcon(int flatIndex, NodeType nodeType, 
                         int inheritedOpacityIndex) const;
   QIcon makeNullIcon() const;
@@ -132,7 +133,6 @@ private:
   vtkPiecewiseFunction* OpacityTransferFunction;
   unsigned int BlockColorsDistinctValues;
   int CompositeWrap;
-
 
   pqTimer UpdateUITimer;
 
