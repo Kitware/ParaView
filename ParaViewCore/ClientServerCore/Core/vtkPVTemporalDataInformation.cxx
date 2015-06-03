@@ -43,6 +43,16 @@ vtkPVTemporalDataInformation::vtkPVTemporalDataInformation()
   this->VertexDataInformation = vtkPVDataSetAttributesInformation::New();
   this->EdgeDataInformation = vtkPVDataSetAttributesInformation::New();
   this->RowDataInformation = vtkPVDataSetAttributesInformation::New();
+
+  // Update field association information on the all the
+  // vtkPVDataSetAttributesInformation instances.
+  for (int cc=0; cc < vtkDataObject::NUMBER_OF_ASSOCIATIONS; cc++)
+    {
+    if (vtkPVDataSetAttributesInformation* dsa = this->GetAttributeInformation(cc))
+      {
+      dsa->SetFieldAssociation(cc);
+      }
+    }
 }
 
 //----------------------------------------------------------------------------

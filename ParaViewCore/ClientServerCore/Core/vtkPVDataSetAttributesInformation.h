@@ -41,6 +41,14 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Returns the field association to which the instance corresponds to.
+  // Returned value can be vtkDataObject::POINT, vtkDataObject::CELL,
+  // vtkDataObject::FIELD, etc i.e. vtkDataObject::FieldAssociations or
+  // vtkDataObject::AttributeTypes.
+  vtkGetMacro(FieldAssociation, int);
+  vtkSetMacro(FieldAssociation, int);
+
+  // Description:
   // Transfer information about a single vtk data object into
   // this object.
   void CopyFromDataSetAttributes(vtkDataSetAttributes* data);
@@ -101,6 +109,7 @@ protected:
   vtkCollection* ArrayInformation;
   // Standard cell attributes.
   short          AttributeIndices[vtkDataSetAttributes::NUM_ATTRIBUTES];
+  int FieldAssociation;
 
 private:
   bool SortArrays;
