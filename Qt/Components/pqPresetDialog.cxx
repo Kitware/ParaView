@@ -93,11 +93,11 @@ public:
     this->endResetModel();
     }
 
-  void removePreset(unsigned int index)
+  void removePreset(unsigned int idx)
     {
-    this->beginRemoveRows(QModelIndex(), index, index);
-    this->Presets->RemovePreset(index);
-    this->Pixmaps.removeAt(index);
+    this->beginRemoveRows(QModelIndex(), idx, idx);
+    this->Presets->RemovePreset(idx);
+    this->Pixmaps.removeAt(idx);
     this->endRemoveRows();
     }
 
@@ -232,6 +232,7 @@ protected:
      case pqPresetDialog::SHOW_NON_INDEXED_COLORS_ONLY:
        return !this->sourceModel()->data(idx, Qt::UserRole).toBool();
        }
+     return false;
      }
 private:
   Q_DISABLE_COPY(pqPresetDialogProxyModel);

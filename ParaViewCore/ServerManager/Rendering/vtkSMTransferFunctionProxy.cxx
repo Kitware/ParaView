@@ -546,7 +546,7 @@ bool vtkSMTransferFunctionProxy::ApplyPreset(const Json::Value& arg, bool rescal
     bool proxyIsLog = (vtkSMPropertyHelper(this, "UseLogScale", true).GetAsInt() == 1);
     vtkRescaleNormalizedControlPoints(cntrlPoints, range[0], range[1], proxyIsLog);
 
-    pointsValue.resize(cntrlPoints.size()*4);
+    pointsValue.resize(static_cast<Json::ArrayIndex>(cntrlPoints.size()*4));
     for (size_t cc=0; cc < cntrlPoints.size(); cc++)
       {
       pointsValue[static_cast<Json::ArrayIndex>(4*cc)]   = Json::Value(cntrlPoints[cc][0]);

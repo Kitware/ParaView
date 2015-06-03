@@ -85,8 +85,11 @@ public:
       {
       return false;
       }
-    this->Presets.clear();
+    this->Presets.erase(this->Presets.begin() + index);
+    index = (index - static_cast<unsigned int>(this->BuiltinPresets.size()));
+
     this->Modified = true;
+    assert(this->CustomPresets.size() > index);
     this->CustomPresets.erase(this->CustomPresets.begin() + index);
     return true;
     }
@@ -114,7 +117,10 @@ public:
       if (index < static_cast<unsigned int>(presets.size()) &&
         index >= static_cast<unsigned int>(this->BuiltinPresets.size()))
         {
-        this->CustomPresets[index - this->BuiltinPresets.size()]["Name"] = newname;
+        index = (index - static_cast<unsigned int>(this->BuiltinPresets.size()));
+        assert(this->CustomPresets.size() > index);
+
+        this->CustomPresets[index]["Name"] = newname;
         this->Presets.clear();
         this->Modified = true;
         return true;
@@ -173,7 +179,7 @@ private:
       {
       vtkGenericWarningMacro(
         << "Failed to parse builtin transfer function presets: "
-        << reader.getFormatedErrorMessages().c_str());
+        << reader.getFormattedErrorMessages().c_str());
       }
     delete [] rawJSON;
     this->BuiltinPresets.insert(this->BuiltinPresets.end(), value.begin(), value.end());
@@ -198,7 +204,7 @@ private:
       {
       vtkGenericWarningMacro(
         << "Failed to parse custom transfer function presets: "
-        << reader.getFormatedErrorMessages().c_str());
+        << reader.getFormattedErrorMessages().c_str());
       }
     this->CustomPresets.insert(this->CustomPresets.end(), value.begin(), value.end());
     }
@@ -287,7 +293,7 @@ bool vtkSMTransferFunctionPresets::AddPreset(
     vtkErrorMacro("Invalid preset string.");
       vtkGenericWarningMacro(
         << "Failed to parse builtin transfer function presets: "
-        << reader.getFormatedErrorMessages().c_str());
+        << reader.getFormattedErrorMessages().c_str());
     return false;
     }
   this->Internals->AddPreset(name, value);

@@ -43,6 +43,14 @@ namespace Json
   class Value;
 }
 
+/// pqPresetDialog is the dialog used by to show the user with a choice of color
+/// maps/opacity maps/presets to choose from. The Dialog can be customized to
+/// show only indexed (or non-indexed) color maps using pqPresetDialog::Modes.
+/// Application code should observe the pqPresetDialog::applyPreset() signal to
+/// perform the applying of the preset to a specific transfer function proxy.
+/// This class works with vtkSMTransferFunctionPresets, which acts as the preset
+/// manager for the application with support to inspect existing presets as well
+/// as updating them.
 class PQCOMPONENTS_EXPORT pqPresetDialog : public QDialog
 {
   Q_OBJECT
