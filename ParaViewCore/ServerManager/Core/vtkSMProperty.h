@@ -567,9 +567,9 @@ private:
 };
 
 #define vtkSMPropertyTemplateMacroCase(typeSMProperty, type, prop, call) \
-  if (typeSMProperty::SafeDownCast(prop)) \
+  if (typeSMProperty* SM_PROPERTY = typeSMProperty::SafeDownCast(prop)) \
     { \
-    typedef typeSMProperty SMPROPERTY_TT; \
+    (void) SM_PROPERTY; \
     typedef type SM_TT; \
     call; \
     }
