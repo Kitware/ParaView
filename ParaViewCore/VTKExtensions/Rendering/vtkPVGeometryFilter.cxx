@@ -678,10 +678,10 @@ void vtkPVGeometryFilter::AddCompositeIndex(vtkPolyData* pd, unsigned int index)
 {
   vtkUnsignedIntArray* cindex = vtkUnsignedIntArray::New();
   cindex->SetNumberOfComponents(1);
-  cindex->SetNumberOfTuples(1);
+  cindex->SetNumberOfTuples(pd->GetNumberOfCells());
   cindex->FillComponent(0, index);
   cindex->SetName("vtkCompositeIndex");
-  pd->GetFieldData()->AddArray(cindex);
+  pd->GetCellData()->AddArray(cindex);
   cindex->FastDelete();
 }
 
@@ -692,12 +692,11 @@ void vtkPVGeometryFilter::AddBlockColors(
   vtkUnsignedIntArray* cindex = vtkUnsignedIntArray::New();
   cindex->SetNumberOfComponents(1);
   cindex->SetNumberOfTuples(1);
-  cindex->FillComponent(0, index % this->BlockColorsDistinctValues);
+  cindex->SetValue(0, index % this->BlockColorsDistinctValues);
   cindex->SetName("vtkBlockColors");
   pd->GetFieldData()->AddArray(cindex);
   cindex->FastDelete();
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::AddHierarchicalIndex(vtkPolyData* pd,
