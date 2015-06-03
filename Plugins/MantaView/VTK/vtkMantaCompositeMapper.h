@@ -33,6 +33,11 @@ public:
   vtkTypeMacro(vtkMantaCompositeMapper, vtkCompositePolyDataMapper);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
+  //Description:
+  //Helper to cleanly track our inputs mtime, and participate in manta
+  //state tracking.
+  virtual unsigned long GetInputTime();
+
 protected:
   vtkMantaCompositeMapper();
   ~vtkMantaCompositeMapper();

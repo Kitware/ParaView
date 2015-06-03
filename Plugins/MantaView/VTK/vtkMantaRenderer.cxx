@@ -429,6 +429,19 @@ void vtkMantaRenderer::LayerRender()
   renViewport= this->GetViewport();
   renderPos0[0] = int( renViewport[0] * renWinSize[0] + 0.5f );
   renderPos0[1] = int( renViewport[1] * renWinSize[1] + 0.5f );
+
+  // get render threads to draw what we've asked them to
+  vtkTimerLog::MarkStartEvent("ThreadSync");
+  this->GetSyncDisplay()->doneRendering();
+  //now transaction callbacks happen
+  this->GetSyncDisplay()->waitOnFrameReady();
+  //now we have frame n-1's image
+  this->GetSyncDisplay()->doneRendering();
+  //now transaction callback effects take place
+  this->GetSyncDisplay()->waitOnFrameReady();
+  //now we have frame n's image
+  vtkTimerLog::MarkEndEvent("ThreadSync");
+
   this->GetSyncDisplay()->getCurrentImage()->
     getResolution( stereoDumy, mantaSize[0], mantaSize[1] );
   mantaBase = dynamic_cast< const Manta::SimpleImageBase * >
@@ -442,12 +455,6 @@ void vtkMantaRenderer::LayerRender()
     ? mantaSize[1] : renderSize[1];
   hMantaDiff  = mantaSize[1] - minHeight;
   hRenderDiff = renderSize[1] - minHeight;
-
-  vtkTimerLog::MarkStartEvent("ThreadSync");
-  // let the render threads draw what we've asked them to
-  this->GetSyncDisplay()->doneRendering();
-  this->GetSyncDisplay()->waitOnFrameReady();
-  vtkTimerLog::MarkEndEvent("ThreadSync");
 
   // memory allocation and acess to the Manta image
   int size = renderSize[0]*renderSize[1];
