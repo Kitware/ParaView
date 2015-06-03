@@ -42,7 +42,7 @@
 #ifdef VTKGL2
 # include "vtkOpenGLShaderCache.h"
 # include "vtkShaderProgram.h"
-# include "vtkglVBOHelper.h"
+# include "vtkOpenGLHelper.h"
 # include "vtkTextureObjectVS.h"
 # include "vtkCompositeZPassFS.h"
 #else
@@ -61,14 +61,8 @@ namespace
 {
   static vtkIceTCompositePass* IceTDrawCallbackHandle = NULL;
   static const vtkRenderState* IceTDrawCallbackState = NULL;
-  void IceTGLDrawCallback()
-    {
-    if (IceTDrawCallbackState && IceTDrawCallbackHandle)
-      {
-      IceTDrawCallbackHandle->GLDraw(IceTDrawCallbackState);
-      }
-    }
 
+#ifdef VTKGL2
   void IceTDrawCallback(
     const IceTDouble * projection_matrix,
     const IceTDouble * modelview_matrix,
@@ -83,6 +77,15 @@ namespace
         background_color, readback_viewport, result);
       }
     }
+#else
+  void IceTGLDrawCallback()
+    {
+    if (IceTDrawCallbackState && IceTDrawCallbackHandle)
+      {
+      IceTDrawCallbackHandle->GLDraw(IceTDrawCallbackState);
+      }
+    }
+#endif
 
   void MergeCubeAxesBounds(double bounds[6], const vtkRenderState* rState)
     {
@@ -549,7 +552,7 @@ void vtkIceTCompositePass::CreateProgram(vtkOpenGLRenderWindow *context)
   assert("pre: Program_void" && this->Program==0);
 
 #ifdef VTKGL2
-  this->Program = new vtkgl::CellBO;
+  this->Program = new vtkOpenGLHelper;
   this->Program->Program =
     context->GetShaderCache()->ReadyShader(vtkTextureObjectVS,
                                            vtkCompositeZPassFS,
@@ -972,7 +975,7 @@ void vtkIceTCompositePass::PushIceTDepthBufferToScreen(
   this->ZTexture->CopyToFrameBuffer(0, 0, w - 1, h - 1,
                                     0, 0, w, h,
                                     this->Program->Program,
-                                    &this->Program->vao);
+                                    this->Program->VAO);
   this->ZTexture->Deactivate();
 #else
   vtkTextureUnitManager *tu=context->GetTextureUnitManager();

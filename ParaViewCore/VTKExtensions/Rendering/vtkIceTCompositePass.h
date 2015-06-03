@@ -46,10 +46,7 @@ class vtkOpenGLRenderWindow;
 class vtkUnsignedCharArray;
 class vtkFloatArray;
 #ifdef VTKGL2
-namespace vtkgl
-{
-class CellBO;
-}
+class vtkOpenGLHelper;
 #else
 class vtkShaderProgram2;
 #endif
@@ -236,7 +233,7 @@ protected:
   vtkPixelBufferObject *PBO;
   vtkTextureObject *ZTexture;
 #ifdef VTKGL2
-  vtkgl::CellBO *Program;
+  vtkOpenGLHelper *Program;
 #else
   vtkShaderProgram2 *Program;
 #endif
