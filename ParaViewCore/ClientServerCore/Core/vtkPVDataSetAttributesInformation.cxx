@@ -17,12 +17,12 @@
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
 #include "vtkDataArray.h"
+#include "vtkDataObject.h"
 #include "vtkDataSetAttributes.h"
-#include "vtkObjectFactory.h"
-#include "vtkPVArrayInformation.h"
-
 #include "vtkGenericAttributeCollection.h"
 #include "vtkGenericAttribute.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkPVGenericAttributeInformation.h"
 
 #include <string.h>
@@ -67,10 +67,9 @@ bool vtkPVDataSetAttributesInformationAlphabeticSorting(
 //----------------------------------------------------------------------------
 vtkPVDataSetAttributesInformation::vtkPVDataSetAttributesInformation()
 {
-  int idx;
-
+  this->FieldAssociation = vtkDataObject::NUMBER_OF_ASSOCIATIONS;
   this->ArrayInformation = vtkCollection::New();
-  for (idx = 0; idx < vtkDataSetAttributes::NUM_ATTRIBUTES; ++idx)
+  for (int idx = 0; idx < vtkDataSetAttributes::NUM_ATTRIBUTES; ++idx)
     {
     this->AttributeIndices[idx] = -1;
     }
@@ -360,6 +359,21 @@ vtkPVDataSetAttributesInformation
         {
         // Take union of range.
         ai1->AddRanges(ai2);
+        if (this->FieldAssociation == vtkDataObject::FIELD)
+          {
+          // For field data, we accumulate the number of tuples as the maximum
+          // number of tuples since field data is not appended together when the
+          // geometries are reduced. This seems like a fair assumption that
+          // addresses BUG #0015503.
+          ai1->SetNumberOfTuples(std::max(
+              ai1->GetNumberOfTuples(), ai2->GetNumberOfTuples()));
+          }
+        else
+          {
+          ai1->SetNumberOfTuples(
+            ai1->GetNumberOfTuples() + ai2->GetNumberOfTuples());
+          }
+
         found = 1;
         // Record default attributes.
         int attribute1 = this->IsArrayAnAttribute(idx1);

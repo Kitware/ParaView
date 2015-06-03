@@ -92,6 +92,16 @@ vtkPVDataInformation::vtkPVDataInformation()
 
   this->PortNumber = -1;
   this->SortArrays = true;
+
+  // Update field association information on the all the
+  // vtkPVDataSetAttributesInformation instances.
+  for (int cc=0; cc < vtkDataObject::NUMBER_OF_ASSOCIATIONS; cc++)
+    {
+    if (vtkPVDataSetAttributesInformation* dsa = this->GetAttributeInformation(cc))
+      {
+      dsa->SetFieldAssociation(cc);
+      }
+    }
 }
 
 //----------------------------------------------------------------------------

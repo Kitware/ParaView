@@ -426,8 +426,6 @@ void vtkPVArrayInformation::AddRanges(vtkPVArrayInformation *info)
       }
     ptr += 2;
     }
-
-  this->NumberOfTuples += info->GetNumberOfTuples();
 }
 
 //----------------------------------------------------------------------------
