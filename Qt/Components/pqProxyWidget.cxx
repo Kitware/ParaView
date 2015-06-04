@@ -540,6 +540,7 @@ public:
   bool CachedShowAdvanced;
   QString CachedFilterText;
   vtkStringList* Properties;
+  QPointer<QLabel> ProxyDocumentationLabel; // used when showProxyDocumentationInPanel is true.
 
   pqInternals(vtkSMProxy* smproxy, QStringList properties):
     Proxy(smproxy), CachedShowAdvanced(false)
@@ -623,6 +624,9 @@ void pqProxyWidget::constructor(
   // if the proxy wants a more descriptive layout for the panel, use it.
   this->UseDocumentationForLabels = pqProxyWidget::useDocumentationForLabels(smproxy);
   this->Internals = new pqProxyWidget::pqInternals(smproxy, properties);
+  this->Internals->ProxyDocumentationLabel = new QLabel(this);
+  this->Internals->ProxyDocumentationLabel->hide();
+  this->Internals->ProxyDocumentationLabel->setWordWrap(true);
 
   QGridLayout* gridLayout = new QGridLayout(this);
   gridLayout->setMargin(pqPropertiesPanel::suggestedMargin());
@@ -674,6 +678,23 @@ QString pqProxyWidget::documentationText(vtkSMProperty* smProperty)
     {
     return pqProxy::rstToHtml(xmlDocumentation).c_str();
     }
+}
+
+//-----------------------------------------------------------------------------
+QString pqProxyWidget::documentationText(vtkSMProxy* smProxy)
+{
+  const char* xmlDocumentation = smProxy->GetDocumentation()?
+    smProxy->GetDocumentation()->GetDescription() : NULL;
+  return (!xmlDocumentation || xmlDocumentation[0] == 0)?
+    QString() : pqProxy::rstToHtml(xmlDocumentation).c_str();
+}
+
+//-----------------------------------------------------------------------------
+bool pqProxyWidget::showProxyDocumentationInPanel(vtkSMProxy* smproxy)
+{
+  return (smproxy &&
+    smproxy->GetHints() &&
+    smproxy->GetHints()->FindNestedElementByName("ShowProxyDocumentationInPanel"));
 }
 
 //-----------------------------------------------------------------------------
@@ -1169,7 +1190,7 @@ bool pqProxyWidget::filterWidgets(bool show_advanced, const QString& filterText)
   delete this->layout();
   QVBoxLayout* vboxLayout = NULL;
   QGridLayout* gridLayout = NULL;
-  
+
   if (this->UseDocumentationForLabels)
     {
     vboxLayout = new QVBoxLayout(this);
@@ -1189,6 +1210,21 @@ bool pqProxyWidget::filterWidgets(bool show_advanced, const QString& filterText)
   int row_index = 0;
   const pqProxyWidgetItem* prevItem = NULL;
   vtkSMProxy* smProxy = this->Internals->Proxy;
+
+  if (this->showProxyDocumentationInPanel(smProxy))
+    {
+    QString doc = this->documentationText(smProxy);
+    cout << doc.toStdString().c_str() << endl;
+    this->Internals->ProxyDocumentationLabel->setText(doc);
+    this->Internals->ProxyDocumentationLabel->setVisible(!doc.isEmpty());
+    gridLayout->addWidget(this->Internals->ProxyDocumentationLabel, row_index, 0, 1, 2);
+    row_index++;
+    }
+  else
+    {
+    this->Internals->ProxyDocumentationLabel->hide();
+    }
+
   foreach (const pqProxyWidgetItem* item, this->Internals->Items)
     {
     bool visible = item->canShowWidget(show_advanced, filterText, smProxy);

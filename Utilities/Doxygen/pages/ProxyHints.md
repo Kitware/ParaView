@@ -94,3 +94,21 @@ Representation elements, start with most restrictive to least restrictive.
         <Representation view="RenderView" type="Wireframe" />
       </Hints>
     </SourceProxy>
+
+ShowProxyDocumentationInPanel
+-----------------------------
+Show an annotation label in the auto-generated panel generated using
+pqProxyWidget.
+
+This hint is used to indicate that the documentation for the proxy should be
+shown in special label at the top of the panel generated for the proxy. This is
+useful to show information to the user directly on the panel.
+
+    <SourceProxy ...>
+      <Documentation>
+        Some text that will be shown in the label.
+      </Documentation>
+      ...
+      <Hints>
+        <ShowProxyDocumentationInPanel />
+      </Hints>
