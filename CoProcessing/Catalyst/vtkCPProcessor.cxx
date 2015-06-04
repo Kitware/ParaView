@@ -254,6 +254,7 @@ int vtkCPProcessor::Finalize()
   if(this->Controller)
     {
     this->Controller->SetGlobalController(NULL);
+    this->Controller->Finalize(1);
     this->Controller->Delete();
     }
 
