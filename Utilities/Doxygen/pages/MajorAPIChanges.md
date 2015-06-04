@@ -22,12 +22,12 @@ appropriate.
 
 ParaView was subclassing vtkRenderWindowInteractor to create
 `vtkPVGenericRenderWindowInteractor` to handle interaction. That piece of code
-was potentially derrived from an older implementation of
+was potentially derived from an older implementation of
 vtkRenderWindowInteractor and hence did what it did. Current implementation of
 vtkRenderWindowInteractor lets the vtkInteractionStyle (and subclasses) do all
 the heavy lifting. ParaView did that to some extent (since it has a
 vtkPVInteractorStyle), but will was relying on
-`vtkPVGenericRenderWindowInteractor`, `vtkPVRenderViewProxy` to propage
+`vtkPVGenericRenderWindowInteractor`, `vtkPVRenderViewProxy` to propagate
 interaction/still renders and other things. This has been refactored. ParaView
 no longer uses a special vtkRenderWindowInteractor. All logic is handled by
 observers on the standard vtkRenderWindowInteractor.
@@ -38,6 +38,23 @@ See also: vtkSMRenderViewProxy::SetupInteractor(). Subclasses of pqView now pass
 the interactor created by QVTKWidget to this method to initialize it.
 
 See also: vtkSMViewProxyInteractorHelper.
+
+###Refactored Color Preset Management (and UI)###
+
+The color preset management has been completely refactored for this release.
+This makes presets accessible to Python clients.
+`vtkSMTransferFunctionPresets` is the class that manages the presets in the
+*ServerManager* layer.
+
+On the UI side, `pqColorPresetModel`, `pqColorPresetManager`, and
+`pqColorMapModel` no longer exist. They have been replaced by `pqPresetDialog`.
+Since the UI is completely redesigned, tests in custom applications
+that used the color preset dialog will need to be updated as well.
+
+The preset themselves are now serialized as JSON in the same form as the
+settings JSON. ColorMaps in legacy XML format are still loadable from the UI. At
+the same time, a tool `vtkLegacyColorMapXMLToJSON` is available to convert such
+XMLs to JSON.
 
 Changes in 4.3
 --------------
