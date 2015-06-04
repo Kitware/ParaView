@@ -40,6 +40,9 @@ paraview_test_load_data(""
   LoadStateMultiView.pvsm
   LoadState.pvsm
   minimal.nii
+  MultiBlockWithPieces_0_0.vtp
+  MultiBlockWithPieces_1_0.vtp
+  MultiBlockWithPieces.vtm
   multicomb_0.vts
   multicomb_1.vts
   multicomb_2.vts
@@ -265,6 +268,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/TensorGlyph.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TemporalInterpolator.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TemporalShiftScale.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/TestSelectionOnMultipiece.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TimeInspector.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Tessellate.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Threshold.xml
@@ -421,6 +425,7 @@ set(NonlinearSubdivisionDisplay_DISABLE_CRS TRUE)
 set(InteractiveSelection_DISABLE_CRS TRUE)
 set(NonConvexPolygon_DISABLE_CRS TRUE)
 set(QuartilePlot_DISABLE_CRS TRUE)
+set(TestSelectionOnMultipiece_DISABLE_CRS TRUE)
 
 # These tests cannot be run using ctest -j since they are affected by focus
 # changed events.
