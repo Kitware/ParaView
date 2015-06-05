@@ -233,6 +233,17 @@ int vtkCPProcessor::CoProcess(vtkCPDataDescription* dataDescription)
         this->Internal->Pipelines.begin();
       iter!=this->Internal->Pipelines.end();iter++)
     {
+    if(dataDescription->GetForceOutput() == false)
+      {
+      // Reset dataDescription so that we can check each pipeline again
+      // before calling CoProcess to make sure which pipelines should
+      // be executing.
+      for(unsigned int i=0;i<dataDescription->GetNumberOfInputDescriptions();i++)
+        {
+        dataDescription->GetInputDescription(i)->GenerateMeshOff();
+        dataDescription->GetInputDescription(i)->AllFieldsOff();
+        }
+      }
     if(dataDescription->GetForceOutput() == true ||
        iter->GetPointer()->RequestDataDescription(dataDescription))
       {
