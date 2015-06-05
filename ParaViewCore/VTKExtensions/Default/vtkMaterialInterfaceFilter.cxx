@@ -62,7 +62,7 @@
 // Filters
 #include "vtkOBBTree.h"
 #include "vtkAppendPolyData.h"
-#include "vtkMarchingCubesCases.h"
+#include "vtkMarchingCubesTriangleCases.h"
 #include "vtkCleanPolyData.h"
 #include "vtkClipPolyData.h"
 #include "vtkContourFilter.h"
