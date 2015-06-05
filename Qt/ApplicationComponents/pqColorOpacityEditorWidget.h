@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationComponentsModule.h"
 #include "pqPropertyWidget.h"
-#include "vtkType.h"
+#include "pqSMProxy.h"
 #include <QList>
 #include <QVariant>
 
@@ -73,6 +73,8 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorOpacityEditorWidget :
   Q_PROPERTY(QList<QVariant> xvmsPoints READ xvmsPoints WRITE setXvmsPoints)
   Q_PROPERTY(bool useLogScale READ useLogScale WRITE setUseLogScale)
   Q_PROPERTY(bool lockScalarRange READ lockScalarRange WRITE setLockScalarRange)
+  Q_PROPERTY(pqSMProxy scalarOpacityFunctionProxy READ scalarOpacityFunctionProxy
+                                                  WRITE setScalarOpacityFunctionProxy)
   typedef pqPropertyWidget Superclass;
 public:
   pqColorOpacityEditorWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent=0);
@@ -92,6 +94,10 @@ public:
   /// Returns true if the scalar range is locked.
   bool lockScalarRange() const;
 
+  /// Returns the scalar opacity function (i.e. PiecewiseFunction) proxy
+  /// used, if any.
+  pqSMProxy scalarOpacityFunctionProxy() const;
+
 public slots:
   /// Sets the xvmsPoints that control the opacity transfer function.
   void setXvmsPoints(const QList<QVariant>&);
@@ -104,6 +110,9 @@ public slots:
 
   /// Set whether the scalar range must be locked.
   void setLockScalarRange(bool val);
+
+  /// Set the scalar opacity function (or PiecewiseFunction) proxy to use.
+  void setScalarOpacityFunctionProxy(pqSMProxy sofProxy);
 
   /// Reset the transfer function ranges to active data source.
   void resetRangeToData();
@@ -124,7 +133,7 @@ public slots:
   void invertTransferFunctions();
 
   /// pick a preset.
-  void choosePreset(const pqColorMapModel* add_new=NULL);
+  void choosePreset(const char* presetName=NULL);
 
   /// save current transfer function as preset.
   void saveAsPreset();
@@ -142,6 +151,11 @@ signals:
   /// Signal fired when lockScalarRange changes.
   void lockScalarRangeChanged();
 
+  /// This signal is never really fired since this
+  /// widget doesn't have any UI to allow users to changes the
+  /// ScalarOpacityFunction proxy used.
+  void scalarOpacityFunctionProxyChanged();
+
 protected slots:
   /// slots called when the current point changes on the two internal
   /// pqTransferFunctionWidget widgets.
@@ -158,7 +172,7 @@ protected slots:
   void currentDataEdited();
 
   /// apply a present.
-  void applyPreset(const pqColorMapModel*);
+  void applyCurrentPreset();
 
   /// Ensures that the color-swatches for indexedColors are shown only when this
   /// is set to true.

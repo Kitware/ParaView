@@ -61,6 +61,7 @@ set (Module_SRCS
   vtkSMSpreadSheetRepresentationProxy.cxx
   vtkSMTextWidgetRepresentationProxy.cxx
   vtkSMTransferFunctionManager.cxx
+  vtkSMTransferFunctionPresets.cxx
   vtkSMTransferFunctionProxy.cxx
   vtkSMUtilities.cxx
   vtkSMViewLayoutProxy.cxx
@@ -107,6 +108,25 @@ configure_file(${VTK_CMAKE_DIR}/vtkObjectFactory.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/${vtk-module}ObjectFactory.h)
 configure_file(${VTK_CMAKE_DIR}/vtkObjectFactory.cxx.in
   ${CMAKE_CURRENT_BINARY_DIR}/${vtk-module}ObjectFactory.cxx)
+#-----------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------
+# Compile ColorMaps.json
+add_custom_command(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vtkSMTransferFunctionPresetsBuiltin.h
+  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/ColorMaps.json
+          kwProcessXML
+  COMMAND kwProcessXML
+          ${CMAKE_CURRENT_BINARY_DIR}/vtkSMTransferFunctionPresetsBuiltin.h
+          vtkSMTransferFunctionPresets JSON JSON
+          ${CMAKE_CURRENT_SOURCE_DIR}/ColorMaps.json
+  COMMENT "Processing builtin color maps")
+set(${vtk-module}_HDRS
+  ${CMAKE_CURRENT_BINARY_DIR}/vtkSMTransferFunctionPresetsBuiltin.h)
+set_source_files_properties(
+  ${CMAKE_CURRENT_BINARY_DIR}/vtkSMTransferFunctionPresetsBuiltin.h
+  HEADER_FILE_ONLY
+  WRAP_EXCLUDE)
 #-----------------------------------------------------------------------------
 
 vtk_module_library(vtkPVServerManagerRendering ${Module_SRCS})

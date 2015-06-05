@@ -46,7 +46,8 @@
       "exclude":[
         { "path":"WrapClientServer" },
         { "path":"VisItBridge" },
-        { "path":"ColorSeriesToXML" }
+        { "path":"ColorSeriesToXML" },
+        { "path":"LegacyColorMapXMLToJSON" }
       ]
     },
     { "name":"vtkPVCatalyst",

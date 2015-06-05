@@ -637,6 +637,7 @@
       "path": "ParaViewCore/ServerManager/Rendering",
       "include": [
         { "path": "module.cmake" },
+        { "path": "ColorMaps.json" },
         { "class": "vtkPVComparativeAnimationCue" },
         { "class": "vtkPVComparativeView" },
         { "class": "vtkPVRepresentedArrayListSettings" },
@@ -668,6 +669,7 @@
         { "class": "vtkSMSpreadSheetRepresentationProxy" },
         { "class": "vtkSMTextWidgetRepresentationProxy" },
         { "class": "vtkSMTransferFunctionManager" },
+        { "class": "vtkSMTransferFunctionPresets"},
         { "class": "vtkSMTransferFunctionProxy" },
         { "class": "vtkSMUtilities" },
         { "class": "vtkSMViewLayoutProxy" },

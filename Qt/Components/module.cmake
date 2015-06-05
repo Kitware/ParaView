@@ -15,6 +15,7 @@ vtk_module(pqComponents
     vtkPVServerManagerDefault
     vtkPVServerManagerRendering
     vtksys
+    vtkjsoncpp
   EXCLUDE_FROM_WRAPPING
   TEST_LABELS
     PARAVIEW

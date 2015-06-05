@@ -97,11 +97,6 @@ file (COPY "${ParaView_SOURCE_DIR}/VTK/Wrapping/Python/vtk/util/numpy_support.py
       DESTINATION ${PV_PYTHON_MODULE_BINARY_DIR}
       USE_SOURCE_PERMISSIONS)
 
-# copy ParaView's default lookup tables
-file(COPY "${CMAKE_SOURCE_DIR}/Qt/Components/Resources/XML/ColorMaps.xml"
-  DESTINATION "${PV_PYTHON_MODULE_BINARY_DIR}"
-  USE_SOURCE_PERMISSIONS)
-
 # Byte compile the paraview Python files.
 configure_file(${PV_PYTHON_MODULE_SOURCE_DIR}/compile_all_pv.py.in
   ${PV_PYTHON_MODULE_BINARY_DIR}/compile_all_pv.py

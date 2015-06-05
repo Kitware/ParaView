@@ -429,6 +429,7 @@ set (Module_UI_FILES
   Resources/UI/pqLightsEditor.ui
   Resources/UI/pqMainControlsToolbar.ui
   Resources/UI/pqPipelineBrowserContextMenu.ui
+  Resources/UI/pqSavePresetOptions.ui
   Resources/UI/pqSeriesEditorPropertyWidget.ui
   Resources/UI/pqTextLocationWidget.ui
   Resources/UI/pqTimeInspectorWidget.ui

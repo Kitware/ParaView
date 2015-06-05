@@ -35,7 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationComponentsModule.h"
 #include "pqPropertyWidget.h"
 
-class pqColorMapModel;
 class QModelIndex;
 class vtkSMPropertyGroup;
 
@@ -92,13 +91,13 @@ private slots:
   void onDoubleClicked(const QModelIndex& idx);
 
   /// pick a preset.
-  void choosePreset(const pqColorMapModel* add_new=NULL);
+  void choosePreset(const char* presetName=NULL);
 
   /// save current transfer function as preset.
   void saveAsPreset();
 
   /// apply a present.
-  void applyPreset(const pqColorMapModel*);
+  void applyCurrentPreset();
 
   /// Ensures that the color-swatches for indexedColors are shown only when this
   /// is set to true.
