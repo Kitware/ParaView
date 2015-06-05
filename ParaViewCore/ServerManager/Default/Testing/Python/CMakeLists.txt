@@ -21,7 +21,6 @@ paraview_test_load_data(""
 set(PY_TESTS
   Animation.py
   ProxyPropertyLinks.py
-  PythonPVLookupTables.py
   PythonPVSimpleCone.py
   PythonPVSimpleExII.py
   PythonPVSimpleSphere.py
