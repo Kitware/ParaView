@@ -37,6 +37,8 @@ set (Module_SRCS
   pqAnimationTimeToolbar.h
   pqAnimationTimeWidget.cxx
   pqAnimationTimeWidget.h
+  pqApplicationComponentsInit.cxx
+  pqApplicationComponentsInit.h
   pqApplicationSettingsReaction.cxx
   pqApplicationSettingsReaction.h
   pqApplyBehavior.cxx
@@ -236,6 +238,8 @@ set (Module_SRCS
   pqSourcesMenuReaction.h
   pqSpreadSheetVisibilityBehavior.cxx
   pqSpreadSheetVisibilityBehavior.h
+  pqStandardArrayColorMapsBehavior.cxx
+  pqStandardArrayColorMapsBehavior.h
   pqStandardPropertyWidgetInterface.cxx
   pqStandardPropertyWidgetInterface.h
   pqStandardViewFrameActionsImplementation.cxx
@@ -376,6 +380,7 @@ set (Module_MOC_HDRS
   pqServerDisconnectReaction.h
   pqSourcesMenuReaction.h
   pqSpreadSheetVisibilityBehavior.h
+  pqStandardArrayColorMapsBehavior.h
   pqStandardPropertyWidgetInterface.h
   pqStandardViewFrameActionsImplementation.h
   pqStatusBar.h
@@ -438,6 +443,7 @@ set (Module_UI_FILES
 )
 
 set (Module_RESOURCE_FILES
+  Resources/pqApplicationComponents.qrc
 )
 
 # not sure this is the best way, but "moc" is complaining about

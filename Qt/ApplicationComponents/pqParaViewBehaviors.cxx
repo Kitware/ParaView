@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertiesPanel.h"
 #include "pqQtMessageHandlerBehavior.h"
 #include "pqSpreadSheetVisibilityBehavior.h"
+#include "pqStandardArrayColorMapsBehavior.h"
 #include "pqStandardPropertyWidgetInterface.h"
 #include "pqStandardViewFrameActionsImplementation.h"
 #include "pqUndoRedoBehavior.h"
@@ -99,6 +100,7 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   new pqCommandLineOptionsBehavior(this);
   new pqPersistentMainWindowStateBehavior(mainWindow);
   new pqCollaborationBehavior(this);
+  new pqStandardArrayColorMapsBehavior(this);
 
   // some special handling for pqStreamingTestingEventPlayer
   pqViewStreamingBehavior* vsbehv = new pqViewStreamingBehavior(this);
