@@ -83,8 +83,22 @@ public:
   /// the same purpose, as needed.
   static QWidget* newGroupLabelWidget(const QString& label, QWidget* parentWidget);
 
+  /// Returns true of the proxy provided has XML hints indicating that labels
+  /// should use documentation instead of the XML label for the widgets in the
+  /// UI.
   static bool useDocumentationForLabels(vtkSMProxy* proxy);
+
+  /// Returns formatted (HTML or plainText) documentation for the property.
   static QString documentationText(vtkSMProperty* property);
+
+  /// Returns formatted (HTML or plainText) documentation for the proxy.
+  /// This only returns the text returned by vtkSMDocumentation::GetDescription().
+  static QString documentationText(vtkSMProxy* property);
+
+  /// Returns true if the proxy has XML hints indicating that the panel should
+  /// show a header label for the documentation. pqProxyWidget uses the
+  /// <ShowProxyDocumentationInPanel /> hint for this purpose.
+  static bool showProxyDocumentationInPanel(vtkSMProxy* proxy);
 
 signals:
   /// This signal is fired as soon as the user starts editing in the widget. The
