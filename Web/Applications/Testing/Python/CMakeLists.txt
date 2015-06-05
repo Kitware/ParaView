@@ -86,14 +86,13 @@ set(TESTAPP_WEB_TESTS_WITH_CHROME
 # Make sure any tests that pop up a browser are run in serial
 set (TestApp-all_FORCE_SERIAL TRUE)
 
-# Temporarily excluding it.
-#add_pvweb_tests("pvweb"
-#  APP          TestApp
-#  COMMAND      $<TARGET_FILE:pvpython>
-#  SERVER       ${pv_pymodule_build_dir}/paraview/web/pv_web_test_app.py
-#  BROWSER      firefox
-#               chrome
-#               internet_explorer
-#               safari
-#  TEST_SCRIPTS ${TESTAPP_WEB_TESTS_WITH_CHROME}
-#  )
+add_pvweb_tests("pvweb"
+  APP          TestApp
+  COMMAND      $<TARGET_FILE:pvpython>
+  SERVER       ${pv_pymodule_build_dir}/paraview/web/pv_web_test_app.py
+  BROWSER      firefox
+               chrome
+               internet_explorer
+               safari
+  TEST_SCRIPTS ${TESTAPP_WEB_TESTS_WITH_CHROME}
+  )
