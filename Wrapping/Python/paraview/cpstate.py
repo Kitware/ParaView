@@ -133,16 +133,17 @@ class ViewAccessor(smtrace.RealProxyAccessor):
         original_trace = smtrace.RealProxyAccessor.trace_ctor(\
             self, ctor, filter, ctor_args, skip_assignment)
         trace = smtrace.TraceOutput(original_trace)
-        trace.append_separated(["# register the view with coprocessor",
+        if self.ProxyName in cpstate_globals.screenshot_info:
+           trace.append_separated(["# register the view with coprocessor",
           "# and provide it with information such as the filename to use,",
           "# how frequently to write the images, etc."])
-        params = cpstate_globals.screenshot_info[self.ProxyName]
-        assert len(params) == 7
-        trace.append([
-            "coprocessor.RegisterView(%s," % self,
-            "    filename='%s', freq=%s, fittoscreen=%s, magnification=%s, width=%s, height=%s, cinema=%s)" %\
-                (params[0], params[1], params[2], params[3], params[4], params[5], params[6])])
-        trace.append_separator()
+           params = cpstate_globals.screenshot_info[self.ProxyName]
+           assert len(params) == 7
+           trace.append([
+              "coprocessor.RegisterView(%s," % self,
+              "    filename='%s', freq=%s, fittoscreen=%s, magnification=%s, width=%s, height=%s, cinema=%s)" %\
+                  (params[0], params[1], params[2], params[3], params[4], params[5], params[6])])
+           trace.append_separator()
         return trace.raw_data()
 
 # -----------------------------------------------------------------------------
