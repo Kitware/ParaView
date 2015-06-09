@@ -437,5 +437,5 @@ std::string pqProxy::rstToHtml(const char* rstStr)
     htmlStr.replace (start, src.size(), "\n<p>\n");
     }
   }
-  return "<html><head/><body><p>" + htmlStr + "</p></body></html>";
+  return htmlStr;
 }

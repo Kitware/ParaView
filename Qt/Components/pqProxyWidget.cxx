@@ -1214,8 +1214,7 @@ bool pqProxyWidget::filterWidgets(bool show_advanced, const QString& filterText)
   if (this->showProxyDocumentationInPanel(smProxy))
     {
     QString doc = this->documentationText(smProxy);
-    cout << doc.toStdString().c_str() << endl;
-    this->Internals->ProxyDocumentationLabel->setText(doc);
+    this->Internals->ProxyDocumentationLabel->setText("<p>" + doc + "</p>");
     this->Internals->ProxyDocumentationLabel->setVisible(!doc.isEmpty());
     gridLayout->addWidget(this->Internals->ProxyDocumentationLabel, row_index, 0, 1, 2);
     row_index++;
