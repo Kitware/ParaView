@@ -62,12 +62,20 @@ public:
   vtkSetMacro(OutlineThreshold, vtkIdType);
   vtkGetMacro(OutlineThreshold, vtkIdType);
 
+  // Description:
+  // Set the radius in pixels to include for finding the closet point when
+  // selecting a point on render view. This only after single point selections
+  // i.e. when selecting a regions this radius is not respected.
+  vtkSetMacro(PointPickingRadius, int);
+  vtkGetMacro(PointPickingRadius, int);
+
 //BTX
 protected:
   vtkPVRenderViewSettings();
   ~vtkPVRenderViewSettings();
 
   vtkIdType OutlineThreshold;
+  int PointPickingRadius;
 private:
   vtkPVRenderViewSettings(const vtkPVRenderViewSettings&); // Not implemented
   void operator=(const vtkPVRenderViewSettings&); // Not implemented

@@ -16,8 +16,10 @@
 
 #include "vtkCamera.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVRenderViewSettings.h"
 #include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkRenderer.h"
+#include "vtkSelection.h"
 
 #include <map>
 
@@ -99,7 +101,25 @@ vtkSelection* vtkPVHardwareSelector::Select(int region[4])
     {
     return NULL;
     }
-  return this->GenerateSelection(region[0], region[1], region[2], region[3]);
+
+  vtkSelection* sel = this->GenerateSelection(region[0], region[1], region[2], region[3]);
+  if (sel->GetNumberOfNodes() == 0 &&
+    this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS &&
+    region[0] == region[2] &&
+    region[1] == region[3] &&
+    vtkPVRenderViewSettings::GetInstance()->GetPointPickingRadius() > 0)
+    {
+    unsigned int pos[2] = {region[0], region[1]};
+    unsigned int out_pos[2];
+    vtkHardwareSelector::PixelInformation info = this->GetPixelInformation(
+      pos, vtkPVRenderViewSettings::GetInstance()->GetPointPickingRadius(), out_pos);
+    if (info.Valid)
+      {
+      sel->Delete();
+      return this->GenerateSelection(out_pos[0], out_pos[1], out_pos[0], out_pos[1]);
+      }
+    }
+  return sel;
 }
 
 //----------------------------------------------------------------------------

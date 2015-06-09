@@ -567,6 +567,18 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="PointPickingRadius"
+                         command="SetPointPickingRadius"
+                         default_values="50"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain name="range" min="0" max="100" />
+        <Documentation>
+          Set the radius (in pixels) to include when using *Select Points On*
+          to click-and-select a single point on the **Render View**.
+        </Documentation>
+      </IntVectorProperty>
+
       <PropertyGroup label="Geometry Mapper Options">
         <Property name="UseDisplayLists" />
         <Property name="ResolveCoincidentTopology" />
