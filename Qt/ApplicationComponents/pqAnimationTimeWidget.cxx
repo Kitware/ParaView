@@ -83,6 +83,7 @@ protected:
   virtual QVariant currentServerManagerValue(bool use_unchecked) const
     {
     Q_ASSERT(use_unchecked == false);
+    Q_UNUSED(use_unchecked);
     unsigned int count = vtkSMPropertyHelper(this->propertySM()).GetNumberOfElements();
     return QVariant(static_cast<int>(count));
     }

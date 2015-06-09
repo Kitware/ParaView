@@ -111,6 +111,7 @@ protected:
   virtual void setServerManagerValue(bool use_unchecked, const QVariant& value)
     {
     Q_ASSERT(use_unchecked == false);
+    Q_UNUSED(use_unchecked);
 
     ValueType val = this->convert(value);
     int association = val.first;
