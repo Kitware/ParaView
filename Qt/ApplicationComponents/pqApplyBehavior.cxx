@@ -250,8 +250,6 @@ void pqApplyBehavior::showData(pqPipelineSource* source, pqView* view)
       {
       // Hide input, since the data wasn't shown in a new view, but an existing
       // view.
-      pqDataRepresentation *repr = source->getRepresentation(outputPort, view);
-      Q_ASSERT(repr);
       if (pqPipelineFilter *filter = qobject_cast<pqPipelineFilter *>(source))
         {
         this->hideInputIfRequired(filter, view);

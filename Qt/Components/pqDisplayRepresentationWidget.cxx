@@ -69,6 +69,7 @@ protected:
   virtual void setServerManagerValue(bool use_unchecked, const QVariant& value)
     {
     Q_ASSERT(use_unchecked == false);
+    Q_UNUSED(use_unchecked);
 
     BEGIN_UNDO_SET("Change representation type");
     vtkSMProxy* reprProxy = this->proxySM();

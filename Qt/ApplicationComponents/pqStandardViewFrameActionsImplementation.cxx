@@ -341,6 +341,7 @@ void pqStandardViewFrameActionsImplementation::addSpreadSheetViewActions(
 {
   Q_ASSERT(frame);
   Q_ASSERT(spreadSheet);
+  Q_UNUSED(frame);
   new pqSpreadSheetViewDecorator(spreadSheet);
 }
 
