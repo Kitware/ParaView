@@ -47,13 +47,15 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqViewMenuManager : public QObject
 public:
   pqViewMenuManager(QMainWindow* mainWindow, QMenu* menu);
 
-private slots:
+protected slots:
   virtual void buildMenu();
+
+protected:
+  QMenu* Menu;
 
 private:
   Q_DISABLE_COPY(pqViewMenuManager)
   QMainWindow* Window;
-  QMenu* Menu;
 };
 
 #endif
