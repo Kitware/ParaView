@@ -705,8 +705,11 @@ int vtkFileSeriesReader::RequestInformationForInput(
     else
       {
       tempOutputVector = vtkSmartPointer<vtkInformationVector>::New();
-      VTK_CREATE(vtkInformation, tempOutputInfo);
-      tempOutputVector->Append(tempOutputInfo);
+      for (int cc=0; cc < this->GetNumberOfOutputPorts(); ++cc)
+        {
+        VTK_CREATE(vtkInformation, tempOutputInfo);
+        tempOutputVector->Append(tempOutputInfo);
+        }
       }
     return this->Reader->ProcessRequest(tempRequest,
                                         (vtkInformationVector**)NULL,

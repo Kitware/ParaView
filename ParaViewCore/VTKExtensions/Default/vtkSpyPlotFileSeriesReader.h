@@ -28,20 +28,20 @@
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkFileSeriesReader.h"
 
+/// vtkSpyPlotFileSeriesReader extends vtkFileSeriesReader to change the number
+/// of output ports on this reader. Based on whether markers support was
+/// enabled, this reader will have 2 or 3 output ports.
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSpyPlotFileSeriesReader : public vtkFileSeriesReader
 {
 public:
   static vtkSpyPlotFileSeriesReader* New ();
-  vtkTypeMacro (vtkSpyPlotFileSeriesReader, vtkFileSeriesReader);
-  void PrintSelf (ostream& os, vtkIndent indent);
+  vtkTypeMacro(vtkSpyPlotFileSeriesReader, vtkFileSeriesReader);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:
-  vtkSpyPlotFileSeriesReader ();
-  ~vtkSpyPlotFileSeriesReader ();
+  vtkSpyPlotFileSeriesReader();
+  ~vtkSpyPlotFileSeriesReader();
 
-  virtual int RequestInformationForInput(int index,
-                                         vtkInformation *request = NULL,
-                                         vtkInformationVector *outputVector = NULL);
 private:
   vtkSpyPlotFileSeriesReader(const vtkSpyPlotFileSeriesReader&); // Not implemented.
   void operator=(const vtkSpyPlotFileSeriesReader&); // Not implemented.
