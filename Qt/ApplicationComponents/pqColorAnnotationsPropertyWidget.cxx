@@ -54,8 +54,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMStringVectorProperty.h"
 #include "vtkSMTransferFunctionPresets.h"
 #include "vtkSMTransferFunctionProxy.h"
+#include "vtkStringList.h"
 #include "vtkTuple.h"
 #include "vtkVariant.h"
 
@@ -657,6 +659,8 @@ void pqColorAnnotationsPropertyWidget::addActiveAnnotations()
       }
 
     QList<QVariant> annotationList;
+    vtkSmartPointer<vtkStringList> activeAnnotatedValues =
+      vtkSmartPointer<vtkStringList>::New();
     vtkSmartPointer<vtkAbstractArray> unique_values;
     unique_values.TakeReference(
       info->GetProminentComponentValues(component_no));
@@ -668,10 +672,15 @@ void pqColorAnnotationsPropertyWidget::addActiveAnnotations()
       {
       annotationList.push_back(unique_values->GetVariantValue(idx).ToString().c_str());
       annotationList.push_back(unique_values->GetVariantValue(idx).ToString().c_str());
+      activeAnnotatedValues->AddString(unique_values->GetVariantValue(idx).ToString().c_str());
       }
     this->setAnnotations(annotationList);
-    }
 
+    // Now update the "active" annotations
+    vtkSMStringVectorProperty* activeAnnotatedValuesProperty =
+      vtkSMStringVectorProperty::SafeDownCast(this->proxy()->GetProperty("ActiveAnnotatedValues"));
+    activeAnnotatedValuesProperty->SetElements(activeAnnotatedValues);
+    }  
   catch (int)
     {
     QMessageBox::warning(
@@ -774,13 +783,21 @@ void pqColorAnnotationsPropertyWidget::addActiveAnnotationsFromVisibleSources()
     qSort(uniqueList);
 
     QList<QVariant> annotationList;
+    vtkSmartPointer<vtkStringList> activeAnnotatedValues =
+      vtkSmartPointer<vtkStringList>::New();
     for (int idx = 0; idx < uniqueList.size(); ++idx)
       {
       annotationList.push_back(uniqueList[idx]);
       annotationList.push_back(uniqueList[idx]);
+      activeAnnotatedValues->AddString(uniqueList[idx].toStdString().c_str());
       }
 
     this->setAnnotations(annotationList);
+
+    // Now update the "active" annotations
+    vtkSMStringVectorProperty* activeAnnotatedValuesProperty =
+      vtkSMStringVectorProperty::SafeDownCast(this->proxy()->GetProperty("ActiveAnnotatedValues"));
+    activeAnnotatedValuesProperty->SetElements(activeAnnotatedValues);
     }
 
   catch (int)

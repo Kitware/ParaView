@@ -47,7 +47,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkNew.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMTransferFunctionManager.h"
 #include "vtkSMViewProxy.h"
 
 #include <QHeaderView>

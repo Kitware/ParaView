@@ -96,6 +96,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/ResetToVisibleRange.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SaveLargeScreenshot.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TestIsoVolume.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/TransferFunctionResetOnVisibilityChange.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/UpdateTransferFunctionRanges.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/XYChart.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/XYHistogram.xml

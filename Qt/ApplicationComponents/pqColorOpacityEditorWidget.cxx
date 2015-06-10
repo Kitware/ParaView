@@ -255,6 +255,13 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
     qCritical("Missing 'XRGBPoints' property. Widget may not function correctly.");
     }
 
+  smproperty = smproxy->GetProperty("LockScalarRange");
+  if (smproperty)
+    {
+    this->addPropertyLink(
+      this, "lockScalarRange", SIGNAL(lockScalarRangeChanged()), smproperty);
+    }
+
   ui.OpacityEditor->hide();
   smproperty = smgroup->GetProperty("ScalarOpacityFunction");
   if (smproperty)
@@ -288,19 +295,6 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   else
     {
     ui.UseLogScale->hide();
-    }
-
-  smproperty = smgroup->GetProperty("LockScalarRange");
-  if (smproperty)
-    {
-    this->addPropertyLink(
-      this, "lockScalarRange", SIGNAL(lockScalarRangeChanged()), smproperty);
-    QObject::connect(ui.AutoRescaleRange, SIGNAL(toggled(bool)),
-      this, SIGNAL(lockScalarRangeChanged()));
-    }
-  else
-    {
-    ui.AutoRescaleRange->hide();
     }
 
   // if proxy has a property named IndexedLookup, we hide this entire widget
@@ -554,15 +548,14 @@ void pqColorOpacityEditorWidget::useLogScaleClicked(bool log_space)
 //-----------------------------------------------------------------------------
 bool pqColorOpacityEditorWidget::lockScalarRange() const
 {
-  Ui::ColorOpacityEditorWidget &ui = this->Internals->Ui;
-  return !ui.AutoRescaleRange->isChecked();
+  return vtkSMPropertyHelper(this->proxy(), "LockScalarRange").GetAsInt() ? true : false;
 }
 
 //-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::setLockScalarRange(bool val)
 {
-  Ui::ColorOpacityEditorWidget &ui = this->Internals->Ui;
-  ui.AutoRescaleRange->setChecked(!val);
+  vtkSMPropertyHelper(this->proxy(), "LockScalarRange").Set(val ? 1 : 0);
+  this->proxy()->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------

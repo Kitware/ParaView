@@ -36,12 +36,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkEventQtSlotConnect.h"
 #include "vtkSmartPointer.h" 
 #include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 
 // Qt includes.
 #include <QPointer>
 
 // ParaView includes.
+#include "pqServer.h"
 #include "pqView.h"
 #include "pqSMAdaptor.h"
 

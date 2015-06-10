@@ -14,9 +14,11 @@
 =========================================================================*/
 #include "vtkSMTransferFunctionProxy.h"
 
+#include "vtkDoubleArray.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVArrayInformation.h"
+#include "vtkPVProminentValuesInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkScalarsToColors.h"
@@ -216,11 +218,13 @@ bool vtkSMTransferFunctionProxy::RescaleTransferFunction(
 {
   vtkSMTransferFunctionProxy* tfp =
     vtkSMTransferFunctionProxy::SafeDownCast(proxy);
-  if (tfp)
+
+  if (!tfp)
     {
-    return tfp->RescaleTransferFunction(rangeMin, rangeMax, extend);
+    return false;
     }
-  return false;
+    
+  return tfp->RescaleTransferFunction(rangeMin, rangeMax, extend);
 }
 
 //----------------------------------------------------------------------------
@@ -365,6 +369,78 @@ bool vtkSMTransferFunctionProxy::ComputeDataRange(double range[2])
       }
     }
   return (range[0] <= range[1]);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMTransferFunctionProxy::ComputeAvailableAnnotations()
+{
+  int component = -1;
+  if (vtkSMPropertyHelper(this, "VectorMode").GetAsInt() == vtkScalarsToColors::COMPONENT)
+    {
+    component = vtkSMPropertyHelper(this, "VectorComponent").GetAsInt();
+    }
+
+  vtkSMStringVectorProperty* allAnnotations =
+    vtkSMStringVectorProperty::SafeDownCast(this->GetProperty("Annotations"));
+  vtkSmartPointer<vtkStringList> activeAnnotations = vtkSmartPointer<vtkStringList>::New();
+  vtkSmartPointer<vtkDoubleArray> activeIndexedColors = vtkSmartPointer<vtkDoubleArray>::New();
+  vtkSMStringVectorProperty* activeAnnotatedValuesProperty =
+    vtkSMStringVectorProperty::SafeDownCast(this->GetProperty("ActiveAnnotatedValues"));
+  vtkSmartPointer<vtkStringList> activeAnnotatedValues =
+    vtkSmartPointer<vtkStringList>::New();
+
+  if (!allAnnotations || !activeAnnotatedValuesProperty)
+    {
+    return false;
+    }
+
+  for (unsigned int cc=0, max=this->GetNumberOfConsumers(); cc < max; ++cc)
+    {
+    vtkSMProxy* proxy = this->GetConsumerProxy(cc);
+    // consumers could be subproxy of something; so, we locate the true-parent
+    // proxy for a proxy.
+    proxy = proxy? proxy->GetTrueParentProxy() : NULL;
+    vtkSMPVRepresentationProxy* consumer = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    if (consumer &&
+      // consumer is visible.
+      vtkSMPropertyHelper(consumer, "Visibility", true).GetAsInt() == 1 &&
+      // consumer is using scalar coloring.
+      consumer->GetUsingScalarColoring())
+      {
+      vtkPVProminentValuesInformation* prominentValues =
+        vtkSMPVRepresentationProxy::GetProminentValuesInformationForColorArray(consumer);
+      if (!prominentValues)
+        {
+        vtkWarningMacro(<< "No prominent values for consumer");
+        continue;
+        }
+      vtkSmartPointer<vtkAbstractArray> uniqueValues;
+      uniqueValues.TakeReference(
+        prominentValues->GetProminentComponentValues(component));
+
+      if (uniqueValues)
+        {
+        for (int idx = 0; idx < uniqueValues->GetNumberOfTuples(); ++idx)
+          {
+          // Look up index of color corresponding to the annotation
+          for (unsigned int j = 0; j < allAnnotations->GetNumberOfElements()/2; ++j)
+            {
+            vtkVariant annotatedValue(allAnnotations->GetElement(2*j + 0));
+            if (annotatedValue == uniqueValues->GetVariantValue(idx))
+              {
+              activeAnnotatedValues->AddUniqueString(allAnnotations->GetElement(2*j + 0));
+              break;
+              }
+            }
+          }
+        }
+      }
+    }
+
+  activeAnnotatedValuesProperty->SetElements(activeAnnotatedValues);
+  this->UpdateVTKObjects();
+
+  return true;
 }
 
 //----------------------------------------------------------------------------

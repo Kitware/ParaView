@@ -48,6 +48,7 @@ set(Module_SRCS
   vtkPVAxesWidget.cxx
   vtkPVCenterAxesActor.cxx
   vtkPVDefaultPass.cxx
+  vtkPVDiscretizableColorTransferFunction.cxx
   vtkPVGeometryFilter.cxx
   vtkPVInteractorStyle.cxx
   vtkPVJoystickFly.cxx

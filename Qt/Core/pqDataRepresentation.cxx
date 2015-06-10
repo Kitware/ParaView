@@ -31,16 +31,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqDataRepresentation.h"
 
+#include "vtkDataObject.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkNew.h"
 #include "vtkPVArrayInformation.h"
+#include "vtkPVGeneralSettings.h"
 #include "vtkPVProminentValuesInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkSMInputProperty.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
-#include "vtkDataObject.h"
+#include "vtkSMTransferFunctionManager.h"
 
 #include <QtDebug>
 #include <QPointer>
@@ -50,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
 #include "pqScalarsToColors.h"
+#include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 
@@ -58,6 +63,7 @@ class pqDataRepresentationInternal
 {
 public:
   QPointer<pqOutputPort> InputPort;
+  bool VisibilityChangedSinceLastUpdate;
 };
 
 //-----------------------------------------------------------------------------
@@ -67,6 +73,7 @@ pqDataRepresentation::pqDataRepresentation(const QString& group,
 : pqRepresentation(group, name, repr, server, _p)
 {
   this->Internal = new pqDataRepresentationInternal;
+  this->Internal->VisibilityChangedSinceLastUpdate = false;
   vtkEventQtSlotConnect* vtkconnector = this->getConnector();
 
   vtkconnector->Connect(repr->GetProperty("Input"),
@@ -257,4 +264,44 @@ pqDataRepresentation* pqDataRepresentation::getRepresentationForUpstreamSource()
    }
 
  return input->getRepresentation(view);
+}
+
+//-----------------------------------------------------------------------------
+void pqDataRepresentation::onVisibilityChanged()
+{
+  this->Superclass::onVisibilityChanged();
+
+  this->Internal->VisibilityChangedSinceLastUpdate = true;
+}
+
+//-----------------------------------------------------------------------------
+void pqDataRepresentation::updateLookupTable()
+{
+  // Only update the LookupTable when the setting tells us to
+  vtkSMProxy* representationProxy = this->getProxy();
+  vtkSMProxy* lut = vtkSMPropertyHelper(representationProxy, "LookupTable").GetAsProxy();
+  if (!lut)
+    {
+    return;
+    }
+
+  int rescaleOnVisibilityChange = vtkSMPropertyHelper(lut, "RescaleOnVisibilityChange", 1).GetAsInt(0);
+  if (rescaleOnVisibilityChange && this->Internal->VisibilityChangedSinceLastUpdate)
+    {
+    this->resetAllTransferFunctionRangesUsingCurrentData();
+    }
+  this->Internal->VisibilityChangedSinceLastUpdate = false;
+}
+
+//-----------------------------------------------------------------------------
+void pqDataRepresentation::resetAllTransferFunctionRangesUsingCurrentData()
+{
+  vtkSMProxy* representationProxy = this->getProxy();
+  vtkSMProxy* lut = vtkSMPropertyHelper(representationProxy, "LookupTable").GetAsProxy();
+  if (lut)
+    {
+    vtkNew<vtkSMTransferFunctionManager> tfmgr;
+    tfmgr->ResetAllTransferFunctionRangesUsingCurrentData(
+      this->getServer()->proxyManager(), false);
+    }
 }

@@ -45,20 +45,20 @@ class pqColorMapModel;
 /// color and opacity transfer functions. The property group is expected to have
 /// properties with the following functions. If any of the optional properties
 /// are missing, then the corresponding widgets are hidden.
-/// \li "XRGBPoints"           :- property with (x,r,g,b) tuples that is
-///                               controlled by a color-transfer function editor
-///                               (pqTransferFunctionWidget).
-/// \li "ScalarOpacityFunction":- (optional) proxy-property referring to a proxy with
-///                               "Points" property with (x,a,m,s) tuples that
-///                               is controlled by an opacity-transfer function
-///                               editor (pqTransferFunctionWidget).
-/// \li "EnableOpacityMapping" :- (optional) property used to enable
-///                               opacity mapping for surfaces. Controlled by a
-///                               checkbox in the Widget.
-/// \li "UseLogScale"          :- (optional) property used to enable/disable log mapping
-///                               for colors.
-/// \li "LockScalarRange       :- (optional) property used to control if the application
-///                               resets transfer function as and when needed.
+/// \li "XRGBPoints"            :- property with (x,r,g,b) tuples that is
+///                                controlled by a color-transfer function editor
+///                                (pqTransferFunctionWidget).
+/// \li "ScalarOpacityFunction" :- (optional) proxy-property referring to a proxy with
+///                                "Points" property with (x,a,m,s) tuples that
+///                                is controlled by an opacity-transfer function
+///                                editor (pqTransferFunctionWidget).
+/// \li "EnableOpacityMapping"  :- (optional) property used to enable
+///                                opacity mapping for surfaces. Controlled by a
+///                                checkbox in the Widget.
+/// \li "UseLogScale"           :- (optional) property used to enable/disable log mapping
+///                                for colors.
+/// \li "LockScalarRange"       :- (optional) property used to control if the application
+///                                resets transfer function as and when needed.
 /// UseLogScale.
 /// Caveats:
 /// \li Opacity editor:- pqColorOpacityEditorWidget shows an opacity editor widget.
@@ -91,7 +91,7 @@ public:
   /// Returns the value for use-log-scale.
   bool useLogScale() const;
 
-  /// Returns true if the scalar range is locked.
+  /// Returns true if the color map range is locked.
   bool lockScalarRange() const;
 
   /// Returns the scalar opacity function (i.e. PiecewiseFunction) proxy
@@ -108,7 +108,7 @@ public slots:
   /// Set whether to use-log scale.
   void setUseLogScale(bool value);
 
-  /// Set whether the scalar range must be locked.
+  /// Set whether the color map range should be locked.
   void setLockScalarRange(bool val);
 
   /// Set the scalar opacity function (or PiecewiseFunction) proxy to use.

@@ -69,10 +69,24 @@
                             number_of_elements="1"></StringVectorProperty>
     </Proxy>
 
-    <TransferFunctionProxy class="vtkDiscretizableColorTransferFunction"
+    <TransferFunctionProxy class="vtkPVDiscretizableColorTransferFunction"
                            name="PVLookupTable"
                            post_push="Build"
                            processes="dataserver|renderserver|client">
+      <IntVectorProperty default_values="0"
+                         name="LockScalarRange"
+                         label="Lock Data Range"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When enabled, data range is locked, meaning that the
+          application will not be permitted to automatically update
+          the color map to fit the data range. To change when the
+          application will update the color map, see the application
+          setting General -> Transfer Function Reset Mode.
+        </Documentation>
+
+      </IntVectorProperty>
       <IntVectorProperty name="IndexedLookup"
                          command="SetIndexedLookup"
                          default_values="0"
@@ -82,6 +96,16 @@
         <Documentation>
           When enabled, the color transfer function switches to indexed-lookup
           (categorical colors) mode.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="RescaleOnVisibilityChange"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Flag indicating whether the color map data range should be
+          updated when a representation's visibility changes.
         </Documentation>
       </IntVectorProperty>
 
@@ -124,16 +148,6 @@
                          name="UseLogScale"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <IntVectorProperty default_values="0"
-                         name="LockScalarRange"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          When set to true (1), the application will not try to automatically
-          change scalar range whenever the application may usually update the lookup table
-          scalar ranges.
-        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetColorSpace"
                          default_values="3"
@@ -285,8 +299,8 @@
       </IntVectorProperty>
 
       <StringVectorProperty name="Annotations"
-                            clean_command="ResetAnnotations"
-                            command="SetAnnotation"
+                            clean_command="ResetAnnotationsInFullSet"
+                            command="SetAnnotationInFullSet"
                             element_types="2 2"
                             number_of_elements_per_command="2"
                             repeat_command="1">
@@ -295,12 +309,25 @@
         </Documentation>
       </StringVectorProperty>
 
+      <StringVectorProperty name="ActiveAnnotatedValues"
+                            clean_command="ResetActiveAnnotatedValues"
+                            command="SetActiveAnnotatedValue"
+                            element_types="2"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            panel_visibility="never">
+        <Documentation>
+          Specify active annotations.
+        </Documentation>
+      </StringVectorProperty>
+
       <DoubleVectorProperty name="IndexedColors"
-                            command="SetIndexedColor"
+                            command="SetIndexedColorInFullSet"
                             number_of_elements_per_command="3"
                             repeat_command="1"
-                            set_number_command="SetNumberOfIndexedColors"
-                            use_index="1">
+                            set_number_command="SetNumberOfIndexedColorsInFullSet"
+                            use_index="1"
+                            panel_visibility="advanced">
         <Documentation>
           Colors used when using IndexedLookup is true.
         </Documentation>
@@ -311,7 +338,6 @@
         <Property name="RGBPoints" function="XRGBPoints" />
         <Property name="ScalarOpacityFunction" function="ScalarOpacityFunction" />
         <Property name="UseLogScale" function="UseLogScale" />
-        <Property name="LockScalarRange" function="LockScalarRange" />
       </PropertyGroup>
 
       <PropertyGroup label="Color Mapping Parameters">
@@ -328,6 +354,7 @@
         <Property name="Annotations" />
         <Property name="IndexedColors" />
       </PropertyGroup>
+
       <!-- End of PVLookupTable -->
     </TransferFunctionProxy>
   </ProxyGroup>

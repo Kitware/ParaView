@@ -32,12 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPresetToPixmap.h"
 
 #include "pqActiveObjects.h"
-#include "vtkDiscretizableColorTransferFunction.h"
 #include "vtkFloatArray.h"
 #include "vtkImageData.h"
 #include "vtkMath.h"
 #include "vtkNew.h"
 #include "vtkPiecewiseFunction.h"
+#include "vtkPVDiscretizableColorTransferFunction.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSession.h"
@@ -215,8 +215,8 @@ QPixmap pqPresetToPixmap::renderColorTransferFunction(
 QPixmap pqPresetToPixmap::renderIndexedColorTransferFunction(
   vtkScalarsToColors* stc, const QSize& size) const
 {
-  vtkDiscretizableColorTransferFunction* dct = vtkDiscretizableColorTransferFunction::SafeDownCast(stc);
-  int numSwatches = static_cast<int>(dct->GetNumberOfIndexedColors());
+  vtkPVDiscretizableColorTransferFunction* dct = vtkPVDiscretizableColorTransferFunction::SafeDownCast(stc);
+  int numSwatches = static_cast<int>(dct->GetNumberOfIndexedColorsInFullSet());
   if (numSwatches < 1)
     {
     return QPixmap();
@@ -224,10 +224,10 @@ QPixmap pqPresetToPixmap::renderIndexedColorTransferFunction(
 
   // This is needed since the vtkDiscretizableColorTransferFunction only
   // respects categorical colors for which annotations are present (currently)
-  dct->ResetAnnotations();
+  dct->ResetAnnotationsInFullSet();
   for (int cc=0; cc <numSwatches; cc++)
     {
-    dct->SetAnnotation(vtkVariant(cc), "");
+    dct->SetAnnotationInFullSet(vtkVariant(cc), "");
     }
   dct->Build();
 
@@ -292,7 +292,7 @@ QPixmap pqPresetToPixmap::renderIndexedColorTransferFunction(
   for (row = 0, col = 0, swatch = 0; swatch <= elideLf; ++swatch)
     {
     double drgba[4];
-    stc->GetIndexedColor(swatch, drgba);
+    dct->GetIndexedColorInFullSet(swatch, drgba);
     painter.setBrush(QColor::fromRgbF(drgba[0], drgba[1], drgba[2]));
     painter.drawRect(PQ_SWATCH_PAD + col * (PQ_SWATCH_PAD + ss)+ 0.5, PQ_SWATCH_PAD + row * (PQ_SWATCH_PAD + ss) + 0.5, ss, ss);
 
@@ -316,7 +316,7 @@ QPixmap pqPresetToPixmap::renderIndexedColorTransferFunction(
   for (; swatch < Nd; ++swatch, ++entry)
     {
     double drgba[4];
-    stc->GetIndexedColor(swatch, drgba);
+    dct->GetIndexedColorInFullSet(swatch, drgba);
     painter.setBrush(QColor::fromRgbF(drgba[0], drgba[1], drgba[2]));
     painter.drawRect(PQ_SWATCH_PAD + col * (PQ_SWATCH_PAD + ss)+ 0.5, PQ_SWATCH_PAD + row * (PQ_SWATCH_PAD + ss) + 0.5, ss, ss);
 

@@ -33,12 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkSMPVRepresentationProxy.h"
 
+#include "pqView.h"
+
 //-----------------------------------------------------------------------------
 pqPipelineRepresentation::pqPipelineRepresentation(
   const QString& group,
   const QString& name,
   vtkSMProxy* display,
-  pqServer* server, QObject* p/*=null*/):
+  pqServer* server, QObject* p/*=null*/) :
   Superclass(group, name, display, server, p)
 {
 }
@@ -52,6 +54,25 @@ pqPipelineRepresentation::~pqPipelineRepresentation()
 vtkSMRepresentationProxy* pqPipelineRepresentation::getRepresentationProxy() const
 {
   return vtkSMRepresentationProxy::SafeDownCast(this->getProxy());
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineRepresentation::setView(pqView* view)
+{
+  pqView* oldView = this->getView();
+  this->Superclass::setView(view);
+
+  if (view)
+    {
+    this->connect(view, SIGNAL(updateDataEvent()),
+                  this, SLOT(updateLookupTable()));
+    }
+
+  if (oldView && oldView != view)
+    {
+    this->disconnect(oldView, SIGNAL(updateDataEvent()),
+                     this, SLOT(updateLookupTable()));
+    }
 }
 
 //-----------------------------------------------------------------------------
