@@ -48,7 +48,7 @@ public:
   pqViewMenuManager(QMainWindow* mainWindow, QMenu* menu);
 
 private slots:
-  void buildMenu();
+  virtual void buildMenu();
 
 private:
   Q_DISABLE_COPY(pqViewMenuManager)
