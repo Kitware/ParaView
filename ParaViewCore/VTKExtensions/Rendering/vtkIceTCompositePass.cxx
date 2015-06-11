@@ -554,9 +554,8 @@ void vtkIceTCompositePass::CreateProgram(vtkOpenGLRenderWindow *context)
 #ifdef VTKGL2
   this->Program = new vtkOpenGLHelper;
   this->Program->Program =
-    context->GetShaderCache()->ReadyShader(vtkTextureObjectVS,
-                                           vtkCompositeZPassFS,
-                                           "");
+    context->GetShaderCache()->ReadyShaderProgram(
+      vtkTextureObjectVS, vtkCompositeZPassFS, "");
   if (!this->Program->Program)
     {
     vtkErrorMacro("Shader program failed to build.");
@@ -969,7 +968,7 @@ void vtkIceTCompositePass::PushIceTDepthBufferToScreen(
     }
 
 #ifdef VTKGL2
-  context->GetShaderCache()->ReadyShader(this->Program->Program);
+  context->GetShaderCache()->ReadyShaderProgram(this->Program->Program);
   this->ZTexture->Activate();
   this->Program->Program->SetUniformi("depth", this->ZTexture->GetTextureUnit());
   this->ZTexture->CopyToFrameBuffer(0, 0, w - 1, h - 1,
