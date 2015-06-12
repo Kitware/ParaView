@@ -99,11 +99,22 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetColorTransferFunction(
   vtkNew<vtkSMParaViewPipelineController> controller;
   controller->PreInitializeProxy(proxy);
 
+  vtkSMSettings* settings = vtkSMSettings::GetInstance();
+
+  // Load array-specific preset, if specified.
+  std::string stdPresetsKey = ".standard_presets.";
+  stdPresetsKey += arrayName;
+  if (settings->HasSetting(stdPresetsKey.c_str()))
+    {
+    vtkSMTransferFunctionProxy::ApplyPreset(proxy,
+      settings->GetSettingAsString(stdPresetsKey.c_str(), 0, "").c_str(),
+      /*rescale=*/false);
+    }
+
   // Look up array-specific transfer function
   vtksys_ios::ostringstream prefix;
   prefix << ".array_" << proxy->GetXMLGroup() << "." << arrayName;
 
-  vtkSMSettings* settings = vtkSMSettings::GetInstance();
   settings->GetProxySettings(prefix.str().c_str(), proxy);
 
   vtksys_ios::ostringstream proxyName;

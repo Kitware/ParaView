@@ -89,66 +89,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMWriterFactory.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
-#include "vtkSMSettings.h"
-
-namespace
-{
-  const char* COMPOSITE_INDEX_REMAINDER_COLOR_MAP = 
-"{\n"
-"   \"array_lookup_tables\" : {\n"
-"      \"vtkBlockColors\" : {\n"
-"         \"PVLookupTable\" : {\n"
-"            \"Annotations\" : [ \"0\", \"0\", \"1\", \"1\", \"2\", \"2\", \"3\", \"3\", \"4\", \"4\", \"5\", \"5\", \"6\", \"6\" ],\n"
-"            \"IndexedColors\" : [\n"
-"               0,\n"
-"               0,\n"
-"               0,\n"
-"               0.8941176470588236,\n"
-"               0.1019607843137255,\n"
-"               0.1098039215686274,\n"
-"               0.2156862745098039,\n"
-"               0.4941176470588236,\n"
-"               0.7215686274509804,\n"
-"               0.3019607843137255,\n"
-"               0.6862745098039216,\n"
-"               0.2901960784313726,\n"
-"               0.596078431372549,\n"
-"               0.3058823529411765,\n"
-"               0.6392156862745098,\n"
-"               1,\n"
-"               0.4980392156862745,\n"
-"               0,\n"
-"               0.6509803921568628,\n"
-"               0.3372549019607843,\n"
-"               0.1568627450980392\n"
-"            ],\n"
-"            \"IndexedLookup\" : 1,\n"
-"            \"NanColor\" : [ 0.65098, 0.337255, 0.156863 ],\n"
-"            \"RGBPoints\" : [\n"
-"               2,\n"
-"               0.231373,\n"
-"               0.298039,\n"
-"               0.752941,\n"
-"               3.5,\n"
-"               0.865003,\n"
-"               0.865003,\n"
-"               0.865003,\n"
-"               5,\n"
-"               0.705882,\n"
-"               0.0156863,\n"
-"               0.14902\n"
-"            ]\n"
-"         }\n"
-"      }\n"
-"   },\n"
-"   \"piecewise_functions\" : {\n"
-"      \"PiecewiseFunction\" : {\n"
-"         \"Points\" : [ 2, 0, 0.5, 0, 5, 1, 0.5, 0 ]\n"
-"      }\n"
-"   }\n"
-"}\n";
-};
-
 
 //-----------------------------------------------------------------------------
 class pqApplicationCore::pqInternals
@@ -181,10 +121,6 @@ pqApplicationCore::pqApplicationCore(int& argc, char** argv, pqOptions* options,
 
   // Create output window before initializing server manager.
   this->createOutputWindow();
-  // setup a default color map for vtkBlockColors
-  vtkSMSettings::GetInstance()->AddCollectionFromString(
-    COMPOSITE_INDEX_REMAINDER_COLOR_MAP, 1);
-
   vtkInitializationHelper::SetOrganizationName(QApplication::organizationName().toStdString());
   vtkInitializationHelper::SetApplicationName(QApplication::applicationName().toStdString());
   vtkInitializationHelper::Initialize(argc, argv,

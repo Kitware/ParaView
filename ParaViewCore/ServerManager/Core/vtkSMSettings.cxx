@@ -129,10 +129,7 @@ public:
   //----------------------------------------------------------------------------
   const Json::Value & GetSettingBelowPriority(const char* settingName, double priority)
   {
-    if (!this->SettingCollectionsAreSorted)
-      {
-      this->SortSettingCollections();
-      }
+    this->SortCollectionsIfNeeded();
 
     // Iterate over settings, checking higher priority settings first
     for (size_t i = 0; i < this->SettingCollections.size(); ++i)
@@ -156,10 +153,7 @@ public:
   //----------------------------------------------------------------------------
   const Json::Value & GetSettingAtOrBelowPriority(const char* settingName, double priority)
   {
-    if (!this->SettingCollectionsAreSorted)
-      {
-      this->SortSettingCollections();
-      }
+    this->SortCollectionsIfNeeded();
 
     // Iterate over settings, checking higher priority settings first
     for (size_t i = 0; i < this->SettingCollections.size(); ++i)
@@ -469,6 +463,7 @@ public:
   void SetSetting(const char* settingName, const std::vector< T > & values)
   {
     this->CreateCollectionIfNeeded();
+    this->SortCollectionsIfNeeded();
 
     // Just set settings in the highest-priority settings group for now.
     std::string root, leaf;
@@ -643,6 +638,7 @@ public:
   bool SetPropertySetting(const char* settingName, vtkSMProperty* property)
   {
     this->CreateCollectionIfNeeded();
+    this->SortCollectionsIfNeeded();
 
     if (vtkSMIntVectorProperty* intVectorProperty =
         vtkSMIntVectorProperty::SafeDownCast(property))
@@ -693,6 +689,7 @@ public:
       }
 
     this->CreateCollectionIfNeeded();
+    this->SortCollectionsIfNeeded();
 
     double highestPriority = this->SettingCollections[0].Priority;
 
@@ -768,8 +765,8 @@ public:
         // lower-priority setting that is not default, we want to be
         // able to set the value back to the default in the higher
         // priority setting collection.
-        Json::Value lowerPriorityValue = this->GetSettingBelowPriority(propertySettingCString,
-                                                                       highestPriority);
+        const Json::Value & lowerPriorityValue = this->GetSettingBelowPriority(propertySettingCString,
+                                                                               highestPriority);
         if (lowerPriorityValue.isNull())
           {
           if (!proxyValue.removeMember(property->GetXMLName()).isNull())
@@ -884,6 +881,17 @@ public:
       }
   }
 
+  //----------------------------------------------------------------------------
+  // Description:
+  // Sort the collections if needed
+  void SortCollectionsIfNeeded()
+  {
+    if (!this->SettingCollectionsAreSorted)
+      {
+      this->SortSettingCollections();
+      this->SettingCollectionsAreSorted = true;
+      }
+  }
 
 };
 

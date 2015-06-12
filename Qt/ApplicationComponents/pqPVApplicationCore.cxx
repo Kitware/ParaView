@@ -34,9 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqAnimationManager.h"
+#include "pqApplicationComponentsInit.h"
 #include "pqApplicationCore.h"
 #include "pqApplyPropertiesManager.h"
-#include "pqComponentsInit.h"
 #include "pqComponentsTestUtility.h"
 #include "pqCoreUtilities.h"
 #include "pqItemViewSearchWidget.h"
@@ -67,7 +67,7 @@ pqPVApplicationCore::pqPVApplicationCore(
 : Superclass(argc, argv, options)
 {
   // Initialize pqComponents resources.
-  pqComponentsInit();
+  pqApplicationComponentsInit();
 
   this->ApplyPropertiesManger = new pqApplyPropertiesManager(this);
   this->AnimationManager = new pqAnimationManager(this);
