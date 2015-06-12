@@ -230,6 +230,12 @@ protected:
   // Called at the end of CreateVTKObjects().
   virtual void CreateVTKObjects();
 
+  // Description:
+  // Returns true if the proxy is in interaction mode that corresponds to making
+  // a selection i.e. vtkPVRenderView::INTERACTION_MODE_POLYGON or
+  // vtkPVRenderView::INTERACTION_MODE_SELECTION.
+  bool IsInSelectionMode();
+
   bool IsSelectionCached;
   void ClearSelectionCache(bool force = false);
 

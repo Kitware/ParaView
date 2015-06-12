@@ -1349,7 +1349,13 @@ void vtkSMRenderViewProxy::NewMasterCallback(vtkObject*, unsigned long, void*)
 //----------------------------------------------------------------------------
 void vtkSMRenderViewProxy::ClearSelectionCache(bool force/*=false*/)
 {
-  if(this->IsSelectionCached || force)
+  // We check if we're currently selecting. If that's the case, any non-forced
+  // modifications (i.e. those coming through because of proxy-modifications)
+  // are considered a part of the making/showing selection and hence we
+  // don't clear the selection cache. While this doesn't help us preserve the
+  // cache between separate surface selection invocations, it does help us with
+  // reusing the case when in interactive selection mode.
+  if ((this->IsSelectionCached && !this->IsInSelectionMode()) || force)
     {
     this->IsSelectionCached = false;
     vtkClientServerStream stream;
@@ -1358,5 +1364,19 @@ void vtkSMRenderViewProxy::ClearSelectionCache(bool force/*=false*/)
             << "InvalidateCachedSelection"
             << vtkClientServerStream::End;
     this->ExecuteStream(stream);
+    }
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMRenderViewProxy::IsInSelectionMode()
+{
+  switch (vtkSMPropertyHelper(this, "InteractionMode", /*quiet*/true).GetAsInt())
+    {
+  case vtkPVRenderView::INTERACTION_MODE_SELECTION:
+  case vtkPVRenderView::INTERACTION_MODE_POLYGON:
+    return true;
+
+  default:
+    return false;
     }
 }
