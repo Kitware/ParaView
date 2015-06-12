@@ -114,7 +114,6 @@
           <String value="thindielectric"/>
           <String value="dielectric"/>
           <String value="metal"/>
-          <String value="orennayer"/>
         </StringListDomain>
       </StringVectorProperty>
 
@@ -122,30 +121,45 @@
         command="SetReflectance"
         number_of_elements="1"
         default_values="0.0">
+        <Documentation>
+        Reflectivity fraction for Phong material.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty name="Thickness"
         command="SetThickness"
         number_of_elements="1"
         default_values="1.0">
+        <Documentation>
+        Thickness of thin dielectric material.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty name="Eta"
         command="SetEta"
         number_of_elements="1"
         default_values="1.52">
+        <Documentation>
+        Refractive index of thin dielectric material.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty name="N"
         command="SetN"
         number_of_elements="1"
         default_values="1.0">
+        <Documentation>
+        Outside refractive index for dielectric material.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty name="Nt"
         command="SetNt"
         number_of_elements="1"
         default_values="1.2">
+        <Documentation>
+        Inside refractive index of dielectric material.
+        </Documentation>
       </DoubleVectorProperty>
 
     </RepresentationProxy>

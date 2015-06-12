@@ -73,7 +73,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Model/Materials/Flat.h>
 #include <Model/Materials/Lambertian.h>
 #include <Model/Materials/MetalMaterial.h>
-#include <Model/Materials/OrenNayar.h>
 #include <Model/Materials/Phong.h>
 #include <Model/Materials/ThinDielectric.h>
 #include <Model/Materials/Transparent.h>
@@ -338,24 +337,20 @@ void vtkMantaProperty::CreateMantaProperty()
             else
               if ( strcmp( this->MaterialType, "metal" ) == 0 )
                 {
-                this->MantaMaterial = new Manta::MetalMaterial( this->DiffuseTexture );
+                this->MantaMaterial
+                  = new Manta::MetalMaterial( this->DiffuseTexture,
+                                              static_cast<int> ( this->GetSpecularPower() ) );
                 }
               else
-                if ( strcmp( this->MaterialType, "orennayer" ) == 0 )
-                  {
-                  this->MantaMaterial = new Manta::OrenNayar( this->DiffuseTexture );
-                  }
-                else
-                  {
-                  // just default to phong
-                  this->MantaMaterial
-                    = new Manta::Phong( this->DiffuseTexture,
-                                        this->SpecularTexture,
-                                        static_cast<int> ( this->GetSpecularPower() ),
-                                        new Manta::Constant<Manta::ColorComponent>
-                                        (
-                                         this->Reflectance) );
-                  }
+                {
+                // just default to phong
+                this->MantaMaterial
+                  = new Manta::Phong( this->DiffuseTexture,
+                                      this->SpecularTexture,
+                                      static_cast<int> ( this->GetSpecularPower() ),
+                                      new Manta::Constant<Manta::ColorComponent>
+                                      ( this->Reflectance) );
+                }
     }
 
   //cerr << "CREATED " << this->MantaMaterial << endl;
