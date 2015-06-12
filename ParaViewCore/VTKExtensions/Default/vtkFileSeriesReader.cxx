@@ -545,7 +545,11 @@ int vtkFileSeriesReader::RequestInformation(
 {
   this->ResetTimeRanges();
 
-  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  int requestFromPort = request->Has(vtkStreamingDemandDrivenPipeline::FROM_OUTPUT_PORT())?
+    request->Get(vtkStreamingDemandDrivenPipeline::FROM_OUTPUT_PORT()) : 0;
+  assert(requestFromPort < this->GetNumberOfOutputPorts());
+
+  vtkInformation *outInfo = outputVector->GetInformationObject(requestFromPort);
   int numFiles = (int)this->GetNumberOfFileNames();
   if (numFiles < 1)
     {
@@ -604,11 +608,15 @@ int vtkFileSeriesReader::RequestInformation(
 
 //----------------------------------------------------------------------------
 int vtkFileSeriesReader::RequestUpdateExtent(
-                                 vtkInformation* vtkNotUsed(request),
+                                 vtkInformation* request,
                                  vtkInformationVector** vtkNotUsed(inputVector),
                                  vtkInformationVector* outputVector)
 {
-  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  int requestFromPort = request->Has(vtkStreamingDemandDrivenPipeline::FROM_OUTPUT_PORT())?
+    request->Get(vtkStreamingDemandDrivenPipeline::FROM_OUTPUT_PORT()) : 0;
+  assert(requestFromPort < this->GetNumberOfOutputPorts());
+
+  vtkInformation *outInfo = outputVector->GetInformationObject(requestFromPort);
   int index = this->ChooseInput(outInfo);
   if (index >= static_cast<int>(this->GetNumberOfFileNames()))
     {
@@ -649,10 +657,14 @@ int vtkFileSeriesReader::RequestData(vtkInformation *request,
                                      vtkInformationVector **inputVector,
                                      vtkInformationVector *outputVector)
 {
+  int requestFromPort = request->Has(vtkStreamingDemandDrivenPipeline::FROM_OUTPUT_PORT())?
+    request->Get(vtkStreamingDemandDrivenPipeline::FROM_OUTPUT_PORT()) : 0;
+  assert(requestFromPort < this->GetNumberOfOutputPorts());
+
   // We have modified the TIME_STEPS information in the output vector.  Some
   // readers (e.g. the Exodus reader) reuse this array to get time indices.
   // Just in case, restore the vector.
-  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  vtkInformation *outInfo = outputVector->GetInformationObject(requestFromPort);
   this->Internal->TimeRanges->GetInputTimeInfo(
     this->_FileIndex,outInfo);
 
@@ -705,8 +717,11 @@ int vtkFileSeriesReader::RequestInformationForInput(
     else
       {
       tempOutputVector = vtkSmartPointer<vtkInformationVector>::New();
-      VTK_CREATE(vtkInformation, tempOutputInfo);
-      tempOutputVector->Append(tempOutputInfo);
+      for (int cc=0; cc < this->GetNumberOfOutputPorts(); ++cc)
+        {
+        VTK_CREATE(vtkInformation, tempOutputInfo);
+        tempOutputVector->Append(tempOutputInfo);
+        }
       }
     return this->Reader->ProcessRequest(tempRequest,
                                         (vtkInformationVector**)NULL,

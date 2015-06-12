@@ -50,14 +50,15 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSpyPlotBlockIterator.h"
 #include "vtkSpyPlotIStream.h"
 
+#include <cassert>
+#include <cctype>
+#include <cmath>
 #include <map>
 #include <set>
-#include <vector>
 #include <string>
 #include <sys/stat.h>
+#include <vector>
 #include <vtksys/SystemTools.hxx>
-#include <assert.h>
-#include <cctype>
 
 #define vtkMIN(x, y) \
   (\
@@ -501,40 +502,36 @@ int vtkSpyPlotReader::UpdateTimeStep(vtkInformation *requestInfo,
 
   vtkInformation *outputInfo=outputInfoVec->GetInformationObject(port);
 
-  // Update the timestep.  
-  int tsLength =
-    outputInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-  double *steps = outputInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+  // Update the timestep. 
   int closestStep = 0;
 
-  if(outputInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
+  if (outputInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()) &&
+    (this->TimeSteps->size() > 0))
     {
     // Get the requested time step. We only supprt requests of a single time
     // step in this reader right now
     double requestedTimeStep =
       outputInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
 
-    int cnt=0;
     double minDist=-1;
-    for (cnt=0;cnt<tsLength;cnt++)
+    int index = 0;
+    for (VectorOfDoubles::iterator iter = this->TimeSteps->begin();
+      iter != this->TimeSteps->end(); ++iter, ++index)
       {
-      double tdist=(steps[cnt]-requestedTimeStep>requestedTimeStep-steps[cnt])?
-        steps[cnt]-requestedTimeStep:
-        requestedTimeStep-steps[cnt];
+      double tdist = std::abs((*iter) - requestedTimeStep);
       if (minDist<0 || tdist<minDist)
         {
-        minDist=tdist;
-        closestStep=cnt;
+        minDist = tdist;
+        closestStep = index;
         }
       }
     }
-
   this->CurrentTimeStep = closestStep;
-
-  if (outputData != NULL) 
+  if ((outputData != NULL) &&
+    (static_cast<int>(this->TimeSteps->size()) < this->CurrentTimeStep))
     {
     outputData->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(),
-                            steps[this->CurrentTimeStep]);
+      (*this->TimeSteps)[this->CurrentTimeStep]);
     }
   return 1;
 }
