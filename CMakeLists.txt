@@ -594,6 +594,9 @@ else()
   set(VTK_Group_StandAlone OFF CACHE BOOL "" FORCE)
   set(VTK_Group_Rendering OFF CACHE BOOL "" FORCE)
 
+  # set the default backend for PV to be OpenGL
+  set(VTK_RENDERING_BACKEND_DEFAULT "OpenGL")
+
 endif()
 
 #----------------------------------------------------------------------------------
