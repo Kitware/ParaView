@@ -25,7 +25,7 @@ QtTesting.playCommand(object3, 'activate', '')
 #create two manta and one gl window
 object6 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/CloseAction'
 QtTesting.playCommand(object6, 'activate', '')
-object7 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/EmptyView/ConvertActionsFrame/Manta'
+object7 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/CentralWidgetFrame/EmptyView/ConvertActionsFrame/Manta'
 QtTesting.playCommand(object7, 'activate', '')
 object8 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/SplitHorizontalAction'
 QtTesting.playCommand(object8, 'activate', '')
@@ -34,9 +34,9 @@ QtTesting.playCommand(object9, 'activate', '')
 QtTesting.playCommand(object8, 'activate', '')
 object10 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/1/MultiViewFrameMenu/CloseAction'
 QtTesting.playCommand(object10, 'activate', '')
-object11 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/1/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/EmptyView/ConvertActionsFrame/Manta'
+object11 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/1/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/CentralWidgetFrame/EmptyView/ConvertActionsFrame/Manta'
 QtTesting.playCommand(object11, 'activate', '')
-object12 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/2/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/EmptyView/ConvertActionsFrame/3D View'
+object12 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/2/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/CentralWidgetFrame/EmptyView/ConvertActionsFrame/3D View'
 QtTesting.playCommand(object12, 'activate', '')
 
 #create some geometry to show

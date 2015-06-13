@@ -59,7 +59,7 @@
   <pqevent object="pqClientMainWindow/pythonDialog/splitter/verticalLayoutWidget/runScript" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pythonDialog/PythonShellRunScriptDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceExodusTrace.py" />
   <pqevent object="pqClientMainWindow/pythonDialog/splitter/verticalLayoutWidget/close" command="activate" arguments="" />
-  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/TraceExodus.png" width="300" height="300" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/TraceExodus.png" width="300" height="300" />
 
   <!-- now reset session and  load the state file -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
