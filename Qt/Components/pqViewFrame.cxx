@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCSfile$
+   Module:  pqViewFrame.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqViewFrame.h"
+#include "ui_pqViewFrame.h"
 
 #include "pqSetName.h"
 
@@ -54,8 +55,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # include "unistd.h"
 #endif
 
-#define PEN_WIDTH 2
 const int ICON_SIZE = 12;
+
+class pqViewFrame::pqInternals
+{
+public:
+  Ui::pqViewFrame Ui;
+  pqInternals(pqViewFrame* self)
+    {
+    this->Ui.setupUi(self);
+    }
+};
 
 //-----------------------------------------------------------------------------
 pqViewFrame::pqViewFrame(QWidget* parentObject)
@@ -63,34 +73,24 @@ pqViewFrame::pqViewFrame(QWidget* parentObject)
   DecorationsVisible(true),
   TitleBarVisible(true),
   BorderVisible(false),
-  BorderColor(QColor("blue")),
   Buttons(SplitVertical | SplitHorizontal | Maximize | Close),
-  TitleBar(new QWidget(this)),
-  ToolBar (new QToolBar(this)),
-  TitleLabel(new QLabel(this)),
-  ContextMenu(new QMenu(this->TitleBar)),
-  UniqueID(QUuid::createUuid())
+  UniqueID(QUuid::createUuid()),
+  Internals(new pqViewFrame::pqInternals(this))
 {
-  this->ToolBar->setIconSize(QSize (ICON_SIZE, ICON_SIZE));
-  QLayout* tbLayout = this->ToolBar->layout ();
-  tbLayout->setSpacing (0);
-  tbLayout->setContentsMargins (0, 0, 0, 0);
+  Ui::pqViewFrame& ui = this->Internals->Ui;
 
-  // to allow an empty frame to work with the focus stuff
-  this->setFocusPolicy(Qt::ClickFocus);
+  this->ToolBar = new QToolBar(this);
+  this->ToolBar->setObjectName("ToolBar");
+  this->ToolBar->setIconSize(QSize(ICON_SIZE, ICON_SIZE));
+  this->ToolBar->layout()->setSpacing(0);
+  this->ToolBar->layout()->setContentsMargins(0, 0, 0, 0);
 
-  QVBoxLayout* vbox = new QVBoxLayout(this);
-  this->setLayout(vbox);
+  this->connect(
+    ui.TitleBar, SIGNAL(customContextMenuRequested(const QPoint&)),
+    SLOT(contextMenuRequested(const QPoint&)));
 
-  this->TitleBar->setObjectName("TitleBar");
-  this->TitleBar->setAcceptDrops(true);
-  this->TitleBar->setContextMenuPolicy(Qt::CustomContextMenu);
-  QObject::connect(
-    this->TitleBar, SIGNAL(customContextMenuRequested(const QPoint&)),
-    this, SLOT(contextMenuRequested(const QPoint&)));
-
-// limits the titlebar's height.
-  this->TitleBar->installEventFilter(this);
+  // To handle drag/drop event.
+  ui.TitleBar->installEventFilter(this);
 
   // Create standard buttons.
   this->StandardToolButtons[SplitVertical] =
@@ -114,9 +114,14 @@ pqViewFrame::pqViewFrame(QWidget* parentObject)
         QIcon(this->style()->standardPixmap(QStyle::SP_TitleBarCloseButton)),
         "Close", this) << pqSetName("Close"));
 
-  this->updateTitleBar();
-  this->updateLayout();
+  // Setup the title bar.
+  ui.TitleBarLayout->insertWidget(0, this->ToolBar);
+  foreach (QToolButton* button, this->StandardToolButtons)
+    {
+    ui.TitleBarLayout->addWidget(button);
+    }
 
+  this->ContextMenu = new QMenu(ui.TitleBar),
   this->ContextMenu->setObjectName("FrameContextMenu");
   this->ContextMenu->addAction(
     this->StandardToolButtons[SplitHorizontal]->defaultAction());
@@ -124,19 +129,38 @@ pqViewFrame::pqViewFrame(QWidget* parentObject)
     this->StandardToolButtons[SplitVertical]->defaultAction());
   this->ContextMenu->addAction(
     this->StandardToolButtons[Close]->defaultAction());
+
+  this->setBorderColor(QColor("blue"));
 }
 
 //-----------------------------------------------------------------------------
 pqViewFrame::~pqViewFrame()
 {
-  delete this->TitleBar;
+}
+
+//-----------------------------------------------------------------------------
+void pqViewFrame::setBorderColor(const QColor& clr)
+{
+  if (this->BorderColor != clr)
+    {
+    this->BorderColor = clr;
+    this->updateComponentVisibilities();
+    }
 }
 
 //-----------------------------------------------------------------------------
 void pqViewFrame::setCentralWidget(QWidget* widget)
 {
   this->CentralWidget = widget;
-  this->updateLayout();
+  Ui::pqViewFrame& ui = this->Internals->Ui;
+  while (QLayoutItem* item = ui.CentralWidgetFrameLayout->takeAt(0))
+    {
+    delete item;
+    }
+  if (this->CentralWidget)
+    {
+    ui.CentralWidgetFrameLayout->addWidget(this->CentralWidget);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -148,132 +172,49 @@ QWidget* pqViewFrame::centralWidget() const
 //-----------------------------------------------------------------------------
 void pqViewFrame::setTitle(const QString& text)
 {
-  this->TitleLabel->setText(text);
+  this->PlainTitle = text;
+  this->updateComponentVisibilities();
 }
 
 //-----------------------------------------------------------------------------
 QString pqViewFrame::title() const
 {
-  return this->TitleLabel->text();
+  return this->Internals->Ui.TitleLabel->text();
 }
 
 //-----------------------------------------------------------------------------
-void pqViewFrame::updateLayout()
+void pqViewFrame::updateComponentVisibilities()
 {
-  QVBoxLayout* vbox = new QVBoxLayout();
-  if ((!this->TitleBarVisible && !this->BorderVisible) ||
-    !this->DecorationsVisible)
+  bool showTitleBar = this->DecorationsVisible && this->TitleBarVisible;
+  bool showBorder = this->DecorationsVisible && this->BorderVisible;
+
+  Ui::pqViewFrame& ui = this->Internals->Ui;
+  ui.TitleBar->setVisible(showTitleBar);
+  if (showBorder)
     {
-    vbox->setMargin(0);
-    vbox->setSpacing(0);
+    ui.CentralWidgetFrame->setForegroundRole(QPalette::WindowText);
+    ui.CentralWidgetFrame->setStyleSheet(
+      QString("QFrame#CentralWidgetFrame { color: rgb(%1, %2, %3); }")
+      .arg(this->BorderColor.red())
+      .arg(this->BorderColor.green())
+      .arg(this->BorderColor.blue()));
+    ui.TitleLabel->setText(QString("<b><u>%1</u></b>").arg(this->PlainTitle));
     }
   else
     {
-    vbox->setMargin(PEN_WIDTH);
-    vbox->setSpacing(PEN_WIDTH);
+    ui.CentralWidgetFrame->setForegroundRole(QPalette::Window);
+    ui.CentralWidgetFrame->setStyleSheet(QString());
+    ui.TitleLabel->setText(this->PlainTitle);
     }
-
-  if (this->TitleBarVisible && this->DecorationsVisible)
+  if (this->DecorationsVisible)
     {
-    vbox->addWidget(this->TitleBar);
-    }
-
-  if (this->CentralWidget)
-    {
-    vbox->addWidget(this->CentralWidget);
+    ui.CentralWidgetFrame->setFrameStyle(QFrame::Plain|QFrame::Box);
+    ui.CentralWidgetFrameLayout->setContentsMargins(1, 1, 1, 1);
     }
   else
     {
-    vbox->addStretch();
-    }
-
-  delete this->layout();
-  this->setLayout(vbox);
-
-  // ensure that the frame is repainted.
-  this->update();
-}
-
-//-----------------------------------------------------------------------------
-void pqViewFrame::updateTitleBar()
-{
-  QHBoxLayout* hbox = new QHBoxLayout(); 
-  hbox->setMargin(0);
-  hbox->setSpacing(0);
-  hbox->addWidget (this->ToolBar);
-  hbox->addStretch();
-
-  this->TitleLabel->setAlignment(Qt::AlignRight);
-  this->TitleLabel->setIndent(10);
-  hbox->addWidget(this->TitleLabel);
-
-  foreach (QToolButton* button, this->StandardToolButtons)
-    {
-    button->hide();
-    }
-  if (this->standardButtons() & SplitHorizontal)
-    {
-    QToolButton* button = this->StandardToolButtons[SplitHorizontal];
-    hbox->addWidget(button);
-    button->show();
-    }
-  if (this->standardButtons() & SplitVertical)
-    {
-    QToolButton* button = this->StandardToolButtons[SplitVertical];
-    hbox->addWidget(button);
-    button->show();
-    }
-
-  if (this->standardButtons() & Maximize)
-    {
-    QToolButton* button = this->StandardToolButtons[Maximize];
-    hbox->addWidget(button);
-    button->show();
-    }
-  if (this->standardButtons() & Restore)
-    {
-    QToolButton* button = this->StandardToolButtons[Restore];
-    hbox->addWidget(button);
-    button->show();
-    }
-  if (this->standardButtons() & Close)
-    {
-    QToolButton* button = this->StandardToolButtons[Close];
-    hbox->addWidget(button);
-    button->show();
-    }
-
-  delete this->TitleBar->layout();
-  this->TitleBar->setLayout(hbox);
-}
-
-//-----------------------------------------------------------------------------
-void pqViewFrame::paintEvent(QPaintEvent* evt)
-{
-  this->Superclass::paintEvent(evt);
-
-  if (this->BorderVisible && this->DecorationsVisible)
-    {
-    QPainter painter(this);
-    QPen pen;
-    pen.setColor(this->BorderColor);
-    pen.setWidth(PEN_WIDTH);
-    painter.setPen(pen);
-    QRect borderRect = this->contentsRect();
-    if (this->isTitleBarVisible())
-      {
-      QLayoutItem* titlebar = this->layout()->itemAt(0);
-      borderRect.adjust(-PEN_WIDTH/2+2, 
-        titlebar->geometry().height()+4-PEN_WIDTH/2, 
-        PEN_WIDTH/2-2, 
-        PEN_WIDTH/2-2);
-      }
-    else
-      {
-      borderRect.adjust(
-        -PEN_WIDTH/2+2, PEN_WIDTH/2, PEN_WIDTH/2-2, PEN_WIDTH/2-2);
-      }
-    painter.drawRect(borderRect);
+    ui.CentralWidgetFrame->setFrameStyle(QFrame::NoFrame);
+    ui.CentralWidgetFrameLayout->setContentsMargins(0, 0, 0, 0);
     }
 }
 
@@ -283,7 +224,11 @@ void pqViewFrame::setStandardButtons(StandardButtons buttons)
   if (this->Buttons != buttons)
     {
     this->Buttons = buttons;
-    this->updateTitleBar();
+    for (StandardToolButtonsMap::iterator iter = this->StandardToolButtons.begin();
+      iter != this->StandardToolButtons.end(); ++iter)
+      {
+      iter.value()->setVisible(this->Buttons & iter.key());
+      }
     }
 }
 
@@ -319,7 +264,6 @@ void pqViewFrame::buttonClicked()
 void pqViewFrame::addTitleBarAction(QAction* action)
 {
   this->ToolBar->addAction (action);
-  this->updateTitleBar();
 }
 
 //-----------------------------------------------------------------------------
@@ -350,14 +294,16 @@ void pqViewFrame::removeTitleBarActions()
 void pqViewFrame::contextMenuRequested(const QPoint& point)
 {
   this->setFocus(Qt::OtherFocusReason);
-  this->ContextMenu->exec(this->TitleBar->mapToGlobal(point));
+
+  Ui::pqViewFrame& ui = this->Internals->Ui;
+  this->ContextMenu->exec(ui.TitleBar->mapToGlobal(point));
 }
 
 //-----------------------------------------------------------------------------
 bool pqViewFrame::eventFilter(QObject* caller, QEvent* evt)
 {
   if (evt->type() == QEvent::MouseButtonPress)
-    {     
+    {
     QMouseEvent *mouseEvent=(QMouseEvent*)evt;
     if (mouseEvent->button() == Qt::LeftButton)
       {
@@ -461,4 +407,10 @@ void pqViewFrame::drop(QDropEvent* evt)
     {
     evt->ignore();
     }
+}
+
+//-----------------------------------------------------------------------------
+QMenu* pqViewFrame::contextMenu() const
+{
+  return this->ContextMenu;
 }

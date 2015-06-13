@@ -147,7 +147,6 @@ namespace
       {
       QWidget* viewWidget = pqview->widget();
       frame->setCentralWidget(viewWidget);
-      viewWidget->setParent(frame);
       }
     }
 
