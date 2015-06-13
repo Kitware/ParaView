@@ -880,6 +880,40 @@
       <!-- End of PNGWriter -->
     </WriterProxy>
     <!-- ================================================================= -->
+    <WriterProxy class="vtkTIFFWriter"
+                 name="TIFFWriter">
+      <Documentation short_help="Write image data as a TIFF file.">Writer to
+      write image data as a TIFF file.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to be
+        written to the file.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetFilePattern"
+                            name="FileName"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <Property name="Input"
+                  show="0" />
+        <Property name="FileName"
+                  show="0" />
+        <WriterFactory extensions="tiff"
+                       file_description="TIFF Image Files" />
+      </Hints>
+      <!-- End of TIFFWriter -->
+    </WriterProxy>
+    <!-- ================================================================= -->
     <WriterProxy class="vtkJPEGWriter"
                  name="JPEGWriter">
       <Documentation short_help="Write image data as a JPEG file.">
