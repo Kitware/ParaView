@@ -114,6 +114,11 @@ def execute_on_global_data(self):
         if self.GetNumberOfTimeSteps() > 0 and \
             array.shape[0] == self.GetNumberOfTimeSteps():
                 chosen_element = array[ns["time_index"]]
+        elif array.shape[0] == 1:
+            # for single element arrays, just extract the value.
+            # This avoids the extra () when converting to string
+            # (see BUG #15321).
+            chosen_element = array[0]
     except AttributeError: pass
 
     try:
