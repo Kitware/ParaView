@@ -63,7 +63,12 @@ public:
     {
     if (role == "minmax" || role == "q1q3")
       {
-      return this->Superclass::NewPlot(self, tableName, columnName, role);
+      vtkPlot* plot = this->Superclass::NewPlot(self, tableName, columnName, role);
+      if (vtkPlotArea* aplot = vtkPlotArea::SafeDownCast(plot))
+        {
+        aplot->SetLegendVisibility(false);
+        }
+      return plot;
       }
     else if ((role == "avg")|| role.empty())
       {
