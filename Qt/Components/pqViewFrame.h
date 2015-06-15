@@ -37,10 +37,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QMap>
 #include <QUuid>
+#include <QScopedPointer>
 
 class QDragEnterEvent;
 class QDragMoveEvent;
 class QDropEvent;
+class QFrame;
 class QLabel;
 class QMenu;
 class QToolBar;
@@ -63,13 +65,16 @@ public:
   void setTitle(const QString& text);
   QString title() const;
 
-  /// Get/Set the central widget shown in this frame.
+  /// Get/Set the central widget shown in this frame. Similar to
+  /// QLayout::addWidget, this call takes the ownership of the widget and the
+  /// widget will be deleted with pqViewFrame is deleted or another widget is set
+  /// using setCentralWidget().
   void setCentralWidget(QWidget* widget);
   QWidget* centralWidget() const;
 
   /// Get/Set the border BorderColor. The border is only drawn when the
   /// borderVisibility is set to true.
-  void setBorderColor(const QColor& clr) { this->BorderColor = clr; }
+  void setBorderColor(const QColor& clr);
   const QColor& borderColor() const { return this->BorderColor; }
 
   /// Get/Set the border visibility.
@@ -81,8 +86,8 @@ public:
   enum StandardButton
     {
     NoButton          =0x0000,
-    SplitVertical     =0x0001,
-    SplitHorizontal   =0x0002,
+    SplitHorizontal   =0x0001,
+    SplitVertical     =0x0002,
     Maximize          =0x0004,
     Restore           =0x0008,
     Close             =0x0010
@@ -104,8 +109,7 @@ public:
   void removeTitleBarActions();
 
   /// Provides access to the context menu.
-  QMenu* contextMenu() const
-    { return this->ContextMenu; }
+  QMenu* contextMenu() const;
 
   /// provides access to the unique id assigned to the frame.
   QUuid uniqueID() const
@@ -120,36 +124,35 @@ signals:
 
   /// Fired to indicate the positions for the two frames need to be swapped.
   void swapPositions(const QString& other);
-  
+
 public slots:
   /// set whether the border is visible.
-  void setBorderVisibility(bool val) 
+  void setBorderVisibility(bool val)
     {
     this->BorderVisible = val;
-    this->updateLayout();
+    this->updateComponentVisibilities();
     }
 
   /// set whether the title-bar is visible.
   void setTitleBarVisibility(bool val)
     {
     this->TitleBarVisible = val;
-    this->updateLayout();
+    this->updateComponentVisibilities();
     }
 
   void setDecorationsVisibility(bool val)
     {
     this->DecorationsVisible = val;
-    this->updateLayout();
+    this->updateComponentVisibilities();
     }
 
   /// event filter to handle drag/drop events.
   virtual bool eventFilter(QObject*, QEvent*);
 
 protected:
-  /// updates the layout.
-  void updateLayout();
-  void updateTitleBar();
-  void paintEvent(QPaintEvent* event);
+  /// Updates the visibilities for various components of the pqViewFrame based
+  /// on flags set on the instance.
+  virtual void updateComponentVisibilities();
 
   /// methods to manage drag-drop.
   void drag();
@@ -167,20 +170,25 @@ protected:
   bool BorderVisible;
   QColor BorderColor;
   StandardButtons Buttons;
-  QPointer<QWidget> CentralWidget;
-  QPointer<QWidget> TitleBar;
   QPointer<QToolBar> ToolBar;
-  QPointer<QLabel> TitleLabel;
-  QMenu* ContextMenu;
+  QPointer<QWidget> CentralWidget;
+  QPointer<QMenu> ContextMenu;
   QUuid UniqueID;
   QPoint DragStartPosition;
-  QMap<StandardButton, QPointer<QToolButton> > StandardToolButtons;
+  typedef QMap<StandardButton, QPointer<QToolButton> > StandardToolButtonsMap;
+  StandardToolButtonsMap StandardToolButtons;
+  QPalette PaletteWithBorder;
+  QPalette PaletteWithoutBorder;
+  QString PlainTitle;
 
 private:
   Q_DISABLE_COPY(pqViewFrame)
 
   /// creates a tool button for the action.
   QToolButton* createButton(QAction* action);
+
+  class pqInternals;
+  const QScopedPointer<pqInternals> Internals;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(pqViewFrame::StandardButtons);
