@@ -124,13 +124,42 @@ pqServerConfiguration::StartupType pqServerConfiguration::startupType() const
 //-----------------------------------------------------------------------------
 vtkPVXMLElement* pqServerConfiguration::optionsXML() const
 {
-  if (this->XML->GetNumberOfNestedElements() == 1)
+  vtkPVXMLElement* startup = this->startupXML();
+  if (startup != NULL)
     {
-    return this->XML->GetNestedElement(0)->FindNestedElementByName("Options");
+    return startup->FindNestedElementByName("Options"); 
     }
   return NULL;
 }
 
+//-----------------------------------------------------------------------------
+vtkPVXMLElement* pqServerConfiguration::hintsXML() const
+{
+  return this->XML->FindNestedElementByName("Hints");
+}
+
+//-----------------------------------------------------------------------------
+vtkPVXMLElement* pqServerConfiguration::startupXML() const
+{
+  switch (this->startupType())
+    {
+    case (MANUAL):
+      {
+      return this->XML->FindNestedElementByName("ManualStartup");
+      break;
+      }
+    case (COMMAND):
+      {
+      return this->XML->FindNestedElementByName("CommandStartup");
+      break;
+      } 
+    default:
+      {
+      return NULL;
+      break;
+      }
+    }
+}
 //-----------------------------------------------------------------------------
 /// If startupType() == COMMAND, then this method can be used to obtain
 /// the command for the startup. Note that this does not include any
@@ -188,14 +217,13 @@ QString pqServerConfiguration::command(double& timeout, double& delay) const
 //-----------------------------------------------------------------------------
 void pqServerConfiguration::setStartupToManual()
 {
-  vtkPVXMLElement* startupElement = this->XML->GetNestedElement(0);
+  vtkPVXMLElement* startupElement = this->startupXML();
   if (startupElement)
     {
     startupElement->SetName("ManualStartup");
     }
   else
     {
-    this->XML->RemoveAllNestedElements(); // for sanity 
     vtkNew<vtkPVXMLElement> child;
     child->SetName("ManualStartup");
     this->XML->AddNestedElement(child.GetPointer());
@@ -207,14 +235,13 @@ void pqServerConfiguration::setStartupToCommand(
   double timeout, double delay, const QString& command_str)
 {
   // we try to preserve any existing options.
-  vtkPVXMLElement* startupElement = this->XML->GetNestedElement(0);
+  vtkPVXMLElement* startupElement = this->startupXML();
   if (startupElement)
     {
     startupElement->SetName("CommandStartup");
     }
   else
     {
-    this->XML->RemoveAllNestedElements(); // for sanity 
     vtkNew<vtkPVXMLElement> child;
     child->SetName("CommandStartup");
     this->XML->AddNestedElement(child.GetPointer());
