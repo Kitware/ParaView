@@ -61,6 +61,7 @@ namespace
         "^Time",
         "^vtkOriginal.*",
         "^vtkValidPointMask",
+        "^N .*",
         NULL
       };
       for (int cc=0; defaults[cc] != NULL; cc++)
