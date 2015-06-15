@@ -42,6 +42,9 @@
 vtkStandardNewMacro(vtkSMChartSeriesSelectionDomain);
 namespace
 {
+  // match string like: "ACCL (0)" or "VEL (1)"
+  static vtksys::RegularExpression PotentailComponentNameRe(".*\\([0-9]+\\)");
+
   typedef std::pair<vtksys::RegularExpression, bool> SeriesVisibilityPair;
   static std::vector<SeriesVisibilityPair> SeriesVisibilityDefaults;
   static void InitSeriesVisibilityDefaults()
@@ -336,6 +339,18 @@ void vtkSMChartSeriesSelectionDomain::PopulateAvailableArrays(
         {
         strings.push_back(seriesName);
         uniquestrings.insert(seriesName);
+
+        // Special case for Quartile plots. PlotSelectionOverTime filter, when
+        // produces stats, likes to pre-split components in an array into multiple
+        // single component arrays. We still want those to be treated as
+        // components and not be shown by default. Hence, we use this hack.
+        // (See BUG #15512).
+        std::string seriesNameWithoutTableName = chartRepr->GetDefaultSeriesLabel(
+          std::string(), arrayInfo->GetName());
+        if (PotentailComponentNameRe.find(seriesNameWithoutTableName))
+          {
+          this->SetDefaultVisibilityOverride(seriesName, false);
+          }
         }
       }
     }
