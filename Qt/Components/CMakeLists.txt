@@ -575,6 +575,7 @@ set (Module_UI_FILES
   Resources/UI/pqSplineWidget.ui
   Resources/UI/pqSpreadSheetViewDecorator.ui
   Resources/UI/pqTimerLogDisplay.ui
+  Resources/UI/pqViewFrame.ui
   Resources/UI/pqWriterDialog.ui
 )
 

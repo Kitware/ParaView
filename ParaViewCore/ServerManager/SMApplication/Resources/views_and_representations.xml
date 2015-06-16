@@ -3118,7 +3118,7 @@
                          default_values="0"
                          name="CubeAxesVisibility"
                          number_of_elements="1"
-                         panel_visibility="never">
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>Set the visibility for the cube axes.</Documentation>
       </IntVectorProperty>
@@ -3338,7 +3338,7 @@
                proxyname="CubeAxesRepresentation"></Proxy>
         <ExposedProperties>
           <PropertyGroup label="Cube Axes"
-                         panel_visibility="default"
+                         panel_visibility="advanced"
                          panel_widget="CubeAxes">
             <Property exposed_name="CubeAxesColor"
                       name="Color" />

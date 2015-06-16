@@ -1,13 +1,13 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqComponentsInit.cxx
+   Module:  pqStandardArrayColorMapsBehavior.cxx
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -29,22 +29,24 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
+#include "pqStandardArrayColorMapsBehavior.h"
 
-#include "vtkPVConfig.h"
-#include "pqComponentsInit.h"
-#include "pqCoreInit.h"
-#include <QObject>  // for Q_INIT_RESOURCE
+#include "vtkSMSettings.h"
+#include <QFile>
 
-void pqComponentsInit()
+//-----------------------------------------------------------------------------
+pqStandardArrayColorMapsBehavior::pqStandardArrayColorMapsBehavior(QObject* parentObject)
+  : Superclass(parentObject)
 {
-#ifndef PARAVIEW_BUILD_SHARED_LIBS
-  // init dependents
-  pqCoreInit();
-
-  // init resources
-  Q_INIT_RESOURCE(pqComponents);
-
-#endif
-
+  QFile file(":/pqApplicationComponents/StandardArrayColorMaps.json");
+  if (file.open(QIODevice::ReadOnly))
+    {
+    vtkSMSettings* settings = vtkSMSettings::GetInstance();
+    settings->AddCollectionFromString(file.readAll().data(), 1.0);
+    }
 }
 
+//-----------------------------------------------------------------------------
+pqStandardArrayColorMapsBehavior::~pqStandardArrayColorMapsBehavior()
+{
+}

@@ -40,7 +40,7 @@ QtTesting.playCommand(object3, 'activate', '')
 #close the 3D view and make a manta view
 object4 = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Close'
 QtTesting.playCommand(object4, 'activate', '')
-object5 = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/EmptyView/scrollArea/qt_scrollarea_viewport/widgetFoo/ConvertActionsFrame/MantaView'
+object5 = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/EmptyView/scrollArea/qt_scrollarea_viewport/widgetFoo/ConvertActionsFrame/MantaView'
 QtTesting.playCommand(object5, 'activate', '')
 
 #show something
