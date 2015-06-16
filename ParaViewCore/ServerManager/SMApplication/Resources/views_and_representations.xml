@@ -4772,7 +4772,7 @@
                           name="input_array_any"></InputArrayDomain>
       </InputProperty>
       <DoubleVectorProperty command="SetPointLabelColor"
-                            default_values="1.0 1.0 0.0"
+                            default_values=".9 .9 0"
                             name="PointLabelColor"
                             number_of_elements="3">
         <DoubleRangeDomain max="1 1 1"
