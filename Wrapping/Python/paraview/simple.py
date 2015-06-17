@@ -577,7 +577,7 @@ def RenameSource(newName, proxy=None):
         proxy = active_objects.source
     pxm = servermanager.ProxyManager()
     oldName = pxm.GetProxyName("sources", proxy)
-    if oldName:
+    if oldName and newName != oldName:
       pxm.RegisterProxy("sources", newName, proxy)
       pxm.UnRegisterProxy("sources", oldName, proxy)
 
