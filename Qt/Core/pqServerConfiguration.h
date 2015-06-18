@@ -101,6 +101,12 @@ public:
   /// returns the <Options> element, if any.
   vtkPVXMLElement* optionsXML() const;
 
+  /// returns the <Hints> element, if any.
+  vtkPVXMLElement* hintsXML() const;
+
+protected:
+  vtkPVXMLElement* startupXML() const;  
+
 private:
   void constructor(vtkPVXMLElement*);
   bool Mutable;
