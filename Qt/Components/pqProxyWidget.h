@@ -88,17 +88,26 @@ public:
   /// UI.
   static bool useDocumentationForLabels(vtkSMProxy* proxy);
 
+  enum DocumentationType
+    {
+    NONE,
+    USE_DESCRIPTION,
+    USE_SHORT_HELP,
+    USE_LONG_HELP
+    };
+
   /// Returns formatted (HTML or plainText) documentation for the property.
-  static QString documentationText(vtkSMProperty* property);
+  /// \c type cannot be NONE.
+  static QString documentationText(vtkSMProperty* property, DocumentationType type=USE_DESCRIPTION);
 
   /// Returns formatted (HTML or plainText) documentation for the proxy.
-  /// This only returns the text returned by vtkSMDocumentation::GetDescription().
-  static QString documentationText(vtkSMProxy* property);
+  /// \c type cannot be NONE.
+  static QString documentationText(vtkSMProxy* property, DocumentationType type=USE_DESCRIPTION);
 
   /// Returns true if the proxy has XML hints indicating that the panel should
   /// show a header label for the documentation. pqProxyWidget uses the
   /// <ShowProxyDocumentationInPanel /> hint for this purpose.
-  static bool showProxyDocumentationInPanel(vtkSMProxy* proxy);
+  static DocumentationType showProxyDocumentationInPanel(vtkSMProxy* proxy);
 
 signals:
   /// This signal is fired as soon as the user starts editing in the widget. The

@@ -104,11 +104,17 @@ This hint is used to indicate that the documentation for the proxy should be
 shown in special label at the top of the panel generated for the proxy. This is
 useful to show information to the user directly on the panel.
 
+The ShowProxyDocumentationInPanel take one optional attribute **type**. The
+possible values are:
+1. *description*: (default) to use vtkSMDocumentation::GetDescription(),
+2. *short_help*: to use vtkSMDocumentation::GetShortHelp(), and
+3. *long_help*: to use vtkSMDocumentation::GetLongHelp().
+
     <SourceProxy ...>
       <Documentation>
         Some text that will be shown in the label.
       </Documentation>
       ...
       <Hints>
-        <ShowProxyDocumentationInPanel />
+        <ShowProxyDocumentationInPanel type="description"/>
       </Hints>
