@@ -74,12 +74,12 @@ namespace
       else if (strcmp(child->GetName(), "Representation") == 0 &&
         // has an attribute "view" that matches the viewType.
         child->GetAttribute("view") &&
-        strcmp(child->GetAttribute("view"), viewType) == 0)
+        strcmp(child->GetAttribute("view"), viewType) == 0 &&
+        child->GetAttribute("type") != NULL)
         {
         // if port is present, it must match "port".
         int xmlPort;
-        if (child->GetScalarAttribute("port", &xmlPort) == 0 ||
-          xmlPort == port)
+        if (child->GetScalarAttribute("port", &xmlPort) == 0 || xmlPort == port)
           {
           return child->GetAttribute("type");
           }

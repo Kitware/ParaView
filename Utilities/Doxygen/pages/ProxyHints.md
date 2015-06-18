@@ -76,8 +76,8 @@ indeed be plotted by such views, one can use this hint.
       </Hints>
     </SourceProxy>
 
-Representation
---------------
+RepresentationType
+------------------
 Specify the representation type to use by default when showing the output from a
 source/filter in a particular view.
 
@@ -87,11 +87,38 @@ Likewise, **port** attribute is optional. When not specified it matches all
 output ports. The hints are processed in order. Hence when specifying multiple
 Representation elements, start with most restrictive to least restrictive.
 
+Note, this hint doesn't control which representaton proxy gets created, but the
+default value for the "Representation" property on the representation proxy
+set using `vtkSMRepresentationProxy::SetRepresentationType()`.
+
     <SourceProxy ...>
       ...
       <Hints>
-        <Representation view="ComparativeRenderView" type="Surface" port="1"/>
-        <Representation view="RenderView" type="Wireframe" />
+        <RepresentationType view="ComparativeRenderView" type="Surface" port="1"/>
+        <RepresentationType view="RenderView" type="Wireframe" />
+      </Hints>
+    </SourceProxy>
+
+Representation
+--------------
+Specify the representation proxy to create to show the output from a
+source/filter in a particular view.
+
+This hint is used to indicate the representation proxy to create to show the
+output from a source/filter in a paritcular view, rather than letting the view
+determine which representation proxy to create. This is rare. The more common
+use-case of picking the default representation type is satisfied by
+**RepresentationType** XML hint documented above.
+
+The required **view** attribute specifies the view to which the hint applies and
+should be set to the XML proxy name of the view. The required **type** attribute
+specifies the XML proxy name for representation to create. The optional
+**port** attribute can be used to limit the hint to specific output port.
+
+    <SourceProxy ...>
+      ...
+      <Hints>
+        <Representation view="RenderView" type="TextSourceRepresentation" />
       </Hints>
     </SourceProxy>
 
