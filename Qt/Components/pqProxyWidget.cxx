@@ -664,11 +664,33 @@ bool pqProxyWidget::useDocumentationForLabels(vtkSMProxy* smproxy)
     smproxy->GetHints()->FindNestedElementByName("UseDocumentationForLabels"));
 }
 
-//-----------------------------------------------------------------------------
-QString pqProxyWidget::documentationText(vtkSMProperty* smProperty)
+namespace
 {
-  const char* xmlDocumentation = smProperty->GetDocumentation()?
-    smProperty->GetDocumentation()->GetDescription() : NULL;
+  const char* vtkGetDocumentation(vtkSMDocumentation* doc, pqProxyWidget::DocumentationType dtype)
+    {
+    if (doc)
+      {
+      switch (dtype)
+        {
+      case pqProxyWidget::USE_SHORT_HELP:
+        return doc->GetShortHelp();
+      case pqProxyWidget::USE_LONG_HELP:
+        return doc->GetLongHelp();
+      case pqProxyWidget::USE_DESCRIPTION:
+        return doc->GetDescription();
+      default:
+        break;
+        }
+      }
+    return NULL;
+    }
+}
+
+//-----------------------------------------------------------------------------
+QString pqProxyWidget::documentationText(vtkSMProperty* smProperty, DocumentationType dtype)
+{
+  const char* xmlDocumentation = smProperty?
+    vtkGetDocumentation(smProperty->GetDocumentation(), dtype) : NULL;
   if (!xmlDocumentation || xmlDocumentation[0] == 0)
     {
     const char *xmlLabel = smProperty->GetXMLLabel();
@@ -681,20 +703,35 @@ QString pqProxyWidget::documentationText(vtkSMProperty* smProperty)
 }
 
 //-----------------------------------------------------------------------------
-QString pqProxyWidget::documentationText(vtkSMProxy* smProxy)
+QString pqProxyWidget::documentationText(vtkSMProxy* smProxy, DocumentationType dtype)
 {
-  const char* xmlDocumentation = smProxy->GetDocumentation()?
-    smProxy->GetDocumentation()->GetDescription() : NULL;
+  const char* xmlDocumentation = smProxy?
+    vtkGetDocumentation(smProxy->GetDocumentation(), dtype) : NULL;
   return (!xmlDocumentation || xmlDocumentation[0] == 0)?
     QString() : pqProxy::rstToHtml(xmlDocumentation).c_str();
 }
 
 //-----------------------------------------------------------------------------
-bool pqProxyWidget::showProxyDocumentationInPanel(vtkSMProxy* smproxy)
+pqProxyWidget::DocumentationType
+pqProxyWidget::showProxyDocumentationInPanel(vtkSMProxy* smproxy)
 {
-  return (smproxy &&
-    smproxy->GetHints() &&
-    smproxy->GetHints()->FindNestedElementByName("ShowProxyDocumentationInPanel"));
+  vtkPVXMLElement* xml =(smproxy && smproxy->GetHints())?
+    smproxy->GetHints()->FindNestedElementByName("ShowProxyDocumentationInPanel") : NULL;
+  if (xml)
+    {
+    QString type = xml->GetAttributeOrDefault("type", "description");
+    type = type.toLower();
+    if (type == "long_help")
+      {
+      return USE_LONG_HELP;
+      }
+    else if (type == "short_help")
+      {
+      return USE_SHORT_HELP;
+      }
+    return USE_DESCRIPTION;
+    }
+  return NONE;
 }
 
 //-----------------------------------------------------------------------------
@@ -1211,9 +1248,10 @@ bool pqProxyWidget::filterWidgets(bool show_advanced, const QString& filterText)
   const pqProxyWidgetItem* prevItem = NULL;
   vtkSMProxy* smProxy = this->Internals->Proxy;
 
-  if (this->showProxyDocumentationInPanel(smProxy))
+  DocumentationType dtype = this->showProxyDocumentationInPanel(smProxy);
+  if (dtype != NONE)
     {
-    QString doc = this->documentationText(smProxy);
+    QString doc = this->documentationText(smProxy, dtype);
     this->Internals->ProxyDocumentationLabel->setText("<p>" + doc + "</p>");
     this->Internals->ProxyDocumentationLabel->setVisible(!doc.isEmpty());
     gridLayout->addWidget(this->Internals->ProxyDocumentationLabel, row_index, 0, 1, 2);
