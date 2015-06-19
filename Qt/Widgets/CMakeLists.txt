@@ -251,11 +251,12 @@ if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
     ${Qt5PrintSupport_INCLUDE_DIRS}
     ${Qt5Test_INCLUDE_DIRS}
     ${Qt5WebKitWidgets_INCLUDE_DIRS})
-  
 else ()
   set (QT_USE_QTNETWORK 1)
   set (QT_USE_QTHELP 1)
-
+  if(PARAVIEW_USE_QTWEBKIT)
+    set(QT_USE_QTWEBKIT 1)
+  endif()
   find_package (Qt4 REQUIRED QUIET)
   include (${QT_USE_FILE})
 
@@ -266,7 +267,9 @@ else ()
 endif ()
 
 set(${vtk-module}_NO_HeaderTest 1)
-
+if(PARAVIEW_USE_QTWEBKIT)
+  add_definitions(-DPARAVIEW_USE_QTWEBKIT)
+endif()
 vtk_module_library(${vtk-module} ${QT_WIDGETS_ALL_SRCS})
 target_link_libraries(${vtk-module} LINK_PUBLIC ${QT_LIBRARIES})
 

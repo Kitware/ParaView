@@ -245,6 +245,13 @@ cmake_dependent_option(PARAVIEW_ENABLE_QT_SUPPORT
   "Build ParaView with Qt support (without GUI)" OFF
   "NOT PARAVIEW_BUILD_QT_GUI" ON)
 
+# Add an option to enable using Qt Webkit for widgets, as needed.
+# Default is OFF. We don't want to depend on WebKit unless absolutely needed.
+cmake_dependent_option(PARAVIEW_USE_QTWEBKIT
+  "Use Qt WebKit components as needed." OFF
+  "PARAVIEW_ENABLE_QT_SUPPORT" OFF)
+mark_as_advanced(PARAVIEW_USE_QTWEBKIT)
+
 # If PARAVIEW_BUILD_QT_GUI is OFF, provide an option to the user to turn other command line
 # executables ON/OFF.
 cmake_dependent_option(PARAVIEW_ENABLE_COMMANDLINE_TOOLS
@@ -460,6 +467,9 @@ if (PARAVIEW_ENABLE_QT_SUPPORT)
       UiTools
       Widgets
       Xml)
+    if(PARAVIEW_USE_QTWEBKIT)
+      list(APPEND Qt5_FIND_COMPONENTS WebKitWidgets)
+    endif()
     include (ParaViewQt5)
     if (NOT QT5_FOUND)
       message( SEND_ERROR "Qt ${QT_MIN_VERSION} or greater not found. "
