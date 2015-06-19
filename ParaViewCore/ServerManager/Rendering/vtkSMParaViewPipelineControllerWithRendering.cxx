@@ -182,7 +182,7 @@ namespace
 
     // Check if there's a hint for the producer. If so, use that.
     if (const char* reprtype = vtkFindTypeFromHints(
-        producer->GetHints(), outputPort, "Representation", "view", view->GetXMLName()))
+        producer->GetHints(), outputPort, "RepresentationType", "view", view->GetXMLName()))
       {
       if (repr->SetRepresentationType(reprtype))
         {
