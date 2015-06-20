@@ -40,44 +40,50 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHelpSearchEngine>
 #include <QHelpSearchQueryWidget>
 #include <QHelpSearchResultWidget>
-#include <QTextBrowser>
+#include <QPointer>
 #include <QUrl>
 
-namespace
-{
-
-// ****************************************************************************
-//            CLASS pqTextBrowser
-// ****************************************************************************
-/// Internal class used to add overload the QTextBrowser
-class pqTextBrowser : public QTextBrowser
+class pqBrowser
 {
 public:
-  pqTextBrowser(QHelpEngine* helpEngine, QWidget* _parent = 0)
-    {
-    this->HelpEngine = helpEngine;
-    this->setParent(_parent);
-    }
-
-protected:
-  /// Implementation reference from:
-  /// http://doc.qt.digia.com/qq/qq28-qthelp.html
-  QVariant loadResource(int type, const QUrl &url)
-    {
-    if (url.scheme() == "qthelp")
-      {
-      return QVariant(this->HelpEngine->fileData(url));
-      }
-    else
-      {
-      return QTextBrowser::loadResource(type, url);
-      }
-    }
-
-  QHelpEngine* HelpEngine;
+  pqBrowser() {}
+  virtual ~pqBrowser() {}
+  virtual QWidget* widget() const = 0;
+  virtual void setUrl(const QUrl& url) = 0;
+private:
+  Q_DISABLE_COPY(pqBrowser);
 };
 
-} // end of namespace
+template <class T>
+class pqBrowserTemplate : public pqBrowser
+{
+  QPointer<T> Widget;
+public:
+  pqBrowserTemplate(QHelpEngine* engine, pqHelpWindow* self)
+    {
+    this->Widget = T::newInstance(engine, self);
+    }
+  virtual ~pqBrowserTemplate()
+    {
+    delete this->Widget;
+    }
+  virtual QWidget* widget() const
+    {
+    return this->Widget;
+    }
+  virtual void setUrl(const QUrl& url)
+    {
+    this->Widget->setUrl(url);
+    }
+};
+
+#ifdef PARAVIEW_USE_QTWEBKIT
+# include "pqHelpWindowWebKit.h"
+typedef pqBrowserTemplate<pqWebView> PQBROWSER_TYPE;
+#else
+# include "pqHelpWindowNoWebKit.h"
+typedef pqBrowserTemplate<pqTextBrowser> PQBROWSER_TYPE;
+#endif
 
 // ****************************************************************************
 //            CLASS pqHelpWindow
@@ -86,7 +92,9 @@ protected:
 //-----------------------------------------------------------------------------
 pqHelpWindow::pqHelpWindow(
   QHelpEngine* engine, QWidget* parentObject, Qt::WindowFlags parentFlags)
-  : Superclass(parentObject, parentFlags), HelpEngine(engine)
+  : Superclass(parentObject, parentFlags),
+  HelpEngine(engine),
+  Browser(new PQBROWSER_TYPE(this->HelpEngine, this))
 {
   Q_ASSERT(engine != NULL);
 
@@ -115,15 +123,10 @@ pqHelpWindow::pqHelpWindow(
     SIGNAL(requestShowLink(const QUrl&)),
     this, SLOT(showPage(const QUrl&)));
 
-  this->Browser = new pqTextBrowser(engine, this);
-  this->Browser->setOpenLinks(false);
-  this->setCentralWidget(this->Browser);
+  this->setCentralWidget(this->Browser->widget());
 
   QObject::connect(
     this->HelpEngine->contentWidget(), SIGNAL(linkActivated(const QUrl&)),
-    this, SLOT(showPage(const QUrl&)));
-  QObject::connect(
-    this->Browser, SIGNAL(anchorClicked(const QUrl&)),
     this, SLOT(showPage(const QUrl&)));
 }
 
@@ -147,7 +150,7 @@ void pqHelpWindow::showPage(const QUrl& url)
     }
   else
     {
-    this->Browser->setSource(url);
+    this->Browser->setUrl(url);
     }
 }
 
