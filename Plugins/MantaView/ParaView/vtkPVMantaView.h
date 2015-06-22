@@ -22,6 +22,7 @@
 #include "vtkPVRenderView.h"
 
 class vtkDataRepresentation;
+class vtkMantaLight;
 
 class VTK_EXPORT vtkPVMantaView : public vtkPVRenderView
 {
@@ -54,6 +55,10 @@ public:
   // Overridden to ensure that we always use an vtkOpenGLCamera of the 2D
   // renderer.
   virtual void SetActiveCamera(vtkCamera*);
+
+  //Description:
+  //Make a particular light the active one. Add it to the renderer if new.
+  void SetCurrentLight(vtkMantaLight*);
 
 //BTX
 protected:
