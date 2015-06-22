@@ -482,9 +482,10 @@ namespace
     {
     pqView* activeView = pqActiveObjects::instance().activeView();
     if (activeView && activeView->widget() &&
-      activeView->widget()->parentWidget())
+      activeView->widget()->parentWidget() &&
+      activeView->widget()->parentWidget()->parentWidget())
       {
-      return activeView->widget()->parentWidget()->findChild<QAction*>(name);
+      return activeView->widget()->parentWidget()->parentWidget()->findChild<QAction*>(name);
       }
     return NULL;
     }
