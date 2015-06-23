@@ -13,14 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="wdgLayout" columnstretch="0,1">
-   <item row="1" column="0">
-    <widget class="QLabel" name="ThicknessLabel">
-     <property name="text">
-      <string>Line Thickness</string>
-     </property>
-    </widget>
-   </item>
+  <layout class="QGridLayout" name="wdgLayout" columnstretch="0,0">
    <item row="1" column="1">
     <widget class="QSpinBox" name="Thickness">
      <property name="enabled">
@@ -46,10 +39,10 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="StyleListLabel">
+   <item row="1" column="0">
+    <widget class="QLabel" name="ThicknessLabel">
      <property name="text">
-      <string>Line Style</string>
+      <string>Line Thickness</string>
      </property>
     </widget>
    </item>
@@ -97,6 +90,13 @@
        <string>Dash Dot Dot</string>
       </property>
      </item>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="StyleListLabel">
+     <property name="text">
+      <string>Line Style</string>
+     </property>
     </widget>
    </item>
    <item row="3" column="0">
@@ -195,7 +195,7 @@
    <item row="0" column="0" colspan="2">
     <widget class="pqTreeView" name="SeriesTable">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -216,6 +216,12 @@
       <bool>false</bool>
      </property>
      <property name="uniformRowHeights">
+      <bool>true</bool>
+     </property>
+     <property name="itemsExpandable">
+      <bool>false</bool>
+     </property>
+     <property name="animated">
       <bool>true</bool>
      </property>
      <property name="maximumRowCountBeforeScrolling" stdset="0">

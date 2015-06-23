@@ -572,18 +572,18 @@ public:
     // this needs to be done after the columns exist.
 #if QT_VERSION >= 0x050000
     this->Ui.SeriesTable->header()->setSectionResizeMode(
-      pqSeriesParametersModel::VISIBILITY, QHeaderView::Stretch);
+      pqSeriesParametersModel::VISIBILITY, QHeaderView::Interactive);
     this->Ui.SeriesTable->header()->setSectionResizeMode(
       pqSeriesParametersModel::COLOR, QHeaderView::ResizeToContents);
     this->Ui.SeriesTable->header()->setSectionResizeMode(
-      pqSeriesParametersModel::LABEL, QHeaderView::Stretch);
+      pqSeriesParametersModel::LABEL, QHeaderView::Interactive);
 #else
     this->Ui.SeriesTable->header()->setResizeMode(
-      pqSeriesParametersModel::VISIBILITY, QHeaderView::Stretch);
+      pqSeriesParametersModel::VISIBILITY, QHeaderView::Interactive);
     this->Ui.SeriesTable->header()->setResizeMode(
       pqSeriesParametersModel::COLOR, QHeaderView::ResizeToContents);
     this->Ui.SeriesTable->header()->setResizeMode(
-      pqSeriesParametersModel::LABEL, QHeaderView::Stretch);
+      pqSeriesParametersModel::LABEL, QHeaderView::Interactive);
 #endif
     }
 
