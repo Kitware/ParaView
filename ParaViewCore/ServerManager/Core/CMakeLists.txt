@@ -56,6 +56,7 @@ set (Module_SRCS
   vtkSMDoubleRangeDomain.cxx
   vtkSMDoubleVectorProperty.cxx
   vtkSMEnumerationDomain.cxx
+  vtkSMEnvironmentAnnotationProxy.cxx
   vtkSMExtentDomain.cxx
   vtkSMFieldDataDomain.cxx
   vtkSMFileListDomain.cxx
