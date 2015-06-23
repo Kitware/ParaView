@@ -15,13 +15,58 @@
 #include "vtkSMRepresentedArrayListDomain.h"
 
 #include "vtkCommand.h"
+#include "vtkDataObject.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVArrayInformation.h"
+#include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVRepresentedArrayListSettings.h"
 #include "vtkSMProperty.h"
 #include "vtkSMRepresentationProxy.h"
 
 #include <vtksys/RegularExpression.hxx>
+#include <cassert>
+
+namespace
+{
+  // Given composite data set information, check whether the arrays
+  // associated with the field data in the leaf blocks have a single
+  // tuple. We do this to limit which field arrays are available to
+  // the domain.
+  bool vtkFieldArrayHasOneTuplePerCompositeDataSetLeaf(vtkPVCompositeDataInformation* info, const char* arrayName)
+    {
+    for (unsigned int i = 0; i < info->GetNumberOfChildren(); ++i)
+      {
+      vtkPVDataInformation* childInfo = info->GetDataInformation(i);
+      if (childInfo)
+        {
+        vtkPVCompositeDataInformation* compositeChildInfo = childInfo->GetCompositeDataInformation();
+        if (compositeChildInfo->GetNumberOfChildren() == 0)
+          {
+          // We have found a leaf in the dataset. Check whether the field
+          // array with the given name has just one tuple.
+          vtkPVArrayInformation* childArrayInfo = childInfo->GetArrayInformation(
+            arrayName, vtkDataObject::FIELD_ASSOCIATION_NONE);
+          if (childArrayInfo && childArrayInfo->GetNumberOfTuples() != 1)
+            {
+            return false;
+            }
+          }
+        else
+          {
+          // Recurse on the composite data information in the child
+          if (!vtkFieldArrayHasOneTuplePerCompositeDataSetLeaf(compositeChildInfo, arrayName))
+            {
+            return false;
+            }
+          }
+        }
+      }
+
+    // If we got here, everything checks out
+    return true;
+    }
+}
 
 // Callback to update the RepresentedArrayListDomain
 class vtkSMRepresentedArrayListDomainUpdateCommand : public vtkCommand
@@ -121,8 +166,10 @@ void vtkSMRepresentedArrayListDomain::OnRepresentationDataUpdated()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMRepresentedArrayListDomain::IsFilteredArrayName(const char* name)
+bool vtkSMRepresentedArrayListDomain::IsFilteredArray(
+  vtkPVDataInformation* info, int association, const char* name)
 {
+  // NOTE: Return `true` to reject.
   vtkPVRepresentedArrayListSettings* colorArraySettings = vtkPVRepresentedArrayListSettings::GetInstance();
   for (int idx = 0; idx < colorArraySettings->GetNumberOfFilterExpressions(); ++idx)
     {
@@ -131,10 +178,23 @@ bool vtkSMRepresentedArrayListDomain::IsFilteredArrayName(const char* name)
     bool matches = re.find(name);
     if (matches)
       {
+      // filter i.e. remove the array.
       return true;
       }
     }
 
+  // If the array is a field data array and the data is a composite datasets,
+  // we need to ensure it has exactly as many tuples as the blocks in dataset
+  // for coloring.
+  if (association == vtkDataObject::FIELD_ASSOCIATION_NONE &&
+      info->GetCompositeDataSetType() >= 0)
+    {
+    vtkPVCompositeDataInformation* cdi = info->GetCompositeDataInformation();
+    assert(cdi);
+    return !vtkFieldArrayHasOneTuplePerCompositeDataSetLeaf(cdi, name);
+    }
+
+  // don't filter.
   return false;
 }
 
