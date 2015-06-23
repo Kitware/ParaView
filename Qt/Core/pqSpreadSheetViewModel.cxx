@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -130,6 +130,8 @@ namespace
       return "Quadratic Wedge";
     case VTK_QUADRATIC_PYRAMID:
       return "Quadratic Pyramid";
+    case VTK_QUADRATIC_POLYGON:
+      return "Quadratic Polygon";
     case VTK_BIQUADRATIC_QUAD:
       return "Bi-Quadratic-Quad";
     case VTK_TRIQUADRATIC_HEXAHEDRON:
