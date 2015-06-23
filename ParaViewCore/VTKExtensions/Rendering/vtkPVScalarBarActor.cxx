@@ -22,9 +22,12 @@
 #include "vtkPVScalarBarActor.h"
 #include "vtkScalarBarActorInternal.h"
 
+#include "vtkAxis.h"
 #include "vtkCellArray.h"
 #include "vtkCellData.h"
+#include "vtkContextScene.h"
 #include "vtkDiscretizableColorTransferFunction.h"
+#include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
 #include "vtkImageData.h"
 #include "vtkMath.h"
@@ -39,6 +42,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkScalarsToColors.h"
 #include "vtkSmartPointer.h"
+#include "vtkStringArray.h"
 #include "vtkTextActor.h"
 #include "vtkTextProperty.h"
 #include "vtkTexture.h"
@@ -89,6 +93,9 @@ vtkPVScalarBarActor::vtkPVScalarBarActor()
   this->TickMarksActor->SetMapper(this->TickMarksMapper);
   this->TickMarksActor->GetPositionCoordinate()
     ->SetReferenceCoordinate(this->PositionCoordinate);
+
+  this->TickLayoutHelper->SetBehavior(vtkAxis::FIXED);
+  this->TickLayoutHelper->SetScene(this->TickLayoutHelperScene.GetPointer());
 }
 
 //-----------------------------------------------------------------------------
@@ -172,6 +179,18 @@ void vtkPVScalarBarActor::ReleaseGraphicsResources(vtkWindow *window)
   this->TickMarksActor->ReleaseGraphicsResources(window);
 
   this->Superclass::ReleaseGraphicsResources(window);
+}
+
+//----------------------------------------------------------------------------
+int vtkPVScalarBarActor::RenderOpaqueGeometry(vtkViewport *viewport)
+{
+  // This ensures that tile scaling can be accounted for in the tick layout:
+  if (vtkRenderer *renderer = vtkRenderer::SafeDownCast(viewport))
+    {
+    this->TickLayoutHelperScene->SetRenderer(renderer);
+    }
+
+  return this->Superclass::RenderOpaqueGeometry(viewport);
 }
 
 //----------------------------------------------------------------------------
@@ -301,163 +320,6 @@ int vtkPVScalarBarActor::CreateLabel(
 
   this->P->TextActors.push_back(textActor.GetPointer());
   return static_cast<int>(this->P->TextActors.size()) - 1;
-}
-
-//-----------------------------------------------------------------------------
-std::vector<double> vtkPVScalarBarActor::LinearTickMarks(
-  const double range[2], int maxTicks, int& minDigits,
-  bool intOnly /*=0*/)
-{
-  std::vector<double> ticks;
-  double absMax = fabs(range[0]);
-  if (absMax < fabs(range[1]))
-    {
-    absMax = fabs(range[1]);
-    }
-  int leadDig = floor(log10(absMax));
-  minDigits = 1;
-
-  // Compute the difference between min and max of scalar bar values.
-  double delta = range[1] - range[0];
-  if (delta == 0) return ticks;
-
-  // See what digit of the decimal number the difference is contained in.
-  double dmag = log10(delta);
-  double emag = floor(dmag) - 1;
-
-  // Compute a preliminary "step size" for tic marks.
-  double originalMag = pow(10.0, emag);
-  // if ((originalMag > MY_ABS(range[0])) || (originalMag > MY_ABS(range[1])))
-  if (1.1*originalMag > delta)
-    {
-    originalMag /= 10.0;
-    }
-
-  // Make sure we comply with intOnly request.
-  if (intOnly)
-    {
-    originalMag = floor(originalMag);
-    if (originalMag < 1.0) originalMag = 1.0;
-    }
-
-  // If we have too many ticks, try reducing the number of ticks by applying
-  // these scaling factors to originalMag in this order.
-  const double magScale[] = { 1.0, 1.5, 2.0, 2.5, 3.0, 3.5,
-                              4.0, 5.0, 6.0, 7.0, 8.0, 9.0,
-                              10.0, 15.0, 20.0, 25.0, 30.0, 35.0,
-                              40.0, 50.0, 60.0, 70.0, 80.0, 90.0,
-                              100.0 };
-  const int numScales = static_cast<int>(sizeof(magScale)/sizeof(double));
-
-  for (int scaleIdx = 0; scaleIdx < numScales; scaleIdx++)
-    {
-    double scale = magScale[scaleIdx];
-
-    if (intOnly && scale == 2.5) continue;
-
-    double mag = scale*originalMag;
-
-    // Use this to get around some rounding errors.
-    double tolerance = 0.0001*mag;
-
-    // Round to a sensible number of digits.
-    // Round minima towards the origin, maxima away from it.
-    double mintrunc, maxtrunc;
-    if (range[0] > 0)
-      {
-      mintrunc = floor(range[0]/mag) * mag;
-      }
-    else
-      {
-      mintrunc = ceil(range[0]/mag) * mag;
-      }
-    if (range[1] > 0)
-      {
-      maxtrunc = ceil(range[1]/mag) * mag;
-      }
-    else
-      {
-      maxtrunc = floor(range[1]/mag) * mag;
-      }
-
-    // Handle cases where rounding extends range.  (Note swapping floor/ceil
-    // above doesn't work well because not all decimal numbers get represented
-    // exactly in binary...) better to do this.
-    if (mintrunc < range[0] - tolerance) mintrunc += mag;
-    if (maxtrunc > range[1] + tolerance) maxtrunc -= mag;
-
-#if 0
-    // Figure out how many digits we must show in order for tic labels
-    // to have at least one unique digit... this may get altered if we change
-    // mag below.  (Note, that we are not using this at the moment since we show
-    // as many digits as possible, but perhaps in the future we want it.)
-    double nsd1 = ceil(log10(MY_ABS(mintrunc)/mag));
-    double nsd2 = ceil(log10(MY_ABS(maxtrunc)/mag));
-    int numSignificantDigits = std::max(nsd1, nsd2);
-#endif
-
-    // Compute the ticks.
-    double tick;
-    ticks.clear();
-    for (int factor = 0; (tick = mintrunc+factor*mag) <= maxtrunc+tolerance;
-         factor++)
-      {
-      ticks.push_back(tick);
-      }
-
-    int nticks = static_cast<int>(ticks.size());
-    int leastDig = floor(log10(fabs(mag)));
-    minDigits = leadDig - leastDig;
-
-    // If we have not exceeded limit, then we are done.
-    if ((maxTicks <= 0) || (nticks <= maxTicks))
-      {
-      return ticks;
-      }
-    }
-
-  // Can't seem to find good ticks.  Return nothing
-  ticks.clear();
-  return ticks;
-}
-
-//-----------------------------------------------------------------------------
-std::vector<double> vtkPVScalarBarActor::LogTickMarks(
-  const double range[2], int maxTicks, int& minDigits)
-{
-  std::vector<double> ticks;
-
-  if (range[0] * range[1] <= 0)
-    {
-    vtkErrorMacro(<< "Can't have a plot that uses/crosses 0!" << endl
-                  << "Freak OUT, man!");
-    return ticks;
-    }
-
-  double logrange[2];
-  logrange[0] = log10(range[0]);  logrange[1] = log10(range[1]);
-  ticks = this->LinearTickMarks(logrange, maxTicks, minDigits, false);
-
-#if 0
-  // Figure out how many digits we must show in order for tic labels
-  // to have at least one unique digit... this may get altered if we change
-  // mag below.  (Note, that we are not using this at the moment since we show
-  // as many digits as possible, but perhaps in the future we want it.)
-  if (ticks.length() > 1)
-    {
-    double ticksZ = pow(10, ticks[1] - ticks[0]);
-    double nsd1 = range[0]/ticksZ;
-    double nsd2 = range[1]/ticksZ;
-    double numSignificantDigits = std::max(nsd1, nsd2);
-    }
-#endif
-
-  for (size_t i = 0; i < ticks.size(); i++)
-    {
-    ticks[i] = pow(10.0, ticks[i]);
-    }
-
-  return ticks;
 }
 
 //----------------------------------------------------------------------------
@@ -728,23 +590,78 @@ void vtkPVScalarBarActor::ConfigureTitle()
 //----------------------------------------------------------------------------
 void vtkPVScalarBarActor::ConfigureTicks()
 {
-  int isLogTable = this->LookupTable->UsingLogScale();
+  bool isLogTable = (this->LookupTable->UsingLogScale() != 0);
   double* range = this->LookupTable->GetRange();
-  int minDigits; // minimum number of digits (base 10) to differentiate between tick marks.
 
   if (this->LookupTable->GetIndexedLookup())
     { // no tick marks in indexed lookup mode.
     return;
     }
 
-  std::vector<double> ticks;
-  if (isLogTable)
+  // Use vtkAxis to compute tick locations:
+  vtkAxis::Location loc;
+  vtkVector2f p1(this->P->TickBox.Posn.Cast<float>().GetData());
+  vtkVector2f p2 = p1;
+  if (this->Orientation == VTK_ORIENT_HORIZONTAL)
     {
-    ticks = this->LogTickMarks(range, this->NumberOfLabels, minDigits);
+    p2[0] += static_cast<float>(this->P->TickBox.Size[1]);
+    loc = vtkAxis::BOTTOM;
     }
   else
     {
-    ticks = this->LinearTickMarks(range, this->NumberOfLabels, minDigits);
+    p2[1] += static_cast<float>(this->P->TickBox.Size[1]);
+    loc = vtkAxis::LEFT;
+    }
+
+  this->TickLayoutHelper->SetPosition(static_cast<int>(loc));
+  this->TickLayoutHelper->SetPoint1(p1);
+  this->TickLayoutHelper->SetPoint2(p2);
+  this->TickLayoutHelper->SetLogScale(isLogTable);
+  this->TickLayoutHelper->SetUnscaledRange(range);
+  this->TickLayoutHelper->SetNumberOfTicks(this->NumberOfLabels);
+  this->TickLayoutHelper->Update();
+
+  vtkDoubleArray *tickArray = this->TickLayoutHelper->GetTickPositions();
+  vtkStringArray *labelArray = this->TickLayoutHelper->GetTickLabels();
+
+  // Process and filter the ticks:
+  std::vector<double> ticks;
+  ticks.reserve(tickArray->GetNumberOfTuples());
+  for (vtkIdType i = 0; i < tickArray->GetNumberOfTuples(); ++i)
+    {
+    // The label will be an empty string if it's not supposed to be labeled.
+    // Filter these out.
+    if (labelArray->GetValue(i).empty())
+      {
+      continue;
+      }
+
+    ticks.push_back(isLogTable ? std::pow(10.0, tickArray->GetValue(i))
+                               : tickArray->GetValue(i));
+    }
+
+  // minimum number of digits (base 10) to differentiate between tick marks.
+  int minDigits = 1;
+
+  // Compute the difference between min and max of scalar bar values.
+  double delta = range[1] - range[0];
+  if (delta != 0)
+    {
+    // See what digit of the decimal number the difference is contained in.
+    double dmag = log10(delta);
+    double emag = floor(dmag) - 1;
+    double mag = pow(10.0, emag);
+    if (1.1*mag > delta)
+      {
+      mag /= 10.0;
+      }
+    int leastDig = floor(log10(fabs(mag)));
+
+    // Find the the maximum number of digits in the range:
+    double absMax = std::max(std::fabs(range[0]), std::fabs(range[1]));
+    int leadDig = floor(log10(absMax));
+
+    minDigits = leadDig - leastDig;
     }
 
   // Map from tick to label ID for tick
