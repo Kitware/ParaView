@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqApplyBehavior_h
 
 #include <QObject>
+#include <QScopedPointer>
 #include "pqApplicationComponentsModule.h"
 
 class pqPipelineFilter;
@@ -74,7 +75,9 @@ protected:
   void hideInputIfRequired(pqPipelineFilter* filter, pqView* view);
 
 private:
-  Q_DISABLE_COPY(pqApplyBehavior)
+  Q_DISABLE_COPY(pqApplyBehavior);
+  class pqInternals;
+  const QScopedPointer<pqInternals> Internals;
 };
 
 #endif
