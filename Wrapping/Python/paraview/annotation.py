@@ -111,9 +111,18 @@ def execute_on_global_data(self):
     array = ns[self.GetFieldArrayName()]
     chosen_element = array
     try:
+        # if the array has as many elements as the timesteps, pick the element
+        # matching the current timestep.
         if self.GetNumberOfTimeSteps() > 0 and \
             array.shape[0] == self.GetNumberOfTimeSteps():
                 chosen_element = array[ns["time_index"]]
+
+        # if the array has as many elements as the `mode_shape_range`, pick the
+        # element matching the `mode_shape` (BUG #0015322).
+        elif ns.has_key("mode_shape") and ns.has_key("mode_shape_range") and \
+            ns["mode_shape_range"].shape[1] == 2 and \
+            array.shape[0] == (ns["mode_shape_range"].GetValue(1) - ns["mode_shape_range"].GetValue(0) + 1):
+                chosen_element = array[ns["mode_shape"].GetValue(0) - ns["mode_shape_range"].GetValue(0)]
         elif array.shape[0] == 1:
             # for single element arrays, just extract the value.
             # This avoids the extra () when converting to string

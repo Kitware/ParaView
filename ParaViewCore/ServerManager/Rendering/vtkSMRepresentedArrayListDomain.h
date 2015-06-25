@@ -40,16 +40,18 @@ public:
   // Update the domain.
   virtual void Update(vtkSMProperty*);
 
-  // Description:
-  // Returns true if an array should be filtered out based on its name
-  // alone. This implementation returns true if the array name matches
-  // an expression in the vtkPVColorArrayListSettings singleton.
-  virtual bool IsFilteredArrayName(const char* name);
-
 //BTX
 protected:
   vtkSMRepresentedArrayListDomain();
   ~vtkSMRepresentedArrayListDomain();
+
+  // Description:
+  // Returns true if an array should be filtered out based on its name or number
+  // of tuples (for field data arrays).
+  // This implementation returns true if the array name matches
+  // an expression in the vtkPVColorArrayListSettings singleton.
+  virtual bool IsFilteredArray(
+    vtkPVDataInformation* info, int association, const char* arrayName);
 
   // Description:
   // HACK: Provides a temporary mechanism for subclasses to provide an
