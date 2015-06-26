@@ -254,6 +254,11 @@ void vtkMantaPolyDataMapper::RenderPiece(vtkRenderer *ren, vtkActor *act)
       {
       this->InternalColorTexture->Load(ren);
       }
+    vtkMantaActor *mantaActor = vtkMantaActor::SafeDownCast(act);
+    if (mantaActor->GetMantaTexture())
+      {
+      mantaActor->GetMantaTexture()->Load(ren);
+      }
     
     this->Draw(ren, act);
     this->BuildTime.Modified();
@@ -268,7 +273,8 @@ void vtkMantaPolyDataMapper::DrawPolygons(vtkPolyData *polys,
                                           vtkPoints *ptarray,
                                           Manta::Mesh *mesh,
                                           Manta::Group *points,
-                                          Manta::Group *lines)
+                                          Manta::Group *lines,
+                                          vtkMantaTexture *mantaTexture)
 {
 
   Manta::Material *material = this->MyHelper->material;
@@ -376,7 +382,7 @@ void vtkMantaPolyDataMapper::DrawPolygons(vtkPolyData *polys,
       
       if ( !mesh->texCoords.empty() )
         {
-        if (this->CellScalarColor)
+        if (this->CellScalarColor && !mantaTexture)
           {
           mesh->texture_indices.push_back(cellNum);
           mesh->texture_indices.push_back(cellNum);
@@ -411,7 +417,7 @@ void vtkMantaPolyDataMapper::DrawPolygons(vtkPolyData *polys,
         
         if ( !mesh->texCoords.empty() )
           {
-          if (this->CellScalarColor)
+          if (this->CellScalarColor && !mantaTexture)
             {
             mesh->texture_indices.push_back(cellNum);
             mesh->texture_indices.push_back(cellNum);
@@ -444,7 +450,8 @@ void vtkMantaPolyDataMapper::DrawTStrips(vtkPolyData *polys,
                                          vtkPoints *ptarray,
                                          Manta::Mesh *mesh, 
                                          Manta::Group *points, 
-                                         Manta::Group *lines)
+                                         Manta::Group *lines,
+                                         vtkMantaTexture *mantaTexture)
 {
   Manta::Material *material = this->MyHelper->material;
   std::vector<Manta::Vector> &texCoords = this->MyHelper->texCoords;
@@ -569,7 +576,7 @@ void vtkMantaPolyDataMapper::DrawTStrips(vtkPolyData *polys,
       
       if ( !mesh->texCoords.empty() )
         {
-        if ( this->CellScalarColor )
+        if ( this->CellScalarColor && !mantaTexture)
           {
           mesh->texture_indices.push_back(cellNum);
           mesh->texture_indices.push_back(cellNum);
@@ -627,7 +634,7 @@ void vtkMantaPolyDataMapper::DrawTStrips(vtkPolyData *polys,
         
         if ( !mesh->texCoords.empty() )
           {
-          if ( this->CellScalarColor )
+          if ( this->CellScalarColor && !mantaTexture)
             {
             mesh->texture_indices.push_back(cellNum);
             mesh->texture_indices.push_back(cellNum);
@@ -672,6 +679,7 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
     {
     return;
     }
+  vtkMantaTexture *mantaTexture = NULL;
   vtkPolyData *input = this->GetInput();
 
   // Compute we need to for color
@@ -694,7 +702,24 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
   Manta::Material *&material = this->MyHelper->material;
   std::vector<Manta::Vector> &texCoords = this->MyHelper->texCoords;
 
-  if ( !this->ScalarVisibility || (!this->Colors && !this->ColorCoordinates))
+  if (input->GetPointData()->GetTCoords() && mantaActor->GetTexture() )
+    {
+    //cerr << "color using actor's texture" << endl;
+    mantaTexture = vtkMantaTexture::SafeDownCast(mantaActor->GetMantaTexture());
+    Manta::Texture<Manta::Color> *texture =
+      mantaTexture->GetMantaTexture();
+    material = new Manta::Lambertian(texture);
+
+    // convert texture coordinates to manta format
+    vtkDataArray *tcoords = input->GetPointData()->GetTCoords();
+    for (int i = 0; i < tcoords->GetNumberOfTuples(); i++)
+      {
+      double *tcoord = tcoords->GetTuple(i);
+      texCoords.push_back
+        ( Manta::Vector(tcoord[0], tcoord[1], 0.0) );
+      }
+    }
+  else if ( !this->ScalarVisibility || (!this->Colors && !this->ColorCoordinates))
     {
     //cerr << "Solid color from actor's property" << endl;
     material = mantaProperty->GetMantaMaterial();
@@ -703,7 +728,6 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
       mantaProperty->CreateMantaProperty();
       material = mantaProperty->GetMantaMaterial();
 
-      //TODO: the leaks
       mantaProperty->SetMantaMaterial(NULL);
       mantaProperty->SetSpecularTexture(NULL);
       mantaProperty->SetDiffuseTexture(NULL);
@@ -774,27 +798,6 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
       {
       double *tcoord = this->ColorCoordinates->GetTuple(i);
       texCoords.push_back( Manta::Vector(tcoord[0], 0, 0) );
-      }
-    }
-  else if (input->GetPointData()->GetTCoords() && actor->GetTexture() )
-    {
-    //cerr << "color using actor's texture" << endl;
-    vtkMantaTexture *mantaTexture = 
-      vtkMantaTexture::SafeDownCast(actor->GetTexture());
-    if (mantaTexture)
-      {
-      Manta::Texture<Manta::Color> *texture = 
-        mantaTexture->GetMantaTexture();
-      material = new Manta::Lambertian(texture);
-      }
-
-    // convert texture coordinates to manta format
-    vtkDataArray *tcoords = input->GetPointData()->GetTCoords();
-    for (int i = 0; i < tcoords->GetNumberOfTuples(); i++)
-      {
-      double *tcoord = tcoords->GetTuple(i);
-      texCoords.push_back
-        ( Manta::Vector(tcoord[0], tcoord[1], tcoord[2]) );
       }
     }
 
@@ -925,13 +928,13 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
   // convert polygons to manta format
   if ( input->GetNumberOfPolys() > 0 )
     {
-    this->DrawPolygons(input, points, mesh, sphereGroup, tubeGroup);
+    this->DrawPolygons(input, points, mesh, sphereGroup, tubeGroup, mantaTexture);
     }
   
   // convert triangle strips to manta format
   if ( input->GetNumberOfStrips() > 0 )
     {
-    this->DrawTStrips(input, points, mesh, sphereGroup, tubeGroup);
+    this->DrawTStrips(input, points, mesh, sphereGroup, tubeGroup, mantaTexture);
     }
 
   //delete transformed point coordinates

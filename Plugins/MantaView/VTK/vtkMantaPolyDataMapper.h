@@ -119,9 +119,11 @@ protected:
 
   //BTX
   void DrawPolygons(vtkPolyData *, vtkPoints *,
-                    Manta::Mesh *, Manta::Group *, Manta::Group *);
+                    Manta::Mesh *, Manta::Group *, Manta::Group *,
+                    vtkMantaTexture *);
   void DrawTStrips(vtkPolyData *, vtkPoints *,
-                    Manta::Mesh *, Manta::Group *, Manta::Group *);
+                   Manta::Mesh *, Manta::Group *, Manta::Group *,
+                   vtkMantaTexture *);
   //ETX
 
 private:

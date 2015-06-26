@@ -35,6 +35,28 @@
        </ExposedProperties>
      </SubProxy>
 
+      <DoubleVectorProperty name="Background Up"
+        command="SetBackgroundUp"
+        immediate_update="1"
+        number_of_elements="3"
+        panel_visibility="default"
+        default_values="0 1 0">
+        <Documentation>
+          The up vector for gradient and texture backgrounds.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Background Right"
+        command="SetBackgroundRight"
+        immediate_update="1"
+        number_of_elements="3"
+        panel_visibility="default"
+        default_values="1 0 0">
+        <Documentation>
+          The right vector for texture (environment map) background.
+        </Documentation>
+      </DoubleVectorProperty>
+
       <IntVectorProperty name="Threads"
         command="SetThreads"
         immediate_update="1"

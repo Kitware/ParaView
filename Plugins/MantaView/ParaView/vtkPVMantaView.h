@@ -55,6 +55,14 @@ public:
   // renderer.
   virtual void SetActiveCamera(vtkCamera*);
 
+  //Description:
+  // World space environment map up vector
+  void SetBackgroundUp(double x, double y, double z);
+
+  //Description:
+  // World space environment map right vector
+  void SetBackgroundRight(double x, double y, double z);
+
 //BTX
 protected:
   vtkPVMantaView();

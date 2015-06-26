@@ -66,9 +66,11 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMantaManager.h"
 #include "vtkMantaProperty.h"
 #include "vtkMantaRenderer.h"
-#include "vtkMapper.h"
+#include "vtkMantaTexture.h"
 
 #include "vtkDataSet.h"
+#include "vtkImageData.h"
+#include "vtkMapper.h"
 #include "vtkObjectFactory.h"
 #include "vtkRendererCollection.h"
 #include "vtkTimerLog.h"
@@ -149,6 +151,7 @@ vtkMantaActor::vtkMantaActor() : Group(0), MantaAS(0)
   //cerr << "MA(" << this << ") CREATE" << endl;
   this->MantaManager = NULL;
   this->SortType = DYNBVH;
+  this->MantaTexture = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -157,6 +160,8 @@ vtkMantaActor::vtkMantaActor() : Group(0), MantaAS(0)
 vtkMantaActor::~vtkMantaActor()
 {
   //cerr << "MA(" << this << ") DESTROY" << endl;
+  this->SetMantaTexture(NULL);
+
   if (this->MantaManager)
     {
     this->ReleaseGraphicsResources(NULL);
@@ -419,3 +424,27 @@ void vtkMantaActor::SetGroup( Manta::Group * group )
                    Manta::Callback::create
                    (R, &vtkMantaActorThreadCache::FreeMantaResources));
 }
+
+//----------------------------------------------------------------------------
+void vtkMantaActor::SetTexture( vtkTexture *texture )
+{
+  if (texture == this->GetTexture())
+    {
+    return;
+    }
+  this->Superclass::SetTexture(texture);
+  if (texture)
+    {
+    vtkMantaTexture *mt = vtkMantaTexture::New();
+    mt->SetInputData(this->GetTexture()->GetInput());
+    this->SetMantaTexture(mt);
+    mt->Delete();
+    }
+  else
+    {
+    this->SetMantaTexture(NULL);
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkCxxSetObjectMacro(vtkMantaActor,MantaTexture,vtkMantaTexture);

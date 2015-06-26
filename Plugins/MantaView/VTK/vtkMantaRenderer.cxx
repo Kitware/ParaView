@@ -63,6 +63,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMantaCamera.h"
 #include "vtkMantaManager.h"
 #include "vtkMantaRenderer.h"
+#include "vtkMantaTexture.h"
 
 #include "vtkActor.h"
 #include "vtkCuller.h"
@@ -76,6 +77,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Core/Color/Color.h>
 #include <Core/Color/ColorDB.h>
 #include <Core/Color/RGBColor.h>
+#include <Core/Geometry/Vector.h>
 #include <Engine/Control/RTRT.h>
 #include <Engine/Display/NullDisplay.h>
 #include <Engine/Display/SyncDisplay.h>
@@ -89,6 +91,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Interface/Object.h>
 #include <Model/AmbientLights/ConstantAmbient.h>
 #include <Model/Backgrounds/ConstantBackground.h>
+#include <Model/Backgrounds/EnvMapBackground.h>
+#include <Model/Backgrounds/LinearBackground.h>
 #include <Model/Groups/Group.h>
 #include <Model/Lights/HeadLight.h>
 
@@ -160,6 +164,15 @@ vtkMantaRenderer::vtkMantaRenderer() :
   this->MantaFactory->selectRenderer( "raytracer" );
 
   this->DefaultLight = NULL;
+
+  this->MantaTexture = NULL;
+  this->BackgroundRight[0] = 1.0;
+  this->BackgroundRight[0] = 0.0;
+  this->BackgroundRight[0] = 0.0;
+  this->BackgroundUp[0] = 0.0;
+  this->BackgroundUp[0] = 1.0;
+  this->BackgroundUp[0] = 0.0;
+
 }
 
 //----------------------------------------------------------------------------
@@ -167,6 +180,8 @@ vtkMantaRenderer::~vtkMantaRenderer()
 {
   //cerr << "MR(" << this << ") DESTROY " << this->MantaManager << " "
   //     << this->MantaManager->GetReferenceCount() << endl;
+
+  this->SetMantaTexture(NULL);
 
   if (this->DefaultLight && this->MantaLightSet)
     {
@@ -214,24 +229,159 @@ void vtkMantaRenderer::SetBackground(double r, double g, double b)
   if ((this->Background[0] != r)||
       (this->Background[1] != g)||
       (this->Background[2] != b))
-  {
-  this->Superclass::SetBackground(r,g,b);
-  this->MantaEngine->addTransaction
-    ( "set background",
-      Manta::Callback::create(this, &vtkMantaRenderer::InternalSetBackground));
-  };
+    {
+    this->Superclass::SetBackground(r,g,b);
+    this->MantaEngine->addTransaction
+      ( "set background",
+        Manta::Callback::create(this, &vtkMantaRenderer::InternalSetBackground));
+    };
+}
+
+//----------------------------------------------------------------------------
+void vtkMantaRenderer::SetBackground2(double r, double g, double b)
+{
+  if ((this->Background2[0] != r)||
+      (this->Background2[1] != g)||
+      (this->Background2[2] != b))
+    {
+    this->Superclass::SetBackground2(r,g,b);
+    this->MantaEngine->addTransaction
+      ( "set background",
+        Manta::Callback::create(this, &vtkMantaRenderer::InternalSetBackground));
+    };
+}
+
+//----------------------------------------------------------------------------
+void vtkMantaRenderer::SetGradientBackground(bool val)
+{
+  if (this->GetGradientBackground() != val)
+    {
+    this->Superclass::SetGradientBackground(val);
+    this->MantaEngine->addTransaction
+      ( "set background",
+        Manta::Callback::create(this, &vtkMantaRenderer::InternalSetBackground));
+    }; 
+}
+
+//----------------------------------------------------------------------------
+void vtkMantaRenderer::SetBackgroundTexture(vtkTexture *texture)
+{
+  if (this->GetBackgroundTexture() != texture)
+    {
+    this->Superclass::SetBackgroundTexture(texture);
+
+    if (texture)
+      {
+      vtkMantaTexture *mt = vtkMantaTexture::New();
+      mt->SetInputData(this->GetBackgroundTexture()->GetInput());
+      this->SetMantaTexture(mt);
+      mt->Delete();
+      }
+    else
+      {
+      this->SetMantaTexture(NULL);
+      }
+
+    this->MantaEngine->addTransaction
+      ( "set background",
+        Manta::Callback::create(this, &vtkMantaRenderer::InternalSetBackground));
+    };
+}
+
+//----------------------------------------------------------------------------
+vtkCxxSetObjectMacro(vtkMantaRenderer,MantaTexture,vtkMantaTexture);
+
+//----------------------------------------------------------------------------
+void vtkMantaRenderer::SetTexturedBackground(bool val)
+{
+  if (this->GetTexturedBackground() != val)
+    {
+    this->Superclass::SetTexturedBackground(val);
+    this->MantaEngine->addTransaction
+      ( "set background",
+        Manta::Callback::create(this, &vtkMantaRenderer::InternalSetBackground));
+    }; 
+}
+
+//----------------------------------------------------------------------------
+void vtkMantaRenderer::SetBackgroundUp(double x, double y, double z)
+{
+  if ((this->BackgroundUp[0] != x)||
+      (this->BackgroundUp[1] != y)||
+      (this->BackgroundUp[2] != z))
+    {
+    this->BackgroundUp[0] = x;
+    this->BackgroundUp[1] = y;
+    this->BackgroundUp[2] = z;
+    this->Modified();
+    this->MantaEngine->addTransaction
+      ( "set background",
+        Manta::Callback::create(this, &vtkMantaRenderer::InternalSetBackground));
+    };
+}
+
+//----------------------------------------------------------------------------
+void vtkMantaRenderer::SetBackgroundRight(double x, double y, double z)
+{
+  if ((this->BackgroundRight[0] != x)||
+      (this->BackgroundRight[1] != y)||
+      (this->BackgroundRight[2] != z))
+    {
+    this->BackgroundRight[0] = x;
+    this->BackgroundRight[1] = y;
+    this->BackgroundRight[2] = z;
+    this->Modified();
+    this->MantaEngine->addTransaction
+      ( "set background",
+        Manta::Callback::create(this, &vtkMantaRenderer::InternalSetBackground));
+    };
 }
 
 //----------------------------------------------------------------------------
 void vtkMantaRenderer::InternalSetBackground()
 {
-  double *color = this->GetBackground();
-  Manta::ConstantBackground * background = new Manta::ConstantBackground(
-    Manta::Color(  Manta::RGBColor( color[0], color[1], color[2] )  )  );
-
-  delete this->MantaScene->getBackground();
-  this->MantaScene->setBackground( background );
+  if (this->GetTexturedBackground() && this->GetMantaTexture())
+    {
+    vtkMantaTexture *mt = this->GetMantaTexture();
+    mt->Load(this);
+    double *up = this->GetBackgroundUp();
+    double *right = this->GetBackgroundRight();
+    Manta::EnvMapBackground * background = new Manta::EnvMapBackground
+      (
+       mt->GetMantaTexture(),
+       Manta::EnvMapBackground::LatLon,
+       Manta::Vector(right[0], right[1], right[2]),
+       Manta::Vector(up[0],up[1],up[2])
+      );
+    delete this->MantaScene->getBackground();
+    this->MantaScene->setBackground( background );
+    }
+  else if (this->GetGradientBackground())
+    {
+    double *color1 = this->GetBackground();
+    double *color2 = this->GetBackground2();
+    double *up = this->GetBackgroundUp();
+    Manta::LinearBackground * background = new Manta::LinearBackground
+      (
+       Manta::Color(  Manta::RGBColor( color1[0], color1[1], color1[2] )  ),
+       Manta::Color(  Manta::RGBColor( color2[0], color2[1], color2[2] )  ),
+       Manta::Vector(up[0],up[1],up[2])
+      );
+    delete this->MantaScene->getBackground();
+    this->MantaScene->setBackground( background );
+    }
+  else
+    {
+    double *color1 = this->GetBackground();
+    Manta::ConstantBackground * background = new Manta::ConstantBackground
+      (
+      Manta::Color(  Manta::RGBColor( color1[0], color1[1], color1[2] )  )
+      );
+    delete this->MantaScene->getBackground();
+    this->MantaScene->setBackground( background );
+    }
 }
+
 
 //----------------------------------------------------------------------------
 void vtkMantaRenderer::ClearLights(void)

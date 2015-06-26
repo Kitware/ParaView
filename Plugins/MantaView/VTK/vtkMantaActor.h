@@ -77,10 +77,9 @@ class Object;
 };
 //ETX
 
-class vtkTimeStamp;
-class vtkMantaProperty;
-class vtkMantaRenderer;
 class vtkMantaManager;
+class vtkMantaTexture;
+class vtkTimeStamp;
 
 class VTKMANTA_EXPORT vtkMantaActor : public vtkActor
 {
@@ -114,6 +113,10 @@ public:
   // Transaction callback that hides the object
   void RemoveObjects();
 
+  //Description:
+  // Overridden to swap in a manta texture
+  virtual void SetTexture(vtkTexture*);
+
   //BTX
   //TODO: This leaks whatever was there, but must schedule its 
   //deletion because of threading
@@ -134,6 +137,11 @@ public:
   vtkSetMacro(SortType, int);
   vtkGetMacro(SortType, int);
 
+  //Description:
+  //Accessor to the manta texture that backs the vtk texture
+  virtual void SetMantaTexture(vtkMantaTexture*);
+  vtkGetObjectMacro(MantaTexture, vtkMantaTexture);
+
  protected:
   vtkMantaActor();
   ~vtkMantaActor();
@@ -153,6 +161,7 @@ public:
   Manta::AccelerationStructure * MantaAS; //acceleration structure for that geometry
   //ETX
 
+  vtkMantaTexture *MantaTexture;
   vtkMantaManager *MantaManager;
 };
 

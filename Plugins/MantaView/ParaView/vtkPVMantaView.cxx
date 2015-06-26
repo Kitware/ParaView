@@ -158,3 +158,19 @@ void vtkPVMantaView::SetMaxDepth(int newval)
     (this->RenderView->GetRenderer());
   mantaRenderer->SetMaxDepth(this->MaxDepth);
 }
+
+//-----------------------------------------------------------------------------
+void vtkPVMantaView::SetBackgroundUp(double x, double y, double z)
+{
+  vtkMantaRenderer *mantaRenderer = vtkMantaRenderer::SafeDownCast
+    (this->RenderView->GetRenderer());
+  mantaRenderer->SetBackgroundUp(x,y,z);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVMantaView::SetBackgroundRight(double x, double y, double z)
+{
+  vtkMantaRenderer *mantaRenderer = vtkMantaRenderer::SafeDownCast
+    (this->RenderView->GetRenderer());
+  mantaRenderer->SetBackgroundRight(x,y,z);
+}
