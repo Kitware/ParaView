@@ -26,6 +26,7 @@
 #include <vtksys/ios/sstream>
 #include <ctype.h>
 #include <cassert>
+#include <cmath>
 
 vtkStandardNewMacro(vtkSMCoreUtilities);
 //----------------------------------------------------------------------------
@@ -133,6 +134,34 @@ bool vtkSMCoreUtilities::AdjustRangeForLog(double range[2])
       range[0] =  range[1] * 0.0001;
       range[0] =  (range[0] < 1.0)? range[0] : 1.0;
       }
+    return true;
+    }
+  return false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMCoreUtilities::AdjustRange(double range[2])
+{
+  if (range[1] < range[0])
+    {
+    // invalid range.
+    return false;
+    }
+
+  // the range must be large enough, compared to values order of magnitude
+  double rangeOrderOfMagnitude = 1e-11;
+  if (rangeOrderOfMagnitude < std::abs(range[0]))
+    {
+    rangeOrderOfMagnitude = std::abs(range[0]);
+    }
+  if (rangeOrderOfMagnitude < std::abs(range[1]))
+    {
+    rangeOrderOfMagnitude = std::abs(range[1]);
+    }
+  double rangeMinLength = rangeOrderOfMagnitude * 1e-5;
+  if ((range[1] - range[0]) < rangeMinLength)
+    {
+    range[1] = range[0] + rangeMinLength;
     return true;
     }
   return false;
