@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDoubleRangeDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProperty.h"
-#include "vtkSMPropertyHelper.h"
+#include "vtkSMUncheckedPropertyHelper.h"
 #include "vtkSMProxy.h"
 
 #include "pqCoreUtilities.h"
@@ -55,6 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDoubleSpinBox>
 #include <QHBoxLayout>
 #include <QStyle>
+#include <QMenu>
 
 pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProperty,
                                                            vtkSMProxy *smProxy,
@@ -127,7 +128,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
       this->connect(widget, SIGNAL(valueEdited(double)),
                     this, SIGNAL(changeFinished()));
 
-      layoutLocal->addWidget(widget);
+      layoutLocal->addWidget(widget, 1);
 
       PV_DEBUG_PANELS() << "pqDoubleRangeWidget for an DoubleVectorProperty "
                     << "with a single element and a "
@@ -204,6 +205,23 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
   if (dvp->FindDomain("vtkSMArrayRangeDomain") != NULL ||
     dvp->FindDomain("vtkSMBoundsDomain") != NULL)
     {
+    PV_DEBUG_PANELS() << "Adding \"Scale\" button since the domain is dynamically";
+    QPushButton* scaleButton = new QPushButton(this);
+    scaleButton->setIcon(scaleButton->style()->standardIcon(QStyle::SP_TitleBarCloseButton));
+    scaleButton->setObjectName("ScaleBy");
+    scaleButton->setToolTip("Scale by ...");
+    scaleButton->setFixedWidth(32);
+    QMenu* menu = new QMenu(scaleButton);
+    menu->setObjectName("ScaleMenu");
+    QAction* actn = menu->addAction("0.5X");
+    actn->setObjectName("x0.5");
+    this->connect(actn, SIGNAL(triggered()), SLOT(scaleHalf()));
+    actn = menu->addAction("2X");
+    actn->setObjectName("x2.0");
+    this->connect(actn, SIGNAL(triggered()), SLOT(scaleTwice()));
+    scaleButton->setMenu(menu);
+    layoutLocal->addWidget(scaleButton);
+
     PV_DEBUG_PANELS() << "Adding \"Reset\" button since the domain is dynamically";
 
     // if this has an vtkSMArrayRangeDomain, add a "reset" button.
@@ -211,6 +229,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
     resetButton->setObjectName("Reset");
     resetButton->setToolTip("Reset using current data values");
     resetButton->setIcon(resetButton->style()->standardIcon(QStyle::SP_BrowserReload));
+    resetButton->setFixedWidth(32);
 
     pqCoreUtilities::connect(dvp, vtkCommand::DomainModifiedEvent,
       this, SIGNAL(highlightResetButton()));
@@ -259,4 +278,31 @@ void pqDoubleVectorPropertyWidget::reset()
 {
   this->Superclass::reset();
   emit this->clearHighlight();
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleVectorPropertyWidget::scaleHalf()
+{
+  this->scale(0.5);
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleVectorPropertyWidget::scaleTwice()
+{
+  this->scale(2.0);
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleVectorPropertyWidget::scale(double factor)
+{
+  if (vtkSMProperty* smproperty = this->property())
+    {
+    vtkSMUncheckedPropertyHelper helper(smproperty);
+    for (unsigned int cc=0, max=helper.GetNumberOfElements(); cc < max; cc++)
+      {
+      helper.Set(cc, helper.GetAsDouble(cc) * factor);
+      }
+    emit this->changeAvailable();
+    emit this->changeFinished();
+    }
 }
