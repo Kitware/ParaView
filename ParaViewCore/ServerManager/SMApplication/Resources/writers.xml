@@ -1033,8 +1033,9 @@
                          number_of_elements="1"
                          default_values="0">
         <BooleanDomain name="bool" />
-        <Documentation>Set the flag that specify if input mesh is static over time.
-        If so, the mesh topology and geometry heavy data will be written only once.
+        <Documentation>When MeshStaticOverTime is turned ON, only the mesh
+          topology and geometry at the first time step will be written in the
+          heavy data file. All time steps will reference them in the Xdmf file.
         </Documentation>
       </IntVectorProperty>
       <Hints>
