@@ -95,6 +95,13 @@ public:
   // @CallOnAllProcessess
   virtual void Initialize(unsigned int id);
 
+
+  // Description:
+  // Overridden to call InvalidateCachedSelection() whenever the render window
+  // parameters change.
+  virtual void SetSize(int, int);
+  virtual void SetPosition(int, int);
+
   // Description:
   // Gets the non-composited renderer for this view. This is typically used for
   // labels, 2D annotations etc.
