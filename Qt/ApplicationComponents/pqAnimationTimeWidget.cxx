@@ -170,10 +170,10 @@ vtkSMProxy* pqAnimationTimeWidget::timeKeeper() const
 void pqAnimationTimeWidget::setTimeValue(double time)
 {
   Ui::AnimationTimeWidget &ui = this->Internals->Ui;
-  ui.timeValue->setTextAndResetCursor(QString::number(time));
+  ui.timeValue->setTextAndResetCursor(QString::number(time, 'g', 17));
   bool prev = ui.timestepValue->blockSignals(true);
-  ui.timestepValue->setValue(
-    vtkSMTimeKeeperProxy::GetLowerBoundTimeStepIndex(this->timeKeeper(), time));
+  int index = vtkSMTimeKeeperProxy::GetLowerBoundTimeStepIndex(this->timeKeeper(), time);
+  ui.timestepValue->setValue(index);
   ui.timestepValue->blockSignals(prev);
 }
 

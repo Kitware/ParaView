@@ -149,8 +149,10 @@ double vtkSMTimeKeeperProxy::GetLowerBoundTimeStep(double value)
     this->GetProperty("TimestepValues"));
   if (dvp && dvp->GetNumberOfElements() > 0)
     {
+    // we shirk the range so that if value > the last timestep, this simply
+    // returns the last timestep's time.
     return *(std::lower_bound(dvp->GetElements(),
-      dvp->GetElements() + dvp->GetNumberOfElements() - 1, // note: this is "last"
+      dvp->GetElements() + dvp->GetNumberOfElements() - 1,
       value));
     }
   return value;
@@ -164,8 +166,10 @@ int vtkSMTimeKeeperProxy::GetLowerBoundTimeStepIndex(double value)
     this->GetProperty("TimestepValues"));
   if (dvp && dvp->GetNumberOfElements() > 0)
     {
+    // we shirk the range so that if value > the last timestep, this simply
+    // returns the last timestep's index.
     const double* first = dvp->GetElements();
-    const double* last = dvp->GetElements() + dvp->GetNumberOfElements() - 1; // note: this is "last"
+    const double* last = dvp->GetElements() + dvp->GetNumberOfElements() - 1;
     const double* iter = std::lower_bound(first, last, value);
     return static_cast<int>(iter - first);
     }

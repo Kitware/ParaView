@@ -190,7 +190,7 @@
                             default_values="none"
                             name="AnimationTime"
                             number_of_elements="1"
-                            precision="16">
+                            precision="17">
         <Documentation>Set the current animation time.</Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetStartTime"
@@ -198,7 +198,7 @@
                             label="Start Time"
                             name="StartTime"
                             number_of_elements="1"
-                            precision="16">
+                            precision="17">
         <Documentation>Set the start time for the animation
         scene.</Documentation>
       </DoubleVectorProperty>
@@ -207,7 +207,7 @@
                             label="End Time"
                             name="EndTime"
                             number_of_elements="1"
-                            precision="16">
+                            precision="17">
         <Documentation>Set the end time for the animation
         scene.</Documentation>
       </DoubleVectorProperty>
