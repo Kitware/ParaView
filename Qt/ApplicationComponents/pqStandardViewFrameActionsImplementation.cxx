@@ -478,7 +478,7 @@ void pqStandardViewFrameActionsImplementation::handleCreateView(
 //-----------------------------------------------------------------------------
 namespace
 {
-  inline QAction* findActiveAction(const QString& name)
+  QAction* findActiveAction(const QString& name)
     {
     pqView* activeView = pqActiveObjects::instance().activeView();
     if (activeView && activeView->widget() &&
@@ -490,7 +490,7 @@ namespace
     return NULL;
     }
 
-  inline void triggerAction(const QString& name)
+  void triggerAction(const QString& name)
     {
     QAction* atcn = findActiveAction(name);
     if (atcn)
@@ -562,9 +562,9 @@ bool pqStandardViewFrameActionsImplementation::eventFilter(
       _event->type() == QEvent::KeyPress)
     {
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(_event);
-    if (keyEvent->key() == Qt::Key_Escape)
+    if (keyEvent->key() == Qt::Key_Escape &&
+      this->exitInteractiveSelection())
       {
-      exitInteractiveSelection();
       return true;
       }
     }
@@ -572,36 +572,34 @@ bool pqStandardViewFrameActionsImplementation::eventFilter(
 }
 
 //-----------------------------------------------------------------------------
-void pqStandardViewFrameActionsImplementation::exitInteractiveSelection()
+bool pqStandardViewFrameActionsImplementation::exitInteractiveSelection()
 {
-  const char* names[] =
+  const char* escapeableActionNames[] = {
+    "actionSelectSurfaceCells",
+    "actionSelectSurfacePoints",
+    "actionSelect_Frustum",
+    "actionSelectFrustumPoints",
+    "actionPolygonSelectionCells",
+    "actionPolygonSelectionPoints",
+    "actionSelect_Block",
+    "actionInteractiveSelectSurfaceCells",
+    "actionInteractiveSelectSurfacePoints",
+    "actionChartSelectPolygon",
+    "actionChartSelectRectangular",
+    NULL
+  };
+
+  for (int cc=0; escapeableActionNames[cc] != NULL; ++cc)
     {
-      "actionInteractiveSelectSurfacePoints",
-      "actionInteractiveSelectSurfaceCells"
-    };
-  QAction* actions[] = 
-    {
-      findActiveAction(names[0]),
-      findActiveAction(names[1])
-    };
-  for (size_t i = 0; i < sizeof(actions) / sizeof(actions[0]);
-       ++i)
-    {
-    if (actions[i] && actions[i]->isChecked())
+    QAction* actn = findActiveAction(escapeableActionNames[cc]);
+    if (actn && actn->isChecked() && actn->isEnabled())
       {
-      actions[i]->trigger();
-      pqRenderView* activeView = qobject_cast<pqRenderView*>(
-        pqActiveObjects::instance().activeView());
-      if (activeView)
-        {
-        vtkSMRenderViewProxy* viewProxy = activeView->getRenderViewProxy();
-        vtkSMInteractiveSelectionPipeline::GetInstance()->Hide(viewProxy);
-        }
-      break;
+      actn->trigger();
+      return true;
       }
     }
+  return false;
 }
-
 
 //-----------------------------------------------------------------------------
 void pqStandardViewFrameActionsImplementation::manageGroupExclusivity(QAction* curAction)
