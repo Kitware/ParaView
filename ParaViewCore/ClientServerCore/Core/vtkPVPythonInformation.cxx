@@ -100,6 +100,7 @@ void vtkPVPythonInformation::DeepCopy(vtkPVPythonInformation *info)
 namespace {
 bool hasModule(const char *module)
 {
+  vtkPythonScopeGilEnsurer gilEnsurer;
   vtkSmartPyObject mod(PyImport_ImportModule(module));
   bool result = mod;
   return result;
@@ -108,6 +109,7 @@ bool hasModule(const char *module)
 // Returns empty string on error.
 std::string getModuleAttrAsString(const char *module, const char *attribute)
 {
+  vtkPythonScopeGilEnsurer gilEnsurer;
   vtkSmartPyObject mod(PyImport_ImportModule(module));
   if (!mod)
     {
@@ -126,7 +128,6 @@ std::string getModuleAttrAsString(const char *module, const char *attribute)
     }
 
   std::string result = PyBytes_AsString(attr);
-
   return result;
 }
 

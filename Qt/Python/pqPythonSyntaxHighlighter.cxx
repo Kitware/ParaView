@@ -65,40 +65,45 @@ pqPythonSyntaxHighlighter::pqPythonSyntaxHighlighter(
   this->Internals->TextEdit = textEdit;
   this->Internals->TextEdit->installEventFilter(this);
   vtkPythonInterpreter::Initialize();
-  this->Internals->PygmentsModule.TakeReference(PyImport_ImportModule("pygments"));
-  if (this->Internals->PygmentsModule && this->Internals->TextEdit != NULL)
-  {
-    this->Internals->HighlightFunction.TakeReference(
-                PyObject_GetAttrString(this->Internals->PygmentsModule, "highlight"));
-    vtkSmartPyObject lexersModule(PyImport_ImportModule("pygments.lexers"));
-    vtkSmartPyObject formattersModule(PyImport_ImportModule(
-                                        "pygments.formatters.redtabhtml"));
-    vtkSmartPyObject htmlFormatterClass;
-    // If we have the custom formatter written for ParaView, great.
-    // otherwise just default to the HtmlFormatter in pygments
-    if (formattersModule)
+
+    {
+    vtkPythonScopeGilEnsurer gilEnsurer;
+    this->Internals->PygmentsModule.TakeReference(PyImport_ImportModule("pygments"));
+    if (this->Internals->PygmentsModule && this->Internals->TextEdit != NULL)
       {
-      htmlFormatterClass.TakeReference(
-        PyObject_GetAttrString(formattersModule, "RedTabHtmlFormatter"));
+      this->Internals->HighlightFunction.TakeReference(
+        PyObject_GetAttrString(this->Internals->PygmentsModule, "highlight"));
+      vtkSmartPyObject lexersModule(PyImport_ImportModule("pygments.lexers"));
+      vtkSmartPyObject formattersModule(PyImport_ImportModule(
+        "pygments.formatters.redtabhtml"));
+      vtkSmartPyObject htmlFormatterClass;
+      // If we have the custom formatter written for ParaView, great.
+      // otherwise just default to the HtmlFormatter in pygments
+      if (formattersModule)
+        {
+        htmlFormatterClass.TakeReference(
+          PyObject_GetAttrString(formattersModule, "RedTabHtmlFormatter"));
+        }
+      else
+        {
+        formattersModule.TakeReference(PyImport_ImportModule("pygments.formatters"));
+        htmlFormatterClass.TakeReference(
+          PyObject_GetAttrString(formattersModule, "HtmlFormatter"));
+        }
+      vtkSmartPyObject pythonLexerClass(
+        PyObject_GetAttrString(lexersModule, "PythonLexer"));
+      vtkSmartPyObject emptyTuple(Py_BuildValue("()"));
+      this->Internals->PythonLexer.TakeReference(
+        PyObject_Call(pythonLexerClass, emptyTuple, NULL));
+      this->Internals->HtmlFormatter.TakeReference(
+        PyObject_Call(htmlFormatterClass, emptyTuple, NULL));
+      PyObject_SetAttrString(this->Internals->HtmlFormatter, "noclasses", Py_True);
+      PyObject_SetAttrString(this->Internals->HtmlFormatter, "nobackground", Py_True);
+      this->connect(this->Internals->TextEdit.data(), SIGNAL(textChanged()),
+                    this, SLOT(rehighlightSyntax()));
       }
-    else
-      {
-      formattersModule.TakeReference(PyImport_ImportModule("pygments.formatters"));
-      htmlFormatterClass.TakeReference(
-        PyObject_GetAttrString(formattersModule, "HtmlFormatter"));
-      }
-    vtkSmartPyObject pythonLexerClass(
-                PyObject_GetAttrString(lexersModule, "PythonLexer"));
-    vtkSmartPyObject emptyTuple(Py_BuildValue("()"));
-    this->Internals->PythonLexer.TakeReference(
-          PyObject_Call(pythonLexerClass, emptyTuple, NULL));
-    this->Internals->HtmlFormatter.TakeReference(
-          PyObject_Call(htmlFormatterClass, emptyTuple, NULL));
-    PyObject_SetAttrString(this->Internals->HtmlFormatter, "noclasses", Py_True);
-    PyObject_SetAttrString(this->Internals->HtmlFormatter, "nobackground", Py_True);
-    this->connect(this->Internals->TextEdit.data(), SIGNAL(textChanged()),
-                  this, SLOT(rehighlightSyntax()));
-  }
+    }
+
   this->Internals->IsSyntaxHighlighting = false;
   // Replace tabs with 4 spaces
   this->Internals->ReplaceTabs = true;
@@ -178,13 +183,19 @@ void pqPythonSyntaxHighlighter::rehighlightSyntax()
     QString trailingWhitespace = text.right(trailingWhiteSpaceLength);
 
     QByteArray bytes = text.trimmed().toUtf8();
-    vtkSmartPyObject unicode(PyUnicode_DecodeUTF8(bytes.data(),bytes.size(),NULL));
-    vtkSmartPyObject args(Py_BuildValue("OOO",unicode.GetPointer(),
-                                       this->Internals->PythonLexer.GetPointer(),this->Internals->HtmlFormatter.GetPointer()));
-    vtkSmartPyObject resultingText(PyObject_Call(this->Internals->HighlightFunction,args,NULL));
+  
+   char* resultingTextAsCString; 
+      { 
+      vtkPythonScopeGilEnsurer gilEnsurer;
+      vtkSmartPyObject unicode(PyUnicode_DecodeUTF8(bytes.data(),bytes.size(),NULL));
+      vtkSmartPyObject args(Py_BuildValue("OOO",unicode.GetPointer(),
+        this->Internals->PythonLexer.GetPointer(),this->Internals->HtmlFormatter.GetPointer()));
+      vtkSmartPyObject resultingText(PyObject_Call(this->Internals->HighlightFunction,args,NULL));
 
-    vtkSmartPyObject resultingTextBytes(PyUnicode_AsUTF8String(resultingText));
-    char* resultingTextAsCString = PyString_AsString(resultingTextBytes);
+      vtkSmartPyObject resultingTextBytes(PyUnicode_AsUTF8String(resultingText));
+      resultingTextAsCString = PyString_AsString(resultingTextBytes);
+      }
+
     QString pygmentsOutput = QString::fromUtf8(resultingTextAsCString);
 
     // the first span tag always should follow the pre tag like this; <pre ...><span

@@ -596,8 +596,11 @@ else()
 
   #----------------------------------------------------------------------------------
   # Set some flags that affect VTK's modules.
-  set (VTK_NO_PYTHON_THREADS 1 CACHE INTERNAL
-                               "Disable Python Threads support" FORCE)
+  cmake_dependent_option(VTK_NO_PYTHON_THREADS "Disable Python Threads support" ON PARAVIEW_ENABLE_PYTHON ON)
+  mark_as_advanced(VTK_NO_PYTHON_THREADS)
+  cmake_dependent_option(VTK_PYTHON_FULL_THREADSAFE "Ensure all calls to Python using GIL" OFF "NOT VTK_NO_PYTHON_THREADS;PARAVIEW_ENABLE_PYTHON" OFF)
+  mark_as_advanced(VTK_PYTHON_FULL_THREADSAFE)
+
   set(VTK_WRAP_PYTHON ${PARAVIEW_ENABLE_PYTHON}
     CACHE INTERNAL "Should VTK Python wrapping be built?" FORCE)
 

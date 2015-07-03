@@ -69,6 +69,7 @@ vtkSMTrace::vtkSMTrace():
 #ifdef PARAVIEW_ENABLE_PYTHON
   // ensure Python interpreter is initialized.
   vtkPythonInterpreter::Initialize();
+  vtkPythonScopeGilEnsurer gilEnsurer;
   this->Internals->TraceModule.TakeReference(PyImport_ImportModule("paraview.smtrace"));
   if (!this->Internals->TraceModule)
     {
@@ -115,6 +116,7 @@ vtkStdString vtkSMTrace::GetState(
 
 #ifdef PARAVIEW_ENABLE_PYTHON
   vtkPythonInterpreter::Initialize();
+  vtkPythonScopeGilEnsurer gilEnsurer;
   try
     {
     vtkSmartPyObject module(PyImport_ImportModule("paraview.smstate"));
@@ -134,7 +136,8 @@ vtkStdString vtkSMTrace::GetState(
       vtkGenericWarningMacro("Failed to generate state.");
       throw 1;
       }
-    return vtkStdString(PyString_AsString(result));
+    vtkStdString s(PyString_AsString(result));
+    return s;
     }
   catch (int)
     {
@@ -164,6 +167,7 @@ vtkSMTrace* vtkSMTrace::StartTrace()
       }
     else
       {
+      vtkPythonScopeGilEnsurer gilEnsurer;
       vtkSmartPyObject _start_trace_internal(
         PyObject_CallMethod(vtkSMTrace::ActiveTracer->GetTraceModule(),
           const_cast<char*>("_start_trace_internal"), NULL));
@@ -192,6 +196,7 @@ vtkStdString vtkSMTrace::StopTrace()
   vtkSMTrace::ActiveTracer = NULL;
 
 #ifdef PARAVIEW_ENABLE_PYTHON
+  vtkPythonScopeGilEnsurer gilEnsurer;
   vtkSmartPyObject _stop_trace_internal(
     PyObject_CallMethod(active->GetTraceModule(), const_cast<char*>("_stop_trace_internal"), NULL));
   if (active->CheckForError() == false)
@@ -199,7 +204,8 @@ vtkStdString vtkSMTrace::StopTrace()
     // no error.
     if (Py_None != _stop_trace_internal.GetPointer() && _stop_trace_internal.GetPointer() != NULL)
       {
-      return vtkStdString(PyString_AsString(_stop_trace_internal));
+      vtkStdString s(PyString_AsString(_stop_trace_internal));
+      return s;
       }
     else
       {
@@ -223,12 +229,13 @@ vtkStdString vtkSMTrace::GetCurrentTrace()
 
 #ifdef PARAVIEW_ENABLE_PYTHON
   vtkSMTrace* active = vtkSMTrace::ActiveTracer;
+  vtkPythonScopeGilEnsurer gilEnsurer;
   vtkSmartPyObject get_current_trace_output(
     PyObject_CallMethod(active->GetTraceModule(), const_cast<char*>("get_current_trace_output"), NULL));
   if (active->CheckForError() == false && get_current_trace_output)
     {
     // no error.
-    return vtkStdString(PyString_AsString(get_current_trace_output));
+    return PyString_AsString(get_current_trace_output);
     }
 #endif
   return vtkStdString();
@@ -256,6 +263,7 @@ const vtkSmartPyObject& vtkSMTrace::GetCreateItemFunction() const
 bool vtkSMTrace::CheckForError()
 {
 #ifdef PARAVIEW_ENABLE_PYTHON
+  vtkPythonScopeGilEnsurer gilEnsurer;
   PyObject *exception = PyErr_Occurred();
   if (exception)
     {
@@ -336,6 +344,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(
   if (vtkSMTrace::GetActiveTracer())
     {
 #ifdef PARAVIEW_ENABLE_PYTHON
+    vtkPythonScopeGilEnsurer gilEnsurer;
     vtkSmartPyObject keyObj(PyString_FromString(key));
     vtkSmartPyObject valObj(vtkPythonUtil::GetObjectFromPointer(val));
     assert(valObj && keyObj);
@@ -358,6 +367,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(
   if (vtkSMTrace::GetActiveTracer())
     {
 #ifdef PARAVIEW_ENABLE_PYTHON
+    vtkPythonScopeGilEnsurer gilEnsurer;
     vtkSmartPyObject keyObj(PyString_FromString(key));
     vtkSmartPyObject valObj;
     if (val == NULL)
@@ -389,6 +399,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(
   if (vtkSMTrace::GetActiveTracer())
     {
 #ifdef PARAVIEW_ENABLE_PYTHON
+    vtkPythonScopeGilEnsurer gilEnsurer;
     vtkSmartPyObject keyObj(PyString_FromString(key));
     vtkSmartPyObject valObj(PyInt_FromLong(val));
     assert(keyObj && valObj);
@@ -411,6 +422,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(
   if (vtkSMTrace::GetActiveTracer())
     {
 #ifdef PARAVIEW_ENABLE_PYTHON
+    vtkPythonScopeGilEnsurer gilEnsurer;
     vtkSmartPyObject keyObj(PyString_FromString(key));
     vtkSmartPyObject valObj(PyFloat_FromDouble(val));
     assert(keyObj && valObj);
@@ -432,6 +444,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(
   if (vtkSMTrace::GetActiveTracer())
     {
 #ifdef PARAVIEW_ENABLE_PYTHON
+    vtkPythonScopeGilEnsurer gilEnsurer;
     vtkSmartPyObject keyObj(PyString_FromString(key));
     vtkSmartPyObject valObj(PyBool_FromLong(val? 1 : 0));
     assert(keyObj && valObj);
@@ -452,6 +465,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(vtkObject* val)
   if (vtkSMTrace::GetActiveTracer())
     {
 #ifdef PARAVIEW_ENABLE_PYTHON
+    vtkPythonScopeGilEnsurer gilEnsurer;
     vtkSmartPyObject valObj(vtkPythonUtil::GetObjectFromPointer(val));
     assert(valObj);
     int ret = PyList_Append(this->Internals->GetPositionalArgs(), valObj);
@@ -470,6 +484,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(const char* val)
   if (vtkSMTrace::GetActiveTracer())
     {
 #ifdef PARAVIEW_ENABLE_PYTHON
+    vtkPythonScopeGilEnsurer gilEnsurer;
     vtkSmartPyObject valObj(PyString_FromString(val));
     assert(valObj);
     int ret = PyList_Append(this->Internals->GetPositionalArgs(), valObj);
@@ -487,6 +502,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(int val)
   if (vtkSMTrace::GetActiveTracer())
     {
 #ifdef PARAVIEW_ENABLE_PYTHON
+    vtkPythonScopeGilEnsurer gilEnsurer;
     vtkSmartPyObject valObj(PyInt_FromLong(val));
     assert(valObj);
     int ret = PyList_Append(this->Internals->GetPositionalArgs(), valObj);
@@ -504,12 +520,13 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(double val)
   if (vtkSMTrace::GetActiveTracer())
     {
 #ifdef PARAVIEW_ENABLE_PYTHON
+    vtkPythonScopeGilEnsurer gilEnsurer;
     vtkSmartPyObject valObj(PyFloat_FromDouble(val));
     assert(valObj);
     int ret = PyList_Append(this->Internals->GetPositionalArgs(), valObj);
     (void)ret;
     assert(ret == 0);
-#endif
+    #endif
     }
   (void)val;
   return *this;
@@ -521,12 +538,13 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(bool val)
   if (vtkSMTrace::GetActiveTracer())
     {
 #ifdef PARAVIEW_ENABLE_PYTHON
+    vtkPythonScopeGilEnsurer gilEnsurer;
     vtkSmartPyObject valObj(PyBool_FromLong(val? 1 : 0));
     assert(valObj);
     int ret = PyList_Append(this->Internals->GetPositionalArgs(), valObj);
     (void)ret;
     assert(ret == 0);
-#endif
+    #endif
     }
   (void)val;
   return *this;
@@ -557,10 +575,11 @@ vtkSMTrace::TraceItem::~TraceItem()
   vtkSMTrace* tracer = vtkSMTrace::GetActiveTracer();
   if (tracer && this->Internals->PyItem)
     {
+    vtkPythonScopeGilEnsurer gilEnsurer;
     vtkSmartPyObject reply(
       PyObject_CallMethod(this->Internals->PyItem,
         const_cast<char*>("finalize"), NULL));
-    tracer->CheckForError();
+        tracer->CheckForError();
     tracer->InvokeEvent(vtkCommand::UpdateEvent);
     }
 #endif
@@ -583,6 +602,7 @@ void vtkSMTrace::TraceItem::operator=(const TraceItemArgs& arguments)
 #ifdef PARAVIEW_ENABLE_PYTHON
   if (vtkSMTrace* tracer = vtkSMTrace::GetActiveTracer())
     {
+    vtkPythonScopeGilEnsurer gilEnsurer;
     assert(tracer->GetTraceModule());
     assert(tracer->GetCreateItemFunction());
 
@@ -613,7 +633,7 @@ void vtkSMTrace::TraceItem::operator=(const TraceItemArgs& arguments)
     this->Internals->PyItem.TakeReference(
       PyObject_Call(tracer->GetCreateItemFunction(), args, NULL));
     tracer->CheckForError();
-    }
+        }
 #endif
   (void)arguments;
 }
