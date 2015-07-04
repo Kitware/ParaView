@@ -121,8 +121,9 @@ protected:
   /// Called when user clicks "Convert To" or create a view from the empty
   /// frame.
   virtual void handleCreateView(const ViewType& viewType);
-  /// Exit interactive selection
-  void exitInteractiveSelection();
+
+  /// Exit interactive selection. Returns true if a selection was exited.
+  bool exitInteractiveSelection();
 private:
   Q_DISABLE_COPY(pqStandardViewFrameActionsImplementation)
   QPointer<QShortcut> ShortCutSurfaceCells;
