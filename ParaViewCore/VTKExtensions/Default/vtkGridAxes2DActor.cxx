@@ -16,6 +16,7 @@
 
 #include "vtkAxis.h"
 #include "vtkContext2D.h"
+#include "vtkContextScene.h"
 #include "vtkDoubleArray.h"
 #include "vtkObjectFactory.h"
 #include "vtkProperty2D.h"
@@ -171,6 +172,7 @@ vtkGridAxes2DActor::vtkGridAxes2DActor() :
   this->PlaneActor.TakeReference(vtkGridAxesPlane2DActor::New(this->Helper.Get()));
   for (int cc=0; cc < 3; cc++)
     {
+    this->AxisHelpers[cc]->SetScene(this->AxisHelperScene.GetPointer());
     this->AxisHelpers[cc]->SetPosition(vtkAxis::LEFT);
     this->AxisHelpers[cc]->SetBehavior(vtkAxis::FIXED);
     this->TitleTextProperty[cc] = vtkSmartPointer<vtkTextProperty>::New();
@@ -391,6 +393,9 @@ bool vtkGridAxes2DActor::Update(vtkViewport* viewport)
 
   vtkRenderer* renderer = vtkRenderer::SafeDownCast(viewport);
   assert(renderer != NULL);
+
+  // This is needed so the vtkAxis labels account for tile scaling.
+  this->AxisHelperScene->SetRenderer(renderer);
 
   if (this->EnableLayerSupport == false || renderer->GetLayer() == this->BackgroundLayer)
     {

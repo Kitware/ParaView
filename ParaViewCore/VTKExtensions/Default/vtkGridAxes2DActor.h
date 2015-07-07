@@ -28,6 +28,7 @@
 #include "vtkStdString.h" // needed for vtkStdString.
 
 class vtkAxis;
+class vtkContextScene;
 class vtkDoubleArray;
 class vtkProperty;
 class vtkTextProperty;
@@ -225,6 +226,7 @@ protected:
   vtkNew<vtkGridAxesHelper> Helper;
   vtkSmartPointer<vtkGridAxesPlane2DActor> PlaneActor;
   vtkNew<vtkAxis> AxisHelpers[3];
+  vtkNew<vtkContextScene> AxisHelperScene;
   vtkTimeStamp UpdateLabelTextPropertiesMTime;
 
 private:
