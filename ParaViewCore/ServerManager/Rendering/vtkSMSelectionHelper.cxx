@@ -46,10 +46,11 @@
 #include "vtkUnsignedIntArray.h"
 #include "vtkView.h"
 
-#include <vector>
+#include <cassert>
 #include <map>
+#include <set>
+#include <vector>
 #include <vtksys/ios/sstream>
-#include <assert.h>
 
 vtkStandardNewMacro(vtkSMSelectionHelper);
 
@@ -202,23 +203,33 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
     }
   else if (contentType == vtkSelectionNode::BLOCKS)
     {
+    std::set<vtkIdType> block_ids;
     vtkSMIdTypeVectorProperty* blocks = vtkSMIdTypeVectorProperty::SafeDownCast(
       selSource->GetProperty("Blocks"));
-    if (!originalSelSource)
-      {
-      blocks->SetNumberOfElements(0);
-      }
-    unsigned int curValues = blocks->GetNumberOfElements();
     vtkUnsignedIntArray* idList = vtkUnsignedIntArray::SafeDownCast(
       selection->GetSelectionList());
     if (idList)
       {
-      vtkIdType numIDs = idList->GetNumberOfTuples();
-      blocks->SetNumberOfElements(curValues+numIDs);
-      for (vtkIdType cc=0; cc < numIDs; cc++)
+      for (unsigned int cc=0, max=blocks->GetNumberOfElements();
+        (cc < max && originalSelSource != NULL); ++cc)
         {
-        blocks->SetElement(curValues+cc, idList->GetValue(cc));
+        block_ids.insert(blocks->GetElement(cc));
         }
+      assert(idList->GetNumberOfComponents() == 1 || idList->GetNumberOfTuples() == 0);
+      for (vtkIdType cc=0, max=idList->GetNumberOfTuples(); cc < max; ++cc)
+        {
+        block_ids.insert(idList->GetValue(cc));
+        }
+      }
+    if (block_ids.size() > 0)
+      {
+      std::vector<vtkIdType> block_ids_vec(block_ids.size());
+      std::copy(block_ids.begin(), block_ids.end(), block_ids_vec.begin());
+      blocks->SetElements(&block_ids_vec[0], static_cast<unsigned int>(block_ids_vec.size()));
+      }
+    else
+      {
+      blocks->SetNumberOfElements(0);
       }
     }
   else if (contentType == vtkSelectionNode::INDICES)
