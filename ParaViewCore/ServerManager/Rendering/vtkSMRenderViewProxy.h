@@ -26,10 +26,11 @@
 #include "vtkNew.h" // needed for vtkInteractorObserver.
 class vtkCamera;
 class vtkCollection;
+class vtkFloatArray;
 class vtkIntArray;
 class vtkRenderer;
 class vtkRenderWindow;
-class vtkRenderWindowInteractor;
+class vtkRenderWinwInteractor;
 class vtkSMDataDeliveryManager;
 class vtkSMViewProxyInteractorHelper;
 
@@ -185,6 +186,10 @@ public:
   // the interaction/view sync. We provide access to it for applications to
   // monitor timer events etc.
   vtkSMViewProxyInteractorHelper* GetInteractorHelper();
+
+  // Description:
+  // Access to the Z buffer.
+  vtkFloatArray* CaptureDepthBuffer();
 
 //BTX
 protected:
