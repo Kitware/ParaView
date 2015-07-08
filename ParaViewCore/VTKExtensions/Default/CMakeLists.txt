@@ -104,6 +104,7 @@ set(Module_SRCS
   vtkPVClipDataSet.cxx
   vtkPVConnectivityFilter.cxx
   vtkPVContourFilter.cxx
+  vtkPVCylinder.cxx
   vtkPVDataSetAlgorithmSelectorFilter.cxx
   vtkPVDReader.cxx
   vtkPVEnSightMasterServerReader2.cxx

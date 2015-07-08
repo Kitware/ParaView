@@ -5965,6 +5965,8 @@ array.
           <Proxy group="implicit_functions"
                  name="Sphere" />
           <Proxy group="implicit_functions"
+                 name="Cylinder" />
+          <Proxy group="implicit_functions"
                  name="Scalar" />
         </ProxyListDomain>
         <Documentation>This property specifies the parameters of the clip

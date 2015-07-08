@@ -22,6 +22,7 @@
         { "class":"vtkPVBox" },
         { "class":"vtkPVClipDataSet" },
         { "class":"vtkPVContourFilter" },
+        { "class":"vtkPVCylinder" },
         { "class":"vtkPVDataSetAlgorithmSelectorFilter" },
         { "class":"vtkPVGlyphFilter" },
         { "class":"vtkPVLegacyGlyphFilter" },
@@ -116,6 +117,7 @@
         "NonMergingPointLocator",
         "Plane",
         "Box",
+        "Cylinder",
         "Sphere",
         "Scalar"
       ]

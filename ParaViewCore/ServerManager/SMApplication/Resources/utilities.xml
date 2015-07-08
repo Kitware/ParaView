@@ -658,6 +658,28 @@
         </PropertyGroup>
       </Hints>
     </Proxy>
+    <Proxy class="vtkPVCylinder"
+           name="Cylinder">
+      <DoubleVectorProperty command="SetCenter"
+                            default_values="none"
+                            name="Center"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetAxis"
+                            default_values="0. 1. 0."
+                            name="Axis"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetRadius"
+                            default_values="0.5"
+                            name="Radius"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+    </Proxy>
   </ProxyGroup>
   <ProxyGroup name="transforms">
     <Proxy class="vtkTransform"
