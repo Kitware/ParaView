@@ -103,9 +103,19 @@ protected:
   void PostProcess(vtkDataObject* output,
     vtkSmartPointer<vtkDataObject> inputs[],
     unsigned int num_inputs);
-
-  void Send(int receiver, vtkDataObject*);
-  vtkDataObject* Receive(int receiver, int dataobjectType);
+  // Description:
+  // GatherV for vtkSelection
+  // sendData is a vtkSelection while receiveData is a vector of NumberOfProcesses
+  // vtkSelections. Selections are gathered on destProcessId
+  int GatherVSelection(
+    vtkDataObject* sendData, vtkSmartPointer<vtkDataObject>* receiveData,
+    int destProcessId);
+  // Description:
+  // Adds selection to the list of vtkDataObjects handled by 
+  // vtkCommunicator::GatherV
+  int GatherV(
+    vtkDataObject* sendData, vtkSmartPointer<vtkDataObject>* receiveData,
+    int destProcessId);
 
   vtkAlgorithm* PreGatherHelper;
   vtkAlgorithm* PostGatherHelper;

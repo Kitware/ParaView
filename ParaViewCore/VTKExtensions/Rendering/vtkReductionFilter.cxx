@@ -42,6 +42,7 @@
 
 #include <vtksys/ios/sstream>
 #include <vector>
+#include <sstream>
 
 vtkStandardNewMacro(vtkReductionFilter);
 vtkCxxSetObjectMacro(vtkReductionFilter, Controller, vtkMultiProcessController);
@@ -357,37 +358,34 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
     }
 
   std::vector<vtkSmartPointer<vtkDataObject> > data_sets;
-  if (myId == 0)
+  std::vector<vtkSmartPointer<vtkDataObject> > receiveData(
+    controller->GetNumberOfProcesses());
+  if (myId == 0 && preOutput)
     {
-    int cc = 0;
-    // Form vtkDataObjects from collected data.
-    // Meanwhile if the user wants to see only one node's data
-    // then pass only that through
-    for (cc=0; cc < numProcs; ++cc)
+    for (int i = 0; i < controller->GetNumberOfProcesses(); ++i)
       {
-      vtkSmartPointer<vtkDataObject> ds = NULL;
-      if (cc == 0)
+        receiveData[i].TakeReference(preOutput->NewInstance());
+      }
+    }
+
+  this->GatherV(preOutput, &receiveData[0], 0);
+  if (preOutput)
+    {
+    if (myId == 0)
+      {
+      if (this->PassThrough >= 0)
         {
-        if (preOutput)
-          {
-          ds.TakeReference(preOutput->NewInstance());
-          ds->ShallowCopy(preOutput);
-          }
+        data_sets.push_back(receiveData[this->PassThrough]);
         }
       else
         {
-        ds.TakeReference(this->Receive(cc, output->GetDataObjectType()));
+        for (int i = 0; i < controller->GetNumberOfProcesses(); ++i)
+          {
+          data_sets.push_back(receiveData[i]);
+          }
         }
-      if (ds && (this->PassThrough<0 || this->PassThrough==cc))
-        {
-        data_sets.push_back(ds);
-        }
-      } 
-    }
-  else
-    {
-    this->Send(0, preOutput);
-    if (preOutput)
+      }
+    else
       {
       data_sets.push_back(preOutput);
       }
@@ -403,51 +401,57 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
     }
 }
 
-//-----------------------------------------------------------------------------
-void vtkReductionFilter::Send(int receiver, vtkDataObject* data)
+int vtkReductionFilter::GatherV(
+  vtkDataObject* sendData, vtkSmartPointer<vtkDataObject>* receiveData,
+  int destProcessId)
 {
-  if (data && data->IsA("vtkSelection"))
+
+  vtkSelection* sel = vtkSelection::SafeDownCast(sendData);
+  return sel ? this->GatherVSelection(sendData, receiveData, destProcessId) :
+    this->Controller->GatherV(sendData, receiveData, destProcessId);
+}
+
+//----------------------------------------------------------------------------
+int vtkReductionFilter::GatherVSelection(
+  vtkDataObject* sendData, vtkSmartPointer<vtkDataObject>* receiveData,
+  int destProcessId)
+{
+  vtkSelection* sel = vtkSelection::SafeDownCast(sendData);
+  if (! sel)
     {
-    // Convert to XML.
-    vtkSelection* sel = vtkSelection::SafeDownCast(data);
-    vtksys_ios::ostringstream res;
-    vtkSelectionSerializer::PrintXML(res, vtkIndent(), 1, sel);
-    res << ends;
-    // Send the size of the string.
-    int size = static_cast<int>(res.str().size());
-    this->Controller->Send(&size, 1, receiver,
-      vtkReductionFilter::TRANSMIT_DATA_OBJECT);
-    // Send the XML string.
-    this->Controller->Send(res.str().c_str(), size, receiver,
-      vtkReductionFilter::TRANSMIT_DATA_OBJECT);
+    vtkErrorMacro(<<"vtkDataObject not a selection");
+    return 0;
+    }
+  std::ostringstream sendBufferOstr;
+  vtkSelectionSerializer::PrintXML(sendBufferOstr, vtkIndent(), 1, sel);
+  std::string sendBufferStr = sendBufferOstr.str();
+  vtkNew<vtkCharArray> sendBuffer;
+  vtkNew<vtkCharArray> recvBuffer;
+  sendBuffer->SetArray(const_cast<char*>(sendBufferStr.c_str()), 
+                       sendBufferStr.size(), 1);
+  vtkNew<vtkIdTypeArray> recvLengths;
+  vtkNew<vtkIdTypeArray> offsets;
+  if (this->Controller->GatherV(
+        sendBuffer.GetPointer(), recvBuffer.GetPointer(),
+        recvLengths.GetPointer(), offsets.GetPointer(), destProcessId))
+    {
+    if (this->Controller->GetLocalProcessId() == destProcessId)
+      {
+      for (int i = 0; i < this->Controller->GetNumberOfProcesses(); ++i)
+        {
+        // offsets has NumberOfProcesses+1 elements
+        vtkSelectionSerializer::Parse(
+          recvBuffer->GetPointer(offsets->GetValue(i)),
+          offsets->GetValue(i + 1) - offsets->GetValue(i),
+          vtkSelection::SafeDownCast(receiveData[i]));
+        }
+      }
     }
   else
     {
-    this->Controller->Send(data, receiver, vtkReductionFilter::TRANSMIT_DATA_OBJECT);
+    return 0;
     }
-}
-
-//-----------------------------------------------------------------------------
-vtkDataObject* vtkReductionFilter::Receive(int sender, int dataType)
-{
-  if (dataType == VTK_SELECTION)
-    {
-    // Get the size of the string.
-    int size = 0;
-    this->Controller->Receive(&size, 1, sender,
-      vtkReductionFilter::TRANSMIT_DATA_OBJECT);
-    char* xml = new char[size];
-    // Get the string itself.
-    this->Controller->Receive(xml, size, sender,
-      vtkReductionFilter::TRANSMIT_DATA_OBJECT);
-    // Parse the XML.
-    vtkSelection* sel = vtkSelection::New();
-    vtkSelectionSerializer::Parse(xml, sel);
-    delete[] xml;
-    return sel;
-    }
-  return this->Controller->ReceiveDataObject(sender,
-    vtkReductionFilter::TRANSMIT_DATA_OBJECT);
+  return 1;
 }
 
 //-----------------------------------------------------------------------------
