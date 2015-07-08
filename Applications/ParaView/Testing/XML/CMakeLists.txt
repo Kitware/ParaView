@@ -287,6 +287,15 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/RandomAttributes.xml
 )
 
+if(VTK_USE_LARGE_DATA)
+  paraview_test_load_data_dirs(""
+    bake
+  )
+  list(APPEND TESTS_WITH_BASELINES
+    ${CMAKE_CURRENT_SOURCE_DIR}/CheckSelectedBlocks.xml
+    )
+endif()
+
 # The color dialog is different on MacOS X which makes this test fail.
 if(NOT APPLE)
   list(APPEND TESTS_WITH_BASELINES
@@ -426,6 +435,7 @@ set(InteractiveSelection_DISABLE_CRS TRUE)
 set(NonConvexPolygon_DISABLE_CRS TRUE)
 set(QuartilePlot_DISABLE_CRS TRUE)
 set(TestSelectionOnMultipiece_DISABLE_CRS TRUE)
+set(CheckSelectedBlocks_DISABLE_CRS TRUE)
 
 # These tests cannot be run using ctest -j since they are affected by focus
 # changed events.
