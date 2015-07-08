@@ -1861,6 +1861,7 @@ found and the point will be rejected.</Documentation>
       </InputProperty>
       <!-- End ExtractEdges -->
     </SourceProxy>
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkDataSetSurfaceFilter"
                  label="Extract Surface"
                  name="DataSetSurfaceFilter">
@@ -1911,6 +1912,85 @@ found and the point will be rejected.</Documentation>
         unstructured grid.</Documentation>
       </IntVectorProperty>
       <!-- End DataSetSurfaceFilter -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkDataSetRegionSurfaceFilter"
+                 label="Extract Region Surface"
+                 name="DataSetRegionSurfaceFilter">
+      <Documentation long_help="Extract a 2D boundary surface using neighbor relations to eliminate internal faces."
+                     short_help="Extract 2D boundary surface.">The Extract
+                     Surface filter extracts the polygons forming the outer
+                     surface of the input dataset. This filter operates on any
+                     type of data and produces polygonal data as
+                     output.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Extract Surface
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetPieceInvariant"
+                         default_values="1"
+                         name="PieceInvariant"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If the value of this property is set to 1, internal
+        surfaces along process boundaries will be removed. NOTE: Enabling this
+        option might cause multiple executions of the data source because more
+        information is needed to remove internal surfaces.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetNonlinearSubdivisionLevel"
+                         default_values="1"
+                         name="NonlinearSubdivisionLevel"
+                         number_of_elements="1">
+        <IntRangeDomain max="4"
+                        min="0"
+                        name="range" />
+        <Documentation>If the input is an unstructured grid with nonlinear
+        faces, this parameter determines how many times the face is subdivided
+        into linear faces. If 0, the output is the equivalent of its linear
+        couterpart (and the midpoints determining the nonlinear interpolation
+        are discarded). If 1, the nonlinear face is triangulated based on the
+        midpoints. If greater than 1, the triangulated pieces are recursively
+        subdivided to reach the desired subdivision. Setting the value to
+        greater than 1 may cause some point data to not be passed even if no
+        quadratic faces exist. This option has no effect if the input is not an
+        unstructured grid.</Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty command="SetRegionArrayName"
+                            label="Region Array"
+                            name="SetRegionArrayName"
+                            number_of_elements_per_command="1"
+                            repeat_command="0"> <!--clean_command="RemoveFloatVolumeArrayNames"-->
+        <Documentation>This property specifies the name(s) of the volume
+        fraction array(s) for generating parts.</Documentation>
+<!--
+        <ArrayListDomain attribute_type="Scalars"
+                         data_type="VTK_INT"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <NoDefault />
+          <PropertyWidgetDecorator type="CTHArraySelectionDecorator">
+            <Property name="SetRegionArrayName" />
+          </PropertyWidgetDecorator>
+        </Hints>
+-->
+      </StringVectorProperty>
+
+
+      <!-- End DataSetRegionSurfaceFilter -->
     </SourceProxy>
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPVArrayCalculator"
