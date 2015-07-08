@@ -43,6 +43,11 @@ public:
   //override one of the signatures
   virtual void RecordOrigCellId(vtkIdType newIndex, vtkFastGeomQuad *quad);
 
+  //Description:
+  //Whether to return single sided material interfaces or double sided
+  //Default is single
+  vtkSetMacro(SingleSided, bool);
+  vtkGetMacro(SingleSided, bool);
 //BTX
 protected:
   vtkDataSetRegionSurfaceFilter();
@@ -60,6 +65,7 @@ protected:
   virtual void InsertTriInHash(vtkIdType a, vtkIdType b, vtkIdType c,
                        vtkIdType sourceId, vtkIdType faceId = -1);
 
+  virtual vtkFastGeomQuad *GetNextVisibleQuadFromHash();
 
 private:
   vtkDataSetRegionSurfaceFilter(const vtkDataSetRegionSurfaceFilter&); // Not implemented.
@@ -70,6 +76,10 @@ private:
   vtkIntArray    *RegionArray;
   vtkIdTypeArray *OrigCellIds;
   vtkCharArray   *CellFaceIds;
+  bool SingleSided;
+
+  class Internals;
+  Internals *Internal;
 };
 
 #endif

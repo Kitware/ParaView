@@ -26,8 +26,18 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkUnstructuredGridGeometryFilter.h"
 
+#include <map>
 
+class vtkDataSetRegionSurfaceFilter::Internals
+{
+public:
+  Internals() : NextRegion(0) {};
+  ~Internals() {};
+  std::map<std::pair<int,int>, int> NewRegions;
+  int NextRegion;
+};
 vtkStandardNewMacro(vtkDataSetRegionSurfaceFilter);
+
 
 //----------------------------------------------------------------------------
 vtkDataSetRegionSurfaceFilter::vtkDataSetRegionSurfaceFilter()
@@ -40,6 +50,8 @@ vtkDataSetRegionSurfaceFilter::vtkDataSetRegionSurfaceFilter()
   this->CellFaceIds = vtkCharArray::New();
   this->CellFaceIds->SetName("CellFaceIds");
   this->CellFaceIds->SetNumberOfComponents(1);
+  this->Internal = new vtkDataSetRegionSurfaceFilter::Internals;
+  this->SingleSided = true;
 }
 
 //----------------------------------------------------------------------------
@@ -48,6 +60,7 @@ vtkDataSetRegionSurfaceFilter::~vtkDataSetRegionSurfaceFilter()
   this->SetRegionArrayName(0);
   this->OrigCellIds->Delete();
   this->CellFaceIds->Delete();
+  delete this->Internal;
 }
 
 //----------------------------------------------------------------------------
@@ -678,6 +691,11 @@ int vtkDataSetRegionSurfaceFilter::UnstructuredGridExecute(vtkDataSet *dataSetIn
 
   // Now transfer geometry from hash to output (only triangles and quads).
   this->InitQuadHashTraversal();
+  vtkIntArray *outRegionArray = NULL;
+  if (this->RegionArrayName)
+    {
+    outRegionArray = vtkIntArray::SafeDownCast(outputCD->GetArray(this->RegionArrayName));
+    }
   while ( (q = this->GetNextVisibleQuadFromHash()) )
     {
     // handle all polys
@@ -687,7 +705,12 @@ int vtkDataSetRegionSurfaceFilter::UnstructuredGridExecute(vtkDataSet *dataSetIn
       }
     newPolys->InsertNextCell(q->numPts, q->ptArray);
     this->RecordOrigCellId(this->NumberOfNewCells, q);
-    outputCD->CopyData(inputCD, q->SourceId, this->NumberOfNewCells++);
+    outputCD->CopyData(inputCD, q->SourceId, this->NumberOfNewCells);
+    if (outRegionArray)
+      {
+      outRegionArray->SetValue(this->NumberOfNewCells, this->Internal->NextRegion);
+      }
+    this->NumberOfNewCells++;
     }
 
   if (this->PassThroughCellIds)
@@ -882,11 +905,11 @@ void vtkDataSetRegionSurfaceFilter::InsertTriInHash(vtkIdType a, vtkIdType b,
       {
       if (((b == quad->ptArray[1] && c == quad->ptArray[2]) ||
            (b == quad->ptArray[2] && c == quad->ptArray[1])) &&
-        (regionId == -1 || regionId == *quadsRegionId) )
+          (regionId == -1 || regionId == *quadsRegionId) ) //internal cells, but on a material interface
         {
         // We have a match.
         quad->SourceId = -1;
-        // That is all we need to do. Hide any tri shared by two or more cells (that also are from same region).
+        // That is all we need to do. Hide any tri shared by two or more cells (that also are from same region)
         return;
         }
       }
@@ -925,4 +948,103 @@ void vtkDataSetRegionSurfaceFilter::RecordOrigCellId(vtkIdType destIndex,
 void vtkDataSetRegionSurfaceFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
+vtkFastGeomQuad *vtkDataSetRegionSurfaceFilter::GetNextVisibleQuadFromHash()
+{
+  if (!this->RegionArray)
+    {
+    this->Internal->NextRegion = -1;
+    return this->Superclass::GetNextVisibleQuadFromHash();
+    }
+
+  vtkFastGeomQuad *quad;
+  quad = this->QuadHashTraversal;
+  // Move till traversal until we have a quad to return.
+  // Note: the current traversal has not been returned yet.
+  while (quad == NULL || quad->SourceId == -1)
+    {
+    if (quad)
+      { // The quad must be hidden.  Move to the next.
+      quad = quad->Next;
+      }
+    else
+      { // must be the end of the linked list.  Move to the next bin.
+      this->QuadHashTraversalIndex += 1;
+      if ( this->QuadHashTraversalIndex >= this->QuadHashLength)
+        { // There are no more bins.
+        this->QuadHashTraversal = NULL;
+        return NULL;
+        }
+      quad = this->QuadHash[this->QuadHashTraversalIndex];
+      }
+    }
+
+  int mat1 = this->RegionArray->GetValue(quad->SourceId);
+  if (this->SingleSided)
+    {
+    //look for the quad's material
+
+    vtkFastGeomQuad *quad2;
+    quad2 = quad->Next;
+    int npts = quad->numPts;
+    while (quad2)
+      {
+      //look for the quad's twin. If one exists collapse to one
+      bool match = false;
+      if ((npts == 3) && (quad2->numPts == 3) &&
+          ((quad->ptArray[1] == quad2->ptArray[1] && quad->ptArray[2] == quad2->ptArray[2]) ||
+           (quad->ptArray[1] == quad2->ptArray[2] && quad->ptArray[2] == quad2->ptArray[1])))
+        {
+        match = true;
+        }
+      if ((npts == 4) && (quad2->numPts == 4) &&
+          ((quad->ptArray[1] == quad2->ptArray[1] && quad->ptArray[3] == quad2->ptArray[3]) ||
+           (quad->ptArray[1] == quad2->ptArray[3] && quad->ptArray[3] == quad2->ptArray[1])))
+        {
+        match = true;
+        }
+      if (match)
+        {
+        int mat2 = this->RegionArray->GetValue(quad2->SourceId);
+        if (mat2 > mat1)
+          {
+          //ensure a consistent ordering for normals
+          quad->SourceId = quad2->SourceId;
+          quad->ptArray[0] = quad2->ptArray[0];
+          quad->ptArray[1] = quad2->ptArray[1];
+          quad->ptArray[2] = quad2->ptArray[2];
+          if (npts == 4)
+            {
+            quad->ptArray[3] = quad2->ptArray[3];
+            }
+          }
+        int m1 = (mat1<mat2?mat1:mat2);
+        int m2 = (mat1<mat2?mat2:mat1);
+        std::pair <int,int> p = std::make_pair(m1,m2);
+        //get material interface id, or make up a new one if not yet seen
+        if (this->Internal->NewRegions.find(p) == this->Internal->NewRegions.end())
+          {
+          int val = this->RegionArray->GetRange()[1] + 1 + this->Internal->NewRegions.size();
+          this->Internal->NewRegions[p] = val;
+          }
+        mat1 = this->Internal->NewRegions[p];
+
+        quad2->SourceId = -1;
+        quad2 = NULL;
+        }
+      else
+        {
+        quad2 = quad2->Next;
+        }
+      }
+    }
+
+  this->Internal->NextRegion = mat1;
+
+  // Now we have a quad to return.  Set the traversal to the next entry.
+  this->QuadHashTraversal = quad->Next;
+
+  return quad;
 }
