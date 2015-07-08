@@ -68,7 +68,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QPointer>
 #include <QSet>
-
+#include <algorithm>
 
 namespace
 {
@@ -108,25 +108,58 @@ private:
 // First column is IndexedColors and the 2nd and 3rd columns are the
 // annotation value and text.
 class pqAnnotationsModel : public QAbstractTableModel
-  {
+{
   typedef QAbstractTableModel Superclass;
 
+  struct ItemType
+    {
+    QColor Color;
+    QString Value;
+    QString Annotation;
+    bool setData(int index, const QVariant& value)
+      {
+      if (index == 0 && value.canConvert(QVariant::Color))
+        {
+        this->Color = value.value<QColor>();
+        return true;
+        }
+      else if (index == 1)
+        {
+        this->Value = value.toString();
+        return true;
+        }
+      else if (index == 2)
+        {
+        this->Annotation = value.toString();
+        return true;
+        }
+      return false;
+      }
+    QVariant data(int index) const
+      {
+      if (index == 0 && this->Color.isValid())
+        {
+        return this->Color;
+        }
+      else if (index == 1)
+        {
+        return this->Value;
+        }
+      else if (index == 2)
+        {
+        return this->Annotation;
+        }
+      return QVariant();
+      }
+    };
+
   QIcon MissingColorIcon;
-  QVector<vtkTuple<QString, 2> > Annotations;
-  QVector<QColor> IndexedColors;
+  QVector<ItemType> Items;
 public:
   pqAnnotationsModel(QObject* parentObject = 0):
     Superclass(parentObject),
     MissingColorIcon(":/pqWidgets/Icons/pqUnknownData16.png")
   {
-  vtkTuple<QString, 2> item;
-  item.GetData()[0] = QString("12.0");
-  item.GetData()[1] = QString("Label 1");
-  this->Annotations.push_back(item);
-
-  item.GetData()[0] = QString("13.0");
-  item.GetData()[1] = QString("Label 2");
-  this->Annotations.push_back(item);
   }
   virtual ~pqAnnotationsModel()
     {
@@ -141,45 +174,28 @@ public:
       this->Superclass::flags(idx);
     }
 
-  virtual bool setData(const QModelIndex &idx, const QVariant &value,
-    int role=Qt::EditRole)
-    {
-    Q_UNUSED(role);
-
-    if (idx.column() == 0)
-      {
-      if (value.canConvert(QVariant::Color))
-        {
-        if (this->IndexedColors.size() <= idx.row())
-          {
-          this->IndexedColors.resize(idx.row()+1);
-          }
-        this->IndexedColors[idx.row()] = value.value<QColor>();
-        emit this->dataChanged(idx, idx);
-        return true;
-        }
-      }
-    else
-      {
-      if (!value.toString().isEmpty())
-        {
-        this->Annotations[idx.row()].GetData()[idx.column()-1] = value.toString();
-        emit this->dataChanged(idx, idx);
-        return true;
-        }
-      }
-    return false;
-    }
-
   virtual int rowCount(const QModelIndex &prnt=QModelIndex()) const
     {
     Q_UNUSED(prnt);
-    return this->Annotations.size();
+    return this->Items.size();
     }
 
   virtual int columnCount(const QModelIndex &/*parent*/) const
     {
     return 3;
+    }
+
+  virtual bool setData(const QModelIndex &idx, const QVariant &value, int role=Qt::EditRole)
+    {
+    Q_UNUSED(role);
+    Q_ASSERT(idx.row() < this->rowCount());
+    Q_ASSERT(idx.column() >= 0 && idx.column() < 3);
+    if (this->Items[idx.row()].setData(idx.column(), value))
+      {
+      emit this->dataChanged(idx, idx);
+      return true;
+      }
+    return false;
     }
 
   virtual QVariant data(const QModelIndex& idx, int role=Qt::DisplayRole) const
@@ -188,25 +204,13 @@ public:
       {
       if (idx.column()==0)
         {
-        if (idx.row() < this->IndexedColors.size())
-          {
-          return this->IndexedColors[idx.row()];
-          }
-        else
-          {
-          return this->MissingColorIcon;
-          }
+        QVariant value = this->Items[idx.row()].data(0);
+        return value.isValid()? value : QVariant(this->MissingColorIcon);
         }
       }
     else if (role == Qt::DisplayRole || role == Qt::EditRole)
       {
-      switch (idx.column())
-        {
-      case 1:
-        return this->Annotations[idx.row()].GetData()[0];
-      case 2:
-        return this->Annotations[idx.row()].GetData()[1];
-        }
+      return idx.column() == 0? QVariant() : this->Items[idx.row()].data(idx.column());
       }
     else if (role == Qt::ToolTipRole || role == Qt::StatusTipRole)
       {
@@ -245,161 +249,137 @@ public:
   QModelIndex addAnnotation(const QModelIndex& after=QModelIndex())
     {
     int row = after.isValid()? after.row() : (this->rowCount(QModelIndex())-1);
-
-    vtkTuple<QString, 2> new_annotation;
-    if (row >= 0  && row < this->Annotations.size())
-      {
-      new_annotation = this->Annotations[row];
-      }
-    else
-      {
-      new_annotation.GetData()[0] = "Value";
-      new_annotation.GetData()[1] = "Text";
-      }
-
     // insert after the current one.
     row++;
 
     emit this->beginInsertRows(QModelIndex(), row, row);
-    this->Annotations.insert(row, new_annotation);
+    this->Items.insert(row, ItemType());
     emit this->endInsertRows();
-
     return this->index(row, 0);
-    }
-
-  // Given a list of modelindexes, return a vector containing multiple sorted
-  // vectors of rows, split by their discontinuity
-  void splitSelectedIndexesToRowRanges(
-    const QModelIndexList& indexList,
-    QVector<QVector<QVariant> > &result)
-    {
-    if (indexList.empty())
-      {
-      return;
-      }
-    result.clear();
-    QVector <int> rows;
-    QModelIndexList::const_iterator iter = indexList.begin();
-    for ( ; iter != indexList.end(); ++iter)
-      {
-      if ((*iter).isValid())
-        {
-        rows.push_back((*iter).row());
-        }
-      }
-    qSort(rows.begin(), rows.end());
-    result.resize(1);
-    result[0].push_back(rows[0]);
-    for (int i = 1; i < rows.size(); ++i)
-      {
-      if (rows[i] == rows[i-1])
-        {
-        // avoid duplicate
-        continue;
-        }
-      if (rows[i] != rows[i-1] + 1)
-        {
-        result.push_back(QVector<QVariant>());
-        }
-      result.back().push_back(QVariant(rows[i]));
-      }
     }
 
   // Remove the given annotation indexes. Returns item before or after the removed
   // item, if any.
   QModelIndex removeAnnotations(const QModelIndexList& toRemove=QModelIndexList())
     {
-    QVector< QVector<QVariant> > rowRanges;
-    this->splitSelectedIndexesToRowRanges(toRemove, rowRanges);
-    int numGroups = static_cast<int>(rowRanges.size());
-    for (int g = numGroups-1; g > -1; --g)
+    QSet<int> rowsToRemove;
+    foreach (const QModelIndex& idx, toRemove)
       {
-      int numRows = rowRanges.at(g).size();
-      int beginRow = rowRanges.at(g).at(0).toInt();
-      int endRow = rowRanges.at(g).at(numRows-1).toInt();
-      emit this->beginRemoveRows(QModelIndex(), beginRow, endRow);
-      for (int r = endRow; r >= beginRow; --r)
-        {
-        this->Annotations.remove(r);
-        }
+      rowsToRemove.insert(idx.row());
+      }
+    QList<int> rowsList = rowsToRemove.toList();
+    for (int cc = (rowsList.size()-1); cc >=0; --cc)
+      {
+      emit this->beginRemoveRows(QModelIndex(), rowsList[cc], rowsList[cc]);
+      this->Items.remove(rowsList[cc]);
       emit this->endRemoveRows();
       }
-
-    int firstRow = rowRanges.at(0).at(0).toInt();
-    int rowsCount = this->rowCount();
-    if (firstRow < rowsCount)
+    if (rowsList.size() > 0 && rowsList.front() > this->Items.size())
       {
-      // since firstRow is still a valid row.
-      return this->index(firstRow, toRemove.at(0).column());
+      return this->index(rowsList.front(), 0);
       }
-    else if (rowsCount > 0 && (firstRow > (rowsCount-1)))
+    if (this->Items.size() > 0)
       {
-      // just return the index for last row.
-      return this->index(rowsCount-1, toRemove.at(0).column());
+      return this->index(this->Items.size()-1, 0);
       }
-
     return QModelIndex();
     }
 
   void removeAllAnnotations()
     {
     emit this->beginResetModel();
-    this->Annotations.clear();
+    this->Items.clear();
     emit this->endResetModel();
     }
 
   void setAnnotations(const QVector<vtkTuple<QString, 2> >& new_annotations)
     {
-    int old_size = this->Annotations.size();
+    int old_size = this->Items.size();
     int new_size = new_annotations.size();
-
     if (old_size > new_size)
       {
       // rows are removed.
       emit this->beginRemoveRows(QModelIndex(), new_size, old_size-1);
-      this->Annotations.resize(new_size);
+      this->Items.resize(new_size);
       emit this->endRemoveRows();
       }
     else if (new_size > old_size)
       {
       // rows are added.
       emit this->beginInsertRows(QModelIndex(), old_size, new_size-1);
-      this->Annotations.resize(new_size);
-      for (int cc=old_size; cc < new_size; cc++)
-        {
-        this->Annotations[cc] = new_annotations[cc];
-        }
+      this->Items.resize(new_size);
       emit this->endInsertRows();
       }
+    Q_ASSERT(this->Items.size() == new_annotations.size());
 
-    Q_ASSERT(this->Annotations.size() == new_annotations.size());
     // now check for data changes.
-    for (int cc=0; cc < this->Annotations.size(); cc++)
+    for (int cc=0; cc < this->Items.size(); cc++)
       {
-      if (this->Annotations[cc] != new_annotations[cc])
+      if (this->Items[cc].Value != new_annotations[cc][0])
         {
-        this->Annotations[cc] = new_annotations[cc];
-        emit this->dataChanged(this->index(cc, 1), this->index(cc, 2));
+        this->Items[cc].Value = new_annotations[cc][0];
+        emit this->dataChanged(this->index(cc, 1), this->index(cc, 1));
+        }
+      if (this->Items[cc].Annotation != new_annotations[cc][1])
+        {
+        this->Items[cc].Annotation = new_annotations[cc][1];
+        emit this->dataChanged(this->index(cc, 2), this->index(cc, 2));
         }
       }
     }
-  const QVector<vtkTuple<QString, 2> >& annotations() const
+  QVector<vtkTuple<QString, 2> > annotations() const
     {
-    return this->Annotations;
+    QVector<vtkTuple<QString, 2> > theAnnotations(this->Items.size());
+    int cc=0;
+    foreach (const ItemType& item, this->Items)
+      {
+      theAnnotations[cc].GetData()[0] = item.Value;
+      theAnnotations[cc].GetData()[1] = item.Annotation;
+      cc++;
+      }
+    return theAnnotations;
     }
 
   void setIndexedColors(const QVector<QColor>& new_colors)
     {
-    if (this->IndexedColors != new_colors)
+    int old_size = this->Items.size();
+    int new_size = new_colors.size();
+    if (old_size > new_size)
       {
-      this->IndexedColors = new_colors;
-      emit this->dataChanged(
-        this->index(0, 0), this->index(this->rowCount()-1, 0));
+      // rows are removed.
+      emit this->beginRemoveRows(QModelIndex(), new_size, old_size-1);
+      this->Items.resize(new_size);
+      emit this->endRemoveRows();
+      }
+    else if (new_size > old_size)
+      {
+      // rows are added.
+      emit this->beginInsertRows(QModelIndex(), old_size, new_size-1);
+      this->Items.resize(new_size);
+      emit this->endInsertRows();
+      }
+    Q_ASSERT(this->Items.size() == new_colors.size());
+
+    // now check for data changes.
+    for (int cc=0; cc < this->Items.size(); cc++)
+      {
+      if (this->Items[cc].Color != new_colors[cc])
+        {
+        this->Items[cc].Color = new_colors[cc];
+        emit this->dataChanged(this->index(cc, 0), this->index(cc, 0));
+        }
       }
     }
-  const QVector<QColor>& indexedColors() const
+  QVector<QColor> indexedColors() const
     {
-    return this->IndexedColors;
+    QVector<QColor> icolors (this->Items.size());
+    int cc=0;
+    foreach (const ItemType& item, this->Items)
+      {
+      icolors[cc] = item.Color;
+      cc++;
+      }
+    return icolors;
     }
 
 private:

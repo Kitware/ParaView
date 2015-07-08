@@ -40,7 +40,7 @@ class vtkSMPropertyGroup;
 
 /// pqColorAnnotationsPropertyWidget is used to edit the Annotations property on the
 /// "PVLookupTable" proxy. The property group can comprise of two properties,
-/// \c Annotations and \c IndexedColors
+/// \c Annotations and \c IndexedColors.
 class PQAPPLICATIONCOMPONENTS_EXPORT pqColorAnnotationsPropertyWidget :
   public pqPropertyWidget
 {
