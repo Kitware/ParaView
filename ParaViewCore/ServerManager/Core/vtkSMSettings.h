@@ -181,15 +181,27 @@ public:
 
   // Description:
   // Save non-default settings in the current user settings.
-  // If 'propertyIt' is not NULL, only the listed properties are saved
+  // Use the optional 'propertyIt' to limit the serialization to a subset of
+  // properties (typically using vtkSMPropertyIterator subclasses like
+  // vtkSMNamedPropertyIterator).
+  // \c skipPropertiesWithDynamicDomains when true (default) ensures that we
+  // skip serializing properties that have domains whose values change at
+  // runtime.
   void SetProxySettings(vtkSMProxy* proxy,
-                        vtkSMPropertyIterator* propertyIt = NULL);
+                        vtkSMPropertyIterator* propertyIt = NULL,
+                        bool skipPropertiesWithDynamicDomains=true);
 
   // Description:
   // Save non-default settings in the current user settings under the given prefix.
-  // If 'propertyIt' is not NULL, only the listed properties are saved
-  void SetProxySettings(const char* prefix, vtkSMProxy* proxy, 
-                        vtkSMPropertyIterator* propertyIt = NULL);
+  // Use the optional 'propertyIt' to limit the serialization to a subset of
+  // properties (typically using vtkSMPropertyIterator subclasses like
+  // vtkSMNamedPropertyIterator).
+  // \c skipPropertiesWithDynamicDomains when true (default) ensures that we
+  // skip serializing properties that have domains whose values change at
+  // runtime.
+  void SetProxySettings(const char* prefix, vtkSMProxy* proxy,
+                        vtkSMPropertyIterator* propertyIt = NULL,
+                        bool skipPropertiesWithDynamicDomains=true);
 
   // Description:
   // Set the description of a setting.
