@@ -188,8 +188,11 @@ void vtkPVProgressHandler::CleanupPendingProgress()
 
   if (!this->Internals->EnableProgress)
     {
+#ifndef NDEBUG
+    // warn only in debug builds.
     vtkWarningMacro("Non-critical internal ParaView Error: "
       "Got request for cleanup pending progress after being cleaned up");
+#endif
     return;
     }
 
@@ -257,9 +260,11 @@ void vtkPVProgressHandler::OnProgressEvent(
   double progress = *reinterpret_cast<double*>(calldata);
   if (progress < 0 || progress > 1.0)
     {
+#ifndef NDEBUG
+    // warn only in debug builds.
     vtkWarningMacro(<< caller->GetClassName() << " reported invalid progress ("
       << progress << "). Value must be between [0, 1]. Clamping to this range.");
-
+#endif
     progress = (progress < 0)? 0 : progress;
     progress = (progress > 1.0)? 1.0 : progress;
     }
