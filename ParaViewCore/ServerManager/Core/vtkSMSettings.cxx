@@ -24,7 +24,6 @@
 #include "vtkSMIdTypeVectorProperty.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMNamedPropertyIterator.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
@@ -663,7 +662,7 @@ public:
   // Description:
   // Set proxy settings to the highest-priority collection.
   bool SetProxySettings(vtkSMProxy* proxy,
-                        vtkSMNamedPropertyIterator* propertyIt)
+                        vtkSMPropertyIterator* propertyIt)
   {
     if (!proxy)
       {
@@ -681,13 +680,12 @@ public:
   // Set proxy settings in the highest-priority collection under
   // the setting prefix.
   bool SetProxySettings(const char* settingPrefix, vtkSMProxy* proxy,
-                        vtkSMNamedPropertyIterator* propertyIt)
+                        vtkSMPropertyIterator* propertyIt)
   {
     if (!proxy)
       {
       return false;
       }
-
     this->CreateCollectionIfNeeded();
     this->SortCollectionsIfNeeded();
 
@@ -705,28 +703,18 @@ public:
 
     bool propertySet = false;
     vtkSmartPointer<vtkSMPropertyIterator> iter;
-    iter.TakeReference(proxy->NewPropertyIterator());
+    if (propertyIt)
+      {
+      iter = propertyIt;
+      }
+    else
+      {
+      iter.TakeReference(proxy->NewPropertyIterator());
+      }
     for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
       {
       vtkSMProperty* property = iter->GetProperty();
       if (!property) continue;
-      // save defaults only for properties listed
-      if (propertyIt)
-        {
-        bool found = false;
-        for (propertyIt->Begin(); ! propertyIt->IsAtEnd(); propertyIt->Next())
-          {
-          if (! strcmp(property->GetXMLName(), propertyIt->GetKey()))
-            {
-            found = true;
-            break;
-            }
-          }
-        if (! found)
-          {
-          continue;
-          }
-        }
 
       // Check to see if we save only to QSettings or to both QSettings
       // and the JSON file.
@@ -1287,14 +1275,14 @@ void vtkSMSettings::SetSetting(const char* settingName, unsigned int index, cons
 
 //----------------------------------------------------------------------------
 void vtkSMSettings::SetProxySettings(vtkSMProxy* proxy,
-                                     vtkSMNamedPropertyIterator* propertyIt)
+                                     vtkSMPropertyIterator* propertyIt)
 {
   this->Internal->SetProxySettings(proxy, propertyIt);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMSettings::SetProxySettings(const char* prefix, vtkSMProxy* proxy,
-                                     vtkSMNamedPropertyIterator* propertyIt)
+                                     vtkSMPropertyIterator* propertyIt)
 {
   this->Internal->SetProxySettings(prefix, proxy, propertyIt);
 }

@@ -86,7 +86,6 @@ namespace Json
 
 
 class vtkSMProxy;
-class vtkSMNamedPropertyIterator;
 class vtkSMPropertyIterator;
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMSettings : public vtkObject
 {
@@ -184,13 +183,13 @@ public:
   // Save non-default settings in the current user settings.
   // If 'propertyIt' is not NULL, only the listed properties are saved
   void SetProxySettings(vtkSMProxy* proxy,
-                        vtkSMNamedPropertyIterator* propertyIt = NULL);
+                        vtkSMPropertyIterator* propertyIt = NULL);
 
   // Description:
   // Save non-default settings in the current user settings under the given prefix.
   // If 'propertyIt' is not NULL, only the listed properties are saved
   void SetProxySettings(const char* prefix, vtkSMProxy* proxy, 
-                        vtkSMNamedPropertyIterator* propertyIt = NULL);
+                        vtkSMPropertyIterator* propertyIt = NULL);
 
   // Description:
   // Set the description of a setting.
