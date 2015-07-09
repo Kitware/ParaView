@@ -2,7 +2,7 @@
    {
       "ColorSpace" : "Diverging",
       "Name" : "Cool to Warm",
-      "NanColor" : [ 0.247058823529, 0, 0 ],
+      "NanColor" : [ 1, 1, 0 ],
       "RGBPoints" : [
          0,
          0.23137254902,
