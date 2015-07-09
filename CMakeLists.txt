@@ -914,6 +914,8 @@ if (NOT WIN32 AND is_git)
       WORKING_DIRECTORY
               "${CMAKE_CURRENT_BINARY_DIR}"
       COMMENT "Creating source tarball in ${format} format")
+    add_dependencies("paraview-source-${format}"
+      ParaViewData)
     add_dependencies(paraview-source
       "paraview-source-${format}")
   endforeach ()
