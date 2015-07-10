@@ -313,7 +313,7 @@ void pqMultiBlockInspectorPanel::buildTree(vtkPVCompositeDataInformation *info,
       }
     else
       {
-      text = QString("Block #%2").arg(flatIndex);
+      text = QString("Block %2").arg(leafIndex);
       }
 
     QTreeWidgetItem *item = new QTreeWidgetItem(parent_, QStringList() << text);
@@ -329,12 +329,19 @@ void pqMultiBlockInspectorPanel::buildTree(vtkPVCompositeDataInformation *info,
 
       // recurse down through child blocks only if the child block
       // is composite and is not a multi-piece data set
-      if(compositeChildInfo->GetDataIsComposite() &&
-         !compositeChildInfo->GetDataIsMultiPiece())
+      if (compositeChildInfo->GetDataIsComposite())
         {
-        this->buildTree(compositeChildInfo, item, flatIndex, leafIndex);
+        if (compositeChildInfo->GetDataIsMultiPiece())
+          {
+          flatIndex += compositeChildInfo->GetNumberOfChildren();
+          }
+        else
+          {
+          this->buildTree(compositeChildInfo, item, flatIndex, leafIndex);
+          }
         }
-      if (!compositeChildInfo->GetDataIsComposite())
+      if (!compositeChildInfo->GetDataIsComposite() ||
+          compositeChildInfo->GetDataIsMultiPiece())
         {
         item->setData(NAME_COLUMN, LEAF_INDEX_ROLE, leafIndex);
         leafIndex++;
@@ -920,6 +927,10 @@ void pqMultiBlockInspectorPanel::updateTree(
         (this->BlockColors.contains(flatIndex) ? flatIndex : -1),
         inheritedOpacityIndex != -1 ? inheritedOpacityIndex :
         (this->BlockOpacities.contains(flatIndex) ? flatIndex : -1));
+      }
+    if (compositeChildInfo && compositeChildInfo->GetDataIsMultiPiece())
+      {
+      flatIndex += compositeChildInfo->GetNumberOfChildren();
       }
     }
 }
