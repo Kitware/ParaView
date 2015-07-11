@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>390</width>
-    <height>126</height>
+    <height>149</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -104,7 +104,7 @@
         <x>0</x>
         <y>0</y>
         <width>372</width>
-        <height>53</height>
+        <height>76</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="ScrollAreaLayout" stretch="0,0,1">
@@ -155,7 +155,7 @@
             <bool>false</bool>
            </property>
            <property name="toolTip">
-            <string>Save current color map settings values as default for array</string>
+            <string>Save current color map settings values as default for arrays of this name</string>
            </property>
            <property name="text">
             <string/>
@@ -172,10 +172,14 @@
             <bool>false</bool>
            </property>
            <property name="toolTip">
-            <string>Save current color map settings values as default</string>
+            <string>Save current color map settings values as default for all arrays</string>
            </property>
            <property name="text">
             <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../../../Components/Resources/pqComponents.qrc">
+             <normaloff>:/pqWidgets/Icons/pqSave16.png</normaloff>:/pqWidgets/Icons/pqSave16.png</iconset>
            </property>
           </widget>
          </item>
