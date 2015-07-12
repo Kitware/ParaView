@@ -62,9 +62,6 @@ public:
   /// NULL, indicating the frame has been assigned to an empty view. Frames are
   /// never reused (except a frame assigned to an empty view).
   virtual void frameConnected(pqViewFrame* frame, pqView* view);
-  /// Used to receive Esc key from main window. A shortcut stops delivering
-  /// Esc to any other window which interferes with 'Search for properties'
-  virtual bool eventFilter(QObject * watched, QEvent * event);
 
 protected slots:
   /// Called before the "Convert To" menu is shown. We populate the menu with
@@ -81,11 +78,15 @@ protected slots:
   void selectFrustumCellsTriggered();
   void selectFrustumPointsTriggered();
   void selectBlocksTriggered();
+  void escTriggered();
 
   /// If a QAction is added to an exclusive QActionGroup, then a checked action
   /// cannot be unchecked by clicking on it. We need that to work. Hence, we
   /// manually manage the exclusivity of the action group.
   void manageGroupExclusivity(QAction*);
+
+  /// A slot called when any action that can be "cancelled" with Esc is toggled.
+  void escapeableActionToggled(bool checked);
 
 protected:
   /// called to setup empty frame.
@@ -122,8 +123,6 @@ protected:
   /// frame.
   virtual void handleCreateView(const ViewType& viewType);
 
-  /// Exit interactive selection. Returns true if a selection was exited.
-  bool exitInteractiveSelection();
 private:
   Q_DISABLE_COPY(pqStandardViewFrameActionsImplementation)
   QPointer<QShortcut> ShortCutSurfaceCells;
@@ -131,6 +130,7 @@ private:
   QPointer<QShortcut> ShortCutFrustumCells;
   QPointer<QShortcut> ShortCutFrustumPoints;
   QPointer<QShortcut> ShortCutBlocks;
+  QPointer<QShortcut> ShortCutEsc;
   static bool ViewTypeComparator(const ViewType& one, const ViewType& two);
 };
 

@@ -75,7 +75,6 @@ pqStandardViewFrameActionsImplementation::pqStandardViewFrameActionsImplementati
   this->ShortCutFrustumCells = new QShortcut(QKeySequence(tr("f")), mainWindow);
   this->ShortCutFrustumPoints = new QShortcut(QKeySequence(tr("g")), mainWindow);
   this->ShortCutBlocks = new QShortcut(QKeySequence("b"), mainWindow);
-  mainWindow->installEventFilter(this);
 
   QObject::connect(this->ShortCutSurfaceCells, SIGNAL(activated()),
     this, SLOT(selectSurfaceCellsTrigerred()));
@@ -87,6 +86,10 @@ pqStandardViewFrameActionsImplementation::pqStandardViewFrameActionsImplementati
     this, SLOT(selectFrustumPointsTriggered()));
   QObject::connect(this->ShortCutBlocks, SIGNAL(activated()),
     this, SLOT(selectBlocksTriggered()));
+
+  this->ShortCutEsc = new QShortcut(QKeySequence(Qt::Key_Escape), mainWindow);
+  this->ShortCutEsc->setEnabled(false);
+  this->connect(this->ShortCutEsc, SIGNAL(activated()), SLOT(escTriggered()));
 }
 
 //-----------------------------------------------------------------------------
@@ -177,6 +180,8 @@ void pqStandardViewFrameActionsImplementation::addContextViewActions(
   chartSelectPolygonAction->setObjectName("actionChartSelectPolygon");
   chartSelectPolygonAction->setCheckable(true);
   chartSelectPolygonAction->setData(QVariant(vtkChart::SELECT_POLYGON));
+  this->connect(chartSelectPolygonAction, SIGNAL(toggled(bool)),
+    SLOT(escapeableActionToggled(bool)));
 
   QAction* chartSelectRectangularAction = frame->addTitleBarAction(
     QIcon(":/pqWidgets/Icons/pqSelectChart16.png"),
@@ -184,6 +189,8 @@ void pqStandardViewFrameActionsImplementation::addContextViewActions(
   chartSelectRectangularAction->setObjectName("actionChartSelectRectangular");
   chartSelectRectangularAction->setCheckable(true);
   chartSelectRectangularAction->setData(QVariant(vtkChart::SELECT_RECTANGLE));
+  this->connect(chartSelectRectangularAction, SIGNAL(toggled(bool)),
+    SLOT(escapeableActionToggled(bool)));
 
   QActionGroup* group = new QActionGroup(frame);
   group->addAction(chartSelectPolygonAction);
@@ -260,6 +267,8 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
   actionSelectSurfaceCells->setCheckable (true);
   new pqRenderViewSelectionReaction(actionSelectSurfaceCells, renderView,
     pqRenderViewSelectionReaction::SELECT_SURFACE_CELLS);
+  this->connect(actionSelectSurfaceCells, SIGNAL(toggled(bool)),
+    SLOT(escapeableActionToggled(bool)));
 
   QAction* actionSelectSurfacePoints = frame->addTitleBarAction(
     QIcon(":/pqWidgets/Icons/pqSurfaceSelectionPoint24.png"), 
@@ -268,6 +277,8 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
   actionSelectSurfacePoints->setCheckable (true);
   new pqRenderViewSelectionReaction(actionSelectSurfacePoints, renderView,
     pqRenderViewSelectionReaction::SELECT_SURFACE_POINTS);
+  this->connect(actionSelectSurfacePoints, SIGNAL(toggled(bool)),
+    SLOT(escapeableActionToggled(bool)));
 
   QAction* actionSelect_Frustum = frame->addTitleBarAction(
     QIcon(":/pqWidgets/Icons/pqFrustumSelectionCell24.png"),
@@ -276,6 +287,8 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
   actionSelect_Frustum->setCheckable (true);
   new pqRenderViewSelectionReaction(actionSelect_Frustum, renderView,
     pqRenderViewSelectionReaction::SELECT_FRUSTUM_CELLS);
+  this->connect(actionSelect_Frustum, SIGNAL(toggled(bool)),
+    SLOT(escapeableActionToggled(bool)));
 
   QAction* actionSelectFrustumPoints = frame->addTitleBarAction(
     QIcon(":/pqWidgets/Icons/pqFrustumSelectionPoint24.png"),
@@ -284,6 +297,8 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
   actionSelectFrustumPoints->setCheckable (true);
   new pqRenderViewSelectionReaction(actionSelectFrustumPoints, renderView,
     pqRenderViewSelectionReaction::SELECT_FRUSTUM_POINTS);
+  this->connect(actionSelectFrustumPoints, SIGNAL(toggled(bool)),
+    SLOT(escapeableActionToggled(bool)));
 
   QAction* actionSelectionPolygonCells = frame->addTitleBarAction(
     QIcon(":/pqWidgets/Icons/pqPolygonSelectSurfaceCell24.png"),
@@ -292,6 +307,8 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
   actionSelectionPolygonCells->setCheckable (true);
   new pqRenderViewSelectionReaction(actionSelectionPolygonCells, renderView,
     pqRenderViewSelectionReaction::SELECT_SURFACE_CELLS_POLYGON);
+  this->connect(actionSelectionPolygonCells, SIGNAL(toggled(bool)),
+    SLOT(escapeableActionToggled(bool)));
 
   QAction* actionSelectionPolygonPoints = frame->addTitleBarAction(
     QIcon(":/pqWidgets/Icons/pqPolygonSelectSurfacePoint24.png"),
@@ -300,6 +317,8 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
   actionSelectionPolygonPoints->setCheckable (true);
   new pqRenderViewSelectionReaction(actionSelectionPolygonPoints, renderView,
     pqRenderViewSelectionReaction::SELECT_SURFACE_POINTS_POLYGON);
+  this->connect(actionSelectionPolygonPoints, SIGNAL(toggled(bool)),
+    SLOT(escapeableActionToggled(bool)));
 
   QAction* actionSelect_Block = frame->addTitleBarAction(
     QIcon(":/pqWidgets/Icons/pqSelectBlock24.png"), "Select Block (b)");
@@ -307,6 +326,8 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
   actionSelect_Block->setCheckable (true);
   new pqRenderViewSelectionReaction(actionSelect_Block, renderView,
     pqRenderViewSelectionReaction::SELECT_BLOCKS);
+  this->connect(actionSelect_Block, SIGNAL(toggled(bool)),
+    SLOT(escapeableActionToggled(bool)));
 
   QAction* actionInteractiveSelectSurfaceCells = frame->addTitleBarAction(
     QIcon(":/pqWidgets/Icons/pqSurfaceSelectionCellInteractive.png"),
@@ -316,6 +337,8 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
   actionInteractiveSelectSurfaceCells->setCheckable (true);
   new pqRenderViewSelectionReaction(actionInteractiveSelectSurfaceCells, renderView,
     pqRenderViewSelectionReaction::SELECT_SURFACE_CELLS_INTERACTIVELY);
+  this->connect(actionInteractiveSelectSurfaceCells, SIGNAL(toggled(bool)),
+    SLOT(escapeableActionToggled(bool)));
 
   QAction* actionInteractiveSelectSurfacePoints = frame->addTitleBarAction(
     QIcon(":/pqWidgets/Icons/pqSurfaceSelectionPointInteractive.png"),
@@ -325,6 +348,8 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
   actionInteractiveSelectSurfacePoints->setCheckable (true);
   new pqRenderViewSelectionReaction(actionInteractiveSelectSurfacePoints, renderView,
     pqRenderViewSelectionReaction::SELECT_SURFACE_POINTS_INTERACTIVELY);
+  this->connect(actionInteractiveSelectSurfacePoints, SIGNAL(toggled(bool)),
+    SLOT(escapeableActionToggled(bool)));
 
   QStyle* style = qApp->style();
   QAction* deselectAction = frame->addTitleBarAction(
@@ -555,50 +580,16 @@ void pqStandardViewFrameActionsImplementation::selectBlocksTriggered()
 }
 
 //-----------------------------------------------------------------------------
-bool pqStandardViewFrameActionsImplementation::eventFilter(
-  QObject* watched, QEvent* _event)
+void pqStandardViewFrameActionsImplementation::escTriggered()
 {
-  if (watched == pqCoreUtilities::mainWidget() &&
-      _event->type() == QEvent::KeyPress)
+  QAction* actn = qobject_cast<QAction*>(
+    this->ShortCutEsc->property("PV_ACTION").value<QObject*>());
+  if (actn && actn->isChecked() && actn->isEnabled())
     {
-    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(_event);
-    if (keyEvent->key() == Qt::Key_Escape &&
-      this->exitInteractiveSelection())
-      {
-      return true;
-      }
+    actn->trigger();
     }
-  return this->QObject::eventFilter(watched, _event);
-}
-
-//-----------------------------------------------------------------------------
-bool pqStandardViewFrameActionsImplementation::exitInteractiveSelection()
-{
-  const char* escapeableActionNames[] = {
-    "actionSelectSurfaceCells",
-    "actionSelectSurfacePoints",
-    "actionSelect_Frustum",
-    "actionSelectFrustumPoints",
-    "actionPolygonSelectionCells",
-    "actionPolygonSelectionPoints",
-    "actionSelect_Block",
-    "actionInteractiveSelectSurfaceCells",
-    "actionInteractiveSelectSurfacePoints",
-    "actionChartSelectPolygon",
-    "actionChartSelectRectangular",
-    NULL
-  };
-
-  for (int cc=0; escapeableActionNames[cc] != NULL; ++cc)
-    {
-    QAction* actn = findActiveAction(escapeableActionNames[cc]);
-    if (actn && actn->isChecked() && actn->isEnabled())
-      {
-      actn->trigger();
-      return true;
-      }
-    }
-  return false;
+  // this is not necessary for the most part, but just to be on the safe side.
+  this->ShortCutEsc->setEnabled(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -617,4 +608,36 @@ void pqStandardViewFrameActionsImplementation::manageGroupExclusivity(QAction* c
       groupAction->setChecked(false);
       }
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqStandardViewFrameActionsImplementation::escapeableActionToggled(bool checked)
+{
+  // If a "selection mode" begins, we will enable the ShortCutEsc to start monitoring
+  // the Esc key to end selection.
+  // If "selection mode" ends (due to one reason or another) and the selection that
+  // ended was indeed the one which we're monitoring the Esc key for, then we
+  // disable the Esc shortcut since it is no longer needed. This disabling
+  // ensure that the shortcut doesn't eat away Esc keys which interferes with
+  // the Esc key in the Search box, for example.
+  QAction* actn = qobject_cast<QAction*>(this->sender());
+  if (!actn || !actn->isEnabled() || !actn->isCheckable())
+    {
+    return;
+    }
+
+  if (!checked)
+    {
+    if (this->ShortCutEsc->property("PV_ACTION").value<QObject*>() == actn)
+      {
+      this->ShortCutEsc->setEnabled(false);
+      }
+    return;
+    }
+
+  // User has entered into a selection mode. Let's add a shortcut to "catch" the
+  // Esc key.
+  Q_ASSERT(checked && actn->isCheckable());
+  this->ShortCutEsc->setEnabled(true);
+  this->ShortCutEsc->setProperty("PV_ACTION", QVariant::fromValue<QObject*>(actn));
 }
