@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
 #include "vtkPVPythonInformation.h"
+#include "vtkPVOpenGLInformation.h"
 #include "vtkPVServerInformation.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
@@ -182,6 +183,13 @@ void pqAboutDialog::AddClientInformation()
   ::addItem(tree, "Disable Registry", opts->GetDisableRegistry()? "On" : "Off");
   ::addItem(tree, "Test Directory", opts->GetTestDirectory());
   ::addItem(tree, "Data Directory", opts->GetDataDirectory());
+
+  vtkNew<vtkPVOpenGLInformation> OpenGLInfo;
+  OpenGLInfo->CopyFromObject(NULL);
+  
+  ::addItem(tree, "OpenGL Vendor", QString::fromStdString(OpenGLInfo->GetVendor()));
+  ::addItem(tree, "OpenGL Version", QString::fromStdString(OpenGLInfo->GetVersion()));
+  ::addItem(tree, "OpenGL Renderer", QString::fromStdString(OpenGLInfo->GetRenderer()));
 #if QT_VERSION >= 0x050000
   tree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 #else
@@ -284,4 +292,12 @@ void pqAboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tree)
                 QString::fromStdString(pythonInfo->GetMatplotlibVersion()));
       }
     }
+
+  vtkNew<vtkPVOpenGLInformation> OpenGLInfo;
+  session->GatherInformation(vtkPVSession::RENDER_SERVER, OpenGLInfo.GetPointer(), 0);
+  ::addItem(tree, "OpenGL Vendor", QString::fromStdString(OpenGLInfo->GetVendor()));
+  ::addItem(tree, "OpenGL Version", QString::fromStdString(OpenGLInfo->GetVersion()));
+  ::addItem(tree, "OpenGL Renderer", QString::fromStdString(OpenGLInfo->GetRenderer()));
+
+
 }
