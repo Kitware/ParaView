@@ -712,3 +712,18 @@ vtkSMProxy* vtkSMProperty::GetParent()
 {
   return this->Proxy.GetPointer();
 }
+
+//---------------------------------------------------------------------------
+bool vtkSMProperty::HasDomainsWithRequiredProperties()
+{
+  for (vtkSMPropertyInternals::DomainMap::iterator iter =
+    this->PInternals->Domains.begin();
+    iter != this->PInternals->Domains.end(); ++iter)
+    {
+    if (iter->second->GetNumberOfRequiredProperties() > 0)
+      {
+      return true;
+      }
+    }
+  return false;
+}
