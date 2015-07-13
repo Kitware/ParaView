@@ -313,7 +313,7 @@ class CoProcessor(object):
             try:
                 length = len(writer.Input)
                 for i in range(length):
-                    proxy.GetProperty("Input").SetInputConnection(
+                    proxy.GetProperty("Input").AddInputConnection(
                         0, writer.Input[i].SMProxy, 0)
             except:
                 proxy.GetProperty("Input").SetInputConnection(
