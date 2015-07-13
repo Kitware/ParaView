@@ -47,6 +47,11 @@ public:
   vtkSetStringMacro(Prefix);
   vtkGetStringMacro(Prefix);
 
+  // Description:
+  // Set the text prefix to display in front of the Field value
+  vtkSetStringMacro(Postfix);
+  vtkGetStringMacro(Postfix);
+
 protected:
   vtkAnnotateGlobalDataFilter();
   ~vtkAnnotateGlobalDataFilter();
@@ -54,6 +59,7 @@ protected:
   virtual void EvaluateExpression();
 
   char* Prefix;
+  char* Postfix;
   char* FieldArrayName;
 private:
   vtkAnnotateGlobalDataFilter(const vtkAnnotateGlobalDataFilter&); // Not implemented
