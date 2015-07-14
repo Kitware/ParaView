@@ -78,11 +78,13 @@ class vtkSphereSource;
 class vtkGlyph3D;
 class vtkTubeFilter;
 class vtkAppendPolyData;
+class vtkIntArray;
 
 //BTX
 namespace Manta {
 class Mesh;
 class Group;
+class Material;
 }
 //ETX
 class vtkCellArray;
@@ -140,6 +142,9 @@ private:
   class Helper;
   Helper *MyHelper;
 //ETX
+
+  // manufacture manta properties declared in the dataset
+  void MakeMantaProperties(vtkPolyData *, bool allow);
 };
 
 #endif

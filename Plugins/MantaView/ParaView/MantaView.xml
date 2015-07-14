@@ -102,6 +102,17 @@
                          base_proxyname="SurfaceRepresentation">
     <!-- proxy that sets up manta display pipeline at vtk level -->
 
+      <IntVectorProperty name="UseDataMaterial"
+        command="SetAllowDataMaterial"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+        Allow cell and field data arrays named 'MantaMaterial' and
+        'MantaMaterials' respectively to define material of each cell.
+        </Documentation>
+      </IntVectorProperty>
+
       <StringVectorProperty name="MaterialType"
         command="SetMaterialType"
         number_of_elements="1"
@@ -393,6 +404,7 @@
           </PropertyGroup>
           <PropertyGroup label="Manta Options">
             <!-- manta specific properties -->
+            <Property name="UseDataMaterial" />
             <Property name="MaterialType" />
             <Property name="Reflectance" />
             <Property name="Thickness" />
