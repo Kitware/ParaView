@@ -2199,12 +2199,11 @@
         variables that are prescribed over this surface.</Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      <IntVectorProperty command="SetCellLayerRight"
-                         default_values="1"
+      <IntVectorProperty default_values="1"
                          name="CellLayerRight"
-                         number_of_elements="1">
-        <Documentation>Specify whether to add the extra layer of cells on the
-        right or left of the domain.</Documentation>
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <Documentation>**DEPRECATED in ParaView 4.4.** No longer needed/suported.</Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <DoubleVectorProperty information_only="1"
