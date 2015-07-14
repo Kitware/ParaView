@@ -91,7 +91,6 @@
         </EnumerationDomain>
         <Hints>
           <RestartRequired />
-          <SaveInQSettings />
         </Hints>
       </IntVectorProperty>
 
