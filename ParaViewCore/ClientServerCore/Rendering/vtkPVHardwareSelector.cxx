@@ -109,7 +109,10 @@ vtkSelection* vtkPVHardwareSelector::Select(int region[4])
     region[1] == region[3] &&
     vtkPVRenderViewSettings::GetInstance()->GetPointPickingRadius() > 0)
     {
-    unsigned int pos[2] = {region[0], region[1]};
+    unsigned int pos[2];
+    pos[0] = static_cast<unsigned int>(region[0]);
+    pos[1] = static_cast<unsigned int>(region[1]);
+
     unsigned int out_pos[2];
     vtkHardwareSelector::PixelInformation info = this->GetPixelInformation(
       pos, vtkPVRenderViewSettings::GetInstance()->GetPointPickingRadius(), out_pos);
