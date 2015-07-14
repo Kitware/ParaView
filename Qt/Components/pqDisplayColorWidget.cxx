@@ -165,6 +165,7 @@ protected:
   virtual QVariant currentServerManagerValue(bool use_unchecked) const
     {
     Q_ASSERT(use_unchecked == false);
+    Q_UNUSED(use_unchecked);
     ValueType val;
     vtkSMProxy* reprProxy = this->proxySM();
     if (vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy))
