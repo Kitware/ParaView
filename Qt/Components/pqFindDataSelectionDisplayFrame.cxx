@@ -613,8 +613,16 @@ void pqFindDataSelectionDisplayFrame::updateInteractiveSelectionLabelProperties(
 //-----------------------------------------------------------------------------
 void pqFindDataSelectionDisplayFrame::editLabelPropertiesInteractiveSelection()
 {
+  vtkSMInteractiveSelectionPipeline* iSelectionPipeline = 
+    vtkSMInteractiveSelectionPipeline::GetInstance();
   vtkSMProxy* proxyISelectionRepresentation = 
-    vtkSMInteractiveSelectionPipeline::GetInstance()->GetSelectionRepresentation();
+    iSelectionPipeline->GetSelectionRepresentation();
+  if (!proxyISelectionRepresentation)
+    {
+    iSelectionPipeline->CreateSelectionRepresentation(NULL);
+    proxyISelectionRepresentation = 
+      iSelectionPipeline->GetSelectionRepresentation();
+    }
 
   QStringList properties;
   properties << "Opacity"
