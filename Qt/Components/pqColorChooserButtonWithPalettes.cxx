@@ -92,14 +92,6 @@ void pqColorChooserButtonWithPalettes::updateMenu()
   delete this->ActionGroup;
   this->ActionGroup = new QActionGroup(popupMenu);
 
-  // Add B&W stock colors
-  QColor black(Qt::black);
-  popupMenu->addAction(this->renderColorSwatch(black),
-    tr("Black"))->setData(black);
-  QColor white(Qt::white);
-  popupMenu->addAction(this->renderColorSwatch(white),
-    tr("White"))->setData(white);
-
   // Add palettes colors
   vtkSMProxy* cp = this->colorPalette();
   if (!cp)
@@ -138,6 +130,16 @@ void pqColorChooserButtonWithPalettes::updateMenu()
       this->ActionGroup->addAction(action);
       }
     }
+
+  // Add B&W stock colors
+  popupMenu->addSeparator();
+  QColor black(Qt::black);
+  popupMenu->addAction(this->renderColorSwatch(black),
+    tr("Black"))->setData(black);
+  QColor white(Qt::white);
+  popupMenu->addAction(this->renderColorSwatch(white),
+    tr("White"))->setData(white);
+
   iter->Delete();
 }
 
