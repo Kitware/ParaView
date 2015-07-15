@@ -158,6 +158,22 @@ namespace
       const char* pname = iter->GetKey();
       vtkSMProperty* dest = repr->GetProperty(pname);
       vtkSMProperty* source = iter->GetProperty();
+      if (pname &&
+        (strcmp(pname, "ColorArrayName") == 0 ||
+         strcmp(pname, "LookupTable") == 0 ||
+         strcmp(pname, "ScalarOpacityFunction") == 0))
+        {
+        // HACK: to fix BUG #15539. We avoid copying coloring properties since
+        // they are already inherited if needed. The tricky question is how do
+        // we inherit data-dependent properties using a generic API? We need a
+        // domain-aware-copy method. This method will copy values from a source
+        // property that are valid for the destination property's domain. It of
+        // course gets more complicated for this like the
+        // LookupTable/ScalarOpacityFunction properties. How are those to be
+        // copied over esp. since they depend on how ColorArrayName property was
+        // copied.
+        continue;
+        }
       if (dest && source &&
         // the property wasn't modified since initialization or if it is
         // "Representation" property -- (HACK)
