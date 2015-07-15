@@ -42,15 +42,15 @@ extern "C" {
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqDeleteReaction.h"
-#include "pqLoadDataReaction.h"
 #include "pqHelpReaction.h"
+#include "pqLoadDataReaction.h"
 #include "pqOptions.h"
 #include "pqParaViewBehaviors.h"
 #include "pqParaViewMenuBuilders.h"
-#include "pqSettings.h"
 #include "vtkProcessModule.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkPVPlugin.h"
+#include "vtkSMSettings.h"
 
 #ifndef BUILD_SHARED_LIBS
 # include "pvStaticPluginsInit.h"
@@ -142,9 +142,10 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->tabifyDockWidget(this->Internals->propertiesDock,
     this->Internals->informationDock);
 
-  pqSettings *settings = pqApplicationCore::instance()->settings();
-  int propertiesPanelMode = settings->value(
-    "GeneralSettings.PropertiesPanelMode", vtkPVGeneralSettings::ALL_IN_ONE).toInt();
+  vtkSMSettings* settings = vtkSMSettings::GetInstance();
+
+  int propertiesPanelMode = settings->GetSettingAsInt(
+    ".settings.GeneralSettings.PropertiesPanelMode", vtkPVGeneralSettings::ALL_IN_ONE);
   switch (propertiesPanelMode)
     {
   case vtkPVGeneralSettings::SEPARATE_DISPLAY_PROPERTIES:
