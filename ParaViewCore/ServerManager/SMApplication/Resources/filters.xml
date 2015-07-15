@@ -5711,6 +5711,8 @@ array.
                  name="Box" />
           <Proxy group="implicit_functions"
                  name="Sphere" />
+          <Proxy group="implicit_functions"
+                 name="Cylinder" />
         </ProxyListDomain>
         <Documentation>This property sets the parameters of the slice
         function.</Documentation>
