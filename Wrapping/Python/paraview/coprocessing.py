@@ -307,8 +307,17 @@ class CoProcessor(object):
             "insitu_writer_parameters", helperName)
         controller.PreInitializeProxy(proxy)
         if writerIsProxy:
-            proxy.GetProperty("Input").SetInputConnection(
-                0, writer.Input.SMProxy, 0)
+            # it's possible that the writer can take in multiple input connections
+            # so we need to go through all of them. the try/except block seems
+            # to be the best way to figure out if there are multipel input connections
+            try:
+                length = len(writer.Input)
+                for i in range(length):
+                    proxy.GetProperty("Input").AddInputConnection(
+                        writer.Input[i].SMProxy, 0)
+            except:
+                proxy.GetProperty("Input").SetInputConnection(
+                    0, writer.Input.SMProxy, 0)
         proxy.GetProperty("FileName").SetElement(0, filename)
         proxy.GetProperty("WriteFrequency").SetElement(0, freq)
         controller.PostInitializeProxy(proxy)
