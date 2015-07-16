@@ -18,6 +18,9 @@ set(_vtk_mpi_modules
 
   vtkFiltersParallelFlowPaths
   #  vtkStreamTracer (Parallel)
+
+  vtkIOMPIParallel
+  # vtkMPIMultiBlockPLOT3DReader.
   )
 
 # Add CosmoTools VTK extensions if enabled.
