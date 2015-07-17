@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqObjectBuilder.h"
 
+#include "vtkDebugLeaksManager.h"
 #include "vtkNew.h"
 #include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
