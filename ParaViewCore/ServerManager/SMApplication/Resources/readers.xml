@@ -2405,11 +2405,6 @@
         <Documentation>
           Set the spacing to use for the image output by this reader.
         </Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="EnableWidgetDecorator">
-            <Property name="UseCustomDataSpacing" function="boolean" />
-          </PropertyWidgetDecorator>
-        </Hints>
       </DoubleVectorProperty>
       <Hints>
         <ReaderFactory extensions="png"
@@ -2442,11 +2437,6 @@
         <Documentation>
           Set the spacing to use for the image output by this reader.
         </Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="EnableWidgetDecorator">
-            <Property name="UseCustomDataSpacing" function="boolean" />
-          </PropertyWidgetDecorator>
-        </Hints>
       </DoubleVectorProperty>
       <Hints>
         <ReaderFactory extensions="jpg jpeg"
