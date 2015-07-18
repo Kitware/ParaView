@@ -250,7 +250,11 @@
     { "path":"CTestConfig.cmake" },
     { "path":"CMake" },
     { "path":"VTK/CMake" },
-    { "path":"VTK/CMakeLists.txt" },
+    { "path":"VTK/CMakeLists.txt",
+      "patches": [
+        { "path": "VTK-CMake.patch" }
+      ]
+    },
     { "name":"vtkPVServerManagerApplication",
       "path":"ParaViewCore/ServerManager/SMApplication",
       "exclude":[
