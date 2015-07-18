@@ -40,10 +40,27 @@ public:
   // Update the domain.
   virtual void Update(vtkSMProperty*);
 
+  // Description:
+  // Set this to true (default) to let this domain use the
+  // represented-data-information from the outer  most representation proxy.
+  // This ensures that for composite representations where user is provided with
+  // a selection between multiple representations, the represented array list
+  // domain fills its values up based on the currently active representation
+  // type, rather than the representation subproxy from which the property was
+  // exposed.
+  // In XML, use 'use_true_parent' attribute on the domain element to set this
+  // value.
+  vtkGetMacro(UseTrueParentForRepresentatedDataInformation, bool);
+
 //BTX
 protected:
   vtkSMRepresentedArrayListDomain();
   ~vtkSMRepresentedArrayListDomain();
+
+  // Description:
+  // Overridden to process "use_true_parent".
+  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* elem);
+
 
   // Description:
   // Returns true if an array should be filtered out based on its name or number
@@ -64,6 +81,9 @@ protected:
 
   vtkWeakPointer<vtkSMRepresentationProxy> RepresentationProxy;
   unsigned long ObserverId;
+
+  vtkSetMacro(UseTrueParentForRepresentatedDataInformation, bool);
+  bool UseTrueParentForRepresentatedDataInformation;
 
 private:
   vtkSMRepresentedArrayListDomain(const vtkSMRepresentedArrayListDomain&); // Not implemented
