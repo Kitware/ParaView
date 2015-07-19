@@ -130,7 +130,7 @@ vtkSMSourceProxy* vtkSMInteractiveSelectionPipeline::ConnectPVExtractSelection(
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMInteractiveSelectionPipeline::CreateSelectionRepresentation(
+void vtkSMInteractiveSelectionPipeline::CreateSelectionRepresentation(
   vtkSMSourceProxy* extract)
 {
   if (! this->SelectionRepresentation)
@@ -168,14 +168,14 @@ bool vtkSMInteractiveSelectionPipeline::CreateSelectionRepresentation(
     vtkSMPropertyHelper(representation, "Color").Set(color, 3);
     representation->UpdateVTKObjects();
     this->SelectionRepresentation = representation;
-    return true;
     }
   else
     {
+    vtkSMPropertyHelper(this->SelectionRepresentation, "Input").Set(
+      extract);
     vtkSMPropertyHelper(this->SelectionRepresentation,
                         "Visibility").Set(true);
     this->SelectionRepresentation->UpdateVTKObjects();
-    return false;
     }
 }
 

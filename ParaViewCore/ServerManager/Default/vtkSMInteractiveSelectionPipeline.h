@@ -41,7 +41,11 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent );
   static vtkSMInteractiveSelectionPipeline* GetInstance();
 
+  // Description:
+  // Get/Create the interactive selection representation
   vtkSMProxy* GetSelectionRepresentation() const;
+  void CreateSelectionRepresentation(vtkSMSourceProxy* extract);
+
   // Description:
   // Shows the interactive selection for 'selection' and 'sourceRepresentation'.
   // If either sourceRepresentation or selection are null it hides the 
@@ -51,7 +55,6 @@ public:
   // Description:
   // Hides the interactive selection
   void Hide(vtkSMRenderViewProxy* view);
-  
 
 protected:
   vtkSMInteractiveSelectionPipeline();
@@ -64,7 +67,6 @@ protected:
   vtkSMSourceProxy* ConnectPVExtractSelection(
     vtkSMSourceProxy* source, unsigned int sourceOutputPort, 
     vtkSMSourceProxy* selection);
-  bool CreateSelectionRepresentation(vtkSMSourceProxy* extract);
 
 private:
   // Not implemented
