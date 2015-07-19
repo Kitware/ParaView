@@ -122,9 +122,9 @@ public:
   void SetSubset(const CartesianExtent &subset);
   void SetDecomp(const CartesianExtent &decomp);
 
-  CartesianExtent GetDomain() const { return this->Domain; }
-  CartesianExtent GetSubset() const { return this->Subset; }
-  CartesianExtent GetDecomp() const { return this->Decomp; }
+  const CartesianExtent& GetDomain() const { return this->Domain; }
+  const CartesianExtent& GetSubset() const { return this->Subset; }
+  const CartesianExtent& GetDecomp() const { return this->Decomp; }
 
   /**
   Return a string naming the vtk dataset that is to be used to
