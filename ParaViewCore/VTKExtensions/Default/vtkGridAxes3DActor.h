@@ -38,6 +38,10 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Shallow copy from another vtkGridAxes3DActor.
+  virtual void ShallowCopy(vtkProp *prop);
+
+  // Description:
   // Set the bounding box defining the grid space. This, together with the
   // \c Face identify which planar surface this class is interested in. This
   // class is designed to work with a single planar surface.
