@@ -693,6 +693,7 @@ void vtkPVRenderView::SetGridAxes3DActor(vtkPVGridAxes3DActor* gridActor)
   if (this->GridAxes3DActor != gridActor)
     {
     vtkPVRendererCuller* culler = vtkPVRendererCuller::SafeDownCast(this->Culler.GetPointer());
+    // we currently don't support grid axes in tile-display mode.
     const bool in_tile_display_mode = this->InTileDisplayMode();
     if (this->GridAxes3DActor)
       {

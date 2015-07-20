@@ -439,7 +439,7 @@ public:
 
   // Description:
   // Set the vtkPVGridAxes3DActor to use for the view.
-  void SetGridAxes3DActor(vtkPVGridAxes3DActor*);
+  virtual void SetGridAxes3DActor(vtkPVGridAxes3DActor*);
 
   //*****************************************************************
   // Forwarded to orientation axes widget.
