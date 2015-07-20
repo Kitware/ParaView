@@ -104,6 +104,11 @@ protected:
   virtual void AboutToRenderOnLocalProcess(bool interactive);
   virtual void UpdateCenterAxes();
 
+  //*****************************************************************
+  // Forward to vtkPVOrthographicSliceView instances.
+  virtual void SetCenterOfRotation(double x, double y, double z);
+  virtual void SetRotationFactor(double factor);
+
   enum
     {
     SIDE_VIEW = 0,

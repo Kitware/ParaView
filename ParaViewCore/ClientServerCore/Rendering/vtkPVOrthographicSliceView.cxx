@@ -380,6 +380,7 @@ void vtkPVOrthographicSliceView::SetSlicePosition(double x, double y, double z)
 //----------------------------------------------------------------------------
 void vtkPVOrthographicSliceView::UpdateCenterAxes()
 {
+  this->Superclass::UpdateCenterAxes();
   vtkBoundingBox bbox(this->GeometryBounds);
   double widths[3];
   bbox.GetLengths(widths);
@@ -561,6 +562,20 @@ void vtkPVOrthographicSliceView::SetTexturedBackground(int val)
     {
     this->Renderers[cc]->SetTexturedBackground(val? true: false);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVOrthographicSliceView::SetCenterOfRotation(double x, double y, double z)
+{
+  this->Superclass::SetCenterOfRotation(x, y, z);
+  this->OrthographicInteractorStyle->SetCenterOfRotation(x, y, z);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVOrthographicSliceView::SetRotationFactor(double factor)
+{
+  this->Superclass::SetRotationFactor(factor);
+  this->OrthographicInteractorStyle->SetRotationFactor(factor);
 }
 
 //----------------------------------------------------------------------------

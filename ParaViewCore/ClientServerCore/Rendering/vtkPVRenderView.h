@@ -454,8 +454,8 @@ public:
 
   //*****************************************************************
   // Forward to vtkPVInteractorStyle instances.
-  void SetCenterOfRotation(double x, double y, double z);
-  void SetRotationFactor(double factor);
+  virtual void SetCenterOfRotation(double x, double y, double z);
+  virtual void SetRotationFactor(double factor);
 
   //*****************************************************************
   // Forward to vtkLightKit.
