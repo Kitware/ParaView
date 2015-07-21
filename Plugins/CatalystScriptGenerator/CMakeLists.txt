@@ -95,6 +95,10 @@ IF (BUILD_TESTING)
       LOAD_PLUGIN "CatalystScriptGeneratorPlugin"
       TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Testing/CatalystGUI.xml )
     SET_TESTS_PROPERTIES(pv.CatalystGUI PROPERTIES RUN_SERIAL ON LABELS "PARAVIEW;CATALYST")
+    add_client_tests("pv"
+      LOAD_PLUGIN "CatalystScriptGeneratorPlugin"
+      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Testing/CatalystCinemaGUI.xml )
+    SET_TESTS_PROPERTIES(pv.CatalystCinemaGUI PROPERTIES RUN_SERIAL ON LABELS "PARAVIEW;CATALYST")
   ELSE ()
     add_client_tests("pv"
       LOAD_PLUGIN "CatalystScriptGeneratorPlugin"

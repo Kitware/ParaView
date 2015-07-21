@@ -8,6 +8,7 @@
 # COPROCESSING_IMAGE_TESTER -- path to CoProcessingCompareImagesTester
 # COPROCESSING_DATA_DIR     -- path to data dir for baselines
 # COPROCESSING_OUTPUTCHECK_SCRIPT -- path to outputcheck.py
+# DO_CINEMA_TEST -- a flag that makes this expect cinema files
 
 macro(execute_process_with_echo)
   set (_cmd)
@@ -22,7 +23,8 @@ file(REMOVE
   "${COPROCESSING_TEST_DIR}/cptest.py"
   "${COPROCESSING_TEST_DIR}/image_0.png"
   "${COPROCESSING_TEST_DIR}/filename_0.pvtp"
-  "${COPROCESSING_TEST_DIR}/filename_0_0.vtp")
+  "${COPROCESSING_TEST_DIR}/filename_0_0.vtp"
+  "${COPROCESSING_TEST_DIR}/cinema")
 
 if (NOT EXISTS "${PARAVIEW_EXECUTABLE}")
   message(FATAL_ERROR "Could not file ParaView '${PARAVIEW_EXECUTABLE}'")
@@ -53,6 +55,17 @@ execute_process_with_echo(COMMAND
   RESULT_VARIABLE rv)
 if(rv)
   message(FATAL_ERROR "pvpython return value was = '${rv}' ")
+endif()
+
+if(DO_CINEMA_TEST)
+  if(NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/image/info.json" OR
+     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/image/0.000000/-180/-180.png" OR
+     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/image/0.000000/-180/60.png" OR
+     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/image/0.000000/60/-180.png" OR
+     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/image/0.000000/60/60.png")
+    message(FATAL_ERROR "Catalyst did not generate a cinema store")
+  endif()
+  return()
 endif()
 
 if(NOT EXISTS "${COPROCESSING_IMAGE_TESTER}")
