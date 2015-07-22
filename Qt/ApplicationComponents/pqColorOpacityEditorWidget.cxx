@@ -147,6 +147,24 @@ public:
 #endif
     this->Ui.OpacityTable->horizontalHeader()->setStretchLastSection(true);
     }
+
+  void render()
+  {
+    pqDataRepresentation* repr =
+      pqActiveObjects::instance().activeRepresentation();
+    if (repr)
+      {
+      repr->renderViewEventually();
+      return;
+      }
+    pqView* activeView = pqActiveObjects::instance().activeView();
+    if (activeView)
+      {
+      activeView->render();
+      return;
+      }
+    pqApplicationCore::instance()->render();
+  }
 };
 
 //-----------------------------------------------------------------------------
@@ -167,6 +185,12 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
       SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)),
       this, SIGNAL(xrgbPointsChanged()));
     }
+  QObject::connect(&pqActiveObjects::instance(),
+    SIGNAL(representationChanged(pqRepresentation*)),
+    this, SLOT(updateButtonEnableState()));
+  QObject::connect(&pqActiveObjects::instance(),
+    SIGNAL(viewChanged(pqView*)),
+    this, SLOT(updateButtonEnableState()));
 
   QObject::connect(
     ui.OpacityEditor, SIGNAL(currentPointChanged(vtkIdType)),
@@ -585,6 +609,21 @@ void pqColorOpacityEditorWidget::currentDataEdited()
 }
 
 //-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::updateButtonEnableState()
+{
+  pqDataRepresentation* repr =
+    pqActiveObjects::instance().activeRepresentation();
+  bool hasRepresentation = repr != NULL;
+  pqView* activeView = pqActiveObjects::instance().activeView();
+  bool hasView = activeView != NULL;
+
+  Ui::ColorOpacityEditorWidget &ui = this->Internals->Ui;
+  ui.ResetRangeToData->setEnabled(hasRepresentation);
+  ui.ResetRangeToDataOverTime->setEnabled(hasRepresentation);
+  ui.ResetRangeToVisibleData->setEnabled(hasRepresentation && hasView);
+}
+
+//-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::resetRangeToData()
 {
   pqDataRepresentation* repr =
@@ -596,7 +635,7 @@ void pqColorOpacityEditorWidget::resetRangeToData()
     }
   BEGIN_UNDO_SET("Reset transfer function ranges using data range");
   vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(repr->getProxy());
-  repr->renderViewEventually();
+  this->Internals->render();
   emit this->changeFinished();
   END_UNDO_SET();
 }
@@ -624,7 +663,7 @@ void pqColorOpacityEditorWidget::resetRangeToDataOverTime()
     // disable auto-rescale of transfer function since the user has set on
     // explicitly (BUG #14371).
     this->setLockScalarRange(true);
-    repr->renderViewEventually();
+    this->Internals->render();
     emit this->changeFinished();
     END_UNDO_SET();
     }
@@ -663,7 +702,7 @@ void pqColorOpacityEditorWidget::resetRangeToVisibleData()
 
   BEGIN_UNDO_SET("Reset transfer function ranges using visible data");
   vtkSMPVRepresentationProxy::RescaleTransferFunctionToVisibleRange(repProxy, rvproxy);
-  repr->renderViewEventually();
+  this->Internals->render();
   END_UNDO_SET();
 }
 
@@ -696,9 +735,7 @@ void pqColorOpacityEditorWidget::resetRangeToCustom(double min, double max)
   // disable auto-rescale of transfer function since the user has set on
   // explicitly (BUG #14371).
   this->setLockScalarRange(true);
-  pqDataRepresentation* repr =
-    pqActiveObjects::instance().activeRepresentation();
-  repr->renderViewEventually();
+  this->Internals->render();
   emit this->changeFinished();
   END_UNDO_SET();
 }
