@@ -419,10 +419,14 @@
           <Property name="Visibility" panel_visibility="never"/>
           <Property name="Position" panel_visibility="never"/>
           <Property name="Position2" panel_visibility="never"/>
-          <Property name="Orientation" panel_visibility="never" />
+          <Property name="AutoOrientInfo" />
           <Property name="PositionInfo" />
           <Property name="Position2Info" />
           <Property name="OrientationInfo" />
+          <PropertyGroup label="Layout">
+            <Property name="AutoOrient" />
+            <Property name="Orientation" />
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
@@ -1220,11 +1224,27 @@
                             name="Position2Info">
         <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
+      <IntVectorProperty command="SetAutoOrient"
+                         default_values="1"
+                         name="AutoOrient"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="GetAutoOrient"
+                         information_only="1"
+                         name="AutoOrientInfo">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <IntVectorProperty command="SetOrientation"
                          default_values="1"
                          information_property="OrientationInfo"
                          name="Orientation"
                          number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="AutoOrient" function="boolean_invert" index="0" />
+          </PropertyWidgetDecorator>
+        </Hints>
         <EnumerationDomain name="enum">
           <Entry text="Horizontal"
                  value="0" />
