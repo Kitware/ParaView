@@ -595,6 +595,40 @@ void vtkGridAxes3DActor::Update(vtkViewport* viewport)
 }
 
 //----------------------------------------------------------------------------
+void vtkGridAxes3DActor::ShallowCopy(vtkProp *prop)
+{
+  this->Superclass::ShallowCopy(prop);
+  vtkGridAxes3DActor* other = vtkGridAxes3DActor::SafeDownCast(prop);
+  if (other == NULL)
+    {
+    return;
+    }
+
+  this->SetGridBounds(other->GetGridBounds());
+  this->SetFaceMask(other->GetFaceMask());
+  this->SetLabelMask(other->GetLabelMask());
+  this->SetLabelUniqueEdgesOnly(other->GetLabelUniqueEdgesOnly());
+  this->SetGenerateGrid(other->GetGenerateGrid());
+  this->SetGenerateEdges(other->GetGenerateEdges());
+  this->SetGenerateTicks(other->GetGenerateTicks());
+  this->SetProperty(other->GetProperty());
+  for (int cc=0; cc < 3; cc++)
+    {
+    this->SetTitleTextProperty(cc, other->GetTitleTextProperty(cc));
+    this->SetTitle(cc, other->GetTitle(cc));
+    this->SetUseCustomLabels(cc, other->UseCustomLabels[cc]);
+    this->CustomLabels[cc]->DeepCopy(other->CustomLabels[cc].GetPointer());
+    this->SetLabelTextProperty(cc, other->GetLabelTextProperty(cc));
+    this->SetNotation(cc, other->GetNotation(cc));
+    this->SetPrecision(cc, other->GetPrecision(cc));
+    }
+  this->SetEnableLayerSupport(other->GetEnableLayerSupport());
+  this->SetBackgroundLayer(other->GetBackgroundLayer());
+  this->SetGeometryLayer(other->GetGeometryLayer());
+  this->SetForegroundLayer(other->GetForegroundLayer());
+}
+
+//----------------------------------------------------------------------------
 void vtkGridAxes3DActor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

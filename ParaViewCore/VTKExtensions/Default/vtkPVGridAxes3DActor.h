@@ -47,9 +47,16 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Shallow copy from another vtkPVGridAxes3DActor.
+  virtual void ShallowCopy(vtkProp *prop);
+
+  // Description:
   // Specify transformation used by the data.
   vtkSetVector3Macro(DataScale, double);
+  vtkGetVector3Macro(DataScale, double);
+
   vtkSetVector3Macro(DataPosition, double);
+  vtkGetVector3Macro(DataPosition, double);
 
   // Description:
   vtkSetVector6Macro(TransformedBounds, double);

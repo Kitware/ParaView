@@ -134,6 +134,22 @@ void vtkPVGridAxes3DActor::UpdateGridBoundsUsingDataBounds()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVGridAxes3DActor::ShallowCopy(vtkProp *prop)
+{
+  this->Superclass::ShallowCopy(prop);
+  if (vtkPVGridAxes3DActor* other = vtkPVGridAxes3DActor::SafeDownCast(prop))
+    {
+    this->SetDataScale(other->GetDataScale());
+    this->SetDataPosition(other->GetDataPosition());
+    this->SetTransformedBounds(other->GetTransformedBounds());
+    this->SetUseModelTransform(other->GetUseModelTransform());
+    this->SetModelBounds(other->GetModelBounds());
+    this->SetModelTransformMatrix(
+      reinterpret_cast<double*>(other->ModelTransformMatrix->Element));
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVGridAxes3DActor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

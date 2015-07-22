@@ -439,7 +439,7 @@ public:
 
   // Description:
   // Set the vtkPVGridAxes3DActor to use for the view.
-  void SetGridAxes3DActor(vtkPVGridAxes3DActor*);
+  virtual void SetGridAxes3DActor(vtkPVGridAxes3DActor*);
 
   //*****************************************************************
   // Forwarded to orientation axes widget.
@@ -454,8 +454,8 @@ public:
 
   //*****************************************************************
   // Forward to vtkPVInteractorStyle instances.
-  void SetCenterOfRotation(double x, double y, double z);
-  void SetRotationFactor(double factor);
+  virtual void SetCenterOfRotation(double x, double y, double z);
+  virtual void SetRotationFactor(double factor);
 
   //*****************************************************************
   // Forward to vtkLightKit.

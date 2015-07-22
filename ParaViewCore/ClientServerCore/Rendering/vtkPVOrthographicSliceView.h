@@ -104,6 +104,15 @@ protected:
   virtual void AboutToRenderOnLocalProcess(bool interactive);
   virtual void UpdateCenterAxes();
 
+  //*****************************************************************
+  // Forward to vtkPVOrthographicSliceView instances.
+  virtual void SetCenterOfRotation(double x, double y, double z);
+  virtual void SetRotationFactor(double factor);
+
+  // Description:
+  // Set the vtkPVGridAxes3DActor to use for the view.
+  virtual void SetGridAxes3DActor(vtkPVGridAxes3DActor*);
+
   enum
     {
     SIDE_VIEW = 0,
@@ -126,6 +135,7 @@ protected:
   vtkNew<vtkPVCenterAxesActor> SlicePositionAxes2D[3];
   vtkNew<vtkPVCenterAxesActor> SlicePositionAxes3D;
   vtkNew<vtkTextRepresentation> SliceAnnotations[3];
+  vtkSmartPointer<vtkPVGridAxes3DActor> GridAxes3DActors[3];
 
   double SliceIncrements[3];
   double SlicePosition[3];
@@ -143,6 +153,9 @@ private:
 
   friend class vtkPVOrthographicSliceViewInteractorStyle;
 
+  bool GridAxes3DActorsNeedShallowCopy;
+  unsigned long GridAxes3DActorObserverId;
+  void OnGridAxes3DActorModified();
 //ETX
 };
 

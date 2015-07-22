@@ -21,6 +21,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVCenterAxesActor.h"
 #include "vtkPVChangeOfBasisHelper.h"
+#include "vtkPVGridAxes3DActor.h"
 #include "vtkPVInteractorStyle.h"
 #include "vtkPVSynchronizedRenderer.h"
 #include "vtkPVSynchronizedRenderWindows.h"
@@ -166,7 +167,9 @@ vtkPVOrthographicSliceView::vtkPVOrthographicSliceView()
   SliceAnnotations(),
   SliceAnnotationsVisibility(false),
   MouseWheelForwardEventId(0),
-  MouseWheelBackwardEventId(0)
+  MouseWheelBackwardEventId(0),
+  GridAxes3DActorsNeedShallowCopy(false),
+  GridAxes3DActorObserverId(0)
 {
   this->CenterAxes->SetVisibility(0);
   this->SliceIncrements[0] = this->SliceIncrements[1] = this->SliceIncrements[2] = 1.0;
@@ -227,6 +230,10 @@ vtkPVOrthographicSliceView::vtkPVOrthographicSliceView()
 //----------------------------------------------------------------------------
 vtkPVOrthographicSliceView::~vtkPVOrthographicSliceView()
 {
+  if (this->GridAxes3DActor && this->GridAxes3DActorObserverId)
+    {
+    this->GridAxes3DActor->RemoveObserver(this->GridAxes3DActorObserverId);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -380,6 +387,7 @@ void vtkPVOrthographicSliceView::SetSlicePosition(double x, double y, double z)
 //----------------------------------------------------------------------------
 void vtkPVOrthographicSliceView::UpdateCenterAxes()
 {
+  this->Superclass::UpdateCenterAxes();
   vtkBoundingBox bbox(this->GeometryBounds);
   double widths[3];
   bbox.GetLengths(widths);
@@ -390,6 +398,16 @@ void vtkPVOrthographicSliceView::UpdateCenterAxes()
   this->SlicePositionAxes2D[1]->SetScale(widths);
   this->SlicePositionAxes2D[2]->SetScale(widths);
   this->SlicePositionAxes3D->SetScale(widths);
+
+  double bounds[6];
+  this->GeometryBounds.GetBounds(bounds);
+  for (int cc=0; cc < 3; cc++)
+    {
+    if (this->GridAxes3DActors[cc])
+      {
+      this->GridAxes3DActors[cc]->SetTransformedBounds(bounds);
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -445,6 +463,30 @@ void vtkPVOrthographicSliceView::AboutToRenderOnLocalProcess(bool interactive)
     stream << axis_names[(cc+2)%3] << "=" << this->SlicePosition[(cc+2)%3];
     this->SliceAnnotations[cc]->SetText(stream.str().c_str());
     }
+
+  if (this->GridAxes3DActorsNeedShallowCopy)
+    {
+    // Update our clones of the GridAxes3DActor that sit in the 3 orthographic
+    // views.
+    this->GridAxes3DActorsNeedShallowCopy = false;
+    if (this->GridAxes3DActor)
+      {
+      for (int cc=0; cc < 3; cc++)
+        {
+        assert(this->GridAxes3DActors[cc]);
+        this->GridAxes3DActors[cc]->ShallowCopy(this->GridAxes3DActor);
+        this->GridAxes3DActors[cc]->SetEnableLayerSupport(false);
+        this->GridAxes3DActors[cc]->SetLabelMask(0xff);
+        }
+      this->GridAxes3DActors[YZ_PLANE]->SetFaceMask(
+        vtkGridAxes3DActor::MAX_YZ | vtkGridAxes3DActor::MIN_YZ);
+      this->GridAxes3DActors[ZX_PLANE]->SetFaceMask(
+        vtkGridAxes3DActor::MAX_ZX | vtkGridAxes3DActor::MIN_ZX);
+      this->GridAxes3DActors[XY_PLANE]->SetFaceMask(
+        vtkGridAxes3DActor::MAX_XY | vtkGridAxes3DActor::MIN_XY);
+      }
+    }
+
   this->Superclass::AboutToRenderOnLocalProcess(interactive);
 }
 
@@ -452,7 +494,13 @@ void vtkPVOrthographicSliceView::AboutToRenderOnLocalProcess(bool interactive)
 void vtkPVOrthographicSliceView::Update()
 {
   this->SlicePositionAxes3D->SetUseBounds(0);
+  // Since vtkGridAxes3DActor is potentially modified in Update (all of those
+  // modifications are passed on to our vtkGridAxes3DActor instances in
+  // UpdateCenterAxes(), hence we avoid forcing ShallowCopy on Render since that
+  // changes too many things.
+  bool prev = this->GridAxes3DActorsNeedShallowCopy;
   this->Superclass::Update();
+  this->GridAxes3DActorsNeedShallowCopy = prev;
   this->SlicePositionAxes3D->SetUseBounds(1);
 }
 
@@ -561,6 +609,68 @@ void vtkPVOrthographicSliceView::SetTexturedBackground(int val)
     {
     this->Renderers[cc]->SetTexturedBackground(val? true: false);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVOrthographicSliceView::SetCenterOfRotation(double x, double y, double z)
+{
+  this->Superclass::SetCenterOfRotation(x, y, z);
+  this->OrthographicInteractorStyle->SetCenterOfRotation(x, y, z);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVOrthographicSliceView::SetRotationFactor(double factor)
+{
+  this->Superclass::SetRotationFactor(factor);
+  this->OrthographicInteractorStyle->SetRotationFactor(factor);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVOrthographicSliceView::SetGridAxes3DActor(vtkPVGridAxes3DActor* gridActor)
+{
+  vtkSmartPointer<vtkPVGridAxes3DActor> prev = this->GridAxes3DActor;
+  this->Superclass::SetGridAxes3DActor(gridActor);
+  if (prev == this->GridAxes3DActor)
+    {
+    // nothing changed.
+    return;
+    }
+
+  if (prev && this->GridAxes3DActorObserverId)
+    {
+    prev->RemoveObserver(this->GridAxes3DActorObserverId);
+    }
+  if (this->GridAxes3DActor)
+    {
+    this->GridAxes3DActorObserverId =
+      this->GridAxes3DActor->AddObserver(vtkCommand::ModifiedEvent,
+        this, &vtkPVOrthographicSliceView::OnGridAxes3DActorModified);
+    this->GridAxes3DActorsNeedShallowCopy = true;
+    }
+
+  // we currently don't support grid axes in tile-display mode.
+  const bool in_tile_display_mode = this->InTileDisplayMode();
+  for (int cc=0; cc < 3; cc++)
+    {
+    if (this->GridAxes3DActors[cc])
+      {
+      this->Renderers[cc]->RemoveViewProp(this->GridAxes3DActors[cc]);
+      }
+    vtkPVGridAxes3DActor* clone = gridActor? gridActor->NewInstance() : NULL;
+    this->GridAxes3DActors[cc].TakeReference(clone);
+    if (this->GridAxes3DActors[cc] && !in_tile_display_mode)
+      {
+      this->GridAxes3DActors[cc]->ShallowCopy(gridActor);
+      this->GridAxes3DActors[cc]->SetEnableLayerSupport(false);
+      this->Renderers[cc]->AddViewProp(this->GridAxes3DActors[cc]);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVOrthographicSliceView::OnGridAxes3DActorModified()
+{
+  this->GridAxes3DActorsNeedShallowCopy = true;
 }
 
 //----------------------------------------------------------------------------
