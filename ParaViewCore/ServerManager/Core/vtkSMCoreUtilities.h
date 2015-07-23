@@ -47,6 +47,14 @@ public:
   // the range is changed, returns true, otherwise returns false.
   static bool AdjustRangeForLog(double range[2]);
 
+  // Description:
+  // Given a range, adjusts it so that it is a valid range i.e. range[0] <
+  // range[1]. This will always perturb the range[1] by a factor of the value itself.
+  // This assumes range[1] < range[0] to indicate an invalid range and returns
+  // false without changing them. If the range is changed, returns true,
+  // otherwise false.
+  static bool AdjustRange(double range[2]);
+
 //BTX
 protected:
   vtkSMCoreUtilities();

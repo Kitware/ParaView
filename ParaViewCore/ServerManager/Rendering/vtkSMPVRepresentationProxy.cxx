@@ -23,6 +23,7 @@
 #include "vtkPVTemporalDataInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMArrayListDomain.h"
+#include "vtkSMCoreUtilities.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
@@ -307,22 +308,9 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
     if (range[1] >= range[0])
       {
       // the range must be large enough, compared to values order of magnitude
-      double rangeOrderOfMagnitude = 1e-11;
-      if (rangeOrderOfMagnitude < std::abs(range[0]))
-        {
-        rangeOrderOfMagnitude = std::abs(range[0]);
-        }
-      if (rangeOrderOfMagnitude < std::abs(range[1]))
-        {
-        rangeOrderOfMagnitude = std::abs(range[1]);
-        }
-      double rangeMinLength = rangeOrderOfMagnitude * 1e-5;
-      if ((range[1] - range[0]) < rangeMinLength)
-        {
-        range[1] = range[0] + rangeMinLength;
-        }
       // If data range is too small then we tweak it a bit so scalar mapping
       // produces valid/reproducible results.
+      vtkSMCoreUtilities::AdjustRange(range);
       if (lut)
         {
         vtkSMTransferFunctionProxy::RescaleTransferFunction(lut, range, extend);

@@ -235,6 +235,7 @@ void vtkSMTransferFunctionManager::ResetAllTransferFunctionRangesUsingCurrentDat
       double range[2] = {VTK_DOUBLE_MAX, VTK_DOUBLE_MIN};
       if (vtkSMTransferFunctionProxy::ComputeDataRange(lutProxy, range))
         {
+        vtkSMCoreUtilities::AdjustRange(range);
         vtkSMTransferFunctionProxy::RescaleTransferFunction(
           lutProxy, range[0], range[1], extend);
         // BUG #0015076: Also reset the opacity function, if any.

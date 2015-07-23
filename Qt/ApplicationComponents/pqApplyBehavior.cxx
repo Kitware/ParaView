@@ -40,7 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
+#include "vtkDataObject.h"
 #include "vtkNew.h"
+#include "vtkPVDataInformation.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkSMAnimationSceneProxy.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
@@ -49,13 +51,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMViewProxy.h"
+#include "vtkWeakPointer.h"
 
 #include <QtDebug>
 #include <QSet>
+#include <QList>
+
+class pqApplyBehavior::pqInternals
+{
+public:
+  QList<vtkWeakPointer<vtkSMRepresentationProxy> > NewlyCreatedRepresentations;
+};
 
 //-----------------------------------------------------------------------------
 pqApplyBehavior::pqApplyBehavior(QObject* parentObject)
-  : Superclass(parentObject)
+  : Superclass(parentObject),
+  Internals(new pqApplyBehavior::pqInternals())
 {
 }
 
@@ -161,6 +172,20 @@ void pqApplyBehavior::applied(pqPropertiesPanel*)
     view->getViewProxy()->Update();
     }
 
+  foreach (vtkSMRepresentationProxy* reprProxy, this->Internals->NewlyCreatedRepresentations)
+    {
+    // If not scalar coloring, we make an attempt to color using
+    // 'vtkBlockColors' array, if present.
+    if (vtkSMPVRepresentationProxy::SafeDownCast(reprProxy) &&
+      vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy) == false &&
+      reprProxy->GetRepresentedDataInformation()->GetArrayInformation(
+        "vtkBlockColors", vtkDataObject::FIELD) != NULL)
+      {
+      vtkSMPVRepresentationProxy::SetScalarColoring(reprProxy,
+        "vtkBlockColors", vtkDataObject::FIELD);
+      }
+    }
+
   //---------------------------------------------------------------------------
   // If user chose it, update all transfer function data range.
   // FIXME: This should happen for all servers available.
@@ -192,6 +217,8 @@ void pqApplyBehavior::applied(pqPropertiesPanel*)
       view->forceRender();
       }
     }
+
+  this->Internals->NewlyCreatedRepresentations.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -256,18 +283,22 @@ void pqApplyBehavior::showData(pqPipelineSource* source, pqView* view)
         }
       }
 
+    vtkSMRepresentationProxy* reprProxy = preferredView->FindRepresentation(
+      source->getSourceProxy(), outputPort);
     // show scalar bar, if applicable.
     vtkPVGeneralSettings* gsettings = vtkPVGeneralSettings::GetInstance();
     if (gsettings->GetScalarBarMode() ==
       vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS)
       {
-      vtkSMProxy* reprProxy = preferredView->FindRepresentation(
-        source->getSourceProxy(), outputPort);
       if (vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy))
         {
         vtkSMPVRepresentationProxy::SetScalarBarVisibility(reprProxy, preferredView, true);
         }
       }
+
+    // Save the newly created representation for further fine-tuning in
+    // pqApplyBehavior::applied().
+    this->Internals->NewlyCreatedRepresentations.push_back(reprProxy);
     }
 }
 
