@@ -157,6 +157,19 @@ if (PARAVIEW_BUILD_QT_GUI)
       -DCOPROCESSING_DATA_DIR:PATH=${PARAVIEW_TEST_OUTPUT_BASELINE_DIR}
       -DCOPROCESSING_OUTPUTCHECK_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/outputcheck.py
       -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
+    set_tests_properties(CoProcessingFullWorkflow PROPERTIES RUN_SERIAL ON)
     set_tests_properties(CoProcessingFullWorkflow PROPERTIES LABELS "${CP_LABELS}")
+
+    add_test(NAME CoProcessingFullWorkflowCinema
+      COMMAND ${CMAKE_COMMAND}
+      -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:paraview>
+      -DCOPROCESSING_TEST_DIR:PATH=${PARAVIEW_TEST_DIR}
+      -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Plugins/CatalystScriptGenerator/Testing/CatalystCinemaGUI.xml
+      -DDO_CINEMA_TEST:BOOL=TRUE
+      -DPVPYTHON_EXECUTABLE:FILEPATH=$<TARGET_FILE:pvpython>
+      -DCOPROCESSING_DRIVER_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/waveletdriver.py
+      -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
+    set_tests_properties(CoProcessingFullWorkflowCinema PROPERTIES RUN_SERIAL ON)
+    set_tests_properties(CoProcessingFullWorkflowCinema PROPERTIES LABELS "${CP_LABELS}")
   ENDIF ()
 endif()
