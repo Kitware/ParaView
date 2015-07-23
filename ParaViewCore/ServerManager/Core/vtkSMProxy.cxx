@@ -465,6 +465,18 @@ void vtkSMProxy::MarkAllPropertiesAsModified()
 //---------------------------------------------------------------------------
 void vtkSMProxy::ResetPropertiesToXMLDefaults()
 {
+  this->ResetPropertiesToDefault(vtkSMProxy::ONLY_XML);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::ResetPropertiesToDomainDefaults()
+{
+  this->ResetPropertiesToDefault(vtkSMProxy::ONLY_DOMAIN);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::ResetPropertiesToDefault(ResetPropertiesMode mode)
+{
   vtkSmartPointer<vtkSMPropertyIterator> iter;
   iter.TakeReference(this->NewPropertyIterator());
 
@@ -480,7 +492,24 @@ void vtkSMProxy::ResetPropertiesToXMLDefaults()
         // Don't reset properties that request overriding of the default mechanism.
         continue;
         }
-      iter->GetProperty()->ResetToXMLDefaults();
+      switch(mode)
+        {
+        case vtkSMProxy::ONLY_XML:
+          {
+          iter->GetProperty()->ResetToXMLDefaults();
+          break;
+          }
+        case vtkSMProxy::ONLY_DOMAIN:
+          {
+          iter->GetProperty()->ResetToDomainDefaults();
+          break;
+          }
+        default:
+          {
+          iter->GetProperty()->ResetToDefault();
+          break;
+          }
+        }
       }
     }
   this->UpdateVTKObjects();
