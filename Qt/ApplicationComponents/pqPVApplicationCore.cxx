@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationManager.h"
 #include "pqApplicationComponentsInit.h"
 #include "pqApplicationCore.h"
-#include "pqApplyPropertiesManager.h"
 #include "pqComponentsTestUtility.h"
 #include "pqCoreUtilities.h"
 #include "pqItemViewSearchWidget.h"
@@ -69,7 +68,6 @@ pqPVApplicationCore::pqPVApplicationCore(
   // Initialize pqComponents resources.
   pqApplicationComponentsInit();
 
-  this->ApplyPropertiesManger = new pqApplyPropertiesManager(this);
   this->AnimationManager = new pqAnimationManager(this);
   this->SelectionManager = new pqSelectionManager(this);
 
@@ -83,7 +81,7 @@ pqPVApplicationCore::pqPVApplicationCore(
   // Ensure that whenever Python is initialized, we tell paraview.servermanager
   // that is being done from the GUI.
 #endif
-  
+
   QObject::connect(&pqActiveObjects::instance(),
     SIGNAL(serverChanged(pqServer*)),
     this->AnimationManager, SLOT(onActiveServerChanged(pqServer*)));
@@ -161,11 +159,6 @@ void pqPVApplicationCore::startSearch()
     new pqItemViewSearchWidget(focusItemView);
   searchDialog->setAttribute(Qt::WA_DeleteOnClose, true);
   searchDialog->showSearchWidget();
-}
-//-----------------------------------------------------------------------------
-pqApplyPropertiesManager* pqPVApplicationCore::applyPropertiesManager() const
-{
-  return this->ApplyPropertiesManger;
 }
 
 //-----------------------------------------------------------------------------

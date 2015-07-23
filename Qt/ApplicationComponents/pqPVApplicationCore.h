@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqPVApplicationCore_h 
+#ifndef __pqPVApplicationCore_h
 #define __pqPVApplicationCore_h
 
 #include "pqApplicationCore.h"
@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QList>
 
-class pqApplyPropertiesManager;
 class pqAnimationManager;
 class pqPythonManager;
 class pqSelectionManager;
@@ -61,9 +60,6 @@ public:
   /// created then return NULL.
   static pqPVApplicationCore* instance()
     { return qobject_cast<pqPVApplicationCore*>(Superclass::instance()); }
-
-  /// Provides access to the apply properties manager.
-  pqApplyPropertiesManager* applyPropertiesManager() const;
 
   /// Provides access to the selection manager. Selection manager provides
   /// access to the ParaView wide data selection mechanism. This must not be
@@ -105,7 +101,6 @@ protected:
 
   QPointer<pqSelectionManager> SelectionManager;
   QPointer<pqAnimationManager> AnimationManager;
-  QPointer<pqApplyPropertiesManager> ApplyPropertiesManger;
 
   pqPythonManager* PythonManager;
   QList<QPointer<QWidget> > QuickLaunchMenus;
