@@ -317,6 +317,30 @@ public:
   // and call vtkSMProperty::ResetToXMLDefaults().
   virtual void ResetPropertiesToXMLDefaults();
 
+  // Description:
+  // Use this method to set all properties on this proxy to their default
+  // domains. This iterates over all properties on this proxy, thus if this proxy
+  // had subproxies, this method will iterate over only the exposed properties
+  // and call vtkSMProperty::ResetToDomainDefaults().
+  virtual void ResetPropertiesToDomainDefaults();
+
+  enum ResetPropertiesMode
+    {
+    DEFAULT = 0,
+    ONLY_XML = 1,
+    ONLY_DOMAIN = 2
+    };
+
+  // Description:
+  // Use this method to set all properties on this proxy to their default domain 
+  // or values. This iterates over all properties on this proxy, thus if this 
+  // proxy had subproxies, this method will iterate over only the exposed 
+  // properties and call correct reset methods.
+  // The parameter allows to choose between resetting ONLY_XML, ONLY_DOMAIN or DEFAULT, 
+  // ie. reset to domain if available, if not reset to xml.
+  // default value is DEFAULT.
+  virtual void ResetPropertiesToDefault(ResetPropertiesMode mode = DEFAULT);
+
 //BTX
   // Description:
   // Flags used for the proxyPropertyCopyFlag argument to the Copy method.
