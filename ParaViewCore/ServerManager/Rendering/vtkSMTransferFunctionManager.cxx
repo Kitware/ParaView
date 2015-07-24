@@ -234,7 +234,7 @@ void vtkSMTransferFunctionManager::ResetAllTransferFunctionRangesUsingCurrentDat
       {
       if (vtkSMPropertyHelper(lutProxy, "IndexedLookup", true).GetAsInt() == 1)
         {
-        vtkSMTransferFunctionProxy::ComputeAvailableAnnotations(lutProxy);
+        vtkSMTransferFunctionProxy::ComputeAvailableAnnotations(lutProxy, extend);
         }
       else
         {

@@ -326,6 +326,12 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
         {
         vtkSmartPointer<vtkStringList> activeAnnotatedValues =
           vtkSmartPointer<vtkStringList>::New();
+
+        if (extend)
+          {
+          activeAnnotatedValuesProperty->GetElements(activeAnnotatedValues);
+          }
+
         for (int idx = 0; idx < uniqueValues->GetNumberOfTuples(); ++idx)
           {
           // Look up index of color corresponding to the annotation

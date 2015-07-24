@@ -241,12 +241,12 @@ public:
 
   // Helper method to compute the active annotated values in visible
   // representations that use the transfer function.
-  virtual bool ComputeAvailableAnnotations();
-  static bool ComputeAvailableAnnotations(vtkSMProxy* proxy)
+  virtual bool ComputeAvailableAnnotations(bool extend=false);
+  static bool ComputeAvailableAnnotations(vtkSMProxy* proxy, bool extend=false)
   {
     vtkSMTransferFunctionProxy* self =
       vtkSMTransferFunctionProxy::SafeDownCast(proxy);
-    return self ? self->ComputeAvailableAnnotations() : false;
+    return self ? self->ComputeAvailableAnnotations(extend) : false;
   }
 
   // Description:

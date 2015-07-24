@@ -372,7 +372,7 @@ bool vtkSMTransferFunctionProxy::ComputeDataRange(double range[2])
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMTransferFunctionProxy::ComputeAvailableAnnotations()
+bool vtkSMTransferFunctionProxy::ComputeAvailableAnnotations(bool extend)
 {
   int component = -1;
   if (vtkSMPropertyHelper(this, "VectorMode").GetAsInt() == vtkScalarsToColors::COMPONENT)
@@ -392,6 +392,12 @@ bool vtkSMTransferFunctionProxy::ComputeAvailableAnnotations()
   if (!allAnnotations || !activeAnnotatedValuesProperty)
     {
     return false;
+    }
+
+  // If we are extending, copy the active annotated values
+  if (extend)
+    {
+    activeAnnotatedValuesProperty->GetElements(activeAnnotatedValues);
     }
 
   for (unsigned int cc=0, max=this->GetNumberOfConsumers(); cc < max; ++cc)
