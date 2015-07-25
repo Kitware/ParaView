@@ -93,6 +93,13 @@ public slots:
   /// or not.
   void printString(const QString&, PrintMode mode=STATUS);
 
+  /// Set a list of statements to be run each time the interpreter is reset.
+  ///
+  /// By default, this imports the paraview.simple module.
+  /// If you call this method, be aware that the preamble is
+  /// assumed not to have any multi-line statements.
+  static void setPreamble(const QStringList& statements);
+
 signals:
   /// signal fired whenever the shell starts (starting=true) and finishes
   /// (starting=false) executing a Python command/script. This can be used by
@@ -107,6 +114,7 @@ protected:
   pqConsoleWidget* ConsoleWidget;
   vtkPythonInteractiveInterpreter* Interpreter;
   const char* Prompt;
+  static QStringList Preamble;
 
   static const char* PS1() { return ">>> "; }
   static const char* PS2() { return "... "; }
