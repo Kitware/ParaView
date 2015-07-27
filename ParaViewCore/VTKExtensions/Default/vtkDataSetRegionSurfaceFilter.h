@@ -70,6 +70,18 @@ public:
   vtkSetStringMacro(MaterialPIDsName);
   vtkGetStringMacro(MaterialPIDsName);
 
+  //Description:
+  //The name of the field array that has characteristics of each material interface
+  //Default is "interface_properties"
+  vtkSetStringMacro(InterfacePropertiesName);
+  vtkGetStringMacro(InterfacePropertiesName);
+
+  //Description:
+  //The name of the field array that has material interface type identifiers in it
+  //Default is "interface_ids"
+  vtkSetStringMacro(InterfaceIDsName);
+  vtkGetStringMacro(InterfaceIDsName);
+
 //BTX
 protected:
   vtkDataSetRegionSurfaceFilter();
@@ -95,13 +107,15 @@ private:
 //ETX
 
   char *RegionArrayName;
-  char *MaterialPropertiesName;
-  char *MaterialIDsName;
-  char *MaterialPIDsName;
   vtkIntArray    *RegionArray;
   vtkIdTypeArray *OrigCellIds;
   vtkCharArray   *CellFaceIds;
   bool SingleSided;
+  char *MaterialPropertiesName;
+  char *MaterialIDsName;
+  char *MaterialPIDsName;
+  char *InterfacePropertiesName;
+  char *InterfaceIDsName;
 
   class Internals;
   Internals *Internal;

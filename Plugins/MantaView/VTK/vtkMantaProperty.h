@@ -137,6 +137,12 @@ public:
   //error.
   static Manta::Material *ManufactureMaterial(std::string specification);
 
+  //Description:
+  //Given two materials, return a material that makes sense as the
+  //interface between them.
+  static Manta::Material *CombineMaterials(std::string m,
+                                           std::string d);
+
   // Description:
   // When true (the default) material properties specified in the data
   // control the appearance. These specification consists of a field associated

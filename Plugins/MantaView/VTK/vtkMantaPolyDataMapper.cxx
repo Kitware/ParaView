@@ -316,7 +316,7 @@ void vtkMantaPolyDataMapper::DrawPolygons(vtkPolyData *polys,
   std::vector<Manta::Vector> &texCoords = this->MyHelper->texCoords;
   Manta::Material *material = NULL;
   vtkIntArray *ma = vtkIntArray::SafeDownCast(polys->GetCellData()->
-                                              GetArray("mantaMaterial"));
+                                              GetArray("material"));
   int total_triangles = 0;
   vtkCellArray *cells = polys->GetPolys();
   vtkIdType npts = 0, *index = 0, cellNum = 0;
@@ -693,7 +693,6 @@ void vtkMantaPolyDataMapper::DrawTStrips(vtkPolyData *polys,
       }
     
     //cerr << "strips: # of triangles = " << total_triangles << endl;
-    
     for ( int i = 0; i < total_triangles; i++ )
       {
       mesh->addTriangle( new Manta::WaldTriangle );
@@ -1057,13 +1056,17 @@ void vtkMantaPolyDataMapper::MakeMantaProperties(vtkPolyData *input, bool allow)
     return;
     }
 
-  int ignored;
   vtkStringArray *sa = vtkStringArray::SafeDownCast
-    (input->GetFieldData()->GetAbstractArray("mantaMaterials", ignored));
+    (input->GetFieldData()->GetAbstractArray("material_properties"));
   vtkIntArray *ida = vtkIntArray::SafeDownCast
-    (input->GetFieldData()->GetArray("mantaMatIDs"));
+    (input->GetFieldData()->GetArray("material_ids"));
+  vtkIntArray *ipa = vtkIntArray::SafeDownCast
+    (input->GetFieldData()->GetArray("material_ancestors"));
   if (sa)
     {
+    std::vector<int> missed_interfaces;
+    Manta::Material *newMat = NULL;
+    
     for (int i= 0;i < sa->GetNumberOfTuples(); i++)
       {
       int idx = i;
@@ -1082,7 +1085,6 @@ void vtkMantaPolyDataMapper::MakeMantaProperties(vtkPolyData *input, bool allow)
         if (s != spec)
           {
           //yes, delete the old content
-          //cerr << "REPLACE" << endl;
           mit = this->MyHelper->extraMaterials.find(idx);
           delete mit->second;
           this->MyHelper->extraMaterials.erase(mit);
@@ -1093,16 +1095,78 @@ void vtkMantaPolyDataMapper::MakeMantaProperties(vtkPolyData *input, bool allow)
       if (sit == this->MyHelper->extrasSpecs.end())
         {
         //new, or replacement, make and insert
-        //cerr << "NEW MATERIAL " << idx << " = " << spec << endl;
-        Manta::Material *newMat = vtkMantaProperty::ManufactureMaterial(spec);
-        if (!newMat)
+        if (ipa && spec == "interface")
           {
-          newMat = vtkMantaProperty::ManufactureMaterial("Flat 0 0 1");
+          missed_interfaces.push_back(idx);
+          }
+        else
+          {
+          newMat = vtkMantaProperty::ManufactureMaterial(spec);
+          if (!newMat)
+            {
+            newMat = vtkMantaProperty::ManufactureMaterial("Flat 0 0 1"); //ala GL blue
+            }
           }
         this->MyHelper->extraMaterials[idx] = newMat;
         this->MyHelper->extrasSpecs[idx] = spec;
         this->Modified();
         }
       }
+
+    //now combine parent materials to make interface materials
+    std::map<std::pair<int, int>, int> overrides;
+    vtkIntArray * inInterfaceIDs = vtkIntArray::SafeDownCast
+      (input->GetFieldData()->GetArray("interface_ids") );
+    vtkStringArray * inInterfaceSpecs = vtkStringArray::SafeDownCast
+      (input->GetFieldData()->GetAbstractArray("interface_properties") );
+    if (inInterfaceIDs && inInterfaceSpecs)
+      {
+      int nOverrides = inInterfaceIDs->GetNumberOfTuples();
+      for (int i = 0; i < nOverrides; i++)
+        {
+        double *old = inInterfaceIDs->GetTuple2(i);
+        int pid0 = (int)old[0];
+        int pid1 = (int)old[1];
+        std::pair <int,int> p = std::make_pair(pid0,pid1);
+        overrides[p] = i;
+        }
+      }
+
+    for (int i = 0; i < missed_interfaces.size(); i++)
+      {
+      int idx = missed_interfaces[i];
+      double dpids[2];
+      int pid0, pid1;
+      ipa->GetTuple(idx, dpids);
+      pid0 = (int)dpids[0];
+      pid1 = (int)dpids[1];
+
+      std::pair <int,int> p = std::make_pair(pid0,pid1);
+      if (overrides.find(p) != overrides.end())
+        {
+        int location = overrides[p];
+        std::string spec = inInterfaceSpecs->GetValue(location);
+        newMat = vtkMantaProperty::ManufactureMaterial(spec);
+        if (!newMat)
+          {
+          newMat = vtkMantaProperty::ManufactureMaterial("Flat 0 0 1"); //ala GL blue
+          }
+        }
+      else
+        {
+        std::string spec0 = this->MyHelper->extrasSpecs[pid0];
+        std::string spec1 = this->MyHelper->extrasSpecs[pid1];
+        //cerr << "parents of " << idx << " are " 
+        //     << pid0 << "(" << pmat0 << ") " << spec0 << "," 
+        //     << pid1 << "(" << pmat1 << ") " << spec1 << endl;
+        newMat = vtkMantaProperty::CombineMaterials(spec0, spec1);
+        if (!newMat)
+          {
+          newMat = vtkMantaProperty::ManufactureMaterial("Flat 0 0 1"); //ala GL blue
+          }
+        }
+      this->MyHelper->extraMaterials[idx] = newMat;
+      }
     }
+
 }

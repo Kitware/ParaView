@@ -2040,6 +2040,19 @@ found and the point will be rejected.</Documentation>
         <Documentation>This the name of the output material ancestry id field data array</Documentation>
       </StringVectorProperty>
 
+      <StringVectorProperty command="SetInterfacePropertiesName"
+                            default_values="interface_properties"
+                            name="InterfacePropertiesName"
+                            number_of_elements="1">
+        <Documentation>This the name of the input interface property field data array</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty command="SetInterfaceIDsName"
+                            default_values="interface_ids"
+                            name="InterfaceIDsName"
+                            number_of_elements="1">
+        <Documentation>This the name of the input and output interface id field data array</Documentation>
+      </StringVectorProperty>
 
       <!-- End DataSetRegionSurfaceFilter -->
     </SourceProxy>

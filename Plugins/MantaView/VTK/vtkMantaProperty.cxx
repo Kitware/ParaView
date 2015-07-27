@@ -66,26 +66,20 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkObjectFactory.h"
 
+#include <cstring>
+
 #include <Core/Color/RGBColor.h>
 #include <Engine/Control/RTRT.h>
-//#include <Model/Materials/AmbientOcclusion.h>
 #include <Model/Materials/Dielectric.h>
 #include <Model/Materials/Flat.h>
 #include <Model/Materials/Lambertian.h>
+#include <Model/Materials/Transparent.h>
 #include <Model/Materials/MetalMaterial.h>
 #include <Model/Materials/Phong.h>
 #include <Model/Materials/ThinDielectric.h>
 #include <Model/Materials/Transparent.h>
-#include <Model/Textures/Constant.h>
 
-#include <cstring>
-#include <Model/Materials/Dielectric.h>
-#include <Model/Materials/Flat.h>
-#include <Model/Materials/Lambertian.h>
-#include <Model/Materials/Transparent.h>
-#include <Model/Materials/MetalMaterial.h>
-#include <Model/Materials/Phong.h>
-#include <Model/Materials/ThinDielectric.h>
+#include <Model/Textures/Constant.h>
 #include <vtksys/ios/sstream>
 
 //============================================================================
@@ -482,4 +476,76 @@ Manta::Material *vtkMantaProperty::ManufactureMaterial(std::string spec)
     cerr << "WARNING unrecognized material " << spec << endl;
     }
   return newMat;
+}
+
+//------------------------------------------------------------------------------
+Manta::Material *vtkMantaProperty::CombineMaterials(std::string mom, 
+                                                    std::string dad)
+{
+  std::string msheader;
+  std::istringstream ms(mom);
+  ms >> msheader;
+  if (ms.fail())
+    {
+    vtkGenericWarningMacro("WARNING unrecognized material " << mom);
+    return NULL;
+    }
+  //mommy's alright
+  std::string mrheader;
+  std::istringstream mr(dad);
+  mr >> mrheader;
+  if (mr.fail())
+    {
+    vtkGenericWarningMacro("WARNING unrecognized material " << mr);
+    return NULL;
+    }
+  //daddy's alright
+
+  double R1, G1, B1;
+  double R2, G2, B2;
+  double N11, N21;
+  double N12, N22;
+  double L1, L2;
+
+  if (msheader == "Dielectric" && mrheader == "Dielectric")
+    {
+    ms >> R1 >> G1 >> B1 >> N11 >> N21 >> L1;
+    if (ms.fail())
+      {
+      cerr << "WARNING unrecognized material " << mom << endl;
+      return NULL;
+      }
+    mr >> R2 >> G2 >> B2 >> N12 >> N22 >> L2;
+    if (mr.fail())
+      {
+      cerr << "WARNING unrecognized material " << dad << endl;
+      return NULL;
+      }
+    //they just seem a little weird
+    double N1 = N11;
+    double N2 = N22;
+    double R = (R1+R2)/2;
+    double G = (G1+G2)/2;
+    double B = (B1+B2)/2;
+    double L = (L1+L2)/2;
+    return new Manta::Dielectric
+      (
+       N1,
+       N2,
+       Manta::Color(Manta::RGBColor(R,G,B)),
+       L
+       );
+    }
+
+  if (msheader == "Dielectric")
+    {
+    return vtkMantaProperty::ManufactureMaterial(dad);
+    }
+  if (mrheader == "Dielectric")
+    {
+    return vtkMantaProperty::ManufactureMaterial(mom);
+    }
+
+  //mother knows best
+  return vtkMantaProperty::ManufactureMaterial(mom);
 }

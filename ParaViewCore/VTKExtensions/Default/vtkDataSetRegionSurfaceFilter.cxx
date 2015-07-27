@@ -62,6 +62,10 @@ vtkDataSetRegionSurfaceFilter::vtkDataSetRegionSurfaceFilter()
   this->SetMaterialIDsName("material_ids");
   this->MaterialPIDsName = 0;
   this->SetMaterialPIDsName("material_ancestors");
+  this->InterfacePropertiesName = 0;
+  this->SetInterfacePropertiesName("interface_properties");
+  this->InterfaceIDsName = 0;
+  this->SetInterfaceIDsName("interface_ids");
   this->OrigCellIds = vtkIdTypeArray::New();
   this->OrigCellIds->SetName("OrigCellIds");
   this->OrigCellIds->SetNumberOfComponents(1);
@@ -79,6 +83,8 @@ vtkDataSetRegionSurfaceFilter::~vtkDataSetRegionSurfaceFilter()
   this->SetMaterialPropertiesName(0);
   this->SetMaterialIDsName(0);
   this->SetMaterialPIDsName(0);
+  this->SetInterfacePropertiesName(0);
+  this->SetInterfaceIDsName(0);
   this->OrigCellIds->Delete();
   this->CellFaceIds->Delete();
   delete this->Internal;
@@ -782,7 +788,7 @@ int vtkDataSetRegionSurfaceFilter::UnstructuredGridExecute(vtkDataSet *dataSetIn
       (input->GetFieldData()->GetArray(this->GetMaterialIDsName()));
     //make a map for quick lookup of material spec for each material later
     std::map<int, int> reverseids;
-    if (inMaterialIDs)
+    if (inMaterialIDs && inMaterialSpecs)
       {
       for (int i = 0; i < inMaterialSpecs->GetNumberOfTuples(); i++)
         {
@@ -817,10 +823,10 @@ int vtkDataSetRegionSurfaceFilter::UnstructuredGridExecute(vtkDataSet *dataSetIn
       int pid1 = this->Internal->OldToNew[it->first.second];
       outMatPIDs->SetTuple2(index, pid0, pid1);
 
-      if (inMaterialSpecs)
+      if (inMaterialSpecs && outMaterialSpecs)
         {
         //keep record of material specifications
-        if (pid1 == -1)
+        if (pid1 == -1 && inMaterialSpecs)
           {
           //copy border materials across
           int location = reverseids[pid0_orig];
@@ -832,6 +838,27 @@ int vtkDataSetRegionSurfaceFilter::UnstructuredGridExecute(vtkDataSet *dataSetIn
           //make a note for materials with two parents
           outMaterialSpecs->SetValue(index, "interface");
           }
+        }
+      }
+
+    //translate any user provided interfaces too
+    vtkIntArray * inInterfaceIDs = vtkIntArray::SafeDownCast
+      (input->GetFieldData()->GetArray(this->GetInterfaceIDsName()) );
+    if (inInterfaceIDs)
+      {
+      int nOverrides = inInterfaceIDs->GetNumberOfTuples();
+      vtkIntArray * outInterfaceIDs = vtkIntArray::New();
+      outInterfaceIDs->SetName(this->GetInterfaceIDsName());
+      outInterfaceIDs->SetNumberOfComponents(2);
+      outInterfaceIDs->SetNumberOfTuples(nOverrides);
+      output->GetFieldData()->AddArray(outInterfaceIDs);
+      outInterfaceIDs->Delete();
+      for (int i = 0; i < nOverrides; i++)
+        {
+        double *old = inInterfaceIDs->GetTuple2(i);
+        int pid0 = this->Internal->OldToNew[(int)old[0]];
+        int pid1 = this->Internal->OldToNew[(int)old[1]];
+        outInterfaceIDs->SetTuple2(i, pid0, pid1);
         }
       }
     }
