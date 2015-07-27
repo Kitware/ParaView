@@ -198,9 +198,20 @@ private slots:
   /// Updates the state of all the buttons, apply/reset/delete.
   void updateButtonState();
 
+  /// Updates enabled state for buttons on panel (other than
+  /// apply/reset/delete);
+  void updateButtonEnableState();
+
   /// called when vtkPVGeneralSettings instance is modified. We update the
   /// auto-apply status.
   void generalSettingsChanged();
+
+  void copyProperties();
+  void pasteProperties();
+  void copyDisplay();
+  void pasteDisplay();
+  void copyView();
+  void pasteView();
 
 protected:
   /// Update the panel to show the widgets for the given pair.

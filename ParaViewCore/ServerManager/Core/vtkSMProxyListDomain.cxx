@@ -125,6 +125,12 @@ const char* vtkSMProxyListDomain::GetProxyName(unsigned int cc)
 }
 
 //-----------------------------------------------------------------------------
+const char* vtkSMProxyListDomain::GetProxyName(vtkSMProxy* proxy)
+{
+  return proxy? proxy->GetXMLName() : NULL;
+}
+
+//-----------------------------------------------------------------------------
 int vtkSMProxyListDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values)
 {
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(prop);
@@ -214,6 +220,24 @@ vtkSMProxy* vtkSMProxyListDomain::GetProxy(unsigned int index)
     return 0;
     }
   return this->Internals->ProxyList[index].GetPointer();
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxy* vtkSMProxyListDomain::FindProxy(const char* xmlgroup, const char* xmlname)
+{
+  vtkSMProxyListDomainInternals::VectorOfProxies::iterator iter;
+  for (iter = this->Internals->ProxyList.begin();
+    xmlgroup != NULL && xmlname != NULL && iter != this->Internals->ProxyList.end(); iter++)
+    {
+    if (iter->GetPointer() &&
+      iter->GetPointer()->GetXMLGroup() && iter->GetPointer()->GetXMLName() &&
+      strcmp(iter->GetPointer()->GetXMLGroup(), xmlgroup) == 0 &&
+      strcmp(iter->GetPointer()->GetXMLName(), xmlname) == 0)
+      {
+      return iter->GetPointer();
+      }
+    }
+  return NULL;
 }
 
 //-----------------------------------------------------------------------------
