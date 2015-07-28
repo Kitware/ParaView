@@ -125,7 +125,7 @@ int vtkCellPointsFilter::ExecuteCompositeDataSet(vtkCompositeDataSet* input,
     {
     totInputs++;
     }
-  double i = 0;
+  int i = 0;
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
     vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
@@ -140,7 +140,7 @@ int vtkCellPointsFilter::ExecuteCompositeDataSet(vtkCompositeDataSet* input,
       this->UpdateProgress(static_cast<double> (i++) / totInputs);
       }
     }
-  return 1;
+  return i;
 }
 //----------------------------------------------------------------------------
 int vtkCellPointsFilter::RequestData(vtkInformation* request,
@@ -207,18 +207,13 @@ int vtkCellPointsFilter::RequestCompositeData(vtkInformation*,
     }
 
   vtkAppendPolyData* append = vtkAppendPolyData::New();
-  //int numInputs = 0;
-
-  int retVal = 0;
   if (this->ExecuteCompositeDataSet(input, append))
     {
     append->Update();
     output->ShallowCopy(append->GetOutput());
     append->Delete();
-    retVal = 1;
     }
-
-  return retVal;
+  return 1;
 }
 //----------------------------------------------------------------------------
 vtkExecutive* vtkCellPointsFilter::CreateDefaultExecutive()
