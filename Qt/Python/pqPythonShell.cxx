@@ -49,6 +49,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTextCharFormat>
 #include <QVBoxLayout>
 
+QStringList pqPythonShell::Preamble;
+
 class pqPythonShellCompleter : public pqConsoleWidgetCompleter
 {
   vtkWeakPointer<vtkPythonInteractiveInterpreter> Interpreter;
@@ -206,6 +208,12 @@ pqPythonShell::pqPythonShell(QWidget* parentObject, Qt::WindowFlags _flags):
   Prompted(false),
   Executing(false)
 {
+  // The default preamble loads paraview.simple:
+  if (pqPythonShell::Preamble.empty())
+    {
+    pqPythonShell::Preamble += "from paraview.simple import *";
+    }
+
   QObject::connect(this, SIGNAL(executing(bool)), this, SLOT(setExecuting(bool)));
 
   this->setObjectName("pythonShell");
@@ -250,9 +258,15 @@ void pqPythonShell::setupInterpreter()
   this->printString(
     QString("Python %1 on %2\n").arg(Py_GetVersion()).arg(Py_GetPlatform()),
     OUTPUT);
-  this->prompt();
-  this->printString("from paraview.simple import *\n");
-  this->pushScript("from paraview.simple import *");
+
+  // Note that we assume each line of the preamble is a complete statement
+  // (i.e., no multi-line statements):
+  foreach (QString line, this->Preamble)
+    {
+    this->prompt();
+    this->printString(line + "\n");
+    this->pushScript(line);
+    }
   this->prompt();
 }
 
@@ -295,6 +309,11 @@ void pqPythonShell::printString(const QString& text, pqPythonShell::PrintMode mo
     // printString by itself should never affect the Prompt, just whether it
     // needs to be shown.
     }
+}
+//-----------------------------------------------------------------------------
+void pqPythonShell::setPreamble(const QStringList& statements)
+{
+  pqPythonShell::Preamble = statements;
 }
 
 //-----------------------------------------------------------------------------
