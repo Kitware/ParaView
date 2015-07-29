@@ -132,6 +132,8 @@ set (Module_SRCS
   pqShowWidgetDecorator.h
   pqExportReaction.cxx
   pqExportReaction.h
+  pqFileNamePropertyWidget.cxx
+  pqFileNamePropertyWidget.h
   pqFiltersMenuReaction.cxx
   pqFiltersMenuReaction.h
   pqFixPathsInStateFilesBehavior.cxx
@@ -330,6 +332,7 @@ set (Module_MOC_HDRS
   pqEnableWidgetDecorator.h
   pqShowWidgetDecorator.h
   pqExportReaction.h
+  pqFileNamePropertyWidget.h
   pqFiltersMenuReaction.h
   pqFixPathsInStateFilesBehavior.h
   pqFontPropertyWidget.h

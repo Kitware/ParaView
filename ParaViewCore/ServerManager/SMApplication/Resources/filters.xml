@@ -329,14 +329,20 @@
       <StringVectorProperty command="SetFileName"
                             name="FileName"
                             default_values=""
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_widget="filename_annotation">
         <Documentation>Annotation of file name.</Documentation>
+        <FileNameDomain name="filename">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </FileNameDomain>
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="visibility"
                                    property="DisplayFileName"
                                    value="1" />
-          <!-- enable this widget when DisplayFileName==2 -->
+          <!-- enable this widget when DisplayFileName==1 -->
         </Hints>
       </StringVectorProperty>
       <Hints>

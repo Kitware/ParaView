@@ -56,10 +56,10 @@ set (Module_SRCS
   vtkSMDoubleRangeDomain.cxx
   vtkSMDoubleVectorProperty.cxx
   vtkSMEnumerationDomain.cxx
-  vtkSMEnvironmentAnnotationProxy.cxx
   vtkSMExtentDomain.cxx
   vtkSMFieldDataDomain.cxx
   vtkSMFileListDomain.cxx
+  vtkSMFileNameDomain.cxx
   vtkSMFixedTypeDomain.cxx
   vtkSMGlobalPropertiesLinkUndoElement.cxx
   vtkSMGlobalPropertiesProxy.cxx
