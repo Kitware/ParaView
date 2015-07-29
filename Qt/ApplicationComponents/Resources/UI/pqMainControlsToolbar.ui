@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>350</width>
-    <height>45</height>
+    <width>414</width>
+    <height>52</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,14 +21,14 @@
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
      <normaloff>:/pqWidgets/Icons/pqOpen24.png</normaloff>:/pqWidgets/Icons/pqOpen24.png</iconset>
    </property>
-   <property name="PV_MUST_BE_MASTER_TO_SHOW" stdset="0">
-    <bool>true</bool>
-   </property>
    <property name="text">
     <string>Open...</string>
    </property>
    <property name="statusTip">
     <string>Open</string>
+   </property>
+   <property name="PV_MUST_BE_MASTER_TO_SHOW" stdset="0">
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionSaveData">
@@ -109,7 +109,7 @@
     <string>Apply changes to parameters automatically</string>
    </property>
   </action>
- <action name="actionQuery">
+  <action name="actionQuery">
    <property name="checkable">
     <bool>false</bool>
    </property>
@@ -118,13 +118,25 @@
    </property>
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqFindData24.png</normaloff>:/pqWidgets/Icons/pqSelectBlock24.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqFindData24.png</normaloff>:/pqWidgets/Icons/pqFindData24.png</iconset>
    </property>
    <property name="text">
     <string>Find data...</string>
    </property>
    <property name="toolTip">
-     <string>Find data matching various criteria from the current source (v)</string>
+    <string>Find data matching various criteria from the current source (v)</string>
+   </property>
+  </action>
+  <action name="actionLoadPalette">
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqPalette32.png</normaloff>:/pqWidgets/Icons/pqPalette32.png</iconset>
+   </property>
+   <property name="text">
+    <string>Load Palette</string>
+   </property>
+   <property name="toolTip">
+    <string>Load a color palette</string>
    </property>
   </action>
   <addaction name="actionOpenData"/>
@@ -136,10 +148,11 @@
   <addaction name="actionUndo"/>
   <addaction name="actionRedo"/>
   <addaction name="separator"/>
-  <addaction name="actionAutoApply"/>
-  <addaction name="separator"/>
   <addaction name="actionHelp"/>
-  <addaction name="actionQuery" />
+  <addaction name="separator"/>
+  <addaction name="actionAutoApply"/>
+  <addaction name="actionQuery"/>
+  <addaction name="actionLoadPalette"/>
  </widget>
  <resources>
   <include location="../../../Components/Resources/pqComponents.qrc"/>
