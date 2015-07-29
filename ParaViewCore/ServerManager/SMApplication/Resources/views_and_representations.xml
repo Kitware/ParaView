@@ -2246,6 +2246,9 @@
                          name="UseGradientBackground"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
+        <Hints>
+          <GlobalPropertyLink type="ColorPalette" property="UseGradientBackground" />
+        </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetTexturedBackground"
                          default_values="0"

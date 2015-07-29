@@ -2250,18 +2250,8 @@
                            min="0 0 0"
                            name="range" />
         <Documentation>
-          Color used for the edges when using 'Surface With Wireframe' representation.
+          Color used for the edges when using 'Surface With Edges' representation.
         </Documentation>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty default_values="0.32 0.34 0.43"
-                            label="Background"
-                            name="BackgroundColor"
-                            number_of_elements="3"
-                            panel_widget="color_selector">
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-        <Documentation>Color used as background for the view.</Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty default_values="1.0 1.0 1.0"
                             label="Text"
@@ -2294,6 +2284,52 @@
                            name="range" />
         <Documentation>Color used for showing interactive selection.</Documentation>
       </DoubleVectorProperty>
+      <IntVectorProperty name="UseGradientBackground"
+                         label="Use Gradient Background"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable gradient background.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty default_values="0.32 0.34 0.43"
+                            label="Background"
+                            name="BackgroundColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Documentation>Color used as background for the view.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.32 0.34 0.43"
+                            label="Background 2"
+                            name="BackgroundColor2"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Documentation>Color used as the 2nd color for gradient backgrounds.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseGradientBackground" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="Selection">
+        <Property name="SelectionColor" />
+        <Property name="InteractiveSelectionColor" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Background">
+        <Property name="UseGradientBackground" />
+        <Property name="BackgroundColor" />
+        <Property name="BackgroundColor2" />
+      </PropertyGroup>
+
       <Property name="LoadPalette"
         panel_widget="color_palette_selector">
         <Documentation>
@@ -2435,8 +2471,8 @@
     <!-- End of group "misc" -->
   </ProxyGroup>
   <ProxyGroup name="palettes">
-    <Proxy label="Screen"
-           name="Screen">
+    <!-- ================================================================= -->
+    <Proxy label="Default Background" name="DefaultBackground">
       <DoubleVectorProperty default_values="1.0 1.0 1.0"
                             name="ForegroundColor"
                             number_of_elements="3"></DoubleVectorProperty>
@@ -2455,10 +2491,13 @@
       <DoubleVectorProperty default_values="0.0 0.0 0.5"
                             name="EdgeColor"
                             number_of_elements="3"></DoubleVectorProperty>
-      <!-- End of (palettes, Screen) -->
+      <IntVectorProperty    default_values="0"
+                            name="UseGradientBackground"
+                            number_of_elements="1"></IntVectorProperty>
     </Proxy>
-    <Proxy label="Print"
-           name="Print">
+
+    <!-- ================================================================= -->
+    <Proxy label="Print Background" name="PrintBackground">
       <DoubleVectorProperty default_values="0.0 0.0 0.0"
                             name="ForegroundColor"
                             number_of_elements="3"></DoubleVectorProperty>
@@ -2477,8 +2516,70 @@
       <DoubleVectorProperty default_values="0.0 0.0 0.5"
                             name="EdgeColor"
                             number_of_elements="3"></DoubleVectorProperty>
+      <IntVectorProperty    default_values="0"
+                            name="UseGradientBackground"
+                            number_of_elements="1"></IntVectorProperty>
       <!-- End of (palettes, Print) -->
     </Proxy>
+
+    <!-- ================================================================= -->
+    <Proxy label="Gray Background" name="GrayBackground"
+      base_proxygroup="palettes"  base_proxyname="DefaultBackground" />
+
+    <!-- ================================================================= -->
+    <Proxy label="White Background" name="WhiteBackground"
+      base_proxygroup="palettes"  base_proxyname="PrintBackground" />
+
+    <!-- ================================================================= -->
+    <Proxy label="Black Background" name="BlackBackground">
+      <DoubleVectorProperty default_values="0 0 0"
+                            name="BackgroundColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="SurfaceColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="TextAnnotationColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 0.0 1.0"
+                            name="SelectionColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.0 0.0 0.5"
+                            name="EdgeColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <IntVectorProperty    default_values="0"
+                            name="UseGradientBackground"
+                            number_of_elements="1"></IntVectorProperty>
+    </Proxy>
+
+    <!-- ================================================================= -->
+    <Proxy label="Gradient Background" name="GradientBackground">
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="ForegroundColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.32 0.34 0.43"
+                            name="BackgroundColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0 0 0.16"
+                            name="BackgroundColor2"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="SurfaceColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="TextAnnotationColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 0.0 1.0"
+                            name="SelectionColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.0 0.0 0.5"
+                            name="EdgeColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <IntVectorProperty    default_values="1"
+                            name="UseGradientBackground"
+                            number_of_elements="1"></IntVectorProperty>
+    </Proxy>
+
     <!-- End of group "palettes" -->
   </ProxyGroup>
   <ProxyGroup name="exporters">
