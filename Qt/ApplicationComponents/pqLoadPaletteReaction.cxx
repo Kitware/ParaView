@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqApplicationSettingsReaction.h"
 #include "pqUndoStack.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkSmartPointer.h"
@@ -91,24 +92,32 @@ void pqLoadPaletteReaction::populateMenu()
       actn->setProperty("PV_XML_NAME", iter->GetProxyName());
       }
     }
+  menu->addAction("Edit Current Palette ...");
 }
 
 //-----------------------------------------------------------------------------
 void pqLoadPaletteReaction::actionTriggered(QAction* actn)
 {
-  vtkSMSessionProxyManager* pxm = pqActiveObjects::instance().proxyManager();
-  Q_ASSERT(pxm);
+  if (actn->property("PV_XML_NAME").isValid())
+    {
+    vtkSMSessionProxyManager* pxm = pqActiveObjects::instance().proxyManager();
+    Q_ASSERT(pxm);
 
-  vtkSMProxy* paletteProxy = pxm->GetProxy("global_properties", "ColorPalette");
+    vtkSMProxy* paletteProxy = pxm->GetProxy("global_properties", "ColorPalette");
 
-  vtkSMProxy* palettePrototype = pxm->GetPrototypeProxy("palettes",
-    actn->property("PV_XML_NAME").toString().toLatin1().data());
-  Q_ASSERT(palettePrototype);
+    vtkSMProxy* palettePrototype = pxm->GetPrototypeProxy("palettes",
+      actn->property("PV_XML_NAME").toString().toLatin1().data());
+    Q_ASSERT(palettePrototype);
 
-  BEGIN_UNDO_SET("Load color palette");
-  paletteProxy->Copy(palettePrototype);
-  paletteProxy->UpdateVTKObjects();
-  END_UNDO_SET();
+    BEGIN_UNDO_SET("Load color palette");
+    paletteProxy->Copy(palettePrototype);
+    paletteProxy->UpdateVTKObjects();
+    END_UNDO_SET();
 
-  pqApplicationCore::instance()->render();
+    pqApplicationCore::instance()->render();
+    }
+  else
+    {
+    pqApplicationSettingsReaction::showApplicationSettingsDialog("Color Palette");
+    }
 }

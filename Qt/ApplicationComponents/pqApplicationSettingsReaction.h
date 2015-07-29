@@ -50,7 +50,7 @@ public:
   virtual ~pqApplicationSettingsReaction();
 
   /// Show the application settings dialog.
-  static void showApplicationSettingsDialog();
+  static void showApplicationSettingsDialog(const QString& tabName="");
 
 protected:
   /// Called when the action is triggered.

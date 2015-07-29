@@ -51,6 +51,10 @@ public:
   pqSettingsDialog(QWidget* parent=0, Qt::WindowFlags flags=0);
   virtual ~pqSettingsDialog();
 
+  /// Make the tab with the given title text current, if possible.
+  /// Does nothing if title is invalid or not present.
+  void showTab(const QString& title);
+
 private slots:
   void clicked(QAbstractButton*);
   void onAccepted();
