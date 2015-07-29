@@ -125,6 +125,10 @@ signals:
   /// Fired to indicate the positions for the two frames need to be swapped.
   void swapPositions(const QString& other);
 
+  /// Internal signal, fired to notify the target
+  /// pqViewFrame instance that the drag operation has completed.
+  void finishDrag(pqViewFrame* source);
+
 public slots:
   /// set whether the border is visible.
   void setBorderVisibility(bool val)
@@ -157,7 +161,6 @@ protected:
   /// methods to manage drag-drop.
   void drag();
   void dragEnter(QDragEnterEvent*);
-  void dragMove(QDragMoveEvent*);
   void drop(QDropEvent*);
 
 protected slots:
@@ -189,6 +192,8 @@ private:
 
   class pqInternals;
   const QScopedPointer<pqInternals> Internals;
+private slots:
+  void finishedDrag(pqViewFrame* source);
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(pqViewFrame::StandardButtons);

@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqViewFrame.h"
 
 #include "pqSetName.h"
-
 #include <QAction>
 #include <QApplication>
 #include <QDrag>
@@ -302,9 +301,10 @@ void pqViewFrame::contextMenuRequested(const QPoint& point)
 //-----------------------------------------------------------------------------
 bool pqViewFrame::eventFilter(QObject* caller, QEvent* evt)
 {
+  Q_UNUSED(caller);
   if (evt->type() == QEvent::MouseButtonPress)
     {
-    QMouseEvent *mouseEvent=(QMouseEvent*)evt;
+    QMouseEvent *mouseEvent = reinterpret_cast<QMouseEvent*>(evt);
     if (mouseEvent->button() == Qt::LeftButton)
       {
       this->DragStartPosition = mouseEvent->pos();
@@ -312,31 +312,28 @@ bool pqViewFrame::eventFilter(QObject* caller, QEvent* evt)
     }
   else if(evt->type() == QEvent::MouseMove)
     {
-    QMouseEvent *mouseEvent=(QMouseEvent*)evt;
+    QMouseEvent *mouseEvent = reinterpret_cast<QMouseEvent*>(evt);
     if ((mouseEvent->buttons() & Qt::LeftButton) &&
       (mouseEvent->pos() - this->DragStartPosition).manhattanLength()
       >= QApplication::startDragDistance())
       {
       this->drag();
+      return true;
       }
     }
   else if(evt->type() == QEvent::DragEnter)
     {
     QDragEnterEvent* de=reinterpret_cast<QDragEnterEvent*>(evt);
     this->dragEnter(de);
-    }
-  else if(evt->type() == QEvent::DragMove)
-    {
-    QDragMoveEvent* de=reinterpret_cast<QDragMoveEvent*>(evt);
-    this->dragMove(de);
+    return true;
     }
   else if(evt->type() == QEvent::Drop)
     {
     QDropEvent* de=reinterpret_cast<QDropEvent*>(evt);
     this->drop(de);
+    return true;
     }
-
-  return this->Superclass::eventFilter(caller, evt);
+  return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -344,69 +341,54 @@ void pqViewFrame::drag()
 {
   QPixmap pixmap(":/pqWidgets/Icons/pqWindow16.png");
 
-  QByteArray output;
-  QDataStream dataStream(&output, QIODevice::WriteOnly);
-  dataStream << this->uniqueID();
-
   QMimeData *mimeData = new QMimeData;
-  QString mimeType = QString("application/paraview3/%1").arg(getpid());
-  mimeData->setData(mimeType, output);
+  mimeData->setText(QString("application/paraview3/%1").arg(getpid()));
 
-  QDrag *dragObj = new QDrag(this);
+  QPointer<QDrag> dragObj = new QDrag(this);
   dragObj->setMimeData(mimeData);
   dragObj->setHotSpot(QPoint(pixmap.width()/2, pixmap.height()/2));
   dragObj->setPixmap(pixmap);
-  dragObj->start();
+  if (dragObj->exec() == Qt::MoveAction)
+    {
+    // Let the target know that the drag operation has concluded.
+    emit this->finishDrag(this);
+    }
+  // It seems we are not supposed to call delete on QDrag. It gets deleted on
+  // its own. Calling delete was causing segfaults on Linux in obscure call
+  // stack.
+  // delete dragObj.
 }
 
 //-----------------------------------------------------------------------------
 void pqViewFrame::dragEnter(QDragEnterEvent* evt)
 {
   QString mimeType = QString("application/paraview3/%1").arg(getpid());
-  if (evt->mimeData()->hasFormat(mimeType))
+  if (evt->source() != this &&
+    evt->mimeData()->hasText() && evt->mimeData()->text() == mimeType)
     {
-    evt->accept();
-    }
-  else
-    {
-    evt->ignore();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqViewFrame::dragMove(QDragMoveEvent* evt)
-{
-  QString mimeType = QString("application/paraview3/%1").arg(getpid());
-  if (evt->mimeData()->hasFormat(mimeType))
-    {
-    evt->accept();
-    }
-  else
-    {
-    evt->ignore();
+    evt->acceptProposedAction();
     }
 }
 
 //-----------------------------------------------------------------------------
 void pqViewFrame::drop(QDropEvent* evt)
 {
+  pqViewFrame* source = qobject_cast<pqViewFrame*>(evt->source());
   QString mimeType = QString("application/paraview3/%1").arg(getpid());
-  if (evt->mimeData()->hasFormat(mimeType))
+  if (source && source != this &&
+    evt->mimeData()->hasText() && evt->mimeData()->text() == mimeType)
     {
-    QByteArray input= evt->mimeData()->data(mimeType);
-    QDataStream dataStream(&input, QIODevice::ReadOnly);
-    QUuid otherUID;
-    dataStream>>otherUID;
-    if (otherUID != this->uniqueID())
-      {
-      this->swapPositions(otherUID.toString());
-      }
-    evt->accept();
+    this->connect(source, SIGNAL(finishDrag(pqViewFrame*)),
+      SLOT(finishedDrag(pqViewFrame*)));
+    evt->acceptProposedAction();
     }
-  else
-    {
-    evt->ignore();
-    }
+}
+
+//-----------------------------------------------------------------------------
+void pqViewFrame::finishedDrag(pqViewFrame* source)
+{
+  Q_ASSERT(source != NULL);
+  emit this->swapPositions(source->uniqueID().toString());
 }
 
 //-----------------------------------------------------------------------------
