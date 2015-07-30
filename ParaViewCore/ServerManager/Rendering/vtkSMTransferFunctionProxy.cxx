@@ -264,6 +264,12 @@ bool vtkSMTransferFunctionProxy::RescaleTransferFunction(
     return false;
     }
 
+  vtkSMCoreUtilities::AdjustRange(rangeMin, rangeMax);
+  if (rangeMax < rangeMin)
+    {
+    return false;
+    }
+
   vtkSMPropertyHelper cntrlPoints(controlPointsProperty);
   unsigned int num_elements = cntrlPoints.GetNumberOfElements();
   if (num_elements == 0)
