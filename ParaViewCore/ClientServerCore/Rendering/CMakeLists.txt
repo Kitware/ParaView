@@ -71,6 +71,7 @@ set (Module_SRCS
   vtkPVImplicitPlaneRepresentation.cxx
   vtkPVLastSelectionInformation.cxx
   vtkPVMultiSliceView.cxx
+  vtkPVOpenGLInformation.cxx
   vtkPVOpenGLExtensionsInformation.cxx
   vtkPVOrthographicSliceView.cxx
   vtkPVParallelCoordinatesRepresentation.cxx
