@@ -36,10 +36,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataQueryReaction.h"
 #include "pqHelpReaction.h"
 #include "pqLoadDataReaction.h"
+#include "pqLoadPaletteReaction.h"
 #include "pqSaveDataReaction.h"
 #include "pqServerConnectReaction.h"
 #include "pqServerDisconnectReaction.h"
 #include "pqUndoRedoReaction.h"
+
+#include <QToolButton>
 
 //-----------------------------------------------------------------------------
 void pqMainControlsToolbar::constructor()
@@ -55,4 +58,11 @@ void pqMainControlsToolbar::constructor()
   new pqHelpReaction(ui.actionHelp);
   new pqAutoApplyReaction(ui.actionAutoApply);
   new pqDataQueryReaction(ui.actionQuery);
+  new pqLoadPaletteReaction(ui.actionLoadPalette);
+
+  QToolButton* tb = qobject_cast<QToolButton*>(this->widgetForAction(ui.actionLoadPalette));
+  if (tb)
+    {
+    tb->setPopupMode(QToolButton::InstantPopup);
+    }
 }

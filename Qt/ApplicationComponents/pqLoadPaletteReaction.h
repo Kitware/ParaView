@@ -1,14 +1,14 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqApplicationSettingsReaction.h
+   Module:  pqLoadPaletteReaction.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -29,40 +29,32 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqApplicationSettingsReaction_h 
-#define __pqApplicationSettingsReaction_h
+#ifndef pqLoadPaletteReaction_h
+#define pqLoadPaletteReaction_h
 
 #include "pqReaction.h"
-#include <QPointer>
-
-class pqSettingsDialog;
 
 /// @ingroup Reactions
-/// pqApplicationSettingsReaction is a reaction to popup the application
-/// settings dialog. It creates pqSettingsDialog when required.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqApplicationSettingsReaction : public pqReaction
+/// pqLoadPaletteReaction is used to setup an action that allows the user to
+/// load a palette. It setups up menu on the parent action which is populated
+/// with available palettes.
+class PQAPPLICATIONCOMPONENTS_EXPORT pqLoadPaletteReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
 public:
-  /// Constructor. Parent cannot be NULL.
-  pqApplicationSettingsReaction(QAction* parent);
-  virtual ~pqApplicationSettingsReaction();
-
-  /// Show the application settings dialog.
-  static void showApplicationSettingsDialog(const QString& tabName="");
+  pqLoadPaletteReaction(QAction* parent=0);
+  virtual ~pqLoadPaletteReaction();
 
 protected:
-  /// Called when the action is triggered.
-  virtual void onTriggered()
-    { pqApplicationSettingsReaction::showApplicationSettingsDialog(); }
+  virtual void updateEnableState();
+
+private slots:
+  void populateMenu();
+  void actionTriggered(QAction* actn);
 
 private:
-  Q_DISABLE_COPY(pqApplicationSettingsReaction)
-
-  static QPointer<pqSettingsDialog> Dialog;
+  Q_DISABLE_COPY(pqLoadPaletteReaction);
 };
 
 #endif
-
-

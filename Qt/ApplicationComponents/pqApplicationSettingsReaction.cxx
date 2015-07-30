@@ -50,7 +50,7 @@ pqApplicationSettingsReaction::~pqApplicationSettingsReaction()
 }
 
 //-----------------------------------------------------------------------------
-void pqApplicationSettingsReaction::showApplicationSettingsDialog()
+void pqApplicationSettingsReaction::showApplicationSettingsDialog(const QString& tabName)
 {
   if (!pqApplicationSettingsReaction::Dialog)
     {
@@ -61,4 +61,5 @@ void pqApplicationSettingsReaction::showApplicationSettingsDialog()
     }
   pqApplicationSettingsReaction::Dialog->show();
   pqApplicationSettingsReaction::Dialog->raise();
+  pqApplicationSettingsReaction::Dialog->showTab(tabName);
 }

@@ -352,3 +352,20 @@ void pqSettingsDialog::saveInQSettings(
     settings->setValue(key, vtkSMPropertyHelper(smproperty).GetAsString());
     }
 }
+
+//-----------------------------------------------------------------------------
+void pqSettingsDialog::showTab(const QString& title)
+{
+  if (!title.isEmpty())
+    {
+    Ui::SettingsDialog &ui = this->Internals->Ui;
+    for (int cc=0; cc < ui.tabBar->count(); ++cc)
+      {
+      if (ui.tabBar->tabText(cc) == title)
+        {
+        ui.tabBar->setCurrentIndex(cc);
+        break;
+        }
+      }
+    }
+}

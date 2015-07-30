@@ -156,6 +156,8 @@ set (Module_SRCS
   pqListPropertyWidget.h
   pqLoadDataReaction.cxx
   pqLoadDataReaction.h
+  pqLoadPaletteReaction.cxx
+  pqLoadPaletteReaction.h
   pqLoadStateReaction.cxx
   pqLoadStateReaction.h
   pqLoadRestoreWindowLayoutReaction.cxx
@@ -341,6 +343,7 @@ set (Module_MOC_HDRS
   pqListPropertyWidget.h
   pqLoadDataReaction.h
   pqLoadRestoreWindowLayoutReaction.h
+  pqLoadPaletteReaction.h
   pqLoadStateReaction.h
   pqMainControlsToolbar.h
   pqManageCustomFiltersReaction.h
