@@ -169,6 +169,10 @@ void pqSGWritersMenuManager::createMenu()
   vtkSMSessionProxyManager* pxm =
       vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
 
+  if (pxm == NULL)
+    {
+    return;
+    }
   vtkSMProxyDefinitionManager* proxyDefinitions =
     pxm->GetProxyDefinitionManager();
 
