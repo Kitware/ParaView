@@ -60,6 +60,8 @@ public:
   const std::string& GetVersion();
   const std::string& GetRenderer();
 
+  bool GetLocalDisplay();
+
 protected:
   vtkPVOpenGLInformation();
   ~vtkPVOpenGLInformation();
@@ -70,11 +72,15 @@ protected:
 
   void SetRenderer();
 
+  void SetLocalDisplay(bool);
+
 
 
 private:
   vtkPVOpenGLInformation(const vtkPVOpenGLInformation&); // Not implemented
   void operator=(const vtkPVOpenGLInformation&); // Not implemented
+
+bool LocalDisplay;
 
 std::string Vendor;
 std::string Version;

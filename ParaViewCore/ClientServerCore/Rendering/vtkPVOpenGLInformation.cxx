@@ -12,8 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#ifdef VTKGL2
+  #include "vtk_glew.h"
+#else
+  #include "vtkOpenGLExtensionManager.h"
+  #include "vtkOpenGLExtensionManagerConfigure.h"
+  #include "vtkgl.h"
+#endif
 
-// Include vtkPython.h first to avoid warnings:
 #include "vtkPVConfig.h"
 #include "vtkPVOpenGLInformation.h"
 
@@ -25,10 +31,6 @@
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
 #include "vtkNew.h"
-
-#include "vtkOpenGLExtensionManager.h"
-#include "vtkOpenGLExtensionManagerConfigure.h"
-#include "vtkgl.h"
 
 #include <sstream>
 #include <string>
@@ -46,6 +48,10 @@ vtkStandardNewMacro(vtkPVOpenGLInformation);
 vtkPVOpenGLInformation::vtkPVOpenGLInformation()
 {
   this->RootOnly = 1;
+  this->LocalDisplay = false;
+  this->Vendor = "Information Unavailable";
+  this->Version = "Information Unavailable";
+  this->Renderer = "Information Unavailable";
 }
 
 //----------------------------------------------------------------------------
@@ -63,9 +69,13 @@ void vtkPVOpenGLInformation::CopyFromObject(vtkObject* obj)
     renWin->SetOffScreenRendering(1);
     renWin->Render();
     }
-  this->SetVendor();
-  this->SetVersion();
-  this->SetRenderer();
+  this->SetLocalDisplay(vtkPVDisplayInformation::CanOpenDisplayLocally());
+  if (this->LocalDisplay)
+  {
+    this->SetVendor();
+    this->SetVersion();
+    this->SetRenderer();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -161,6 +171,18 @@ void vtkPVOpenGLInformation::SetVersion()
 void vtkPVOpenGLInformation::SetRenderer()
 {
   this->Renderer = std::string(safes(glGetString(GL_RENDERER)));
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVOpenGLInformation::GetLocalDisplay()
+{
+  return this->LocalDisplay;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVOpenGLInformation::SetLocalDisplay(bool val)
+{
+  this->LocalDisplay = val;
 }
 
 #undef safes
