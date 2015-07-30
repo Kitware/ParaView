@@ -74,6 +74,16 @@ void vtkCameraManipulator::OnMouseMove(int, int, vtkRenderer*,
 }
 
 //-------------------------------------------------------------------------
+void vtkCameraManipulator::OnKeyUp(vtkRenderWindowInteractor*)
+{
+}
+
+//-------------------------------------------------------------------------
+void vtkCameraManipulator::OnKeyDown(vtkRenderWindowInteractor*)
+{
+}
+
+//-------------------------------------------------------------------------
 void vtkCameraManipulator::ComputeDisplayCenter(vtkRenderer *ren)
 {
   double *pt;

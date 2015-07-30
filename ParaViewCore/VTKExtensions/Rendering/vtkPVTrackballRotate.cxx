@@ -32,6 +32,7 @@ vtkPVTrackballRotate::vtkPVTrackballRotate()
   this->Center[2] = 0;
   this->DisplayCenter[0] = 0;
   this->DisplayCenter[1] = 0;
+  this->KeyCode = 0;
 }
 
 //-------------------------------------------------------------------------
@@ -87,15 +88,44 @@ void vtkPVTrackballRotate::OnMouseMove(int x, int y, vtkRenderer *ren,
   int dx = rwi->GetLastEventPosition()[0] - x;
   int dy = rwi->GetLastEventPosition()[1] - y;
 
-  // azimuth
   camera->OrthogonalizeViewUp();
-  double *viewUp = camera->GetViewUp();
   int *size = ren->GetSize();
-  transform->RotateWXYZ(360.0 * dx / size[0] * this->RotationFactor, viewUp[0], viewUp[1], viewUp[2]);
 
-  // elevation
-  vtkMath::Cross(camera->GetDirectionOfProjection(), viewUp, v2);
-  transform->RotateWXYZ(-360.0 * dy / size[1] * this->RotationFactor, v2[0], v2[1], v2[2]);
+  if (this->GetKeyCode() == 'x' || this->GetKeyCode() == 'y' || this->GetKeyCode() == 'z' ||
+    this->GetKeyCode() == 'X' || this->GetKeyCode() == 'Y' || this->GetKeyCode() == 'Z')
+    {
+    bool use_dx = std::abs(dx) > std::abs(dy);
+    double delta = 360 *  this->RotationFactor * (use_dx?  dx * 1.0 / size[0] : dy * -1.0 / size[1]);
+    double axis[3] = { 0, 0, 0 };
+    switch (this->GetKeyCode())
+      {
+    case 'x':
+    case 'X':
+      axis[0] = 1.0;
+      break;
+    case 'y':
+    case 'Y':
+      axis[1] = 1.0;
+      break;
+    case 'z':
+    case 'Z':
+      axis[2] = 1.0;
+      break;
+    default:
+      abort();
+      }
+    transform->RotateWXYZ(delta, axis[0], axis[1], axis[2]);
+    }
+  else
+    {
+    // azimuth
+    double *viewUp = camera->GetViewUp();
+    transform->RotateWXYZ(360.0 * dx / size[0] * this->RotationFactor, viewUp[0], viewUp[1], viewUp[2]);
+
+    // elevation
+    vtkMath::Cross(camera->GetDirectionOfProjection(), viewUp, v2);
+    transform->RotateWXYZ(-360.0 * dy / size[1] * this->RotationFactor, v2[0], v2[1], v2[2]);
+    }
 
   // translate back
   transform->Translate(-this->Center[0]/scale, -this->Center[1]/scale, -this->Center[2]/scale);
@@ -113,6 +143,24 @@ void vtkPVTrackballRotate::OnMouseMove(int x, int y, vtkRenderer *ren,
 
   rwi->Render();
   transform->Delete();
+}
+
+//-------------------------------------------------------------------------
+void vtkPVTrackballRotate::OnKeyUp(vtkRenderWindowInteractor* iren)
+{
+  if (iren->GetKeyCode() == this->KeyCode)
+    {
+    this->KeyCode = 0;
+    }
+}
+
+//-------------------------------------------------------------------------
+void vtkPVTrackballRotate::OnKeyDown(vtkRenderWindowInteractor* iren)
+{
+  if (this->KeyCode == 0)
+    {
+    this->KeyCode = iren->GetKeyCode();
+    }
 }
 
 //-------------------------------------------------------------------------

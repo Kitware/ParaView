@@ -51,6 +51,13 @@ public:
                           vtkRenderWindowInteractor *iren);
 
   // Description:
+  // These methods are called on all registered manipulators, not just the
+  // active one. Hence, these should just be used to record state and not
+  // perform any interactions.
+  virtual void OnKeyUp(vtkRenderWindowInteractor* iren);
+  virtual void OnKeyDown(vtkRenderWindowInteractor* iren);
+
+  // Description:
   // These settings determine which button and modifiers the
   // manipulator responds to. Button can be either 1 (left), 2
   // (middle), and 3 right.
