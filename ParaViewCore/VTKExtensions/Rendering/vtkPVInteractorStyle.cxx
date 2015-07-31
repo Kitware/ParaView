@@ -231,6 +231,32 @@ void vtkPVInteractorStyle::ResetLights()
 }
 
 //-------------------------------------------------------------------------
+void vtkPVInteractorStyle::OnKeyDown()
+{
+  // Look for a matching camera interactor.
+  this->CameraManipulators->InitTraversal();
+  vtkCameraManipulator* manipulator = NULL;
+  while ((manipulator = (vtkCameraManipulator*)
+                        this->CameraManipulators->GetNextItemAsObject()))
+    {
+    manipulator->OnKeyDown(this->Interactor);
+    }
+}
+
+//-------------------------------------------------------------------------
+void vtkPVInteractorStyle::OnKeyUp()
+{
+  // Look for a matching camera interactor.
+  this->CameraManipulators->InitTraversal();
+  vtkCameraManipulator* manipulator = NULL;
+  while ((manipulator = (vtkCameraManipulator*)
+                        this->CameraManipulators->GetNextItemAsObject()))
+    {
+    manipulator->OnKeyUp(this->Interactor);
+    }
+}
+
+//-------------------------------------------------------------------------
 void vtkPVInteractorStyle::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

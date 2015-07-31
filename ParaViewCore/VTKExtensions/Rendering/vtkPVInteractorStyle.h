@@ -49,6 +49,13 @@ public:
   virtual void OnRightButtonUp();
 
   // Description:
+  // Unlike mouse events, these are forwarded to all camera manipulators
+  // since we don't have a mechanism to activate a manipulator by key presses
+  // currently.
+  virtual void OnKeyDown();
+  virtual void OnKeyUp();
+
+  // Description:
   // Overrides superclass behaviors to only support the key codes that make
   // sense in a ParaView application.
   virtual void OnChar();
