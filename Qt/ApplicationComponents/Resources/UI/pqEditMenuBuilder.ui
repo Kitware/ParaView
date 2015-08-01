@@ -78,9 +78,8 @@
   </action>
   <action name="actionCopy">
    <property name="icon">
-    <iconset>
-     <normaloff/>
-    </iconset>
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqCopy22.png</normaloff>:/pqWidgets/Icons/pqCopy22.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Copy</string>
@@ -91,9 +90,8 @@
   </action>
   <action name="actionPaste">
    <property name="icon">
-    <iconset>
-     <normaloff/>
-    </iconset>
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqPaste22.png</normaloff>:/pqWidgets/Icons/pqPaste22.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Paste</string>
@@ -159,7 +157,7 @@
     <string>Find data matching various criteria from the current source (v).</string>
    </property>
    <property name="shortcut">
-     <string>v</string>
+    <string>V</string>
    </property>
   </action>
   <addaction name="actionEditUndo"/>
@@ -168,7 +166,7 @@
   <addaction name="actionEditCameraUndo"/>
   <addaction name="actionEditCameraRedo"/>
   <addaction name="separator"/>
-  <addaction name="actionQuery" />
+  <addaction name="actionQuery"/>
   <addaction name="actionChangeInput"/>
   <addaction name="actionCopy"/>
   <addaction name="actionPaste"/>

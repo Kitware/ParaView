@@ -39,9 +39,8 @@
   </action>
   <action name="actionPBCopy">
    <property name="icon">
-    <iconset>
-     <normaloff/>
-    </iconset>
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqCopy22.png</normaloff>:/pqWidgets/Icons/pqCopy22.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Copy</string>
@@ -52,9 +51,8 @@
   </action>
   <action name="actionPBPaste">
    <property name="icon">
-    <iconset>
-     <normaloff/>
-    </iconset>
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqPaste22.png</normaloff>:/pqWidgets/Icons/pqPaste22.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Paste</string>
