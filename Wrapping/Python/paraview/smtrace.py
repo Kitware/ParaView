@@ -347,6 +347,7 @@ class Accessor(object):
 
     def finalize(self):
         Trace.unregister_accessor(self)
+        self.__Object = None
 
     def __str__(self):
         return self.Varname
