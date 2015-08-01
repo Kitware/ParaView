@@ -102,9 +102,8 @@
   </action>
   <action name="actionDelete">
    <property name="icon">
-    <iconset>
-     <normaloff/>
-    </iconset>
+    <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
+     <normaloff>:/QtWidgets/Icons/pqDelete24.png</normaloff>:/QtWidgets/Icons/pqDelete24.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Delete</string>
@@ -147,6 +146,10 @@
    </property>
   </action>
   <action name="actionQuery">
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqFindData32.png</normaloff>:/pqWidgets/Icons/pqFindData32.png</iconset>
+   </property>
    <property name="text">
     <string>Find Data...</string>
    </property>
@@ -178,6 +181,7 @@
  </widget>
  <resources>
   <include location="../../../Components/Resources/pqComponents.qrc"/>
+  <include location="../../../Widgets/Resources/QtWidgets.qrc"/>
  </resources>
  <connections/>
 </ui>

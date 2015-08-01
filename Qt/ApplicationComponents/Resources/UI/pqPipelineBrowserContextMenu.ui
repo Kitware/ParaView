@@ -26,9 +26,8 @@
   </action>
   <action name="actionPBDelete">
    <property name="icon">
-    <iconset>
-     <normaloff/>
-    </iconset>
+    <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
+     <normaloff>:/QtWidgets/Icons/pqDelete24.png</normaloff>:/QtWidgets/Icons/pqDelete24.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Delete</string>
@@ -111,7 +110,7 @@
  </widget>
  <resources>
   <include location="../../../Components/Resources/pqComponents.qrc"/>
-  <include location="../../../Components/Resources/pqComponents.qrc"/>
+  <include location="../../../Widgets/Resources/QtWidgets.qrc"/>
  </resources>
  <connections/>
 </ui>
