@@ -951,7 +951,6 @@ class ExportView(TraceItem):
 
         viewAccessor = Trace.get_accessor(view)
         exporterAccessor = ProxyAccessor("temporaryExporter", exporter)
-        exporterAccessor.finalize() # so that it will get deleted
 
         trace = TraceOutput()
         trace.append("# export view")
@@ -959,6 +958,7 @@ class ExportView(TraceItem):
             exporterAccessor.trace_ctor("ExportView", ExporterProxyFilter(),
               ctor_args="'%s', view=%s" % (filename, viewAccessor),
               skip_assignment=True))
+        exporterAccessor.finalize() # so that it will get deleted
         del exporterAccessor
         Trace.Output.append_separated(trace.raw_data())
 
@@ -970,7 +970,6 @@ class SaveData(TraceItem):
         sourceAccessor = Trace.get_accessor(source)
         writer = sm._getPyProxy(writer)
         writerAccessor = ProxyAccessor("temporaryWriter", writer)
-        writerAccessor.finalize() # so that it will get deleted.
 
         if port > 0:
             ctor_args_1 = "OutputPort(%s, %d)" % (sourceAccessor, port)
@@ -983,6 +982,7 @@ class SaveData(TraceItem):
             writerAccessor.trace_ctor("SaveData", WriterProxyFilter(),
               ctor_args="'%s', proxy=%s" % (filename, ctor_args_1),
               skip_assignment=True))
+        writerAccessor.finalize() # so that it will get deleted.
         del writerAccessor
         del writer
         Trace.Output.append_separated(trace.raw_data())
