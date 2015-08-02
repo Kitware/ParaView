@@ -1982,6 +1982,27 @@ found and the point will be rejected.</Documentation>
         a surface for the material on each side.</Documentation>
       </IntVectorProperty>
 
+      <StringVectorProperty command="SetMaterialPropertiesName"
+                            default_values="material_properties"
+                            name="MaterialPropertiesName"
+                            number_of_elements="1">
+        <Documentation>This the name of the input material property field data array</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty command="SetMaterialIDsName"
+                            default_values="material_ids"
+                            name="MaterialIDsName"
+                            number_of_elements="1">
+        <Documentation>This the name of the input and output material id field data array</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty command="SetMaterialPIDsName"
+                            default_values="material_ancestors"
+                            name="MaterialPIDsName"
+                            number_of_elements="1">
+        <Documentation>This the name of the output material ancestry id field data array</Documentation>
+      </StringVectorProperty>
+
 
       <!-- End DataSetRegionSurfaceFilter -->
     </SourceProxy>

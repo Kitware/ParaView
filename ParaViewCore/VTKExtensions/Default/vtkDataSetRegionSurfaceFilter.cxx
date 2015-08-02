@@ -16,13 +16,14 @@
 #include "vtkGenericCell.h"
 #include "vtkIdList.h"
 #include "vtkIdTypeArray.h"
+#include "vtkIntArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-
-#include "vtkObjectFactory.h"
 #include "vtkNew.h"
+#include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkSmartPointer.h"
+#include "vtkStringArray.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkUnstructuredGridGeometryFilter.h"
 
@@ -31,10 +32,20 @@
 class vtkDataSetRegionSurfaceFilter::Internals
 {
 public:
-  Internals() : NextRegion(0) {};
+  Internals() : NextRegion(0) {
+    this->OldToNew[-1] = -1;
+  };
   ~Internals() {};
-  std::map<std::pair<int,int>, int> NewRegions;
+
+  //place to pass a material id back but still subclass
   int NextRegion;
+
+  //pair entries are two materials that a polygon bounds (-1 if external)
+  //content is index into output material array for this pair
+  std::map<std::pair<int,int>, int> NewRegions;
+
+  //map old material ids into new locations
+  std::map<int, int> OldToNew;
 };
 vtkStandardNewMacro(vtkDataSetRegionSurfaceFilter);
 
@@ -44,6 +55,13 @@ vtkDataSetRegionSurfaceFilter::vtkDataSetRegionSurfaceFilter()
 {
   this->RegionArray = 0;
   this->RegionArrayName = 0;
+  this->SetRegionArrayName("Regions");
+  this->MaterialPropertiesName = 0;
+  this->SetMaterialPropertiesName("material_properties");
+  this->MaterialIDsName = 0;
+  this->SetMaterialIDsName("material_ids");
+  this->MaterialPIDsName = 0;
+  this->SetMaterialPIDsName("material_ancestors");
   this->OrigCellIds = vtkIdTypeArray::New();
   this->OrigCellIds->SetName("OrigCellIds");
   this->OrigCellIds->SetNumberOfComponents(1);
@@ -58,6 +76,9 @@ vtkDataSetRegionSurfaceFilter::vtkDataSetRegionSurfaceFilter()
 vtkDataSetRegionSurfaceFilter::~vtkDataSetRegionSurfaceFilter()
 {
   this->SetRegionArrayName(0);
+  this->SetMaterialPropertiesName(0);
+  this->SetMaterialIDsName(0);
+  this->SetMaterialPIDsName(0);
   this->OrigCellIds->Delete();
   this->CellFaceIds->Delete();
   delete this->Internal;
@@ -722,8 +743,100 @@ int vtkDataSetRegionSurfaceFilter::UnstructuredGridExecute(vtkDataSet *dataSetIn
     outputPD->AddArray(this->OriginalPointIds);
     }
 
+  //wrangle materials
+  if (outRegionArray)
+    {
+    int nummats = this->Internal->NewRegions.size();
+
+    //place to keep track of two parent materials
+    vtkIntArray * outMatPIDs = vtkIntArray::New();
+    outMatPIDs->SetName(this->GetMaterialPIDsName());
+    outMatPIDs->SetNumberOfComponents(2);
+    outMatPIDs->SetNumberOfTuples(nummats);
+    output->GetFieldData()->AddArray(outMatPIDs);
+    outMatPIDs->Delete();
+
+    //place to copy or construct material specifications
+    vtkStringArray * outMaterialSpecs = NULL;
+    vtkStringArray * inMaterialSpecs = vtkStringArray::SafeDownCast
+      (input->GetFieldData()->GetAbstractArray
+       (this->GetMaterialPropertiesName()) );
+    if (inMaterialSpecs)
+      {
+      outMaterialSpecs = vtkStringArray::New();
+      outMaterialSpecs->SetName(this->GetMaterialPropertiesName());
+      outMaterialSpecs->SetNumberOfComponents(1);
+      outMaterialSpecs->SetNumberOfTuples(nummats);
+      output->GetFieldData()->AddArray(outMaterialSpecs);
+      outMaterialSpecs->Delete();
+      }
+
+    //indices into material specifications
+    vtkIntArray * outMaterialIDs = vtkIntArray::New();
+    outMaterialIDs->SetName(this->GetMaterialIDsName());
+    outMaterialIDs->SetNumberOfComponents(1);
+    outMaterialIDs->SetNumberOfTuples(nummats);
+    output->GetFieldData()->AddArray(outMaterialIDs);
+    outMaterialIDs->Delete();
+    vtkIntArray * inMaterialIDs = vtkIntArray::SafeDownCast
+      (input->GetFieldData()->GetArray(this->GetMaterialIDsName()));
+    //make a map for quick lookup of material spec for each material later
+    std::map<int, int> reverseids;
+    if (inMaterialIDs)
+      {
+      for (int i = 0; i < inMaterialSpecs->GetNumberOfTuples(); i++)
+        {
+        reverseids[inMaterialIDs->GetValue(i)] = i;
+        }
+      }
+    else
+      {
+      if (inMaterialSpecs)
+        {
+        for (int i = 0; i < inMaterialSpecs->GetNumberOfTuples(); i++)
+          {
+          reverseids[i] = i;
+          }
+        }
+      }
+
+    //go through all the materials we've made
+    std::map<std::pair<int,int>, int>::iterator it;
+    for (it = this->Internal->NewRegions.begin();
+         it != this->Internal->NewRegions.end();
+         it++)
+      {
+      int index = it->second;
+
+      //we created them be counting up from 0 so just do this
+      outMaterialIDs->SetValue(index, index);
+
+      //keep record of parents
+      int pid0_orig = it->first.first;
+      int pid0 = this->Internal->OldToNew[pid0_orig];
+      int pid1 = this->Internal->OldToNew[it->first.second];
+      outMatPIDs->SetTuple2(index, pid0, pid1);
+
+      if (inMaterialSpecs)
+        {
+        //keep record of material specifications
+        if (pid1 == -1)
+          {
+          //copy border materials across
+          int location = reverseids[pid0_orig];
+          outMaterialSpecs->SetValue
+            (index, inMaterialSpecs->GetValue(location));
+          }
+        else
+          {
+          //make a note for materials with two parents
+          outMaterialSpecs->SetValue(index, "interface");
+          }
+        }
+      }
+    }
+
   // Update ourselves and release memory
-  //
   cell->Delete();
   coords->Delete();
   pts->Delete();
@@ -982,16 +1095,30 @@ vtkFastGeomQuad *vtkDataSetRegionSurfaceFilter::GetNextVisibleQuadFromHash()
     }
 
   int mat1 = this->RegionArray->GetValue(quad->SourceId);
-  if (this->SingleSided)
-    {
-    //look for the quad's material
 
+  if (!this->SingleSided)
+    {
+    this->Internal->NextRegion = mat1;
+    }
+  else
+    {
+    //preserve this quad's material in isolation (external faces)
+    int matidx;
+    std::pair <int,int> p = std::make_pair(mat1,-1);
+    if (this->Internal->NewRegions.find(p) == this->Internal->NewRegions.end())
+      {
+      matidx = this->Internal->NewRegions.size();
+      this->Internal->NewRegions[p] = matidx;
+      this->Internal->OldToNew[mat1] = matidx;
+      }
+    matidx = this->Internal->NewRegions[p];
+
+    //look for this quad's twin across material interface.
     vtkFastGeomQuad *quad2;
     quad2 = quad->Next;
     int npts = quad->numPts;
     while (quad2)
       {
-      //look for the quad's twin. If one exists collapse to one
       bool match = false;
       if ((npts == 3) && (quad2->numPts == 3) &&
           ((quad->ptArray[1] == quad2->ptArray[1] && quad->ptArray[2] == quad2->ptArray[2]) ||
@@ -1010,7 +1137,7 @@ vtkFastGeomQuad *vtkDataSetRegionSurfaceFilter::GetNextVisibleQuadFromHash()
         int mat2 = this->RegionArray->GetValue(quad2->SourceId);
         if (mat2 > mat1)
           {
-          //ensure a consistent ordering for normals
+          //pick greater material to ensure a consistent ordering for normals
           quad->SourceId = quad2->SourceId;
           quad->ptArray[0] = quad2->ptArray[0];
           quad->ptArray[1] = quad2->ptArray[1];
@@ -1020,28 +1147,27 @@ vtkFastGeomQuad *vtkDataSetRegionSurfaceFilter::GetNextVisibleQuadFromHash()
             quad->ptArray[3] = quad2->ptArray[3];
             }
           }
+        //preserve the joined quad's material
         int m1 = (mat1<mat2?mat1:mat2);
         int m2 = (mat1<mat2?mat2:mat1);
-        std::pair <int,int> p = std::make_pair(m1,m2);
-        //get material interface id, or make up a new one if not yet seen
+        p = std::make_pair(m1,m2);
         if (this->Internal->NewRegions.find(p) == this->Internal->NewRegions.end())
           {
-          int val = this->RegionArray->GetRange()[1] + 1 + this->Internal->NewRegions.size();
-          this->Internal->NewRegions[p] = val;
+          matidx = this->Internal->NewRegions.size();
+          this->Internal->NewRegions[p] = matidx;
           }
-        mat1 = this->Internal->NewRegions[p];
+        matidx = this->Internal->NewRegions[p];
 
-        quad2->SourceId = -1;
+        quad2->SourceId = -1; //don't visit the twin
         quad2 = NULL;
         }
       else
-        {
+        { //not a match
         quad2 = quad2->Next;
         }
       }
+    this->Internal->NextRegion = matidx;
     }
-
-  this->Internal->NextRegion = mat1;
 
   // Now we have a quad to return.  Set the traversal to the next entry.
   this->QuadHashTraversal = quad->Next;
