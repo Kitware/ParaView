@@ -29,6 +29,7 @@
 #
 #==========================================================================
 set(Module_SRCS
+  vtkAdditionalFieldReader.cxx
   vtkAMRConnectivity.cxx
   vtkAMRDualClip.cxx
   vtkAMRDualContour.cxx

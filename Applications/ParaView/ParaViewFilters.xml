@@ -117,6 +117,7 @@
     <Proxy group="filters" name="DataSetRegionSurfaceFilter" />
   </Category>
 
+  <Proxy group="filters" name="AddFieldArrays" />
   <Proxy group="filters" name="ImageDataToAMR" />
   <Proxy group="filters" name="UniformGridPartitioner" />
   <Proxy group="filters" name="Append" />
