@@ -53,6 +53,11 @@ public:
   const char* GetProxyName(unsigned int index);
 
   // Description:
+  // If the \c proxy is part of the domain, then this returns the name used for
+  // the proxy in the domain. Returns NULL otherwise.
+  const char* GetProxyName(vtkSMProxy* proxy);
+
+  // Description:
   // This always returns true.
   virtual int IsInDomain(vtkSMProperty* property);
 
@@ -71,6 +76,10 @@ public:
   // Description:
   // Get proxy at a given index.
   vtkSMProxy* GetProxy(unsigned int index);
+
+  // Description:
+  // Find a proxy in the domain of the given group and type.
+  vtkSMProxy* FindProxy(const char* xmlgroup, const char* xmlname);
 
   // Description:
   // Removes the first occurence of the \c proxy in the domain.

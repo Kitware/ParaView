@@ -26,9 +26,8 @@
   </action>
   <action name="actionPBDelete">
    <property name="icon">
-    <iconset>
-     <normaloff/>
-    </iconset>
+    <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
+     <normaloff>:/QtWidgets/Icons/pqDelete24.png</normaloff>:/QtWidgets/Icons/pqDelete24.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Delete</string>
@@ -39,9 +38,8 @@
   </action>
   <action name="actionPBCopy">
    <property name="icon">
-    <iconset>
-     <normaloff/>
-    </iconset>
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqCopy22.png</normaloff>:/pqWidgets/Icons/pqCopy22.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Copy</string>
@@ -52,9 +50,8 @@
   </action>
   <action name="actionPBPaste">
    <property name="icon">
-    <iconset>
-     <normaloff/>
-    </iconset>
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqPaste22.png</normaloff>:/pqWidgets/Icons/pqPaste22.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Paste</string>
@@ -113,7 +110,7 @@
  </widget>
  <resources>
   <include location="../../../Components/Resources/pqComponents.qrc"/>
-  <include location="../../../Components/Resources/pqComponents.qrc"/>
+  <include location="../../../Widgets/Resources/QtWidgets.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -108,7 +108,7 @@
         <x>0</x>
         <y>0</y>
         <width>332</width>
-        <height>692</height>
+        <height>689</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="ScrollAreaLayout" stretch="0,0,0,0,0,0,1">
@@ -135,7 +135,59 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="PropertiesCopy">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>50</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Copy properties</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="../pqComponents.qrc">
+              <normaloff>:/pqWidgets/Icons/pqCopy22.png</normaloff>:/pqWidgets/Icons/pqCopy22.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="PropertiesPaste">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>50</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Paste copied properties</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="../pqComponents.qrc">
+              <normaloff>:/pqWidgets/Icons/pqPaste22.png</normaloff>:/pqWidgets/Icons/pqPaste22.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="PropertiesRestoreDefaults">
+            <property name="maximumSize">
+             <size>
+              <width>50</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="toolTip">
              <string>Restore application default setting values</string>
             </property>
@@ -146,6 +198,12 @@
           </item>
           <item>
            <widget class="QPushButton" name="PropertiesSaveAsDefaults">
+            <property name="maximumSize">
+             <size>
+              <width>50</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="toolTip">
              <string>Save current settings values as default</string>
             </property>
@@ -193,7 +251,59 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="DisplayCopy">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>50</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Copy display properties</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="../pqComponents.qrc">
+              <normaloff>:/pqWidgets/Icons/pqCopy22.png</normaloff>:/pqWidgets/Icons/pqCopy22.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="DisplayPaste">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>50</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Paste copied display properties</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="../pqComponents.qrc">
+              <normaloff>:/pqWidgets/Icons/pqPaste22.png</normaloff>:/pqWidgets/Icons/pqPaste22.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="DisplayRestoreDefaults">
+            <property name="maximumSize">
+             <size>
+              <width>50</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="toolTip">
              <string>Restore application default setting values for display</string>
             </property>
@@ -204,6 +314,12 @@
           </item>
           <item>
            <widget class="QPushButton" name="DisplaySaveAsDefaults">
+            <property name="maximumSize">
+             <size>
+              <width>50</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="toolTip">
              <string>Save current display settings values as default</string>
             </property>
@@ -251,7 +367,59 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="ViewCopy">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>50</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Copy view properties</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="../pqComponents.qrc">
+              <normaloff>:/pqWidgets/Icons/pqCopy22.png</normaloff>:/pqWidgets/Icons/pqCopy22.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="ViewPaste">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>50</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Paste view properties</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="../pqComponents.qrc">
+              <normaloff>:/pqWidgets/Icons/pqPaste22.png</normaloff>:/pqWidgets/Icons/pqPaste22.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="ViewRestoreDefaults">
+            <property name="maximumSize">
+             <size>
+              <width>50</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="toolTip">
              <string>Restore application default setting values for view</string>
             </property>
@@ -262,6 +430,12 @@
           </item>
           <item>
            <widget class="QPushButton" name="ViewSaveAsDefaults">
+            <property name="maximumSize">
+             <size>
+              <width>50</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="toolTip">
              <string>Save current view settings values as default</string>
             </property>
