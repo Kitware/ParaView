@@ -98,7 +98,7 @@ vtkSMMantaViewProxy::vtkSMMantaViewProxy()
 //-----------------------------------------------------------------------------
 vtkSMMantaViewProxy::~vtkSMMantaViewProxy()
 {
-  for (int i = 0; i < this->Internals->Lights.size(); i++)
+  for (size_t i = 0; i < this->Internals->Lights.size(); i++)
     {
     this->Internals->Lights[i]->UnRegister(this);
     }
@@ -117,7 +117,9 @@ void vtkSMMantaViewProxy::CreateVTKObjects()
   this->Superclass::CreateVTKObjects();
 
   vtkSMPropertyHelper(this, "UseLight").Set(0);
-  vtkSMPropertyHelper(this, "LightSwitch").Set(0); //disable the light renderview gives us
+
+  //disable the light renderview gives us
+  vtkSMPropertyHelper(this, "LightSwitch").Set(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -198,7 +200,8 @@ void vtkSMMantaViewProxy::PreviousLight()
 //-----------------------------------------------------------------------------
 void vtkSMMantaViewProxy::NextLight()
 {
-  if (this->Internals->CurrentLight >= this->Internals->Lights.size()-1)
+  if (static_cast<size_t>(this->Internals->CurrentLight) >=
+      this->Internals->Lights.size()-1)
     {
     return;
     }

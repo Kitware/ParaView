@@ -95,9 +95,20 @@ protected:
                           vtkInformationVector *);
 
   virtual void InsertQuadInHash(vtkIdType a, vtkIdType b, vtkIdType c,
-                                vtkIdType d, vtkIdType sourceId, vtkIdType faceId = -1);
+                                vtkIdType d, vtkIdType sourceId, vtkIdType faceId);
+  virtual void InsertQuadInHash(vtkIdType a, vtkIdType b, vtkIdType c,
+                                vtkIdType d, vtkIdType sourceId)
+  {
+    this->InsertQuadInHash(a,b,c,d,sourceId, -1); //for -Woverloaded-virtual comp warning
+  }
+
   virtual void InsertTriInHash(vtkIdType a, vtkIdType b, vtkIdType c,
-                       vtkIdType sourceId, vtkIdType faceId = -1);
+                       vtkIdType sourceId, vtkIdType faceId);
+  virtual void InsertTriInHash(vtkIdType a, vtkIdType b, vtkIdType c,
+                       vtkIdType sourceId)
+  {
+    this->InsertTriInHash(a,b,c,sourceId, -1); //for -Woverloaded-virtual comp warning
+  }
 
   virtual vtkFastGeomQuad *GetNextVisibleQuadFromHash();
 

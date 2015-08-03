@@ -752,7 +752,7 @@ int vtkDataSetRegionSurfaceFilter::UnstructuredGridExecute(vtkDataSet *dataSetIn
   //wrangle materials
   if (outRegionArray)
     {
-    int nummats = this->Internal->NewRegions.size();
+    int nummats = static_cast<int>(this->Internal->NewRegions.size());
 
     //place to keep track of two parent materials
     vtkIntArray * outMatPIDs = vtkIntArray::New();
@@ -790,7 +790,7 @@ int vtkDataSetRegionSurfaceFilter::UnstructuredGridExecute(vtkDataSet *dataSetIn
     std::map<int, int> reverseids;
     if (inMaterialIDs && inMaterialSpecs)
       {
-      for (int i = 0; i < inMaterialSpecs->GetNumberOfTuples(); i++)
+      for (i = 0; i < inMaterialSpecs->GetNumberOfTuples(); i++)
         {
         reverseids[inMaterialIDs->GetValue(i)] = i;
         }
@@ -799,7 +799,7 @@ int vtkDataSetRegionSurfaceFilter::UnstructuredGridExecute(vtkDataSet *dataSetIn
       {
       if (inMaterialSpecs)
         {
-        for (int i = 0; i < inMaterialSpecs->GetNumberOfTuples(); i++)
+        for (i = 0; i < inMaterialSpecs->GetNumberOfTuples(); i++)
           {
           reverseids[i] = i;
           }
@@ -853,7 +853,7 @@ int vtkDataSetRegionSurfaceFilter::UnstructuredGridExecute(vtkDataSet *dataSetIn
       outInterfaceIDs->SetNumberOfTuples(nOverrides);
       output->GetFieldData()->AddArray(outInterfaceIDs);
       outInterfaceIDs->Delete();
-      for (int i = 0; i < nOverrides; i++)
+      for (i = 0; i < nOverrides; i++)
         {
         double *old = inInterfaceIDs->GetTuple2(i);
         int pid0 = this->Internal->OldToNew[(int)old[0]];
@@ -1134,7 +1134,7 @@ vtkFastGeomQuad *vtkDataSetRegionSurfaceFilter::GetNextVisibleQuadFromHash()
     std::pair <int,int> p = std::make_pair(mat1,-1);
     if (this->Internal->NewRegions.find(p) == this->Internal->NewRegions.end())
       {
-      matidx = this->Internal->NewRegions.size();
+      matidx = static_cast<int>(this->Internal->NewRegions.size());
       this->Internal->NewRegions[p] = matidx;
       this->Internal->OldToNew[mat1] = matidx;
       }
@@ -1180,7 +1180,7 @@ vtkFastGeomQuad *vtkDataSetRegionSurfaceFilter::GetNextVisibleQuadFromHash()
         p = std::make_pair(m1,m2);
         if (this->Internal->NewRegions.find(p) == this->Internal->NewRegions.end())
           {
-          matidx = this->Internal->NewRegions.size();
+          matidx = static_cast<int>(this->Internal->NewRegions.size());
           this->Internal->NewRegions[p] = matidx;
           }
         matidx = this->Internal->NewRegions[p];
