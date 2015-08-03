@@ -60,7 +60,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqApplyBehavior::pqInternals
 {
 public:
-  QList<vtkWeakPointer<vtkSMRepresentationProxy> > NewlyCreatedRepresentations;
+  typedef QPair<vtkWeakPointer<vtkSMRepresentationProxy>, vtkWeakPointer<vtkSMViewProxy> > PairType;
+  QList<PairType> NewlyCreatedRepresentations;
 };
 
 //-----------------------------------------------------------------------------
@@ -172,8 +173,12 @@ void pqApplyBehavior::applied(pqPropertiesPanel*)
     view->getViewProxy()->Update();
     }
 
-  foreach (vtkSMRepresentationProxy* reprProxy, this->Internals->NewlyCreatedRepresentations)
+  vtkPVGeneralSettings* gsettings = vtkPVGeneralSettings::GetInstance();
+  foreach (const pqInternals::PairType& pair, this->Internals->NewlyCreatedRepresentations)
     {
+    vtkSMRepresentationProxy* reprProxy = pair.first;
+    vtkSMViewProxy* viewProxy = pair.second;
+
     // If not scalar coloring, we make an attempt to color using
     // 'vtkBlockColors' array, if present.
     if (vtkSMPVRepresentationProxy::SafeDownCast(reprProxy) &&
@@ -183,6 +188,10 @@ void pqApplyBehavior::applied(pqPropertiesPanel*)
       {
       vtkSMPVRepresentationProxy::SetScalarColoring(reprProxy,
         "vtkBlockColors", vtkDataObject::FIELD);
+      if (gsettings->GetScalarBarMode() == vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS)
+        {
+        vtkSMPVRepresentationProxy::SetScalarBarVisibility(reprProxy, viewProxy, true);
+        }
       }
     }
 
@@ -190,7 +199,7 @@ void pqApplyBehavior::applied(pqPropertiesPanel*)
   // If user chose it, update all transfer function data range.
   // FIXME: This should happen for all servers available.
   vtkNew<vtkSMTransferFunctionManager> tmgr;
-  int mode = vtkPVGeneralSettings::GetInstance()->GetTransferFunctionResetMode();
+  int mode = gsettings->GetTransferFunctionResetMode();
   switch (mode)
     {
   case vtkPVGeneralSettings::RESET_ON_APPLY:
@@ -298,7 +307,8 @@ void pqApplyBehavior::showData(pqPipelineSource* source, pqView* view)
 
     // Save the newly created representation for further fine-tuning in
     // pqApplyBehavior::applied().
-    this->Internals->NewlyCreatedRepresentations.push_back(reprProxy);
+    this->Internals->NewlyCreatedRepresentations.push_back(
+      pqInternals::PairType(reprProxy, preferredView));
     }
 }
 
