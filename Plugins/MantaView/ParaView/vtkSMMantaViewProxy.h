@@ -86,8 +86,20 @@ public:
     vtkSMProxy*, int opport);
 
   // Description:
+  // Manta view's can not participate in selection so disable it.
   virtual bool IsSelectionAvailable() { return false; }
 
+  // Description:
+  // Call to create a new light
+  void MakeLight();
+
+  // Description:
+  // Call to make an different light active so the user can control it.
+  void PreviousLight();
+
+  // Description:
+  // Call to make an different light active so the user can control it.
+  void NextLight();
 
 //BTX
 protected:
@@ -101,6 +113,8 @@ private:
   vtkSMMantaViewProxy(const vtkSMMantaViewProxy&); // Not implemented.
   void operator=(const vtkSMMantaViewProxy&); // Not implemented.
 
+  class Internal;
+  Internal *Internals;
 //ETX
 };
 

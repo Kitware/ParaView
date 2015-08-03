@@ -105,14 +105,134 @@
         </Documentation>
       </IntVectorProperty>
 
+      <ProxyProperty name="CurrentLight"
+                     command="SetCurrentLight"
+                     panel_widget="proxy_editor" >
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="extra_lights" name="MantaLight" />
+        </ProxyListDomain>
+        <Hints>
+          <ProxyEditorPropertyWidget />
+        </Hints>
+      </ProxyProperty>
+
+      <PropertyGroup label="Extra Lights"
+                     panel_widget="extra_lights"
+                     panel_visibility="default">
+        <Property name="CurrentLight" />
+      </PropertyGroup>
     </MantaViewProxy>
+
   </ProxyGroup>
 
-  <ProxyGroup name="camera">
-    <CameraProxy name="MantaCamera" class="vtkMantaCamera"
-      processes="client|dataserver|renderserver"
-      base_proxygroup="camera" base_proxyname="Camera" >
-    </CameraProxy>
+  <ProxyGroup name="extra_lights" label="Lights">
+    <Proxy name="MantaLight" class="vtkMantaLight"
+      processes="client|dataserver|renderserver">
+
+      <IntVectorProperty command="GetLightType"
+                         default_values="1"
+                         information_only="1"
+                         number_of_elements="1"
+                         name="LightTypeInfo">
+        <SimpleIntInformationHelper /> -->
+      </IntVectorProperty>
+      <IntVectorProperty name="LightType"
+        command="SetLightType"
+        number_of_elements="1"
+        panel_visibility="default"
+        default_values="1"
+        information_property="LightTypeInfo">
+        <EnumerationDomain name="enum">
+          <Entry text="HEADLIGHT"
+                 value="1" />
+          <Entry text="CAMERA"
+                 value="2" />
+          <Entry text="SCENE"
+                 value="3" />
+        </EnumerationDomain>
+        <Documentation>
+        Whether this light is attached the the eye, relative to the eye or fixed in world space.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="GetSwitch"
+                         default_values="1"
+                         information_only="1"
+                         name="LightSwitchInfo"
+                         number_of_elements="1">
+        <SimpleDoubleInformationHelper />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetSwitch"
+                         default_values="1"
+                         information_property="LightSwitchInfo"
+                         name="LightSwitch"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+        Turn light on or off.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="GetIntensity"
+                            default_values="1.0"
+                            information_only="1"
+                            name="LightIntensityInfo"
+                            number_of_elements="1">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetIntensity"
+                            default_values="1.0"
+                            information_property="LightIntensityInfo"
+                            name="LightIntensity"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range"
+                           resolution="0.01" />
+        <Documentation>
+        Light intensity.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="GetMantaPosition"
+                            default_values="0 0 0"
+                            information_only="1"
+                            name="LightPositionInfo"
+                            number_of_elements="3">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetMantaPosition"
+                            default_values="0 0 0"
+                            information_property="LightPositionInfo"
+                            name="LightPosition"
+                            number_of_elements="3">
+        <Documentation>
+        Relative position of light for CAMERA type, Absolute for SCENE type light.
+        </Documentation>
+     </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="GetDiffuseColor"
+                            default_values="1 1 1"
+                            information_only="1"
+                            name="LightColorInfo"
+                            number_of_elements="3">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetColor"
+                            default_values="1 1 1"
+                            ignore_synchronization="1"
+                            information_property="LightColorInfo"
+                            name="LightColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain
+            max="1 1 1"
+            min="0 0 0"
+            name="range" />
+        <Documentation>
+        RGB color of light.
+        </Documentation>
+      </DoubleVectorProperty>
+    </Proxy>
   </ProxyGroup>
 
   <ProxyGroup name="representations">

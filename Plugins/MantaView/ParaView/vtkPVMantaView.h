@@ -22,6 +22,7 @@
 #include "vtkPVRenderView.h"
 
 class vtkDataRepresentation;
+class vtkMantaLight;
 
 class VTK_EXPORT vtkPVMantaView : public vtkPVRenderView
 {
@@ -62,6 +63,10 @@ public:
   //Description:
   // World space environment map right vector
   void SetBackgroundRight(double x, double y, double z);
+
+  //Description:
+  //Make a particular light the active one. Add it to the renderer if new.
+  void SetCurrentLight(vtkMantaLight*);
 
 //BTX
 protected:
