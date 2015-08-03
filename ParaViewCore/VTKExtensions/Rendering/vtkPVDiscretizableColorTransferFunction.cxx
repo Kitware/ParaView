@@ -265,40 +265,36 @@ void vtkPVDiscretizableColorTransferFunction::Build()
     return;
     }
 
-  if (this->IndexedLookup)
+  this->ResetAnnotations();
+
+  int annotationCount = 0;
+  if (this->AnnotatedValuesInFullSet)
     {
-    //this->SetAnnotations(NULL, NULL);
-    this->ResetAnnotations();
-
-    int annotationCount = 0;
-    if (this->AnnotatedValuesInFullSet)
+    for (vtkIdType i = 0; i < this->AnnotatedValuesInFullSet->GetNumberOfTuples(); ++i)
       {
-      for (vtkIdType i = 0; i < this->AnnotatedValuesInFullSet->GetNumberOfTuples(); ++i)
+      vtkStdString annotation = this->AnnotationsInFullSet->GetValue(i);
+      vtkVariant value = this->AnnotatedValuesInFullSet->GetVariantValue(i);
+
+      bool useAnnotation = true;
+      if (this->IndexedLookup && this->UseActiveValues)
         {
-        vtkStdString annotation = this->AnnotationsInFullSet->GetValue(i);
-        vtkVariant value = this->AnnotatedValuesInFullSet->GetVariantValue(i);
-
-        bool useAnnotation = true;
-        if (this->UseActiveValues)
+        vtkIdType id = this->ActiveAnnotatedValues->LookupValue(value);
+        if (id < 0)
           {
-          vtkIdType id = this->ActiveAnnotatedValues->LookupValue(value);
-          if (id < 0)
-            {
-            useAnnotation = false;
-            }
+          useAnnotation = false;
           }
+        }
 
-        if (useAnnotation)
+      if (useAnnotation)
+        {
+        this->SetAnnotation(value, annotation);
+
+        if (i < this->IndexedColorsInFullSet->GetNumberOfTuples())
           {
-          this->SetAnnotation(value, annotation);
-
-          if (i < this->IndexedColorsInFullSet->GetNumberOfTuples())
-            {
-            double color[3];
-            this->GetIndexedColorInFullSet(i, color);
-            this->SetIndexedColor(annotationCount, color);
-            annotationCount++;
-            }
+          double color[3];
+          this->GetIndexedColorInFullSet(i, color);
+          this->SetIndexedColor(annotationCount, color);
+          annotationCount++;
           }
         }
       }
