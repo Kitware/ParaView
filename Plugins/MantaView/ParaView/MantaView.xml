@@ -12,6 +12,11 @@
         base_proxygroup="views" base_proxyname="RenderView"
         label="Manta Rendered 3D View">
 
+      <Documentation>
+        A render view subclasses to use Manta raytracing instead of OpenGL
+        rasterization for rendering.
+      </Documentation>
+
      <SubProxy>
        <Proxy name="ActiveCamera" proxyname="MantaCamera" proxygroup="camera"
               override="1">
@@ -291,7 +296,10 @@
                          processes="client|renderserver|dataserver"
                          base_proxygroup="representations"
                          base_proxyname="SurfaceRepresentation">
-    <!-- proxy that sets up manta display pipeline at vtk level -->
+
+      <Documentation>
+        A proxy that sets up manta display pipeline at vtk level.
+      </Documentation>
 
       <IntVectorProperty name="UseDataMaterial"
         command="SetAllowDataMaterial"
@@ -299,8 +307,9 @@
         default_values="1">
         <BooleanDomain name="bool" />
         <Documentation>
-        Allow cell and field data arrays named 'MantaMaterial' and
-        'MantaMaterials' respectively to define material of each cell.
+        Let cell array 'material', be a lookup into field arrays
+        'material_id' and 'material_properties' that define
+        materials of each cell.
         </Documentation>
       </IntVectorProperty>
 
@@ -317,6 +326,11 @@
           <String value="dielectric"/>
           <String value="metal"/>
         </StringListDomain>
+        <Documentation>
+        Apply the chosen Manta material to the object. This takes effect only when
+        Coloring is set to Solid Color. It has no effect when color mapping by an array.
+        Specific characteristics of the manta material are defined below.
+        </Documentation>
       </StringVectorProperty>
 
       <DoubleVectorProperty name="Reflectance"
@@ -377,6 +391,9 @@
       The hack is necessary since xml overrides didn't work
       (shared properties I think), and because at the C++
       level it is too late to change them by the time the subclass is created.
+
+      I also use this now to hide properties from the GUI that have not affect
+      on manta.
       -->
 
       <Documentation>
