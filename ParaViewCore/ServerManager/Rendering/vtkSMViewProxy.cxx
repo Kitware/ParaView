@@ -681,6 +681,12 @@ void vtkSMViewProxy::SetTransparentBackground(bool val)
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMViewProxy::GetTransparentBackground()
+{
+  return vtkSMViewProxy::TransparentBackground;
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMViewProxy::IsContextReadyForRendering()
 {
   if (vtkRenderWindow* window = this->GetRenderWindow())

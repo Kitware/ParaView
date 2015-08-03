@@ -76,6 +76,8 @@ public:
 
   // Description:
   // Fill the specified extents in the image with the given color.
+  // If the image is a 4 component image, then this method fills the 4th
+  // component with 0xff.
   static void FillImage(vtkImageData* image, const int extent[6], const unsigned char rgb[3]);
 
 //BTX

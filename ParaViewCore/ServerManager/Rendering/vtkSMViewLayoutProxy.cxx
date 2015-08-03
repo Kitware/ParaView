@@ -1038,14 +1038,15 @@ vtkImageData* vtkSMViewLayoutProxy::CaptureWindow(int magnification)
     return NULL;
     }
 
+  int numComponents = vtkSMViewProxy::GetTransparentBackground()? 4 : 3;
   vtkImageData* image = vtkImageData::New();
   image->SetExtent(extent);
-  image->AllocateScalars(VTK_UNSIGNED_CHAR, 3);
+  image->AllocateScalars(VTK_UNSIGNED_CHAR, numComponents);
 
   unsigned char* image_data =
     reinterpret_cast<unsigned char*>(image->GetScalarPointer());
   std::fill(
-    image_data, image_data + image->GetNumberOfPoints() * 3,
+    image_data, image_data + image->GetNumberOfPoints() * numComponents,
     static_cast<unsigned char>(0));
 
   unsigned char color[3];

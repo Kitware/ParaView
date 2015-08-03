@@ -321,17 +321,17 @@ void vtkSMUtilities::FillImage(vtkImageData* image, const int extent[6],
   const unsigned char rgb[3])
 {
   assert(image->GetScalarType() == VTK_UNSIGNED_CHAR);
-
+  unsigned char rgba[4] = {rgb[0], rgb[1], rgb[2], 0xFF};
   vtkImageIterator<unsigned char> iter(image, const_cast<int*>(extent));
   int num_comps = image->GetNumberOfScalarComponents();
-  int comps_to_fill = std::min(3, num_comps);
+  int comps_to_fill = std::min(4, num_comps);
   while (!iter.IsAtEnd())
     {
     unsigned char* start = iter.BeginSpan();
     unsigned char* end = iter.EndSpan();
     for (; start < end; start += num_comps)
       {
-      memcpy(start, rgb, sizeof(unsigned char) * comps_to_fill);
+      memcpy(start, rgba, sizeof(unsigned char) * comps_to_fill);
       }
     iter.NextSpan();
     }
