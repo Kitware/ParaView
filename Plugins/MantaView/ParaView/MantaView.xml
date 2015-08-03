@@ -28,7 +28,7 @@
          <Property name="CameraClippingRange" panel_visibility="never"/>
          <Property name="CameraParallelScale" panel_visibility="never"/>
          <Property name="CameraParallelScaleInfo" panel_visibility="never"/>
-         <Property name="CameraParallelProjection" panel_visibility="advanced"/>
+         <Property name="CameraParallelProjection" panel_visibility="never"/>
          <Property name="EyeAngle" panel_visibility="never"/>
          <Property name="EyeTransformMatrix" />
          <Property name="ModelTransformMatrix" />
@@ -116,11 +116,60 @@
         </Hints>
       </ProxyProperty>
 
-      <PropertyGroup label="Extra Lights"
+      <PropertyGroup label="hidden stuff"
+                     panel_widget="sir_not_appearing_in_this_film"
+                     panel_visibility="never">
+        <Property name="CenterAxesVisibility"/>
+        <Property name="AxesGrid"/>
+        <Property name="UseLight"/>
+        <!-- Key Light -->
+        <Property name="KeyLightWarmth"/>
+        <Property name="KeyLightIntensity"/>
+        <Property name="KeyLightElevation"/>
+        <Property name="KeyLightAzimuth"/>
+        <!-- Fill Light -->
+        <Property name="FillLightWarmth"/>
+        <Property name="FillLightK:F Ratio"/>
+        <Property name="FillLightElevation"/>
+        <Property name="FillLightAzimuth"/>
+        <!-- Back Light -->
+        <Property name="BackLightWarmth"/>
+        <Property name="BackLightK:B Ratio"/>
+        <Property name="BackLightElevation"/>
+        <Property name="BackLightAzimuth"/>
+        <!-- Head Light -->
+        <Property name="HeadLightWarmth"/>
+        <Property name="HeadLightK:H Ratio"/>
+        <Property name="MaintainLuminance"/>
+        <!-- Light -->
+        <Property name="LightSwitch"/>
+        <Property name="LightAmbientColor"/>
+        <Property name="LightSpecularColor"/>
+        <Property name="LightDiffuseColor"/>
+        <Property name="LightIntensity"/>
+        <Property name="LightType"/>
+      </PropertyGroup>
+
+      <PropertyGroup label="Manta Lights"
                      panel_widget="extra_lights"
                      panel_visibility="default">
         <Property name="CurrentLight" />
       </PropertyGroup>
+
+      <PropertyGroup label="Manta Background"
+                     panel_visibility="default">
+        <Property name="Background Up" />
+        <Property name="Background Right" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Manta Engine"
+                     panel_visibility="default">
+        <Property name="Threads" />
+        <Property name="EnableShadows" />
+        <Property name="Samples" />
+        <Property name="MaxDepth" />
+      </PropertyGroup>
+
     </MantaViewProxy>
 
   </ProxyGroup>
@@ -496,21 +545,21 @@
           <PropertyGroup label="Edge Styling">
             <Property name="EdgeColor"
                       panel_widget="color_selector"
-                      panel_visibility="advanced"
+                      panel_visibility="never"
                       panel_visibility_default_for_representation="Surface With Edges" />
           </PropertyGroup>
 
           <PropertyGroup label="Backface Styling">
             <Property name="BackfaceRepresentation"
-                      panel_visibility="advanced" />
+                      panel_visibility="never" />
             <Property name="BackfaceAmbientColor"
                       panel_widget="color_selector"
-                      panel_visibility="advanced" />
+                      panel_visibility="never" />
             <Property name="BackfaceDiffuseColor"
                       panel_widget="color_selector"
-                      panel_visibility="advanced" />
+                      panel_visibility="never" />
             <Property name="BackfaceOpacity"
-                      panel_visibility="advanced" />
+                      panel_visibility="never" />
           </PropertyGroup>
 
           <PropertyGroup label="Transforming">
@@ -526,7 +575,7 @@
 
           <PropertyGroup label="Miscellaneous">
             <Property name="Pickable"
-                      panel_visibility="advanced" />
+                      panel_visibility="never" />
             <Property name="StaticMode"
                       panel_visibility="never" />
             <Property name="SuppressLOD"
@@ -536,7 +585,7 @@
             <Property name="UserTransform"
                       panel_visibility="never" />
             <Property name="NonlinearSubdivisionLevel"
-                      panel_visibility="advanced" />
+                      panel_visibility="never" />
             <Property name="BlockVisibility"
                       panel_visibility="never" />
             <Property name="BlockColor"
@@ -544,7 +593,7 @@
             <Property name="BlockOpacity"
                       panel_visibility="never" />
           </PropertyGroup>
-          <PropertyGroup label="Manta Options">
+          <PropertyGroup label="Manta Materials">
             <!-- manta specific properties -->
             <Property name="UseDataMaterial" />
             <Property name="MaterialType" />
@@ -559,10 +608,11 @@
       <SubProxy>
         <Proxy name="CubeAxesRepresentation"
                proxygroup="representations"
-               proxyname="CubeAxesRepresentation"></Proxy>
+               proxyname="CubeAxesRepresentation">
+        </Proxy>
         <ExposedProperties>
           <PropertyGroup label="Cube Axes"
-                         panel_visibility="default"
+                         panel_visibility="never"
                          panel_widget="CubeAxes">
             <Property exposed_name="CubeAxesColor"
                       name="Color" />
