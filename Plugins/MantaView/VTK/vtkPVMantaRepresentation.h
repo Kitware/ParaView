@@ -96,6 +96,8 @@ public:
   double GetN();
   void SetNt(double);
   double GetNt();
+  void SetAllowDataMaterial(bool);
+  bool GetAllowDataMaterial();
 
 //BTX
 protected:

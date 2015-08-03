@@ -29,6 +29,7 @@
 #
 #==========================================================================
 set(Module_SRCS
+  vtkAdditionalFieldReader.cxx
   vtkAMRConnectivity.cxx
   vtkAMRDualClip.cxx
   vtkAMRDualContour.cxx
@@ -43,6 +44,7 @@ set(Module_SRCS
   vtkCleanUnstructuredGridCells.cxx
   vtkCleanUnstructuredGrid.cxx
   vtkCSVWriter.cxx
+  vtkDataSetRegionSurfaceFilter.cxx
   vtkEnsembleDataReader.cxx
   vtkEquivalenceSet.cxx
   vtkExodusFileSeriesReader.cxx
