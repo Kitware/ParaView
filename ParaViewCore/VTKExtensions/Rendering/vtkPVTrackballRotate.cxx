@@ -22,6 +22,8 @@
 #include "vtkRenderWindow.h"
 #include "vtkTransform.h"
 
+#include <cstdlib>
+
 vtkStandardNewMacro(vtkPVTrackballRotate);
 
 //-------------------------------------------------------------------------
