@@ -17,14 +17,16 @@
 
 #include "vtkObjectFactory.h"
 
+#include "vtkAbstractArray.h"
+#include "vtkCompositeDataSet.h"
+#include "vtkCompositeDataIterator.h"
+#include "vtkDataObject.h"
+#include "vtkDataObjectReader.h"
+#include "vtkDataSet.h"
+#include "vtkFieldData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkSmartPointer.h"
-#include "vtkDataSet.h"
-#include "vtkDataObjectReader.h"
-#include "vtkFieldData.h"
-#include "vtkDataObject.h"
-#include "vtkAbstractArray.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkAdditionalFieldReader);
@@ -59,8 +61,13 @@ int vtkAdditionalFieldReader::RequestData(
 
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
   vtkDataObject *dout = outInfo->Get(vtkDataObject::DATA_OBJECT());
-
+  vtkCompositeDataSet *cdout = vtkCompositeDataSet::SafeDownCast(dout);
+  vtkCompositeDataIterator *cditer = NULL;
   dout->ShallowCopy(din);
+  if (cdout)
+    {
+    cditer = cdout->NewIterator();
+    }
 
   if (this->FileName && strlen(this->FileName))
     {
@@ -73,11 +80,30 @@ int vtkAdditionalFieldReader::RequestData(
       return VTK_ERROR;
       }
     vtkFieldData *arrs = d->GetFieldData();
-    vtkFieldData *ofd = dout->GetFieldData();
+    vtkFieldData *ofd = NULL;
     for (int i = 0; i < arrs->GetNumberOfArrays(); i++)
       {
-      ofd->AddArray(arrs->GetAbstractArray(i));
+      if (cditer)
+        {
+        cditer->InitTraversal();
+        while (!cditer->IsDoneWithTraversal())
+          {
+          vtkDataObject *dsout = cditer->GetCurrentDataObject();
+          ofd = dsout->GetFieldData();
+          ofd->AddArray(arrs->GetAbstractArray(i));
+          cditer->GoToNextItem();
+          }
+        }
+      else
+        {
+        ofd = dout->GetFieldData();
+        ofd->AddArray(arrs->GetAbstractArray(i));
+        }
       }
+    }
+  if (cditer)
+    {
+    cditer->Delete();
     }
 
   return VTK_OK;

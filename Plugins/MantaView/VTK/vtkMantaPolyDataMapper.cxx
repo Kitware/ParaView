@@ -122,21 +122,21 @@ public:
   std::map<int, int> materialOffsets;
 
   Manta::Material* LookupMaterial
-    (Manta::Mesh *mesh, vtkIntArray *ma, vtkIdType cellNum)
+    (Manta::Mesh *mesh, vtkDataArray *ma, vtkIdType cellNum)
   {
     int offset = this->LookupMaterialID(ma, cellNum);
     return mesh->materials[offset];
   }
 
   int LookupMaterialID
-    (vtkIntArray *ma, vtkIdType cellNum)
+    (vtkDataArray *ma, vtkIdType cellNum)
   {
     //converts material ID to an offset in the mess
     //return 0 - the default material if problematic
     int offset = 0;
     if (ma && this->extraMaterials.size())
       {
-      int matID = ma->GetValue(cellNum);
+      int matID = (int)(*ma->GetTuple(cellNum));
       std::map<int, int>::iterator mit =
         this->materialOffsets.find(matID);
       if (mit != this->materialOffsets.end())
@@ -321,8 +321,7 @@ void vtkMantaPolyDataMapper::DrawPolygons(vtkPolyData *polys,
 {
   std::vector<Manta::Vector> &texCoords = this->MyHelper->texCoords;
   Manta::Material *material = NULL;
-  vtkIntArray *ma = vtkIntArray::SafeDownCast(polys->GetCellData()->
-                                              GetArray("material"));
+  vtkDataArray *ma = polys->GetCellData()->GetArray("material");
   int total_triangles = 0;
   vtkCellArray *cells = polys->GetPolys();
   vtkIdType npts = 0, *index = 0, cellNum = 0;
@@ -1061,10 +1060,9 @@ void vtkMantaPolyDataMapper::MakeMantaProperties(vtkPolyData *input, bool allow)
 
   vtkStringArray *sa = vtkStringArray::SafeDownCast
     (input->GetFieldData()->GetAbstractArray("material_properties"));
-  vtkIntArray *ida = vtkIntArray::SafeDownCast
+  vtkDataArray *ida = vtkDataArray::SafeDownCast
     (input->GetFieldData()->GetArray("material_ids"));
-  vtkIntArray *ipa = vtkIntArray::SafeDownCast
-    (input->GetFieldData()->GetArray("material_ancestors"));
+  vtkDataArray *ipa = input->GetFieldData()->GetArray("material_ancestors");
   if (sa)
     {
     std::vector<int> missed_interfaces;
@@ -1075,7 +1073,7 @@ void vtkMantaPolyDataMapper::MakeMantaProperties(vtkPolyData *input, bool allow)
       int idx = i;
       if (ida)
         {
-        idx = ida->GetValue(i);
+        idx = (int)(*ida->GetTuple(i));
         }
       std::string spec = sa->GetValue(i);
       std::map<int, std::string>::iterator sit;
@@ -1118,8 +1116,7 @@ void vtkMantaPolyDataMapper::MakeMantaProperties(vtkPolyData *input, bool allow)
 
     //now combine parent materials to make interface materials
     std::map<std::pair<int, int>, int> overrides;
-    vtkIntArray * inInterfaceIDs = vtkIntArray::SafeDownCast
-      (input->GetFieldData()->GetArray("interface_ids") );
+    vtkDataArray * inInterfaceIDs = input->GetFieldData()->GetArray("interface_ids");
     vtkStringArray * inInterfaceSpecs = vtkStringArray::SafeDownCast
       (input->GetFieldData()->GetAbstractArray("interface_properties") );
     if (inInterfaceIDs && inInterfaceSpecs)
