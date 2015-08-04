@@ -160,6 +160,7 @@ public:
   // Description:
   // Sets whether screenshots have a transparent background.
   static void SetTransparentBackground(bool val);
+  static bool GetTransparentBackground();
 
   // Description:
   // Method used to hide other representations if the view has a
