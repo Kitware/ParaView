@@ -108,7 +108,7 @@
 
       <IntVectorProperty name="BlockColorsDistinctValues"
                          number_of_elements="1"
-                         default_values="7"
+                         default_values="12"
                          command="SetBlockColorsDistinctValues"
                          panel_visibility="advanced">
         <Documentation>
