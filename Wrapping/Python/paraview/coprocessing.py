@@ -504,7 +504,8 @@ class CoProcessor(object):
         def float_limiter(x):
             #a shame, but needed to make sure python, java and (directory/file)name agree
             if isinstance(x, (float)):
-                return '%6f' % x #arbitrarily chose 6 decimal places
+                #return '%6f' % x #arbitrarily chose 6 decimal places
+                return '%.6e' % x #arbitrarily chose 6 significant digits
             else:
                 return x
 
