@@ -81,12 +81,25 @@ void pqLoadPaletteReaction::populateMenu()
   vtkSMProxyDefinitionManager* pdmgr = pxm->GetProxyDefinitionManager();
   Q_ASSERT(pdmgr);
 
+  // Add "DefaultBackground" as the first entry.
+  if (vtkSMProxy* prototype = pxm->GetPrototypeProxy("palettes", "DefaultBackground"))
+    {
+    QAction* actn = menu->addAction(prototype->GetXMLLabel());
+    actn->setProperty("PV_XML_GROUP", "palettes");
+    actn->setProperty("PV_XML_NAME", "DefaultBackground");
+    }
+
   vtkSmartPointer<vtkPVProxyDefinitionIterator> iter;
   iter.TakeReference(pdmgr->NewSingleGroupIterator("palettes"));
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
     if (vtkSMProxy* prototype = pxm->GetPrototypeProxy("palettes", iter->GetProxyName()))
       {
+      if (strcmp(prototype->GetXMLName(), "DefaultBackground") == 0)
+        {
+        // skip DefaultBackground since already added.
+        continue;
+        }
       QAction* actn = menu->addAction(prototype->GetXMLLabel());
       actn->setProperty("PV_XML_GROUP", "palettes");
       actn->setProperty("PV_XML_NAME", iter->GetProxyName());
