@@ -17,6 +17,8 @@
 // VTK includes
 #include "vtkAppendPolyData.h"
 #include "vtkBoundingBox.h"
+#include "vtkCellCenters.h"
+#include "vtkCellData.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkDataSet.h"
 #include "vtkInformation.h"
@@ -328,9 +330,21 @@ int vtkPVGlyphFilter::RequestData(
     this->Internals->UpdateWithDataset(ds, this);
     this->Internals->SynchronizeGlobalInformation(this);
 
+    if (!this->IsInputArrayToProcessValid(ds))
+      {
+      return 1;
+      }
+
     vtkPolyData* outputPD = vtkPolyData::GetData(outputVector);
     assert(outputPD);
-    return this->Execute(ds, sourceVector, outputPD)? 1 : 0;
+    if (this->UseCellCenters(ds))
+      {
+      return this->ExecuteWithCellCenters(ds, sourceVector, outputPD)? 1 : 0;
+      }
+    else
+      {
+      return this->Execute(ds, sourceVector, outputPD)? 1 : 0;
+      }
     }
   else if (cds)
     {
@@ -356,8 +370,22 @@ int vtkPVGlyphFilter::RequestData(
       vtkDataSet* currentDS = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
       if (currentDS)
         {
+        if (!this->IsInputArrayToProcessValid(currentDS))
+          {
+          continue;
+          }
+
+        bool res;
         vtkNew<vtkPolyData> outputPD;
-        if (!this->Execute(currentDS, sourceVector, outputPD.GetPointer()))
+        if (this->UseCellCenters(currentDS))
+          {
+          res = this->ExecuteWithCellCenters(currentDS, sourceVector, outputPD.GetPointer());
+          }
+        else
+          {
+         res = this->Execute(currentDS, sourceVector, outputPD.GetPointer());
+          }
+        if (!res)
           {
           vtkErrorMacro("Glyph generation failed for block: " << iter->GetCurrentFlatIndex());
           this->Internals->Reset();
@@ -376,6 +404,53 @@ int vtkPVGlyphFilter::IsPointVisible(vtkDataSet* ds, vtkIdType ptId)
 {
   return (this->Superclass::IsPointVisible(ds, ptId) != 0) &&
     (this->Internals->IsPointVisible(ds, ptId, this));
+}
+
+//-----------------------------------------------------------------------------
+bool vtkPVGlyphFilter::IsInputArrayToProcessValid(vtkDataSet* input)
+{
+  vtkDataArray* inSScalars = this->GetInputArrayToProcess(0, input);
+  vtkDataArray* inVectors = this->GetInputArrayToProcess(1, input);
+  int inSScalarsAssociation = this->GetInputArrayAssociation(0, input);
+  int inVectorsAssociation = this->GetInputArrayAssociation(1, input);
+  if (inSScalarsAssociation != inVectorsAssociation && inSScalars && inVectors)
+    {
+    std::string inSScalarsType =
+      (inSScalarsAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS ? "point" : "cell");
+    std::string inVectorsType =
+      (inVectorsAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS ? "point" : "cell");
+    vtkWarningMacro( << "Mismatched attributes:\n"
+                     << inSScalars->GetName() << " is a " << inSScalarsType << " attribute whereas "
+                     << inVectors->GetName() << " is a " << inVectorsType << " attribute.");
+    return false;
+    }
+
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+bool vtkPVGlyphFilter::UseCellCenters(vtkDataSet* input)
+{
+  int inSScalarsAssociation = this->GetInputArrayAssociation(0, input);
+  int inVectorsAssociation = this->GetInputArrayAssociation(1, input);
+  return inSScalarsAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS
+      || inVectorsAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS;
+}
+
+//-----------------------------------------------------------------------------
+bool vtkPVGlyphFilter::ExecuteWithCellCenters(vtkDataSet* input,
+                                              vtkInformationVector* sourceVector,
+                                              vtkPolyData* output)
+{
+  vtkNew<vtkCellCenters> cellCenters;
+  cellCenters->SetInputData(input);
+  cellCenters->Update();
+  input = cellCenters->GetOutput();
+  vtkDataArray* inSScalars = input->GetPointData()->GetArray(
+    this->GetInputArrayInformation(0)->Get(vtkDataObject::FIELD_NAME()));
+  vtkDataArray* inVectors = input->GetPointData()->GetArray(
+    this->GetInputArrayInformation(1)->Get(vtkDataObject::FIELD_NAME()));
+  return this->Execute(input, sourceVector, output, inSScalars, inVectors);
 }
 
 //-----------------------------------------------------------------------------

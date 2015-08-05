@@ -104,6 +104,22 @@ protected:
   // Returns 1 if point is to be glyped, otherwise returns 0.
   virtual int IsPointVisible(vtkDataSet* ds, vtkIdType ptId);
 
+  // Description:
+  // Returns true if input Scalars and Vectors are compatible, otherwise returns 0.
+  bool IsInputArrayToProcessValid(vtkDataSet* input);
+
+  // Description:
+  // Returns true if input Scalars and Vectors are cell attributes, otherwise returns 0.
+  bool UseCellCenters(vtkDataSet* input);
+
+  // Description:
+  // Method called in RequestData() to do the actual data processing. This will
+  // apply a Cell Centers before the Glyph. The \c input, filling up the \c output
+  // based on the filter parameters.
+  virtual bool ExecuteWithCellCenters(vtkDataSet* input,
+                                      vtkInformationVector* sourceVector,
+                                      vtkPolyData* output);
+
   int GlyphMode;
   int MaximumNumberOfSamplePoints;
   int Seed;

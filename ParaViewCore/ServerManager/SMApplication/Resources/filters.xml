@@ -6800,12 +6800,10 @@ cluttred.
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
         </DataTypeDomain>
-        <InputArrayDomain attribute_type="point"
-                          name="input_array1"
+        <InputArrayDomain name="input_array1"
                           number_of_components="1"
                           optional="1" />
-        <InputArrayDomain attribute_type="point"
-                          name="input_array2"
+        <InputArrayDomain name="input_array2"
                           number_of_components="3"
                           optional="1" />
         <Documentation>
@@ -6840,17 +6838,25 @@ dataset from which the points are selecetd to be glyphed.
         placed at the points in the input dataset.</Documentation>
       </InputProperty>
       <StringVectorProperty command="SetInputArrayToProcess"
+                            default_values="0"
                             element_types="0 0 0 0 2"
                             name="Scalars"
                             number_of_elements="5">
         <ArrayListDomain attribute_type="Scalars"
                          input_domain_name="input_array1"
-                         name="array_list">
+                         name="array_list"
+                         none_string="None">
           <RequiredProperties>
             <Property function="Input"
                       name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
         <Documentation>
 Select the input array to be treated as the active **Scalars**.  You
 can scale the glyphs using the selected scalars by setting the **Scale
@@ -6865,12 +6871,19 @@ Mode** property to **scalar**.
         <!-- default value=1 so normals go to the right place -->
         <ArrayListDomain attribute_type="Vectors"
                          input_domain_name="input_array2"
-                         name="array_list">
+                         name="array_list"
+                         none_string="None">
           <RequiredProperties>
             <Property function="Input"
                       name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
         <Documentation>
 Select the input array to be treated as the active **Vectors**.  You can
 scale the glyphs using the selected vectors by setting the **Scale
