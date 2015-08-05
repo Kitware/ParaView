@@ -158,7 +158,8 @@
       <IntVectorProperty command="SetUseBelowRangeColor"
                          default_values="0"
                          name="UseBelowRangeColor"
-                         number_of_elements="1" >
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
         <BooleanDomain name="bool" />
         <Documentation>
           Use special color to use when a data value is below the range of the color map.
@@ -168,7 +169,8 @@
                             default_values="0 0 0"
                             name="BelowRangeColor"
                             number_of_elements="3"
-                            panel_widget="color_selector" >
+                            panel_widget="color_selector"
+                            panel_visibility="advanced" >
         <Documentation>
           Set the color to use when a data value is below the range of the color map.
         </Documentation>
@@ -181,7 +183,8 @@
       <IntVectorProperty command="SetUseAboveRangeColor"
                          default_values="0"
                          name="UseAboveRangeColor"
-                         number_of_elements="1" >
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
         <BooleanDomain name="bool" />
         <Documentation>
           Use special color to use when a data value is above the range of the color map.
@@ -191,7 +194,8 @@
                             default_values="1 1 1"
                             name="AboveRangeColor"
                             number_of_elements="3"
-                            panel_widget="color_selector" >
+                            panel_widget="color_selector"
+                            panel_visibility="advanced" >
         <Documentation>
           Set the color to use when a data value is above the range of the color map.
         </Documentation>
