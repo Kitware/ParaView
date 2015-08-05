@@ -40,32 +40,10 @@ vtkSMInputFileNameDomain::~vtkSMInputFileNameDomain()
   this->FileName = 0;
 }
 
-//---------------------------------------------------------------------------
-int vtkSMInputFileNameDomain::IsInDomain(vtkSMProperty* property)
-{
-  if (this->IsOptional)
-    {
-    return 1;
-    }
-
-  if (!property)
-    {
-    return 0;
-    }
-  vtkSMStringVectorProperty* sp = vtkSMStringVectorProperty::SafeDownCast(property);
-  if (sp)
-    {
-    return 1;
-    }
-
-  return 0;
-}
-
 
 //---------------------------------------------------------------------------
 void vtkSMInputFileNameDomain::Update(vtkSMProperty* vtkNotUsed(prop))
 {
-
   vtkSMProperty* propForInput = this->GetRequiredProperty("Input");
   if (!propForInput)
     {
@@ -86,6 +64,30 @@ void vtkSMInputFileNameDomain::Update(vtkSMProperty* vtkNotUsed(prop))
       return;
       }
     }
+}
+
+
+//---------------------------------------------------------------------------
+int vtkSMInputFileNameDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values)
+{
+  vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(prop);
+  if (svp)
+    {
+    vtkSMPropertyHelper helper(prop);
+    helper.SetUseUnchecked(use_unchecked_values);
+    const char* defaultValue = svp->GetDefaultValue(0);
+    unsigned int temp;
+    if (defaultValue && this->IsInDomain(defaultValue, temp))
+      {
+      helper.Set(0, defaultValue);
+      }
+    else
+      {
+      helper.Set(0, "(No File Name)");
+      }
+    return 1;  
+    }
+  return 0;
 }
 
 

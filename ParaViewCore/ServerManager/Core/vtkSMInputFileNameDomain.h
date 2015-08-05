@@ -26,26 +26,31 @@
 #define __vtkSMInputFileNameDomain_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
-#include "vtkSMDomain.h"
+#include "vtkSMStringListDomain.h"
 
-class VTKPVSERVERMANAGERCORE_EXPORT vtkSMInputFileNameDomain : public vtkSMDomain
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMInputFileNameDomain : public vtkSMStringListDomain
 {
 public:
   static vtkSMInputFileNameDomain* New();
   vtkTypeMacro(vtkSMInputFileNameDomain, vtkSMDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Returns true if the value of the property is in the domain.
-  // The propery has to be a vtkSMStringVectorProperty. If in 
-  // the domain, it returns 1. It returns 0 otherwise.
-  virtual int IsInDomain(vtkSMProperty*);
-
   // Update self checking the "unchecked" values of all required
   // properties. Overwritten by sub-classes.
   virtual void Update(vtkSMProperty*);
 
   vtkGetStringMacro(FileName);
+
+  // // Description:
+  // // A vtkSMProperty is often defined with a default value in the
+  // // XML itself. However, many times, the default value must be determined
+  // // at run time. To facilitate this, domains can override this method
+  // // to compute and set the default value for the property.
+  // // Note that unlike the compile-time default values, the
+  // // application must explicitly call this method to initialize the
+  // // property.
+  // // Returns 1 if the domain updated the property.
+  virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values);
 
 protected:
   vtkSMInputFileNameDomain();

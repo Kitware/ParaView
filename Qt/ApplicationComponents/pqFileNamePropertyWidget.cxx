@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMInputFileNameDomain.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMUncheckedPropertyHelper.h"
+#include "vtkSmartPointer.h"
 
 #include "pqCoreUtilities.h"
 #include "pqDoubleRangeWidget.h"
@@ -67,67 +68,52 @@ pqFileNamePropertyWidget::pqFileNamePropertyWidget(
     }
   
   // find the domain
-  vtkSMInputFileNameDomain *defaultDomain = NULL;
-
-  vtkSMDomain *domain = svp->FindDomain("vtkSMInputFileNameDomain");
+  vtkSmartPointer<vtkSMInputFileNameDomain> domain = vtkSMInputFileNameDomain::SafeDownCast(svp->FindDomain("vtkSMInputFileNameDomain"));
 
   if(!domain)
     {
-    defaultDomain = vtkSMInputFileNameDomain::New();
-    domain = defaultDomain;
+    domain = vtkSmartPointer<vtkSMInputFileNameDomain>::New();
     }
 
   QHBoxLayout *layoutLocal = new QHBoxLayout;
   layoutLocal->setMargin(0);
   layoutLocal->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
 
-  if(vtkSMInputFileNameDomain *fileNameDomain = vtkSMInputFileNameDomain::SafeDownCast(domain))
-  {
-    QLineEdit* lineEdit = new pqLineEdit(this);
-    lineEdit->setObjectName(smproxy->GetPropertyName(smproperty));
-    this->addPropertyLink(lineEdit, "text",
-                          SIGNAL(textChanged(const QString&)), smproperty);
-    this->connect(lineEdit, SIGNAL(textChangedAndEditingFinished()),
-                  this, SIGNAL(changeFinished()));
-    this->setChangeAvailableAsChangeFinished(false);
-    
-    layoutLocal->addWidget(lineEdit);
-    this->setShowLabel(false);
+  QLineEdit* lineEdit = new pqLineEdit(this);
+  lineEdit->setObjectName(smproxy->GetPropertyName(smproperty));
+  this->addPropertyLink(lineEdit, "text",
+                        SIGNAL(textChanged(const QString&)), smproperty);
+  this->connect(lineEdit, SIGNAL(textChangedAndEditingFinished()),
+                this, SIGNAL(changeFinished()));
+  this->setChangeAvailableAsChangeFinished(false);
+  
+  layoutLocal->addWidget(lineEdit);
 
-    PV_DEBUG_PANELS() << "LineEdit for a "
-                  << "StringVectorProperty with a InputFileNameDomain ("
-                  << pqPropertyWidget::getXMLName(fileNameDomain) << ") ";
-  }
+  PV_DEBUG_PANELS() << "LineEdit for a "
+                << "StringVectorProperty with a InputFileNameDomain ("
+                << pqPropertyWidget::getXMLName(vtkSMInputFileNameDomain::SafeDownCast(domain)) << ") ";
 
-  if (svp->FindDomain("vtkSMInputFileNameDomain") != NULL)
-    {
-    PV_DEBUG_PANELS() << "Adding \"Reset\" button since the domain is dynamically";
+  PV_DEBUG_PANELS() << "Adding \"Reset\" button since the domain is dynamically allocated";
 
-    // if this has an vtkSMArrayRangeDomain, add a "reset" button.
-    pqHighlightablePushButton* resetButton = new pqHighlightablePushButton(this);
-    resetButton->setObjectName("Reset");
-    resetButton->setToolTip("Reset using current data values");
-    resetButton->setIcon(resetButton->style()->standardIcon(QStyle::SP_BrowserReload));
-    // resetButton->setFixedWidth(32);
+  // add a "reset" button.
+  pqHighlightablePushButton* resetButton = new pqHighlightablePushButton(this);
+  resetButton->setObjectName("Reset");
+  resetButton->setToolTip("Reset using current data values");
+  resetButton->setIcon(resetButton->style()->standardIcon(QStyle::SP_BrowserReload));
 
-    pqCoreUtilities::connect(svp, vtkCommand::DomainModifiedEvent,
-      this, SIGNAL(highlightResetButton()));
-    pqCoreUtilities::connect(svp, vtkCommand::UncheckedPropertyModifiedEvent,
-      this, SIGNAL(highlightResetButton()));
+  pqCoreUtilities::connect(svp, vtkCommand::DomainModifiedEvent,
+    this, SIGNAL(highlightResetButton()));
+  pqCoreUtilities::connect(svp, vtkCommand::UncheckedPropertyModifiedEvent,
+    this, SIGNAL(highlightResetButton()));
 
-    this->connect(resetButton, SIGNAL(clicked()), SLOT(resetButtonClicked()));
-    resetButton->connect(this, SIGNAL(highlightResetButton()), SLOT(highlight()));
-    resetButton->connect(this, SIGNAL(clearHighlight()), SLOT(clear()));
+  this->connect(resetButton, SIGNAL(clicked()), SLOT(resetButtonClicked()));
+  resetButton->connect(this, SIGNAL(highlightResetButton()), SLOT(highlight()));
+  resetButton->connect(this, SIGNAL(clearHighlight()), SLOT(clear()));
 
-    layoutLocal->addWidget(resetButton);
-    }
+  layoutLocal->addWidget(resetButton);
 
   this->setLayout(layoutLocal);
 
-  if (defaultDomain)
-    {
-    defaultDomain->Delete();
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -151,7 +137,6 @@ void pqFileNamePropertyWidget::resetButtonClicked()
     if (domain->GetFileName() != NULL)
       {
       fileName = domain->GetFileName();
-      // std::cout << fileName << std::endl;
       }
     }
 
