@@ -34,3 +34,5 @@ foreach(file ${GLSL_SRCS})
 endforeach()
 
 vtk_module_library(vtkEyeDomeLighting ${SRC_FILES})
+include(vtkOpenGL)
+vtk_opengl_link(vtkEyeDomeLighting)

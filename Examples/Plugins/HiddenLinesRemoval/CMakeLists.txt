@@ -50,4 +50,9 @@ add_paraview_plugin(
           vtkVisibleLinesPainter.cxx
           ${ENCODED_STRING_FILES}
 )
+
+find_package(OpenGL REQUIRED)
+include_directories(SYSTEM ${OPENGL_INCLUDE_DIR})
+target_link_libraries(HiddenLinesRemoval LINK_PRIVATE ${OPENGL_LIBRARIES})
+
 endif()

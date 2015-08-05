@@ -45,3 +45,5 @@ endforeach()
 # -----------------------------------------------------------------------------
 set (${vtk-module}_HDRS ${KIT_EXTRA_SRCS})
 vtk_module_library(${vtk-module} ${KIT_SRCS})
+include(vtkOpenGL)
+vtk_opengl_link(${vtk-module})
