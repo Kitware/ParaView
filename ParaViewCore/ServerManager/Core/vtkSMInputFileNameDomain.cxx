@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMFileNameDomain.cxx
+  Module:    vtkSMInputFileNameDomain.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,11 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMFileNameDomain.h"
+#include "vtkSMInputFileNameDomain.h"
 #include "vtkSMSourceProxy.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMCoreUtilities.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMPropertyHelper.h"
@@ -25,22 +26,22 @@
 #include <vtksys/SystemTools.hxx>
 #include <iostream>
 
-vtkStandardNewMacro(vtkSMFileNameDomain);
+vtkStandardNewMacro(vtkSMInputFileNameDomain);
 
 //---------------------------------------------------------------------------
-vtkSMFileNameDomain::vtkSMFileNameDomain()
+vtkSMInputFileNameDomain::vtkSMInputFileNameDomain()
 {
   this->FileName = NULL;
 }
 
 //---------------------------------------------------------------------------
-vtkSMFileNameDomain::~vtkSMFileNameDomain()
+vtkSMInputFileNameDomain::~vtkSMInputFileNameDomain()
 {
   this->FileName = 0;
 }
 
 //---------------------------------------------------------------------------
-int vtkSMFileNameDomain::IsInDomain(vtkSMProperty* property)
+int vtkSMInputFileNameDomain::IsInDomain(vtkSMProperty* property)
 {
   if (this->IsOptional)
     {
@@ -62,51 +63,34 @@ int vtkSMFileNameDomain::IsInDomain(vtkSMProperty* property)
 
 
 //---------------------------------------------------------------------------
-void vtkSMFileNameDomain::Update(vtkSMProperty* vtkNotUsed(prop))
+void vtkSMInputFileNameDomain::Update(vtkSMProperty* vtkNotUsed(prop))
 {
 
   vtkSMProperty* propForInput = this->GetRequiredProperty("Input");
   if (!propForInput)
-  {
+    {
     return;
-  }
+    }
 
   vtkSMUncheckedPropertyHelper inputHelper(propForInput);
-  vtkSMSourceProxy* proxy = vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy());
-  if (proxy != NULL)
-  {
-    vtkSmartPointer<vtkSMStringVectorProperty> fileNameProperty = vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("FileName"));
-    if (fileNameProperty != NULL)
-    {
 
+  if (inputHelper.GetAsProxy() != NULL)
+    {
+    vtkSMProperty * fileNameProperty = (inputHelper.GetAsProxy())->GetProperty(vtkSMCoreUtilities::GetFileNameProperty(inputHelper.GetAsProxy()));
+    if (fileNameProperty != NULL)
+      {
       std::string fname =  vtksys::SystemTools::DuplicateString(vtkSMPropertyHelper(fileNameProperty).GetAsString());
       fname = vtksys::SystemTools::GetFilenameName(fname);
       this->FileName = vtksys::SystemTools::DuplicateString(fname.c_str());
       this->DomainModified();
       return;
-    }
-  }
-}
-
-//---------------------------------------------------------------------------
-void vtkSMFileNameDomain::SetAnimationValue(vtkSMProperty *prop, int idx,
-                                              double vtkNotUsed(value))
-{
-  if (!prop)
-    {
-    return;
-    }
-
-  vtkSMStringVectorProperty *svp =
-    vtkSMStringVectorProperty::SafeDownCast(prop);
-  if (svp)
-    {
-    svp->SetElement(idx, this->FileName);
+      }
     }
 }
 
+
 //---------------------------------------------------------------------------
-void vtkSMFileNameDomain::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSMInputFileNameDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

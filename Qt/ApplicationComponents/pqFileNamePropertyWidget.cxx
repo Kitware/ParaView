@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCoreUtilities.h"
 #include "vtkCommand.h"
-#include "vtkSMFileNameDomain.h"
+#include "vtkSMInputFileNameDomain.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMUncheckedPropertyHelper.h"
 
@@ -67,13 +67,13 @@ pqFileNamePropertyWidget::pqFileNamePropertyWidget(
     }
   
   // find the domain
-  vtkSMFileNameDomain *defaultDomain = NULL;
+  vtkSMInputFileNameDomain *defaultDomain = NULL;
 
-  vtkSMDomain *domain = svp->FindDomain("vtkSMFileNameDomain");
+  vtkSMDomain *domain = svp->FindDomain("vtkSMInputFileNameDomain");
 
   if(!domain)
     {
-    defaultDomain = vtkSMFileNameDomain::New();
+    defaultDomain = vtkSMInputFileNameDomain::New();
     domain = defaultDomain;
     }
 
@@ -81,7 +81,7 @@ pqFileNamePropertyWidget::pqFileNamePropertyWidget(
   layoutLocal->setMargin(0);
   layoutLocal->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
 
-  if(vtkSMFileNameDomain *fileNameDomain = vtkSMFileNameDomain::SafeDownCast(domain))
+  if(vtkSMInputFileNameDomain *fileNameDomain = vtkSMInputFileNameDomain::SafeDownCast(domain))
   {
     QLineEdit* lineEdit = new pqLineEdit(this);
     lineEdit->setObjectName(smproxy->GetPropertyName(smproperty));
@@ -95,11 +95,11 @@ pqFileNamePropertyWidget::pqFileNamePropertyWidget(
     this->setShowLabel(false);
 
     PV_DEBUG_PANELS() << "LineEdit for a "
-                  << "StringVectorProperty with a FileNameDomain ("
+                  << "StringVectorProperty with a InputFileNameDomain ("
                   << pqPropertyWidget::getXMLName(fileNameDomain) << ") ";
   }
 
-  if (svp->FindDomain("vtkSMFileNameDomain") != NULL)
+  if (svp->FindDomain("vtkSMInputFileNameDomain") != NULL)
     {
     PV_DEBUG_PANELS() << "Adding \"Reset\" button since the domain is dynamically";
 
@@ -145,13 +145,13 @@ void pqFileNamePropertyWidget::resetButtonClicked()
   vtkSMProperty* smproperty = this->property();
 
   const char* fileName = "";
-  if (vtkSMFileNameDomain* domain = vtkSMFileNameDomain::SafeDownCast(
+  if (vtkSMInputFileNameDomain* domain = vtkSMInputFileNameDomain::SafeDownCast(
       smproperty->GetDomain("filename")))
     {
     if (domain->GetFileName() != NULL)
       {
       fileName = domain->GetFileName();
-      std::cout << fileName << std::endl;
+      // std::cout << fileName << std::endl;
       }
     }
 

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMFileNameDomain.h
+  Module:    vtkSMInputFileNameDomain.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,26 +12,27 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMFileNameDomain - a domain with two values: true or false
+// .NAME vtkSMInputFileNameDomain - a string domain that can be set automatically
+// with the source file name
 // .SECTION Description
-// vtkSMFileNameDomain does not really restrict the values of the property
-// that contains it. All integer values are valid. Rather, it is used to
-// specified that the property represents a true/false state. This domains
-// works with only vtkSMIntVectorProperty.
+// vtkSMInputFileNameDomain does not really restrict the values of the property
+// that contains it. All string values are valid. Rather, it is used to
+// annotate a pipeline with the source name. This domain
+// works with only vtkSMStringVectorProperty.
 // .SECTION See Also
-// vtkSMDomain vtkSMIntVectorProperty
+// vtkSMDomain vtkSMStringVectorProperty
 
-#ifndef __vtkSMFileNameDomain_h
-#define __vtkSMFileNameDomain_h
+#ifndef __vtkSMInputFileNameDomain_h
+#define __vtkSMInputFileNameDomain_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDomain.h"
 
-class VTKPVSERVERMANAGERCORE_EXPORT vtkSMFileNameDomain : public vtkSMDomain
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMInputFileNameDomain : public vtkSMDomain
 {
 public:
-  static vtkSMFileNameDomain* New();
-  vtkTypeMacro(vtkSMFileNameDomain, vtkSMDomain);
+  static vtkSMInputFileNameDomain* New();
+  vtkTypeMacro(vtkSMInputFileNameDomain, vtkSMDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -46,15 +47,13 @@ public:
 
   vtkGetStringMacro(FileName);
 
-  virtual void SetAnimationValue(vtkSMProperty*, int, double);
-
 protected:
-  vtkSMFileNameDomain();
-  ~vtkSMFileNameDomain();
+  vtkSMInputFileNameDomain();
+  ~vtkSMInputFileNameDomain();
 
 private:
-  vtkSMFileNameDomain(const vtkSMFileNameDomain&); // Not implemented
-  void operator=(const vtkSMFileNameDomain&); // Not implemented
+  vtkSMInputFileNameDomain(const vtkSMInputFileNameDomain&); // Not implemented
+  void operator=(const vtkSMInputFileNameDomain&); // Not implemented
   char * FileName;
 };
 

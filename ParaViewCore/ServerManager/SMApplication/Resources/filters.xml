@@ -332,11 +332,11 @@
                             number_of_elements="1"
                             panel_widget="filename_annotation">
         <Documentation>Annotation of file name.</Documentation>
-        <FileNameDomain name="filename">
+        <InputFileNameDomain name="filename">
           <RequiredProperties>
             <Property function="Input" name="Input" />
           </RequiredProperties>
-        </FileNameDomain>
+        </InputFileNameDomain>
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="visibility"
