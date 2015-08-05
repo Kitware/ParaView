@@ -625,6 +625,68 @@ void pqColorAnnotationsPropertyWidget::removeAnnotation()
   emit this->annotationsChanged();
 }
 
+namespace {
+
+//-----------------------------------------------------------------------------
+// Given a list of existing annotations and a list of potentially new
+// annotations, merge the lists. The candidate annotations are first
+// selected to fill in empty annotation values in the existing
+// annotations list, then they are added to the end.
+//
+// mergedAnnotations - interleaved annotation array (value/label)
+// existingAnnotations - interleaved annotation array (value/label)
+// candidateValues - candidate array of just annotation values, possibly new
+void MergeAnnotations(QList<QVariant> & mergedAnnotations,
+                      const QList<QVariant> & existingAnnotations,
+                      const QList<QVariant> & candidateValues)
+{
+  // Extract values from exisiting interleaved annotation list.
+  QList<QVariant> existingValues;
+  for (int idx = 0; idx < existingAnnotations.size()/2; ++idx)
+    {
+    existingValues.push_back(existingAnnotations[2*idx]);
+    }
+
+  // Subset candidate annotations to only those not in existing annotations
+  // Candidate values
+  QList<QVariant> newCandidateValues;
+  for (int idx = 0; idx < candidateValues.size(); ++idx)
+    {
+    if (!existingValues.contains(candidateValues[idx]))
+      {
+      newCandidateValues.push_back(candidateValues[idx]);
+      }
+    }
+
+  // Iterate over existing annotations, backfilling new candidates
+  // in empty slots where possible.
+  int candidateIdx = 0;
+  for (int idx = 0; idx < existingValues.size(); ++idx)
+    {
+    if (existingValues[idx] == "" &&
+        candidateIdx < newCandidateValues.size())
+      {
+      mergedAnnotations.push_back(newCandidateValues[candidateIdx]); // value
+      mergedAnnotations.push_back(newCandidateValues[candidateIdx]); // annotation
+      ++candidateIdx;
+      }
+    else
+      {
+      mergedAnnotations.push_back(existingAnnotations[2*idx + 0]); // value
+      mergedAnnotations.push_back(existingAnnotations[2*idx + 1]); // annotation
+      }
+    }
+
+  // Add any left over candidates
+  for ( ; candidateIdx < newCandidateValues.size(); ++candidateIdx)
+    {
+    mergedAnnotations.push_back(newCandidateValues[candidateIdx]); // value
+    mergedAnnotations.push_back(newCandidateValues[candidateIdx]); // annotation
+    }
+}
+
+} // end anonymous namespace
+
 //-----------------------------------------------------------------------------
 void pqColorAnnotationsPropertyWidget::addActiveAnnotations()
 {
@@ -658,28 +720,29 @@ void pqColorAnnotationsPropertyWidget::addActiveAnnotations()
       component_no = 0;
       }
 
-    QList<QVariant> annotationList;
-    vtkSmartPointer<vtkStringList> activeAnnotatedValues =
-      vtkSmartPointer<vtkStringList>::New();
-    vtkSmartPointer<vtkAbstractArray> unique_values;
-    unique_values.TakeReference(
+    vtkSmartPointer<vtkAbstractArray> uniqueValues;
+    uniqueValues.TakeReference(
       info->GetProminentComponentValues(component_no));
-    if (unique_values == NULL)
+    if (uniqueValues == NULL)
       {
       throw 0;
       }
-    for (vtkIdType idx=0; idx < unique_values->GetNumberOfTuples(); idx++)
-      {
-      annotationList.push_back(unique_values->GetVariantValue(idx).ToString().c_str());
-      annotationList.push_back(unique_values->GetVariantValue(idx).ToString().c_str());
-      activeAnnotatedValues->AddString(unique_values->GetVariantValue(idx).ToString().c_str());
-      }
-    this->setAnnotations(annotationList);
 
-    // Now update the "active" annotations
-    vtkSMStringVectorProperty* activeAnnotatedValuesProperty =
-      vtkSMStringVectorProperty::SafeDownCast(this->proxy()->GetProperty("ActiveAnnotatedValues"));
-    activeAnnotatedValuesProperty->SetElements(activeAnnotatedValues);
+    QList<QVariant> existingAnnotations = this->annotations();
+
+    QList<QVariant> candidateAnnotationValues;
+    for (vtkIdType idx=0; idx < uniqueValues->GetNumberOfTuples(); idx++)
+      {
+      candidateAnnotationValues.push_back(uniqueValues->GetVariantValue(idx).ToString().c_str());
+      }
+
+    // Combined annotation values (old and new)
+    QList<QVariant> mergedAnnotations;
+    MergeAnnotations(mergedAnnotations, existingAnnotations, candidateAnnotationValues);
+
+    // Set the merged annotations
+    this->setAnnotations(mergedAnnotations);
+
     }  
   catch (int)
     {
@@ -766,40 +829,37 @@ void pqColorAnnotationsPropertyWidget::addActiveAnnotationsFromVisibleSources()
         component_no = 0;
         }
 
-      vtkSmartPointer<vtkAbstractArray> unique_values;
-      unique_values.TakeReference(
+      vtkSmartPointer<vtkAbstractArray> uniqueValues;
+      uniqueValues.TakeReference(
         info->GetProminentComponentValues(component_no));
-      if (unique_values == NULL)
+      if (uniqueValues == NULL)
         {
         continue;
         }
-      for (vtkIdType idx=0; idx < unique_values->GetNumberOfTuples(); idx++)
+      for (vtkIdType idx=0; idx < uniqueValues->GetNumberOfTuples(); idx++)
         {
-        uniqueAnnotations.insert(QString(unique_values->GetVariantValue(idx).ToString().c_str()));
+        QString value(uniqueValues->GetVariantValue(idx).ToString().c_str());
+        uniqueAnnotations.insert(value);
         }
       }
 
     QList<QString> uniqueList = uniqueAnnotations.values();
     qSort(uniqueList);
 
-    QList<QVariant> annotationList;
-    vtkSmartPointer<vtkStringList> activeAnnotatedValues =
-      vtkSmartPointer<vtkStringList>::New();
-    for (int idx = 0; idx < uniqueList.size(); ++idx)
+    QList<QVariant> existingAnnotations = this->annotations();
+
+    QList<QVariant> candidateAnnotationValues;
+    for (int idx=0; idx < uniqueList.size(); idx++)
       {
-      annotationList.push_back(uniqueList[idx]);
-      annotationList.push_back(uniqueList[idx]);
-      activeAnnotatedValues->AddString(uniqueList[idx].toStdString().c_str());
+      candidateAnnotationValues.push_back(uniqueList[idx]);
       }
 
-    this->setAnnotations(annotationList);
+    // Combined annotation values (old and new)
+    QList<QVariant> mergedAnnotations;
+    MergeAnnotations(mergedAnnotations, existingAnnotations, candidateAnnotationValues);
 
-    // Now update the "active" annotations
-    vtkSMStringVectorProperty* activeAnnotatedValuesProperty =
-      vtkSMStringVectorProperty::SafeDownCast(this->proxy()->GetProperty("ActiveAnnotatedValues"));
-    activeAnnotatedValuesProperty->SetElements(activeAnnotatedValues);
+    this->setAnnotations(mergedAnnotations);
     }
-
   catch (int)
     {
     QMessageBox::warning(
