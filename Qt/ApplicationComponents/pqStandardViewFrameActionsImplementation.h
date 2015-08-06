@@ -45,9 +45,43 @@ class QShortcut;
 class QWidget;
 
 /// pqStandardViewFrameActionsImplementation implements
-/// pqViewFrameActionsInterface to add the default view toolbar buttons/actions
-/// used in ParaView for various types of views, including chart views and
-/// render views.
+/// pqViewFrameActionsInterface to add the default view toolbar
+/// buttons/actions used in ParaView for various types of views,
+/// including chart views and render views.
+///
+/// Toolbar buttons/actions can be added/removed in the XML for a view
+/// using hints. For example,
+///
+/// \verbatim
+/// <Hints>
+///   <StandardViewFrameActions default_actions="none" />
+/// </Hints>
+/// \endverbatim
+///
+/// disables all toolbar buttons while
+///
+/// \verbatim
+/// <Hints>
+///   <StandardViewFrameActions default_actions="none" />
+///   <ToggleInteractionMode />
+/// </Hints>
+/// \endverbatim
+///
+/// disables all toolbar buttons except for the button that toggles
+/// between 2D/3D camera interactions. This type of hint can be used
+/// to add only the toolbar buttons that are desired for the view.
+///
+/// To show all the default toolbar buttons except for the button that
+/// brings up the camera control dialog, use
+///
+/// \verbatim
+/// <Hints>
+///   <StandardViewFrameActions>
+///     <AdjustCamera visibility="never" />
+///   </StandardViewFrameActions>
+/// </Hints>
+/// \endverbatim
+///
 class PQAPPLICATIONCOMPONENTS_EXPORT pqStandardViewFrameActionsImplementation :
   public QObject,
   public pqViewFrameActionsInterface
@@ -107,6 +141,10 @@ protected:
 
   /// called to add actions/decorator for pqSpreadSheetView.
   virtual void addSpreadSheetViewActions(pqViewFrame* frame, pqSpreadSheetView* view);
+
+  /// check the XML hints to see if a button with the given name
+  /// should be added to the view frame
+  bool isButtonVisible(const std::string & buttonName, pqView* view);
 
   struct ViewType
     {
