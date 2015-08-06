@@ -70,12 +70,19 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModule.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkSMSessionProxyManager.h"
-#include "vtkSMSession.h"
 #include "vtkSMRepresentationProxy.h"
+#include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 
 #include <assert.h>
+
+class vtkSMMantaViewProxy::Internal
+{
+public:
+  std::vector<vtkSMProxy*> Lights;
+  int CurrentLight;
+};
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMMantaViewProxy);
@@ -84,11 +91,18 @@ vtkStandardNewMacro(vtkSMMantaViewProxy);
 //-----------------------------------------------------------------------------
 vtkSMMantaViewProxy::vtkSMMantaViewProxy()
 {
+  this->Internals = new vtkSMMantaViewProxy::Internal();
+  this->Internals->CurrentLight = -1;
 }
 
 //-----------------------------------------------------------------------------
 vtkSMMantaViewProxy::~vtkSMMantaViewProxy()
 {
+  for (size_t i = 0; i < this->Internals->Lights.size(); i++)
+    {
+    this->Internals->Lights[i]->UnRegister(this);
+    }
+  delete this->Internals;
 }
 
 //-----------------------------------------------------------------------------
@@ -103,7 +117,9 @@ void vtkSMMantaViewProxy::CreateVTKObjects()
   this->Superclass::CreateVTKObjects();
 
   vtkSMPropertyHelper(this, "UseLight").Set(0);
-  vtkSMPropertyHelper(this, "LightSwitch").Set(1);
+
+  //disable the light renderview gives us
+  vtkSMPropertyHelper(this, "LightSwitch").Set(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -143,4 +159,53 @@ vtkSMRepresentationProxy* vtkSMMantaViewProxy::CreateDefaultRepresentation(
     }
 
   return 0;
+}
+
+
+//-----------------------------------------------------------------------------
+void vtkSMMantaViewProxy::MakeLight()
+{
+  vtkSMProxy* pxy;
+  if (this->Internals->CurrentLight == -1)
+    {
+    //we have a light at start by virtue of CurrentLight proxy property
+    //but have no record of it. So when we make the first new one,
+    //grab hold of the initial one
+    pxy = vtkSMPropertyHelper(this, "CurrentLight").GetAsProxy();
+    this->Internals->Lights.push_back(pxy);
+    pxy->Register(this);
+    }
+
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
+  pxy = pxm->NewProxy("extra_lights", "MantaLight");
+  this->Internals->Lights.push_back(pxy);
+  this->Internals->CurrentLight = this->Internals->Lights.size()-1;
+  vtkSMPropertyHelper(this, "CurrentLight").Set(pxy);
+  pxy->UpdateSelfAndAllInputs();
+  this->UpdateSelfAndAllInputs();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMMantaViewProxy::PreviousLight()
+{
+  if (this->Internals->CurrentLight < 1)
+    {
+    return;
+    }
+  this->Internals->CurrentLight = this->Internals->CurrentLight - 1;
+  vtkSMProxy *pxy = this->Internals->Lights[this->Internals->CurrentLight];
+  vtkSMPropertyHelper(this, "CurrentLight").Set(pxy);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMMantaViewProxy::NextLight()
+{
+  if (static_cast<size_t>(this->Internals->CurrentLight) >=
+      this->Internals->Lights.size()-1)
+    {
+    return;
+    }
+  this->Internals->CurrentLight = this->Internals->CurrentLight + 1;
+  vtkSMProxy *pxy = this->Internals->Lights[this->Internals->CurrentLight];
+  vtkSMPropertyHelper(this, "CurrentLight").Set(pxy);
 }

@@ -90,6 +90,17 @@ public:
   // Implement base class method.
   void Render(vtkRenderer *ren, int light_index);
 
+  // Description:
+  // overridden to always reset transform and to use MantaPosition
+  virtual void SetLightType(int type);
+
+  // Description:
+  // An alternate behavior for VTK light positions.
+  void SetMantaPosition(double x, double y, double z);
+  void SetMantaPosition(const double a[3]) {
+    this->SetMantaPosition(a[0], a[1], a[2]); };
+  vtkGetVector3Macro(MantaPosition, double);
+
 protected:
   vtkMantaLight();
   ~vtkMantaLight();
@@ -106,6 +117,7 @@ private:
 
   vtkMantaManager *MantaManager;
 
+  double MantaPosition[3];
 };
 
 #endif

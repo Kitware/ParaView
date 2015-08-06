@@ -83,6 +83,7 @@ class Light;
 //ETX
 
 class vtkMantaManager;
+class vtkMantaTexture;
 
 class VTKMANTA_EXPORT vtkMantaRenderer : public vtkOpenGLRenderer
 {
@@ -96,6 +97,28 @@ public:
   virtual void SetBackground(double rgb[3])
     { this->Superclass::SetBackground(rgb); }
   virtual void SetBackground(double r, double g, double b);
+
+  // Description:
+  // Overridden to use manta callbacks to do the work.
+  virtual void SetBackgroundUp(double x, double y, double z);
+  vtkGetVector3Macro(BackgroundUp,double);
+
+  // Description:
+  // Overridden to use manta callbacks to do the work.
+  virtual void SetBackground2(double rgb[3])
+    { this->Superclass::SetBackground2(rgb); }
+  virtual void SetBackground2(double r, double g, double b);
+  virtual void SetGradientBackground(bool);
+
+  // Description:
+  // Set/Get the world space right vector for texture background wraparound.
+  virtual void SetBackgroundRight(double x, double y, double z);
+  vtkGetVector3Macro(BackgroundRight,double);
+
+  // Description:
+  // Overridden to intercept and adapt to manta backend.
+  virtual void SetBackgroundTexture(vtkTexture *tex);
+  virtual void SetTexturedBackground(bool);
 
   //Description:
   //Changes the number of manta rendering threads.
@@ -223,6 +246,11 @@ protected:
   };
   virtual double GetPickedZ() { return 0.0f; };
 
+  //Description:
+  //Accessor to the manta texture that backs the vtk texture
+  virtual void SetMantaTexture(vtkMantaTexture*);
+  vtkGetObjectMacro(MantaTexture, vtkMantaTexture);
+
 private:
   vtkMantaRenderer(const vtkMantaRenderer&); // Not implemented.
   void operator=(const vtkMantaRenderer&); // Not implemented.
@@ -261,6 +289,11 @@ private:
   int EnableShadows;
   int Samples;
   int MaxDepth;
+
+  vtkMantaTexture *MantaTexture;
+
+  double BackgroundUp[3];
+  double BackgroundRight[3];
 };
 
 #endif

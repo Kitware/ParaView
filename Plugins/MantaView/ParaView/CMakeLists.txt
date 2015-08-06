@@ -19,6 +19,16 @@ IF(PARAVIEW_BUILD_QT_GUI)
     QT4_WRAP_CPP(MOC_SRCS
       ${MantaView_SRCS})
   ENDIF ()
+  IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+    QT5_WRAP_CPP(MOC_SRCS pqLightsWidget.h)
+  ELSE ()
+    QT4_WRAP_CPP(MOC_SRCS pqLightsWidget.h)
+  ENDIF ()
+
+  add_paraview_property_group_widget(IFACES IFACE_SRCS
+    TYPE "extra_lights"
+    CLASS_NAME pqLightsWidget)
+
   add_pqproxy(
     VIEW_IFACE VIEW_IFACE_SRCS
     TYPE MantaView
@@ -27,6 +37,7 @@ IF(PARAVIEW_BUILD_QT_GUI)
 ENDIF()
 
 LINK_DIRECTORIES ( ${MANTA_BUILD_LIB} )
+
 
 add_paraview_plugin(
   MantaView "2.0"
@@ -38,10 +49,11 @@ add_paraview_plugin(
   SERVER_MANAGER_XML
     MantaView.xml
   GUI_INTERFACES
-    ${VIEW_IFACE} ${OPTIONS_IFACE} ${DISPLAY_IFACE}
+    ${IFACES} ${VIEW_IFACE}
   GUI_SOURCES
-    ${VIEW_IFACE_SRCS} ${OPTIONS_IFACE_SRCS} ${DISPLAY_IFACE_SRCS} ${UI_SRCS}
+    ${IFACE_SRCS} ${VIEW_IFACE_SRCS} ${UI_SRCS}
     ${MOC_SRCS}
+    pqLightsWidget.cxx
     MantaView.cxx
 )
 

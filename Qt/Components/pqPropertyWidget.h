@@ -181,8 +181,10 @@ protected:
   pqPropertyLinks& links()
     { return this->Links; }
 
-private:
+public:
   void setProperty(vtkSMProperty *property);
+
+private:
 
   friend class pqPropertyWidgetDecorator;
   friend class pqProxyWidget;

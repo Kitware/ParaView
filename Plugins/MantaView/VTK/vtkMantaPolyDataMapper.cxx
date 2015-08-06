@@ -84,28 +84,30 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPolyData.h"
 #include "vtkProperty.h"
 #include "vtkSphereSource.h"
+#include "vtkStringArray.h"
 #include "vtkTransform.h"
 #include "vtkTubeFilter.h"
 #include "vtkUnsignedCharArray.h"
 
+#include <Core/Geometry/Vector.h>
 #include <Engine/Control/RTRT.h>
 #include <Model/Groups/DynBVH.h>
 #include <Model/Groups/Group.h>
 #include <Model/Groups/Mesh.h>
-#include <Model/Primitives/TextureCoordinateCylinder.h>
-#include <Model/Primitives/TextureCoordinateSphere.h>
-#include <Model/Primitives/WaldTriangle.h>
+#include <Model/Materials/Dielectric.h>
 #include <Model/Materials/Flat.h>
 #include <Model/Materials/Lambertian.h>
 #include <Model/Materials/Transparent.h>
+#include <Model/Materials/MetalMaterial.h>
 #include <Model/Materials/Phong.h>
+#include <Model/Materials/ThinDielectric.h>
+#include <Model/Primitives/TextureCoordinateCylinder.h>
+#include <Model/Primitives/TextureCoordinateSphere.h>
+#include <Model/Primitives/WaldTriangle.h>
 #include <Model/Textures/TexCoordTexture.h>
 #include <Model/Textures/Constant.h>
 
-
-#include <Core/Geometry/Vector.h>
 #include <vector>
-
 #include <math.h>
 
 class vtkMantaPolyDataMapper::Helper {
@@ -115,6 +117,35 @@ public:
 
   Manta::Material *material;
   std::vector<Manta::Vector> texCoords;
+  std::map<int, Manta::Material *> extraMaterials;
+  std::map<int, std::string> extrasSpecs;
+  std::map<int, int> materialOffsets;
+
+  Manta::Material* LookupMaterial
+    (Manta::Mesh *mesh, vtkDataArray *ma, vtkIdType cellNum)
+  {
+    int offset = this->LookupMaterialID(ma, cellNum);
+    return mesh->materials[offset];
+  }
+
+  int LookupMaterialID
+    (vtkDataArray *ma, vtkIdType cellNum)
+  {
+    //converts material ID to an offset in the mess
+    //return 0 - the default material if problematic
+    int offset = 0;
+    if (ma && this->extraMaterials.size())
+      {
+      int matID = (int)(*ma->GetTuple(cellNum));
+      std::map<int, int>::iterator mit =
+        this->materialOffsets.find(matID);
+      if (mit != this->materialOffsets.end())
+        {
+        offset = mit->second;
+        }
+      }
+    return offset;
+  }
 };
 
 vtkStandardNewMacro(vtkMantaPolyDataMapper);
@@ -140,6 +171,14 @@ vtkMantaPolyDataMapper::~vtkMantaPolyDataMapper()
   if (this->InternalColorTexture)
     {
     this->InternalColorTexture->Delete();
+    }
+
+  std::map<int, Manta::Material *>::iterator it;
+  for (it = this->MyHelper->extraMaterials.begin();
+       it != this->MyHelper->extraMaterials.end();
+       it++)
+    {
+    delete it->second;
     }
 
   if (this->MantaManager)
@@ -237,7 +276,11 @@ void vtkMantaPolyDataMapper::RenderPiece(vtkRenderer *ren, vtkActor *act)
       }
     this->InternalColorTexture->SetInputData(this->ColorTextureMap);
     }
-  
+
+  //if the data defines any, make sure we have specific materials handy
+  vtkMantaProperty *prop = vtkMantaProperty::SafeDownCast(act->GetProperty());
+  this->MakeMantaProperties(input, prop->GetAllowDataMaterial());
+
   // if something has changed, regenerate Manta primitives if required
   if ( this->GetMTime()  > this->BuildTime ||
        input->GetMTime() > this->BuildTime ||
@@ -254,6 +297,11 @@ void vtkMantaPolyDataMapper::RenderPiece(vtkRenderer *ren, vtkActor *act)
       {
       this->InternalColorTexture->Load(ren);
       }
+    vtkMantaActor *mantaActor = vtkMantaActor::SafeDownCast(act);
+    if (mantaActor->GetMantaTexture())
+      {
+      mantaActor->GetMantaTexture()->Load(ren);
+      }
     
     this->Draw(ren, act);
     this->BuildTime.Modified();
@@ -268,12 +316,12 @@ void vtkMantaPolyDataMapper::DrawPolygons(vtkPolyData *polys,
                                           vtkPoints *ptarray,
                                           Manta::Mesh *mesh,
                                           Manta::Group *points,
-                                          Manta::Group *lines)
+                                          Manta::Group *lines,
+                                          vtkMantaTexture *mantaTexture)
 {
-
-  Manta::Material *material = this->MyHelper->material;
   std::vector<Manta::Vector> &texCoords = this->MyHelper->texCoords;
-
+  Manta::Material *material = NULL;
+  vtkDataArray *ma = polys->GetCellData()->GetArray("material");
   int total_triangles = 0;
   vtkCellArray *cells = polys->GetPolys();
   vtkIdType npts = 0, *index = 0, cellNum = 0;
@@ -283,6 +331,7 @@ void vtkMantaPolyDataMapper::DrawPolygons(vtkPolyData *polys,
     {
     for ( cells->InitTraversal(); cells->GetNextCell(npts, index); cellNum++ )
       {
+      material = this->MyHelper->LookupMaterial(mesh, ma, cellNum);
       double coord[3];
       Manta::Vector noTC(0.0,0.0,0.0);      
       for (int i = 0; i < npts; i++)
@@ -312,6 +361,7 @@ void vtkMantaPolyDataMapper::DrawPolygons(vtkPolyData *polys,
     Manta::TextureCoordinateCylinder *segment;
     for ( cells->InitTraversal(); cells->GetNextCell(npts, index); cellNum++ )
       {
+      material = this->MyHelper->LookupMaterial(mesh, ma, cellNum);
       ptarray->GetPoint(index[0], coord0);
       for (vtkIdType i = 1; i < npts; i++)
         {
@@ -352,6 +402,7 @@ void vtkMantaPolyDataMapper::DrawPolygons(vtkPolyData *polys,
   case VTK_SURFACE:
   default:
     {
+        
     // write polygons with on the fly triangulation, assuming polygons are simple and
     // can be triangulated into "fans"
     for ( cells->InitTraversal(); cells->GetNextCell(npts, index); cellNum++ )
@@ -365,8 +416,7 @@ void vtkMantaPolyDataMapper::DrawPolygons(vtkPolyData *polys,
       mesh->vertex_indices.push_back(triangle[0]);
       mesh->vertex_indices.push_back(triangle[1]);
       mesh->vertex_indices.push_back(triangle[2]);
-      mesh->face_material.push_back(0);
-      
+      mesh->face_material.push_back(this->MyHelper->LookupMaterialID(ma,cellNum));
       if ( !mesh->vertexNormals.empty() )
         {
         mesh->normal_indices.push_back(triangle[0]);
@@ -376,7 +426,7 @@ void vtkMantaPolyDataMapper::DrawPolygons(vtkPolyData *polys,
       
       if ( !mesh->texCoords.empty() )
         {
-        if (this->CellScalarColor)
+        if (this->CellScalarColor && !mantaTexture)
           {
           mesh->texture_indices.push_back(cellNum);
           mesh->texture_indices.push_back(cellNum);
@@ -400,7 +450,7 @@ void vtkMantaPolyDataMapper::DrawPolygons(vtkPolyData *polys,
         mesh->vertex_indices.push_back(triangle[0]);
         mesh->vertex_indices.push_back(triangle[1]);
         mesh->vertex_indices.push_back(triangle[2]);
-        mesh->face_material.push_back(0);
+        mesh->face_material.push_back(this->MyHelper->LookupMaterialID(ma, cellNum));
         
         if ( !mesh->vertexNormals.empty() )
           {
@@ -411,7 +461,7 @@ void vtkMantaPolyDataMapper::DrawPolygons(vtkPolyData *polys,
         
         if ( !mesh->texCoords.empty() )
           {
-          if (this->CellScalarColor)
+          if (this->CellScalarColor && !mantaTexture)
             {
             mesh->texture_indices.push_back(cellNum);
             mesh->texture_indices.push_back(cellNum);
@@ -444,8 +494,10 @@ void vtkMantaPolyDataMapper::DrawTStrips(vtkPolyData *polys,
                                          vtkPoints *ptarray,
                                          Manta::Mesh *mesh, 
                                          Manta::Group *points, 
-                                         Manta::Group *lines)
+                                         Manta::Group *lines,
+                                         vtkMantaTexture *mantaTexture)
 {
+  //cerr << "TSTRIPS" << endl;
   Manta::Material *material = this->MyHelper->material;
   std::vector<Manta::Vector> &texCoords = this->MyHelper->texCoords;
 
@@ -569,7 +621,7 @@ void vtkMantaPolyDataMapper::DrawTStrips(vtkPolyData *polys,
       
       if ( !mesh->texCoords.empty() )
         {
-        if ( this->CellScalarColor )
+        if ( this->CellScalarColor && !mantaTexture)
           {
           mesh->texture_indices.push_back(cellNum);
           mesh->texture_indices.push_back(cellNum);
@@ -627,7 +679,7 @@ void vtkMantaPolyDataMapper::DrawTStrips(vtkPolyData *polys,
         
         if ( !mesh->texCoords.empty() )
           {
-          if ( this->CellScalarColor )
+          if ( this->CellScalarColor && !mantaTexture)
             {
             mesh->texture_indices.push_back(cellNum);
             mesh->texture_indices.push_back(cellNum);
@@ -647,7 +699,6 @@ void vtkMantaPolyDataMapper::DrawTStrips(vtkPolyData *polys,
       }
     
     //cerr << "strips: # of triangles = " << total_triangles << endl;
-    
     for ( int i = 0; i < total_triangles; i++ )
       {
       mesh->addTriangle( new Manta::WaldTriangle );
@@ -672,6 +723,7 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
     {
     return;
     }
+  vtkMantaTexture *mantaTexture = NULL;
   vtkPolyData *input = this->GetInput();
 
   // Compute we need to for color
@@ -694,7 +746,24 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
   Manta::Material *&material = this->MyHelper->material;
   std::vector<Manta::Vector> &texCoords = this->MyHelper->texCoords;
 
-  if ( !this->ScalarVisibility || (!this->Colors && !this->ColorCoordinates))
+  if (input->GetPointData()->GetTCoords() && mantaActor->GetTexture() )
+    {
+    //cerr << "color using actor's texture" << endl;
+    mantaTexture = vtkMantaTexture::SafeDownCast(mantaActor->GetMantaTexture());
+    Manta::Texture<Manta::Color> *texture =
+      mantaTexture->GetMantaTexture();
+    material = new Manta::Lambertian(texture);
+
+    // convert texture coordinates to manta format
+    vtkDataArray *tcoords = input->GetPointData()->GetTCoords();
+    for (int i = 0; i < tcoords->GetNumberOfTuples(); i++)
+      {
+      double *tcoord = tcoords->GetTuple(i);
+      texCoords.push_back
+        ( Manta::Vector(tcoord[0], tcoord[1], 0.0) );
+      }
+    }
+  else if ( !this->ScalarVisibility || (!this->Colors && !this->ColorCoordinates))
     {
     //cerr << "Solid color from actor's property" << endl;
     material = mantaProperty->GetMantaMaterial();
@@ -703,7 +772,6 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
       mantaProperty->CreateMantaProperty();
       material = mantaProperty->GetMantaMaterial();
 
-      //TODO: the leaks
       mantaProperty->SetMantaMaterial(NULL);
       mantaProperty->SetSpecularTexture(NULL);
       mantaProperty->SetDiffuseTexture(NULL);
@@ -774,27 +842,6 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
       {
       double *tcoord = this->ColorCoordinates->GetTuple(i);
       texCoords.push_back( Manta::Vector(tcoord[0], 0, 0) );
-      }
-    }
-  else if (input->GetPointData()->GetTCoords() && actor->GetTexture() )
-    {
-    //cerr << "color using actor's texture" << endl;
-    vtkMantaTexture *mantaTexture = 
-      vtkMantaTexture::SafeDownCast(actor->GetTexture());
-    if (mantaTexture)
-      {
-      Manta::Texture<Manta::Color> *texture = 
-        mantaTexture->GetMantaTexture();
-      material = new Manta::Lambertian(texture);
-      }
-
-    // convert texture coordinates to manta format
-    vtkDataArray *tcoords = input->GetPointData()->GetTCoords();
-    for (int i = 0; i < tcoords->GetNumberOfTuples(); i++)
-      {
-      double *tcoord = tcoords->GetTuple(i);
-      texCoords.push_back
-        ( Manta::Vector(tcoord[0], tcoord[1], tcoord[2]) );
       }
     }
 
@@ -918,20 +965,34 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
       }
     }
 
+  //give our materials to the mesh
+  int i = 0;
   mesh->materials.push_back(material);
+  std::map<int, Manta::Material *>::iterator it;
+  for (it = this->MyHelper->extraMaterials.begin();
+       it != this->MyHelper->extraMaterials.end();
+       it++)
+    {
+    i++;
+    mesh->materials.push_back(it->second);
+    //polys refer to materials by offset not ID
+    //keep track of material IDs to location mapping
+    this->MyHelper->materialOffsets[it->first] = i;
+    }
+
   mesh->texCoords = texCoords;
   texCoords.clear();
 
   // convert polygons to manta format
   if ( input->GetNumberOfPolys() > 0 )
     {
-    this->DrawPolygons(input, points, mesh, sphereGroup, tubeGroup);
+    this->DrawPolygons(input, points, mesh, sphereGroup, tubeGroup, mantaTexture);
     }
   
   // convert triangle strips to manta format
   if ( input->GetNumberOfStrips() > 0 )
     {
-    this->DrawTStrips(input, points, mesh, sphereGroup, tubeGroup);
+    this->DrawTStrips(input, points, mesh, sphereGroup, tubeGroup, mantaTexture);
     }
 
   //delete transformed point coordinates
@@ -978,4 +1039,134 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
     delete group;
     //cerr << "NOTHING TO SEE" << endl;
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkMantaPolyDataMapper::MakeMantaProperties(vtkPolyData *input, bool allow)
+{
+  if (!allow)
+    {
+    //remove anything we used to have
+    std::map<int, Manta::Material *>::iterator it;
+    for (it = this->MyHelper->extraMaterials.begin();
+         it != this->MyHelper->extraMaterials.end();
+         it++)
+      {
+      delete it->second;
+      }
+    this->MyHelper->extraMaterials.clear();
+    return;
+    }
+
+  vtkStringArray *sa = vtkStringArray::SafeDownCast
+    (input->GetFieldData()->GetAbstractArray("material_properties"));
+  vtkDataArray *ida = vtkDataArray::SafeDownCast
+    (input->GetFieldData()->GetArray("material_ids"));
+  vtkDataArray *ipa = input->GetFieldData()->GetArray("material_ancestors");
+  if (sa)
+    {
+    std::vector<int> missed_interfaces;
+    Manta::Material *newMat = NULL;
+    
+    for (int i= 0;i < sa->GetNumberOfTuples(); i++)
+      {
+      int idx = i;
+      if (ida)
+        {
+        idx = (int)(*ida->GetTuple(i));
+        }
+      std::string spec = sa->GetValue(i);
+      std::map<int, std::string>::iterator sit;
+      std::map<int, Manta::Material *>::iterator mit;
+      sit = this->MyHelper->extrasSpecs.find(idx);
+      if (sit != this->MyHelper->extrasSpecs.end())
+        {
+        //had something, check if it needs updating
+        std::string s = sit->second;
+        if (s != spec)
+          {
+          //yes, delete the old content
+          mit = this->MyHelper->extraMaterials.find(idx);
+          delete mit->second;
+          this->MyHelper->extraMaterials.erase(mit);
+          this->MyHelper->extrasSpecs.erase(sit);
+          sit = this->MyHelper->extrasSpecs.end();
+          }
+        }
+      if (sit == this->MyHelper->extrasSpecs.end())
+        {
+        //new, or replacement, make and insert
+        if (ipa && spec == "interface")
+          {
+          missed_interfaces.push_back(idx);
+          }
+        else
+          {
+          newMat = vtkMantaProperty::ManufactureMaterial(spec);
+          if (!newMat)
+            {
+            newMat = vtkMantaProperty::ManufactureMaterial("Flat 0 0 1"); //ala GL blue
+            }
+          }
+        this->MyHelper->extraMaterials[idx] = newMat;
+        this->MyHelper->extrasSpecs[idx] = spec;
+        this->Modified();
+        }
+      }
+
+    //now combine parent materials to make interface materials
+    std::map<std::pair<int, int>, int> overrides;
+    vtkDataArray * inInterfaceIDs = input->GetFieldData()->GetArray("interface_ids");
+    vtkStringArray * inInterfaceSpecs = vtkStringArray::SafeDownCast
+      (input->GetFieldData()->GetAbstractArray("interface_properties") );
+    if (inInterfaceIDs && inInterfaceSpecs)
+      {
+      int nOverrides = inInterfaceIDs->GetNumberOfTuples();
+      for (int i = 0; i < nOverrides; i++)
+        {
+        double *old = inInterfaceIDs->GetTuple2(i);
+        int pid0 = (int)old[0];
+        int pid1 = (int)old[1];
+        std::pair <int,int> p = std::make_pair(pid0,pid1);
+        overrides[p] = i;
+        }
+      }
+
+    for (int i = 0; i < missed_interfaces.size(); i++)
+      {
+      int idx = missed_interfaces[i];
+      double dpids[2];
+      int pid0, pid1;
+      ipa->GetTuple(idx, dpids);
+      pid0 = (int)dpids[0];
+      pid1 = (int)dpids[1];
+
+      std::pair <int,int> p = std::make_pair(pid0,pid1);
+      if (overrides.find(p) != overrides.end())
+        {
+        int location = overrides[p];
+        std::string spec = inInterfaceSpecs->GetValue(location);
+        newMat = vtkMantaProperty::ManufactureMaterial(spec);
+        if (!newMat)
+          {
+          newMat = vtkMantaProperty::ManufactureMaterial("Flat 0 0 1"); //ala GL blue
+          }
+        }
+      else
+        {
+        std::string spec0 = this->MyHelper->extrasSpecs[pid0];
+        std::string spec1 = this->MyHelper->extrasSpecs[pid1];
+        //cerr << "parents of " << idx << " are " 
+        //     << pid0 << "(" << pmat0 << ") " << spec0 << "," 
+        //     << pid1 << "(" << pmat1 << ") " << spec1 << endl;
+        newMat = vtkMantaProperty::CombineMaterials(spec0, spec1);
+        if (!newMat)
+          {
+          newMat = vtkMantaProperty::ManufactureMaterial("Flat 0 0 1"); //ala GL blue
+          }
+        }
+      this->MyHelper->extraMaterials[idx] = newMat;
+      }
+    }
+
 }

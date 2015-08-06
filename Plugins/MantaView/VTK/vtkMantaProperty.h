@@ -70,6 +70,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProperty.h"
 #include "Interface/Texture.h"
 
+#include "string"
+
 //BTX
 namespace Manta {
   class Material;
@@ -129,6 +131,27 @@ public:
   //Do not call them directly.
   void CreateMantaProperty();
 
+  //Description:
+  //Given a string specification with name and parameters for a 
+  //material constructor, makes and returns one. Returns null on
+  //error.
+  static Manta::Material *ManufactureMaterial(std::string specification);
+
+  //Description:
+  //Given two materials, return a material that makes sense as the
+  //interface between them.
+  static Manta::Material *CombineMaterials(std::string m,
+                                           std::string d);
+
+  // Description:
+  // When true (the default) material properties specified in the data
+  // control the appearance. These specification consists of a field associated
+  // a field associated string array named "mantaMaterials" that define a
+  // some number of materials and a cell associated int array named "mantaMaterial"
+  // that chooses from those numbered materials for each cell,
+  vtkSetMacro(AllowDataMaterial, bool);
+  vtkGetMacro(AllowDataMaterial, bool);
+
 protected:
   vtkMantaProperty();
   ~vtkMantaProperty();
@@ -168,6 +191,8 @@ private:
   float Nt;
 
   vtkMantaManager *MantaManager;
+
+  bool AllowDataMaterial;
 };
 
 #endif

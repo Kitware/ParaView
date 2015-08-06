@@ -62,6 +62,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkManta.h"
 #include "vtkMantaLight.h"
 #include "vtkMantaManager.h"
+
 #include "vtkMantaRenderer.h"
 
 #include "vtkObjectFactory.h"
@@ -83,6 +84,9 @@ vtkMantaLight::vtkMantaLight() : MantaLight(0)
   //cerr << "ML(" << this << ") CREATE" << endl;
   this->MantaLight = NULL;
   this->MantaManager = NULL;
+  this->MantaPosition[0] = 0.0;
+  this->MantaPosition[1] = 0.0;
+  this->MantaPosition[2] = 0.0;
 }
 
 //----------------------------------------------------------------------------
@@ -232,4 +236,32 @@ void vtkMantaLight::UpdateMantaLight(vtkRenderer *ren)
         (<< "Changing from Positional to Directional light is not supported by vtkManta" );
       }
     }
+}
+
+//------------------------------------------------------------------------------
+void vtkMantaLight::SetLightType(int type)
+{
+  if (type == this->GetLightType())
+    {
+    return;
+    }
+  this->SetTransformMatrix(NULL);
+  this->SetPosition(this->GetMantaPosition());
+  this->Superclass::SetLightType(type);
+}
+
+//----------------------------------------------------------------------------
+void vtkMantaLight::SetMantaPosition(double x, double y, double z)
+{
+  if (x == this->MantaPosition[0] &&
+      y == this->MantaPosition[1] &&
+      z == this->MantaPosition[2])
+    {
+    return;
+    }
+  this->MantaPosition[0] = x;
+  this->MantaPosition[1] = y;
+  this->MantaPosition[2] = z;
+  this->SetTransformMatrix(NULL);
+  this->SetPosition(this->GetMantaPosition());
 }

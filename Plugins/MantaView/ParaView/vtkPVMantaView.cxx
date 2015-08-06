@@ -16,6 +16,7 @@
 
 #include "vtkCamera.h"
 #include "vtkDataRepresentation.h"
+#include "vtkLightCollection.h"
 #include "vtkMantaCamera.h"
 #include "vtkMantaLight.h"
 #include "vtkMantaRenderer.h"
@@ -55,13 +56,9 @@ vtkPVMantaView::vtkPVMantaView()
   this->Light->SetSpecularColor(1, 1, 1);
   this->Light->SetDiffuseColor(1, 1, 1);
   this->Light->SetIntensity(1.0);
-  this->Light->SetLightType(2); // CameraLight
+  this->Light->SetLightType(VTK_LIGHT_TYPE_HEADLIGHT);
+  this->SetCurrentLight(vtkMantaLight::SafeDownCast(this->Light));
 
-  //TODO:
-  //replace with a manta light kit that knows to instantiate vtkMantaLights
-//  this->LightKit = NULL;//vtkLightKit::New();
-
-  mantaRenderer->AddLight(this->Light);
   mantaRenderer->SetAutomaticLightCreation(0);
 
 //  this->OrderedCompositingBSPCutsSource = vtkBSPCutsGenerator::New();
@@ -157,4 +154,30 @@ void vtkPVMantaView::SetMaxDepth(int newval)
   vtkMantaRenderer *mantaRenderer = vtkMantaRenderer::SafeDownCast
     (this->RenderView->GetRenderer());
   mantaRenderer->SetMaxDepth(this->MaxDepth);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVMantaView::SetBackgroundUp(double x, double y, double z)
+{
+  vtkMantaRenderer *mantaRenderer = vtkMantaRenderer::SafeDownCast
+    (this->RenderView->GetRenderer());
+  mantaRenderer->SetBackgroundUp(x,y,z);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVMantaView::SetBackgroundRight(double x, double y, double z)
+{
+  vtkMantaRenderer *mantaRenderer = vtkMantaRenderer::SafeDownCast
+    (this->RenderView->GetRenderer());
+  mantaRenderer->SetBackgroundRight(x,y,z);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVMantaView::SetCurrentLight(vtkMantaLight *light)
+{
+  vtkLightCollection *lc = this->GetRenderer()->GetLights();
+  if (!lc->IsItemPresent(light))
+    {
+    this->GetRenderer()->AddLight(light);
+    }
 }

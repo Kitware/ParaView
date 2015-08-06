@@ -239,6 +239,43 @@
       </InputProperty>
     </SourceProxy>
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkAdditionalFieldReader"
+                 label="Add Field Arrays"
+                 name="AddFieldArrays">
+      <Documentation long_help="Reads arrays from a file and adds them to the input data object."
+                     short_help="Adds arrays to a data object.">
+                     Takes in an input data object and a filename. Opens the file
+                     and adds any arrays it sees there to the input data.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <Documentation>The input.</Documentation>
+      </InputProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="always">
+        <FileListDomain name="files" />
+        <Documentation>
+          This property specifies the file to read to get arrays
+        </Documentation>
+      </StringVectorProperty>
+      <Property command="Modified"
+                label="Reload"
+                name="Reload"
+                panel_widget="command_button"
+                panel_visibility="always">
+        <Documentation> A convenient way to reload the data file </Documentation>
+      </Property>
+
+      <!-- End of AdditionalFieldReader -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkAMRToMultiBlockFilter"
                  label="Convert AMR dataset to Multi-block"
                  name="AMRToMultiBlock">
@@ -1861,6 +1898,7 @@ found and the point will be rejected.</Documentation>
       </InputProperty>
       <!-- End ExtractEdges -->
     </SourceProxy>
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkDataSetSurfaceFilter"
                  label="Extract Surface"
                  name="DataSetSurfaceFilter">
@@ -1911,6 +1949,112 @@ found and the point will be rejected.</Documentation>
         unstructured grid.</Documentation>
       </IntVectorProperty>
       <!-- End DataSetSurfaceFilter -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkDataSetRegionSurfaceFilter"
+                 label="Extract Region Surface"
+                 name="DataSetRegionSurfaceFilter">
+      <Documentation long_help="Extract a 2D boundary surface using neighbor relations to eliminate internal faces."
+                     short_help="Extract 2D boundary surface.">The Extract
+                     Surface filter extracts the polygons forming the outer
+                     surface of the input dataset. This filter operates on any
+                     type of data and produces polygonal data as
+                     output.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Extract Surface
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetPieceInvariant"
+                         default_values="1"
+                         name="PieceInvariant"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If the value of this property is set to 1, internal
+        surfaces along process boundaries will be removed. NOTE: Enabling this
+        option might cause multiple executions of the data source because more
+        information is needed to remove internal surfaces.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetNonlinearSubdivisionLevel"
+                         default_values="1"
+                         name="NonlinearSubdivisionLevel"
+                         number_of_elements="1">
+        <IntRangeDomain max="4"
+                        min="0"
+                        name="range" />
+        <Documentation>If the input is an unstructured grid with nonlinear
+        faces, this parameter determines how many times the face is subdivided
+        into linear faces. If 0, the output is the equivalent of its linear
+        couterpart (and the midpoints determining the nonlinear interpolation
+        are discarded). If 1, the nonlinear face is triangulated based on the
+        midpoints. If greater than 1, the triangulated pieces are recursively
+        subdivided to reach the desired subdivision. Setting the value to
+        greater than 1 may cause some point data to not be passed even if no
+        quadratic faces exist. This option has no effect if the input is not an
+        unstructured grid.</Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty command="SetRegionArrayName"
+                            default_values="Regions"
+                            name="RegionArrayName"
+                            number_of_elements="1">
+        <Documentation>This property specifies the name of the material
+        array for generating parts.</Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty command="SetSingleSided"
+                         default_values="1"
+                         name="SingleSided"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If the value of this property is set to 1 (the default),
+        surfaces along the boundary are 1 layer thick. Otherwise there is
+        a surface for the material on each side.</Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty command="SetMaterialPropertiesName"
+                            default_values="material_properties"
+                            name="MaterialPropertiesName"
+                            number_of_elements="1">
+        <Documentation>This the name of the input material property field data array</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty command="SetMaterialIDsName"
+                            default_values="material_ids"
+                            name="MaterialIDsName"
+                            number_of_elements="1">
+        <Documentation>This the name of the input and output material id field data array</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty command="SetMaterialPIDsName"
+                            default_values="material_ancestors"
+                            name="MaterialPIDsName"
+                            number_of_elements="1">
+        <Documentation>This the name of the output material ancestry id field data array</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty command="SetInterfacePropertiesName"
+                            default_values="interface_properties"
+                            name="InterfacePropertiesName"
+                            number_of_elements="1">
+        <Documentation>This the name of the input interface property field data array</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty command="SetInterfaceIDsName"
+                            default_values="interface_ids"
+                            name="InterfaceIDsName"
+                            number_of_elements="1">
+        <Documentation>This the name of the input and output interface id field data array</Documentation>
+      </StringVectorProperty>
+
+      <!-- End DataSetRegionSurfaceFilter -->
     </SourceProxy>
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPVArrayCalculator"
