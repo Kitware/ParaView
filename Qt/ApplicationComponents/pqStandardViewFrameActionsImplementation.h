@@ -88,6 +88,10 @@ protected slots:
   /// A slot called when any action that can be "cancelled" with Esc is toggled.
   void escapeableActionToggled(bool checked);
 
+  /// A slot called when an interactive selection is toggled
+  void interactiveSelectionToggled(bool checked);
+
+
 protected:
   /// called to setup empty frame.
   virtual void setupEmptyFrame(QWidget* frame);

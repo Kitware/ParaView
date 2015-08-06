@@ -144,7 +144,7 @@ vtkSMProxy* vtkSMInteractiveSelectionPipeline::CreateSelectionRepresentation(
 
     vtkSMPropertyHelper(representation, "Input").Set(
       extract);
-    vtkSMPropertyHelper(representation, "Visibility").Set(1);
+    vtkSMPropertyHelper(representation, "Visibility").Set(extract != NULL);
     double color[] = {0.5, 0, 1};
     vtkSMProxy* colorPalette =
       proxyManager->GetProxy("global_properties", "ColorPalette");
@@ -174,7 +174,7 @@ vtkSMProxy* vtkSMInteractiveSelectionPipeline::CreateSelectionRepresentation(
     vtkSMPropertyHelper(this->SelectionRepresentation, "Input").Set(
       extract);
     vtkSMPropertyHelper(this->SelectionRepresentation,
-                        "Visibility").Set(true);
+                        "Visibility").Set(extract != NULL);
     this->SelectionRepresentation->UpdateVTKObjects();
     }
   return this->SelectionRepresentation;
@@ -218,7 +218,7 @@ void vtkSMInteractiveSelectionPipeline::OnColorModified(
 //----------------------------------------------------------------------------
 void vtkSMInteractiveSelectionPipeline::Hide(vtkSMRenderViewProxy* view)
 {
-  if (this->SelectionRepresentation)
+  if (this->SelectionRepresentation && view)
     {
     vtkSMPropertyHelper(this->SelectionRepresentation, "Visibility").Set(0);
     this->SelectionRepresentation->UpdateVTKObjects();
@@ -231,7 +231,7 @@ void vtkSMInteractiveSelectionPipeline::Show(
   vtkSMSourceProxy* sourceRepresentation,
   vtkSMSourceProxy* selection, vtkSMRenderViewProxy* view)
 {
-  if (sourceRepresentation)
+  if (sourceRepresentation && view)
     {
     vtkSMPropertyHelper helper(sourceRepresentation, "Input", true);
     vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(
