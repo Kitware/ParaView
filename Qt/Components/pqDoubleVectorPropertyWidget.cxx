@@ -206,8 +206,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
     dvp->FindDomain("vtkSMBoundsDomain") != NULL)
     {
     PV_DEBUG_PANELS() << "Adding \"Scale\" button since the domain is dynamically";
-    QPushButton* scaleButton = new QPushButton(this);
-    scaleButton->setIcon(scaleButton->style()->standardIcon(QStyle::SP_TitleBarCloseButton));
+    QPushButton* scaleButton = new QPushButton("X", this);
     scaleButton->setObjectName("ScaleBy");
     scaleButton->setToolTip("Scale by ...");
     scaleButton->setFixedWidth(32);
@@ -220,7 +219,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
     actn->setObjectName("x2.0");
     this->connect(actn, SIGNAL(triggered()), SLOT(scaleTwice()));
     scaleButton->setMenu(menu);
-    layoutLocal->addWidget(scaleButton);
+    layoutLocal->addWidget(scaleButton, 0, Qt::AlignBottom);
 
     PV_DEBUG_PANELS() << "Adding \"Reset\" button since the domain is dynamically";
 
@@ -240,7 +239,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
     resetButton->connect(this, SIGNAL(highlightResetButton()), SLOT(highlight()));
     resetButton->connect(this, SIGNAL(clearHighlight()), SLOT(clear()));
 
-    layoutLocal->addWidget(resetButton);
+    layoutLocal->addWidget(resetButton, 0, Qt::AlignBottom);
     }
 
   this->setLayout(layoutLocal);
