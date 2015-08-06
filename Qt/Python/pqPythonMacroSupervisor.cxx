@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPythonManager.h"
 #include "pqCoreUtilities.h"
+#include <vtksys/SystemTools.hxx>
 
 #include <QAction>
 #include <QDebug>
@@ -51,6 +52,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include <QStringList>
 #include <QApplication>
+
+#if defined(_WIN32) && !defined(__CYGWIN__)
+const char ENV_PATH_SEP=';';
+#else
+const char ENV_PATH_SEP=':';
+#endif
 
 
 class pqPythonMacroSupervisor::pqInternal {
@@ -298,7 +305,7 @@ void pqPythonMacroSupervisor::addMacro(const QString& macroName, const QString& 
   bool enable = pqApplicationCore::instance()->getActiveServer() ?
                 pqApplicationCore::instance()->getActiveServer()->isMaster() :
                 true;
-  
+
   // Run action
   QAction* runAction = new QAction(macroName, this);
   runAction->setData(fileName);
@@ -416,16 +423,31 @@ QStringList pqPythonMacroSupervisor::getMacrosFilePaths()
   QDir dir;
   dir.setFilter(QDir::Files);
 
-  foreach(QString dirPath, pqCoreUtilities::findParaviewPaths(QString("Macros"),
-                                                              true, true))
+  QStringList macroDirs = pqCoreUtilities::findParaviewPaths(QString("Macros"),
+                                                             true, true);
+
+  // add user defined macro paths from environment variable PV_MACRO_PATH
+  const char* env = vtksys::SystemTools::GetEnv("PV_MACRO_PATH");
+  if (env)
     {
-    dir.setPath(dirPath);
-    for (int i = 0; i < dir.entryList().size(); ++i)
+    QStringList macroPathDirs = QString::fromLatin1(env).split(ENV_PATH_SEP);
+    macroDirs << macroPathDirs;
+    }
+
+  foreach (QString dirPath, macroDirs)
+    {
+    if (QFile::exists(dirPath))
       {
-      const QString filePath = dir.entryList().at(i);
-      if(filePath.startsWith("."))
-        continue;
-      macroList.push_back(dirPath + QDir::separator() + filePath);
+      dir.setPath(dirPath);
+      for (int i = 0; i < dir.entryList().size(); ++i)
+        {
+        const QString filePath = dir.entryList().at(i);
+        if (filePath.startsWith("."))
+          {
+          continue;
+          }
+        macroList.push_back(dirPath + QDir::separator() + filePath);
+        }
       }
     }
 
