@@ -34,6 +34,7 @@
 
 class vtkActor2D;
 class vtkCellCenters;
+class vtkCallbackCommand;
 class vtkCompositeDataToUnstructuredGridFilter;
 class vtkLabeledDataMapper;
 class vtkProp3D;
@@ -160,6 +161,11 @@ protected:
   vtkTransform* Transform;
 
   vtkSmartPointer<vtkDataObject> Dataset;
+
+  // Mutes label mapper warnings
+  vtkCallbackCommand *WarningObserver;
+  static void OnWarningEvent(
+    vtkObject* source, unsigned long, void* clientdata, void *);
 
   int PointLabelVisibility;
   int CellLabelVisibility;

@@ -16,6 +16,7 @@
 
 #include "vtkActor2D.h"
 #include "vtkActor.h"
+#include "vtkCallbackCommand.h"
 #include "vtkCellCenters.h"
 #include "vtkCompositeDataToUnstructuredGridFilter.h"
 #include "vtkInformation.h"
@@ -72,6 +73,13 @@ vtkDataLabelRepresentation::vtkDataLabelRepresentation()
   this->CellLabelActor->SetVisibility(0);
 
   this->TransformHelperProp = vtkActor::New();
+
+  // mute warnings in the point and cell label mappers
+  this->WarningObserver = vtkCallbackCommand::New();
+  this->WarningObserver->SetCallback(&vtkDataLabelRepresentation::OnWarningEvent);
+  this->WarningObserver->SetClientData(this);
+  this->CellLabelMapper->AddObserver(vtkCommand::WarningEvent,
+                                     this->WarningObserver);
 }
 
 //----------------------------------------------------------------------------
@@ -88,6 +96,7 @@ vtkDataLabelRepresentation::~vtkDataLabelRepresentation()
   this->Transform->Delete();
   this->TransformHelperProp->Delete();
   this->CacheKeeper->Delete();
+  this->WarningObserver->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -418,4 +427,11 @@ void vtkDataLabelRepresentation::SetUserTransform(const double matrix[16])
   transform->SetMatrix(matrix);
   this->TransformHelperProp->SetUserTransform(transform.GetPointer());
   this->UpdateTransform();
+}
+
+//----------------------------------------------------------------------------
+void vtkDataLabelRepresentation::OnWarningEvent(
+  vtkObject*, unsigned long, void*, void *)
+{
+  // we just ignore the warning here.
 }
