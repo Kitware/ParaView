@@ -33,8 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqRenderView.h"
-#include "vtkSMRenderViewProxy.h"
 #include "pqPipelineRepresentation.h"
+
+#include "vtkPVXMLElement.h"
+#include "vtkSMRenderViewProxy.h"
 
 //-----------------------------------------------------------------------------
 pqCameraReaction::pqCameraReaction(QAction* parentObject,
@@ -65,7 +67,16 @@ void pqCameraReaction::updateEnableState()
       }
     else
       {
-      this->parentAction()->setEnabled(true);
+      // Check hints to see if actions should be disabled
+      bool cameraResetButtonsEnabled = true;
+      vtkPVXMLElement* hints = rview->getHints();
+      if (hints)
+        {
+        cameraResetButtonsEnabled =
+          hints->FindNestedElementByName("DisableCameraToolbarButtons") == NULL;
+        }
+
+      this->parentAction()->setEnabled(cameraResetButtonsEnabled);
       }
     }
   else
