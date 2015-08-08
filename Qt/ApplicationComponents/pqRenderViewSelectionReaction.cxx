@@ -388,10 +388,14 @@ void pqRenderViewSelectionReaction::onMouseMove()
 
   int x = rmp->GetInteractor()->GetEventPosition()[0];
   int y = rmp->GetInteractor()->GetEventPosition()[1];
-  if (x < 0 || y < 0)
+  int* size = rmp->GetInteractor()->GetSize();
+  vtkSMInteractiveSelectionPipeline* iSelectionPipeline =
+    vtkSMInteractiveSelectionPipeline::GetInstance();
+  if (x < 0 || y < 0 || x >= size[0] || y >= size[1])
     {
-    // sometimes when the cursor goes quickly out of the window we receive -1
-    // the rest of the code hangs in that case.
+    // If the cursor goes out of the render window we hide the
+    // interactive selection
+    iSelectionPipeline->Hide(rmp);
     return;
     }
 
@@ -399,9 +403,6 @@ void pqRenderViewSelectionReaction::onMouseMove()
 
   vtkNew<vtkCollection> selectedRepresentations;
   vtkNew<vtkCollection> selectionSources;
-  vtkSMInteractiveSelectionPipeline* iSelectionPipeline =
-    vtkSMInteractiveSelectionPipeline::GetInstance();
-
   bool status = false;
   switch (this->Mode)
     {

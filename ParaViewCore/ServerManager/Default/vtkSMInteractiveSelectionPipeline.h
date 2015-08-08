@@ -44,7 +44,9 @@ public:
   // Description:
   // Get/Create the interactive selection representation
   vtkSMProxy* GetSelectionRepresentation() const;
-  void CreateSelectionRepresentation(vtkSMSourceProxy* extract);
+  vtkSMProxy* GetOrCreateSelectionRepresentation();
+  vtkSMProxy* CreateSelectionRepresentation(vtkSMSourceProxy* extract);
+  
 
   // Description:
   // Shows the interactive selection for 'selection' and 'sourceRepresentation'.

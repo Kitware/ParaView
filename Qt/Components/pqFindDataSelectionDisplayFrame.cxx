@@ -469,12 +469,16 @@ void pqFindDataSelectionDisplayFrame::fillPointLabels()
 //-----------------------------------------------------------------------------
 void pqFindDataSelectionDisplayFrame::cellLabelSelected(QAction* act)
 {
+  vtkSMInteractiveSelectionPipeline::GetInstance()->
+    GetOrCreateSelectionRepresentation();
   this->Internals->labelBy(vtkDataObject::FIELD_ASSOCIATION_CELLS, act);
 }
 
 //-----------------------------------------------------------------------------
 void pqFindDataSelectionDisplayFrame::pointLabelSelected(QAction* act)
 {
+  vtkSMInteractiveSelectionPipeline::GetInstance()->
+    GetOrCreateSelectionRepresentation();
   this->Internals->labelBy(vtkDataObject::FIELD_ASSOCIATION_POINTS, act);
 }
 
@@ -613,16 +617,8 @@ void pqFindDataSelectionDisplayFrame::updateInteractiveSelectionLabelProperties(
 //-----------------------------------------------------------------------------
 void pqFindDataSelectionDisplayFrame::editLabelPropertiesInteractiveSelection()
 {
-  vtkSMInteractiveSelectionPipeline* iSelectionPipeline = 
-    vtkSMInteractiveSelectionPipeline::GetInstance();
   vtkSMProxy* proxyISelectionRepresentation = 
-    iSelectionPipeline->GetSelectionRepresentation();
-  if (!proxyISelectionRepresentation)
-    {
-    iSelectionPipeline->CreateSelectionRepresentation(NULL);
-    proxyISelectionRepresentation = 
-      iSelectionPipeline->GetSelectionRepresentation();
-    }
+    vtkSMInteractiveSelectionPipeline::GetInstance()->GetOrCreateSelectionRepresentation();
 
   QStringList properties;
   properties << "Opacity"

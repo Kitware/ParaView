@@ -57,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMInteractiveSelectionPipeline.h"
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxy.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkSMSessionProxyManager.h"
 
 #include <QKeyEvent>
@@ -339,6 +340,9 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
     pqRenderViewSelectionReaction::SELECT_SURFACE_CELLS_INTERACTIVELY);
   this->connect(actionInteractiveSelectSurfaceCells, SIGNAL(toggled(bool)),
     SLOT(escapeableActionToggled(bool)));
+  this->connect(actionInteractiveSelectSurfaceCells, SIGNAL(toggled(bool)),
+    SLOT(interactiveSelectionToggled(bool)));
+
 
   QAction* actionInteractiveSelectSurfacePoints = frame->addTitleBarAction(
     QIcon(":/pqWidgets/Icons/pqSurfaceSelectionPointInteractive.png"),
@@ -350,6 +354,9 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
     pqRenderViewSelectionReaction::SELECT_SURFACE_POINTS_INTERACTIVELY);
   this->connect(actionInteractiveSelectSurfacePoints, SIGNAL(toggled(bool)),
     SLOT(escapeableActionToggled(bool)));
+  this->connect(actionInteractiveSelectSurfacePoints, SIGNAL(toggled(bool)),
+    SLOT(interactiveSelectionToggled(bool)));
+
 
   QStyle* style = qApp->style();
   QAction* deselectAction = frame->addTitleBarAction(
@@ -640,4 +647,16 @@ void pqStandardViewFrameActionsImplementation::escapeableActionToggled(bool chec
   Q_ASSERT(checked && actn->isCheckable());
   this->ShortCutEsc->setEnabled(true);
   this->ShortCutEsc->setProperty("PV_ACTION", QVariant::fromValue<QObject*>(actn));
+}
+
+void pqStandardViewFrameActionsImplementation::interactiveSelectionToggled(
+  bool checked)
+{
+  if (! checked)
+    {
+    vtkSMInteractiveSelectionPipeline::GetInstance()->
+      Hide(
+        vtkSMRenderViewProxy::SafeDownCast(
+          pqActiveObjects::instance().activeView()->getViewProxy()));
+    }
 }
