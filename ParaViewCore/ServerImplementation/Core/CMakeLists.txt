@@ -77,6 +77,7 @@ set_source_files_properties(
 set (${vtk-module}_HDRS
   ${CMAKE_CURRENT_SOURCE_DIR}/vtkSMMessageMinimal.h
   ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/vtkSIVectorPropertyTemplate.h
   )
 
 #------------------------------------------------------------------------------

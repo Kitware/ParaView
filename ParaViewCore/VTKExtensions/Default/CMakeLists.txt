@@ -155,6 +155,11 @@ if ("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
     )
 endif()
 
+# Add header-only files so they get installed correctly.
+set (${vtk-module}_HDRS
+  vtkMaterialInterfaceIdListItem.h
+)
+
 set_source_files_properties(
   vtkAMRDualGridHelper
   vtkGridAxesHelper
