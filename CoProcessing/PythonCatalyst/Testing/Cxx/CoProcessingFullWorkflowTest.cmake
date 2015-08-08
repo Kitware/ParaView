@@ -59,10 +59,10 @@ endif()
 
 if(DO_CINEMA_TEST)
   if(NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/image/info.json" OR
-     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/image/0.000000/-180/-180.png" OR
-     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/image/0.000000/-180/60.png" OR
-     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/image/0.000000/60/-180.png" OR
-     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/image/0.000000/60/60.png")
+     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/image/0.000000e+00/-180/-180.png" OR
+     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/image/0.000000e+00/-180/60.png" OR
+     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/image/0.000000e+00/60/-180.png" OR
+     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/image/0.000000e+00/60/60.png")
     message(FATAL_ERROR "Catalyst did not generate a cinema store")
   endif()
   return()
