@@ -224,8 +224,8 @@ def copy_paths(config, paths):
         run_patches(config, path_entry)
 
       if classes:
-        edition_name = os.path.basename(config.current_input_dir)
-        with open(os.path.join(dest, '%s.catalyst.cmake' % edition_name), 'w+') as fout:
+        ename = edition_name(config.current_input_dir)
+        with open(os.path.join(dest, '%s.catalyst.cmake' % ename), 'w+') as fout:
           fout.write('list(APPEND Module_SRCS\n')
           for cls in classes:
             fout.write('  %s.cxx\n' % cls)
