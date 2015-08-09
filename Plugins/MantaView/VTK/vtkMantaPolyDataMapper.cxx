@@ -974,7 +974,16 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
        it++)
     {
     i++;
-    mesh->materials.push_back(it->second);
+    if (!it->second)
+      {
+      //user asked for manual, or was a problem with spec
+      //in either case, use manual
+      mesh->materials.push_back(material);
+      }
+    else
+      {
+      mesh->materials.push_back(it->second);
+      }
     //polys refer to materials by offset not ID
     //keep track of material IDs to location mapping
     this->MyHelper->materialOffsets[it->first] = i;
@@ -1067,7 +1076,7 @@ void vtkMantaPolyDataMapper::MakeMantaProperties(vtkPolyData *input, bool allow)
     {
     std::vector<int> missed_interfaces;
     Manta::Material *newMat = NULL;
-    
+
     for (int i= 0;i < sa->GetNumberOfTuples(); i++)
       {
       int idx = i;
@@ -1103,10 +1112,6 @@ void vtkMantaPolyDataMapper::MakeMantaProperties(vtkPolyData *input, bool allow)
         else
           {
           newMat = vtkMantaProperty::ManufactureMaterial(spec);
-          if (!newMat)
-            {
-            newMat = vtkMantaProperty::ManufactureMaterial("Flat 0 0 1"); //ala GL blue
-            }
           }
         this->MyHelper->extraMaterials[idx] = newMat;
         this->MyHelper->extrasSpecs[idx] = spec;
@@ -1147,23 +1152,15 @@ void vtkMantaPolyDataMapper::MakeMantaProperties(vtkPolyData *input, bool allow)
         int location = overrides[p];
         std::string spec = inInterfaceSpecs->GetValue(location);
         newMat = vtkMantaProperty::ManufactureMaterial(spec);
-        if (!newMat)
-          {
-          newMat = vtkMantaProperty::ManufactureMaterial("Flat 0 0 1"); //ala GL blue
-          }
         }
       else
         {
         std::string spec0 = this->MyHelper->extrasSpecs[pid0];
         std::string spec1 = this->MyHelper->extrasSpecs[pid1];
-        //cerr << "parents of " << idx << " are " 
-        //     << pid0 << "(" << pmat0 << ") " << spec0 << "," 
+        //cerr << "parents of " << idx << " are "
+        //     << pid0 << "(" << pmat0 << ") " << spec0 << ","
         //     << pid1 << "(" << pmat1 << ") " << spec1 << endl;
         newMat = vtkMantaProperty::CombineMaterials(spec0, spec1);
-        if (!newMat)
-          {
-          newMat = vtkMantaProperty::ManufactureMaterial("Flat 0 0 1"); //ala GL blue
-          }
         }
       this->MyHelper->extraMaterials[idx] = newMat;
       }
