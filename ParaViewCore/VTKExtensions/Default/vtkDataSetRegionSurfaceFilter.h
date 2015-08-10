@@ -71,12 +71,6 @@ public:
   vtkGetStringMacro(MaterialPIDsName);
 
   //Description:
-  //The name of the field array that has characteristics of each material interface
-  //Default is "interface_properties"
-  vtkSetStringMacro(InterfacePropertiesName);
-  vtkGetStringMacro(InterfacePropertiesName);
-
-  //Description:
   //The name of the field array that has material interface type identifiers in it
   //Default is "interface_ids"
   vtkSetStringMacro(InterfaceIDsName);
@@ -125,7 +119,6 @@ private:
   char *MaterialPropertiesName;
   char *MaterialIDsName;
   char *MaterialPIDsName;
-  char *InterfacePropertiesName;
   char *InterfaceIDsName;
 
   class Internals;

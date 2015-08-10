@@ -1104,14 +1104,16 @@ void vtkMantaPolyDataMapper::MakeMantaProperties(vtkPolyData *input, bool allow)
         }
       if (sit == this->MyHelper->extrasSpecs.end())
         {
-        //new, or replacement, make and insert
+        //new or replacement, make and insert
         if (ipa && spec == "interface")
           {
           missed_interfaces.push_back(idx);
+          //use NULL for now but try and fill in below
           }
         else
           {
           newMat = vtkMantaProperty::ManufactureMaterial(spec);
+          //may end up with NULL, in which case we use the manually define material
           }
         this->MyHelper->extraMaterials[idx] = newMat;
         this->MyHelper->extrasSpecs[idx] = spec;
@@ -1119,7 +1121,7 @@ void vtkMantaPolyDataMapper::MakeMantaProperties(vtkPolyData *input, bool allow)
         }
       }
 
-    //now combine parent materials to make interface materials
+    //look for user defined interface materials
     std::map<std::pair<int, int>, int> overrides;
     vtkDataArray * inInterfaceIDs = input->GetFieldData()->GetArray("interface_ids");
     vtkStringArray * inInterfaceSpecs = vtkStringArray::SafeDownCast
@@ -1137,6 +1139,7 @@ void vtkMantaPolyDataMapper::MakeMantaProperties(vtkPolyData *input, bool allow)
         }
       }
 
+    //figure out what to do about interface materials
     for (int i = 0; i < missed_interfaces.size(); i++)
       {
       int idx = missed_interfaces[i];
@@ -1149,19 +1152,19 @@ void vtkMantaPolyDataMapper::MakeMantaProperties(vtkPolyData *input, bool allow)
       std::pair <int,int> p = std::make_pair(pid0,pid1);
       if (overrides.find(p) != overrides.end())
         {
+        //user told us what to do use that
         int location = overrides[p];
         std::string spec = inInterfaceSpecs->GetValue(location);
         newMat = vtkMantaProperty::ManufactureMaterial(spec);
         }
       else
         {
+        //user didn't give us guidance, try to do something sensible
         std::string spec0 = this->MyHelper->extrasSpecs[pid0];
         std::string spec1 = this->MyHelper->extrasSpecs[pid1];
-        //cerr << "parents of " << idx << " are "
-        //     << pid0 << "(" << pmat0 << ") " << spec0 << ","
-        //     << pid1 << "(" << pmat1 << ") " << spec1 << endl;
         newMat = vtkMantaProperty::CombineMaterials(spec0, spec1);
         }
+      //may be NULL, in which case we use the manually define material
       this->MyHelper->extraMaterials[idx] = newMat;
       }
     }
