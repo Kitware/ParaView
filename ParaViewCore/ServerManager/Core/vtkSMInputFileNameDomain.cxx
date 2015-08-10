@@ -31,35 +31,34 @@ vtkStandardNewMacro(vtkSMInputFileNameDomain);
 //---------------------------------------------------------------------------
 vtkSMInputFileNameDomain::vtkSMInputFileNameDomain()
 {
-  this->FileName = NULL;
 }
 
 //---------------------------------------------------------------------------
 vtkSMInputFileNameDomain::~vtkSMInputFileNameDomain()
 {
-  this->FileName = 0;
 }
 
 
 //---------------------------------------------------------------------------
 void vtkSMInputFileNameDomain::Update(vtkSMProperty* vtkNotUsed(prop))
 {
-  vtkSMProperty* propForInput = this->GetRequiredProperty("Input");
-  if (!propForInput)
+  vtkSMProperty* inputProperty = this->GetRequiredProperty("Input");
+  if (!inputProperty)
     {
     return;
     }
 
-  vtkSMUncheckedPropertyHelper inputHelper(propForInput);
-
-  if (inputHelper.GetAsProxy() != NULL)
+  vtkSMUncheckedPropertyHelper inputHelper(inputProperty);
+  vtkSMProxy* inputProxy = inputHelper.GetAsProxy();
+  if (inputProxy != NULL)
     {
-    vtkSMProperty * fileNameProperty = (inputHelper.GetAsProxy())->GetProperty(vtkSMCoreUtilities::GetFileNameProperty(inputHelper.GetAsProxy()));
+    const char * propertyName = vtkSMCoreUtilities::GetFileNameProperty(inputProxy);
+    vtkSMProperty * fileNameProperty = inputProxy->GetProperty(propertyName);
     if (fileNameProperty != NULL)
       {
-      std::string fname =  vtksys::SystemTools::DuplicateString(vtkSMPropertyHelper(fileNameProperty).GetAsString());
+      std::string fname(vtkSMPropertyHelper(fileNameProperty).GetAsString());
       fname = vtksys::SystemTools::GetFilenameName(fname);
-      this->FileName = vtksys::SystemTools::DuplicateString(fname.c_str());
+      this->FileName = fname;
       this->DomainModified();
       return;
       }
@@ -71,23 +70,19 @@ void vtkSMInputFileNameDomain::Update(vtkSMProperty* vtkNotUsed(prop))
 int vtkSMInputFileNameDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values)
 {
   vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(prop);
-  if (svp)
+  if (svp && this->FileName != "")
     {
-    vtkSMPropertyHelper helper(prop);
-    helper.SetUseUnchecked(use_unchecked_values);
-    const char* defaultValue = svp->GetDefaultValue(0);
-    unsigned int temp;
-    if (defaultValue && this->IsInDomain(defaultValue, temp))
+    if (use_unchecked_values)
       {
-      helper.Set(0, defaultValue);
+      svp->SetUncheckedElement(0, this->FileName.c_str());
       }
     else
       {
-      helper.Set(0, "(No File Name)");
+      svp->SetElement(0, this->FileName.c_str());
       }
-    return 1;  
+    return 1;
     }
-  return 0;
+   return 0;
 }
 
 
@@ -95,4 +90,5 @@ int vtkSMInputFileNameDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unc
 void vtkSMInputFileNameDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "FileName: " << this->FileName << endl;
 }

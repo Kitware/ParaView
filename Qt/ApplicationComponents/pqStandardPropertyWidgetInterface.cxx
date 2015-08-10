@@ -160,7 +160,7 @@ pqStandardPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy *smProxy,
     {
     return new pqIntMaskPropertyWidget(smProxy, smProperty);
     }
-  else if (name == "filename_annotation")
+  else if (name == "filename_widget")
     {
     return new pqFileNamePropertyWidget(smProxy, smProperty);
     }

@@ -330,7 +330,7 @@
                             name="FileName"
                             default_values=""
                             number_of_elements="1"
-                            panel_widget="filename_annotation">
+                            panel_widget="filename_widget">
         <Documentation>Annotation of file name.</Documentation>
         <InputFileNameDomain name="filename">
           <RequiredProperties>

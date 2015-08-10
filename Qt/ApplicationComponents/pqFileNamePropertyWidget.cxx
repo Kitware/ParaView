@@ -31,7 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqFileNamePropertyWidget.h"
 
-#include "pqCoreUtilities.h"
 #include "vtkCommand.h"
 #include "vtkSMInputFileNameDomain.h"
 #include "vtkSMStringVectorProperty.h"
@@ -52,7 +51,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHBoxLayout>
 #include <QStyle>
 #include <QMenu>
-#include <iostream>
 
 //-----------------------------------------------------------------------------
 pqFileNamePropertyWidget::pqFileNamePropertyWidget(
@@ -124,7 +122,7 @@ pqFileNamePropertyWidget::~pqFileNamePropertyWidget()
 //-----------------------------------------------------------------------------
 void pqFileNamePropertyWidget::resetButtonClicked()
 {
-  // Now this logic to hardcoded for the Environment Annotation filter (hence the name of this
+  // Logic is hardcoded for the Environment Annotation filter (hence the name of this
   // widget).
 
   vtkSMProxy* smproxy = this->proxy();
@@ -134,15 +132,15 @@ void pqFileNamePropertyWidget::resetButtonClicked()
   if (vtkSMInputFileNameDomain* domain = vtkSMInputFileNameDomain::SafeDownCast(
       smproperty->GetDomain("filename")))
     {
-    if (domain->GetFileName() != NULL)
+    if (domain->GetFileName() != "")
       {
-      fileName = domain->GetFileName();
+      fileName = domain->GetFileName().c_str();
       }
     }
 
 
   vtkSMUncheckedPropertyHelper helper(smproperty);
-  if (helper.GetAsString() != fileName)
+  if (strcmp(helper.GetAsString(), fileName))
     {
     vtkSMUncheckedPropertyHelper(smproxy, "FileName").Set(fileName);
     emit this->changeAvailable();
