@@ -86,12 +86,11 @@ def IterateOverTimeSteps(globalController, timeCompartmentSize, timeSteps, write
 
 def CreateReader(ctor, fileInfo, **kwargs):
     "Creates a reader, checks if it can be used, and sets the filenames"
-    reader = ctor()
-    CheckReader(reader)
     import glob
     files = glob.glob(fileInfo)
     files.sort() # assume there is a logical ordering of the filenames that corresponds to time ordering
-    reader.FileName = files
+    reader = ctor(FileName=files)
+    CheckReader(reader)
     if kwargs:
         pvsimple.SetProperties(reader, **kwargs)
     return reader
