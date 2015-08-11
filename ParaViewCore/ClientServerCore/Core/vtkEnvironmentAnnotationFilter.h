@@ -31,8 +31,8 @@
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkTableAlgorithm.h"
+#include <string> //needed for iVars
 
-#include <string>
 
 class VTKPVCLIENTSERVERCORECORE_EXPORT vtkEnvironmentAnnotationFilter : public vtkTableAlgorithm
 {

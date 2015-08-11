@@ -28,13 +28,11 @@
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMStringListDomain.h"
 
-#include <string>
-
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMInputFileNameDomain : public vtkSMStringListDomain
 {
 public:
   static vtkSMInputFileNameDomain* New();
-  vtkTypeMacro(vtkSMInputFileNameDomain, vtkSMDomain);
+  vtkTypeMacro(vtkSMInputFileNameDomain, vtkSMStringListDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Update self checking the "unchecked" values of all required
