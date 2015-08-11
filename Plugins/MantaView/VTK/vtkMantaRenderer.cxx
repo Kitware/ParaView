@@ -116,7 +116,7 @@ vtkMantaRenderer::vtkMantaRenderer() :
   this->NumberOfWorkers = 1;
   this->EnableShadows = 0;
   this->Samples = 1;
-  this->MaxDepth = 5;
+  this->MaxDepth = 10;
 
   // the default global ambient light created by vtkRenderer is too bright.
   this->SetAmbient( 0.1, 0.1, 0.1 );

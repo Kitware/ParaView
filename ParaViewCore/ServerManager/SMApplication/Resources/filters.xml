@@ -2002,7 +2002,7 @@ found and the point will be rejected.</Documentation>
       </IntVectorProperty>
 
       <StringVectorProperty command="SetRegionArrayName"
-                            default_values="Regions"
+                            default_values="material"
                             name="RegionArrayName"
                             number_of_elements="1">
         <Documentation>This property specifies the name of the material
@@ -2022,35 +2022,32 @@ found and the point will be rejected.</Documentation>
       <StringVectorProperty command="SetMaterialPropertiesName"
                             default_values="material_properties"
                             name="MaterialPropertiesName"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced">
         <Documentation>This the name of the input material property field data array</Documentation>
       </StringVectorProperty>
 
       <StringVectorProperty command="SetMaterialIDsName"
                             default_values="material_ids"
                             name="MaterialIDsName"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced">
         <Documentation>This the name of the input and output material id field data array</Documentation>
       </StringVectorProperty>
 
       <StringVectorProperty command="SetMaterialPIDsName"
                             default_values="material_ancestors"
                             name="MaterialPIDsName"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced">
         <Documentation>This the name of the output material ancestry id field data array</Documentation>
-      </StringVectorProperty>
-
-      <StringVectorProperty command="SetInterfacePropertiesName"
-                            default_values="interface_properties"
-                            name="InterfacePropertiesName"
-                            number_of_elements="1">
-        <Documentation>This the name of the input interface property field data array</Documentation>
       </StringVectorProperty>
 
       <StringVectorProperty command="SetInterfaceIDsName"
                             default_values="interface_ids"
                             name="InterfaceIDsName"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced">
         <Documentation>This the name of the input and output interface id field data array</Documentation>
       </StringVectorProperty>
 
@@ -2152,8 +2149,7 @@ type as the input.</Documentation>
       <IntVectorProperty command="SetCoordinateResults"
                          default_values="0"
                          name="CoordinateResults"
-                         number_of_elements="1"
-                         panel_visibility="advanced">
+                         number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>The value of this property determines whether the
         results of this computation should be used as point coordinates or as a

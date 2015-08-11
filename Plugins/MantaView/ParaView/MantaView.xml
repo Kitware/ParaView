@@ -103,7 +103,7 @@
         immediate_update="1"
         number_of_elements="1"
         panel_visibility="advanced"
-        default_values="5">
+        default_values="10">
         <IntRangeDomain name="range" min="1" />
         <Documentation>
           Controls maximum number of ray bounces.

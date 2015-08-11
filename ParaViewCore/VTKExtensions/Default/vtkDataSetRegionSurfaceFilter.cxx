@@ -55,15 +55,13 @@ vtkDataSetRegionSurfaceFilter::vtkDataSetRegionSurfaceFilter()
 {
   this->RegionArray = 0;
   this->RegionArrayName = 0;
-  this->SetRegionArrayName("Regions");
+  this->SetRegionArrayName("material");
   this->MaterialPropertiesName = 0;
   this->SetMaterialPropertiesName("material_properties");
   this->MaterialIDsName = 0;
   this->SetMaterialIDsName("material_ids");
   this->MaterialPIDsName = 0;
   this->SetMaterialPIDsName("material_ancestors");
-  this->InterfacePropertiesName = 0;
-  this->SetInterfacePropertiesName("interface_properties");
   this->InterfaceIDsName = 0;
   this->SetInterfaceIDsName("interface_ids");
   this->OrigCellIds = vtkIdTypeArray::New();
@@ -83,7 +81,6 @@ vtkDataSetRegionSurfaceFilter::~vtkDataSetRegionSurfaceFilter()
   this->SetMaterialPropertiesName(0);
   this->SetMaterialIDsName(0);
   this->SetMaterialPIDsName(0);
-  this->SetInterfacePropertiesName(0);
   this->SetInterfaceIDsName(0);
   this->OrigCellIds->Delete();
   this->CellFaceIds->Delete();
@@ -813,8 +810,6 @@ int vtkDataSetRegionSurfaceFilter::UnstructuredGridExecute(vtkDataSet *dataSetIn
          it++)
       {
       int index = it->second;
-
-      //we created them be counting up from 0 so just do this
       outMaterialIDs->SetValue(index, index);
 
       //keep record of parents
@@ -1175,8 +1170,8 @@ vtkFastGeomQuad *vtkDataSetRegionSurfaceFilter::GetNextVisibleQuadFromHash()
             }
           }
         //preserve the joined quad's material
-        int m1 = (mat1<mat2?mat1:mat2);
-        int m2 = (mat1<mat2?mat2:mat1);
+        int m1 = (mat1>mat2?mat1:mat2);
+        int m2 = (mat1>mat2?mat2:mat1);
         p = std::make_pair(m1,m2);
         if (this->Internal->NewRegions.find(p) == this->Internal->NewRegions.end())
           {
