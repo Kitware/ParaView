@@ -1289,7 +1289,8 @@ QIcon pqMultiBlockInspectorPanel::makeColorIcon(
     drawColorIcon(painter, color, 
                   (index == flatIndex) ? USER_VALUE : SYSTEM_VALUE);
     }
-  else if (this->ColorTransferFunction && nodeType == LEAF_NODE)
+  else if (this->ColorTransferFunction && nodeType == LEAF_NODE &&
+           this->ColorTransferFunction->GetNumberOfAnnotatedValues() > 0)
     {
     unsigned char* rgb = this->ColorTransferFunction->MapValue(
       CompositeWrap ? 
