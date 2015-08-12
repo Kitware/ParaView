@@ -141,7 +141,7 @@ class ParaViewPipelineController(object):
                 newArgs.append(arg)
         func = getattr(self.SMController, self.__LastAttrName)
         retVal = func(*newArgs)
-        if type(retVal) is type(self.SMController) and retVal.IsA("vtkSMProxy"):
+        if isinstance(retVal, vtkSMProxy):
             # if this is a vtkObject and is a "vtkSMProxy", return a Proxy().
             return _getPyProxy(retVal)
         else:
@@ -427,9 +427,9 @@ class Proxy(object):
                 newArgs.append(arg)
         func = getattr(self.SMProxy, self.__LastAttrName)
         retVal = func(*newArgs)
-        if type(retVal) is type(self.SMProxy) and retVal.IsA("vtkSMProxy"):
+        if isinstance(retVal, vtkSMProxy):
             return _getPyProxy(retVal)
-        elif type(retVal) is type(self.SMProxy) and retVal.IsA("vtkSMProperty"):
+        elif isinstance(retVal, vtkSMProperty):
             return _wrap_property(self, retVal)
         else:
             return retVal
@@ -1747,7 +1747,7 @@ class ProxyManager(object):
               newArgs.append(arg)
       func = getattr(self.SMProxyManager, self.__LastAttrName)
       retVal = func(*newArgs)
-      if type(retVal) is type(self.SMProxyManager) and retVal.IsA("vtkSMProxy"):
+      if isinstance(retVal, vtkSMProxy):
           return _getPyProxy(retVal)
       else:
           return retVal
