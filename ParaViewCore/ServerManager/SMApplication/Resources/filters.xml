@@ -277,6 +277,11 @@
     <SourceProxy class="vtkEnvironmentAnnotationFilter"
                  label="Environment Annotation"
                  name="EnvironmentAnnotation">
+      <Documentation long_help="Allows annotation of user name, date/time, OS, and possibly filename."
+        short_help="Adds annotation overlay.">
+        Apply to any source. Gui allows manual selection of desired annotation options.
+        If the source is a file, can display the filename.
+      </Documentation>
       <InputProperty clean_command="RemoveAllInputs"
                      command="AddInputConnection"
                      multiple_input="1"
