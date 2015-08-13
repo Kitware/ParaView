@@ -115,6 +115,7 @@
     <Proxy group="filters" name="PythonAnnotation" />
     <Proxy group="filters" name="TimeToTextConvertor" />
     <Proxy group="filters" name="DataSetRegionSurfaceFilter" />
+    <Proxy group="filters" name="EnvironmentAnnotation" />
   </Category>
 
   <Proxy group="filters" name="AddFieldArrays" />

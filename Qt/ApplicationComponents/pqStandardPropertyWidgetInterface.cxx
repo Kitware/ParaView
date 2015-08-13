@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplayRepresentationWidget.h"
 #include "pqDoubleRangeSliderPropertyWidget.h"
 #include "pqEnableWidgetDecorator.h"
+#include "pqFileNamePropertyWidget.h"
 #include "pqFontPropertyWidget.h"
 #include "pqGenericPropertyWidgetDecorator.h"
 #include "pqGlyphScaleFactorPropertyWidget.h"
@@ -158,6 +159,10 @@ pqStandardPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy *smProxy,
   else if (name == "int_mask")
     {
     return new pqIntMaskPropertyWidget(smProxy, smProperty);
+    }
+  else if (name == "filename_widget")
+    {
+    return new pqFileNamePropertyWidget(smProxy, smProperty);
     }
   // *** NOTE: When adding new types, please update the header documentation ***
   return NULL;

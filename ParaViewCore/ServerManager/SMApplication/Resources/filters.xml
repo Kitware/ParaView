@@ -253,7 +253,7 @@
           <Group name="sources" />
           <Group name="filters" />
         </ProxyGroupDomain>
-        <Documentation>The input.</Documentation>
+                <Documentation>The input.</Documentation>
       </InputProperty>
       <StringVectorProperty animateable="0"
                             command="SetFileName"
@@ -272,8 +272,90 @@
                 panel_visibility="always">
         <Documentation> A convenient way to reload the data file </Documentation>
       </Property>
-
+    </SourceProxy>
       <!-- End of AdditionalFieldReader -->
+    <SourceProxy class="vtkEnvironmentAnnotationFilter"
+                 label="Environment Annotation"
+                 name="EnvironmentAnnotation">
+      <Documentation long_help="Allows annotation of user name, date/time, OS, and possibly filename."
+        short_help="Adds annotation overlay.">
+        Apply to any source. Gui allows manual selection of desired annotation options.
+        If the source is a file, can display the filename.
+      </Documentation>
+      <InputProperty clean_command="RemoveAllInputs"
+                     command="AddInputConnection"
+                     multiple_input="1"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+        <Documentation>Set the input of the filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetDisplayUserName"
+                         name="DisplayUserName"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Toggle User Name Visibility.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDisplaySystemName"
+                         name="DisplaySystemName"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Toggle System Name Visibility.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDisplayDate"
+                         name="DisplayDate"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Toggle Date/Time Visibility.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDisplayFileName"
+                         name="DisplayFileName"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Toggle File Name Visibility.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            default_values=""
+                            number_of_elements="1"
+                            panel_widget="filename_widget">
+        <Documentation>Annotation of file name.</Documentation>
+        <InputFileNameDomain name="filename">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </InputFileNameDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="DisplayFileName"
+                                   value="1" />
+          <!-- enable this widget when DisplayFileName==1 -->
+        </Hints>
+      </StringVectorProperty>
+      <Hints>
+        <Visibility replace_input="0" />
+        <OutputPort index="0"
+                    name="Output-0"
+                    type="text" />
+      </Hints>
     </SourceProxy>
     <!-- ==================================================================== -->
     <SourceProxy class="vtkAMRToMultiBlockFilter"

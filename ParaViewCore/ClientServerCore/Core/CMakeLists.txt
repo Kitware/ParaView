@@ -77,6 +77,7 @@ set (Module_SRCS
   vtkSession.cxx
   vtkSessionIterator.cxx
   vtkTCPNetworkAccessManager.cxx
+  vtkEnvironmentAnnotationFilter.cxx
 )
 
 

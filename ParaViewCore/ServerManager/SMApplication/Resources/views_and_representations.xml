@@ -3405,8 +3405,8 @@
                       name="YLabelFormat" />
             <Property exposed_name="CubeAxesZLabelFormat"
                       name="ZLabelFormat" />
-      <Property name="StickyAxes" />
-      <Property name="CenterStickyAxes" />
+            <Property name="StickyAxes" />
+            <Property name="CenterStickyAxes" />
           </PropertyGroup>
         </ExposedProperties>
         <ShareProperties subproxy="SurfaceRepresentation">
