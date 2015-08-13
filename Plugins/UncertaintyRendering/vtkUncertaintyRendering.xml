@@ -1,6 +1,6 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="representations">
-    <UncertaintySurfaceRepresentationProxy name="UncertaintySurfaceRepresentation"
+    <RepresentationProxy name="UncertaintySurfaceRepresentation"
                                            class="vtkUncertaintySurfaceRepresentation"
                                            processes="client|dataserver|renderserver"
                                            base_proxygroup="internal_representations"
@@ -53,17 +53,13 @@
                      command="SetUncertaintyTransferFunction"
                      label="Uncertainty Transfer Function"
                      panel_widget="transfer_function_editor">
+       <ProxyListDomain name="proxy_list">
+         <Proxy group="piecewise_functions" name="PiecewiseFunction" />
+       </ProxyListDomain>
         <Documentation>
           Sets the transfer function used to map scalars to uncertainty values.
         </Documentation>
       </ProxyProperty>
-
-      <SubProxy>
-        <Proxy name="TransferFunction"
-               proxygroup="piecewise_functions"
-               proxyname="PiecewiseFunction">
-        </Proxy>
-      </SubProxy>
-    </UncertaintySurfaceRepresentationProxy>
+    </RepresentationProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
