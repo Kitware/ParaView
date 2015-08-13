@@ -302,7 +302,7 @@ int vtkPVScalarBarActor::CreateLabel(
   // Size the font to fit in the targetHeight, which we are using
   // to size the font because it is (relatively?) constant.
   int fontSize = textActor->SetConstrainedFontSize(
-    viewport, targetHeight, VTK_INT_MAX);
+    viewport, VTK_INT_MAX, targetHeight);
   int maxFontSize = this->LabelTextProperty->GetFontSize();
   if (fontSize > maxFontSize)
     {
