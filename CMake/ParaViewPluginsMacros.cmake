@@ -178,6 +178,9 @@ macro(pv_process_plugins root_src root_build)
     set(PARAVIEW_BUILD_PLUGIN_${pv-plugin} ${${pv-plugin}_DEFAULT_ENABLED}
       CACHE BOOL "Build ${pv-plugin} Plugin")
     mark_as_advanced(PARAVIEW_BUILD_PLUGIN_${pv-plugin})
+    cmake_dependent_option(PARAVIEW_AUTOLOAD_PLUGIN_${pv-plugin} "Load ${pv-plugin} Plugin Automatically" OFF
+                           "PARAVIEW_BUILD_PLUGIN_${pv-plugin}" ${${pv-plugin}_AUTOLOAD})
+    mark_as_advanced(PARAVIEW_AUTOLOAD_PLUGIN_${pv-plugin})
   endforeach()
 
   # process all enabled plugins.
@@ -213,7 +216,7 @@ macro(pv_process_plugins root_src root_build)
       # the enabled plugins.
       list(APPEND PARAVIEW_PLUGINLIST ${${pv-plugin}_PLUGIN_NAMES})
       foreach (libname IN LISTS ${pv-plugin}_PLUGIN_NAMES)
-        if (${pv-plugin}_AUTOLOAD)
+        if (PARAVIEW_AUTOLOAD_PLUGIN_${pv-plugin})
           set(plugin_ini
             "${plugin_ini}  <Plugin name=\"${libname}\" auto_load=\"1\"/>\n")
         else ()
