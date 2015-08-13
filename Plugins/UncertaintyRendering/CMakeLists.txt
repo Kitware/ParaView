@@ -9,7 +9,6 @@ IF (PARAVIEW_BUILD_QT_GUI)
     vtkUncertaintySurfacePainter.cxx
     vtkUncertaintySurfaceDefaultPainter.cxx
     vtkUncertaintySurfaceRepresentation.cxx
-    vtkSMUncertaintySurfaceRepresentationProxy.cxx
   )
 
   SET(SM_XMLS
