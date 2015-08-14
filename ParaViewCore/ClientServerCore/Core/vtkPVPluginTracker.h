@@ -68,16 +68,19 @@ public:
   // form:
   // @code
   // <Plugins>
-  //    <Plugin name="[plugin name]" auto_load="[bool]" />
+  //    <Plugin name="[plugin name]" filename="[optionnal file name] auto_load="[bool]" />
   //       ...
   // </Plugins>
   // @endcode
   // This method will process the XML, locate the plugin shared library and
   // either load the plugin or call RegisterAvailablePlugin based on the status
-  // of the auto_load flag.
-  void LoadPluginConfigurationXML(const char* filename);
-  void LoadPluginConfigurationXML(vtkPVXMLElement*);
-  void LoadPluginConfigurationXMLFromString(const char* xmlcontents);
+  // of the auto_load flag. auto_load flag is optionnal and is 0 by default.
+  // filaname is also optionnal, if not provided this method will look in 
+  // different place to find the plugin, eg. paraview lib dir. It will NOT look
+  // in PV_PLUGIN_PATH.
+  void LoadPluginConfigurationXML(const char* filename, bool forceLoad = false);
+  void LoadPluginConfigurationXML(vtkPVXMLElement*, bool forceLoad = false);
+  void LoadPluginConfigurationXMLFromString(const char* xmlcontents, bool forceLoad = false);
 
   // Description:
   // Methods to iterate over registered plugins.

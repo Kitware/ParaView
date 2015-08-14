@@ -59,6 +59,19 @@ public:
   void LoadPluginsFromPluginSearchPath();
 
   // Description:
+  // Use PV_PLUGIN_CONFILE_FILE xml file to load specified plugins
+  // It can contain path to multiples xml pluginc config files
+  // sperated by env separator.
+  // It allow user to fine pick which plugins to load, instead of using PV_PLUGIN_PATH
+  // the format a xml plugin file should be the following :
+  // <?xml version="1.0"?>
+  //  <Plugins>
+  //    <Plugin name="MyPlugin" filename="absolute/path/to/libMyPlugin.so"/>
+  //    ...
+  //  </Plugins>
+  void LoadPluginsFromPluginConfigFile();
+
+  // Description:
   // Loads all plugin libraries at a path.
   void LoadPluginsFromPath(const char* path);
 
