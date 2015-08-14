@@ -384,20 +384,35 @@ std::string vtkInitializationHelper::GetUserSettingsDirectory()
     }
   directoryPath += applicationName + separator;
 #else
-  const char* home = getenv("HOME");
-  if (!home)
-    {
-    return std::string();
-    }
+  std::string directoryPath;
   std::string separator("/");
-  std::string directoryPath(home);
-  if (directoryPath[directoryPath.size()-1] != separator[0])
+  
+  // Emulating QSettings behavior.
+  const char* xdgConfigHome = getenv("XDG_CONFIG_HOME");
+  if (xdgConfigHome && strlen(xdgConfigHome) > 0)
     {
-    directoryPath.append(separator);
+    directoryPath = xdgConfigHome;
+    if (directoryPath[directoryPath.size() - 1] != separator[0])
+      {
+      directoryPath += separator;
+      }
     }
-  directoryPath += ".config" + separator + organizationName + separator;
+  else
+    {
+    const char* home = getenv("HOME");
+    if (!home)
+      {
+      return std::string();
+      }
+    directoryPath = home;
+    if (directoryPath[directoryPath.size() - 1] != separator[0])
+      {
+      directoryPath += separator;
+      }
+     directoryPath += ".config/";
+    }
+  directoryPath += organizationName + separator;
 #endif
-
   return directoryPath;
 }
 

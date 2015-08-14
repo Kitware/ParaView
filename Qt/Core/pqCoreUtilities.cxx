@@ -77,18 +77,8 @@ QWidget* pqCoreUtilities::findMainWindow()
 //-----------------------------------------------------------------------------
 QString pqCoreUtilities::getParaViewUserDirectory()
   {
-  QString settingsRoot;
-#if defined(Q_OS_WIN)
-  settingsRoot = QString::fromLocal8Bit(getenv("APPDATA"));
-#else
-  settingsRoot = QString::fromLocal8Bit(getenv("HOME")) +
-                 QDir::separator() + QString::fromLocal8Bit(".config");
-#endif
-  QString settingsPath = QString("%2%1%3");
-  settingsPath = settingsPath.arg(QDir::separator());
-  settingsPath = settingsPath.arg(settingsRoot);
-  settingsPath = settingsPath.arg(QApplication::organizationName());
-  return settingsPath;
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  return QFileInfo(settings->fileName()).path();
   }
 
 //-----------------------------------------------------------------------------
