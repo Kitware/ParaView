@@ -1229,6 +1229,9 @@
                          name="AutoOrient"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
+        <Hints>
+          <NoDefault />
+        </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="GetAutoOrient"
                          information_only="1"
@@ -1244,6 +1247,7 @@
           <PropertyWidgetDecorator type="EnableWidgetDecorator">
             <Property name="AutoOrient" function="boolean_invert" index="0" />
           </PropertyWidgetDecorator>
+          <NoDefault />
         </Hints>
         <EnumerationDomain name="enum">
           <Entry text="Horizontal"
