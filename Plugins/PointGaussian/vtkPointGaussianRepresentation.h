@@ -9,6 +9,7 @@ class vtkActor;
 class vtkPointGaussianMapper;
 class vtkScalarsToColors;
 class vtkPolyData;
+class vtkPiecewiseFunction;
 
 class vtkPointGaussianRepresentation : public vtkPVDataRepresentation
 {
@@ -50,22 +51,26 @@ public:
   // Use to set whether the data in this representation is visible or not
   virtual void SetVisibility(bool val);
 
-  // Description:
-  // Use to set the opactiy of the data in this representation
-  virtual void SetOpacity(double val);
+  //***************************************************************************
+  // Forwarded to Actor.
+  virtual void SetOrientation(double, double, double);
+  virtual void SetOrigin(double, double, double);
+  virtual void SetPickable(int val);
+  virtual void SetPosition(double, double, double);
+  virtual void SetScale(double, double, double);
 
-  // Description:
-  // Override to set the ambient color of the dataset
+  //***************************************************************************
+  // Forwarded to Actor->GetProperty()
   virtual void SetAmbientColor(double r, double g, double b);
-  // Description:
-  // Override to set the color of the dataset
   virtual void SetColor(double r, double g, double b);
-  // Description:
-  // Override to set the diffuse color of the dataset
   virtual void SetDiffuseColor(double r, double g, double b);
-  // Description:
-  // Override to set the specular color of the dataset
+  virtual void SetEdgeColor(double r, double g, double b);
+  virtual void SetInterpolation(int val);
+  virtual void SetLineWidth(double val);
+  virtual void SetOpacity(double val);
+  virtual void SetPointSize(double val);
   virtual void SetSpecularColor(double r, double g, double b);
+  virtual void SetSpecularPower(double val);
 
   // Description:
   // Sets the radius of the gaussian splats if there is no scale array or if
@@ -73,10 +78,41 @@ public:
   virtual void SetSplatSize(double radius);
 
   // Description:
+  // Sets the snippet of fragment shader code used to color the sprites.
+  void SetCustomShader(const char* shaderString);
+
+  // Description:
   // Sets the point array to scale the guassians by.  The array should be a
   // float array.  The first four parameters are unused and only needed for
   // the ParaView GUI's signature recognition.
   void SelectScaleArray(int, int, int, int, const char* name);
+
+  // Description:
+  // Sets a vtkPiecewiseFunction to use in mapping array values to sprite
+  // sizes.  Performance decreases (along with understandability) when
+  // large values are used for sprite sizes.  This is only used when
+  // "SetScaleArray" is also set.
+  void SetScaleTransferFunction(vtkPiecewiseFunction* pwf);
+
+  // Description:
+  // Sets a vtkPiecewiseFunction to use in mapping array values to sprite
+  // opacities.  Only used when "Opacity Array" is set.
+  void SetOpacityTransferFunction(vtkPiecewiseFunction* pwf);
+
+  // Description:
+  // Sets the point array to use in calculating point sprite opacities.
+  // The array should be a float or double array.  The first four
+  // parameters are unused and only needed for the ParaView GUI's
+  // signature recognition.
+  void SelectOpacityArray(int, int, int, int, const char* name);
+
+  // Description:
+  // Enables or disables setting opacity by an array.  Set which array
+  // should be used for opacity with SelectOpacityArray, and set an
+  // opacity transfer function with SetOpacityTransferFunction.
+  void SetOpacityByArray(bool newVal);
+  vtkGetMacro(OpacityByArray, bool);
+  vtkBooleanMacro(OpacityByArray, bool);
 
   // Description:
   // Enables or disables scaling by a data array vs. a constant factor.  Set
@@ -104,6 +140,11 @@ protected:
   char* LastScaleArray;
 
   vtkSetStringMacro(LastScaleArray);
+
+  bool OpacityByArray;
+  char* LastOpacityArray;
+
+  vtkSetStringMacro(LastOpacityArray);
 };
 
 #endif // VTKPOINTGAUSSIANREPRESENTATION_H
