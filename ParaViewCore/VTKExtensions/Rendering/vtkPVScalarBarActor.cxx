@@ -684,6 +684,19 @@ void vtkPVScalarBarActor::ConfigureTicks()
   else // VTK_ORIENT_VERTICAL
     {
     targetHeight = (targetHeight - (ticks.size() - 1) * this->TextPad) / (ticks.size() + 1.);
+    // Get the target height based on the selected font size. Set this
+    // as the target height
+    //int desiredFontSize = this->LabelTextProperty->GetFontSize();
+    vtkNew<vtkTextActor> dummyActor;
+    dummyActor->GetTextProperty()->ShallowCopy(this->LabelTextProperty);
+    dummyActor->SetInput("|");
+    double tsize[2];
+    dummyActor->GetSize(this->P->Viewport, tsize);
+
+    if (tsize[1] < targetHeight)
+      {
+      targetHeight = tsize[1];
+      }
     }
 
   bool precede = this->TextPosition == vtkScalarBarActor::PrecedeScalarBar;
