@@ -387,17 +387,15 @@ void pqPropertiesPanel::setPanelMode(int val)
   this->Internals->Ui.Delete->setVisible(has_source);
   this->Internals->Ui.Help->setVisible(has_source);
   this->Internals->Ui.Reset->setVisible(has_source);
-  this->Internals->Ui.PropertiesSaveAsDefaults->setVisible(has_source);
-  this->Internals->Ui.PropertiesRestoreDefaults->setVisible(has_source);
 
+  this->Internals->Ui.PropertiesButtons->setVisible(has_source);
   this->Internals->Ui.PropertiesFrame->setVisible(has_source);
+
   this->Internals->Ui.ViewFrame->setVisible(has_view);
-  this->Internals->Ui.ViewSaveAsDefaults->setVisible(has_view);
-  this->Internals->Ui.ViewRestoreDefaults->setVisible(has_view);
+  this->Internals->Ui.ViewButtons->setVisible(has_view);
 
   this->Internals->Ui.DisplayFrame->setVisible(has_display);
-  this->Internals->Ui.DisplaySaveAsDefaults->setVisible(has_display);
-  this->Internals->Ui.DisplayRestoreDefaults->setVisible(has_display);
+  this->Internals->Ui.DisplayButtons->setVisible(has_display);
 
   // the buttons need not be shown if there's only 1 type in the panel.
   bool has_multiples_types =
