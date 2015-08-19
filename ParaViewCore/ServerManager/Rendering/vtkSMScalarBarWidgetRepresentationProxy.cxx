@@ -250,6 +250,21 @@ bool vtkSMScalarBarWidgetRepresentationProxy::PlaceInView(vtkSMProxy* view)
   vtkSMPropertyHelper posHelper(this, "Position");
   posHelper.Get(myanchor.GetData(), 2);
 
+  // Shift anchor x position for horizontal orientations
+  if (!isVertical)
+    {
+    // Scoot the scalar bar to the left a bit from where a vertically
+    // oriented scalar bar would be to fit it in the vieww
+    myanchor[0] = 0.54;
+
+    double minSize = std::min(mysize[0], mysize[1]);
+    double maxSize = std::max(mysize[0], mysize[1]);
+    mysize[0] = maxSize;
+    mysize[1] = minSize;
+    }
+  posHelper.Set(myanchor.GetData(), 2);
+  pos2Helper.Set(mysize.GetData(), 2);
+
   vtkBoundingBox mybox = GetBox(myanchor, mysize);
   // let call mybox as (x1,y1):(x2,y2)
   if (IsAvailable(mybox, occupiedBoxes))
@@ -289,6 +304,11 @@ bool vtkSMScalarBarWidgetRepresentationProxy::PlaceInView(vtkSMProxy* view)
       double deltaX = maxX - minX;
       minX = clamp(maxX - barWidth, 0, 1);
       maxX = clamp(minX + deltaX, 0, 1);
+      }
+    else
+      {
+      minX += 0.01;
+      maxX += 0.01;
       }
     vtkBoundingBox flippedYBox(
         // xmin, xmax
