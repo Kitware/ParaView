@@ -49,9 +49,10 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkMultiProcessStream.h"
 
-#include <vector>
+#include <algorithm>
 #include <map>
 #include <string>
+#include <vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
 
@@ -749,7 +750,7 @@ void vtkPVDataInformation::AddInformation(
   vtkPVInformation* pvi, int addingParts)
 {
   vtkPVDataInformation *info;
-  int             i,j;
+  int             i;
   int*            ext;
 
   info = vtkPVDataInformation::SafeDownCast(pvi);
@@ -873,17 +874,30 @@ void vtkPVDataInformation::AddInformation(
 
   // Extents are only a little harder.
   ext = info->GetExtent();
-  for (i = 0; i < 3; ++i)
+  if ((ext[0] > ext[1]) || (ext[2] > ext[3]) || (ext[4] > ext[5]))
     {
-    j = i*2;
-    if (ext[j] < this->Extent[j])
+    // ext is invalid. ignore it.
+    }
+  else if ( (this->Extent[0] > this->Extent[1]) ||
+            (this->Extent[2] > this->Extent[3]) ||
+            (this->Extent[4] > this->Extent[5]) )
+    {
+    std::copy(ext, ext + 6, this->Extent);
+    }
+  else
+    {
+    for (i = 0; i < 3; ++i)
       {
-      this->Extent[j] = ext[j];
-      }
-    ++j;
-    if (ext[j] > this->Extent[j])
-      {
-      this->Extent[j] = ext[j];
+      int j = i*2;
+      if (ext[j] < this->Extent[j])
+        {
+        this->Extent[j] = ext[j];
+        }
+      ++j;
+      if (ext[j] > this->Extent[j])
+        {
+        this->Extent[j] = ext[j];
+        }
       }
     }
 
