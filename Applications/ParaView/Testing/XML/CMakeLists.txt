@@ -162,17 +162,23 @@ if(PARAVIEW_ENABLE_CATALYST AND PARAVIEW_ENABLE_PYTHON)
 endif()
 
 
-list(APPEND TESTS_WITH_BASELINES
-  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfRead.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadImageData.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadImageDataCollection.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadRectilinearGrid.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadRectilinearGridCollection.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadStructuredGrid.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadStructuredGridCollection.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfGridAttributes.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/ZLibXDMF.xml
-  )
+if (NOT PARAVIEW_ENABLE_XDMF3)
+  # Presently, all these tests only work with Xdmf2 and when Xdmf3 is enabled,
+  # the SelectReader dialog confuses these tests. So, we'll disable them for now.
+  # We need a better mechanism to handle such cases in the testing framework.
+  list(APPEND TESTS_WITH_BASELINES
+    ${CMAKE_CURRENT_SOURCE_DIR}/ExtractBlock.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfRead.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadImageData.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadImageDataCollection.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadRectilinearGrid.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadRectilinearGridCollection.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadStructuredGrid.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadStructuredGridCollection.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfGridAttributes.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/ZLibXDMF.xml
+    )
+endif()
 
 list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/CopyPasteProperties.xml
@@ -213,7 +219,6 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/ExportX3dPOVVRML.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExTimeseries.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExTimeseries2.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/ExtractBlock.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExtractComponentFilter.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExtractLevel.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/FFTOverTime.xml
