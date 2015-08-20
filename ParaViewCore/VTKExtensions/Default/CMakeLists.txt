@@ -113,6 +113,7 @@ set(Module_SRCS
   vtkPVEnSightMasterServerReader.cxx
   vtkPVEnSightMasterServerTranslator.cxx
   vtkPVExtractBagPlots.cxx
+  vtkPVExtractComponent.cxx
   vtkPVExtractVOI.cxx
   vtkPVFrustumActor.cxx
   vtkPVGlyphFilter.cxx

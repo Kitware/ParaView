@@ -151,6 +151,7 @@
   <Proxy group="filters" name="Delaunay3D" />
   <Proxy group="filters" name="ElevationFilter" />
   <Proxy group="filters" name="ExtractBlock" />
+  <Proxy group="filters" name="ExtractComponent" />
   <Proxy group="filters" name="ExtractEdges" />
   <Proxy group="filters" name="ExtractGeometry" />
   <Proxy group="filters" name="ExtractGrid" />

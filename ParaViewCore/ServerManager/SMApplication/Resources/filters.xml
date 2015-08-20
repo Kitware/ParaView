@@ -10808,6 +10808,67 @@ source.</Documentation>
       <!-- End ExtractBlock -->
     </SourceProxy>
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkPVExtractComponent"
+                 name="ExtractComponent"
+                 label="Extract Component">
+      <Documentation long_help="This filter extracts a component of a multi-component attribute array."
+                     short_help="Extract Component."/>
+      <InputProperty command="SetInputConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array">
+        </InputArrayDomain>
+        <Documentation>
+          This property specifies the input of the Extract Component filter.
+        </Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="SelectInputArray"
+                            label="Input Array"
+                            number_of_elements="5">
+        <ArrayListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Documentation>
+          This property indicates the name of the array to be extracted.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetInputArrayComponent"
+                         default_values="0"
+                         name="Component"
+                         number_of_elements="1">
+        <Documentation>
+          This property indicates the component of the array to be extracted.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetOutputArrayName"
+                            name="OutputArrayName"
+                            label="Output Array Name"
+                            default_values="Result"
+                            number_of_elements="1">
+        <Documentation>
+          This property indicates the name of the output scalar array.
+        </Documentation>
+      </StringVectorProperty>
+      <!-- End ExtractComponent -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkExtractDataSets"
                  label="Extract AMR Blocks"
                  name="ExtractHierarchicalDataSets">
