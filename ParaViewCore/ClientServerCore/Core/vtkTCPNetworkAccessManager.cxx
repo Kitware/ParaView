@@ -30,7 +30,7 @@
 #include <vtksys/SystemTools.hxx>
 
 #include <string>
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <vector>
 #include <map>
 
@@ -318,7 +318,7 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::ConnectToRemote(
   vtkSocketCommunicator* comm = vtkSocketCommunicator::SafeDownCast(
     controller->GetCommunicator());
 #if GENERATE_DEBUG_LOG
-  vtksys_ios::ostringstream mystr;
+  std::ostringstream mystr;
   mystr << "/tmp/client."<< getpid() << ".log";
   comm->LogToFile(mystr.str().c_str());
 #endif

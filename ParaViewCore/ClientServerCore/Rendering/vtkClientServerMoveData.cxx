@@ -32,7 +32,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnstructuredGrid.h"
 
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 vtkStandardNewMacro(vtkClientServerMoveData);
 vtkCxxSetObjectMacro(vtkClientServerMoveData, Controller,
@@ -214,7 +214,7 @@ int vtkClientServerMoveData::SendData(vtkDataObject* input,
       }
     else
       {
-      vtksys_ios::ostringstream res;
+      std::ostringstream res;
       vtkSelectionSerializer::PrintXML(res, vtkIndent(), 1, sel);
 
       // Send the size of the string.

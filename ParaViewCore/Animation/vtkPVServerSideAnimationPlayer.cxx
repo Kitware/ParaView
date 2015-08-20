@@ -36,7 +36,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include <assert.h>
 #include <string>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 //****************************************************************************
 class vtkPVServerSideAnimationPlayer::vtkInternals

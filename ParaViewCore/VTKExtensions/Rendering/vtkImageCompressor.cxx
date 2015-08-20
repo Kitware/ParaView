@@ -19,7 +19,7 @@
 #include "vtkCommand.h"
 #include "vtkMultiProcessStream.h"
 #include <string>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 
 //-----------------------------------------------------------------------------

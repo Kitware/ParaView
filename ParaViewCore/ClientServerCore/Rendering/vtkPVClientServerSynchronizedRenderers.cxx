@@ -21,7 +21,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkZlibImageCompressor.h"
 
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <assert.h>
 
 vtkStandardNewMacro(vtkPVClientServerSynchronizedRenderers);

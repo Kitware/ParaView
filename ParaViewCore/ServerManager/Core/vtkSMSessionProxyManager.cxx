@@ -53,7 +53,7 @@
 #include <map>
 #include <set>
 #include <vector>
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <vtksys/RegularExpression.hxx>
 #include <assert.h>
 
@@ -209,7 +209,7 @@ void vtkSMSessionProxyManager::InstantiateGroupPrototypes(const char* groupName)
 
   assert(this->ProxyDefinitionManager != 0);
 
-  vtksys_ios::ostringstream newgroupname;
+  std::ostringstream newgroupname;
   newgroupname << groupName << "_prototypes" << ends;
 
   // Not a huge fan of this iterator API. Need to make it more consistent with
@@ -280,7 +280,7 @@ vtkSMProxy* vtkSMSessionProxyManager::NewProxy(vtkPVXMLElement* pelement,
                                         const char* subProxyName)
 {
   vtkObject* object = 0;
-  vtksys_ios::ostringstream cname;
+  std::ostringstream cname;
   cname << "vtkSM" << pelement->GetName() << ends;
   object = vtkPVInstantiator::CreateInstance(cname.str().c_str());
 
@@ -564,7 +564,7 @@ vtkStdString vtkSMSessionProxyManager::GetUniqueProxyName(
   if (it == this->Internals->RegisteredProxyMap.end())
     {
     int suffix = 1;
-    vtksys_ios::ostringstream name_stream;
+    std::ostringstream name_stream;
     name_stream << prefix << suffix;
     return name_stream.str();
     }
@@ -579,7 +579,7 @@ vtkStdString vtkSMSessionProxyManager::GetUniqueProxyName(
 
   for (int suffix=1; suffix < VTK_INT_MAX; ++suffix)
     {
-    vtksys_ios::ostringstream name_stream;
+    std::ostringstream name_stream;
     name_stream << prefix << suffix;
     if (existingNames.find(name_stream.str()) == existingNames.end())
       {
@@ -1261,7 +1261,7 @@ vtkPVXMLElement* vtkSMSessionProxyManager::AddInternalState(vtkPVXMLElement *par
   rootElement->SetName("ServerManagerState");
 
   // Set version number on the state element.
-  vtksys_ios::ostringstream version_string;
+  std::ostringstream version_string;
   version_string << vtkSMProxyManager::GetVersionMajor() << "."
                  << vtkSMProxyManager::GetVersionMinor() << "."
                  << vtkSMProxyManager::GetVersionPatch();

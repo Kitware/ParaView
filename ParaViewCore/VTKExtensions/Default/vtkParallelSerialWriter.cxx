@@ -29,7 +29,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTrivialProducer.h"
 
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <vtksys/SystemTools.hxx>
 
 #include <string>
@@ -206,7 +206,7 @@ void vtkParallelSerialWriter::WriteATimestep(vtkDataObject* input)
         vtksys::SystemTools::GetFilenameWithoutLastExtension(this->FileName);
       std::string ext =
         vtksys::SystemTools::GetFilenameLastExtension(this->FileName);
-      vtksys_ios::ostringstream fname;
+      std::ostringstream fname;
       fname << path << "/" << fnamenoext << idx << ext;
       this->WriteAFile(fname.str().c_str(), curObj);
       }
@@ -261,7 +261,7 @@ void vtkParallelSerialWriter::WriteAFile(const char* filename, vtkDataObject* in
       outputCopy.TakeReference(output->NewInstance());
       outputCopy->ShallowCopy(output);
 
-      vtksys_ios::ostringstream fname;
+      std::ostringstream fname;
       if (this->WriteAllTimeSteps)
         {
         std::string path =

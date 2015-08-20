@@ -23,7 +23,7 @@ vtkStandardNewMacro(vtkPVXMLElement);
 #include <ctype.h>
 #include <string>
 #include <vector>
-#include <vtksys/ios/sstream>
+#include <sstream>
 #if defined(_WIN32) && !defined(__CYGWIN__)
 # define SNPRINTF _snprintf
 #else
@@ -91,7 +91,7 @@ void vtkPVXMLElement::PrintSelf(ostream& os, vtkIndent indent)
 void vtkPVXMLElement::AddAttribute(const char* attrName, 
                                    unsigned int attrValue)
 {
-  vtksys_ios::ostringstream valueStr;
+  std::ostringstream valueStr;
   valueStr << attrValue << ends;
   this->AddAttribute(attrName, valueStr.str().c_str());
 }
@@ -99,7 +99,7 @@ void vtkPVXMLElement::AddAttribute(const char* attrName,
 //----------------------------------------------------------------------------
 void vtkPVXMLElement::AddAttribute(const char* attrName, int attrValue)
 {
-  vtksys_ios::ostringstream valueStr;
+  std::ostringstream valueStr;
   valueStr << attrValue << ends;
   this->AddAttribute(attrName, valueStr.str().c_str());
 }
@@ -108,7 +108,7 @@ void vtkPVXMLElement::AddAttribute(const char* attrName, int attrValue)
 //----------------------------------------------------------------------------
 void vtkPVXMLElement::AddAttribute(const char* attrName, vtkIdType attrValue)
 {
-  vtksys_ios::ostringstream valueStr;
+  std::ostringstream valueStr;
   valueStr << attrValue << ends;
   this->AddAttribute(attrName, valueStr.str().c_str());
 }
@@ -117,7 +117,7 @@ void vtkPVXMLElement::AddAttribute(const char* attrName, vtkIdType attrValue)
 //----------------------------------------------------------------------------
 void vtkPVXMLElement::AddAttribute(const char* attrName, double attrValue)
 {
-  vtksys_ios::ostringstream valueStr;
+  std::ostringstream valueStr;
   valueStr << attrValue << ends;
   this->AddAttribute(attrName, valueStr.str().c_str());
 }
@@ -132,7 +132,7 @@ void vtkPVXMLElement::AddAttribute(const char* attrName, double attrValue,
     }
   else
     {
-    vtksys_ios::ostringstream valueStr;
+    std::ostringstream valueStr;
     valueStr << setprecision(precision) << attrValue << ends;
     this->AddAttribute(attrName, valueStr.str().c_str());
     }
@@ -470,7 +470,7 @@ template <class T>
 int vtkPVXMLVectorAttributeParse(const char* str, int length, T* data)
 {
   if(!str || !length) { return 0; }
-  vtksys_ios::stringstream vstr;
+  std::stringstream vstr;
   vstr << str << ends;
   int i;
   for(i=0;i < length;++i)
@@ -751,8 +751,8 @@ bool vtkPVXMLElement::Equals(vtkPVXMLElement* other)
     {
     return false;
     }
-  vtksys_ios::ostringstream selfstream;
-  vtksys_ios::ostringstream otherstream;
+  std::ostringstream selfstream;
+  std::ostringstream otherstream;
   this->PrintXML(selfstream, vtkIndent());
   other->PrintXML(otherstream, vtkIndent());
   return (selfstream.str() == otherstream.str());

@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
-#include "vtksys/ios/sstream"
+#include "sstream"
 
 class pqCustomFilterManagerModelInternal : public QList<QString> {};
 
@@ -237,7 +237,7 @@ void pqCustomFilterManagerModel::exportCustomFiltersToSettings()
   root->SetName("CustomFilterDefinitions");
   proxyManager->SaveCustomProxyDefinitions(root);
 
-  vtksys_ios::ostringstream os;
+  std::ostringstream os;
   root->PrintXML(os,vtkIndent(0));
   QString state = os.str().c_str();
   root->Delete();

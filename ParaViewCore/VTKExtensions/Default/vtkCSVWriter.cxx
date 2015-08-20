@@ -29,7 +29,7 @@
 #include "vtkSmartPointer.h"
 
 #include <vector>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 vtkStandardNewMacro(vtkCSVWriter);
 //-----------------------------------------------------------------------------
@@ -263,7 +263,7 @@ void vtkCSVWriter::WriteTable(vtkTable* table)
         }
       first = false;
 
-      vtksys_ios::ostringstream array_name;
+      std::ostringstream array_name;
       array_name << array->GetName();
       if (array->GetNumberOfComponents() > 1)
         {

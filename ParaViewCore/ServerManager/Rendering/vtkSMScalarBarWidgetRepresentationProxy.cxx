@@ -27,7 +27,7 @@
 #include <algorithm>
 #include <string>
 #include <vector>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 vtkStandardNewMacro(vtkSMScalarBarWidgetRepresentationProxy);
 
@@ -150,7 +150,7 @@ bool vtkSMScalarBarWidgetRepresentationProxy::UpdateComponentTitle(
       // just use the component number directly.
       if (component >= 0)
         {
-        vtksys_ios::ostringstream cname;
+        std::ostringstream cname;
         cname << component;
         componentName = cname.str();
         }

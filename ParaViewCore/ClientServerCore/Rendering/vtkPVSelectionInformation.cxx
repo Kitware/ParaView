@@ -23,7 +23,7 @@
 #include "vtkSelectionNode.h"
 #include "vtkSelectionSerializer.h"
 #include "vtkSmartPointer.h"
-#include "vtksys/ios/sstream"
+#include "sstream"
 
 vtkStandardNewMacro(vtkPVSelectionInformation);
 
@@ -111,7 +111,7 @@ void vtkPVSelectionInformation::CopyToStream(vtkClientServerStream* css)
   css->Reset();
   *css << vtkClientServerStream::Reply;
 
-  vtksys_ios::ostringstream res;
+  std::ostringstream res;
   vtkSelectionSerializer::PrintXML(res, vtkIndent(), 1, this->Selection);
   res << ends;
   *css << res.str().c_str();

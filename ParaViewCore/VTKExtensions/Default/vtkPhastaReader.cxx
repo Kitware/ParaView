@@ -36,7 +36,7 @@ vtkCxxSetObjectMacro(vtkPhastaReader, CachedGrid, vtkUnstructuredGrid);
 #include <map>
 #include <vector>
 #include <string>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 struct vtkPhastaReaderInternal
 {
@@ -874,7 +874,7 @@ void vtkPhastaReader::ReadFieldFile(char* fieldFileName,
     {
     int idx=i-5;
     sArrays[idx] = vtkDoubleArray::New();
-    vtksys_ios::ostringstream aName;
+    std::ostringstream aName;
     aName << "s" << idx+1 << ends;
     sArrays[idx]->SetName(aName.str().c_str());
     sArrays[idx]->SetNumberOfTuples(noOfNodes);

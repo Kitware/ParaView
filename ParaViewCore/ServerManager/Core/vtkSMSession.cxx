@@ -36,7 +36,7 @@
 #include "vtkSMUndoStackBuilder.h"
 #include "vtkWeakPointer.h"
 
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <vtkNew.h>
 #include <assert.h>
 
@@ -343,7 +343,7 @@ vtkIdType vtkSMSession::ConnectToRemote(const char* hostname, int port)
 vtkIdType vtkSMSession::ConnectToRemoteInternal(
   const char* hostname, int port, bool is_auto_mpi)
 {
-  vtksys_ios::ostringstream sname;
+  std::ostringstream sname;
   sname << "cs://" << hostname << ":" << port;
   vtkSMSessionClient* session = vtkSMSessionClient::New();
   session->IsAutoMPI = is_auto_mpi;
@@ -361,7 +361,7 @@ vtkIdType vtkSMSession::ConnectToRemoteInternal(
 vtkIdType vtkSMSession::ConnectToRemote(const char* dshost, int dsport,
   const char* rshost, int rsport)
 {
-  vtksys_ios::ostringstream sname;
+  std::ostringstream sname;
   sname << "cdsrs://" << dshost << ":" << dsport << "/"
     << rshost << ":" << rsport;
   vtkSMSessionClient* session = vtkSMSessionClient::New();
@@ -415,7 +415,7 @@ vtkIdType vtkSMSession::ReverseConnectToRemote(
   vtkTemp temp;
   temp.Callback = callback;
 
-  vtksys_ios::ostringstream sname;
+  std::ostringstream sname;
   if (rsport <= -1)
     {
     sname << "csrc://localhost:" << dsport;

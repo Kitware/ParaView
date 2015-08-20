@@ -35,7 +35,7 @@
 #include <set>
 #include <vector>
 #include <algorithm>
-#include "vtksys/ios/sstream"
+#include "sstream"
 
 vtkStandardNewMacro(vtkSMArrayListDomain);
 
@@ -519,7 +519,7 @@ int vtkSMArrayListDomain::ReadXMLAttributes(
     {
     // data_type can be a space delimited list of types
     // vlaid for the domain
-    vtksys_ios::istringstream dataTypeStream(data_type);
+    std::istringstream dataTypeStream(data_type);
 
     while (dataTypeStream.good())
       {
@@ -685,7 +685,7 @@ int vtkSMArrayListDomain::SetDefaultValues(vtkSMProperty* prop, bool use_uncheck
         svp->GetElements(values.GetPointer());
         }
 
-      vtksys_ios::ostringstream ass;
+      std::ostringstream ass;
       ass << info->FieldAssociation;
       values->SetString(3, ass.str().c_str());
       values->SetString(4, info->ArrayName.c_str());
@@ -818,7 +818,7 @@ void vtkSMArrayListDomain::PrintSelf(ostream& os, vtkIndent indent)
 vtkStdString vtkSMArrayListDomain::CreateMangledName(
   vtkPVArrayInformation *arrayInfo, int component)
 {
-  vtksys_ios::ostringstream stream;
+  std::ostringstream stream;
   if ( component != arrayInfo->GetNumberOfComponents() )
     {
     stream << arrayInfo->GetName() << "_" <<

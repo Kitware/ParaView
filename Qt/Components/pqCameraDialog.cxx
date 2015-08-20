@@ -62,7 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // STL
 #include <string>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 #define pqErrorMacro(estr)\
   qDebug()\
@@ -472,7 +472,7 @@ void pqCameraDialog::configureCustomViews()
   settings->endGroup();
 
   // grab the current camera configuration.
-  vtksys_ios::ostringstream os;
+  std::ostringstream os;
 
   vtkSMCameraConfigurationWriter *writer=vtkSMCameraConfigurationWriter::New();
   writer->SetRenderViewProxy(ui->RenderModule->getRenderViewProxy());

@@ -35,7 +35,7 @@
 #include "vtkStringList.h"
 #include "vtkTimerLog.h"
 
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <map>
 #include <vtksys/RegularExpression.hxx>
 #include <set>

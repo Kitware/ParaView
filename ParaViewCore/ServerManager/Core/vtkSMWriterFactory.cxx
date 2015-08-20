@@ -33,7 +33,7 @@
 #include <set>
 #include <string>
 #include <vector>
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <vtksys/SystemTools.hxx>
 #include <assert.h>
 
@@ -332,7 +332,7 @@ static std::string vtkJoin(
   const std::set<std::string> exts, const char* prefix,
   const char* suffix)
 {
-  vtksys_ios::ostringstream stream;
+  std::ostringstream stream;
   std::set<std::string>::const_iterator iter;
   for (iter = exts.begin(); iter != exts.end(); ++iter)
     {
@@ -358,14 +358,14 @@ const char* vtkSMWriterFactory::GetSupportedFileTypes(
       if (iter->second.Extensions.size() > 0)
         {
         std::string ext_join = ::vtkJoin(iter->second.Extensions, "*.", " ");
-        vtksys_ios::ostringstream stream;
+        std::ostringstream stream;
         stream << iter->second.Description << "(" << ext_join << ")";
         sorted_types.insert(stream.str());
         }
       }
     }
   
-  vtksys_ios::ostringstream all_types;
+  std::ostringstream all_types;
   std::set<std::string>::iterator iter2;
   for (iter2 = sorted_types.begin(); iter2 != sorted_types.end(); ++iter2)
     {

@@ -26,7 +26,7 @@
 #include "vtkStringArray.h"
 
 #include <string>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 vtkStandardNewMacro(vtkSIArraySelectionProperty);
 //----------------------------------------------------------------------------
@@ -66,7 +66,7 @@ bool vtkSIArraySelectionProperty::Pull(vtkSMMessage* msgToFill)
   vtkObjectBase *reader = this->GetVTKObject();
   if (reader != NULL)
     {
-    vtksys_ios::ostringstream aname;
+    std::ostringstream aname;
     aname << "GetNumberOf" << this->Command << "Arrays" << ends;
 
     // Get the number of arrays.
@@ -87,7 +87,7 @@ bool vtkSIArraySelectionProperty::Pull(vtkSMMessage* msgToFill)
     // For each array, get its name and status.
     for(int i=0; i < numArrays; ++i)
       {
-      vtksys_ios::ostringstream naname;
+      std::ostringstream naname;
       naname << "Get" << this->Command << "ArrayName" << ends;
 
       // Get the array name.
@@ -115,7 +115,7 @@ bool vtkSIArraySelectionProperty::Pull(vtkSMMessage* msgToFill)
         }
       std::string name = pname;
 
-      vtksys_ios::ostringstream saname;
+      std::ostringstream saname;
       saname << "Get" << this->Command << "ArrayStatus" << ends;
       // Get the array status.
       stream << vtkClientServerStream::Invoke

@@ -27,7 +27,7 @@
 #include <sstream>
 #include <vector>
 #include <vtk_pugixml.h>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 using namespace pugi;
 using namespace std;
@@ -129,7 +129,7 @@ namespace
 
       // Add new XML state for "VolumeArrays" property with the value as
       // "selected_arrays".
-      vtksys_ios::ostringstream stream;
+      std::ostringstream stream;
       stream << "<Property name=\"VolumeArrays\" >\n";
       int index=0;
       for (std::set<std::string>::const_iterator it = selected_arrays.begin();
@@ -201,7 +201,7 @@ struct Process_4_1_to_4_2
         }
       if (!colorArrayName.empty() || !attributeType.empty())
         {
-        vtksys_ios::ostringstream stream;
+        std::ostringstream stream;
         stream << "<Property name=\"ColorArrayName\" number_of_elements=\"5\">\n"
                << "   <Element index=\"0\" value=\"\" />\n"
                << "   <Element index=\"1\" value=\"\" />\n"
@@ -598,7 +598,7 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent)
     }
 
   // A little hackish for now, convert vtkPVXMLElement to string.
-  vtksys_ios::ostringstream stream;
+  std::ostringstream stream;
   root->PrintXML(stream, vtkIndent());
 
   // parse using pugi.
@@ -624,7 +624,7 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent)
 
   if (status)
     {
-    vtksys_ios::ostringstream stream2;
+    std::ostringstream stream2;
     document.save(stream2, "  ");
 
     vtkNew<vtkPVXMLParser> parser;

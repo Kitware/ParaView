@@ -41,7 +41,7 @@
 
 #include <algorithm>
 #include <vector>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 #include <math.h>
 
@@ -367,7 +367,7 @@ void vtkTemporalRanges::AccumulateTable(vtkTable *source, vtkTable *target)
 vtkDoubleArray *vtkTemporalRanges::GetColumn(vtkTable *table, const char *name,
                                              int component)
 {
-  vtksys_ios::ostringstream fullname;
+  std::ostringstream fullname;
   fullname << name << "_";
   if (component < 0)
     {

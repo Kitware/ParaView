@@ -32,7 +32,7 @@
 #include <vtksys/SystemTools.hxx>
 
 #include <map>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 struct vtkPPhastaReaderInternal
 {
@@ -262,7 +262,7 @@ int vtkPPhastaReader::RequestData(vtkInformation*,
       strcpy(geom_name, fieldPattern);
       }
 
-    vtksys_ios::ostringstream geomFName;
+    std::ostringstream geomFName;
     std::string gpath = vtksys::SystemTools::GetFilenamePath(geom_name);
     if (gpath.empty() || !vtksys::SystemTools::FileIsFullPath(gpath.c_str()))
       {
@@ -275,7 +275,7 @@ int vtkPPhastaReader::RequestData(vtkInformation*,
     geomFName << geom_name << ends;
     this->Reader->SetGeometryFileName(geomFName.str().c_str());
 
-    vtksys_ios::ostringstream fieldFName;
+    std::ostringstream fieldFName;
     std::string fpath = vtksys::SystemTools::GetFilenamePath(field_name);
     if (fpath.empty() || !vtksys::SystemTools::FileIsFullPath(fpath.c_str()))
       {
@@ -492,7 +492,7 @@ int vtkPPhastaReader::RequestInformation(vtkInformation*,
           paraviewFieldTag = nested2->GetAttribute("paraview_field_tag");
           if (!paraviewFieldTag)
             {
-            vtksys_ios::ostringstream paraviewFieldTagStrStream;
+            std::ostringstream paraviewFieldTagStrStream;
             paraviewFieldTagStrStream << "Field " << numberOfFields2 << ends;
             paraviewFieldTagStr = paraviewFieldTagStrStream.str();
             paraviewFieldTag = paraviewFieldTagStr.c_str();

@@ -43,7 +43,7 @@
 #include "vtkXMLWriter.h"
 
 #include <vtksys/SystemTools.hxx>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 #include <string>
 #include <vector>
@@ -206,7 +206,7 @@ int vtkXMLPVDWriter::RequestData(vtkInformation* request,
       w->RemoveObserver(this->ProgressObserver);
       
       // Create the entry for the collection file.
-      vtksys_ios::ostringstream entry_with_warning_C4701;
+      std::ostringstream entry_with_warning_C4701;
       entry_with_warning_C4701
         << "<DataSet part=\"" << i
         << "\" file=\"" << fname.c_str() << "\"/>" << ends;
@@ -607,7 +607,7 @@ void vtkXMLPVDWriter::DeleteAllEntries()
 std::string vtkXMLPVDWriterInternals::CreatePieceFileName(int index)
 {
   std::string fname;
-  vtksys_ios::ostringstream fn_with_warning_C4701;
+  std::ostringstream fn_with_warning_C4701;
   fn_with_warning_C4701
     << this->FilePrefix.c_str() << "/"
     << this->FilePrefix.c_str() << "_" << index << "."

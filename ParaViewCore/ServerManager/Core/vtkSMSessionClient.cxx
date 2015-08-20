@@ -42,7 +42,7 @@
 #include "vtkSocketCommunicator.h"
 
 #include <string>
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <vtksys/RegularExpression.hxx>
 
 #include <assert.h>
@@ -161,7 +161,7 @@ bool vtkSMSessionClient::Connect(const char* url)
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkPVOptions* options = pm->GetOptions();
 
-  vtksys_ios::ostringstream handshake;
+  std::ostringstream handshake;
   handshake << "handshake=paraview." << PARAVIEW_VERSION;
   // Add connect-id if needed. The connect-id is added to the handshake that
   // must match on client and server processes.
@@ -179,7 +179,7 @@ bool vtkSMSessionClient::Connect(const char* url)
     int port = atoi(pvserver.match(3).c_str());
     port = (port <= 0)? 11111: port;
 
-    vtksys_ios::ostringstream stream;
+    std::ostringstream stream;
     stream << "tcp://" << hostname << ":" << port << "?" << handshake.str();
     data_server_url = stream.str();
     }
@@ -188,7 +188,7 @@ bool vtkSMSessionClient::Connect(const char* url)
     // 0 ports are acceptable for reverse connections.
     int port = atoi(pvserver_reverse.match(3).c_str());
     port = (port < 0)? 11111: port;
-    vtksys_ios::ostringstream stream;
+    std::ostringstream stream;
     stream << "tcp://localhost:" << port << "?listen=true&nonblocking=true&" << handshake.str();
     data_server_url = stream.str();
 
@@ -203,12 +203,12 @@ bool vtkSMSessionClient::Connect(const char* url)
     int rsport = atoi(pvrenderserver.match(4).c_str());
     rsport = (rsport <= 0)? 22221 : rsport;
 
-    vtksys_ios::ostringstream stream;
+    std::ostringstream stream;
     stream << "tcp://" << dataserverhost << ":" << dsport
       << "?" << handshake.str();
     data_server_url = stream.str().c_str();
 
-    vtksys_ios::ostringstream stream2;
+    std::ostringstream stream2;
     stream2 << "tcp://" << renderserverhost << ":" << rsport
       << "?" << handshake.str();
     render_server_url = stream2.str();
@@ -221,12 +221,12 @@ bool vtkSMSessionClient::Connect(const char* url)
     int rsport = atoi(pvrenderserver_reverse.match(7).c_str());
     rsport = (rsport < 0)? 22221 : rsport;
 
-    vtksys_ios::ostringstream stream;
+    std::ostringstream stream;
     stream << "tcp://localhost:" << dsport
       << "?listen=true&nonblocking=true&" << handshake.str();
     data_server_url = stream.str().c_str();
 
-    vtksys_ios::ostringstream stream2;
+    std::ostringstream stream2;
     stream2 << "tcp://localhost:" << rsport
       << "?listen=true&nonblocking=true&" << handshake.str();
     render_server_url = stream2.str();
@@ -352,9 +352,9 @@ void vtkSMSessionClient::SetupDataServerRenderServerConnection()
   vtkSMPropertyHelper helper(mpiMToN, "Connections");
   for (int cc = 0; cc < info->GetNumberOfConnections(); cc++)
     {
-    vtksys_ios::ostringstream processNo;
+    std::ostringstream processNo;
     processNo << cc;
-    vtksys_ios::ostringstream str;
+    std::ostringstream str;
     str << info->GetProcessPort(cc);
     helper.Set(3*cc, processNo.str().c_str());
     helper.Set(3*cc+1, str.str().c_str());

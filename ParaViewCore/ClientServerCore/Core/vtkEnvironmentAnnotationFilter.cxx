@@ -27,7 +27,7 @@
 #include <map>
 #include <vector>
 
-#include "vtksys/ios/sstream"
+#include "sstream"
 #include "vtksys/SystemTools.hxx"
 #include "vtksys/SystemInformation.hxx"
 

@@ -27,7 +27,7 @@
 #include "vtkSMTransferFunctionProxy.h"
 
 #include <assert.h>
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <vtksys/RegularExpression.hxx>
 #include <set>
 
@@ -41,7 +41,7 @@ namespace
     // In previous versions, they were registered as
     // (numComps).(arrayName).(ProxyXMLName). We dropped the numComps, but this
     // lookup should still match those old LUTs loaded from state.
-    vtksys_ios::ostringstream expr;
+    std::ostringstream expr;
     expr << "^[0-9.]*" << arrayName << "\\.";
     vtksys::RegularExpression regExp(expr.str().c_str());
     vtkNew<vtkSMProxyIterator> iter;
@@ -112,12 +112,12 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetColorTransferFunction(
     }
 
   // Look up array-specific transfer function
-  vtksys_ios::ostringstream prefix;
+  std::ostringstream prefix;
   prefix << ".array_" << proxy->GetXMLGroup() << "." << arrayName;
 
   settings->GetProxySettings(prefix.str().c_str(), proxy);
 
-  vtksys_ios::ostringstream proxyName;
+  std::ostringstream proxyName;
   proxyName << arrayName << ".PVLookupTable";
   if (proxy->GetProperty("ScalarOpacityFunction"))
     {
@@ -163,7 +163,7 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetOpacityTransferFunction(
   controller->PreInitializeProxy(proxy);
   controller->PostInitializeProxy(proxy);
 
-  vtksys_ios::ostringstream proxyName;
+  std::ostringstream proxyName;
   proxyName << arrayName << ".PiecewiseFunction";
   controller->RegisterOpacityTransferFunction(proxy, proxyName.str().c_str());
   proxy->FastDelete();

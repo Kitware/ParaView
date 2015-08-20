@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSettings.h"
 
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <assert.h>
 #include <vtk_jsoncpp.h>
 int TestSettings(int argc, char* argv[])

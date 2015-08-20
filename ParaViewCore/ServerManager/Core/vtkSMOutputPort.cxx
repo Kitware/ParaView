@@ -30,7 +30,7 @@
 #include "vtkSMSession.h"
 #include "vtkTimerLog.h"
 
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMOutputPort);
@@ -64,7 +64,7 @@ vtkPVDataInformation* vtkSMOutputPort::GetDataInformation()
 {
   if (!this->DataInformationValid)
     {
-    vtksys_ios::ostringstream mystr;
+    std::ostringstream mystr;
     mystr << this->GetSourceProxy()->GetXMLName() << "::GatherInformation";
     vtkTimerLog::MarkStartEvent(mystr.str().c_str());
     this->GatherDataInformation();

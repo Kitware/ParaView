@@ -29,7 +29,7 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVAnimationWriter);
@@ -252,7 +252,7 @@ void vtkXMLPVAnimationWriter::WriteTime(double time)
     std::string fname =
       this->Internal->CreateFileName(i, this->GetFilePrefix(),
                                      writer->GetDefaultFileExtension());
-    vtksys_ios::ostringstream entry_with_warning_C4701;
+    std::ostringstream entry_with_warning_C4701;
     entry_with_warning_C4701
       << "<DataSet timestep=\"" << time
       << "\" group=\"" << this->Internal->InputGroupNames[i].c_str()
@@ -326,7 +326,7 @@ vtkXMLPVAnimationWriterInternals::CreateFileName(int index,
                                                  const char* ext)
 {
   // Start with the directory and file name prefix.
-  vtksys_ios::ostringstream fn_with_warning_C4701;
+  std::ostringstream fn_with_warning_C4701;
   fn_with_warning_C4701 << prefix << "/" << prefix << "_";
 
   // Add the group name.

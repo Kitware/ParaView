@@ -13,11 +13,11 @@
 
 =========================================================================*/
 #include "vtkMaterialInterfaceProcessRing.h"
-#include "vtksys/ios/iostream"
+#include <iostream>
 using std::vector;
-using vtksys_ios::ostream;
-using vtksys_ios::cerr;
-using vtksys_ios::endl;
+using std::ostream;
+using std::cerr;
+using std::endl;
 //
 // void vtkMaterialInterfaceProcessRing::Initialize(
 //     vtkMaterialInterfaceProcessPriorityQueue &Q,

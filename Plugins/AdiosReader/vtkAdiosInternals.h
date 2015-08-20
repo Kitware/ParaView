@@ -14,14 +14,14 @@
 =========================================================================*/
 
 // Standard library
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <string>
 #include <map>
 #include <set>
 #include <sys/stat.h>
 #include <assert.h>
 
-using vtksys_ios::ostringstream;
+using std::ostringstream;
 
 // Variable containers
 #include <vtkCharArray.h>

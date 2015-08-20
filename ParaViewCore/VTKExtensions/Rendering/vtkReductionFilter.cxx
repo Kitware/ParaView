@@ -40,7 +40,7 @@
 #include "vtkSelection.h"
 #include "vtkSelectionSerializer.h"
 
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <vector>
 #include <sstream>
 

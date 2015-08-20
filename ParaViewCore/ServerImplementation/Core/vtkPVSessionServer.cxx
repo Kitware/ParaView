@@ -38,7 +38,7 @@
 
 #include <assert.h>
 #include <string>
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <vtksys/RegularExpression.hxx>
 #include <string>
 #include <vector>
@@ -260,7 +260,7 @@ vtkMultiProcessController* vtkPVSessionServer::GetController(ServerFlags process
 //----------------------------------------------------------------------------
 bool vtkPVSessionServer::Connect()
 {
-  vtksys_ios::ostringstream url;
+  std::ostringstream url;
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
@@ -354,7 +354,7 @@ bool vtkPVSessionServer::Connect(const char* url)
   vtksys::RegularExpression pvrenderserver_reverse (
     "^cdsrsrc://([^:]+)?(:([0-9]+))?/([^:]+)?(:([0-9]+))?");
 
-  vtksys_ios::ostringstream handshake;
+  std::ostringstream handshake;
   handshake << "handshake=paraview." << PARAVIEW_VERSION;
   // Add connect-id if needed. The connect-id is added to the handshake that
   // must match on client and server processes.
@@ -371,7 +371,7 @@ bool vtkPVSessionServer::Connect(const char* url)
     int port = atoi(pvserver.match(3).c_str());
     port = (port < 0)? 11111: port;
 
-    vtksys_ios::ostringstream stream;
+    std::ostringstream stream;
     stream << "tcp://localhost:" << port << "?listen=true&" << handshake.str();
     stream << (this->MultipleConnection ? "&multiple=true" : "");
     client_url = stream.str();
@@ -381,7 +381,7 @@ bool vtkPVSessionServer::Connect(const char* url)
     std::string hostname = pvserver_reverse.match(1);
     int port = atoi(pvserver_reverse.match(3).c_str());
     port = (port <= 0)? 11111: port;
-    vtksys_ios::ostringstream stream;
+    std::ostringstream stream;
     stream << "tcp://" << hostname.c_str() << ":" << port << "?" << handshake.str();
     client_url = stream.str();
     }
@@ -396,14 +396,14 @@ bool vtkPVSessionServer::Connect(const char* url)
     if (vtkProcessModule::GetProcessType() ==
       vtkProcessModule::PROCESS_RENDER_SERVER)
       {
-      vtksys_ios::ostringstream stream;
+      std::ostringstream stream;
       stream << "tcp://localhost:" << rsport << "?listen=true&" << handshake.str();
       client_url = stream.str();
       }
     else if (vtkProcessModule::GetProcessType() ==
       vtkProcessModule::PROCESS_DATA_SERVER)
       {
-      vtksys_ios::ostringstream stream;
+      std::ostringstream stream;
       stream << "tcp://localhost:" << dsport << "?listen=true&" << handshake.str();
       stream << (this->MultipleConnection ? "&multiple=true" : "");
       client_url = stream.str();
@@ -422,14 +422,14 @@ bool vtkPVSessionServer::Connect(const char* url)
     if (vtkProcessModule::GetProcessType() ==
       vtkProcessModule::PROCESS_RENDER_SERVER)
       {
-      vtksys_ios::ostringstream stream;
+      std::ostringstream stream;
       stream << "tcp://" << dataserverhost.c_str() << ":" << rsport << "?" << handshake.str();
       client_url = stream.str();
       }
     else if (vtkProcessModule::GetProcessType() ==
       vtkProcessModule::PROCESS_DATA_SERVER)
       {
-      vtksys_ios::ostringstream stream;
+      std::ostringstream stream;
       stream << "tcp://" << renderserverhost.c_str() << ":" << dsport << "?" << handshake.str();
       client_url = stream.str();
       }

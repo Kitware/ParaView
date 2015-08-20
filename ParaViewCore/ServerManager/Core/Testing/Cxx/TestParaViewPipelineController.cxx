@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMViewProxy.h"
 #include "vtkTestUtilities.h"
 
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <assert.h>
 
 int TestParaViewPipelineController(int argc, char* argv[])

@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSession.h"
 #include "vtkSMRemoteObject.h"
 
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <vtksys/RegularExpression.hxx>
 
 vtkStandardNewMacro(pqUndoStackBuilder);
@@ -122,7 +122,7 @@ void pqUndoStackBuilder::OnStateChange( vtkSMSession *session,
     {
     vtkSMRemoteObject* proxy =
       vtkSMRemoteObject::SafeDownCast(session->GetRemoteObject(globalId));
-    vtksys_ios::ostringstream stream;
+    std::ostringstream stream;
     stream << "Changed '" << proxy->GetClassName() <<"'";
     this->Begin(stream.str().c_str());
     }

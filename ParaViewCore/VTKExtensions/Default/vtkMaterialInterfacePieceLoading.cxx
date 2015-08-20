@@ -16,9 +16,9 @@
 #include "vtkMaterialInterfaceUtilities.hxx"
 #include "vector"
 using std::vector;
-using vtksys_ios::ostream;
-using vtksys_ios::cerr;
-using vtksys_ios::endl;
+using std::ostream;
+using std::cerr;
+using std::endl;
 
 //
 ostream &operator<<(ostream &sout, vtkMaterialInterfacePieceLoading &fp)

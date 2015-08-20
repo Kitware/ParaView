@@ -50,7 +50,7 @@
 #include "vtkUnstructuredGrid.h"
 
 #include "vtk_zlib.h"
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <vector>
 
 #ifdef PARAVIEW_USE_MPI
@@ -1068,7 +1068,7 @@ void vtkMPIMoveData::MarshalDataToBuffer(vtkDataObject* data)
     // the extents.
     int *extent = imageData->GetExtent();
     double* origin = imageData->GetOrigin();
-    vtksys_ios::ostringstream stream;
+    std::ostringstream stream;
     stream << "EXTENT " << extent[0] << " " <<
       extent[1] << " " <<
       extent[2] << " " <<

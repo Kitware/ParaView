@@ -53,7 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMTransferFunctionProxy.h"
 #include "vtkWeakPointer.h"
 
-#include "vtksys/ios/sstream"
+#include "sstream"
 
 #include <QDebug>
 #include <QKeyEvent>
@@ -359,7 +359,7 @@ void pqColorMapEditor::saveAsArrayDefault()
     std::string sanitizedArrayName =
       vtkSMCoreUtilities::SanitizeName(colorArrayHelper.GetInputArrayNameToProcess());
 
-    vtksys_ios::ostringstream prefix;
+    std::ostringstream prefix;
     prefix << ".array_" << lutProxy->GetXMLGroup() << "." << sanitizedArrayName;
 
     settings->SetProxySettings(prefix.str().c_str(), lutProxy);

@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTextStream>
 #include <QDir>
 #include <QApplication>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 namespace
 {

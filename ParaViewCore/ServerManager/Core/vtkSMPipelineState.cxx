@@ -26,7 +26,7 @@
 #include "vtkPVSession.h"
 
 #include <vtksys/SystemTools.hxx>
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <assert.h>
 
 vtkStandardNewMacro(vtkSMPipelineState);

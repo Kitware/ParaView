@@ -22,7 +22,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMMessage.h"
 
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <string>
 #include <vector>
 

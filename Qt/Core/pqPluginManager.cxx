@@ -51,7 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QSet>
 
-#include <vtksys/ios/sstream>
+#include <sstream>
 class pqPluginManager::pqInternals
 {
 public:
@@ -61,7 +61,7 @@ public:
 
   QString getXML(vtkPVPluginsInformation* info, bool remote)
     {
-    vtksys_ios::ostringstream stream;
+    std::ostringstream stream;
     stream << "<?xml version=\"1.0\" ?>\n";
     stream << "<Plugins>\n";
     for (unsigned int cc=0; cc < info->GetNumberOfPlugins(); cc++)

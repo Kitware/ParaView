@@ -20,7 +20,7 @@
 #include "vtkInformationVector.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <string>
 #include <map>
 
@@ -39,8 +39,8 @@
 #include <vtkSmartPointer.h>
 #include <vtkStructuredGrid.h>
 
-#include <vtksys/ios/sstream>
-using vtksys_ios::ostringstream;
+#include <sstream>
+using std::ostringstream;
 
 //*****************************************************************************
 class vtkAdiosPixieReader::Internals

@@ -54,7 +54,7 @@
 #include "vtkgl.h"
 
 #include <vector>
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <string>
 #include <assert.h>
 

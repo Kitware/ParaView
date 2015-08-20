@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTransferFunctionManager.h"
 
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <assert.h>
 
 int TestTransferFunctionManager(int argc, char* argv[])

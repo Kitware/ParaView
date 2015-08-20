@@ -28,7 +28,7 @@
 #include "vtkSelectionSerializer.h"
 
 #include <assert.h>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 vtkStandardNewMacro(vtkChartSelectionRepresentation);
 //----------------------------------------------------------------------------
@@ -133,7 +133,7 @@ int vtkChartSelectionRepresentation::RequestData(vtkInformation* request,
         vtkMultiProcessController* controller = pm->GetGlobalController();
         if (myId == 0)
           {
-          vtksys_ios::ostringstream res;
+          std::ostringstream res;
           vtkSelectionSerializer::PrintXML(res, vtkIndent(), 1, clone.GetPointer());
 
           // Send the size of the string.

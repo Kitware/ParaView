@@ -35,7 +35,7 @@
 #include <set>
 #include <string>
 #include <vector>
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/RegularExpression.hxx>
 #include <assert.h>
@@ -485,7 +485,7 @@ static std::string vtkJoin(
   const std::vector<std::string> exts, const char* prefix,
   const char* suffix)
 {
-  vtksys_ios::ostringstream stream;
+  std::ostringstream stream;
   std::vector<std::string>::const_iterator iter;
   for (iter = exts.begin(); iter != exts.end(); ++iter)
     {
@@ -497,7 +497,7 @@ static std::string vtkJoin(
 //----------------------------------------------------------------------------
 const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkSMSession* session)
 {
-  vtksys_ios::ostringstream all_types;
+  std::ostringstream all_types;
   all_types << "Supported Files (";
 
   std::set<std::string> sorted_types;
@@ -532,7 +532,7 @@ const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkSMSession* session)
 
       if (ext_list.size() > 0)
         {
-        vtksys_ios::ostringstream stream;
+        std::ostringstream stream;
         stream << iter->second.Description << "(" << ext_list << ")";
         sorted_types.insert(stream.str());
         all_types << ext_list << " ";

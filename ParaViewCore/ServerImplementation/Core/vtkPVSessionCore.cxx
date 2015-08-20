@@ -41,7 +41,7 @@
 #include <fstream>
 #include <set>
 #include <string>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 
 #define LOG(x)\
@@ -298,7 +298,7 @@ vtkPVSessionCore::vtkPVSessionCore()
     vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
     if (options->GetLogFileName())
       {
-      vtksys_ios::ostringstream filename;
+      std::ostringstream filename;
       filename  << options->GetLogFileName();
       if (this->ParallelController->GetNumberOfProcesses() > 1)
         {
@@ -383,7 +383,7 @@ void vtkPVSessionCore::OnInterpreterError( vtkObject*, unsigned long,
     {
     if(!this->Internals->DisableErrorMacro)
       {
-      vtksys_ios::ostringstream error;
+      std::ostringstream error;
       error << "\nwhile processing\n";
       info->css->PrintMessage(error, info->message);
       error << ends;

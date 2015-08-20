@@ -53,7 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 #include <QFile>
 
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 //-----------------------------------------------------------------------------
 pqAboutDialog::pqAboutDialog(QWidget* Parent) :
@@ -74,7 +74,7 @@ pqAboutDialog::pqAboutDialog(QWidget* Parent) :
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pqOptions* opts = pqOptions::SafeDownCast(pm->GetOptions());
 
-  vtksys_ios::ostringstream str;
+  std::ostringstream str;
   vtkIndent indent;
   opts->PrintSelf(str, indent.GetNextIndent());
   str << ends;

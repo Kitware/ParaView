@@ -44,7 +44,7 @@
 #include <set>
 #include <string>
 #include <vector>
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <vtksys/RegularExpression.hxx>
 
 //---------------------------------------------------------------------------
@@ -1376,7 +1376,7 @@ vtkSMProperty* vtkSMProxy::NewProperty(const char* name,
   vtkSIProxyDefinitionManager::PatchXMLProperty(propElement);
 
   vtkObject* object = 0;
-  vtksys_ios::ostringstream cname;
+  std::ostringstream cname;
   cname << "vtkSM" << propElement->GetName() << ends;
   object = vtkPVInstantiator::CreateInstance(cname.str().c_str());
 
@@ -2040,7 +2040,7 @@ vtkPVXMLElement* vtkSMProxy::SaveXMLState(vtkPVXMLElement* root,
       }
     if (!iter->GetProperty()->GetIsInternal())
       {
-      vtksys_ios::ostringstream propID;
+      std::ostringstream propID;
       propID << this->GetGlobalID() << "." << iter->GetKey() << ends;
       iter->GetProperty()->SaveState( proxyXml,
                                       iter->GetKey(),

@@ -30,7 +30,7 @@
 #include <map>
 #include <set>
 #include <string>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 //****************************************************************************
 struct SubProxyInfo
@@ -498,7 +498,7 @@ bool vtkSIProxy::ReadXMLProperty(vtkPVXMLElement* propElement)
     }
   else
     {
-    vtksys_ios::ostringstream cname;
+    std::ostringstream cname;
     cname << "vtkSI" << propElement->GetName() << ends;
     classname = cname.str();
     }

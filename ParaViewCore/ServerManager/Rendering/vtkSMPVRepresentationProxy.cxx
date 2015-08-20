@@ -37,7 +37,7 @@
 #include <cmath>
 #include <set>
 #include <string>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 class vtkSMPVRepresentationProxy::vtkStringSet :
   public std::set<std::string> {};

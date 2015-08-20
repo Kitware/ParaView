@@ -22,7 +22,7 @@
 #include "vtkQuadricClustering.h"
 #include "vtkTimerLog.h"
 
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTimerInformation);
@@ -146,7 +146,7 @@ void vtkPVTimerInformation::CopyFromObject(vtkObject*)
   length = vtkTimerLog::GetNumberOfEvents() * 40;
   if (length > 0)
     {
-    vtksys_ios::ostringstream fptr;
+    std::ostringstream fptr;
     //*fptr << "Hello world !!!\n ()";
     vtkTimerLog::DumpLogWithIndents(&fptr, threshold);
     fptr << ends;
