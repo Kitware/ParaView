@@ -210,7 +210,7 @@ void vtkPointGaussianRepresentation::SetOpacity(double val)
 //----------------------------------------------------------------------------
 void vtkPointGaussianRepresentation::SetSplatSize(double radius)
 {
-  this->Mapper->SetDefaultRadius(radius);
+  this->Mapper->SetScaleFactor(radius);
 }
 
 //----------------------------------------------------------------------------
