@@ -1,13 +1,13 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqSpinBox.cxx
+   Module:  pqSpinBox.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -32,8 +32,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSpinBox.h"
 
 //-----------------------------------------------------------------------------
-pqSpinBox::pqSpinBox(QWidget* _parent) : QSpinBox(_parent)
+pqSpinBox::pqSpinBox(QWidget* _parent) : Superclass(_parent),
+  EditingFinishedPending(false)
 {
+  this->connect(this, SIGNAL(editingFinished()), SLOT(onEditingFinished()));
+  this->connect(this, SIGNAL(valueChanged(int)), SLOT(onValueEdited()));
 }
 
 //-----------------------------------------------------------------------------
@@ -45,5 +48,21 @@ void pqSpinBox::stepBy(int steps)
   if (this->value() != old_value)
     {
     emit this->editingFinished();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqSpinBox::onValueEdited()
+{
+  this->EditingFinishedPending = true;
+}
+
+//-----------------------------------------------------------------------------
+void pqSpinBox::onEditingFinished()
+{
+  if (this->EditingFinishedPending)
+    {
+    emit this->valueChangedAndEditingFinished();
+    this->EditingFinishedPending = false;
     }
 }

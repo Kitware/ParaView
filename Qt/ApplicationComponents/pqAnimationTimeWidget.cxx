@@ -105,7 +105,7 @@ pqAnimationTimeWidget::pqAnimationTimeWidget(QWidget* parentObject)
   this->connect(ui.timeValue, SIGNAL(textChangedAndEditingFinished()), SIGNAL(timeValueChanged()));
   this->connect(ui.radioButtonValue, SIGNAL(toggled(bool)), SIGNAL(playModeChanged()));
   this->connect(ui.radioButtonValue, SIGNAL(toggled(bool)), SLOT(updateTimestepCountLabelVisibility()));
-  this->connect(ui.timestepValue, SIGNAL(editingFinished()),
+  this->connect(ui.timestepValue, SIGNAL(valueChangedAndEditingFinished()),
     SLOT(timestepValueChanged()));
 }
 

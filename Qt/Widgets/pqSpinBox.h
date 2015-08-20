@@ -1,13 +1,13 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqSpinBox.h
+   Module:  pqSpinBox.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -29,14 +29,17 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqSpinBox_h 
-#define __pqSpinBox_h
+#ifndef pqSpinBox_h
+#define pqSpinBox_h
 
 #include <QSpinBox>
 #include "pqWidgetsModule.h"
 
 /// QSpinBox which fires editingFinished() signal when the value is changed
 /// by steps (increments).
+/// Also, this adds a new signal valueChangedAndEditingFinished() which is fired
+/// after editingFinished() signal is fired and the value in the spin box indeed
+/// changed.
 class PQWIDGETS_EXPORT pqSpinBox : public QSpinBox
 {
   Q_OBJECT
@@ -48,11 +51,21 @@ public:
   /// overridding this so that we can emit editingFinished() signal
   virtual void stepBy(int steps);
 
+signals:
+  /// Unlike QSpinBox::editingFinished() which gets fired whenever the widget
+  /// looses focus irrespective of if the value was indeed edited,
+  /// valueChangedAndEditingFinished() is fired only when the value was changed
+  /// as well.
+  void valueChangedAndEditingFinished();
+
+private slots:
+  void onValueEdited();
+  void onEditingFinished();
+
 private:
   pqSpinBox(const pqSpinBox&); // Not implemented.
   void operator=(const pqSpinBox&); // Not implemented.
+  bool EditingFinishedPending;
 };
 
 #endif
-
-
