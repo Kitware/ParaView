@@ -32,11 +32,11 @@
 #include "vtkStringList.h"
 
 #include <vtksys/ios/sstream>
-#include <vtksys/String.hxx>
 #include <vtksys/SystemTools.hxx>
 #include "vtk_jsoncpp.h"
 
 #include <algorithm>
+#include <string>
 #include <cfloat>
 
 #define vtkSMSettingsDebugMacro(x)\
@@ -1067,7 +1067,7 @@ bool vtkSMSettings::SaveSettingsToFile(const std::string & filePath)
     }
 
   // Get directory component of filePath and create it if it doesn't exist.
-  vtksys_stl::string directory =
+  std::string directory =
     vtksys::SystemTools::GetParentDirectory(filePath.c_str());
   bool createdDirectory = vtksys::SystemTools::MakeDirectory(directory.c_str());
   if (!createdDirectory)

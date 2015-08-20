@@ -48,7 +48,6 @@
 #include "vtkDoubleArray.h"
 
 #include <algorithm>
-#include <vtksys/stl/map>
 #include <vector>
 #include <set>
 
