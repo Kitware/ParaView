@@ -23,7 +23,7 @@
 #include "vtkSMProxy.h"
 #include "vtkSMDomain.h"
 
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <ctype.h>
 #include <cassert>
 #include <cmath>
@@ -98,7 +98,7 @@ vtkStdString vtkSMCoreUtilities::SanitizeName(const char* name)
     return vtkStdString();
     }
 
-  vtksys_ios::ostringstream cname;
+  std::ostringstream cname;
   for (size_t cc=0; name[cc]; cc++)
     {
     if (isalnum(name[cc]))

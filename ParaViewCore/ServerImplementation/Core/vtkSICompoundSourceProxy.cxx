@@ -23,7 +23,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 
 #include <vector>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 #include <assert.h>
 

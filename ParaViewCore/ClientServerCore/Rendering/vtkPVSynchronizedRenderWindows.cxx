@@ -33,7 +33,7 @@
 #include "vtkTuple.h"
 
 #include <vtksys/SystemTools.hxx>
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <assert.h>
 #include <map>
 #include <set>
@@ -610,7 +610,7 @@ vtkRenderWindow* vtkPVSynchronizedRenderWindows::NewRenderWindow()
       vtkRenderWindow* window = vtkRenderWindow::New();
       window->DoubleBufferOn();
       window->AlphaBitPlanesOn();
-      vtksys_ios::ostringstream name_stream;
+      std::ostringstream name_stream;
       if (this->Mode == BATCH)
         {
         name_stream << "ParaView (batch)";
@@ -1714,7 +1714,7 @@ bool vtkPVSynchronizedRenderWindows::BroadcastToDataServer(vtkSelection* selecti
     return true;
     }
 
-  vtksys_ios::ostringstream xml_stream;
+  std::ostringstream xml_stream;
   vtkSelectionSerializer::PrintXML(xml_stream, vtkIndent(), 1, selection);
   vtkMultiProcessStream stream;
   stream << xml_stream.str();

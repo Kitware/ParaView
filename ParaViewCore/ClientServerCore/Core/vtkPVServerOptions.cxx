@@ -18,7 +18,7 @@
 #include "vtkProcessModule.h"
 #include "vtkPVServerOptionsInternals.h"
 
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <vtksys/SystemTools.hxx>
 
 #include <cstdio>
@@ -140,12 +140,12 @@ int vtkPVServerOptions::AddMachineInformation(const char** atts)
       }
     else if(key == "FullScreen")
       {
-      vtksys_ios::istringstream str(const_cast<char *>(value.c_str()));
+      std::istringstream str(const_cast<char *>(value.c_str()));
       str >> info.FullScreen;
       }
     else if(key == "ShowBorders")
       {
-      vtksys_ios::istringstream str(const_cast<char *>(value.c_str()));
+      std::istringstream str(const_cast<char *>(value.c_str()));
       str >> info.ShowBorders;
       }
     else if(key == "StereoType")
@@ -186,7 +186,7 @@ int vtkPVServerOptions::AddMachineInformation(const char** atts)
     else if(key == "LowerLeft")
       {
       caveBounds++;
-      vtksys_ios::istringstream str(const_cast<char *>(value.c_str()));
+      std::istringstream str(const_cast<char *>(value.c_str()));
       for(int j =0; j < 3; j++)
         {
         str >> info.LowerLeft[j];
@@ -195,7 +195,7 @@ int vtkPVServerOptions::AddMachineInformation(const char** atts)
     else if(key == "LowerRight")
       {
       caveBounds++;
-      vtksys_ios::istringstream str(const_cast<char *>(value.c_str()));
+      std::istringstream str(const_cast<char *>(value.c_str()));
       for(int j =0; j < 3; j++)
         {
         str >> info.LowerRight[j];
@@ -204,7 +204,7 @@ int vtkPVServerOptions::AddMachineInformation(const char** atts)
     else if(key == "UpperRight")
       {
       caveBounds++;
-      vtksys_ios::istringstream str(const_cast<char *>(value.c_str()));
+      std::istringstream str(const_cast<char *>(value.c_str()));
       for(int j =0; j < 3; j++)
         {
         str >> info.UpperRight[j];
@@ -231,7 +231,7 @@ int vtkPVServerOptions::AddEyeSeparationInformation(const char** atts)
     std::string value = atts[1];
     if(key == "Value")
       {
-      vtksys_ios::istringstream str(const_cast<char *>(value.c_str()));
+      std::istringstream str(const_cast<char *>(value.c_str()));
       str >> this->Internals->EyeSeparation;
       }
     else

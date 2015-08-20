@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QStringList>
 #include <QTextStream>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 #define SERVER_CONFIGURATION_DEFAULT_NAME "unknown"
 
@@ -283,7 +283,7 @@ void pqServerConfiguration::setStartupToCommand(
 //-----------------------------------------------------------------------------
 QString pqServerConfiguration::toString(vtkIndent indent) const
 {
-  vtksys_ios::stringstream stream;
+  std::stringstream stream;
   this->XML->PrintXML(stream, indent);
   return stream.str().c_str();
 }

@@ -13,7 +13,7 @@
 #include "pqFileDialog.h"
 
 #include <string>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 #define pqErrorMacro(estr)\
   qDebug()\
@@ -274,7 +274,7 @@ void pqCustomViewButtonDialog::importConfigurations()
         return;
         }
       int isEmpty;
-      vtksys_ios::istringstream is(isEmptyValue);
+      std::istringstream is(isEmptyValue);
       is >> isEmpty;
       if (isEmpty)
         {
@@ -297,7 +297,7 @@ void pqCustomViewButtonDialog::importConfigurations()
 
         // Extract configuration hierarchy from the stream
         // we should validate it but PV state doesn't support this.
-        vtksys_ios::ostringstream os;
+        std::ostringstream os;
         cameraConfig->PrintXML(os,vtkIndent());
 
         configs << os.str().c_str();
@@ -340,7 +340,7 @@ void pqCustomViewButtonDialog::exportConfigurations()
       tip->SetAttribute("value",this->ToolTips[i]->text().toStdString().c_str());
 
       // camera configuration
-      vtksys_ios::ostringstream os;
+      std::ostringstream os;
       os << (this->Configurations[i].isEmpty()?1:0);
 
       vtkPVXMLElement *config=vtkPVXMLElement::New();

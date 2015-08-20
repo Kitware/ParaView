@@ -28,7 +28,7 @@
 
 #include <string>
 #include <vtksys/SystemTools.hxx>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 extern "C" {
   void vtkPVInitializePythonModules();
@@ -52,7 +52,7 @@ namespace
 
     vtkPythonInterpreter::Initialize();
 
-    vtksys_ios::ostringstream loadPythonModules;
+    std::ostringstream loadPythonModules;
     loadPythonModules
       << "import sys\n"
       << "import paraview\n"
@@ -190,7 +190,7 @@ int vtkCPPythonScriptPipeline::Initialize(const char* fileName)
   // del _source
   // del _code
   // import foo
-  vtksys_ios::ostringstream loadPythonModules;
+  std::ostringstream loadPythonModules;
   loadPythonModules << "import types" << std::endl;
   loadPythonModules << "_" << fileNameName << " = types.ModuleType('" << fileNameName << "')" << std::endl;
   loadPythonModules <<  "_" << fileNameName << ".__file__ = '" << fileNameName << ".pyc'" << std::endl;
@@ -230,7 +230,7 @@ int vtkCPPythonScriptPipeline::RequestDataDescription(
   // check the script to see if it should be run...
   vtkStdString dataDescriptionString = this->GetPythonAddress(dataDescription);
 
-  vtksys_ios::ostringstream pythonInput;
+  std::ostringstream pythonInput;
   pythonInput << "dataDescription = vtkPVCatalystPython.vtkCPDataDescription('"
               << dataDescriptionString << "')\n"
               << this->PythonScriptName << ".RequestDataDescription(dataDescription)\n";
@@ -254,7 +254,7 @@ int vtkCPPythonScriptPipeline::CoProcess(
 
   vtkStdString dataDescriptionString = this->GetPythonAddress(dataDescription);
 
-  vtksys_ios::ostringstream pythonInput;
+  std::ostringstream pythonInput;
   pythonInput
     << "dataDescription = vtkPVCatalystPython.vtkCPDataDescription('"
     << dataDescriptionString << "')\n"
@@ -270,7 +270,7 @@ int vtkCPPythonScriptPipeline::Finalize()
 {
   InitializePython();
 
-  vtksys_ios::ostringstream pythonInput;
+  std::ostringstream pythonInput;
   pythonInput
     << "if hasattr(" << this->PythonScriptName << ", 'Finalize'):\n"
     << "  " << this->PythonScriptName << ".Finalize()\n";

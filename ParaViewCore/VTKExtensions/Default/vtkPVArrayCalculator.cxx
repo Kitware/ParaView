@@ -29,14 +29,14 @@
 #include <assert.h>
 #include <set>
 #include <string>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 namespace
 {
   template <class A, class B>
     std::string vtkJoinToString(const A& a, const B& b)
       {
-      vtksys_ios::ostringstream stream;
+      std::ostringstream stream;
       stream << a << "_" << b;
       return stream.str();
       }

@@ -29,7 +29,7 @@
 #include <assert.h>
 #include <map>
 #include <vector>
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkPythonAnnotationFilter);
@@ -85,7 +85,7 @@ int vtkPythonAnnotationFilter::RequestData(
   this->CurrentInputDataObject = input;
 
   // Extract time information
-  vtksys_ios::ostringstream timeInfo;
+  std::ostringstream timeInfo;
   if (vtkInformation* dataInformation = input->GetInformation())
     {
     if (dataInformation->Has(vtkDataObject::DATA_TIME_STEP()))
@@ -161,7 +161,7 @@ static std::string vtkGetReferenceAsString(void* ref)
 //----------------------------------------------------------------------------
 void vtkPythonAnnotationFilter::EvaluateExpression()
 {
-  vtksys_ios::ostringstream stream;
+  std::ostringstream stream;
   stream
     << "def vtkPythonAnnotationFilter_EvaluateExpression():" << endl
     << "    from paraview import annotation as pv_ann" << endl

@@ -31,7 +31,7 @@
 
 #include <assert.h>
 #include <string>
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------

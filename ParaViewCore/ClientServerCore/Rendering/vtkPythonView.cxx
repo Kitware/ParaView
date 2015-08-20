@@ -30,7 +30,7 @@
 #include "vtkTimerLog.h"
 
 #include <algorithm>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 
 class vtkPythonView::vtkInternals
@@ -145,7 +145,7 @@ void vtkPythonView::Update()
       }
 
     // Import necessary items from ParaView
-    vtksys_ios::ostringstream importStream;
+    std::ostringstream importStream;
     importStream << "import paraview" << endl
                  << "from vtkPVClientServerCoreRenderingPython import vtkPythonView" << endl
                  << "pythonView = vtkPythonView('" << addressOfThis << " ')" << endl;
@@ -163,7 +163,7 @@ void vtkPythonView::Update()
     // Update the data array settings. Do this only on servers where local data is available
     if (this->IsLocalDataAvailable())
       {
-      vtksys_ios::ostringstream setupDataCommandStream;
+      std::ostringstream setupDataCommandStream;
       setupDataCommandStream
         << "from paraview import python_view\n"
         << "try:\n"
@@ -413,7 +413,7 @@ void vtkPythonView::StillRender()
     int width  = this->Size[0] * this->Magnification;
     int height = this->Size[1] * this->Magnification;
 
-    vtksys_ios::ostringstream renderCommandStream;
+    std::ostringstream renderCommandStream;
     renderCommandStream
       << "from paraview import python_view\n"
       << "try:\n"

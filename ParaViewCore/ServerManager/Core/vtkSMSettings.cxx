@@ -31,7 +31,7 @@
 #include "vtkSMStringVectorProperty.h"
 #include "vtkStringList.h"
 
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <vtksys/SystemTools.hxx>
 #include "vtk_jsoncpp.h"
 
@@ -41,7 +41,7 @@
 
 #define vtkSMSettingsDebugMacro(x)\
   { if (vtksys::SystemTools::GetEnv("PV_SETTINGS_DEBUG")) {     \
-  vtksys_ios::ostringstream vtkerror;                           \
+  std::ostringstream vtkerror;                           \
   vtkerror << x << endl;                                        \
   vtkOutputWindowDisplayText(vtkerror.str().c_str());} }
 
@@ -409,7 +409,7 @@ public:
           !property->GetNoCustomDefault())
         {
         // Build the JSON reference string
-        vtksys_ios::ostringstream settingStringStream;
+        std::ostringstream settingStringStream;
         settingStringStream << settingPrefix
                             << "." << proxyName
                             << "." << propertyName;
@@ -696,7 +696,7 @@ public:
 
     // Get reference to JSON value
     const char* proxyName = proxy->GetXMLName();
-    vtksys_ios::ostringstream settingStringStream;
+    std::ostringstream settingStringStream;
     settingStringStream << settingPrefix << "." << proxyName;
     std::string settingString(settingStringStream.str());
     const char* settingCString = settingString.c_str();
@@ -736,7 +736,7 @@ public:
         }
 
       const char* propertyName = iter->GetKey();
-      vtksys_ios::ostringstream propertySettingStringStream;
+      std::ostringstream propertySettingStringStream;
       propertySettingStringStream << settingStringStream.str() << "."
                                   << propertyName;
       std::string propertySettingString(propertySettingStringStream.str());

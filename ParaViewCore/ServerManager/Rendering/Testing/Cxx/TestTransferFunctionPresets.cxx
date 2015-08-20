@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMTransferFunctionPresets.h"
 
 #include "vtk_jsoncpp.h"
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <cassert>
 
 #define myassert(condition, message) \

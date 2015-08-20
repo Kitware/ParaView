@@ -43,7 +43,7 @@
 #include <set>
 #include <string>
 #include <vtksys/SystemTools.hxx>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 //#define vtkLiveInsituLinkDebugMacro(x) cerr x << endl;
 #define vtkLiveInsituLinkDebugMacro(x)
@@ -281,7 +281,7 @@ public:
     int Port;
     std::string ToString() const
       {
-      vtksys_ios::ostringstream key;
+      std::ostringstream key;
       key << this->Group.c_str() << ":" << this->Name.c_str() << ":" <<
         this->Port;
       return key.str();
@@ -413,7 +413,7 @@ void vtkLiveInsituLink::InitializeLive()
     nam->AddObserver(vtkCommand::ConnectionClosedEvent,
       this, &vtkLiveInsituLink::OnConnectionClosedEvent);
 
-    vtksys_ios::ostringstream url;
+    std::ostringstream url;
     url << "tcp://localhost:" << this->InsituPort << "?"
       << "listen=true&nonblocking=true&"
       << "handshake=paraview.insitu." << PARAVIEW_VERSION;
@@ -475,7 +475,7 @@ void vtkLiveInsituLink::InitializeInsitu()
     {
     vtkNetworkAccessManager* nam = pm->GetNetworkAccessManager();
 
-    vtksys_ios::ostringstream url;
+    std::ostringstream url;
     url << "tcp://" << this->Hostname << ":" << this->InsituPort << "?"
       << "timeout=0&handshake=paraview.insitu." << PARAVIEW_VERSION;
     this->SetURL(url.str().c_str());
@@ -662,7 +662,7 @@ void vtkLiveInsituLink::InsituConnect(vtkMultiProcessController* controller)
       // Filter XML to remove any view/representation/timeKeeper/animation proxy
       vtkLiveInsituLink::FilterXMLState(xml);
 
-      vtksys_ios::ostringstream xml_string;
+      std::ostringstream xml_string;
       xml->PrintXML(xml_string, vtkIndent());
       xml->Delete();
 

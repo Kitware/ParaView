@@ -20,7 +20,7 @@
 #include "vtkSMSession.h"
 
 #include <vtksys/SystemTools.hxx>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 //----------------------------------------------------------------------------
 vtkSMRemoteObject::vtkSMRemoteObject()
@@ -82,7 +82,7 @@ const char* vtkSMRemoteObject::GetGlobalIDAsString()
 {
   if (!this->GlobalIDString)
     {
-    vtksys_ios::ostringstream cname;
+    std::ostringstream cname;
     cname << this->GetGlobalID();
 
     delete [] this->GlobalIDString;

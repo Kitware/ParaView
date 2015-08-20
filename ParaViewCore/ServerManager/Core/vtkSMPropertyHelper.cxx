@@ -52,7 +52,7 @@
 #include "vtkSMStringVectorProperty.h"
 #include "vtkStringList.h"
 
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 #include <algorithm>
 #include <cassert>
@@ -288,7 +288,7 @@ inline void vtkSMPropertyHelper::SetProperty(unsigned int index, int value)
       break;
     case STRING:
         {
-        vtksys_ios::ostringstream str;
+        std::ostringstream str;
         str << value;
         if (this->UseUnchecked)
           {
@@ -881,7 +881,7 @@ unsigned int vtkSMPropertyHelper::GetOutputPort(unsigned int index/*=0*/)
 //----------------------------------------------------------------------------
 void vtkSMPropertyHelper::SetStatus(const char* key, int value)
 {
-  vtksys_ios::ostringstream str;
+  std::ostringstream str;
   str << value;
   this->SetStatus(key, str.str().c_str());
 }
@@ -889,7 +889,7 @@ void vtkSMPropertyHelper::SetStatus(const char* key, int value)
 //----------------------------------------------------------------------------
 int vtkSMPropertyHelper::GetStatus(const char* key, int default_value/*=0*/)
 {
-  vtksys_ios::ostringstream str;
+  std::ostringstream str;
   str << default_value;
   const char* value = vtkSMPropertyHelper::GetStatus(key, str.str().c_str());
   return std::atoi(value);
@@ -938,7 +938,7 @@ void vtkSMPropertyHelper::SetStatus(const char* key, double *values,
       {
       for (int kk=0; kk < num_values; kk++)
         {
-        vtksys_ios::ostringstream str;
+        std::ostringstream str;
         str << values[kk];
         list->SetString(cc+kk+1, str.str().c_str());
         }
@@ -951,7 +951,7 @@ void vtkSMPropertyHelper::SetStatus(const char* key, double *values,
     list->AddString(key);
     for (int kk=0; kk < num_values; kk++)
       {
-      vtksys_ios::ostringstream str;
+      std::ostringstream str;
       str << values[kk];
       list->AddString(str.str().c_str());
       }
@@ -1155,7 +1155,7 @@ void vtkSMPropertyHelper::SetInputArrayToProcess(int fieldAssociation, const cha
     return;
     }
 
-  vtksys_ios::ostringstream str;
+  std::ostringstream str;
   str << fieldAssociation;
 
   vtkNew<vtkStringList> vals;

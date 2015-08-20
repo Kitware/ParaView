@@ -72,8 +72,8 @@
 // STL
 #include <fstream>
 using std::ofstream;
-#include "vtksys/ios/sstream"
-using vtksys_ios::ostringstream;
+#include "sstream"
+using std::ostringstream;
 #include "vector"
 using std::vector;
 #include "string"

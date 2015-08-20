@@ -23,7 +23,7 @@
 #include "vtkImageData.h"
 #include "vtkPNGWriter.h"
 
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <vtkNew.h>
 
 #include <map>
@@ -251,7 +251,7 @@ void vtkTileDisplayHelper::SetDumpImagePath(const char* newPath)
           vtkMultiProcessController::GetGlobalController()->GetLocalProcessId():
           1;
 
-    vtksys_ios::ostringstream fullPath;
+    std::ostringstream fullPath;
     fullPath << newPath << "-Tile" << pid << ".png";
     vtkTileDisplayHelper::GetInstance()->Internals->DumpImagePath = fullPath.str();
     }

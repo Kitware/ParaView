@@ -31,7 +31,7 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStateLoader.h"
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 //#define vtkSMLiveInsituLinkProxyDebugMacro(x) cerr x << endl;
 #define vtkSMLiveInsituLinkProxyDebugMacro(x)
@@ -241,7 +241,7 @@ void vtkSMLiveInsituLinkProxy::PushUpdatedState()
     vtkSMLiveInsituLinkProxyDebugMacro(<< "Push new state to server.");
     // push new state.
     vtkPVXMLElement* root = this->InsituProxyManager->SaveXMLState();
-    vtksys_ios::ostringstream data;
+    std::ostringstream data;
     root->PrintXML(data, vtkIndent());
     root->Delete();
 
@@ -284,7 +284,7 @@ void vtkSMLiveInsituLinkProxy::LiveChanged()
 bool vtkSMLiveInsituLinkProxy::HasExtract(
     const char* reg_group, const char* reg_name, int port_number)
 {
-  vtksys_ios::ostringstream key;
+  std::ostringstream key;
   key << reg_group << ":" << reg_name << ":" << port_number;
   return (this->Internals->ExtractProxies.find(key.str()) !=
     this->Internals->ExtractProxies.end());
@@ -307,7 +307,7 @@ vtkSMProxy* vtkSMLiveInsituLinkProxy::CreateExtract(
     << vtkClientServerStream::End;
   this->ExecuteStream(stream);
 
-  vtksys_ios::ostringstream key;
+  std::ostringstream key;
   key << reg_group << ":" << reg_name << ":" << port_number;
   this->Internals->ExtractProxies[key.str()] = proxy;
   proxy->Delete();

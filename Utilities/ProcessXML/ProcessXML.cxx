@@ -20,7 +20,7 @@
 #include <vtksys/Base64.h>
 #include <vtksys/RegularExpression.hxx>
 #include <fstream>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 #include <assert.h>
 class Output
@@ -37,7 +37,7 @@ public:
     }
   Output(const Output&){}
   void operator=(const Output&){}
-  vtksys_ios::ostringstream Stream;
+  std::ostringstream Stream;
 
   int MaxLen;
   long CurrentPosition;
@@ -91,7 +91,7 @@ public:
         reinterpret_cast<unsigned char*>(encoded_buffer),
         0);
       encoded_buffer[end] = 0;
-      vtksys_ios::istringstream iss(encoded_buffer);
+      std::istringstream iss(encoded_buffer);
 
       delete[] buffer;
       delete[] encoded_buffer;
@@ -274,8 +274,8 @@ int main(int argc, char* argv[])
       return 1;
       }
     int kk;
-    vtksys_ios::ostringstream createstring;
-    vtksys_ios::ostringstream lenstr;
+    std::ostringstream createstring;
+    std::ostringstream lenstr;
     for ( kk = 0; kk < num; kk ++ )
       {
       lenstr << endl 

@@ -23,7 +23,7 @@
 #include <vector>
 #include <algorithm>
 #include <string>
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include "vtkCommand.h"
 #include <vtkPVXMLElement.h>
 #include "vtkSMProperty.h"
@@ -369,7 +369,7 @@ public:
       }
     for (unsigned int i=0; i<size; i++)
       {
-      vtksys_ios::ostringstream valueAsString;
+      std::ostringstream valueAsString;
 
       // set the stream precision to the maximum precision for the data type
       valueAsString.precision(std::numeric_limits<T>::digits10);

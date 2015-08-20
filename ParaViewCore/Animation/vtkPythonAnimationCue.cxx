@@ -19,7 +19,7 @@
 #include "vtkProcessModule.h"
 #include "vtkPythonInterpreter.h"
 
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 vtkStandardNewMacro(vtkPythonAnimationCue);
 //----------------------------------------------------------------------------
@@ -60,7 +60,7 @@ void vtkPythonAnimationCue::HandleStartCueEvent()
     }
   if (this->Script)
     {
-    vtksys_ios::ostringstream stream;
+    std::ostringstream stream;
     stream << "from paraview import servermanager" << endl;
     stream << "def start_cue(foo): pass" << endl;
     stream << this->Script << endl;
@@ -97,7 +97,7 @@ void vtkPythonAnimationCue::HandleTickEvent()
     }
   if (this->Script)
     {
-    vtksys_ios::ostringstream stream;
+    std::ostringstream stream;
     stream << "from paraview import servermanager" << endl;
     stream << this->Script << endl;
     stream << "_me = servermanager.vtkPythonAnimationCue('" << aplus << "')\n";
@@ -133,7 +133,7 @@ void vtkPythonAnimationCue::HandleEndCueEvent()
     }
   if (this->Script)
     {
-    vtksys_ios::ostringstream stream;
+    std::ostringstream stream;
     stream << "from paraview import servermanager" << endl;
     stream << "def end_cue(foo): pass" << endl;
     stream << this->Script << endl;

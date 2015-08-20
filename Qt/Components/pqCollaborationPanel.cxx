@@ -66,7 +66,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkNew.h>
 #include <map>
 #include <string>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 //*****************************************************************************
 #include "ui_pqCollaborationPanel.h"

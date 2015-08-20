@@ -19,7 +19,7 @@
 #include "vtkSMIntVectorProperty.h"
 
 #include <vector>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 #include "vtkStdString.h"
 
@@ -255,7 +255,7 @@ void vtkSMEnumerationDomain::Update(vtkSMProperty* prop)
     unsigned int max = ivp->GetNumberOfElements();
     for (unsigned int cc=0;cc < max; ++cc)
       {
-      vtksys_ios::ostringstream stream;
+      std::ostringstream stream;
       stream << ivp->GetElement(cc);
       this->AddEntry(stream.str().c_str(), ivp->GetElement(cc));
       }

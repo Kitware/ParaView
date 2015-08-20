@@ -9,7 +9,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkByteSwap.h"
 #include <vector>
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <vtksys/RegularExpression.hxx>
 
 //=============================================================================
@@ -1653,7 +1653,7 @@ int vtkSpyPlotUniReader::ReadDataDumps(vtkSpyPlotIStream *spis)
         }
       if ( variable->Index >= 0 )
         {
-        vtksys_ios::ostringstream ostr;
+        std::ostringstream ostr;
         ostr << this->MaterialFields[variable->Material].Comment << " - " 
              << variable->Index+1 << ends;
         variable->Name = new char[ostr.str().size() + 1];

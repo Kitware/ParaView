@@ -24,7 +24,7 @@
 
 #include <assert.h>
 
-#include <vtksys/ios/sstream>
+#include <sstream>
 #if !defined(_WIN32) || defined(__CYGWIN__)
 # include <unistd.h>
 # include <sys/wait.h>
@@ -814,7 +814,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
       std::string rs_connection_info;
       this->SetupServer(renderServer, this->RenderServerExecutable, argv);
 
-      vtksys_ios::ostringstream processName;
+      std::ostringstream processName;
       processName << "renderserver " << rs_connection_infos.size();
 
       if(!this->StartProcessAndWait(renderServer, processName.str().c_str(),
@@ -839,7 +839,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
       std::string s_connection_info;
       this->SetupServer(server, this->TestRenderServer ? this->DataServerExecutable : this->ServerExecutable, argv);
 
-      vtksys_ios::ostringstream processName;
+      std::ostringstream processName;
       processName << (renderServers.empty() ? "server " : "dataserver ")
                   << s_connection_infos.size();
 
@@ -867,7 +867,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
       {
       std::string rs_host("localhost"), ds_host("localhost");
       int rs_port(22221), ds_port(11111);
-      vtksys_ios::ostringstream stream;
+      std::ostringstream stream;
       stream << "-url=";
       for(int i=0; i < this->NumberOfServers; i++)
         {
@@ -886,7 +886,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
       {
       std::string host("localhost");
       int port(11111);
-      vtksys_ios::ostringstream stream;
+      std::ostringstream stream;
       stream << "-url=";
       for(int i=0; i < this->NumberOfServers; i++)
         {
@@ -903,7 +903,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     // Now run the client(s).
     for (size_t cc=0; cc < clients.size(); cc++)
       {
-      vtksys_ios::ostringstream client_name;
+      std::ostringstream client_name;
       client_name << "client";
       if (clients.size() > 1)
         {
@@ -937,7 +937,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     {
     std::string output_to_ignore;
     this->SetupServer(script, this->ScriptExecutable, argv);
-    vtksys_ios::ostringstream processName;
+    std::ostringstream processName;
     processName << "script";
     if(!this->StartProcessAndWait(
          script, processName.str().c_str(),ScriptStdOut, ScriptStdErr,
@@ -1060,7 +1060,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
   int clientResult = 0;
   for (size_t cc=0; cc < clients.size(); cc++)
     {
-    vtksys_ios::ostringstream client_name;
+    std::ostringstream client_name;
     client_name << "client" << cc;
     int cur_result = this->ReportStatus(clients[cc], client_name.str().c_str());
     // 0 == success

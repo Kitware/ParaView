@@ -10,7 +10,7 @@ using std::cerr;
 using std::endl;
 
 #include <string>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 #define pqErrorMacro(estr)\
   qDebug()\

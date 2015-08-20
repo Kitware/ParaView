@@ -24,7 +24,7 @@
 #include "vtkPVSessionCore.h"
 #include "vtkWeakPointer.h"
 
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <assert.h>
 
 //----------------------------------------------------------------------------

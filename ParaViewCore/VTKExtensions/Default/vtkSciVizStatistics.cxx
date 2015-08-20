@@ -22,7 +22,7 @@
 #include "vtkDataArray.h"
 
 #include <set>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 vtkInformationKeyMacro(vtkSciVizStatistics, MULTIPLE_MODELS, Integer);
 
@@ -528,7 +528,7 @@ int vtkSciVizStatistics::PrepareFullDataTable( vtkTable* inTable, vtkFieldData* 
         const char* compName;
         for ( i = 0; i < ncomp; ++ i )
           {
-          vtksys_ios::ostringstream os;
+          std::ostringstream os;
           compName = arr->GetComponentName( i );
           os << arr->GetName() << "_";
           ( compName ) ? os << compName : os << i;

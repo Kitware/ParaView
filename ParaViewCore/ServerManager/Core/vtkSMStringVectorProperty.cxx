@@ -23,7 +23,7 @@
 #include "vtkStringList.h"
 #include "vtkSMStateLocator.h"
 
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
 

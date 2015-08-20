@@ -35,7 +35,7 @@
 #include <map>
 #include <set>
 #include <string>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 #include <assert.h>
 

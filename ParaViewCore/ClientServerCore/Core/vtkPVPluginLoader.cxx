@@ -29,13 +29,13 @@
 #include <string>
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/Directory.hxx>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 #include <cstdlib>
 
 #define vtkPVPluginLoaderDebugMacro(x)\
 { if (this->DebugPlugin) {\
-  vtksys_ios::ostringstream vtkerror;\
+  std::ostringstream vtkerror;\
   vtkerror << x;\
   vtkOutputWindowDisplayText(vtkerror.str().c_str());} }
 
@@ -395,7 +395,7 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
   // totally bogus (even for the GUI layer).
   if (pv_verfication_data != __PV_PLUGIN_VERIFICATION_STRING__)
     {
-    vtksys_ios::ostringstream error;
+    std::ostringstream error;
     error << "Mismatch in versions: \n" <<
       "ParaView Signature: " << __PV_PLUGIN_VERIFICATION_STRING__ << "\n"
       "Plugin Signature: " << pv_verfication_data.c_str();

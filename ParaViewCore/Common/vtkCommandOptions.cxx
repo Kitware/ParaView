@@ -19,7 +19,7 @@
 
 #include <vtksys/CommandLineArguments.hxx>
 #include <vtksys/SystemTools.hxx>
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <string>
 
 
@@ -207,7 +207,7 @@ void vtkCommandOptions::AddDeprecatedArgument(const char* longarg, const char* s
 //----------------------------------------------------------------------------
 int vtkCommandOptions::DeprecatedArgument(const char* argument)
 {
-  vtksys_ios::ostringstream str;
+  std::ostringstream str;
   str << "  " << this->Internals->CMD.GetHelp(argument);
   str << ends;
   this->SetErrorMessage(str.str().c_str());

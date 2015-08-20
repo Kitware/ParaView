@@ -1133,7 +1133,7 @@ int main(int argc, char *argv[])
 #endif
   if (!strcmp("vtkObjectBase",data->Name))
     {
-    fprintf(fp,"#include <vtksys/ios/sstream>\n");
+    fprintf(fp,"#include <sstream>\n");
     }
   if (!data->IsAbstract)
     {
@@ -1202,7 +1202,7 @@ int main(int argc, char *argv[])
     fprintf(fp,
             "  if (!strcmp(\"Print\",method) && msg.GetNumberOfArguments(0) == 2)\n"
             "    {\n"
-            "    vtksys_ios::ostringstream buf_with_warning_C4701;\n"
+            "    std::ostringstream buf_with_warning_C4701;\n"
             "    op->Print(buf_with_warning_C4701);\n"
             "    resultStream.Reset();\n"
             "    resultStream << vtkClientServerStream::Reply\n"

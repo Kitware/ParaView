@@ -30,7 +30,7 @@
 #include <vtkNew.h>
 #include <vtkWeakPointer.h>
 #include <string>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 //****************************************************************************
 //                            Internal class
@@ -106,7 +106,7 @@ public:
       user->set_user(userId);
       if(this->UserNames[userId].empty())
         {
-        vtksys_ios::ostringstream newUserName;
+        std::ostringstream newUserName;
         newUserName << "User " << userId;
         this->UserNames[userId] = newUserName.str().c_str();
         }

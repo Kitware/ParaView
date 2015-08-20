@@ -79,7 +79,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSettings.h"
 #include "pqTabbedMultiViewWidget.h"
 
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 #define SEQUENCE 0
 #define REALTIME 1
@@ -643,7 +643,7 @@ bool pqAnimationManager::saveAnimation()
     writer->Delete();
 
      // Get ProxyManager XML state
-    vtksys_ios::ostringstream xmlStringStream;
+    std::ostringstream xmlStringStream;
     vtkSmartPointer<vtkPVXMLElement> state;
     state.TakeReference(pxm->SaveXMLState());
     state->PrintXML(xmlStringStream, vtkIndent(0));

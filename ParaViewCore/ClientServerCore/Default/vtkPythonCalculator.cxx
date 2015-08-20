@@ -31,7 +31,7 @@
 #include <map>
 #include <string>
 #include <vtksys/SystemTools.hxx>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 vtkStandardNewMacro(vtkPythonCalculator);
 
@@ -133,7 +133,7 @@ void vtkPythonCalculator::Exec(const char* expression)
     aplus += 2; //skip over "0x"
     }
 
-  vtksys_ios::ostringstream python_stream;
+  std::ostringstream python_stream;
   python_stream
     << "import paraview\n"
     << "from paraview import calculator\n"

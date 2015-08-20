@@ -40,7 +40,7 @@
 
 #include <string>
 #include <vector>
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <assert.h>
 
 #define OUTPUT_PORTNAME_PREFIX "Output-"
@@ -74,7 +74,7 @@ struct vtkSMSourceProxyInternals
       {
       if (it->Name.empty())
         {
-        vtksys_ios::ostringstream nameStream;
+        std::ostringstream nameStream;
         nameStream << OUTPUT_PORTNAME_PREFIX << idx;
         it->Name = nameStream.str();
         }

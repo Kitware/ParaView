@@ -42,7 +42,7 @@
 #include <map>
 #include <set>
 #include <vector>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 class vtkSMParaViewPipelineController::vtkInternals
 {
@@ -126,7 +126,7 @@ vtkSMParaViewPipelineController::~vtkSMParaViewPipelineController()
 vtkStdString vtkSMParaViewPipelineController::GetHelperProxyGroupName(vtkSMProxy* proxy)
 {
   assert(proxy != NULL);
-  vtksys_ios::ostringstream groupnamestr;
+  std::ostringstream groupnamestr;
   groupnamestr << "pq_helper_proxies." << proxy->GetGlobalIDAsString();
   return groupnamestr.str();
 }

@@ -30,7 +30,7 @@
 #include "vtkSMProxy.h"
 
 #include <vector>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 #include "vtkSMPropertyInternals.h"
 
@@ -476,7 +476,7 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
   int deprecated_attr_value;
   if(element->GetScalarAttribute("update_self", &deprecated_attr_value))
     {
-    vtksys_ios::ostringstream proxyXML;
+    std::ostringstream proxyXML;
     element->GetParent()->PrintXML(proxyXML, vtkIndent(1));
     vtkWarningMacro(<< "Attribute update_self is not managed anymore."
                     << "It is deprecated. " << endl
@@ -520,7 +520,7 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
 
     // Everything else is assumed to be a domain element.
     vtkObject* object = 0;
-    vtksys_ios::ostringstream name;
+    std::ostringstream name;
     name << "vtkSM" << domainEl->GetName() << ends;
     object = vtkPVInstantiator::CreateInstance(name.str().c_str());
     if (object)
@@ -670,7 +670,7 @@ void vtkSMProperty::SaveDomainState(vtkPVXMLElement* propertyElement,
   this->DomainIterator->Begin();
   while(!this->DomainIterator->IsAtEnd())
     {
-    vtksys_ios::ostringstream dname;
+    std::ostringstream dname;
     dname << uid << "." << this->DomainIterator->GetKey() << ends;
     this->DomainIterator->GetDomain()->SaveState(propertyElement,
                                                  dname.str().c_str());

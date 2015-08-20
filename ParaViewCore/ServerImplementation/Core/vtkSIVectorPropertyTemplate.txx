@@ -22,7 +22,7 @@
 
 #include <vector>
 #include <assert.h>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 namespace
 {

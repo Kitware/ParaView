@@ -19,7 +19,7 @@
 #include "vtkPythonInterpreter.h"
 
 #include <string>
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
@@ -57,7 +57,7 @@ vtkAnnotateGlobalDataFilter::~vtkAnnotateGlobalDataFilter()
 //----------------------------------------------------------------------------
 void vtkAnnotateGlobalDataFilter::EvaluateExpression()
 {
-  vtksys_ios::ostringstream stream;
+  std::ostringstream stream;
   stream
     << "def vtkAnnotateGlobalDataFilter_EvaluateExpression():" << endl
     << "    from paraview import annotation as pv_ann" << endl

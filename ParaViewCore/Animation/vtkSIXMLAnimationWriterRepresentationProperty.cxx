@@ -18,7 +18,7 @@
 #include "vtkSIProxy.h"
 #include "vtkSMMessage.h"
 
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 vtkStandardNewMacro(vtkSIXMLAnimationWriterRepresentationProperty);
 //----------------------------------------------------------------------------
@@ -62,7 +62,7 @@ bool vtkSIXMLAnimationWriterRepresentationProperty::Push(
       this->GetSIObject(proxy_ids[cc]));
 
     // Assign unique group name for each source.
-    vtksys_ios::ostringstream groupname_str;
+    std::ostringstream groupname_str;
     groupname_str << "source" << proxy_ids[cc];
     stream << vtkClientServerStream::Invoke
       << object

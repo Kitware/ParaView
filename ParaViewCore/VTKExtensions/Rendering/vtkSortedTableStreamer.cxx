@@ -54,8 +54,8 @@
 #include <float.h>
 
 #include <string>
-#include <vtksys/ios/sstream>
-using vtksys_ios::ostringstream;
+#include <sstream>
+using std::ostringstream;
 
 #define MAX(a,b)		(((a)>(b)) ? (a) : (b))
 #define MIN(a,b)		(((a)<(b)) ? (a) : (b))

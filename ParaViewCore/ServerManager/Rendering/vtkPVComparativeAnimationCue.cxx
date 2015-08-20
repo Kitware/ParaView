@@ -23,7 +23,7 @@
 #include "vtkSMProxy.h"
 
 #include <vtksys/SystemTools.hxx>
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <vector>
 #include <string>
 #include <string.h>
@@ -47,7 +47,7 @@ public:
   private:
     std::string ValuesToString(double* values)
       {
-      vtksys_ios::ostringstream str;
+      std::ostringstream str;
       for (unsigned int cc=0; cc < this->NumberOfValues; cc++)
         {
         str << setprecision(16)<< values[cc];

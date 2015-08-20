@@ -24,7 +24,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 
 #include <vector>
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <vtksys/SystemTools.hxx>
 
 class vtkQuerySelectionSource::vtkInternals

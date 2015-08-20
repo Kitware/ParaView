@@ -31,7 +31,7 @@
 #include <assert.h>
 #include <string>
 #include <vector>
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/String.hxx>
 
@@ -47,7 +47,7 @@
 
 #define vtkPVPluginTrackerDebugMacro(x)\
 { if (debug_plugin) {\
-  vtksys_ios::ostringstream vtkerror;\
+  std::ostringstream vtkerror;\
   vtkerror << x << endl;\
   vtkOutputWindowDisplayText(vtkerror.str().c_str());} }
 

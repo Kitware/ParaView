@@ -22,7 +22,7 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <sys/stat.h>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
@@ -274,7 +274,7 @@ vtkClientServerInterpreter::ProcessOneMessage(const vtkClientServerStream& css,
     default:
       {
       // Command is not known.
-      vtksys_ios::ostringstream error;
+      std::ostringstream error;
       error << "Message with type "
             << vtkClientServerStream::GetStringFromCommand(cmd)
             << " cannot be executed." << ends;
@@ -348,7 +348,7 @@ vtkClientServerInterpreter
     if(this->Internal->IDToMessageMap.find(id.ID) !=
        this->Internal->IDToMessageMap.end())
       {
-      vtksys_ios::ostringstream error;
+      std::ostringstream error;
       error << "Attempt to create object with existing ID " << id.ID << "."
             << ends;
       *this->LastResultMessage
@@ -380,7 +380,7 @@ vtkClientServerInterpreter
     else
       {
       // Object was not created.
-      vtksys_ios::ostringstream error;
+      std::ostringstream error;
       error << "Cannot create object of type \"" << cname << "\"." << ends;
       *this->LastResultMessage
         << vtkClientServerStream::Error << error.str().c_str()
@@ -442,7 +442,7 @@ vtkClientServerInterpreter
     else
       {
       // Command function was not found for the class.
-      vtksys_ios::ostringstream error;
+      std::ostringstream error;
       const char* cname = obj? obj->GetClassName():"(vtk object is NULL)";
       error << "Wrapper function not found for class \"" << cname << "\"."
             << ends;
@@ -570,7 +570,7 @@ vtkClientServerInterpreter
     if(this->Internal->IDToMessageMap.find(id.ID) !=
        this->Internal->IDToMessageMap.end())
       {
-      vtksys_ios::ostringstream error;
+      std::ostringstream error;
       error << "Attempt to assign existing ID " << id.ID << "." << ends;
       *this->LastResultMessage
         << vtkClientServerStream::Error << error.str().c_str()
@@ -616,7 +616,7 @@ int vtkClientServerInterpreter::ExpandMessage(const vtkClientServerStream& in,
   out.Reset();
   if(inIndex < 0 || inIndex >= in.GetNumberOfMessages())
     {
-    vtksys_ios::ostringstream error;
+    std::ostringstream error;
     error << "ExpandMessage called to expand message index " << inIndex
           << " in a stream with " << in.GetNumberOfMessages()
           << " messages." << ends;

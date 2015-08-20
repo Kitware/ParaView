@@ -34,7 +34,7 @@
 #include "vtkUnstructuredGrid.h"
 
 #include <vector>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 #include <assert.h>
 
@@ -312,7 +312,7 @@ void vtkSISourceProxy::SetupSelectionProxy(int port, vtkSIProxy* extractSelectio
 //----------------------------------------------------------------------------
 void vtkSISourceProxy::MarkStartEvent()
 {
-  vtksys_ios::ostringstream filterName;
+  std::ostringstream filterName;
   filterName
     << "Execute "
     << (this->GetVTKClassName()?  this->GetVTKClassName() : this->GetClassName())
@@ -323,7 +323,7 @@ void vtkSISourceProxy::MarkStartEvent()
 //----------------------------------------------------------------------------
 void vtkSISourceProxy::MarkEndEvent()
 {
-  vtksys_ios::ostringstream filterName;
+  std::ostringstream filterName;
   filterName
     << "Execute "
     << (this->GetVTKClassName()?  this->GetVTKClassName() : this->GetClassName())

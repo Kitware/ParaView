@@ -20,7 +20,7 @@
 
 #include <vtksys/CommandLineArguments.hxx>
 #include <vtksys/SystemTools.hxx>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonOptions);
@@ -43,7 +43,7 @@ int vtkPVPythonOptions::PostProcess(int argc, const char* const* argv)
   if ( this->PythonScriptName && 
     vtksys::SystemTools::GetFilenameLastExtension(this->PythonScriptName) != ".py")
     {
-    vtksys_ios::ostringstream str;
+    std::ostringstream str;
     str << "Wrong batch script name: " << this->PythonScriptName;
     this->SetErrorMessage(str.str().c_str());
     return 0;

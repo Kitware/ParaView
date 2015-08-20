@@ -80,7 +80,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Model/Materials/Transparent.h>
 
 #include <Model/Textures/Constant.h>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 //============================================================================
 //This is a helper that exists just to hold on to manta side resources

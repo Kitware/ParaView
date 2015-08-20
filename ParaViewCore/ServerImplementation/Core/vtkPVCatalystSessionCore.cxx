@@ -26,7 +26,7 @@
 #include <assert.h>
 #include <string>
 #include <vector>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 //****************************************************************************/
 //                        Internal Class
@@ -106,7 +106,7 @@ public:
   //---------------------------------------------------------------------------
   std::string GenerateID(vtkTypeUInt32 globalid, unsigned int port, vtkPVInformation *info)
   {
-    vtksys_ios::ostringstream id;
+    std::ostringstream id;
     id << globalid << ":";
     if(info)
       {

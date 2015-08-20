@@ -25,7 +25,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <vtksys/SystemTools.hxx>
 
 #include <string>
@@ -179,7 +179,7 @@ int vtkFileSeriesWriter::RequestData(
 void vtkFileSeriesWriter::WriteATimestep(vtkDataObject* input,
                                          vtkInformation* inInfo)
 {
-  vtksys_ios::ostringstream fname;
+  std::ostringstream fname;
   if (this->WriteAllTimeSteps && this->NumberOfTimeSteps > 1)
     {
     std::string path =

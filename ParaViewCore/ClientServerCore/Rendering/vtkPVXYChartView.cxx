@@ -35,7 +35,7 @@
 #include "vtkContextMouseEvent.h"
 
 #include <string>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 class vtkPVXYChartView::vtkInternals
 {
@@ -708,7 +708,7 @@ void vtkPVXYChartView::Render(bool interactive)
     }
   if (this->InternalTitle)
     {
-    vtksys_ios::ostringstream new_title;
+    std::ostringstream new_title;
     std::string title(this->InternalTitle);
     size_t pos = title.find("${TIME}");
     if (pos != std::string::npos)

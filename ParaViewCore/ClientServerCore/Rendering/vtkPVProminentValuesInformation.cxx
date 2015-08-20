@@ -43,7 +43,7 @@
 #include <map>
 #include <set>
 #include <vector>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 #define VTK_MAX_CATEGORICAL_VALS (32)
 

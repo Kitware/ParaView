@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkPVXMLElement.h"
 #include "vtkNew.h"
-#include "vtksys/ios/sstream"
+#include "sstream"
 
 //----------------------------------------------------------------------------
 int TestProxyAnnotation(int argc, char* argv[])
@@ -90,7 +90,7 @@ int TestProxyAnnotation(int argc, char* argv[])
   // -----------------------------------------------------------------------
   vtkNew<vtkPVXMLElement> withAnnotationXML;
   proxy->SaveXMLState(withAnnotationXML.GetPointer());
-  vtksys_ios::ostringstream withAnnotationStr;
+  std::ostringstream withAnnotationStr;
   withAnnotationXML->PrintXML(withAnnotationStr, vtkIndent());
   // -----------------------------------------------------------------------
 
@@ -189,7 +189,7 @@ int TestProxyAnnotation(int argc, char* argv[])
   // -----------------------------------------------------------------------
   vtkNew<vtkPVXMLElement> withoutAnnotationXML;
   proxy->SaveXMLState(withoutAnnotationXML.GetPointer());
-  vtksys_ios::ostringstream withoutAnnotationStr;
+  std::ostringstream withoutAnnotationStr;
   withoutAnnotationXML->PrintXML(withoutAnnotationStr, vtkIndent());
   // -----------------------------------------------------------------------
 

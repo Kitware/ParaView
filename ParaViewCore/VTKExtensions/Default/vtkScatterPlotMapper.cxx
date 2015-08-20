@@ -55,7 +55,7 @@
 #include "vtkgl.h"
 
 #include <vector>
-#include <vtksys/ios/sstream>
+#include <sstream>
 #include <string>
 #include <assert.h>
 
@@ -287,7 +287,7 @@ void vtkScatterPlotMapper::SetArrayByName(ArrayIndex idx, const char* arrayName)
       std::size_t endParenthesis = array.find(')',arrayString.length());
       if( endParenthesis != std::string::npos)
         {
-        vtksys_ios::stringstream componentString;
+        std::stringstream componentString;
         componentString << 
           array.substr(arrayString.length(),endParenthesis-arrayString.length());
         char parenthesis;
@@ -297,7 +297,7 @@ void vtkScatterPlotMapper::SetArrayByName(ArrayIndex idx, const char* arrayName)
     }
   else
     {
-    vtksys_ios::stringstream componentString;
+    std::stringstream componentString;
     componentString << arrayComponent ;
     componentString >> component;
     }
