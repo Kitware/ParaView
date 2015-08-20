@@ -23,8 +23,8 @@
 #include "vtkStringList.h"
 #include "vtkPVXMLElement.h"
 
-#include <vtksys/ios/fstream>
-#include <vtksys/ios/iostream>
+#include <fstream>
+#include <iostream>
 
 #define safeio(a) ((a)?(a):"NULL")
 
@@ -66,7 +66,7 @@ vtkCxxSetObjectMacro(vtkSMProxyConfigurationWriter,PropertyIterator,vtkSMPropert
 vtkCxxSetObjectMacro(vtkSMProxyConfigurationWriter,Proxy,vtkSMProxy);
 
 //---------------------------------------------------------------------------
-int vtkSMProxyConfigurationWriter::WriteConfiguration(ostream &os)
+int vtkSMProxyConfigurationWriter::WriteConfiguration(std::ostream &os)
 {
   // The user didn't set a iterator, assume he wants all
   // of the properties saved, use the default iterator.
@@ -122,7 +122,7 @@ int vtkSMProxyConfigurationWriter::WriteConfiguration(const char *cFilename)
     filename+=ext;
     }
 
-  ofstream os(filename.c_str(), ios::out);
+  std::ofstream os(filename.c_str(), ios::out);
   if (!os.good())
     {
     vtkErrorMacro("Failed to open " << filename.c_str() << " for writing.");
@@ -141,7 +141,8 @@ int vtkSMProxyConfigurationWriter::WriteConfiguration()
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyConfigurationWriter::PrintSelf(ostream &os, vtkIndent indent)
+void vtkSMProxyConfigurationWriter::PrintSelf(std::ostream &os,
+                                              vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 

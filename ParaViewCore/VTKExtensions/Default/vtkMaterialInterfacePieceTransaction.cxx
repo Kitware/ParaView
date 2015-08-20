@@ -14,7 +14,7 @@
 =========================================================================*/
 
 #include "vtkMaterialInterfacePieceTransaction.h"
-using vtksys_ios::ostream;
+using std::ostream;
 
 //
 ostream &operator<<(

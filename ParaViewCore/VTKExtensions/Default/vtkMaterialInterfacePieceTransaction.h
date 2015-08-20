@@ -28,7 +28,7 @@
 
 #include "vtkSystemIncludes.h"
 
-#include "vtksys/ios/iostream"
+#include <iostream>
 
 class vtkMaterialInterfacePieceTransaction
 {
@@ -80,7 +80,7 @@ public:
 private:
   int Data[SIZE];
 };
-vtksys_ios::ostream &operator<<(vtksys_ios::ostream &sout, const vtkMaterialInterfacePieceTransaction &ta);
+std::ostream &operator<<(std::ostream &sout, const vtkMaterialInterfacePieceTransaction &ta);
 #endif
 
 

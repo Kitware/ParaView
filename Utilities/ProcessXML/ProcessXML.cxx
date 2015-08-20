@@ -19,7 +19,7 @@
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/Base64.h>
 #include <vtksys/RegularExpression.hxx>
-#include <vtksys/ios/fstream>
+#include <fstream>
 #include <vtksys/ios/sstream>
 
 #include <assert.h>
@@ -68,9 +68,9 @@ public:
 
   int ProcessFile(const char* file, const char* title)
     {
-    vtksys_ios::ifstream ifs(file,
-      this->UseBase64Encoding? (vtksys_ios::ifstream::in |
-        vtksys_ios::ifstream::binary) : vtksys_ios::ifstream::in);
+    std::ifstream ifs(file,
+      this->UseBase64Encoding? (std::ifstream::in |
+        std::ifstream::binary) : std::ifstream::in);
     if ( !ifs )
       {
       cout << "Canot open file: " << file << endl;
@@ -78,9 +78,9 @@ public:
       }
     if (this->UseBase64Encoding)
       {
-      ifs.seekg(0, vtksys_ios::ios::end);
+      ifs.seekg(0, std::ios::end);
       size_t length = ifs.tellg();
-      ifs.seekg(0, vtksys_ios::ios::beg);
+      ifs.seekg(0, std::ios::beg);
       unsigned char* buffer = new unsigned char[length];
       ifs.read(reinterpret_cast<char*>(buffer), length);
       ifs.close();
@@ -103,7 +103,7 @@ public:
       }
     }
 
-  bool ReadLine(vtksys_ios::istream& ifs, std::string &line)
+  bool ReadLine(std::istream& ifs, std::string &line)
     {
     if (!ifs)
       {
@@ -126,7 +126,7 @@ public:
       }
     }
 
-  int ProcessFile(vtksys_ios::istream &ifs, const char* file, const char* title)
+  int ProcessFile(std::istream &ifs, const char* file, const char* title)
     {
     int ch;
     int in_ifdef = 0;

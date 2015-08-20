@@ -25,9 +25,9 @@
 #include<vtkUnsignedIntArray.h>
 #include<vtkDataArraySelection.h>
 // STL
-#include "vtksys/ios/fstream"
-using vtksys_ios::ofstream;
-using vtksys_ios::ifstream;
+#include <fstream>
+using std::ofstream;
+using std::ifstream;
 #include "vtksys/ios/sstream"
 using vtksys_ios::ostringstream;
 #include<vector>

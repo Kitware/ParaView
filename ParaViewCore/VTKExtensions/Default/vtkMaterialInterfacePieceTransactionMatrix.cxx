@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkMaterialInterfacePieceTransactionMatrix.h"
 #include "vtkCommunicator.h"
-#include "vtksys/ios/iostream"
 #include <cassert>
 using std::vector;
 
