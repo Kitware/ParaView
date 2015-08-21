@@ -196,7 +196,7 @@ int vtkPVImageSliceMapper::SetupScalars(vtkImageData* input)
   int cellFlag = 0;
   vtkDataArray* scalars = vtkAbstractMapper::GetScalars(input,
     this->ScalarMode,
-    this->ArrayName? VTK_GET_ARRAY_BY_NAME : VTK_GET_ARRAY_BY_ID,
+    *this->ArrayName ? VTK_GET_ARRAY_BY_NAME : VTK_GET_ARRAY_BY_ID,
     this->ArrayId,
     this->ArrayName,
     cellFlag);
