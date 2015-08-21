@@ -54,7 +54,7 @@ public:
   }
   // Description:
   // Set/Get
-  int GetId() const{ return this->Data[ID]; }
+  vtkIdType GetId() const{ return this->Data[ID]; }
   vtkIdType GetLoading() const{ return this->Data[LOADING]; }
   void SetLoading(vtkIdType loading){ this->Data[LOADING]=loading; }
   // Description:
