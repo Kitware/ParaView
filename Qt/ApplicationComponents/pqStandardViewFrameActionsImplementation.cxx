@@ -61,6 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMTooltipSelectionPipeline.h"
 
 #include <QKeyEvent>
 #include <QMenu>
@@ -451,6 +452,22 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
       SLOT(interactiveSelectionToggled(bool)));
     }
 
+  if (this->isButtonVisible("HoveringSurfacePoints", renderView))
+    {
+    QAction* hoveringSurfacePointsAction = frame->addTitleBarAction(
+      QIcon(":/pqWidgets/Icons/pqSurfaceHoveringPoint.png"),
+      "Hover Points On");
+    hoveringSurfacePointsAction->setObjectName(
+      "actionHoveringSurfacePoints");
+    hoveringSurfacePointsAction->setCheckable (true);
+    new pqRenderViewSelectionReaction(hoveringSurfacePointsAction, renderView,
+      pqRenderViewSelectionReaction::SELECT_SURFACE_POINTS_TOOLTIP);
+    this->connect(hoveringSurfacePointsAction, SIGNAL(toggled(bool)),
+      SLOT(escapeableActionToggled(bool)));
+    this->connect(hoveringSurfacePointsAction, SIGNAL(toggled(bool)),
+      SLOT(interactiveSelectionToggled(bool)));
+    }
+
   if (this->isButtonVisible("ClearSelection", renderView))
     {
     QStyle* style = qApp->style();
@@ -788,6 +805,10 @@ void pqStandardViewFrameActionsImplementation::interactiveSelectionToggled(
   if (! checked)
     {
     vtkSMInteractiveSelectionPipeline::GetInstance()->
+      Hide(
+        vtkSMRenderViewProxy::SafeDownCast(
+          pqActiveObjects::instance().activeView()->getViewProxy()));
+    vtkSMTooltipSelectionPipeline::GetInstance()->
       Hide(
         vtkSMRenderViewProxy::SafeDownCast(
           pqActiveObjects::instance().activeView()->getViewProxy()));
