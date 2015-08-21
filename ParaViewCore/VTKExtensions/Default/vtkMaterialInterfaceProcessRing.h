@@ -66,9 +66,9 @@ public:
       vtkIdType upperLoadingBound);
   // Description:
   // Get the next process id from the ring.
-  int GetNextId()
+  vtkIdType GetNextId()
   {
-    int id=this->Buffer[this->NextElement];
+    vtkIdType id=this->Buffer[this->NextElement];
     ++this->NextElement;
     if (this->NextElement==this->BufferSize)
       {
@@ -81,9 +81,9 @@ public:
   void Print();
 
 private:
-  int NextElement;
-  int BufferSize;
-  std::vector<int> Buffer;
+  vtkIdType NextElement;
+  vtkIdType BufferSize;
+  std::vector<vtkIdType> Buffer;
 };
 #endif
 

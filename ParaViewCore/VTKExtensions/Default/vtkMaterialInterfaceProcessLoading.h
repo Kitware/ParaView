@@ -72,7 +72,7 @@ class vtkMaterialInterfaceProcessLoading
     }
     // Description:
     // Return the process id.
-    int GetId() const{ return this->Data[ID]; }
+    vtkIdType GetId() const{ return this->Data[ID]; }
     // Description:
     // Return the load factor.
     vtkIdType GetLoadFactor() const{ return this->Data[LOADING]; }
