@@ -8,6 +8,7 @@
 class vtkActor;
 class vtkPointGaussianMapper;
 class vtkScalarsToColors;
+class vtkPolyData;
 
 class vtkPointGaussianRepresentation : public vtkPVDataRepresentation
 {
