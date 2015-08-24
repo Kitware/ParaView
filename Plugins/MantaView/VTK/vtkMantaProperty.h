@@ -70,7 +70,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProperty.h"
 #include "Interface/Texture.h"
 
-#include "string"
+#include <string>
 
 //BTX
 namespace Manta {

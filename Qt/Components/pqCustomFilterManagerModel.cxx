@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
-#include "sstream"
+#include <sstream>
 
 class pqCustomFilterManagerModelInternal : public QList<QString> {};
 

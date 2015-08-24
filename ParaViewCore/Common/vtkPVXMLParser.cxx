@@ -15,7 +15,7 @@
 #include "vtkPVXMLParser.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "sstream"
+#include <sstream>
 
 vtkStandardNewMacro(vtkPVXMLParser);
 

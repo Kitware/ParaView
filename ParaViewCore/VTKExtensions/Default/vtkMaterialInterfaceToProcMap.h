@@ -22,7 +22,7 @@
 #ifndef __vtkMaterialInterfaceToProcMap_h
 #define __vtkMaterialInterfaceToProcMap_h
 
-#include "vector"
+#include <vector>
 
 class vtkMaterialInterfaceToProcMap
 {

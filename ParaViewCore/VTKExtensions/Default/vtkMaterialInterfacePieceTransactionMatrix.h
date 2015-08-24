@@ -29,7 +29,7 @@
 
 #include "vtkMaterialInterfacePieceTransaction.h" //
 #include "vtkType.h" //
-#include "vector" //
+#include <vector> //
 
 class vtkCommunicator;
 

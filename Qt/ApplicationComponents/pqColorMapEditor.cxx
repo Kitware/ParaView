@@ -53,7 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMTransferFunctionProxy.h"
 #include "vtkWeakPointer.h"
 
-#include "sstream"
+#include <sstream>
 
 #include <QDebug>
 #include <QKeyEvent>

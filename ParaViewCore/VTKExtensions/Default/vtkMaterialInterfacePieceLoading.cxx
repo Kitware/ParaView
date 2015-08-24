@@ -14,7 +14,7 @@
 =========================================================================*/
 #include "vtkMaterialInterfacePieceLoading.h"
 #include "vtkMaterialInterfaceUtilities.hxx"
-#include "vector"
+#include <vector>
 using std::vector;
 using std::ostream;
 using std::cerr;

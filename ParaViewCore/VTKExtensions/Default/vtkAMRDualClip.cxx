@@ -15,7 +15,7 @@
 #include "vtkAMRDualClip.h"
 #include "vtkAMRDualGridHelper.h"
 
-#include "vector"
+#include <vector>
 
 // Pipeline & VTK
 #include "vtkMarchingCubesTriangleCases.h"

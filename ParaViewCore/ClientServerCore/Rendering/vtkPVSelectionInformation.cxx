@@ -23,7 +23,7 @@
 #include "vtkSelectionNode.h"
 #include "vtkSelectionSerializer.h"
 #include "vtkSmartPointer.h"
-#include "sstream"
+#include <sstream>
 
 vtkStandardNewMacro(vtkPVSelectionInformation);
 
