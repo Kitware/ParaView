@@ -16,6 +16,7 @@
 #include "vtkPVRenderView.h"
 #include "vtkRenderer.h"
 #include "vtkUnstructuredGrid.h"
+#include "vtkDataSet.h"
 
 vtkStandardNewMacro(vtkPointGaussianRepresentation)
 
@@ -91,33 +92,37 @@ int vtkPointGaussianRepresentation::RequestData(
     vtkInformation *request, vtkInformationVector **inputVector,
     vtkInformationVector *outputVector)
 {
-  if (inputVector[0]->GetNumberOfInformationObjects() == 1)
-    {
-    vtkNew< vtkMaskPoints > convertToPoints;
-    vtkSmartPointer< vtkDataSet > inData =
-        vtkDataSet::GetData(inputVector[0],0);
-    vtkCompositeDataSet* inComposite =
-        vtkCompositeDataSet::GetData(inputVector[0],0);
-    if (inComposite)
-      {
-      vtkNew< vtkCompositeDataToUnstructuredGridFilter > merge;
-      merge->SetInputData(inComposite);
-      merge->Update();
-      inData = merge->GetOutput();
-      }
-    convertToPoints->SetInputData(inData);
-    convertToPoints->SetMaximumNumberOfPoints(inData->GetNumberOfPoints());
-    convertToPoints->GenerateVerticesOn();
-    convertToPoints->SingleVertexPerCellOn();
-    convertToPoints->SetOnRatio(1);
-    convertToPoints->Update();
-    this->ProcessedData = convertToPoints->GetOutput();
-    }
-  else
-    {
+    vtkSmartPointer<vtkDataSet> input = vtkDataSet::GetData(inputVector[0]);
+    vtkPolyData* inputPolyData = vtkPolyData::SafeDownCast(input);
+    vtkCompositeDataSet* compositeInput = vtkCompositeDataSet::GetData(inputVector[0],0);
     this->ProcessedData = NULL;
-    }
-  return this->Superclass::RequestData(request,inputVector,outputVector);
+    if(inputPolyData)
+        {
+        this->ProcessedData = inputPolyData;
+        }
+    else if (compositeInput)
+        {
+        vtkNew< vtkCompositeDataToUnstructuredGridFilter > merge;
+        merge->SetInputData(compositeInput);
+        merge->Update();
+        input = merge->GetOutput();
+        }
+
+    // The mapper underneath expect only PolyData
+    // Apply conversion - We do not need vertex list as we
+    // use all the points in that use case
+    if(this->ProcessedData == NULL && input != NULL)
+        {
+        vtkNew< vtkMaskPoints > unstructuredToPolyData;
+        unstructuredToPolyData->SetInputData(input);
+        unstructuredToPolyData->SetMaximumNumberOfPoints(input->GetNumberOfPoints());
+        unstructuredToPolyData->GenerateVerticesOff();
+        unstructuredToPolyData->SetOnRatio(1);
+        unstructuredToPolyData->Update();
+        this->ProcessedData = unstructuredToPolyData->GetOutput();
+        }
+
+    return this->Superclass::RequestData(request,inputVector,outputVector);
 }
 
 //----------------------------------------------------------------------------
