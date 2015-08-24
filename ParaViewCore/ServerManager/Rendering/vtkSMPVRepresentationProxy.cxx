@@ -628,15 +628,6 @@ vtkPVArrayInformation* vtkSMPVRepresentationProxy::GetArrayInformationForColorAr
 
   // now, determine a name for it if possible.
   vtkSMPropertyHelper colorArrayHelper(this, "ColorArrayName");
-  vtkPVArrayInformation* arrayInfo =
-    this->GetRepresentedDataInformation()->GetArrayInformation(
-      colorArrayHelper.GetInputArrayNameToProcess(),
-      colorArrayHelper.GetInputArrayAssociation());
-  if (arrayInfo)
-    {
-    return arrayInfo;
-    }
-
   vtkSMPropertyHelper inputHelper(this, "Input");
   vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy());
   unsigned int port = inputHelper.GetOutputPort();
@@ -646,6 +637,16 @@ vtkPVArrayInformation* vtkSMPVRepresentationProxy::GetArrayInformationForColorAr
       colorArrayHelper.GetInputArrayNameToProcess(),
       colorArrayHelper.GetInputArrayAssociation());
     }
+
+  vtkPVArrayInformation* arrayInfo =
+    this->GetRepresentedDataInformation()->GetArrayInformation(
+      colorArrayHelper.GetInputArrayNameToProcess(),
+      colorArrayHelper.GetInputArrayAssociation());
+  if (arrayInfo)
+    {
+    return arrayInfo;
+    }
+
   return NULL;
 }
 
