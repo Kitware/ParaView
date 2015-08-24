@@ -246,7 +246,7 @@ int vtkPVScalarBarActor::CreateLabel(
     int smallestFoundWidth = VTK_INT_MAX;
     bool foundValid = false;
     string[0] = '\0';
-    for (int i = 1 + minDigits; i < 20; i++)
+    for (int i = 1 + minDigits; i < 6; i++)
       {
       char format[512];
       char string2[1024];
@@ -689,7 +689,13 @@ void vtkPVScalarBarActor::ConfigureTicks()
     //int desiredFontSize = this->LabelTextProperty->GetFontSize();
     vtkNew<vtkTextActor> dummyActor;
     dummyActor->GetTextProperty()->ShallowCopy(this->LabelTextProperty);
-    dummyActor->SetInput("|");
+    dummyActor->SetInput("()"); // parentheses are taller than numbers for all useful fonts.
+    if (this->P->Viewport)
+      {
+      dummyActor->SetTextScaleModeToViewport();
+      dummyActor->ComputeScaledFont(this->P->Viewport);
+      }
+
     double tsize[2];
     dummyActor->GetSize(this->P->Viewport, tsize);
 
