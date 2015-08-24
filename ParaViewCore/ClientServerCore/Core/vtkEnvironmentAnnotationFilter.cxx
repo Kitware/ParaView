@@ -27,7 +27,7 @@
 #include <map>
 #include <vector>
 
-#include "sstream"
+#include <sstream>
 #include "vtksys/SystemTools.hxx"
 #include "vtksys/SystemInformation.hxx"
 

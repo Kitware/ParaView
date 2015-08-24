@@ -15,7 +15,7 @@
 
 #include "vtkMaterialInterfaceToProcMap.h"
 #include <cassert>
-#include "vector"
+#include <vector>
 using std::vector;
 
 //

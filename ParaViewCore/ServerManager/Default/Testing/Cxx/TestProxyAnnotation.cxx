@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkPVXMLElement.h"
 #include "vtkNew.h"
-#include "sstream"
+#include <sstream>
 
 //----------------------------------------------------------------------------
 int TestProxyAnnotation(int argc, char* argv[])

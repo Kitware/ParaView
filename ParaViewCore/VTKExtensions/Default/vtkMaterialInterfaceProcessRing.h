@@ -22,7 +22,7 @@
 #ifndef __vtkMaterialInterfaceProcessRing_h
 #define __vtkMaterialInterfaceProcessRing_h
 
-#include "vector"
+#include <vector>
 #include "vtkMaterialInterfaceProcessLoading.h"
 
 class vtkMaterialInterfaceProcessRing
