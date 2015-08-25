@@ -41,7 +41,6 @@
           </RequiredProperties>
         </FieldDataDomain>
       </StringVectorProperty>
-
       <StringVectorProperty name="SetScaleArray"
         command="SelectScaleArray"
         number_of_elements="5"
@@ -53,13 +52,10 @@
             <Property name="Input" function="Input"/>
           </RequiredProperties>
         </ArrayListDomain>
-
         <Documentation>
           This property specifies the name of the input array to scale the splats by.
         </Documentation>
       </StringVectorProperty>
-
-
       <ProxyProperty command="SetLookupTable"
                      name="LookupTable"
                      skip_dependency="1">
@@ -67,6 +63,14 @@
         Lookuptable is only used with MapScalars to ON.</Documentation>
         <ProxyGroupDomain name="groups">
           <Group name="lookup_tables" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <ProxyProperty command="SetScaleTransferFunction"
+                     name="ScaleTransferFunction">
+        <Documentation>Set the piecewise function used to map data array to sprite size.
+        ScaleTransferFunction is only used if ScaleByArray is set.</Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="piecewise_functions" />
         </ProxyGroupDomain>
       </ProxyProperty>
       <IntVectorProperty command="SetScaleByArray"
@@ -80,6 +84,41 @@
           of the gaussians.  Otherwise the Default Radius will be used.
         </Documentation>
       </IntVectorProperty>
+      <ProxyProperty command="SetOpacityTransferFunction"
+                     name="OpacityTransferFunction">
+        <Documentation>Set the piecewise function used to map data array to sprite opacity.
+        OpacityTransferFunction is only used if ScaleByArray is set and OpacityArray is
+        also given.</Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="piecewise_functions" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <IntVectorProperty command="SetOpacityByArray"
+                         default_values="0"
+                         name="OpacityByArray"
+                         number_of_elements="1"
+                         label="Use Opacity Array">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If this property is on, the Opacity Array will be used to determine the
+          point gaussian sprites.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty name="OpacityArray"
+                            command="SelectOpacityArray"
+                            number_of_elements="5"
+                            element_types="0 0 0 0 2"
+                            label="Gaussian Opacity Array">
+        <ArrayListDomain name="array_list"
+          input_domain_name="input_point_array">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          This property specifies the name of the input array to map to point opacity.
+        </Documentation>
+      </StringVectorProperty>
       <DoubleVectorProperty command="SetOpacity"
                             default_values="1.0"
                             name="Opacity"
@@ -98,6 +137,41 @@
         <Documentation>
           The radius of the gaussian blur for each point.
         </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetColor"
+                            default_values="1.0 1.0 1.0"
+                            name="Color"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <GlobalPropertyLink type="ColorPalette" property="ForegroundColor" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetEdgeColor"
+                            default_values="0 0 0.5"
+                            name="EdgeColor"
+                            number_of_elements="3">
+        <Documentation>Set the edge color. This color is used to draw the edge
+        for the polygonal data when EdgeVisibility is on.</Documentation>
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <GlobalPropertyLink type="ColorPalette" property="EdgeColor" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetAmbientColor"
+                            default_values="1.0 1.0 1.0"
+                            name="AmbientColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <GlobalPropertyLink type="ColorPalette" property="ForegroundColor" />
+        </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetDiffuseColor"
                             default_values="1.0 1.0 1.0"
@@ -124,7 +198,53 @@
           The specular color of the model
         </Documentation>
       </DoubleVectorProperty>
-
+      <DoubleVectorProperty command="SetPosition"
+                            default_values="0 0 0"
+                            label="Translation"
+                            name="Position"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetScale"
+                            default_values="1 1 1"
+                            name="Scale"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetOrientation"
+                            default_values="0 0 0"
+                            name="Orientation"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetOrigin"
+                            default_values="0 0 0"
+                            name="Origin"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetPickable"
+                         default_values="1"
+                         name="Pickable"
+                         number_of_elements="1">
+        <Hints>
+          <NoDefault />
+        </Hints>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <StringVectorProperty command="SetCustomShader"
+                            defaults="
+// compute the eye position and unit direction
+//VTK::Color::Impl
+  float dist2 = dot(offsetVCVSOutput.xy,offsetVCVSOutput.xy);
+  if (dist2 > 9.0) { discard; }
+  float gaussian = exp(-0.5*dist2);
+  opacity = opacity*gaussian;
+"
+                            label="Custom Shader Code"
+                            name="CustomShader"
+                            number_of_elements="1">
+      </StringVectorProperty>
     </RepresentationProxy>
 
     <Extension name="GeometryRepresentation">
@@ -149,6 +269,12 @@
           <Property name="ScaleByArray" />
           <Property name="GaussianRadius" />
           <Property name="SetScaleArray" />
+          <Property name="ScaleTransferFunction" />
+          <Property name="OpacityByArray" />
+          <Property name="OpacityTransferFunction" />
+          <Property name="OpacityArray" />
+          <Property name="CustomShader" />
+          <Property name="Color" />
         </ExposedProperties>
       </SubProxy>
     </Extension>
@@ -175,6 +301,12 @@
           <Property name="ScaleByArray" />
           <Property name="GaussianRadius" />
           <Property name="SetScaleArray" />
+          <Property name="ScaleTransferFunction" />
+          <Property name="OpacityByArray" />
+          <Property name="OpacityTransferFunction" />
+          <Property name="OpacityArray" />
+          <Property name="CustomShader" />
+          <Property name="Color" />
         </ExposedProperties>
       </SubProxy>
     </Extension>
