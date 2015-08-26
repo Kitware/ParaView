@@ -12350,6 +12350,14 @@ source.</Documentation>
             <DataType value="vtkSelection" />
           </Domain>
         </Property>
+        <Property id="734.SetReportStatisticsOnly"
+                  name="Only Report Selection Statistics"
+                  number_of_elements="1">
+          <Element index="0"
+                   value="0" />
+          <Domain id="734.SetReportStatisticsOnly.bool"
+                  name="bool" />
+        </Property>
       </Proxy>
       <Proxy compound_name="TableFFT1"
              group="filters"
