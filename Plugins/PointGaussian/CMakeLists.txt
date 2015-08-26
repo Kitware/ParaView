@@ -15,3 +15,8 @@ add_paraview_plugin(PointGaussian "1.0"
     vtkPointGaussianRepresentation.cxx
     vtkPointGaussianRepresentation.h
 )
+
+# Add testing if necessary
+if (BUILD_TESTING)
+  add_subdirectory(Testing)
+endif()
