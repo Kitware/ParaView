@@ -63,7 +63,11 @@ pqRenderViewSelectionReaction::pqRenderViewSelectionReaction(
   PreviousRenderViewMode(-1),
   ZoomCursor(QCursor(QPixmap((const char **)zoom_xpm)))
 {
-  this->ObserverIds[0] = this->ObserverIds[1] = 0;
+for (size_t i = 0;
+     i < sizeof(this->ObserverIds) / sizeof(this->ObserverIds[0]); ++i)
+    {
+    this->ObserverIds[i] = 0;
+    }
 
   QObject::connect(parentObject, SIGNAL(triggered(bool)),
     this, SLOT(actionTriggered(bool)));
@@ -98,15 +102,15 @@ pqRenderViewSelectionReaction::~pqRenderViewSelectionReaction()
 //-----------------------------------------------------------------------------
 void pqRenderViewSelectionReaction::cleanupObservers()
 {
-  if (this->ObservedObject != NULL && this->ObserverIds[0] > 0)
+  for (size_t i = 0;
+       i < sizeof(this->ObserverIds) / sizeof(this->ObserverIds[0]); ++i)
     {
-    this->ObservedObject->RemoveObserver(this->ObserverIds[0]);
-    }
-  if (this->ObservedObject != NULL && this->ObserverIds[1] > 0)
+    if (this->ObservedObject != NULL && this->ObserverIds[i] > 0)
     {
-    this->ObservedObject->RemoveObserver(this->ObserverIds[1]);
+      this->ObservedObject->RemoveObserver(this->ObserverIds[i]);
     }
-  this->ObserverIds[0] = this->ObserverIds[1] = 0;
+    this->ObserverIds[i] = 0;
+    }
   this->ObservedObject = NULL;
 }
 
@@ -264,7 +268,14 @@ void pqRenderViewSelectionReaction::beginSelection()
       this, &pqRenderViewSelectionReaction::onMouseMove);
     this->ObserverIds[1] = this->ObservedObject->AddObserver(
       vtkCommand::LeftButtonReleaseEvent,
-      this, &pqRenderViewSelectionReaction::onLeftButtonPress);
+      this, &pqRenderViewSelectionReaction::onLeftButtonRelease);
+
+    this->ObserverIds[2] = this->ObservedObject->AddObserver(
+      vtkCommand::MouseWheelForwardEvent,
+      this, &pqRenderViewSelectionReaction::onWheelRotate);
+    this->ObserverIds[3] = this->ObservedObject->AddObserver(
+      vtkCommand::MouseWheelBackwardEvent,
+      this, &pqRenderViewSelectionReaction::onWheelRotate);
     break;
 
   default:
@@ -437,7 +448,7 @@ void pqRenderViewSelectionReaction::onMouseMove()
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderViewSelectionReaction::onLeftButtonPress()
+void pqRenderViewSelectionReaction::onLeftButtonRelease()
 {
   if (pqRenderViewSelectionReaction::ActiveReaction != this)
     {
@@ -471,7 +482,16 @@ void pqRenderViewSelectionReaction::onLeftButtonPress()
     break;
 
   default:
-    qCritical("Invalid call to pqRenderViewSelectionReaction::onLeftButtonPress");
+    qCritical("Invalid call to pqRenderViewSelectionReaction::onLeftButtonRelease");
     break;
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderViewSelectionReaction::onWheelRotate()
+{
+  if (pqRenderViewSelectionReaction::ActiveReaction == this)
+    {
+    this->onMouseMove();
     }
 }

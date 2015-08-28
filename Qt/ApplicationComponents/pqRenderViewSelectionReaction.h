@@ -113,7 +113,8 @@ private:
 
   /// callback called for click events when in 'interactive selection'
   /// modes.
-  void onLeftButtonPress();
+  void onLeftButtonRelease();
+  void onWheelRotate();
 
 private:
   Q_DISABLE_COPY(pqRenderViewSelectionReaction);
@@ -121,7 +122,7 @@ private:
   SelectionMode Mode;
   int PreviousRenderViewMode;
   vtkWeakPointer<vtkObject> ObservedObject;
-  unsigned long ObserverIds[2];
+  unsigned long ObserverIds[4];
   QCursor ZoomCursor;
 
   static QPointer<pqRenderViewSelectionReaction> ActiveReaction;

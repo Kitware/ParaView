@@ -799,6 +799,13 @@ bool vtkPVRenderView::PrepareSelect(int fieldAssociation)
   this->Selector->SetRenderer(this->GetRenderer());
   this->Selector->SetFieldAssociation(fieldAssociation);
   this->Selector->SetSynchronizedWindows(this->SynchronizedWindows);
+
+  // This is used when in interactive selection and changing the camera
+  if (this->RenderView->GetRenderer()->GetActiveCamera()->GetMTime() > 
+      this->Selector->GetMTime())
+    {
+    this->Selector->Modified();
+    }
   return true;
 }
 
