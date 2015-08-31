@@ -327,18 +327,27 @@ void pqRenderViewSelectionReaction::selectionChanged(
 
   BEGIN_UNDO_EXCLUDE();
 
-  bool ctrl = (rmp->GetInteractor()->GetControlKey() == 1);
+  pqRenderView::pqSelectionOperator selOp = pqRenderView::PV_SELECTION_NEW;
+  if (rmp->GetInteractor()->GetControlKey() == 1)
+    {
+    selOp = pqRenderView::PV_SELECTION_MERGE;
+    }
+  else if (rmp->GetInteractor()->GetShiftKey() == 1)
+    {
+    selOp = pqRenderView::PV_SELECTION_SUBTRACT;
+    }
+
   int* region = reinterpret_cast<int*>(calldata);
   vtkObject* unsafe_object = reinterpret_cast<vtkObject*>(calldata);
 
   switch (this->Mode)
     {
   case SELECT_SURFACE_CELLS:
-    this->View->selectOnSurface(region, ctrl);
+    this->View->selectOnSurface(region, selOp);
     break;
 
   case SELECT_SURFACE_POINTS:
-    this->View->selectPointsOnSurface(region, ctrl);
+    this->View->selectPointsOnSurface(region, selOp);
     break;
 
   case SELECT_FRUSTUM_CELLS:
@@ -351,16 +360,16 @@ void pqRenderViewSelectionReaction::selectionChanged(
 
   case SELECT_SURFACE_CELLS_POLYGON:
     this->View->selectPolygonCells(vtkIntArray::SafeDownCast(unsafe_object),
-      ctrl);
+      selOp);
     break;
 
   case SELECT_SURFACE_POINTS_POLYGON:
     this->View->selectPolygonPoints(vtkIntArray::SafeDownCast(unsafe_object),
-      ctrl);
+      selOp);
     break;
 
   case SELECT_BLOCKS:
-    this->View->selectBlock(region, ctrl);
+    this->View->selectBlock(region, selOp);
     break;
 
   case SELECT_CUSTOM_BOX:
@@ -468,17 +477,23 @@ void pqRenderViewSelectionReaction::onLeftButtonRelease()
     return;
     }
 
-  bool ctrl = true;
+  vtkSMRenderViewProxy* rmp = this->View->getRenderViewProxy();
+  pqRenderView::pqSelectionOperator selOp = pqRenderView::PV_SELECTION_MERGE;
+  if (rmp->GetInteractor()->GetShiftKey() == 1)
+    {
+    selOp = pqRenderView::PV_SELECTION_SUBTRACT;
+    }
+
   int region[4] = {x, y, x, y};
 
   switch (this->Mode)
     {
   case SELECT_SURFACE_CELLS_INTERACTIVELY:
-    this->View->selectOnSurface(region, ctrl);
+    this->View->selectOnSurface(region, selOp);
     break;
 
   case SELECT_SURFACE_POINTS_INTERACTIVELY:
-    this->View->selectPointsOnSurface(region, ctrl);
+    this->View->selectPointsOnSurface(region, selOp);
     break;
 
   default:

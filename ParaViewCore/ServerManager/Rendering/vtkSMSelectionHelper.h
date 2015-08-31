@@ -71,6 +71,16 @@ public:
     vtkSMSourceProxy* output, vtkSMSourceProxy* input,
     vtkSMSourceProxy* dataSource, int outputport);
 
+  // Description:
+  // Updates output to be a subtraction of input and output (input - output) if the two selection
+  // sources are mergeable. Returns true if the subtraction is successful.
+  // dataSource and outputport are needed if a conversion is needed to make the
+  // input expandable to the type of the output.
+  static bool SubtractSelection(
+    vtkSMSourceProxy* output, vtkSMSourceProxy* input,
+    vtkSMSourceProxy* dataSource, int outputport);
+
+
 protected:
   vtkSMSelectionHelper() {};
   ~vtkSMSelectionHelper() {};
