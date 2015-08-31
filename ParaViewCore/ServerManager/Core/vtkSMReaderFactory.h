@@ -137,6 +137,16 @@ public:
   void RemoveGroup(const char* groupName);
   void GetGroups(vtkStringList* groups);
 
+  // Description:
+  // This function is for ParaView based applications that only wish to expose
+  // a subset of the readers.  If this function is never called, the reader
+  // factory will expose all the readers as it has in the past.  However, if
+  // any readers are specified by passing their group name and reader name to
+  // this function, then only those readers will be available in any reader
+  // factories created by the application.  This is intended to be called at
+  // the begining of the application's execution before any sessions are
+  // created.
+  static void AddReaderOfInterest(const char* readerxmlgroup, const char* readerxmlname);
 //BTX
 protected:
   vtkSMReaderFactory();
