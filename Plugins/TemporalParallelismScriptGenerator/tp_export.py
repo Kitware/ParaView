@@ -40,7 +40,7 @@ class ReaderAccessor(smtrace.RealProxyAccessor):
         # FIXME: ensures thate FileName doesn't get traced.
 
         # change to call STP.CreateReader instead.
-        ctor_args = "%s, fileinfo='%s'" % (ctor, self.FileNameGlob)
+        ctor_args = "%s, fileInfo='%s'" % (ctor, self.FileNameGlob)
         ctor = "STP.CreateReader"
         original_trace = smtrace.RealProxyAccessor.trace_ctor(\
             self, ctor, ReaderFilter(), ctor_args, skip_assignment)
@@ -117,7 +117,7 @@ class WriterAccessor(smtrace.RealProxyAccessor):
         trace = smtrace.TraceOutput(original_trace)
         trace.append_separated(["# register the writer with STP",
           "# and provide it with information such as the filename to use"])
-        trace.append("STP.RegisterWriter(%s, filename='%s', tp_writers)" % \
+        trace.append("STP.RegisterWriter(%s, '%s', tp_writers)" % \
             (self, filename))
         trace.append_separator()
         return trace.raw_data()
