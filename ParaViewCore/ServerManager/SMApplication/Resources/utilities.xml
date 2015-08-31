@@ -2536,6 +2536,9 @@
 
     <!-- ================================================================= -->
     <Proxy label="Black Background" name="BlackBackground">
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="ForegroundColor"
+                            number_of_elements="3"></DoubleVectorProperty>
       <DoubleVectorProperty default_values="0 0 0"
                             name="BackgroundColor"
                             number_of_elements="3"></DoubleVectorProperty>
