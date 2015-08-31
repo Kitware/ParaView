@@ -96,6 +96,16 @@ public:
   void RemoveGroup(const char* groupName);
   void GetGroups(vtkStringList* groups);
 
+  // Description:
+  // This function is for ParaView based applications that only wish to expose
+  // a subset of the writers.  If this function is never called, the reader
+  // factory will expose all the writers as it has in the past.  However, if
+  // any writers are specified by passing their group name and reader name to
+  // this function, then only those writers will be available in any reader
+  // factories created by the application.  This is intended to be called at
+  // the begining of the application's execution before any sessions are
+  // created.
+  static void AddWriterOfInterest(const char* writerxmlgroup, const char* writerxmlname);
 //BTX
 protected:
   vtkSMWriterFactory();
