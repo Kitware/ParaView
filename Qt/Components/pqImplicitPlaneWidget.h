@@ -83,6 +83,9 @@ protected:
   virtual void setControlledProperty(const char* function,
     vtkSMProperty * controlled_property);
 
+  /// Called on pick.
+  virtual void pick(double, double, double);
+
 protected:
   /// Internal method to create the widget.
   void createWidget(pqServer*);

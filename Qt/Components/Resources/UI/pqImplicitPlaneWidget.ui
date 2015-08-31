@@ -36,6 +36,21 @@
     </widget>
    </item>
    <item>
+    <widget class="QLabel" name="pickLabel" >
+     <property name="font">
+      <font>
+        <bold>true</bold>
+      </font>
+     </property>
+     <property name="wordWrap">
+       <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>Note: Use 'P' key to pick origin position on mesh</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QGridLayout" >
      <property name="leftMargin" >
       <number>0</number>

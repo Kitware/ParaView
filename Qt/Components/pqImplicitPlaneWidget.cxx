@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyLinks.h"
 #include "pqRenderView.h"
 #include "pqServerManagerModel.h"
+#include "pqSMAdaptor.h"
 
 #include <QDoubleValidator>
 
@@ -114,6 +115,9 @@ pqImplicitPlaneWidget::pqImplicitPlaneWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWi
   Superclass(o, pxy, p),
   Implementation(new pqImplementation())
 {
+  // enable picking.
+  this->pickingSupported(QKeySequence(tr("P")));
+
   this->Implementation->UI->setupUi(this);
   this->Implementation->UI->show3DWidget->setChecked(this->widgetVisible());
 
@@ -267,6 +271,19 @@ void pqImplicitPlaneWidget::setNormalProperty(vtkSMProperty* normal_property)
     }
 }
 
+//-----------------------------------------------------------------------------
+void pqImplicitPlaneWidget::pick(double dx, double dy, double dz)
+{
+  vtkSMProxy* widget = this->getWidgetProxy();
+  QList<QVariant> value;
+  value << dx << dy << dz;
+  pqSMAdaptor::setMultipleElementProperty(
+      widget->GetProperty("Origin"), value);
+  widget->UpdateVTKObjects();
+
+  this->setModified();
+  this->render();
+}
 
 //-----------------------------------------------------------------------------
 void pqImplicitPlaneWidget::onWidgetVisibilityChanged(bool visible)
