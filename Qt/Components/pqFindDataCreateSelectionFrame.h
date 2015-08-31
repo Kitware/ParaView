@@ -70,6 +70,9 @@ signals:
   void helpRequested();
 
 private slots:
+  /// marks if the underlying data has changed
+  void dataChanged();
+
   /// refreshes the query widget.
   void refreshQuery();
 
