@@ -264,12 +264,6 @@ bool vtkSMReaderFactory::vtkInternals::vtkValue::CanReadFile(
       }
     }
 
-  if (strcmp(prototype->GetXMLName(), "ImageReader") == 0)
-    {
-    // ImageReader always returns 0 so don't test it
-    return true;
-    }
-
   vtkSMProxy* proxy = pxm->NewProxy(this->Group.c_str(), this->Name.c_str());
   proxy->SetLocation(vtkProcessModule::DATA_SERVER_ROOT);
   // we deliberate don't call UpdateVTKObjects() here since CanReadFile() can
