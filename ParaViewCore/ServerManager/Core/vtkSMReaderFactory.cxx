@@ -53,6 +53,7 @@ static void string_replace(std::string& string, char c, std::string str)
 class vtkSMReaderFactory::vtkInternals
 {
 public:
+  static std::set<std::pair<std::string,std::string> > ReadersOfInterest;
   struct vtkValue
     {
     vtkWeakPointer<vtkSMSession> Session;
@@ -189,6 +190,7 @@ public:
   // included.
   std::set<std::string> Groups;
 };
+std::set<std::pair<std::string,std::string> > vtkSMReaderFactory::vtkInternals::ReadersOfInterest;
 
 //----------------------------------------------------------------------------
 bool vtkSMReaderFactory::vtkInternals::vtkValue::ExtensionTest(
@@ -335,7 +337,15 @@ void vtkSMReaderFactory::UpdateAvailableReaders()
           iter->GetGroupName(), iter->GetProxyName());
         if (hints && hints->FindNestedElementByName("ReaderFactory"))
           {
-          this->RegisterPrototype(iter->GetGroupName(), iter->GetProxyName());
+          // By default this does no filtering on the readers available.  However, if the
+          // application has specified that it is only interested in a subset of the readers
+          // then only that subset will be available.
+          std::pair<std::string,std::string> reader(iter->GetGroupName(), iter->GetProxyName());
+          if (vtkInternals::ReadersOfInterest.empty() ||
+              vtkInternals::ReadersOfInterest.find(reader) != vtkInternals::ReadersOfInterest.end())
+            {
+            this->RegisterPrototype(iter->GetGroupName(), iter->GetProxyName());
+            }
           }
         }
       iter->Delete();
@@ -647,4 +657,15 @@ bool vtkSMReaderFactory::CanReadFile(const char* filename,
 void vtkSMReaderFactory::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMReaderFactory::AddReaderOfInterest(const char* readerxmlgroup,
+                                             const char* readerxmlname)
+{
+  if (readerxmlgroup != NULL && readerxmlname != NULL)
+    {
+    vtkSMReaderFactory::vtkInternals::ReadersOfInterest.insert(
+      std::pair<std::string,std::string>(readerxmlgroup,readerxmlname));
+    }
 }
