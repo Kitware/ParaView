@@ -8164,7 +8164,7 @@ source.</Documentation>
       </DoubleVectorProperty>
 
       <Hints>
-        <Visibility replace_input="0" />
+        <Visibility replace_input="1" />
       </Hints>
       <!-- End Probe -->
     </SourceProxy>
