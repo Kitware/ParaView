@@ -744,7 +744,7 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::PickBlock(int x,
 
 //----------------------------------------------------------------------------
 bool vtkSMRenderViewProxy::ConvertDisplayToPointOnSurface(
-    const int display_position[2], double world_position[3])
+    const int display_position[2], double world_position[3], bool snapOnMeshPoint)
 {
   int region[4] = {display_position[0], display_position[1],
     display_position[0], display_position[1] };
@@ -752,7 +752,15 @@ bool vtkSMRenderViewProxy::ConvertDisplayToPointOnSurface(
   vtkSMSessionProxyManager* spxm = this->GetSessionProxyManager();
   vtkNew<vtkCollection> representations;
   vtkNew<vtkCollection> sources;
-  this->SelectSurfaceCells(region, representations.GetPointer(), sources.GetPointer(), false);
+  
+  if (snapOnMeshPoint)
+    {
+    this->SelectSurfacePoints(region, representations.GetPointer(), sources.GetPointer(), false);
+    }
+  else
+    {
+    this->SelectSurfaceCells(region, representations.GetPointer(), sources.GetPointer(), false);
+    }
 
   if (representations->GetNumberOfItems() > 0 && sources->GetNumberOfItems() > 0)
     {
@@ -795,6 +803,7 @@ bool vtkSMRenderViewProxy::ConvertDisplayToPointOnSurface(
     vtkSMPropertyHelper(pickingHelper, "Selection").Set( selection );
     vtkSMPropertyHelper(pickingHelper, "PointA").Set(nearLinePoint, 3);
     vtkSMPropertyHelper(pickingHelper, "PointB").Set(farLinePoint, 3);
+    vtkSMPropertyHelper(pickingHelper, "SnapOnMeshPoint").Set(snapOnMeshPoint);
     pickingHelper->UpdateVTKObjects();
     pickingHelper->UpdateProperty("Update",1);
     vtkSMPropertyHelper(pickingHelper, "Intersection").UpdateValueFromServer();

@@ -22,6 +22,7 @@
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkObject.h"
 class vtkAlgorithm;
+class vtkDataSet;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVRayCastPickingHelper : public vtkObject
 {
@@ -49,6 +50,11 @@ public:
   vtkGetVector3Macro(PointB, double);
 
   // Description:
+  // Set the flag to use directly selected points on mesh as intersection
+  vtkSetMacro(SnapOnMeshPoint, bool);
+  vtkGetMacro(SnapOnMeshPoint, bool);
+
+  // Description:
   // Compute the intersection
   void ComputeIntersection();
 
@@ -60,9 +66,14 @@ protected:
   vtkPVRayCastPickingHelper();
   ~vtkPVRayCastPickingHelper();
 
+  // Description:
+  // Compute the intersection using provided dataset
+  void ComputeIntersectionFromDataSet(vtkDataSet* ds);
+
   double Intersection[3];
   double PointA[3];
   double PointB[3];
+  bool SnapOnMeshPoint;
   vtkAlgorithm* Input;
   vtkAlgorithm* Selection;
 

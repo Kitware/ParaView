@@ -51,6 +51,16 @@
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="pickMeshPoint" >
+     <property name="text" >
+      <string>Snap Picked Point on Mesh Point</string>
+     </property>
+     <property name="toolTip">
+       <string>If checked, picked points using 'P' will be snapped on mesh points</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QGridLayout" >
      <property name="leftMargin" >
       <number>0</number>
