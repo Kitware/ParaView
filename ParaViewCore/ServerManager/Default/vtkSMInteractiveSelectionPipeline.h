@@ -57,6 +57,11 @@ public:
   // Description:
   // Hides the interactive selection
   void Hide(vtkSMRenderViewProxy* view);
+  // Description:
+  // Copies the labels for interactive selection from 
+  // the selection labels in the representation parameter.
+  void CopyLabels(vtkSMProxy* representation);
+
 
 protected:
   vtkSMInteractiveSelectionPipeline();
@@ -81,6 +86,7 @@ protected:
   vtkSMProxy* SelectionRepresentation;
 
   vtkSMRenderViewProxy* PreviousView;
+  vtkSMSourceProxy* PreviousRepresentation;
   vtkCallbackCommand* ColorObserver;
   vtkCallbackCommand* ConnectionObserver;
 };
