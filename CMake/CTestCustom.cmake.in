@@ -93,13 +93,6 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
   # exclude warnings from mpi4py
   ".*mpi4py.*"
 
-  # exclude Nektar plugin warnings
-  "Nektar.*overloaded-virtual"
-  "Nektar/include.*unused"
-  "Nektar/Veclib"
-  "f951: warning: command line option '-fvisibility-inlines-hidden' is valid"
-  "Nektar/ParaViewPlugin/.*"
-
   # exclude warnings from external genericio library.
   "genericio"
 
