@@ -42,6 +42,11 @@ public:
   vtkTypeMacro(vtkPVImageReader, vtkImageReader);
 #endif
 
+  virtual int CanReadFile(const char*)
+  {
+    return 1;
+  }
+
   void PrintSelf(ostream& os, vtkIndent indent);
 
 //BTX
