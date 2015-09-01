@@ -53,7 +53,7 @@ static void string_replace(std::string& string, char c, std::string str)
 class vtkSMReaderFactory::vtkInternals
 {
 public:
-  static std::set<std::pair<std::string,std::string> > ReadersOfInterest;
+  static std::set<std::pair<std::string,std::string> > ReaderWhitelist;
   struct vtkValue
     {
     vtkWeakPointer<vtkSMSession> Session;
@@ -190,7 +190,7 @@ public:
   // included.
   std::set<std::string> Groups;
 };
-std::set<std::pair<std::string,std::string> > vtkSMReaderFactory::vtkInternals::ReadersOfInterest;
+std::set<std::pair<std::string,std::string> > vtkSMReaderFactory::vtkInternals::ReaderWhitelist;
 
 //----------------------------------------------------------------------------
 bool vtkSMReaderFactory::vtkInternals::vtkValue::ExtensionTest(
@@ -335,8 +335,8 @@ void vtkSMReaderFactory::UpdateAvailableReaders()
           // application has specified that it is only interested in a subset of the readers
           // then only that subset will be available.
           std::pair<std::string,std::string> reader(iter->GetGroupName(), iter->GetProxyName());
-          if (vtkInternals::ReadersOfInterest.empty() ||
-              vtkInternals::ReadersOfInterest.find(reader) != vtkInternals::ReadersOfInterest.end())
+          if (vtkInternals::ReaderWhitelist.empty() ||
+              vtkInternals::ReaderWhitelist.find(reader) != vtkInternals::ReaderWhitelist.end())
             {
             this->RegisterPrototype(iter->GetGroupName(), iter->GetProxyName());
             }
@@ -654,12 +654,12 @@ void vtkSMReaderFactory::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMReaderFactory::AddReaderOfInterest(const char* readerxmlgroup,
-                                             const char* readerxmlname)
+void vtkSMReaderFactory::AddReaderToWhitelist(const char* readerxmlgroup,
+                                              const char* readerxmlname)
 {
   if (readerxmlgroup != NULL && readerxmlname != NULL)
     {
-    vtkSMReaderFactory::vtkInternals::ReadersOfInterest.insert(
+    vtkSMReaderFactory::vtkInternals::ReaderWhitelist.insert(
       std::pair<std::string,std::string>(readerxmlgroup,readerxmlname));
     }
 }

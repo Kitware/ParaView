@@ -105,7 +105,7 @@ public:
   // factories created by the application.  This is intended to be called at
   // the begining of the application's execution before any sessions are
   // created.
-  static void AddWriterOfInterest(const char* writerxmlgroup, const char* writerxmlname);
+  static void AddWriterToWhitelist(const char* writerxmlgroup, const char* writerxmlname);
 //BTX
 protected:
   vtkSMWriterFactory();

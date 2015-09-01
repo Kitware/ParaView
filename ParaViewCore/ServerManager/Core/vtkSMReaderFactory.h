@@ -146,7 +146,7 @@ public:
   // factories created by the application.  This is intended to be called at
   // the begining of the application's execution before any sessions are
   // created.
-  static void AddReaderOfInterest(const char* readerxmlgroup, const char* readerxmlname);
+  static void AddReaderToWhitelist(const char* readerxmlgroup, const char* readerxmlname);
 //BTX
 protected:
   vtkSMReaderFactory();
