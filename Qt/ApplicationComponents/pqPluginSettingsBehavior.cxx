@@ -41,8 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 pqPluginSettingsBehavior::pqPluginSettingsBehavior(QObject* parent)
+  : Superclass(parent)
 {
-  (void) parent;
   pqPluginManager* pluginManager = pqApplicationCore::instance()->getPluginManager();
   this->connect(pluginManager, SIGNAL(pluginsUpdated()), this, SLOT(updateSettings()));
 }

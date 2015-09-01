@@ -141,7 +141,7 @@ pqOutputWindow::pqOutputWindow(QWidget* Parent) :
     SIGNAL(clicked(bool)), this, SLOT(clear()));
   QObject::connect(ui.checkBoxConsoleView,
                    SIGNAL(stateChanged(int)), this, SLOT(setConsoleView(int)));
-  QMenu* filterMenu = new QMenu();
+  QMenu* filterMenu = new QMenu(this);
   QAction* errorAction = new QAction (tr("Errors"), this);
   errorAction->setCheckable(true);
   errorAction->setChecked(true);
