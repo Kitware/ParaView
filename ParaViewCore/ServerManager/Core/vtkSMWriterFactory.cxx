@@ -40,7 +40,7 @@
 class vtkSMWriterFactory::vtkInternals
 {
 public:
-  static std::set<std::pair<std::string,std::string> > WritersOfInterest;
+  static std::set<std::pair<std::string,std::string> > WriterWhitelist;
   struct vtkValue
     {
     std::string Group;
@@ -166,7 +166,7 @@ public:
   std::set<std::string> Groups;
 };
 
-std::set<std::pair<std::string,std::string> > vtkSMWriterFactory::vtkInternals::WritersOfInterest;
+std::set<std::pair<std::string,std::string> > vtkSMWriterFactory::vtkInternals::WriterWhitelist;
 
 vtkStandardNewMacro(vtkSMWriterFactory);
 //----------------------------------------------------------------------------
@@ -265,8 +265,8 @@ void vtkSMWriterFactory::UpdateAvailableWriters()
           // application has specified that it is only interested in a subset of the writers
           // then only that subset will be available.
           std::pair<std::string,std::string> writer(iter->GetGroupName(), iter->GetProxyName());
-          if (vtkInternals::WritersOfInterest.empty() ||
-              vtkInternals::WritersOfInterest.find(writer) != vtkInternals::WritersOfInterest.end())
+          if (vtkInternals::WriterWhitelist.empty() ||
+              vtkInternals::WriterWhitelist.find(writer) != vtkInternals::WriterWhitelist.end())
             {
             this->RegisterPrototype(iter->GetGroupName(), iter->GetProxyName());
             }
@@ -418,12 +418,12 @@ void vtkSMWriterFactory::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMWriterFactory::AddWriterOfInterest(const char* readerxmlgroup,
+void vtkSMWriterFactory::AddWriterToWhitelist(const char* readerxmlgroup,
                                              const char* readerxmlname)
 {
   if (readerxmlgroup != NULL && readerxmlname != NULL)
     {
-    vtkSMWriterFactory::vtkInternals::WritersOfInterest.insert(
+    vtkSMWriterFactory::vtkInternals::WriterWhitelist.insert(
       std::pair<std::string,std::string>(readerxmlgroup,readerxmlname));
     }
 }
