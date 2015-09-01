@@ -5446,6 +5446,7 @@
             <Property name="XMLFileName" panel_visibility="advanced"/>
             <Property name="XMLFileNameInfo" />
           </PropertyGroup>
+          <Property name="GenerateFileIdArray" />
           <Property name="Refresh" />
         </ExposedProperties>
       </SubProxy>
@@ -5587,6 +5588,7 @@
             <Property name="XMLFileName" panel_visibility="advanced"/>
             <Property name="XMLFileNameInfo" />
           </PropertyGroup>
+          <Property name="GenerateFileIdArray" />
           <Property name="Refresh" />
         </ExposedProperties>
       </SubProxy>
