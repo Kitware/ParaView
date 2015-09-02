@@ -99,6 +99,28 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="ShowIndexedColorActiveValues"
+                         command="SetUseActiveValues"
+                         default_values="0"
+                         number_of_elements="1"
+                         label="Show Categorical Colors in Data Range Only"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="IndexedLookup" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>
+          When interpretting values as categories, enabling this
+          option results in the display of only the 'active'
+          categorical colors for values in the data range, i.e.,
+          values that exist in the source. You may need to click the
+          'Rescale to Data Range' button to update the active values
+          that are displayed.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty name="RescaleOnVisibilityChange"
                          default_values="0"
                          number_of_elements="1">
