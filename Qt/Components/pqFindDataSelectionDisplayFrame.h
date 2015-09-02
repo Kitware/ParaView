@@ -81,6 +81,7 @@ private slots:
   void editLabelPropertiesSelection();
   void editLabelPropertiesInteractiveSelection();
   void showFrustum(bool);
+  void onDataUpdated();
 
 private:
   Q_DISABLE_COPY(pqFindDataSelectionDisplayFrame);
