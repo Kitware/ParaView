@@ -45,35 +45,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QActionGroup>
 #include <QtDebug>
 
-namespace
-{
-  inline int getSelectionModifier(QActionGroup* group)
-    {
-    if (!group)
-      {
-      return vtkContextScene::SELECTION_DEFAULT;
-      }
-
-    // we cannot use QActionGroup::checkedAction() since the ModifierGroup may
-    // not be exclusive.
-    foreach (QAction* maction, group->actions())
-      {
-      if (maction->isChecked() && maction->data().isValid())
-        {
-        return maction->data().toInt();
-        }
-      }
-
-    return vtkContextScene::SELECTION_DEFAULT;
-    }
-}
-
 //-----------------------------------------------------------------------------
 pqChartSelectionReaction::pqChartSelectionReaction(
   QAction *parentObject, pqContextView *view, QActionGroup* modifierGroup)
-: Superclass(parentObject),
-  View(view),
-  ModifierGroup(modifierGroup)
+: Superclass(parentObject, modifierGroup),
+  View(view)
 {
   parentObject->setEnabled(view != NULL && view->supportsSelection());
   this->connect(parentObject, SIGNAL(triggered(bool)), SLOT(triggered(bool)));
@@ -85,14 +61,6 @@ pqChartSelectionReaction::pqChartSelectionReaction(
     pqCoreUtilities::connect(
       interactor, vtkCommand::LeftButtonReleaseEvent,
       this, SLOT(stopSelection()));
-    }
-
-  // if modified is changed while selection is in progress, we need to ensure we
-  // update the selection modifier on the view.
-  if (modifierGroup)
-    {
-    this->connect(modifierGroup, SIGNAL(triggered(QAction*)),
-      SLOT(modifiersChanged()));
     }
 }
 
@@ -157,7 +125,7 @@ void pqChartSelectionReaction::stopSelection()
 //-----------------------------------------------------------------------------
 void pqChartSelectionReaction::modifiersChanged()
 {
-  int selectionModifier = getSelectionModifier(this->ModifierGroup);
+  int selectionModifier = this->getSelectionModifier();
   ::setChartParameters(this->View, -1, false, selectionModifier, true);
 }
 
@@ -175,7 +143,7 @@ void pqChartSelectionReaction::triggered(bool checked)
       selectionType = _action->data().toInt();
       }
 
-    int selectionModifier = getSelectionModifier(this->ModifierGroup);
+    int selectionModifier = this->getSelectionModifier();
     if (checked)
       {
       pqChartSelectionReaction::startSelection(this->View,

@@ -80,6 +80,16 @@ public:
     vtkSMSourceProxy* output, vtkSMSourceProxy* input,
     vtkSMSourceProxy* dataSource, int outputport);
 
+  // Description:
+  // Updates output to be a toggle of input and output (input + (input | output ) - (input & output ) ) if the two selection
+  // sources are mergeable. Returns true if the toggling is successful.
+  // dataSource and outputport are needed if a conversion is needed to make the
+  // input expandable to the type of the output.
+  static bool ToggleSelection(
+    vtkSMSourceProxy* output, vtkSMSourceProxy* input,
+    vtkSMSourceProxy* dataSource, int outputport);
+
+
 
 protected:
   vtkSMSelectionHelper() {};

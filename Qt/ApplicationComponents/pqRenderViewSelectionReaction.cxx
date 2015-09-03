@@ -56,8 +56,8 @@ QPointer<pqRenderViewSelectionReaction> pqRenderViewSelectionReaction::ActiveRea
 
 //-----------------------------------------------------------------------------
 pqRenderViewSelectionReaction::pqRenderViewSelectionReaction(
-  QAction* parentObject, pqRenderView* view, SelectionMode mode)
-  : Superclass(parentObject),
+  QAction* parentObject, pqRenderView* view, SelectionMode mode, QActionGroup* modifierGroup)
+  : Superclass(parentObject, modifierGroup),
   View(view),
   Mode(mode),
   PreviousRenderViewMode(-1),
@@ -322,32 +322,20 @@ void pqRenderViewSelectionReaction::selectionChanged(
     return;
     }
 
-  vtkSMRenderViewProxy* rmp = this->View->getRenderViewProxy();
-  Q_ASSERT(rmp != NULL);
-
   BEGIN_UNDO_EXCLUDE();
 
-  pqRenderView::pqSelectionOperator selOp = pqRenderView::PV_SELECTION_NEW;
-  if (rmp->GetInteractor()->GetControlKey() == 1)
-    {
-    selOp = pqRenderView::PV_SELECTION_MERGE;
-    }
-  else if (rmp->GetInteractor()->GetShiftKey() == 1)
-    {
-    selOp = pqRenderView::PV_SELECTION_SUBTRACT;
-    }
-
+  int selectionModifier = this->getSelectionModifier();
   int* region = reinterpret_cast<int*>(calldata);
   vtkObject* unsafe_object = reinterpret_cast<vtkObject*>(calldata);
 
   switch (this->Mode)
     {
   case SELECT_SURFACE_CELLS:
-    this->View->selectOnSurface(region, selOp);
+    this->View->selectOnSurface(region, selectionModifier);
     break;
 
   case SELECT_SURFACE_POINTS:
-    this->View->selectPointsOnSurface(region, selOp);
+    this->View->selectPointsOnSurface(region, selectionModifier);
     break;
 
   case SELECT_FRUSTUM_CELLS:
@@ -360,16 +348,16 @@ void pqRenderViewSelectionReaction::selectionChanged(
 
   case SELECT_SURFACE_CELLS_POLYGON:
     this->View->selectPolygonCells(vtkIntArray::SafeDownCast(unsafe_object),
-      selOp);
+      selectionModifier);
     break;
 
   case SELECT_SURFACE_POINTS_POLYGON:
     this->View->selectPolygonPoints(vtkIntArray::SafeDownCast(unsafe_object),
-      selOp);
+      selectionModifier);
     break;
 
   case SELECT_BLOCKS:
-    this->View->selectBlock(region, selOp);
+    this->View->selectBlock(region, selectionModifier);
     break;
 
   case SELECT_CUSTOM_BOX:
@@ -485,11 +473,11 @@ void pqRenderViewSelectionReaction::onLeftButtonRelease()
     return;
     }
 
-  vtkSMRenderViewProxy* rmp = this->View->getRenderViewProxy();
-  pqRenderView::pqSelectionOperator selOp = pqRenderView::PV_SELECTION_MERGE;
-  if (rmp->GetInteractor()->GetShiftKey() == 1)
+  int selectionModifier = this->getSelectionModifier();
+  if (selectionModifier == vtkContextScene::SELECTION_NONE 
+      || selectionModifier == vtkContextScene::SELECTION_DEFAULT)
     {
-    selOp = pqRenderView::PV_SELECTION_SUBTRACT;
+    selectionModifier = vtkContextScene::SELECTION_ADDITION;
     }
 
   int region[4] = {x, y, x, y};
@@ -497,17 +485,42 @@ void pqRenderViewSelectionReaction::onLeftButtonRelease()
   switch (this->Mode)
     {
   case SELECT_SURFACE_CELLS_INTERACTIVELY:
-    this->View->selectOnSurface(region, selOp);
+    this->View->selectOnSurface(region, selectionModifier);
     break;
 
   case SELECT_SURFACE_POINTS_INTERACTIVELY:
-    this->View->selectPointsOnSurface(region, selOp);
+    this->View->selectPointsOnSurface(region, selectionModifier);
     break;
 
   default:
     qCritical("Invalid call to pqRenderViewSelectionReaction::onLeftButtonRelease");
     break;
     }
+}
+
+//-----------------------------------------------------------------------------
+int pqRenderViewSelectionReaction::getSelectionModifier()
+{
+  int selectionModifier = this->Superclass::getSelectionModifier();
+
+  vtkSMRenderViewProxy* rmp = this->View->getRenderViewProxy();
+  Q_ASSERT(rmp != NULL);
+
+  bool ctrl = rmp->GetInteractor()->GetControlKey() == 1;
+  bool shift = rmp->GetInteractor()->GetShiftKey() == 1;
+  if (ctrl && shift)
+    {
+    selectionModifier = vtkContextScene::SELECTION_TOGGLE;
+    }
+  else if (ctrl)
+    {
+    selectionModifier = vtkContextScene::SELECTION_ADDITION;
+    }
+  else if (shift)
+    {
+    selectionModifier = vtkContextScene::SELECTION_SUBTRACTION;
+    }
+  return selectionModifier;
 }
 
 //-----------------------------------------------------------------------------

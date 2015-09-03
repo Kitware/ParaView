@@ -41,6 +41,7 @@ class pqContextView;
 class pqRenderView;
 class pqSpreadSheetView;
 class QAction;
+class QActionGroup;
 class QShortcut;
 class QWidget;
 
@@ -132,6 +133,9 @@ protected:
 
   /// called to add view type independent actions first.
   virtual void addGenericActions(pqViewFrame* frame, pqView* view);
+
+  /// called to add view type independent actions first.
+  virtual QActionGroup* addSelectionModifierActions(pqViewFrame* frame, pqView* view); 
 
   /// called to add context view actions.
   virtual void addContextViewActions(pqViewFrame* frame, pqContextView* chart_view);
