@@ -92,6 +92,7 @@ public:
   /// Computes the magnification and view size given the current view size for
   /// the full size for the view.
   static int computeMagnification(const QSize& fullsize, QSize& viewsize);
+
 public slots:
   /// Request a StillRender on idle. Multiple calls are collapsed into one. 
   virtual void render();
@@ -166,6 +167,10 @@ public:
   //vtkSMViewProxy::CanDisplayData().
   bool canDisplay(pqOutputPort* opPort) const;
 
+  /// Called when a selection is made, passing in the mode as the sole
+  /// argument.
+  virtual void emitSelectionSignals(bool frustum);
+
 signals:
   /// Fired when the vtkSMViewProxy fires the vtkCommand::UpdateDataEvent
   /// The view proxy fires this event at the end of vtkSMViewProxy::Update()
@@ -202,6 +207,10 @@ signals:
   ///    the selection input on the source proxy for the opport must already
   ///    have been initialized to a selection source.
   void selected(pqOutputPort* opport);
+
+  /// Fired when the selection changes.
+  /// \c frustum is a boolean indicating whether the selection is frustum-based.
+  void selectionModeChanged(bool frustum);
 
   /// Fired when a port is picked.
   /// \c opport is the port that got picked.

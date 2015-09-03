@@ -208,6 +208,12 @@ void pqView::cancelPendingRenders()
 }
 
 //-----------------------------------------------------------------------------
+void pqView::emitSelectionSignals(bool frustum)
+{
+  emit selectionModeChanged(frustum);
+}
+
+//-----------------------------------------------------------------------------
 void pqView::render()
 {
   this->Internal->RenderTimer.start();
