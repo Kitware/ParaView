@@ -6,4 +6,6 @@ foreach (cmake_file IN LISTS cmake_files)
   include("${cmake_file}")
 endforeach ()
 
+include(vtkOpenGL)
 vtk_module_library(vtkIOExport ${Module_SRCS})
+vtk_opengl_link(vtkIOExport)

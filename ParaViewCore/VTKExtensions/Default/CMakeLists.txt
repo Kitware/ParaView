@@ -192,6 +192,8 @@ set(${vtk-module}_WRAP_HINTS "${CMAKE_CURRENT_SOURCE_DIR}/hints")
 vtk_module_library(vtkPVVTKExtensionsDefault ${Module_SRCS})
 target_link_libraries(vtkPVVTKExtensionsDefault LINK_PRIVATE
   ${vtkIOInfovis_LIBRARIES})
+include(vtkOpenGL)
+vtk_opengl_link(vtkPVVTKExtensionsDefault)
 
 OPTION(PARAVIEW_ENABLE_SPYPLOT_MARKERS
        "Enables markers in the spyplot reader"

@@ -52,6 +52,8 @@ set (${vtk-module}_NO_HeaderTest 1)
 
 vtk_module_library(${vtk-module} ${MANTA_SRCS})
 TARGET_LINK_LIBRARIES (${vtk-module} LINK_PRIVATE ${MANTA_LINK_LIBRARIES})
+include(vtkOpenGL)
+vtk_opengl_link(${vtk-module})
 
 # Manta_Core uses MMTime which is in it's own special library.
 if(WIN32)
