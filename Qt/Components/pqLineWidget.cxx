@@ -96,6 +96,7 @@ pqLineWidget::pqLineWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p,
 
   this->Implementation->UI.setupUi(this);
   this->Implementation->UI.visible->setChecked(this->widgetVisible());
+  this->Implementation->UI.pickMeshPoint->setChecked(this->pickOnMeshPoint());
 
   // Setup validators for all line widgets.
   QDoubleValidator* validator = new QDoubleValidator(this);
@@ -108,6 +109,9 @@ pqLineWidget::pqLineWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p,
 
   QObject::connect(this->Implementation->UI.visible,
     SIGNAL(toggled(bool)), this, SLOT(setWidgetVisible(bool)));
+
+  QObject::connect(this->Implementation->UI.pickMeshPoint,
+    SIGNAL(toggled(bool)), this, SLOT(setPickOnMeshPoint(bool)));
 
   QObject::connect(this, SIGNAL(widgetVisibilityChanged(bool)),
     this, SLOT(onWidgetVisibilityChanged(bool)));

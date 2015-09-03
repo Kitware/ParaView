@@ -120,6 +120,7 @@ pqImplicitPlaneWidget::pqImplicitPlaneWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWi
 
   this->Implementation->UI->setupUi(this);
   this->Implementation->UI->show3DWidget->setChecked(this->widgetVisible());
+  this->Implementation->UI->pickMeshPoint->setChecked(this->pickOnMeshPoint());
 
   // Set validators for all line edit boxes.
   QDoubleValidator* validator = new QDoubleValidator(this);
@@ -134,7 +135,9 @@ pqImplicitPlaneWidget::pqImplicitPlaneWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWi
     SIGNAL(toggled(bool)), this, SLOT(onShow3DWidget(bool)));
   QObject::connect(this, SIGNAL(widgetVisibilityChanged(bool)),
     this, SLOT(onWidgetVisibilityChanged(bool)));
-
+  QObject::connect(this->Implementation->UI->pickMeshPoint,
+    SIGNAL(toggled(bool)), this, SLOT(setPickOnMeshPoint(bool)));
+ 
   connect(this->Implementation->UI->useXNormal,
     SIGNAL(clicked()), this, SLOT(onUseXNormal()));
   connect(this->Implementation->UI->useYNormal,

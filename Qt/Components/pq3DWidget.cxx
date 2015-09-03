@@ -150,7 +150,8 @@ public:
     WidgetVisible(true),
     Selected(false),
     LastWidgetVisibilityGoal(true),
-    InDeleteCall(false)
+    InDeleteCall(false),
+    PickOnMeshPoint(false)
   {
   this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
   this->IsMaster = pqApplicationCore::instance()->getActiveServer()->isMaster();
@@ -176,6 +177,7 @@ public:
   bool IsMaster;
   bool LastWidgetVisibilityGoal;
   bool InDeleteCall;
+  bool PickOnMeshPoint;
 };
 
 //-----------------------------------------------------------------------------
@@ -354,6 +356,12 @@ void pq3DWidget::render()
 }
 
 //-----------------------------------------------------------------------------
+void pq3DWidget::setPickOnMeshPoint(bool enable)
+{
+  this->Internal->PickOnMeshPoint = enable;
+}
+
+//-----------------------------------------------------------------------------
 void pq3DWidget::pickPoint()
 {
   pqRenderView* rview = qobject_cast<pqRenderView*>(this->renderView());
@@ -369,7 +377,7 @@ void pq3DWidget::pickPoint()
     const int* eventpos = rwi->GetEventPosition();
     double position[3];
     if (rview->getRenderViewProxy()->ConvertDisplayToPointOnSurface(eventpos,
-      position))
+      position, this->Internal->PickOnMeshPoint))
       {
       this->pick(position[0], position[1], position[2]);
       }
@@ -496,6 +504,12 @@ void pq3DWidget::setHints(vtkPVXMLElement* hints)
       pxy->GetProperty(propElem->GetAttribute("name")));
     }
 }
+
+//-----------------------------------------------------------------------------
+bool pq3DWidget::pickOnMeshPoint() const
+{
+  return this->Internal->PickOnMeshPoint;
+} 
 
 //-----------------------------------------------------------------------------
 void pq3DWidget::setControlledProperty(const char* function,

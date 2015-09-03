@@ -42,6 +42,7 @@ vtkPVRayCastPickingHelper::vtkPVRayCastPickingHelper()
 {
   this->Selection = NULL;
   this->Input = NULL;
+  this->SnapOnMeshPoint = false;
   this->PointA[0] = this->PointA[1] = this->PointA[2] = 0.0;
   this->PointB[0] = this->PointB[1] = this->PointB[2] = 0.0;
 }
@@ -63,6 +64,8 @@ void vtkPVRayCastPickingHelper::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PointB: "
      << this->PointB[0] << ", " << this->PointB[1] << ", " << this->PointB[2]
      << endl;
+  os << indent << "SnapOnMeshPoint: "
+     << this->SnapOnMeshPoint << endl;
   os << indent << "Last Intersection: "
      << this->Intersection[0] << ", " << this->Intersection[1] << ", "
      << this->Intersection[2] << endl;
@@ -80,11 +83,6 @@ void vtkPVRayCastPickingHelper::ComputeIntersection()
 
   // Reset the intersection value
   this->Intersection[0] = this->Intersection[1] = this->Intersection[2] = 0.0;
-
-  double tolerance = 0.1;
-  double t;
-  int subId;
-  double pcoord[3];
 
   // Manage multi-process distribution
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
@@ -104,12 +102,7 @@ void vtkPVRayCastPickingHelper::ComputeIntersection()
       vtkCompositeDataSet::SafeDownCast(extractSelectionFilter->GetOutput());
   if(ds && ds->GetNumberOfCells() > 0)
     {
-    if(ds->GetCell(0)->IntersectWithLine(
-         this->PointA, this->PointB, tolerance, t, this->Intersection,
-         pcoord, subId) == 0 && t == VTK_DOUBLE_MAX)
-      {
-      vtkErrorMacro("The intersection was not properly found");
-      }
+     this->ComputeIntersectionFromDataSet(ds);
     }
   else if(cds)
     {
@@ -117,20 +110,8 @@ void vtkPVRayCastPickingHelper::ComputeIntersection()
     dsIter.TakeReference(cds->NewIterator());
     for(dsIter->GoToFirstItem();!dsIter->IsDoneWithTraversal();dsIter->GoToNextItem())
       {
-      ds = vtkDataSet::SafeDownCast(dsIter->GetCurrentDataObject());
-      if(ds && ds->GetNumberOfCells() > 0)
-        {
-        if(ds->GetCell(0)->IntersectWithLine(
-             this->PointA, this->PointB, tolerance, t, this->Intersection,
-             pcoord, subId) == 0 && t == VTK_DOUBLE_MAX)
-          {
-          vtkErrorMacro("The intersection was not properly found");
-          }
-        else
-          {
-          break;
-          }
-        }
+      this->ComputeIntersectionFromDataSet(
+        vtkDataSet::SafeDownCast(dsIter->GetCurrentDataObject()));
       }
     }
 
@@ -143,5 +124,28 @@ void vtkPVRayCastPickingHelper::ComputeIntersection()
     this->Intersection[0] = result[0];
     this->Intersection[1] = result[1];
     this->Intersection[2] = result[2];
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRayCastPickingHelper::ComputeIntersectionFromDataSet(vtkDataSet* ds)
+{
+  double tolerance = 0.1;
+  double t;
+  int subId;
+  double pcoord[3];
+
+  if(ds && ds->GetNumberOfCells() > 0)
+    {
+    if (this->SnapOnMeshPoint)
+      {
+      ds->GetPoint(0, this->Intersection);
+      }
+    else if(ds->GetCell(0)->IntersectWithLine(
+      this->PointA, this->PointB, tolerance, t, this->Intersection,
+      pcoord, subId) == 0 && t == VTK_DOUBLE_MAX)
+      {
+      vtkErrorMacro("The intersection was not properly found");
+      }
     }
 }

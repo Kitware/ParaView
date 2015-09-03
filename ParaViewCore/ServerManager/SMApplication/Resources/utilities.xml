@@ -2454,6 +2454,12 @@
                             default_values="0.0 0.0 1.0"
                             name="PointB"
                             number_of_elements="3"></DoubleVectorProperty>
+      <IntVectorProperty command="SetSnapOnMeshPoint"
+                         default_values="0"
+                         name="SnapOnMeshPoint"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <DoubleVectorProperty command="GetIntersection"
                             default_values="0.0 0.0 0.0"
                             information_only="1"
