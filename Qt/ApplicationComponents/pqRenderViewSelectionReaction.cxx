@@ -90,6 +90,17 @@ for (size_t i = 0;
         SLOT(updateEnableState()));
       }
     }
+
+  if (this->Mode == SELECT_FRUSTUM_CELLS || 
+      this->Mode == SELECT_FRUSTUM_POINTS)
+    {
+    this->DisableSelectionModifiers = true;
+    }
+  else
+    {
+    this->DisableSelectionModifiers = false;
+    }
+
   this->updateEnableState();
 }
 
@@ -173,11 +184,21 @@ void pqRenderViewSelectionReaction::beginSelection()
     return;
     }
 
+  // Check if this selection support selection modifier
   if (pqRenderViewSelectionReaction::ActiveReaction)
     {
+    // Check if selection are compatible, if not, deactivate selection modifiers
+    if (!pqRenderViewSelectionReaction::ActiveReaction->isCompatible(this->Mode))
+      {
+      this->uncheckSelectionModifiers();
+      }
+
     // Some other selection was active, end it before we start a new one.
     pqRenderViewSelectionReaction::ActiveReaction->endSelection();
     }
+
+  // Enable/Disable selection if supported
+  this->disableSelectionModifiers(this->DisableSelectionModifiers);
 
   pqRenderViewSelectionReaction::ActiveReaction = this;
 
@@ -211,6 +232,8 @@ void pqRenderViewSelectionReaction::beginSelection()
       "Use the 'Selection Display Inspector' to choose the array to label with.\n\n"
       "To add the currently "
       "highlighted element to the active selection, simply click on that element.\n\n"
+      "You can click on selection modifier button or use modifier keys to subtract or "
+      " even toggle the selection. Click outside of mesh to clear selection.\n\n"
       "Use the 'Esc' key or the same toolbar button to exit this mode.",
       QMessageBox::Ok | QMessageBox::Save);
     this->View->setCursor(Qt::CrossCursor);
@@ -521,6 +544,33 @@ int pqRenderViewSelectionReaction::getSelectionModifier()
     selectionModifier = vtkContextScene::SELECTION_SUBTRACTION;
     }
   return selectionModifier;
+}
+
+bool pqRenderViewSelectionReaction::isCompatible(SelectionMode mode)
+{
+  if (this->Mode == mode)
+    {
+    return true;
+    }
+  else if ((this->Mode == SELECT_SURFACE_CELLS ||
+       this->Mode == SELECT_SURFACE_CELLS_POLYGON ||
+       this->Mode == SELECT_SURFACE_CELLS_INTERACTIVELY) &&
+      (mode == SELECT_SURFACE_CELLS ||
+       mode == SELECT_SURFACE_CELLS_POLYGON ||
+       mode == SELECT_SURFACE_CELLS_INTERACTIVELY))
+    {
+    return true;
+    }
+  else if ((this->Mode == SELECT_SURFACE_POINTS ||
+       this->Mode == SELECT_SURFACE_POINTS_POLYGON ||
+       this->Mode == SELECT_SURFACE_POINTS_INTERACTIVELY) &&
+      (mode == SELECT_SURFACE_POINTS ||
+       mode == SELECT_SURFACE_POINTS_POLYGON ||
+       mode == SELECT_SURFACE_POINTS_INTERACTIVELY))
+    {
+    return true;
+    }
+  return false;
 }
 
 //-----------------------------------------------------------------------------

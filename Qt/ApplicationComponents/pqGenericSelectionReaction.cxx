@@ -53,6 +53,28 @@ int pqGenericSelectionReaction::getSelectionModifier()
   return vtkContextScene::SELECTION_DEFAULT;
 }
 
+void pqGenericSelectionReaction::uncheckSelectionModifiers()
+{
+  if (this->ModifierGroup)
+    {
+    foreach (QAction* act, this->ModifierGroup->actions())
+      {
+      act->setChecked(false);
+      }
+    } 
+}
+
+void pqGenericSelectionReaction::disableSelectionModifiers(bool disable)
+{
+  if (this->ModifierGroup)
+    { 
+    this->ModifierGroup->setEnabled(!disable);
+    if(disable)
+      {
+      this->uncheckSelectionModifiers();
+      }
+    }
+}
 //-----------------------------------------------------------------------------
 pqGenericSelectionReaction::pqGenericSelectionReaction(
   QAction *parentObject, QActionGroup* modifierGroup)

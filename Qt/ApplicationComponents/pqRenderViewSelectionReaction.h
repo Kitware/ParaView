@@ -120,10 +120,14 @@ private:
   // Get the current state of selection modifier
   int getSelectionModifier();
 
+  // Check this selection is compatible with another type of selection
+  bool isCompatible(SelectionMode mode);
+
 private:
   Q_DISABLE_COPY(pqRenderViewSelectionReaction);
   QPointer<pqRenderView> View;
   SelectionMode Mode;
+  bool DisableSelectionModifiers;
   int PreviousRenderViewMode;
   vtkWeakPointer<vtkObject> ObservedObject;
   unsigned long ObserverIds[4];

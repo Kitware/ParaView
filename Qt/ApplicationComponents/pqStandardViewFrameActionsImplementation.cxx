@@ -229,7 +229,6 @@ QActionGroup* pqStandardViewFrameActionsImplementation::addSelectionModifierActi
     toggleAction->setData(QVariant(vtkContextScene::SELECTION_TOGGLE));
     }
 
-
   QActionGroup* modeGroup = new QActionGroup(frame);
   if (plusAction)
     {
@@ -365,7 +364,7 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
     selectFrustumCellsAction->setObjectName("actionSelectFrustumCells");
     selectFrustumCellsAction->setCheckable (true);
     new pqRenderViewSelectionReaction(selectFrustumCellsAction, renderView,
-      pqRenderViewSelectionReaction::SELECT_FRUSTUM_CELLS);
+      pqRenderViewSelectionReaction::SELECT_FRUSTUM_CELLS, modeGroup);
     this->connect(selectFrustumCellsAction, SIGNAL(toggled(bool)),
       SLOT(escapeableActionToggled(bool)));
     }
@@ -378,7 +377,7 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
     selectFrustumPointsAction->setObjectName("actionSelectFrustumPoints");
     selectFrustumPointsAction->setCheckable (true);
     new pqRenderViewSelectionReaction(selectFrustumPointsAction, renderView,
-      pqRenderViewSelectionReaction::SELECT_FRUSTUM_POINTS);
+      pqRenderViewSelectionReaction::SELECT_FRUSTUM_POINTS, modeGroup);
     this->connect(selectFrustumPointsAction, SIGNAL(toggled(bool)),
       SLOT(escapeableActionToggled(bool)));
     }

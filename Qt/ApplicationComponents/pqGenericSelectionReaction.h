@@ -58,11 +58,18 @@ protected slots:
   virtual void modifiersChanged() {}
 
 protected:
-  /// Get the current state of selection modifier
+  /// Get the current state of selection modifier, if any
   virtual int getSelectionModifier();
 
-private:
+  /// Uncheck selection modifiers, if any
+  virtual void uncheckSelectionModifiers();
+
+  /// Disable/Enable selection modifiers, if any
+  virtual void disableSelectionModifiers(bool disable);
+
   QPointer<QActionGroup> ModifierGroup;
+
+private:
   Q_DISABLE_COPY(pqGenericSelectionReaction)
 };
 
