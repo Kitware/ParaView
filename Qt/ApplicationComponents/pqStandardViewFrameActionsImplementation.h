@@ -107,8 +107,8 @@ protected slots:
   void invoked();
 
   /// slots for various shortcuts.
-  void selectSurfaceCellsTrigerred();
-  void selectSurfacePointsTrigerred();
+  void selectSurfaceCellsTriggered();
+  void selectSurfacePointsTriggered();
   void selectFrustumCellsTriggered();
   void selectFrustumPointsTriggered();
   void selectBlocksTriggered();

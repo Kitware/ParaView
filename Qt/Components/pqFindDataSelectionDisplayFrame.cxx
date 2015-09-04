@@ -425,7 +425,32 @@ pqFindDataSelectionDisplayFrame::~pqFindDataSelectionDisplayFrame()
 //-----------------------------------------------------------------------------
 void pqFindDataSelectionDisplayFrame::setView(pqView* view)
 {
+  if (this->Internals->View)
+    {
+    this->disconnect(this->Internals->View, SIGNAL(selectionModeChanged(bool)),
+                     this, SLOT(onSelectionModeChanged(bool)));
+    }
+
   this->Internals->View = view;
+  if (this->Internals->View)
+    {
+    this->connect(this->Internals->View, SIGNAL(selectionModeChanged(bool)),
+                  this, SLOT(onSelectionModeChanged(bool)));
+    }
+
+  this->Internals->updatePanel(this);
+}
+
+//-----------------------------------------------------------------------------
+void pqFindDataSelectionDisplayFrame::onSelectionModeChanged(bool frustum)
+{
+  // Only change visibility of the frustum if we should turn it off.
+  // We don't want to turn it on automatically.
+  if (!frustum)
+    {
+    this->showFrustum(frustum);
+    }
+
   this->Internals->updatePanel(this);
 }
 
@@ -487,7 +512,6 @@ void pqFindDataSelectionDisplayFrame::showFrustum(bool val)
 {
   this->Internals->showFrustum(val);
 }
-
 
 //-----------------------------------------------------------------------------
 void pqFindDataSelectionDisplayFrame::setUseVerticalLayout(bool vertical)

@@ -81,9 +81,9 @@ pqStandardViewFrameActionsImplementation::pqStandardViewFrameActionsImplementati
   this->ShortCutBlocks = new QShortcut(QKeySequence("b"), mainWindow);
 
   QObject::connect(this->ShortCutSurfaceCells, SIGNAL(activated()),
-    this, SLOT(selectSurfaceCellsTrigerred()));
+    this, SLOT(selectSurfaceCellsTriggered()));
   QObject::connect(this->ShortCutSurfacePoints, SIGNAL(activated()),
-    this, SLOT(selectSurfacePointsTrigerred()));
+    this, SLOT(selectSurfacePointsTriggered()));
   QObject::connect(this->ShortCutFrustumCells, SIGNAL(activated()),
     this, SLOT(selectFrustumCellsTriggered()));
   QObject::connect(this->ShortCutFrustumPoints, SIGNAL(activated()),
@@ -634,7 +634,7 @@ namespace
 }
 
 //-----------------------------------------------------------------------------
-void pqStandardViewFrameActionsImplementation::selectSurfaceCellsTrigerred()
+void pqStandardViewFrameActionsImplementation::selectSurfaceCellsTriggered()
 {
   pqView* activeView = pqActiveObjects::instance().activeView();
   pqContextView *chartView = qobject_cast<pqContextView*>(activeView);
@@ -652,7 +652,7 @@ void pqStandardViewFrameActionsImplementation::selectSurfaceCellsTrigerred()
 }
 
 //-----------------------------------------------------------------------------
-void pqStandardViewFrameActionsImplementation::selectSurfacePointsTrigerred()
+void pqStandardViewFrameActionsImplementation::selectSurfacePointsTriggered()
 {
   pqView* activeView = pqActiveObjects::instance().activeView();
   pqContextView *chartView = qobject_cast<pqContextView*>(activeView);

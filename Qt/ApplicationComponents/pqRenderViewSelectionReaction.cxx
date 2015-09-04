@@ -392,6 +392,14 @@ void pqRenderViewSelectionReaction::selectionChanged(
   END_UNDO_EXCLUDE();
 
   this->endSelection();
+
+  if (this->View)
+    {
+    bool frustumSelection =
+      this->Mode == pqRenderViewSelectionReaction::SELECT_FRUSTUM_CELLS ||
+      this->Mode == pqRenderViewSelectionReaction::SELECT_FRUSTUM_POINTS;
+    this->View->emitSelectionSignals(frustumSelection);
+    }
 }
 
 //-----------------------------------------------------------------------------
