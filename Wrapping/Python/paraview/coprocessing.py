@@ -390,9 +390,9 @@ class CoProcessor(object):
             input = rep.Input
             input.UpdatePipeline(time) #make sure range is up-to-date
             lut = rep.LookupTable
-            if rep.ColorAttributeType == 'POINT_DATA':
+            if rep.ColorAttributeType == 'POINT_DATA' or rep.ColorAttributeType == "POINTS":
                 datainformation = input.GetPointDataInformation()
-            elif rep.ColorAttributeType == 'CELL_DATA':
+            elif rep.ColorAttributeType == 'CELL_DATA' or rep.ColorAttributeType == "CELLS":
                 datainformation = input.GetCellDataInformation()
             else:
                 print 'something strange with color attribute type', rep.ColorAttributeType
