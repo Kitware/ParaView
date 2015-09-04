@@ -58,7 +58,7 @@ protected slots:
   virtual void modifiersChanged() {}
 
 protected:
-  // Get the current state of selection modifier
+  /// Get the current state of selection modifier
   virtual int getSelectionModifier();
 
 private:

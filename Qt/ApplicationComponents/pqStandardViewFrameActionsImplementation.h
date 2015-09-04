@@ -137,6 +137,9 @@ protected:
   /// called to add view type independent actions first.
   virtual QActionGroup* addSelectionModifierActions(pqViewFrame* frame, pqView* view); 
 
+  /// called to add a separator in the action bar
+  virtual void addSeparator(pqViewFrame* frame, pqView* view); 
+
   /// called to add context view actions.
   virtual void addContextViewActions(pqViewFrame* frame, pqContextView* chart_view);
 

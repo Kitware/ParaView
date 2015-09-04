@@ -475,7 +475,7 @@ void pqRenderViewSelectionReaction::onLeftButtonRelease()
 
   int selectionModifier = this->getSelectionModifier();
   if (selectionModifier == vtkContextScene::SELECTION_NONE 
-      || selectionModifier == vtkContextScene::SELECTION_DEFAULT)
+    || selectionModifier == vtkContextScene::SELECTION_DEFAULT)
     {
     selectionModifier = vtkContextScene::SELECTION_ADDITION;
     }

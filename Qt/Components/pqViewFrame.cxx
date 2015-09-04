@@ -284,6 +284,15 @@ QAction* pqViewFrame::addTitleBarAction(const QIcon& icon, const QString& titles
 }
 
 //-----------------------------------------------------------------------------
+QAction* pqViewFrame::addTitleBarSeparator()
+{
+  QAction *separator = new QAction(this);
+  separator->setSeparator(true);
+  this->addTitleBarAction(separator);
+  return separator;
+}
+
+//-----------------------------------------------------------------------------
 void pqViewFrame::removeTitleBarActions()
 {
   this->ToolBar->clear();

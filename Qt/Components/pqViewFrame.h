@@ -105,6 +105,9 @@ public:
   QAction* addTitleBarAction(const QString& title);
   QAction* addTitleBarAction(const QIcon& icon, const QString& title);
 
+  /// One can add a separator between actions
+  QAction* addTitleBarSeparator();
+
   /// remove all added custom title-bar actions.
   void removeTitleBarActions();
 

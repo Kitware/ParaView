@@ -74,7 +74,8 @@ public:
   /// If \c view is NULL, this reaction will track the active-view maintained by
   /// pqActiveObjects.
   pqRenderViewSelectionReaction(
-    QAction* parentAction, pqRenderView* view, SelectionMode mode, QActionGroup* modifierGroup = NULL);
+    QAction* parentAction, pqRenderView* view, SelectionMode mode,
+    QActionGroup* modifierGroup = NULL);
   virtual ~pqRenderViewSelectionReaction();
 
 signals:

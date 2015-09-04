@@ -148,12 +148,7 @@ void pqStandardViewFrameActionsImplementation::addContextViewActions(
   QActionGroup* modeGroup = this->addSelectionModifierActions(frame, chart_view);
   QActionGroup* group = new QActionGroup(frame);
 
-  if (this->isButtonVisible("Separator", chart_view))
-    {
-    QAction *separator = new QAction(this);
-    separator->setSeparator(true);
-    frame->addTitleBarAction(separator);
-    }
+  this->addSeparator(frame, chart_view);
 
   if (this->isButtonVisible("SelectPolygon", chart_view))
     {
@@ -202,18 +197,13 @@ QActionGroup* pqStandardViewFrameActionsImplementation::addSelectionModifierActi
   QAction* minusAction = NULL;
   QAction* plusAction = NULL;
 
-  if (this->isButtonVisible("Separator", view))
-    {
-    QAction *separator = new QAction(this);
-    separator->setSeparator(true);
-    frame->addTitleBarAction(separator);
-    }
+  this->addSeparator(frame, view);
 
   if (this->isButtonVisible("AddSelection", view))
     {
     plusAction = frame->addTitleBarAction(
       QIcon(":/pqWidgets/Icons/pqSelectPlus16.png"),
-      "Add selection (Ctrl)");
+      tr("Add selection (Ctrl)"));
     plusAction->setObjectName("actionAddSelection");
     plusAction->setCheckable(true);
     plusAction->setData(QVariant(vtkContextScene::SELECTION_ADDITION));
@@ -223,7 +213,7 @@ QActionGroup* pqStandardViewFrameActionsImplementation::addSelectionModifierActi
     {
     minusAction = frame->addTitleBarAction(
       QIcon(":/pqWidgets/Icons/pqSelectMinus16.png"),
-      "Subtract selection (Shift)");
+      tr("Subtract selection (Shift)"));
     minusAction->setObjectName("actionSubtractSelection");
     minusAction->setCheckable(true);
     minusAction->setData(QVariant(vtkContextScene::SELECTION_SUBTRACTION));
@@ -233,7 +223,7 @@ QActionGroup* pqStandardViewFrameActionsImplementation::addSelectionModifierActi
     {
     toggleAction = frame->addTitleBarAction(
       QIcon(":/pqWidgets/Icons/pqSelectToggle16.png"),
-      "Toggle selection (Ctrl+Shift)");
+      tr("Toggle selection (Ctrl+Shift)"));
     toggleAction->setObjectName("actionToggleSelection");
     toggleAction->setCheckable(true);
     toggleAction->setData(QVariant(vtkContextScene::SELECTION_TOGGLE));
@@ -264,6 +254,15 @@ QActionGroup* pqStandardViewFrameActionsImplementation::addSelectionModifierActi
   return modeGroup;
 }
 
+//-----------------------------------------------------------------------------
+void pqStandardViewFrameActionsImplementation::addSeparator(
+  pqViewFrame *frame, pqView *view)
+{
+  if (this->isButtonVisible("Separator", view))
+    {
+    frame->addTitleBarSeparator();
+    }
+}
 
 //-----------------------------------------------------------------------------
 void pqStandardViewFrameActionsImplementation::addGenericActions(
@@ -309,13 +308,8 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
   Q_ASSERT(renderView);
   Q_ASSERT(frame);
 
-  if (this->isButtonVisible("Separator", renderView))
-    {
-    QAction *separator = new QAction(this);
-    separator->setSeparator(true);
-    frame->addTitleBarAction(separator);
-    }
-
+  this->addSeparator(frame, renderView);
+  
   if (this->isButtonVisible("ToggleInteractionMode", renderView))
     {
     QAction* toggleInteractionModeAction = frame->addTitleBarAction(
@@ -335,12 +329,7 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
 
   QActionGroup* modeGroup = this->addSelectionModifierActions(frame, renderView);
 
-  if (this->isButtonVisible("Separator", renderView))
-    {
-    QAction *separator = new QAction(this);
-    separator->setSeparator(true);
-    frame->addTitleBarAction(separator);
-    }
+  this->addSeparator(frame, renderView);
 
   if (this->isButtonVisible("SelectSurfaceCells", renderView))
     {

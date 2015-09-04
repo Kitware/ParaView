@@ -89,8 +89,6 @@ public:
     vtkSMSourceProxy* output, vtkSMSourceProxy* input,
     vtkSMSourceProxy* dataSource, int outputport);
 
-
-
 protected:
   vtkSMSelectionHelper() {};
   ~vtkSMSelectionHelper() {};
