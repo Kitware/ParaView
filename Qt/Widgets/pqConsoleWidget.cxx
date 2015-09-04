@@ -269,6 +269,29 @@ public:
     this->setFocusPolicy(Qt::WheelFocus);
   }
 
+  /// overridden to handle middle-button click pasting in *nix
+  void mouseReleaseEvent(QMouseEvent* e)
+  {
+    if (e->button() == Qt::MidButton)
+      {
+      QTextEdit::mouseReleaseEvent(e);
+
+      // At this point, the InteractivePosition has not been
+      // updated. Read the buffer from the previous
+      // InteractivePosition and store that in the history.
+      QString pastedCommand = this->toPlainText().mid(this->InteractivePosition);
+      if (this->CommandHistory.size() > 0)
+        {
+        this->commandBuffer() = pastedCommand;
+        }
+      else
+        {
+        this->CommandHistory.push_back(pastedCommand);
+        }
+      this->CommandPosition = this->CommandHistory.size() - 1;
+      }
+  }
+
   void updateCompleterIfVisible()
   {
     if (this->Completer && this->Completer->popup()->isVisible())
@@ -394,7 +417,9 @@ public:
   int InteractivePosition;
   /// Stores command-history, plus the current command buffer
   QStringList CommandHistory;
-  /// Stores the current position in the command-history
+  /// Stores the current position in the command-history. This is an
+  /// index into the history of commands, not an index into the
+  /// command buffer.
   int CommandPosition;
 };
 
