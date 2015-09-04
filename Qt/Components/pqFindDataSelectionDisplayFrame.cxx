@@ -410,6 +410,8 @@ pqFindDataSelectionDisplayFrame::pqFindDataSelectionDisplayFrame(
   pqActiveObjects& activeObjects = pqActiveObjects::instance();
   this->connect(&activeObjects, SIGNAL(portChanged(pqOutputPort*)),
                 SLOT(setSelectedPort(pqOutputPort*)));
+  this->connect(&activeObjects, SIGNAL(dataUpdated()),
+                SLOT(onDataUpdated()));
   this->setSelectedPort(activeObjects.activePort());
   // if no pqSelectionManager, then one must use public API to set the active
   // selection manually.
@@ -716,4 +718,85 @@ void pqFindDataSelectionDisplayFrame::editLabelPropertiesSelection()
   dialog.exec();
   this->updateInteractiveSelectionLabelProperties();
   END_UNDO_SET();
+}
+
+//-----------------------------------------------------------------------------
+void pqFindDataSelectionDisplayFrame::onDataUpdated()
+{
+  // remove a label array name that does not exist anymore
+  int fieldAssociations[] = 
+    {vtkDataObject::FIELD_ASSOCIATION_CELLS,
+     vtkDataObject::FIELD_ASSOCIATION_POINTS};
+  const char* selectionArrayNames[] = 
+    {"SelectionCellFieldDataArrayName", "SelectionPointFieldDataArrayName"};
+  const char* selectionVisibilityNames[] = 
+    {"SelectionCellLabelVisibility", "SelectionPointLabelVisibility"};
+  const char* iSelectionArrayNames[] =
+    {"CellFieldDataArrayName", "PointFieldDataArrayName"};
+  const char* iSelectionVisibilityNames[] = 
+    {"CellLabelVisibility", "PointLabelVisibility"};
+
+  pqDataRepresentation* pqrepresentation = 
+    this->Internals->Port->getRepresentation(this->Internals->View);
+  if (! pqrepresentation)
+    {
+    return;
+    }
+  vtkSMProxy* selectionRepresentation = pqrepresentation->getProxy();
+  vtkSMProxy* iSelectionRepresentation =
+    vtkSMInteractiveSelectionPipeline::GetInstance()->
+    GetOrCreateSelectionRepresentation();
+  for (int i = 0; i < 2; ++i)
+    {
+    int fieldAssociation = fieldAssociations[i];
+    const char* iSelectionVisibilityName = iSelectionVisibilityNames[i];
+    const char* iSelectionArrayName = iSelectionArrayNames[i];
+    const char* selectionVisibilityName = selectionVisibilityNames[i];
+    const char* selectionArrayName = selectionArrayNames[i];
+
+    QString arrayName;
+    if (vtkSMPropertyHelper(
+          selectionRepresentation, selectionVisibilityName,
+          true).GetAsInt() != 0)
+      {
+      arrayName= vtkSMPropertyHelper(
+        selectionRepresentation, selectionArrayName,
+        /*quiet=*/true).GetAsString();
+      }
+    if (! arrayName.isEmpty())
+      {
+      vtkPVDataSetAttributesInformation* attrInfo=
+        this->Internals->attributeInformation(fieldAssociation);
+      if (!attrInfo)
+        {
+        return;
+        }
+
+      bool found = false;
+      for (int cc=0; cc < attrInfo->GetNumberOfArrays(); cc++)
+        {
+        vtkPVArrayInformation* arrayInfo = attrInfo->GetArrayInformation(cc);
+        if (arrayName == arrayInfo->GetName())
+          {
+          found = true;
+          break;
+          }
+        }
+      if (! found)
+        {
+        // update selection representation
+        vtkSMPropertyHelper(
+          selectionRepresentation, selectionVisibilityName, true).Set(0);
+        vtkSMPropertyHelper(
+          selectionRepresentation, selectionArrayName, /*quiet=*/true).Set("");
+        selectionRepresentation->UpdateVTKObjects();
+        // update interactive selection representation
+        vtkSMPropertyHelper(iSelectionRepresentation,
+                            iSelectionVisibilityName, true).Set(0);
+        vtkSMPropertyHelper(iSelectionRepresentation,
+                            iSelectionArrayName, /*quiet=*/true).Set("");
+        iSelectionRepresentation->UpdateVTKObjects();
+        }
+      }
+    }
 }
