@@ -74,6 +74,11 @@ public:
   // Get the internal display proxy.
   vtkSMRepresentationProxy* getRepresentationProxy() const;
 
+protected:
+
+  // Overridden to set up some additional Qt connections
+  virtual void setView(pqView* view);
+
 public slots:
   // If lookuptable is set up and is used for coloring,
   // then calling this method resets the table ranges to match the current 
@@ -85,10 +90,6 @@ public slots:
   // range of the selected array over time. This can potentially be a slow
   // processes hence use with caution!!!
   void resetLookupTableScalarRangeOverTime();
-
-private:
-  class pqInternal;
-  pqInternal* Internal; 
 };
 
 #endif

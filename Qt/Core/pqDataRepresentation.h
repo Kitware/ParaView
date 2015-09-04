@@ -116,6 +116,16 @@ signals:
   /// coloring settings on the representation.
   void colorArrayNameModified();
 
+public slots:
+  /// Slot to update the lookup table if the application setting to
+  /// reset it on visibility changes is on.
+  virtual void updateLookupTable();
+
+  virtual void resetAllTransferFunctionRangesUsingCurrentData();
+
+  /// Overridden to set the VisibilityChangedSinceLastUpdate flag.
+  virtual void onVisibilityChanged();
+
 protected slots:
   /// called when input property on display changes. We must detect if
   /// (and when) the display is connected to a new proxy.

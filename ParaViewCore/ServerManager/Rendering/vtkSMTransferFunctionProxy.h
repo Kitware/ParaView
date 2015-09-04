@@ -238,6 +238,18 @@ public:
     }
 
   // Description:
+
+  // Helper method to compute the active annotated values in visible
+  // representations that use the transfer function.
+  virtual bool ComputeAvailableAnnotations(bool extend=false);
+  static bool ComputeAvailableAnnotations(vtkSMProxy* proxy, bool extend=false)
+  {
+    vtkSMTransferFunctionProxy* self =
+      vtkSMTransferFunctionProxy::SafeDownCast(proxy);
+    return self ? self->ComputeAvailableAnnotations(extend) : false;
+  }
+
+  // Description:
   // Helper method to reset a transfer function proxy to its XML defaults. By
   // passing in preserve_range, you can make this method preserve the current
   // transfer function range.

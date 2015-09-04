@@ -107,7 +107,7 @@ protected:
 
   /// Called by pqView when this representation gets added to / removed from the
   /// view.
-  void setView(pqView*);
+  virtual void setView(pqView*);
 
 private:
   class pqInternal;

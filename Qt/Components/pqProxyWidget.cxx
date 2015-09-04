@@ -1222,7 +1222,7 @@ bool pqProxyWidget::filterWidgets(bool show_advanced, const QString& filterText)
     show_advanced = true;
     }
 
-  // this->Panel->hide();
+  this->hide();
 
   delete this->layout();
   QVBoxLayout* vboxLayout = NULL;
@@ -1284,7 +1284,7 @@ bool pqProxyWidget::filterWidgets(bool show_advanced, const QString& filterText)
       }
     }
 
-  // this->Panel->show();
+  this->show();
   return (prevItem != NULL);
 }
 

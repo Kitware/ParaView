@@ -96,6 +96,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/ResetToVisibleRange.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SaveLargeScreenshot.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TestIsoVolume.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/TransferFunctionResetOnVisibilityChange.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/UpdateTransferFunctionRanges.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/XYChart.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/XYHistogram.xml
@@ -175,6 +176,7 @@ list(APPEND TESTS_WITH_BASELINES
   )
 
 list(APPEND TESTS_WITH_BASELINES
+  ${CMAKE_CURRENT_SOURCE_DIR}/Annotations.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CopyPasteProperties.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRBaseline.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRClip.xml
