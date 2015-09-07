@@ -611,11 +611,6 @@ def __render(ss, v, title, nframes):
         for i in range(nframes):
             c.Elevation(0.5)
             Render()
-            if not servermanager.fromGUI:
-                sys.stdout.write(".")
-                sys.stdout.flush()
-        if not servermanager.fromGUI:
-            sys.stdout.write("\n")
         tpr = (time.time() - c1)/nframes
         ncells = ss.GetDataInformation().GetNumberOfCells()
         print tpr, " secs/frame"
@@ -656,7 +651,6 @@ def run(filename=None, nframes=60):
     # Color by normals
     lt = servermanager.rendering.PVLookupTable()
     rep.LookupTable = lt
-    rep.ColorAttributeType = 0 # point data
     rep.ColorArrayName = "Normals"
     lt.RGBPoints = [-1, 0, 0, 1, 0.0288, 1, 0, 0]
     lt.ColorSpace = 'HSV'
