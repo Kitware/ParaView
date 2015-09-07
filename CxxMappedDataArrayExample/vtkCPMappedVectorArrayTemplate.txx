@@ -382,6 +382,14 @@ template <class Scalar> void vtkCPMappedVectorArrayTemplate<Scalar>
 
 //------------------------------------------------------------------------------
 template <class Scalar> void vtkCPMappedVectorArrayTemplate<Scalar>
+::InsertVariantValue(vtkIdType, vtkVariant)
+{
+  vtkErrorMacro("Read only container.")
+  return;
+}
+
+//------------------------------------------------------------------------------
+template <class Scalar> void vtkCPMappedVectorArrayTemplate<Scalar>
 ::RemoveTuple(vtkIdType)
 {
   vtkErrorMacro("Read only container.")

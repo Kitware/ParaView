@@ -17,7 +17,7 @@
 #include <vtkXMLPUnstructuredGridWriter.h>
 
 #include <string>
-#include <vtksys/ios/sstream>
+#include <sstream>
 
 vtkStandardNewMacro(vtkCPVTKPipeline);
 

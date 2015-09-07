@@ -88,6 +88,7 @@ public:
   void InterpolateTuple(vtkIdType i, vtkIdType id1, vtkAbstractArray *source1,
                         vtkIdType id2, vtkAbstractArray *source2, double t);
   void SetVariantValue(vtkIdType idx, vtkVariant value);
+  void InsertVariantValue(vtkIdType idx, vtkVariant value);
   void RemoveTuple(vtkIdType id);
   void RemoveFirstTuple();
   void RemoveLastTuple();
