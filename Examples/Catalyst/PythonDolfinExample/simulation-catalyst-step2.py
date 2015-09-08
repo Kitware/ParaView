@@ -184,8 +184,8 @@ while tstep < maxtimestep:
     # pfile << p1
 
     # [SC14-Catalyst] convert solution to VTK grid
-    ugrid = None 
- 
+    ugrid = None
+
     # [SC14-Catalyst] trigger catalyst execution
     coProcess(ugrid,t,tstep)
 

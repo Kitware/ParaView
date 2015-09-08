@@ -15,14 +15,14 @@ def CreateCoProcessor():
   def _CreatePipeline(coprocessor, datadescription):
     class Pipeline:
       filename_10_vthb = coprocessor.CreateProducer( datadescription, "input" )
-      
+
       Slice1 = Slice( guiName="Slice1", Crinkleslice=0, SliceOffsetValues=[0.0], Triangulatetheslice=1, SliceType="Plane" )
       Slice1.SliceType.Offset = 0.0
       Slice1.SliceType.Origin = [1.9627925694422252, 50.0, 50.0]
       Slice1.SliceType.Normal = [1.0, 0.0, 0.0]
-      
+
       ParallelMultiBlockDataSetWriter1 = coprocessor.CreateWriter( XMLMultiBlockDataWriter, "filename_%t.vtm", 10 )
-      
+
     return Pipeline()
 
   class CoProcessor(coprocessing.CoProcessor):

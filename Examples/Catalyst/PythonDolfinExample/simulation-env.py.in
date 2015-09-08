@@ -9,4 +9,3 @@ SOURCE_DIR='@DOLFIN_EXAMPLE_SOURCE_DIR@'
 PV_PYTHON_PATH = [PV_MAIN_DIR+'/lib/'+PV_MAIN_SUBDIR+'/site-packages', PV_MAIN_DIR+'/lib/'+PV_MAIN_SUBDIR,PV_MAIN_DIR+'/lib/'+PV_MAIN_SUBDIR+'/site-packages/vtk']
 
 sys.path = PV_PYTHON_PATH + sys.path
-

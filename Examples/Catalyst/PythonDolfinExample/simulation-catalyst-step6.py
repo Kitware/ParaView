@@ -81,59 +81,59 @@ def coProcess(grid, time, step):
 
 # [SC14-Catalyst] convert dolfin mesh to a VTK unstructured grid
 def Mesh2VTKUGrid(mesh):
-	vtkcelltypes=((),(vtk.VTK_EMPTY_CELL,vtk.VTK_VERTEX,vtk.VTK_LINE),(vtk.VTK_EMPTY_CELL,vtk.VTK_VERTEX,vtk.VTK_LINE,vtk.VTK_TRIANGLE,vtk.VTK_QUAD,vtk.VTK_POLYGON,vtk.VTK_POLYGON),(vtk.VTK_EMPTY_CELL,vtk.VTK_VERTEX,vtk.VTK_LINE,vtk.VTK_TRIANGLE,vtk.VTK_TETRA,vtk.VTK_CONVEX_POINT_SET,vtk.VTK_CONVEX_POINT_SET,vtk.VTK_CONVEX_POINT_SET,vtk.VTK_HEXAHEDRON))
-	npoints=mesh.num_vertices()
-	geom=mesh.geometry()
-	pts=vtk.vtkPoints()
-	pts.SetNumberOfPoints(npoints)
-	for i in xrange(npoints):
-		p=geom.point(i)
-		pts.SetPoint(i,p.x(),p.y(),p.z())
-	dim = mesh.topology().dim()
-	ncells=mesh.num_cells()
-	cells=vtk.vtkCellArray()
-	cellTypes=vtk.vtkUnsignedCharArray()
-	cellTypes.SetNumberOfTuples(ncells)
-	cellLocations=vtk.vtkIdTypeArray()
-	cellLocations.SetNumberOfTuples(ncells)
-	loc=0
-	for (cell,i) in zip(mesh.cells(),xrange(ncells)) :
-		ncellpoints=len(cell)
-		cells.InsertNextCell(ncellpoints)
-		for cpoint in cell:
-			cells.InsertCellPoint(cpoint)
-		cellTypes.SetTuple1(i,vtkcelltypes[dim][ncellpoints])
-		cellLocations.SetTuple1(i,loc)
-		loc+=1+ncellpoints
-	ugrid = vtk.vtkUnstructuredGrid()
-	ugrid.SetPoints(pts)
-	ugrid.SetCells(cellTypes,cellLocations,cells)
-	return ugrid
+    vtkcelltypes=((),(vtk.VTK_EMPTY_CELL,vtk.VTK_VERTEX,vtk.VTK_LINE),(vtk.VTK_EMPTY_CELL,vtk.VTK_VERTEX,vtk.VTK_LINE,vtk.VTK_TRIANGLE,vtk.VTK_QUAD,vtk.VTK_POLYGON,vtk.VTK_POLYGON),(vtk.VTK_EMPTY_CELL,vtk.VTK_VERTEX,vtk.VTK_LINE,vtk.VTK_TRIANGLE,vtk.VTK_TETRA,vtk.VTK_CONVEX_POINT_SET,vtk.VTK_CONVEX_POINT_SET,vtk.VTK_CONVEX_POINT_SET,vtk.VTK_HEXAHEDRON))
+    npoints=mesh.num_vertices()
+    geom=mesh.geometry()
+    pts=vtk.vtkPoints()
+    pts.SetNumberOfPoints(npoints)
+    for i in xrange(npoints):
+        p=geom.point(i)
+        pts.SetPoint(i,p.x(),p.y(),p.z())
+    dim = mesh.topology().dim()
+    ncells=mesh.num_cells()
+    cells=vtk.vtkCellArray()
+    cellTypes=vtk.vtkUnsignedCharArray()
+    cellTypes.SetNumberOfTuples(ncells)
+    cellLocations=vtk.vtkIdTypeArray()
+    cellLocations.SetNumberOfTuples(ncells)
+    loc=0
+    for (cell,i) in zip(mesh.cells(),xrange(ncells)) :
+        ncellpoints=len(cell)
+        cells.InsertNextCell(ncellpoints)
+        for cpoint in cell:
+            cells.InsertCellPoint(cpoint)
+        cellTypes.SetTuple1(i,vtkcelltypes[dim][ncellpoints])
+        cellLocations.SetTuple1(i,loc)
+        loc+=1+ncellpoints
+    ugrid = vtk.vtkUnstructuredGrid()
+    ugrid.SetPoints(pts)
+    ugrid.SetCells(cellTypes,cellLocations,cells)
+    return ugrid
 
 # [SC14-Catalyst] convert a flattened sequence of values to VTK double array
 def Values2VTKArray(values,n,name):
-	ncomps=len(values)/n
-	array=vtk.vtkDoubleArray()
-	array.SetNumberOfComponents(ncomps)
-	array.SetNumberOfTuples(n)
+    ncomps=len(values)/n
+    array=vtk.vtkDoubleArray()
+    array.SetNumberOfComponents(ncomps)
+    array.SetNumberOfTuples(n)
         for i in range(n):
             a = []
             for j in range(ncomps):
                 a.append(values[i+j*n])
             array.SetTupleValue(i, a)
 
-	array.SetName(name)
-	return array
+    array.SetName(name)
+    return array
 
 def AddFieldData(ugrid, pointArrays, cellArrays ):
-	# add Point data fields
-	npoints = ugrid.GetNumberOfPoints()
-	for (name,values) in pointArrays:
-		ugrid.GetPointData().AddArray( Values2VTKArray(values,npoints,name) )
-	# add Cell data fields
-	ncells = ugrid.GetNumberOfCells()
-	for (name,values) in cellArrays:
-		ugrid.GetCellData().AddArray( Values2VTKArray(values,ncells,name) )
+    # add Point data fields
+    npoints = ugrid.GetNumberOfPoints()
+    for (name,values) in pointArrays:
+        ugrid.GetPointData().AddArray( Values2VTKArray(values,npoints,name) )
+    # add Cell data fields
+    ncells = ugrid.GetNumberOfCells()
+    for (name,values) in cellArrays:
+        ugrid.GetCellData().AddArray( Values2VTKArray(values,ncells,name) )
 
 # Begin demo
 
@@ -248,7 +248,7 @@ while tstep < maxtimestep:
 
     # [SC14-Catalyst] convert solution to VTK grid
     ugrid = Mesh2VTKUGrid( u1.function_space().mesh() )
- 
+
     # [SC14-Catalyst] add field data to the VTK grid
     velocity = u1.compute_vertex_values()
     pressure = p1.compute_vertex_values()

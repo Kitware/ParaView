@@ -124,4 +124,3 @@ def DoCoProcessing(datadescription):
     coprocessor.WriteData(datadescription)
     coprocessor.WriteImages(datadescription)
     coprocessor.DoLiveVisualization(datadescription,"localhost",22222)
-

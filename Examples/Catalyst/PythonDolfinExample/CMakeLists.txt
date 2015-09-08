@@ -48,5 +48,3 @@ configure_file(
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/simulation-env.py.in
     ${CMAKE_CURRENT_BINARY_DIR}/simulation-env.py @ONLY)
-
-

@@ -88,5 +88,3 @@ def coprocess(time, timeStep, grid, attributes):
         dataDescription.GetInputDescriptionByName("input").SetGrid(imageData)
         dataDescription.GetInputDescriptionByName("input").SetWholeExtent(0, grid.NumberOfGlobalXPoints-1, 0, grid.NumberOfYPoints-1, 0, grid.NumberOfZPoints-1)
         coProcessor.CoProcess(dataDescription)
-
-
