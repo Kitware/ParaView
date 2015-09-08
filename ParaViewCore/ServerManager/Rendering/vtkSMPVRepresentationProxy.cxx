@@ -687,7 +687,7 @@ vtkPVArrayInformation* vtkSMPVRepresentationProxy::GetArrayInformationForColorAr
       colorArrayHelper.GetInputArrayAssociation());
     if (arrayInfoFromData)
       {
-        return arrayInfoFromData; 
+      return arrayInfoFromData; 
       }
     }
 
