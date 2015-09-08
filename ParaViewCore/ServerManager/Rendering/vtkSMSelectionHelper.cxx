@@ -923,29 +923,57 @@ bool vtkSMSelectionHelper::ToggleSelection(
     vtkSMPropertyHelper outputIDs(output, "Blocks");
     vtkSMPropertyHelper inputIDs(input, "Blocks");
 
+    // Store ids to toggle as vector , so set is ordered correctly.
     std::vector<vtkIdType> ids;
-    std::set<vtkIdType> idsToRemove;
+    std::set< std::vector<vtkIdType> > idsToToggle;
     unsigned int cc;
-    unsigned int count = outputIDs.GetNumberOfElements();
+    unsigned int count = outputIDs.GetNumberOfElements() / selectionTupleSize;
     for (cc=0; cc < count; cc++)
       {
-      idsToRemove.insert(outputIDs.GetAsIdType(cc));
+      std::vector<vtkIdType> id;
+      for (int i = 0; i < selectionTupleSize; i++)
+        {
+        id.push_back(outputIDs.GetAsIdType(cc * selectionTupleSize + i));
+        }
+      idsToToggle.insert(id);
       }
 
-    count = inputIDs.GetNumberOfElements();
+    // Insert ids only if non present in set. remove for idToToggle if present
+    count = inputIDs.GetNumberOfElements() / selectionTupleSize;
     for (cc=0; cc < count; cc++)
       {
-      vtkIdType id = inputIDs.GetAsIdType(cc);
-      if (idsToRemove.find(id) == idsToRemove.end())
+      std::vector<vtkIdType> id;
+      for (int i = 0; i < selectionTupleSize; i++)
         {
-        ids.push_back(inputIDs.GetAsIdType(cc));
+        id.push_back(inputIDs.GetAsIdType(cc * selectionTupleSize + i));
+        }
+      if (idsToToggle.find(id) == idsToToggle.end())
+        {
+        for (int i = 0; i < selectionTupleSize; i++)
+          {
+          ids.push_back(id[i]);
+          }
+        }
+      else
+        {
+        idsToToggle.erase(id);
         }
       }
+
+    // Insert new element, remaining in idToToggle
+    for (std::set< std::vector<vtkIdType> >::const_iterator it = idsToToggle.begin();
+         it != idsToToggle.end(); it++)
+      {
+        for (int i = 0; i < selectionTupleSize; i++)
+          {
+          ids.push_back((*it)[i]);
+          }
+      }
+ 
     outputIDs.Set(&ids[0], static_cast<unsigned int>(ids.size()));
     output->UpdateVTKObjects();
     return true;
     }
-
   return false;
 }
 
