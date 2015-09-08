@@ -6,6 +6,13 @@ if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
   QT5_WRAP_UI(UI_BUILT_SOURCES
     ParaViewMainWindow.ui)
   list( APPEND Qt5_FIND_COMPONENTS Network )
+  if (APPLE)
+    # XXX: The Qt5 plugin for Cocoa (Plugins/platforms/libqcocoa.dylib in the
+    # dmg file) links to QtPrintSupport.framework, but is not brought into the
+    # package by fixup_bundle. Link to it from ParaView so that it gets brought
+    # in properly.
+    list( APPEND Qt5_FIND_COMPONENTS PrintSupport )
+  endif ()
   include( ParaViewQt5 )
 else ()
   QT4_WRAP_CPP(MOC_BUILT_SOURCES
@@ -92,6 +99,8 @@ build_paraview_client(paraview
 if( PARAVIEW_QT_VERSION VERSION_GREATER "4" )
   set_target_properties(paraview PROPERTIES
     COMPILE_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+  target_link_libraries(paraview
+    LINK_PRIVATE ${QT_LIBRARIES})
 endif()
 
 # Link against the documentation module.
