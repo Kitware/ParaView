@@ -682,9 +682,13 @@ vtkPVArrayInformation* vtkSMPVRepresentationProxy::GetArrayInformationForColorAr
   unsigned int port = inputHelper.GetOutputPort();
   if (input)
     {
-    return input->GetDataInformation(port)->GetArrayInformation(
+    vtkPVArrayInformation* arrayInfoFromData = input->GetDataInformation(port)->GetArrayInformation(
       colorArrayHelper.GetInputArrayNameToProcess(),
       colorArrayHelper.GetInputArrayAssociation());
+    if (arrayInfoFromData)
+      {
+      return arrayInfoFromData; 
+      }
     }
 
   vtkPVArrayInformation* arrayInfo =
