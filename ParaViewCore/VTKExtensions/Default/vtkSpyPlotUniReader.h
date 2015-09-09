@@ -91,8 +91,6 @@ public:
 
   double* GetTimeArray();
 
-  const char* GetCellFieldDescription(int field);
-
   // Description:
   // Returns 1 if the grid information contained in the file has
   // Adaptive Mesh Refinement (AMR) else it returns 0

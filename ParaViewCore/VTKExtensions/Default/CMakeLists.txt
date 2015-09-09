@@ -182,6 +182,11 @@ set_source_files_properties(
   )
 
 set_source_files_properties(
+  vtkSpyPlotBlockIterator
+  PROPERTIES WRAP_EXCLUDE_PYTHON 1
+  )
+
+set_source_files_properties(
   vtkCellIntegrator
   vtkPEnSightReader
   vtkSciVizStatistics

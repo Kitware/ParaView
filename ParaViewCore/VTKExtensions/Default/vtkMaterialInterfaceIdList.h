@@ -24,9 +24,10 @@
 #define __vtkMaterialInterfaceIdList_h
 
 #include <vector>
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMaterialInterfaceIdListItem.h"
 
-class vtkMaterialInterfaceIdList
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMaterialInterfaceIdList
 {
 public:
   vtkMaterialInterfaceIdList()
@@ -48,17 +49,6 @@ public:
   // Initialize the container with a list of id's
   // these must be in ascending order.
   void Initialize(std::vector<int> ids, bool preSorted=false);
-  // Description:
-  // Initialize the container from the ids that have
-  // been pushed. This must be done before querrying.
-  void Initialize();
-  // Description:
-  // Add a fragment id to the list. Return its index.
-  int PushId();
-  // Description:
-  // Add a fragment id to the list, if it is unique.
-  // Return its index or -1 to indicate its not unique.
-  int PushUniqueId();
   // Description:
   // Given a global id, get the local id, or -1 if the
   // global id is not in the list.

@@ -22,9 +22,11 @@
 #ifndef __vtkMaterialInterfaceToProcMap_h
 #define __vtkMaterialInterfaceToProcMap_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
+
 #include <vector>
 
-class vtkMaterialInterfaceToProcMap
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMaterialInterfaceToProcMap
 {
 public:
   vtkMaterialInterfaceToProcMap(){ this->Clear(); }
@@ -42,8 +44,6 @@ public:
   int GetProcOwnsPiece(int procId, int fragmentId) const;
   void SetProcOwnsPiece(int procId, int fragmentId);
   void SetProcOwnsPiece(int fragmentId);
-  void UnSetProcOwnsPiece(int procId, int fragmentId);
-  void UnSetProcOwnsPiece(int fragmentId);
   std::vector<int> WhoHasAPiece(int fragmentId, int excludeProc) const;
   std::vector<int> WhoHasAPiece(int fragmentId) const;
   int GetProcCount(int fragmentId){ return this->ProcCount[fragmentId]; }

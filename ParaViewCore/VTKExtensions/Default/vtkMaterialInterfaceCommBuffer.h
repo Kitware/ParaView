@@ -15,6 +15,7 @@
 #ifndef __vtkMaterialInterfaceCommBuffer_h
 #define __vtkMaterialInterfaceCommBuffer_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkSystemIncludes.h"
 
 #include<vector>
@@ -31,7 +32,7 @@ class vtkFloatArray;
 // Can be used to send all attributes and ids
 // in a single send. UnPack in the same order that you
 // packed.
-class vtkMaterialInterfaceCommBuffer
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMaterialInterfaceCommBuffer
 {
 public:
   // header layout

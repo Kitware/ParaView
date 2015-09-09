@@ -23,9 +23,10 @@
 #define __vtkMaterialInterfaceProcessRing_h
 
 #include <vector>
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMaterialInterfaceProcessLoading.h"
 
-class vtkMaterialInterfaceProcessRing
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMaterialInterfaceProcessRing
 {
 public:
   // Description:

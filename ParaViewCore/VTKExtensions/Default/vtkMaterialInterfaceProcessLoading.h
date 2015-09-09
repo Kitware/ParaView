@@ -20,12 +20,14 @@
 #ifndef __vtkMaterialInterfaceProcessLoading_h
 #define __vtkMaterialInterfaceProcessLoading_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
+
 #include <cassert>
 #include "vtkType.h"
 #include <iostream>
 #include <vector>
 
-class vtkMaterialInterfaceProcessLoading
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMaterialInterfaceProcessLoading
 {
   public:
     enum {ID=0, LOADING=1, SIZE=2};
@@ -87,8 +89,10 @@ class vtkMaterialInterfaceProcessLoading
   private:
     vtkIdType Data[SIZE];
 };
-std::ostream &operator<<(std::ostream &sout, vtkMaterialInterfaceProcessLoading &fp);
-std::ostream &operator<<(std::ostream &sout, std::vector<vtkMaterialInterfaceProcessLoading> &vfp);
+VTKPVVTKEXTENSIONSDEFAULT_EXPORT
+std::ostream &operator<<(std::ostream &sout, const vtkMaterialInterfaceProcessLoading &fp);
+VTKPVVTKEXTENSIONSDEFAULT_EXPORT
+std::ostream &operator<<(std::ostream &sout, const std::vector<vtkMaterialInterfaceProcessLoading> &vfp);
 #endif
 
 
