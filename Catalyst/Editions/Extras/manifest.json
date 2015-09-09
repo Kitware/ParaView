@@ -123,6 +123,7 @@
         { "class":"vtkIntegrateAttributes" },
         { "class":"vtkParallelSerialWriter" },
         { "class":"vtkPExtractHistogram" },
+        { "class":"vtkPVNullSource" },
         { "class":"vtkPVTransform" }
       ],
       "cswrap":true,
@@ -248,7 +249,14 @@
     },
     { "path":"ParaViewCore/ServerManager/SMApplication/Resources/utilities.xml",
       "proxies":[
-        "Transform2"
+        "Transform2",
+        "XMLPImageDataWriter",
+        "XMLPRectilinearGridWriter",
+        "XMLPStructuredGridWriter",
+        "XMLPPolyDataWriter",
+        "XMLPUnstructuredGridWriter",
+        "XMLMultiBlockDataWriter",
+        "XMLHierarchicalBoxDataWriter"
       ]
     },
     { "path":"ParaViewCore/ServerManager/SMApplication/Resources/sources.xml",
