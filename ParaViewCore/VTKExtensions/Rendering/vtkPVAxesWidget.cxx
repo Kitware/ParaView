@@ -185,6 +185,8 @@ void vtkPVAxesWidget::SetEnabled(int enabling)
     this->AxesActor->SetVisibility(0);
     if (this->ParentRenderer)
       {
+      // release the resources of the renderer we own
+      this->Renderer->ReleaseGraphicsResources(this->ParentRenderer->GetRenderWindow());
       if (this->ParentRenderer->GetRenderWindow())
         {
         this->ParentRenderer->GetRenderWindow()->RemoveRenderer(this->Renderer);
@@ -194,6 +196,10 @@ void vtkPVAxesWidget::SetEnabled(int enabling)
         {
         this->ParentRenderer->RemoveObserver(this->StartEventObserverId);
         }
+      }
+    else
+      {
+      vtkErrorMacro("Widget disabled without parent window, this should never happen.");
       }
 
     this->InvokeEvent(vtkCommand::DisableEvent, NULL);
