@@ -14,7 +14,6 @@
 =========================================================================*/
 
 #include "vtkMaterialInterfaceIdList.h"
-using std::vector;
 #include <cassert>
 #include <algorithm>
 
@@ -49,10 +48,33 @@ int search(
     return -1;
   }
 }
+}
+
+// PIMPL class
+class vtkMaterialInterfaceIdList::IdListContainer :
+  public std::vector<vtkMaterialInterfaceIdListItem>
+{
 };
 
+vtkMaterialInterfaceIdList::vtkMaterialInterfaceIdList()
+{
+  this->IsInitialized=false;
+  this->IdList = new IdListContainer;
+}
 //
-void vtkMaterialInterfaceIdList::Initialize(vector<int> ids, bool preSorted)
+vtkMaterialInterfaceIdList::~vtkMaterialInterfaceIdList()
+{
+  delete this->IdList;
+}
+//
+void vtkMaterialInterfaceIdList::Clear()
+{
+  this->IdList->clear();
+  this->IsInitialized=false;
+}
+//
+void vtkMaterialInterfaceIdList::Initialize(
+  const std::vector<int>& ids, bool preSorted)
 {
   // Prep.
   this->Clear();
@@ -64,18 +86,18 @@ void vtkMaterialInterfaceIdList::Initialize(vector<int> ids, bool preSorted)
   }
   // Make a copy of incoming, convert to list items to track
   // local id as items are sorted.
-  this->IdList.resize(nLocalIds);
+  this->IdList->resize(nLocalIds);
   for (int localId=0; localId<nLocalIds; ++localId)
   {
     int globalId=ids[localId];
-    this->IdList[localId].Initialize(localId,globalId);
+    (*this->IdList)[localId].Initialize(localId,globalId);
   }
   // Sort incoming items to support efficient searching.
   if (!preSorted)
   {
     // Heap sort, because these are likely to be, if not completely
     // in order almost in order.
-    partial_sort(this->IdList.begin(), this->IdList.end(), this->IdList.end());
+    partial_sort(this->IdList->begin(), this->IdList->end(), this->IdList->end());
   }
   this->IsInitialized=true;
 }
@@ -86,8 +108,8 @@ int vtkMaterialInterfaceIdList::GetLocalId(int globalId)
          && this->IsInitialized);
 
   const int firstListItem=0;
-  const int lastListItem = static_cast<int>(this->IdList.size()) - 1;
+  const int lastListItem = static_cast<int>(this->IdList->size()) - 1;
   vtkMaterialInterfaceIdListItem itemToFind(globalId);
   return
-    search(&this->IdList[0],firstListItem,lastListItem,itemToFind);
+    search(&(*this->IdList)[0],firstListItem,lastListItem,itemToFind);
 }

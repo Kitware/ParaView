@@ -23,39 +23,31 @@
 #ifndef __vtkMaterialInterfaceIdList_h
 #define __vtkMaterialInterfaceIdList_h
 
-#include <vector>
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMaterialInterfaceIdListItem.h"
+
+#include <vector> // needed for Initialize method
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMaterialInterfaceIdList
 {
 public:
-  vtkMaterialInterfaceIdList()
-  {
-    this->Clear();
-  }
-  ~vtkMaterialInterfaceIdList()
-  {
-    this->Clear();
-  }
+  vtkMaterialInterfaceIdList();
+  ~vtkMaterialInterfaceIdList();
   // Description:
   // Return the container to an empty state.
-  void Clear()
-  {
-    this->IdList.clear();
-    this->IsInitialized=false;
-  }
+  void Clear();
   // Description:
   // Initialize the container with a list of id's
   // these must be in ascending order.
-  void Initialize(std::vector<int> ids, bool preSorted=false);
+  void Initialize(const std::vector<int>& ids, bool preSorted=false);
   // Description:
   // Given a global id, get the local id, or -1 if the
   // global id is not in the list.
   int GetLocalId(int globalId);
 private:
   bool IsInitialized;
-  std::vector<vtkMaterialInterfaceIdListItem> IdList;
+  class IdListContainer;
+  IdListContainer *IdList;
 };
 #endif
 

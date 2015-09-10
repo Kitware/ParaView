@@ -24,15 +24,16 @@
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
-#include <vector>
+#include <vector> // for WhoHasAPiece()
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMaterialInterfaceToProcMap
 {
 public:
-  vtkMaterialInterfaceToProcMap(){ this->Clear(); }
+  vtkMaterialInterfaceToProcMap();
   vtkMaterialInterfaceToProcMap(int nFragments);
   vtkMaterialInterfaceToProcMap(int nProcs, int nFragments);
   vtkMaterialInterfaceToProcMap(const vtkMaterialInterfaceToProcMap &other);
+  ~vtkMaterialInterfaceToProcMap();
   vtkMaterialInterfaceToProcMap &operator=(const vtkMaterialInterfaceToProcMap &rhs);
   // logistics
   void Clear();
@@ -46,13 +47,15 @@ public:
   void SetProcOwnsPiece(int fragmentId);
   std::vector<int> WhoHasAPiece(int fragmentId, int excludeProc) const;
   std::vector<int> WhoHasAPiece(int fragmentId) const;
-  int GetProcCount(int fragmentId){ return this->ProcCount[fragmentId]; }
+  int GetProcCount(int fragmentId);
 private:
   // proc -> fragment -> bit mask, bit is 1 if
   // the fragment is on proc
-  std::vector<std::vector<int> > PieceToProcMap;
+  class PieceToProcMapContainer;
+  PieceToProcMapContainer *PieceToProcMap;
   // fragment id -> count num procs
-  std::vector<int> ProcCount;
+  class ProcCountContainer;
+  ProcCountContainer *ProcCount;
 
   int NProcs;     // number of procs
   int NFragments; // number of fragments to map

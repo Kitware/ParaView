@@ -19,8 +19,9 @@
 #ifndef __vtkMaterialInterfaceIdListItem_h
 #define __vtkMaterialInterfaceIdListItem_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
-class vtkMaterialInterfaceIdListItem
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMaterialInterfaceIdListItem
 {
 public:
   enum {LOCAL_ID=0, GLOBAL_ID=1, SIZE=2};
