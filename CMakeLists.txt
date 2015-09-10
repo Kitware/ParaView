@@ -329,7 +329,7 @@ if (APPLE AND PARAVIEW_DO_UNIX_STYLE_INSTALLS)
     # Allow the user to set a custom install_name directory. This is useful for
     # using ParaView as an SDK where the binaries are not necessarily in the
     # same place as ParaView's binaries.
-    set(CMAKE_INSTALL_NAME_DIR "${PARAVIEW_CUSTOM_INSTALL_NAME_DIR}")
+    set(CMAKE_INSTALL_NAME_DIR "${PARAVIEW_CUSTOM_INSTALL_NAME_DIR}/${VTK_INSTALL_LIBRARY_DIR}")
   else ()
     # Set CMAKE_INSTALL_NAME_DIR to point to the libraries directory relative
     # to the executable.
