@@ -53,7 +53,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkChart.h"
 #include "vtkCollection.h"
-#include "vtkContextScene.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
@@ -206,7 +205,7 @@ QActionGroup* pqStandardViewFrameActionsImplementation::addSelectionModifierActi
       tr("Add selection (Ctrl)"));
     plusAction->setObjectName("actionAddSelection");
     plusAction->setCheckable(true);
-    plusAction->setData(QVariant(vtkContextScene::SELECTION_ADDITION));
+    plusAction->setData(QVariant(pqView::PV_SELECTION_ADDITION));
     }
 
   if (this->isButtonVisible("SubtractSelection", view))
@@ -216,7 +215,7 @@ QActionGroup* pqStandardViewFrameActionsImplementation::addSelectionModifierActi
       tr("Subtract selection (Shift)"));
     minusAction->setObjectName("actionSubtractSelection");
     minusAction->setCheckable(true);
-    minusAction->setData(QVariant(vtkContextScene::SELECTION_SUBTRACTION));
+    minusAction->setData(QVariant(pqView::PV_SELECTION_SUBTRACTION));
     }
 
   if (this->isButtonVisible("ToggleSelection", view))
@@ -226,7 +225,7 @@ QActionGroup* pqStandardViewFrameActionsImplementation::addSelectionModifierActi
       tr("Toggle selection (Ctrl+Shift)"));
     toggleAction->setObjectName("actionToggleSelection");
     toggleAction->setCheckable(true);
-    toggleAction->setData(QVariant(vtkContextScene::SELECTION_TOGGLE));
+    toggleAction->setData(QVariant(pqView::PV_SELECTION_TOGGLE));
     }
 
   QActionGroup* modeGroup = new QActionGroup(frame);

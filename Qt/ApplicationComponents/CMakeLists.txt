@@ -140,8 +140,6 @@ set (Module_SRCS
   pqFontPropertyWidget.h
   pqGenericPropertyWidgetDecorator.cxx
   pqGenericPropertyWidgetDecorator.h
-  pqGenericSelectionReaction.cxx
-  pqGenericSelectionReaction.h
   pqGlyphScaleFactorPropertyWidget.cxx
   pqGlyphScaleFactorPropertyWidget.h
   pqHelpReaction.cxx
@@ -232,6 +230,8 @@ set (Module_SRCS
   pqSaveStateReaction.h
   pqScalarBarVisibilityReaction.cxx
   pqScalarBarVisibilityReaction.h
+  pqSelectionReaction.cxx
+  pqSelectionReaction.h
   pqSeriesEditorPropertyWidget.cxx
   pqSeriesEditorPropertyWidget.h
   pqServerConnectReaction.cxx
@@ -338,7 +338,6 @@ set (Module_MOC_HDRS
   pqFixPathsInStateFilesBehavior.h
   pqFontPropertyWidget.h
   pqGenericPropertyWidgetDecorator.h
-  pqGenericSelectionReaction.h
   pqGlyphScaleFactorPropertyWidget.h
   pqHelpReaction.h
   pqIgnoreSourceTimeReaction.h
@@ -383,6 +382,7 @@ set (Module_MOC_HDRS
   pqSaveScreenshotReaction.h
   pqSaveStateReaction.h
   pqScalarBarVisibilityReaction.h
+  pqSelectionReaction.h
   pqSeriesEditorPropertyWidget.h
   pqServerConnectReaction.h
   pqServerDisconnectReaction.h

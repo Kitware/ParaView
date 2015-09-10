@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqRenderViewSelectionReaction_h
 #define __pqRenderViewSelectionReaction_h
 
-#include "pqGenericSelectionReaction.h"
+#include "pqSelectionReaction.h"
 #include <QPointer>
 #include <QCursor>
 #include "vtkWeakPointer.h"
@@ -49,10 +49,10 @@ class vtkObject;
 /// at most 1 view (and 1 type of selection) is in selection-mode at any given
 /// time.
 class PQAPPLICATIONCOMPONENTS_EXPORT pqRenderViewSelectionReaction :
-  public pqGenericSelectionReaction
+  public pqSelectionReaction
 {
   Q_OBJECT
-  typedef pqGenericSelectionReaction Superclass;
+  typedef pqSelectionReaction Superclass;
 public:
   enum SelectionMode
     {

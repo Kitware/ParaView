@@ -497,10 +497,9 @@ void pqRenderViewSelectionReaction::onLeftButtonRelease()
     }
 
   int selectionModifier = this->getSelectionModifier();
-  if (selectionModifier == vtkContextScene::SELECTION_NONE 
-    || selectionModifier == vtkContextScene::SELECTION_DEFAULT)
+  if (selectionModifier == pqView::PV_SELECTION_DEFAULT)
     {
-    selectionModifier = vtkContextScene::SELECTION_ADDITION;
+    selectionModifier = pqView::PV_SELECTION_ADDITION;
     }
 
   int region[4] = {x, y, x, y};
@@ -533,15 +532,15 @@ int pqRenderViewSelectionReaction::getSelectionModifier()
   bool shift = rmp->GetInteractor()->GetShiftKey() == 1;
   if (ctrl && shift)
     {
-    selectionModifier = vtkContextScene::SELECTION_TOGGLE;
+    selectionModifier = pqView::PV_SELECTION_TOGGLE;
     }
   else if (ctrl)
     {
-    selectionModifier = vtkContextScene::SELECTION_ADDITION;
+    selectionModifier = pqView::PV_SELECTION_ADDITION;
     }
   else if (shift)
     {
-    selectionModifier = vtkContextScene::SELECTION_SUBTRACTION;
+    selectionModifier = pqView::PV_SELECTION_SUBTRACTION;
     }
   return selectionModifier;
 }

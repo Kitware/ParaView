@@ -635,15 +635,15 @@ void pqRenderView::collectSelectionPorts(
 
     switch(selectionModifier)
       {
-      case(vtkContextScene::SELECTION_ADDITION):
+      case(pqView::PV_SELECTION_ADDITION):
         vtkSMSelectionHelper::MergeSelection(selectionSource,
           opPort->getSelectionInput(), selectedSource, opPort->getPortNumber());
         break;
-      case(vtkContextScene::SELECTION_SUBTRACTION):
+      case(pqView::PV_SELECTION_SUBTRACTION):
         vtkSMSelectionHelper::SubtractSelection(selectionSource,
           opPort->getSelectionInput(), selectedSource, opPort->getPortNumber());
         break;
-      case(vtkContextScene::SELECTION_TOGGLE):
+      case(pqView::PV_SELECTION_TOGGLE):
         vtkSMSelectionHelper::ToggleSelection(selectionSource,
           opPort->getSelectionInput(), selectedSource, opPort->getPortNumber());
         break;
@@ -788,7 +788,7 @@ void pqRenderView::selectFrustum(int rect[4])
   END_UNDO_EXCLUDE();
 
   this->collectSelectionPorts(selectedRepresentations,
-    selectionSources, output_ports, vtkContextScene::SELECTION_DEFAULT, false);
+    selectionSources, output_ports, pqView::PV_SELECTION_DEFAULT, false);
 
   // Fire selection event to let the world know that this view selected
   // something.
@@ -818,7 +818,7 @@ void pqRenderView::selectFrustumPoints(int rect[4])
   END_UNDO_EXCLUDE();
 
   this->collectSelectionPorts(selectedRepresentations,
-    selectionSources, output_ports, vtkContextScene::SELECTION_DEFAULT, false);
+    selectionSources, output_ports, pqView::PV_SELECTION_DEFAULT, false);
 
   // Fire selection event to let the world know that this view selected
   // something.

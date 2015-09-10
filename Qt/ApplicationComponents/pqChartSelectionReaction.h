@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqChartSelectionReaction_h 
 #define __pqChartSelectionReaction_h
 
-#include "pqGenericSelectionReaction.h"
+#include "pqSelectionReaction.h"
 #include <QPointer> // needed for QPointer.
 
 class pqContextView;
@@ -40,10 +40,10 @@ class vtkObject;
 
 /// @ingroup Reactions
 /// Reaction for creating selections on chart views.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqChartSelectionReaction : public pqGenericSelectionReaction
+class PQAPPLICATIONCOMPONENTS_EXPORT pqChartSelectionReaction : public pqSelectionReaction
 {
   Q_OBJECT
-  typedef pqGenericSelectionReaction Superclass;
+  typedef pqSelectionReaction Superclass;
 public:
   /// Constructor. \c parent is expected to have data() that indicates the
   /// selection type e.g. vtkChart::SELECT_RECTANGLE or vtkChart::SELECT_POLYGON.
@@ -74,6 +74,8 @@ protected slots:
   /// called when modifier group is changed.
   virtual void modifiersChanged();
 
+  // Get the current state of selection modifier, converting it to vtkScene enum
+  int getSelectionModifier();
 private:
   Q_DISABLE_COPY(pqChartSelectionReaction)
   QPointer<pqContextView> View;

@@ -155,3 +155,27 @@ void pqChartSelectionReaction::triggered(bool checked)
       }
     }
 }
+
+//-----------------------------------------------------------------------------
+int pqChartSelectionReaction::getSelectionModifier()
+{
+  int selectionModifier = this->Superclass::getSelectionModifier();
+  switch(selectionModifier)
+    {
+   case(pqView::PV_SELECTION_DEFAULT):
+      return vtkContextScene::SELECTION_DEFAULT; 
+      break;
+    case(pqView::PV_SELECTION_ADDITION):
+      return vtkContextScene::SELECTION_ADDITION; 
+      break;
+    case(pqView::PV_SELECTION_SUBTRACTION):
+      return vtkContextScene::SELECTION_SUBTRACTION; 
+      break;
+    case(pqView::PV_SELECTION_TOGGLE):
+      return vtkContextScene::SELECTION_TOGGLE; 
+      break;
+    default:
+      return vtkContextScene::SELECTION_NONE;
+      break;
+    }
+}

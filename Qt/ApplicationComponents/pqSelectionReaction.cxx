@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqGenericSelectionReaction.cxx
+   Module:    pqSelectionReaction.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,14 +29,12 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqGenericSelectionReaction.h"
-
-#include "vtkContextScene.h"
-
+#include "pqSelectionReaction.h"
+#include "pqView.h"
 #include <QActionGroup>
 
 //-----------------------------------------------------------------------------
-int pqGenericSelectionReaction::getSelectionModifier()
+int pqSelectionReaction::getSelectionModifier()
 {
   if (this->ModifierGroup)
     {
@@ -50,10 +48,10 @@ int pqGenericSelectionReaction::getSelectionModifier()
         }
       }
     }
-  return vtkContextScene::SELECTION_DEFAULT;
+  return pqView::PV_SELECTION_DEFAULT;
 }
 
-void pqGenericSelectionReaction::uncheckSelectionModifiers()
+void pqSelectionReaction::uncheckSelectionModifiers()
 {
   if (this->ModifierGroup)
     {
@@ -64,7 +62,7 @@ void pqGenericSelectionReaction::uncheckSelectionModifiers()
     } 
 }
 
-void pqGenericSelectionReaction::disableSelectionModifiers(bool disable)
+void pqSelectionReaction::disableSelectionModifiers(bool disable)
 {
   if (this->ModifierGroup)
     { 
@@ -76,7 +74,7 @@ void pqGenericSelectionReaction::disableSelectionModifiers(bool disable)
     }
 }
 //-----------------------------------------------------------------------------
-pqGenericSelectionReaction::pqGenericSelectionReaction(
+pqSelectionReaction::pqSelectionReaction(
   QAction *parentObject, QActionGroup* modifierGroup)
 : Superclass(parentObject), ModifierGroup(modifierGroup)
 {

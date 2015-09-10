@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "pqRenderViewBase.h"
-#include "vtkContextScene.h"
 #include <QColor> // needed for return type.
 
 class pqDataRepresentation;
@@ -148,8 +147,8 @@ public:
 public:
   /// Creates a new surface selection given the rectangle in display
   /// coordinates.
-  void selectOnSurface(int rectangle[4], int selectionModifier = vtkContextScene::SELECTION_DEFAULT);
-  void selectPointsOnSurface(int rectangle[4], int selectionModifier = vtkContextScene::SELECTION_DEFAULT);
+  void selectOnSurface(int rectangle[4], int selectionModifier = pqView::PV_SELECTION_DEFAULT);
+  void selectPointsOnSurface(int rectangle[4], int selectionModifier = pqView::PV_SELECTION_DEFAULT);
 
   /// Picks the representation at the given position.
   /// This will result in firing the picked(pqOutputPort*) signal on successful
@@ -168,15 +167,15 @@ public:
 
   /// Creates a "block" selection given the rectangle in display coordinates.
   /// block selection is selection of a block in a composite dataset.
-  void selectBlock(int rectangle[4], int selectionModifier = vtkContextScene::SELECTION_DEFAULT);
+  void selectBlock(int rectangle[4], int selectionModifier = pqView::PV_SELECTION_DEFAULT);
 
   /// Creates a new surface points selection given the polygon in display
   /// coordinates.
-  void selectPolygonPoints(vtkIntArray* polygon, int selectionModifier = vtkContextScene::SELECTION_DEFAULT);
+  void selectPolygonPoints(vtkIntArray* polygon, int selectionModifier = pqView::PV_SELECTION_DEFAULT);
 
   /// Creates a new surface cells selection given the polygon in display
   /// coordinates.
-  void selectPolygonCells(vtkIntArray* polygon, int selectionModifier = vtkContextScene::SELECTION_DEFAULT);
+  void selectPolygonCells(vtkIntArray* polygon, int selectionModifier = pqView::PV_SELECTION_DEFAULT);
 
 signals:
   // Triggered when interaction mode change underneath

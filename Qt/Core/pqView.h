@@ -57,6 +57,13 @@ class PQCORE_EXPORT pqView : public pqProxy
   Q_OBJECT
   typedef pqProxy Superclass;
 public:
+  enum SelectionModifier {
+    PV_SELECTION_DEFAULT = 0,
+    PV_SELECTION_ADDITION,
+    PV_SELECTION_SUBTRACTION,
+    PV_SELECTION_TOGGLE
+  };
+
   virtual ~pqView();
 
   /// Returns the internal render Module proxy associated with this object.

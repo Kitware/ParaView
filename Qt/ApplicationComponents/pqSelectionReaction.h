@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqGenericSelectionReaction.h
+   Module:    pqSelectionReaction.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqGenericSelectionReaction_h 
-#define __pqGenericSelectionReaction_h
+#ifndef __pqSelectionReaction_h 
+#define __pqSelectionReaction_h
 
 #include "pqReaction.h"
 #include <QPointer> // needed for QPointer.
@@ -38,20 +38,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QActionGroup;
 
 /// @ingroup Reactions
-/// Reaction for creating selections on chart views.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqGenericSelectionReaction : public pqReaction
+/// Generric reaction for creating selections on views.
+class PQAPPLICATIONCOMPONENTS_EXPORT pqSelectionReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
   /// Constructor.\c modifierGroup is used to determine selection modifier. If
   /// there's a non-null checkedAction() in the group, we use that action's
   /// data() to determine the selection mode e.g.
-  /// vtkContextScene::SELECTION_ADDITION,
-  /// vtkContextScene::SELECTION_SUBTRACTION etc. If no QActionGroup is
+  /// pqView::PVSELECTION_ADDITION,
+  /// pqView::PVSELECTION_SUBTRACTION etc. If no QActionGroup is
   /// specified or no checked action is present, then the default mode of
-  /// vtkContextScene::SELECTION_DEFAULT is used.
-  pqGenericSelectionReaction(QAction* parent, QActionGroup* modifierGroup = NULL);
+  /// pqView::PVSELECTION_DEFAULT is used.
+  pqSelectionReaction(QAction* parent, QActionGroup* modifierGroup = NULL);
 
 protected slots:
   /// called when modifier group is changed.
@@ -70,7 +71,7 @@ protected:
   QPointer<QActionGroup> ModifierGroup;
 
 private:
-  Q_DISABLE_COPY(pqGenericSelectionReaction)
+  Q_DISABLE_COPY(pqSelectionReaction)
 };
 
 #endif
