@@ -310,7 +310,7 @@ bool vtkSMTransferFunctionProxy::RescaleTransferFunction(
     rangeMin = std::min(rangeMin, preNormalizationRange[0]);
     rangeMax = std::max(rangeMax, preNormalizationRange[1]);
     }
-  if (points.front()[0] == rangeMin && points.back()[0] == rangeMax)
+  if (preNormalizationRange[0] == rangeMin && preNormalizationRange[1] == rangeMax)
     {
     // current range is same as the new range. Nothing to do here.
     return true;
