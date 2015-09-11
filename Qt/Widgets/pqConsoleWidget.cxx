@@ -235,6 +235,7 @@ public:
         
       case Qt::Key_Return:
       case Qt::Key_Enter:
+        checkForPastedText();
         e->accept();
         
         text_cursor.setPosition(this->documentEnd());
@@ -275,21 +276,26 @@ public:
     if (e->button() == Qt::MidButton)
       {
       QTextEdit::mouseReleaseEvent(e);
-
-      // At this point, the InteractivePosition has not been
-      // updated. Read the buffer from the previous
-      // InteractivePosition and store that in the history.
-      QString pastedCommand = this->toPlainText().mid(this->InteractivePosition);
-      if (this->CommandHistory.size() > 0)
-        {
-        this->commandBuffer() = pastedCommand;
-        }
-      else
-        {
-        this->CommandHistory.push_back(pastedCommand);
-        }
-      this->CommandPosition = this->CommandHistory.size() - 1;
+      checkForPastedText();
       }
+  }
+
+  // checkForPastedText looks at the text buffer to see if there is any un-registered
+  // data. This is necessary because pasting into the buffer can alter the buffer
+  // without causing an event. This function is called after the return key is
+  // pressed to guarantee that the entire buffer is used.
+  void checkForPastedText()
+  {
+    QString pastedCommand = this->toPlainText().mid(this->InteractivePosition);
+    if (this->CommandHistory.size() > 0)
+      {
+      this->commandBuffer() = pastedCommand;
+      }
+    else
+      {
+      this->CommandHistory.push_back(pastedCommand);
+      }
+    this->CommandPosition = this->CommandHistory.size() - 1;
   }
 
   void updateCompleterIfVisible()
