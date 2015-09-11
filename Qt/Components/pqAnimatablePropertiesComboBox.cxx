@@ -294,7 +294,7 @@ vtkSMProxy* pqAnimatablePropertiesComboBox::getCurrentProxy() const
       pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
       pqPipelineSource* src = smmodel->findItem<pqPipelineSource*>(info.Proxy);
       QList<vtkSMProxy*> helperProxies = src->getHelperProxies("RepresentationAnimationHelper");
-      if (helperProxies.size() > info.DisplayPort)
+      if (static_cast<unsigned int>(helperProxies.size()) > info.DisplayPort)
         {
         return helperProxies[info.DisplayPort];
         }
