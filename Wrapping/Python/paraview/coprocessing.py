@@ -333,7 +333,7 @@ class CoProcessor(object):
         self.__CinemaTracksList.append({"name":name, "proxy":proxy, "smproperty":smproperty, "valrange":valrange})
         return proxy
 
-    def RegisterView(self, view, filename, freq, fittoscreen, magnification, width, height, cinema):
+    def RegisterView(self, view, filename, freq, fittoscreen, magnification, width, height, cinema=None):
         """Register a view for image capture with extra meta-data such
         as magnification, size and frequency."""
         if not isinstance(view, servermanager.Proxy):
@@ -555,7 +555,7 @@ class CoProcessor(object):
 
         #make track for the camera rotation
         cinemaOptions = view.cpCinemaOptions
-        if cinemaOptions['camera'] == 'Spherical':
+        if cinemaOptions and cinemaOptions.get('camera') == 'Spherical':
             fnpattern = fnpattern + "{phi}/{theta}/"
             if 'initial' in cinemaOptions:
                 eye = cinemaOptions['initial']['eye']
