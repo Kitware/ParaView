@@ -15,6 +15,10 @@ macro(vtk_add_cs_wrapping module)
       "may not have been imported correctly.")
   endif()
 
+  if(NOT ${module}_EXCLUDE_FROM_WRAP_HIERARCHY)
+    set(KIT_HIERARCHY_FILE ${${module}_WRAP_HIERARCHY_FILE})
+  endif()
+
   pv_pre_wrap_vtk_mod_cs("${module}CS" "${module}")
   vtk_module_dep_includes(${module})
   vtk_add_library(${module}CS STATIC ${${module}CS_SRCS})
