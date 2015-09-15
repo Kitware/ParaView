@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QAbstractButton>
 #include <QApplication>
+#include <QDebug>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -198,8 +199,13 @@ unsigned long pqCoreUtilities::connect(
   QObject* qobject, const char* signal_or_slot,
   Qt::ConnectionType type/* = Qt::AutoConnection*/)
 {
+  Q_ASSERT(vtk_object != NULL);
+  Q_ASSERT(qobject != NULL);
+  Q_ASSERT(signal_or_slot != NULL);
   if (vtk_object == NULL || qobject == NULL || signal_or_slot == NULL)
     {
+    // qCritical is Qt's 'print error message' stream
+    qCritical() << "Error: Cannot connect to or from NULL.";
     return 0;
     }
 
