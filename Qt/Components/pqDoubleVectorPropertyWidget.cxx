@@ -32,7 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqDoubleVectorPropertyWidget.h"
 
+#include "vtkCollection.h"
 #include "vtkCommand.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSMArrayRangeDomain.h"
 #include "vtkSMBoundsDomain.h"
 #include "vtkSMDomain.h"
@@ -46,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqDoubleRangeWidget.h"
 #include "pqHighlightablePushButton.h"
+#include "pqLabel.h"
 #include "pqLineEdit.h"
 #include "pqPropertiesPanel.h"
 #include "pqScalarValueListPropertyWidget.h"
@@ -68,6 +71,13 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
   if(!dvp)
     {
     return;
+    }
+
+  vtkPVXMLElement *hints = dvp->GetHints();
+  vtkPVXMLElement *showLabels = NULL;
+  if (hints != NULL)
+    {
+    showLabels = hints->FindNestedElementByName("ShowComponentLabels");
     }
   
   // find the domain
@@ -140,6 +150,29 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
       // unbounded ranges are represented with a line edit
       int elementCount = dvp->GetNumberOfElements();
 
+      std::vector<const char*> componentLabels;
+      componentLabels.resize(elementCount);
+
+      if (showLabels)
+        {
+        vtkNew<vtkCollection> elements;
+        showLabels->GetElementsByName("ComponentLabel", elements.GetPointer());
+        for (int i = 0; i < elements->GetNumberOfItems(); ++i)
+          {
+          vtkPVXMLElement *labelElement =
+            vtkPVXMLElement::SafeDownCast(elements->GetItemAsObject(i));
+          if (!labelElement)
+            {
+            continue;
+            }
+          int component;
+          if (labelElement->GetScalarAttribute("component", &component))
+            {
+            componentLabels[component] = labelElement->GetAttributeOrEmpty("label");
+            }
+          }
+        }
+
       if(elementCount == 6)
         {
         QGridLayout *gridLayout = new QGridLayout;
@@ -153,7 +186,17 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
           lineEdit->setObjectName(QString("LineEdit%1").arg(i));
           lineEdit->setTextAndResetCursor(
             QVariant(vtkSMPropertyHelper(smProperty).GetAsDouble(i)).toString());
-          gridLayout->addWidget(lineEdit, i, 0);
+          if (showLabels)
+            {
+            pqLabel *label = new pqLabel(componentLabels[i],this);
+            label->setAlignment(Qt::AlignTop|Qt::AlignHCenter);
+            gridLayout->addWidget(label, (i * 2), 0);
+            gridLayout->addWidget(lineEdit, (i * 2) + 1, 0);
+            }
+          else
+            {
+            gridLayout->addWidget(lineEdit, i, 0);
+            }
           this->addPropertyLink(lineEdit, "text2",
                                 SIGNAL(textChanged(const QString&)), dvp, i);
           this->connect(lineEdit, SIGNAL(textChangedAndEditingFinished()),
@@ -164,7 +207,17 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
           lineEdit->setObjectName(QString("LineEdit%1").arg(i+3));
           lineEdit->setTextAndResetCursor(
             QVariant(vtkSMPropertyHelper(smProperty).GetAsDouble(i + 3)).toString());
-          gridLayout->addWidget(lineEdit, i, 1);
+          if (showLabels)
+            {
+            pqLabel *label = new pqLabel(componentLabels[i + 3],this);
+            label->setAlignment(Qt::AlignTop|Qt::AlignHCenter);
+            gridLayout->addWidget(label, (i * 2), 1);
+            gridLayout->addWidget(lineEdit, (i * 2) + 1, 1);
+            }
+          else
+            {
+            gridLayout->addWidget(lineEdit, i, 1);
+            }
           this->addPropertyLink(lineEdit, "text2",
                                 SIGNAL(textChanged(const QString&)), dvp, i + 3);
           this->connect(lineEdit, SIGNAL(textChangedAndEditingFinished()),
@@ -182,6 +235,12 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
         {
         for(unsigned int i = 0; i < dvp->GetNumberOfElements(); i++)
           {
+          if (showLabels)
+            {
+            pqLabel *label = new pqLabel(componentLabels[i], this);
+            label->setAlignment(Qt::AlignTop|Qt::AlignHCenter);
+            layoutLocal->addWidget(label);
+            }
           pqLineEdit *lineEdit = new pqLineEdit(this);
           lineEdit->setValidator(new QDoubleValidator(lineEdit));
           lineEdit->setObjectName(QString("LineEdit%1").arg(i));
