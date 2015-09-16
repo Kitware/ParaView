@@ -779,6 +779,204 @@ bool vtkSMSelectionHelper::SubtractSelection(
   return false;
 }
 
+//-----------------------------------------------------------------------------
+bool vtkSMSelectionHelper::ToggleSelection(
+  vtkSMSourceProxy* output, vtkSMSourceProxy* input,
+  vtkSMSourceProxy* dataSource, int dataPort)
+{
+  if (!output || !input)
+    {
+    return false;
+    }
+
+  // Currently only index based selections i.e. ids, global ids based selections
+  // are subtractable and that too only is input and output are identical in all
+  // respects (except the indices ofcourse).
+  if (vtkSMPropertyHelper(output, "FieldType").GetAsInt() !=
+    vtkSMPropertyHelper(input, "FieldType").GetAsInt())
+    {
+    return false;
+    }
+
+  if (vtkSMPropertyHelper(output, "ContainingCells").GetAsInt() !=
+    vtkSMPropertyHelper(input, "ContainingCells").GetAsInt())
+    {
+    return false;
+    }
+
+  if (vtkSMPropertyHelper(output, "InsideOut").GetAsInt() !=
+    vtkSMPropertyHelper(input, "InsideOut").GetAsInt())
+    {
+    return false;
+    }
+
+  vtkSmartPointer<vtkSMSourceProxy> tempInput;
+  if (strcmp(output->GetXMLName(), input->GetXMLName()) != 0)
+    {
+    // before totally giving up, check to see if the input selection can be
+    // converted to the same type as the output.
+    std::string inputType = input->GetXMLName();
+    std::string outputType = output->GetXMLName();
+
+    if (
+      (inputType == "GlobalIDSelectionSource" &&
+       outputType == "IDSelectionSource") ||
+      (inputType == "GlobalIDSelectionSource" &&
+       outputType == "CompositeDataIDSelectionSource") ||
+      (inputType == "IDSelectionSource" &&
+       outputType == "GlobalIDSelectionSource") ||
+      (inputType == "CompositeDataIDSelectionSource" &&
+       outputType == "GlobalIDSelectionSource"))
+      {
+      int type = vtkSelectionNode::INDICES;
+      if (outputType == "GlobalIDSelectionSource")
+        {
+        type = vtkSelectionNode::GLOBALIDS;
+        }
+
+      // Conversion is possible!.
+      tempInput.TakeReference(vtkSMSourceProxy::SafeDownCast(
+          vtkSMSelectionHelper::ConvertSelection(type,
+            input,
+            dataSource,
+            dataPort)));
+      input = tempInput;
+      }
+    else
+      {
+      return false;
+      }
+    }
+
+  // Recover type of selection, so we know what is contained in selection source
+  std::string inputType = input->GetXMLName();
+  int selectionTupleSize = 1;
+  if (inputType == "ThresholdSelectionSource" || inputType == "IDSelectionSource")
+    {
+    selectionTupleSize = 2;
+    }
+  else if (inputType=="CompositeDataIDSelectionSource" || inputType == "HierarchicalDataIDSelectionSource")
+    {
+    selectionTupleSize = 3;
+    }
+
+  // Toggle IDs or Blocks properties.
+  if (output->GetProperty("IDs") && input->GetProperty("IDs"))
+    {
+    vtkSMPropertyHelper outputIDs(output, "IDs");
+    vtkSMPropertyHelper inputIDs(input, "IDs");
+
+    // Store ids to toggle as vector , so set is ordered correctly.
+    std::vector<vtkIdType> ids;
+    std::set< std::vector<vtkIdType> > idsToToggle;
+    unsigned int cc;
+    unsigned int count = outputIDs.GetNumberOfElements() / selectionTupleSize;
+    for (cc=0; cc < count; cc++)
+      {
+      std::vector<vtkIdType> id;
+      for (int i = 0; i < selectionTupleSize; i++)
+        {
+        id.push_back(outputIDs.GetAsIdType(cc * selectionTupleSize + i));
+        }
+      idsToToggle.insert(id);
+      }
+
+    // Insert ids only if non present in set. remove for idToToggle if present
+    count = inputIDs.GetNumberOfElements() / selectionTupleSize;
+    for (cc=0; cc < count; cc++)
+      {
+      std::vector<vtkIdType> id;
+      for (int i = 0; i < selectionTupleSize; i++)
+        {
+        id.push_back(inputIDs.GetAsIdType(cc * selectionTupleSize + i));
+        }
+      if (idsToToggle.find(id) == idsToToggle.end())
+        {
+        for (int i = 0; i < selectionTupleSize; i++)
+          {
+          ids.push_back(id[i]);
+          }
+        }
+      else
+        {
+        idsToToggle.erase(id);
+        }
+      }
+
+    // Insert new element, remaining in idToToggle
+    for (std::set< std::vector<vtkIdType> >::const_iterator it = idsToToggle.begin();
+         it != idsToToggle.end(); it++)
+      {
+        for (int i = 0; i < selectionTupleSize; i++)
+          {
+          ids.push_back((*it)[i]);
+          }
+      }
+ 
+    outputIDs.Set(&ids[0], static_cast<unsigned int>(ids.size()));
+    output->UpdateVTKObjects();
+    return true;
+    }
+
+  if (output->GetProperty("Blocks") && input->GetProperty("Blocks"))
+    {
+    vtkSMPropertyHelper outputIDs(output, "Blocks");
+    vtkSMPropertyHelper inputIDs(input, "Blocks");
+
+    // Store ids to toggle as vector , so set is ordered correctly.
+    std::vector<vtkIdType> ids;
+    std::set< std::vector<vtkIdType> > idsToToggle;
+    unsigned int cc;
+    unsigned int count = outputIDs.GetNumberOfElements() / selectionTupleSize;
+    for (cc=0; cc < count; cc++)
+      {
+      std::vector<vtkIdType> id;
+      for (int i = 0; i < selectionTupleSize; i++)
+        {
+        id.push_back(outputIDs.GetAsIdType(cc * selectionTupleSize + i));
+        }
+      idsToToggle.insert(id);
+      }
+
+    // Insert ids only if non present in set. remove for idToToggle if present
+    count = inputIDs.GetNumberOfElements() / selectionTupleSize;
+    for (cc=0; cc < count; cc++)
+      {
+      std::vector<vtkIdType> id;
+      for (int i = 0; i < selectionTupleSize; i++)
+        {
+        id.push_back(inputIDs.GetAsIdType(cc * selectionTupleSize + i));
+        }
+      if (idsToToggle.find(id) == idsToToggle.end())
+        {
+        for (int i = 0; i < selectionTupleSize; i++)
+          {
+          ids.push_back(id[i]);
+          }
+        }
+      else
+        {
+        idsToToggle.erase(id);
+        }
+      }
+
+    // Insert new element, remaining in idToToggle
+    for (std::set< std::vector<vtkIdType> >::const_iterator it = idsToToggle.begin();
+         it != idsToToggle.end(); it++)
+      {
+        for (int i = 0; i < selectionTupleSize; i++)
+          {
+          ids.push_back((*it)[i]);
+          }
+      }
+ 
+    outputIDs.Set(&ids[0], static_cast<unsigned int>(ids.size()));
+    output->UpdateVTKObjects();
+    return true;
+    }
+  return false;
+}
+
 namespace
 {
   // Splits \c selection into a collection of selections based on the

@@ -56,8 +56,8 @@ QPointer<pqRenderViewSelectionReaction> pqRenderViewSelectionReaction::ActiveRea
 
 //-----------------------------------------------------------------------------
 pqRenderViewSelectionReaction::pqRenderViewSelectionReaction(
-  QAction* parentObject, pqRenderView* view, SelectionMode mode)
-  : Superclass(parentObject),
+  QAction* parentObject, pqRenderView* view, SelectionMode mode, QActionGroup* modifierGroup)
+  : Superclass(parentObject, modifierGroup),
   View(view),
   Mode(mode),
   PreviousRenderViewMode(-1),
@@ -90,6 +90,17 @@ for (size_t i = 0;
         SLOT(updateEnableState()));
       }
     }
+
+  if (this->Mode == SELECT_FRUSTUM_CELLS || 
+      this->Mode == SELECT_FRUSTUM_POINTS)
+    {
+    this->DisableSelectionModifiers = true;
+    }
+  else
+    {
+    this->DisableSelectionModifiers = false;
+    }
+
   this->updateEnableState();
 }
 
@@ -173,11 +184,21 @@ void pqRenderViewSelectionReaction::beginSelection()
     return;
     }
 
+  // Check if this selection support selection modifier
   if (pqRenderViewSelectionReaction::ActiveReaction)
     {
+    // Check if selection are compatible, if not, deactivate selection modifiers
+    if (!pqRenderViewSelectionReaction::ActiveReaction->isCompatible(this->Mode))
+      {
+      this->uncheckSelectionModifiers();
+      }
+
     // Some other selection was active, end it before we start a new one.
     pqRenderViewSelectionReaction::ActiveReaction->endSelection();
     }
+
+  // Enable/Disable selection if supported
+  this->disableSelectionModifiers(this->DisableSelectionModifiers);
 
   pqRenderViewSelectionReaction::ActiveReaction = this;
 
@@ -211,6 +232,8 @@ void pqRenderViewSelectionReaction::beginSelection()
       "Use the 'Selection Display Inspector' to choose the array to label with.\n\n"
       "To add the currently "
       "highlighted element to the active selection, simply click on that element.\n\n"
+      "You can click on selection modifier button or use modifier keys to subtract or "
+      " even toggle the selection. Click outside of mesh to clear selection.\n\n"
       "Use the 'Esc' key or the same toolbar button to exit this mode.",
       QMessageBox::Ok | QMessageBox::Save);
     this->View->setCursor(Qt::CrossCursor);
@@ -322,32 +345,20 @@ void pqRenderViewSelectionReaction::selectionChanged(
     return;
     }
 
-  vtkSMRenderViewProxy* rmp = this->View->getRenderViewProxy();
-  Q_ASSERT(rmp != NULL);
-
   BEGIN_UNDO_EXCLUDE();
 
-  pqRenderView::pqSelectionOperator selOp = pqRenderView::PV_SELECTION_NEW;
-  if (rmp->GetInteractor()->GetControlKey() == 1)
-    {
-    selOp = pqRenderView::PV_SELECTION_MERGE;
-    }
-  else if (rmp->GetInteractor()->GetShiftKey() == 1)
-    {
-    selOp = pqRenderView::PV_SELECTION_SUBTRACT;
-    }
-
+  int selectionModifier = this->getSelectionModifier();
   int* region = reinterpret_cast<int*>(calldata);
   vtkObject* unsafe_object = reinterpret_cast<vtkObject*>(calldata);
 
   switch (this->Mode)
     {
   case SELECT_SURFACE_CELLS:
-    this->View->selectOnSurface(region, selOp);
+    this->View->selectOnSurface(region, selectionModifier);
     break;
 
   case SELECT_SURFACE_POINTS:
-    this->View->selectPointsOnSurface(region, selOp);
+    this->View->selectPointsOnSurface(region, selectionModifier);
     break;
 
   case SELECT_FRUSTUM_CELLS:
@@ -360,16 +371,16 @@ void pqRenderViewSelectionReaction::selectionChanged(
 
   case SELECT_SURFACE_CELLS_POLYGON:
     this->View->selectPolygonCells(vtkIntArray::SafeDownCast(unsafe_object),
-      selOp);
+      selectionModifier);
     break;
 
   case SELECT_SURFACE_POINTS_POLYGON:
     this->View->selectPolygonPoints(vtkIntArray::SafeDownCast(unsafe_object),
-      selOp);
+      selectionModifier);
     break;
 
   case SELECT_BLOCKS:
-    this->View->selectBlock(region, selOp);
+    this->View->selectBlock(region, selectionModifier);
     break;
 
   case SELECT_CUSTOM_BOX:
@@ -485,11 +496,10 @@ void pqRenderViewSelectionReaction::onLeftButtonRelease()
     return;
     }
 
-  vtkSMRenderViewProxy* rmp = this->View->getRenderViewProxy();
-  pqRenderView::pqSelectionOperator selOp = pqRenderView::PV_SELECTION_MERGE;
-  if (rmp->GetInteractor()->GetShiftKey() == 1)
+  int selectionModifier = this->getSelectionModifier();
+  if (selectionModifier == pqView::PV_SELECTION_DEFAULT)
     {
-    selOp = pqRenderView::PV_SELECTION_SUBTRACT;
+    selectionModifier = pqView::PV_SELECTION_ADDITION;
     }
 
   int region[4] = {x, y, x, y};
@@ -497,17 +507,69 @@ void pqRenderViewSelectionReaction::onLeftButtonRelease()
   switch (this->Mode)
     {
   case SELECT_SURFACE_CELLS_INTERACTIVELY:
-    this->View->selectOnSurface(region, selOp);
+    this->View->selectOnSurface(region, selectionModifier);
     break;
 
   case SELECT_SURFACE_POINTS_INTERACTIVELY:
-    this->View->selectPointsOnSurface(region, selOp);
+    this->View->selectPointsOnSurface(region, selectionModifier);
     break;
 
   default:
     qCritical("Invalid call to pqRenderViewSelectionReaction::onLeftButtonRelease");
     break;
     }
+}
+
+//-----------------------------------------------------------------------------
+int pqRenderViewSelectionReaction::getSelectionModifier()
+{
+  int selectionModifier = this->Superclass::getSelectionModifier();
+
+  vtkSMRenderViewProxy* rmp = this->View->getRenderViewProxy();
+  Q_ASSERT(rmp != NULL);
+
+  bool ctrl = rmp->GetInteractor()->GetControlKey() == 1;
+  bool shift = rmp->GetInteractor()->GetShiftKey() == 1;
+  if (ctrl && shift)
+    {
+    selectionModifier = pqView::PV_SELECTION_TOGGLE;
+    }
+  else if (ctrl)
+    {
+    selectionModifier = pqView::PV_SELECTION_ADDITION;
+    }
+  else if (shift)
+    {
+    selectionModifier = pqView::PV_SELECTION_SUBTRACTION;
+    }
+  return selectionModifier;
+}
+
+bool pqRenderViewSelectionReaction::isCompatible(SelectionMode mode)
+{
+  if (this->Mode == mode)
+    {
+    return true;
+    }
+  else if ((this->Mode == SELECT_SURFACE_CELLS ||
+       this->Mode == SELECT_SURFACE_CELLS_POLYGON ||
+       this->Mode == SELECT_SURFACE_CELLS_INTERACTIVELY) &&
+      (mode == SELECT_SURFACE_CELLS ||
+       mode == SELECT_SURFACE_CELLS_POLYGON ||
+       mode == SELECT_SURFACE_CELLS_INTERACTIVELY))
+    {
+    return true;
+    }
+  else if ((this->Mode == SELECT_SURFACE_POINTS ||
+       this->Mode == SELECT_SURFACE_POINTS_POLYGON ||
+       this->Mode == SELECT_SURFACE_POINTS_INTERACTIVELY) &&
+      (mode == SELECT_SURFACE_POINTS ||
+       mode == SELECT_SURFACE_POINTS_POLYGON ||
+       mode == SELECT_SURFACE_POINTS_INTERACTIVELY))
+    {
+    return true;
+    }
+  return false;
 }
 
 //-----------------------------------------------------------------------------

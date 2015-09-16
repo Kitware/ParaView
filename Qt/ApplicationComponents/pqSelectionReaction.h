@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqChartSelectionReaction.h
+   Module:    pqSelectionReaction.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,56 +29,49 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqChartSelectionReaction_h 
-#define __pqChartSelectionReaction_h
+#ifndef __pqSelectionReaction_h 
+#define __pqSelectionReaction_h
 
-#include "pqSelectionReaction.h"
+#include "pqReaction.h"
 #include <QPointer> // needed for QPointer.
 
-class pqContextView;
-class vtkObject;
+class QActionGroup;
 
 /// @ingroup Reactions
-/// Reaction for creating selections on chart views.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqChartSelectionReaction : public pqSelectionReaction
+/// Generric reaction for creating selections on views.
+class PQAPPLICATIONCOMPONENTS_EXPORT pqSelectionReaction : public pqReaction
 {
   Q_OBJECT
-  typedef pqSelectionReaction Superclass;
+  typedef pqReaction Superclass;
+
 public:
-  /// Constructor. \c parent is expected to have data() that indicates the
-  /// selection type e.g. vtkChart::SELECT_RECTANGLE or vtkChart::SELECT_POLYGON.
-  /// QActionGroup \c modifierGroup is used to determine selection modifier. If
+  /// Constructor.\c modifierGroup is used to determine selection modifier. If
   /// there's a non-null checkedAction() in the group, we use that action's
   /// data() to determine the selection mode e.g.
-  /// vtkContextScene::SELECTION_ADDITION,
-  /// vtkContextScene::SELECTION_SUBTRACTION etc. If no QActionGroup is
+  /// pqView::PVSELECTION_ADDITION,
+  /// pqView::PVSELECTION_SUBTRACTION etc. If no QActionGroup is
   /// specified or no checked action is present, then the default mode of
-  /// vtkContextScene::SELECTION_DEFAULT is used.
-  pqChartSelectionReaction(QAction* parent,
-    pqContextView* view, QActionGroup* modifierGroup);
-
-  /// start selection on the view where selectionType is one of
-  /// vtkChart::SELECT_POLYGON, vtkChart::SELECT_RECTANGLE, etc., and
-  /// selectionModifier is one of vtkContextScene::SELECTION_DEFAULT,
-  /// vtkContextScene::SELECTION_ADDITION, etc.
-  static void startSelection(pqContextView* view, 
-    int selectionType, int selectionModifier);
+  /// pqView::PVSELECTION_DEFAULT is used.
+  pqSelectionReaction(QAction* parent, QActionGroup* modifierGroup = NULL);
 
 protected slots:
-  /// Called when the action is triggered.
-  virtual void triggered(bool);
-
-  /// stops selecting on the view
-  void stopSelection();
-
   /// called when modifier group is changed.
-  virtual void modifiersChanged();
+  virtual void modifiersChanged() {}
 
-  // Get the current state of selection modifier, converting it to vtkScene enum
-  int getSelectionModifier();
+protected:
+  /// Get the current state of selection modifier, if any
+  virtual int getSelectionModifier();
+
+  /// Uncheck selection modifiers, if any
+  virtual void uncheckSelectionModifiers();
+
+  /// Disable/Enable selection modifiers, if any
+  virtual void disableSelectionModifiers(bool disable);
+
+  QPointer<QActionGroup> ModifierGroup;
+
 private:
-  Q_DISABLE_COPY(pqChartSelectionReaction)
-  QPointer<pqContextView> View;
+  Q_DISABLE_COPY(pqSelectionReaction)
 };
 
 #endif

@@ -51,6 +51,10 @@ set (Module_SRCS
   pqAxesToolbar.h
   pqBackgroundEditorWidget.cxx
   pqBackgroundEditorWidget.h
+  pqBoolPropertyWidgetDecorator.cxx
+  pqBoolPropertyWidgetDecorator.h
+  pqCTHArraySelectionDecorator.cxx
+  pqCTHArraySelectionDecorator.h
   pqCameraLinkReaction.cxx
   pqCameraLinkReaction.h
   pqCameraManipulatorWidget.cxx
@@ -66,10 +70,10 @@ set (Module_SRCS
   pqCatalystContinueReaction.h
   pqCatalystPauseSimulationReaction.cxx
   pqCatalystPauseSimulationReaction.h
-  pqCatalystSetBreakpointReaction.cxx
-  pqCatalystSetBreakpointReaction.h
   pqCatalystRemoveBreakpointReaction.cxx
   pqCatalystRemoveBreakpointReaction.h
+  pqCatalystSetBreakpointReaction.cxx
+  pqCatalystSetBreakpointReaction.h
   pqCategoryToolbarsBehavior.cxx
   pqCategoryToolbarsBehavior.h
   pqChangePipelineInputReaction.cxx
@@ -104,8 +108,6 @@ set (Module_SRCS
   pqCrashRecoveryBehavior.h
   pqCreateCustomFilterReaction.cxx
   pqCreateCustomFilterReaction.h
-  pqCTHArraySelectionDecorator.cxx
-  pqCTHArraySelectionDecorator.h
   pqCubeAxesPropertyWidget.cxx
   pqCubeAxesPropertyWidget.h
   pqDataQueryReaction.cxx
@@ -124,12 +126,8 @@ set (Module_SRCS
   pqEditCameraReaction.h
   pqEditColorMapReaction.cxx
   pqEditColorMapReaction.h
-  pqBoolPropertyWidgetDecorator.cxx
-  pqBoolPropertyWidgetDecorator.h
   pqEnableWidgetDecorator.cxx
   pqEnableWidgetDecorator.h
-  pqShowWidgetDecorator.cxx
-  pqShowWidgetDecorator.h
   pqExportReaction.cxx
   pqExportReaction.h
   pqFileNamePropertyWidget.cxx
@@ -160,10 +158,10 @@ set (Module_SRCS
   pqLoadDataReaction.h
   pqLoadPaletteReaction.cxx
   pqLoadPaletteReaction.h
-  pqLoadStateReaction.cxx
-  pqLoadStateReaction.h
   pqLoadRestoreWindowLayoutReaction.cxx
   pqLoadRestoreWindowLayoutReaction.h
+  pqLoadStateReaction.cxx
+  pqLoadStateReaction.h
   pqMainControlsToolbar.cxx
   pqMainControlsToolbar.h
   pqManageCustomFiltersReaction.cxx
@@ -180,6 +178,10 @@ set (Module_SRCS
   pqObjectPickingBehavior.h
   pqOpacityTableModel.cxx
   pqOpacityTableModel.h
+  pqPVAnimationWidget.cxx
+  pqPVAnimationWidget.h
+  pqPVApplicationCore.cxx
+  pqPVApplicationCore.h
   pqParaViewBehaviors.cxx
   pqParaViewBehaviors.h
   pqParaViewMenuBuilders.cxx
@@ -200,10 +202,6 @@ set (Module_SRCS
   pqPropertyGroupButton.h
   pqProxyGroupMenuManager.cxx
   pqProxyGroupMenuManager.h
-  pqPVAnimationWidget.cxx
-  pqPVAnimationWidget.h
-  pqPVApplicationCore.cxx
-  pqPVApplicationCore.h
   pqPythonShellReaction.cxx
   pqPythonShellReaction.h
   pqQtMessageHandlerBehavior.cxx
@@ -232,12 +230,16 @@ set (Module_SRCS
   pqSaveStateReaction.h
   pqScalarBarVisibilityReaction.cxx
   pqScalarBarVisibilityReaction.h
+  pqSelectionReaction.cxx
+  pqSelectionReaction.h
   pqSeriesEditorPropertyWidget.cxx
   pqSeriesEditorPropertyWidget.h
   pqServerConnectReaction.cxx
   pqServerConnectReaction.h
   pqServerDisconnectReaction.cxx
   pqServerDisconnectReaction.h
+  pqShowWidgetDecorator.cxx
+  pqShowWidgetDecorator.h
   pqSourcesMenuReaction.cxx
   pqSourcesMenuReaction.h
   pqSpreadSheetVisibilityBehavior.cxx
@@ -291,6 +293,8 @@ set (Module_MOC_HDRS
   pqAutoLoadPluginXMLBehavior.h
   pqAxesToolbar.h
   pqBackgroundEditorWidget.h
+  pqBoolPropertyWidgetDecorator.h
+  pqCTHArraySelectionDecorator.h
   pqCameraLinkReaction.h
   pqCameraManipulatorWidget.h
   pqCameraReaction.h
@@ -299,8 +303,8 @@ set (Module_MOC_HDRS
   pqCatalystConnectReaction.h
   pqCatalystContinueReaction.h
   pqCatalystPauseSimulationReaction.h
-  pqCatalystSetBreakpointReaction.h
   pqCatalystRemoveBreakpointReaction.h
+  pqCatalystSetBreakpointReaction.h
   pqCategoryToolbarsBehavior.h
   pqChangePipelineInputReaction.h
   pqChartSelectionReaction.h
@@ -318,7 +322,6 @@ set (Module_MOC_HDRS
   pqCopyReaction.h
   pqCrashRecoveryBehavior.h
   pqCreateCustomFilterReaction.h
-  pqCTHArraySelectionDecorator.h
   pqCubeAxesPropertyWidget.h
   pqDataQueryReaction.h
   pqDataTimeStepBehavior.h
@@ -328,9 +331,7 @@ set (Module_MOC_HDRS
   pqDoubleRangeSliderPropertyWidget.h
   pqEditCameraReaction.h
   pqEditColorMapReaction.h
-  pqBoolPropertyWidgetDecorator.h
   pqEnableWidgetDecorator.h
-  pqShowWidgetDecorator.h
   pqExportReaction.h
   pqFileNamePropertyWidget.h
   pqFiltersMenuReaction.h
@@ -345,8 +346,8 @@ set (Module_MOC_HDRS
   pqLightsEditor.h
   pqListPropertyWidget.h
   pqLoadDataReaction.h
-  pqLoadRestoreWindowLayoutReaction.h
   pqLoadPaletteReaction.h
+  pqLoadRestoreWindowLayoutReaction.h
   pqLoadStateReaction.h
   pqMainControlsToolbar.h
   pqManageCustomFiltersReaction.h
@@ -356,6 +357,8 @@ set (Module_MOC_HDRS
   pqModelTransformSupportBehavior.h
   pqObjectPickingBehavior.h
   pqOpacityTableModel.h
+  pqPVAnimationWidget.h
+  pqPVApplicationCore.h
   pqParaViewBehaviors.h
   pqPersistentMainWindowStateBehavior.h
   pqPipelineContextMenuBehavior.h
@@ -365,8 +368,6 @@ set (Module_MOC_HDRS
   pqPluginSettingsBehavior.h
   pqPropertyGroupButton.h
   pqProxyGroupMenuManager.h
-  pqPVAnimationWidget.h
-  pqPVApplicationCore.h
   pqPythonShellReaction.h
   pqQtMessageHandlerBehavior.h
   pqReaction.h
@@ -381,9 +382,11 @@ set (Module_MOC_HDRS
   pqSaveScreenshotReaction.h
   pqSaveStateReaction.h
   pqScalarBarVisibilityReaction.h
+  pqSelectionReaction.h
   pqSeriesEditorPropertyWidget.h
   pqServerConnectReaction.h
   pqServerDisconnectReaction.h
+  pqShowWidgetDecorator.h
   pqSourcesMenuReaction.h
   pqSpreadSheetVisibilityBehavior.h
   pqStandardArrayColorMapsBehavior.h

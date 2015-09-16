@@ -520,10 +520,10 @@ void pqRenderView::resetViewDirection(
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderView::selectOnSurface(int rect[4], pqSelectionOperator selOp)
+void pqRenderView::selectOnSurface(int rect[4], int selectionModifier)
 {
   QList<pqOutputPort*> opPorts;
-  this->selectOnSurfaceInternal(rect, opPorts, false, selOp, false);
+  this->selectOnSurfaceInternal(rect, opPorts, false, selectionModifier, false);
   this->emitSelectionSignal(opPorts);
 }
 
@@ -583,7 +583,7 @@ void pqRenderView::collectSelectionPorts(
   vtkCollection* selectedRepresentations,
   vtkCollection* selectionSources,
   QList<pqOutputPort*>& output_ports,
-  pqSelectionOperator selOp,
+  int selectionModifier,
   bool select_blocks)
 {
   if (!selectedRepresentations ||
@@ -633,18 +633,24 @@ void pqRenderView::collectSelectionPorts(
       selectionSource.TakeReference(newSelSource);
       }
 
-    if (selOp == PV_SELECTION_MERGE)
+    switch(selectionModifier)
       {
-      vtkSMSelectionHelper::MergeSelection(selectionSource,
-        opPort->getSelectionInput(),
-        selectedSource, opPort->getPortNumber());
+      case(pqView::PV_SELECTION_ADDITION):
+        vtkSMSelectionHelper::MergeSelection(selectionSource,
+          opPort->getSelectionInput(), selectedSource, opPort->getPortNumber());
+        break;
+      case(pqView::PV_SELECTION_SUBTRACTION):
+        vtkSMSelectionHelper::SubtractSelection(selectionSource,
+          opPort->getSelectionInput(), selectedSource, opPort->getPortNumber());
+        break;
+      case(pqView::PV_SELECTION_TOGGLE):
+        vtkSMSelectionHelper::ToggleSelection(selectionSource,
+          opPort->getSelectionInput(), selectedSource, opPort->getPortNumber());
+        break;
+      default:
+        break;
       }
-    else if (selOp == PV_SELECTION_SUBTRACT)
-      {
-      vtkSMSelectionHelper::SubtractSelection(selectionSource,
-        opPort->getSelectionInput(),
-        selectedSource, opPort->getPortNumber());
-      }
+
     opPort->setSelectionInput(selectionSource, 0);
     output_ports.append(opPort);
     }
@@ -654,7 +660,7 @@ void pqRenderView::collectSelectionPorts(
 void pqRenderView::selectOnSurfaceInternal(
   int rect[4], QList<pqOutputPort*>& pqOutputPorts,
   bool select_points,
-  pqSelectionOperator selOp,
+  int selectionModifier,
   bool select_blocks)
 {
   BEGIN_UNDO_EXCLUDE();
@@ -688,34 +694,34 @@ void pqRenderView::selectOnSurfaceInternal(
 
   END_UNDO_EXCLUDE();
   this->collectSelectionPorts(selectedRepresentations,
-    selectionSources, pqOutputPorts, selOp, select_blocks);
+    selectionSources, pqOutputPorts, selectionModifier, select_blocks);
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderView::selectPointsOnSurface(int rect[4], pqSelectionOperator selOp)
+void pqRenderView::selectPointsOnSurface(int rect[4], int selectionModifier)
 {
   QList<pqOutputPort*> output_ports;
-  this->selectOnSurfaceInternal(rect, output_ports, true, selOp, false);
+  this->selectOnSurfaceInternal(rect, output_ports, true, selectionModifier, false);
   // Fire selection event to let the world know that this view selected
   // something.
   this->emitSelectionSignal(output_ports);
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderView::selectPolygonPoints(vtkIntArray* polygon, pqSelectionOperator selOp)
+void pqRenderView::selectPolygonPoints(vtkIntArray* polygon, int selectionModifier)
 {
   QList<pqOutputPort*> output_ports;
-  this->selectPolygonInternal(polygon, output_ports, true, selOp, false);
+  this->selectPolygonInternal(polygon, output_ports, true, selectionModifier, false);
   // Fire selection event to let the world know that this view selected
   // something.
   this->emitSelectionSignal(output_ports);
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderView::selectPolygonCells(vtkIntArray* polygon, pqSelectionOperator selOp)
+void pqRenderView::selectPolygonCells(vtkIntArray* polygon, int selectionModifier)
 {
   QList<pqOutputPort*> output_ports;
-  this->selectPolygonInternal(polygon, output_ports, false, selOp, false);
+  this->selectPolygonInternal(polygon, output_ports, false, selectionModifier, false);
   // Fire selection event to let the world know that this view selected
   // something.
   this->emitSelectionSignal(output_ports);
@@ -724,7 +730,7 @@ void pqRenderView::selectPolygonCells(vtkIntArray* polygon, pqSelectionOperator 
 //-----------------------------------------------------------------------------
 void pqRenderView::selectPolygonInternal(vtkIntArray* polygon,
   QList<pqOutputPort*>& pqOutputPorts,  bool select_points,
-  pqSelectionOperator selOp, bool select_blocks)
+  int selectionModifier, bool select_blocks)
 {
   vtkSMRenderViewProxy* renderModuleP = this->getRenderViewProxy();
   vtkSmartPointer<vtkCollection> selectedRepresentations =
@@ -756,7 +762,7 @@ void pqRenderView::selectPolygonInternal(vtkIntArray* polygon,
 
   END_UNDO_EXCLUDE();
   this->collectSelectionPorts(selectedRepresentations,
-    selectionSources, pqOutputPorts, selOp, select_blocks);
+    selectionSources, pqOutputPorts, selectionModifier, select_blocks);
 }
 
 //-----------------------------------------------------------------------------
@@ -782,7 +788,7 @@ void pqRenderView::selectFrustum(int rect[4])
   END_UNDO_EXCLUDE();
 
   this->collectSelectionPorts(selectedRepresentations,
-    selectionSources, output_ports, PV_SELECTION_NEW, false);
+    selectionSources, output_ports, pqView::PV_SELECTION_DEFAULT, false);
 
   // Fire selection event to let the world know that this view selected
   // something.
@@ -812,7 +818,7 @@ void pqRenderView::selectFrustumPoints(int rect[4])
   END_UNDO_EXCLUDE();
 
   this->collectSelectionPorts(selectedRepresentations,
-    selectionSources, output_ports, PV_SELECTION_NEW, false);
+    selectionSources, output_ports, pqView::PV_SELECTION_DEFAULT, false);
 
   // Fire selection event to let the world know that this view selected
   // something.
@@ -820,11 +826,11 @@ void pqRenderView::selectFrustumPoints(int rect[4])
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderView::selectBlock(int rectangle[4], pqSelectionOperator selOp)
+void pqRenderView::selectBlock(int rectangle[4], int selectionModifier)
 {
   bool block = this->blockSignals(true);
   QList<pqOutputPort*> opPorts;
-  this->selectOnSurfaceInternal(rectangle, opPorts, false, selOp, true);
+  this->selectOnSurfaceInternal(rectangle, opPorts, false, selectionModifier, true);
   this->blockSignals(block);
   this->emitSelectionSignal(opPorts);
 }

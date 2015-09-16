@@ -261,6 +261,9 @@ list(APPEND TESTS_WITH_BASELINES
 #  ${CMAKE_CURRENT_SOURCE_DIR}/SaveAnimationGeometry.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SaveColorMap.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SaveCSV.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SelectionModifiersCells.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SelectionModifiersPoints.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SelectionModifiersBlocks.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SelectReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SimpleInteraction.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Slice.xml
@@ -447,6 +450,9 @@ set(NonConvexPolygon_DISABLE_CRS TRUE)
 set(QuartilePlot_DISABLE_CRS TRUE)
 set(TestSelectionOnMultipiece_DISABLE_CRS TRUE)
 set(CheckSelectedBlocks_DISABLE_CRS TRUE)
+set(SelectionModifiersCells_DISABLE_CRS TRUE)
+set(SelectionModifiersBlocks_DISABLE_CRS TRUE)
+set(SelectionModifiersPoints_DISABLE_CRS TRUE)
 
 # These tests cannot be run using ctest -j since they are affected by focus
 # changed events.

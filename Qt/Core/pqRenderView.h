@@ -50,12 +50,6 @@ class PQCORE_EXPORT pqRenderView : public pqRenderViewBase
   typedef pqRenderViewBase Superclass;
 
 public:
-  typedef enum pqSelectionOperator {
-    PV_SELECTION_NEW = 0,
-    PV_SELECTION_MERGE = 1,
-    PV_SELECTION_SUBTRACT = -1
-  } pqSelectionOperator;
-
   static QString renderViewType() { return "RenderView"; }
 
   // Constructor:
@@ -153,8 +147,8 @@ public:
 public:
   /// Creates a new surface selection given the rectangle in display
   /// coordinates.
-  void selectOnSurface(int rectangle[4], pqSelectionOperator selOp = PV_SELECTION_NEW);
-  void selectPointsOnSurface(int rectangle[4], pqSelectionOperator selOp = PV_SELECTION_NEW);
+  void selectOnSurface(int rectangle[4], int selectionModifier = pqView::PV_SELECTION_DEFAULT);
+  void selectPointsOnSurface(int rectangle[4], int selectionModifier = pqView::PV_SELECTION_DEFAULT);
 
   /// Picks the representation at the given position.
   /// This will result in firing the picked(pqOutputPort*) signal on successful
@@ -173,15 +167,15 @@ public:
 
   /// Creates a "block" selection given the rectangle in display coordinates.
   /// block selection is selection of a block in a composite dataset.
-  void selectBlock(int rectangle[4], pqSelectionOperator selOp = PV_SELECTION_NEW);
+  void selectBlock(int rectangle[4], int selectionModifier = pqView::PV_SELECTION_DEFAULT);
 
   /// Creates a new surface points selection given the polygon in display
   /// coordinates.
-  void selectPolygonPoints(vtkIntArray* polygon, pqSelectionOperator selOp = PV_SELECTION_NEW);
+  void selectPolygonPoints(vtkIntArray* polygon, int selectionModifier = pqView::PV_SELECTION_DEFAULT);
 
   /// Creates a new surface cells selection given the polygon in display
   /// coordinates.
-  void selectPolygonCells(vtkIntArray* polygon, pqSelectionOperator selOp = PV_SELECTION_NEW);
+  void selectPolygonCells(vtkIntArray* polygon, int selectionModifier = pqView::PV_SELECTION_DEFAULT);
 
 signals:
   // Triggered when interaction mode change underneath
@@ -278,14 +272,14 @@ private:
   class pqInternal;
   pqInternal* Internal;
   void selectOnSurfaceInternal(int rect[4], QList<pqOutputPort*>&,
-    bool select_points, pqSelectionOperator selOp, bool select_blocks);
+    bool select_points, int selectionModifier, bool select_blocks);
   void selectPolygonInternal(vtkIntArray* polygon, QList<pqOutputPort*>&,
-    bool select_points, pqSelectionOperator selOp, bool select_blocks);
+    bool select_points, int selectionModifier, bool select_blocks);
 
   void emitSelectionSignal(QList<pqOutputPort*>);
   void collectSelectionPorts(vtkCollection* selectedRepresentations,
     vtkCollection* selectionSources, QList<pqOutputPort*> &pqPorts,
-    pqSelectionOperator selOp, bool select_blocks);
+    int selectionModifier, bool select_blocks);
 
   void InternalConstructor(vtkSMViewProxy *renModule);
 };
