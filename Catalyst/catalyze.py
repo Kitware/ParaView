@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 #
 # Scripted used to transform a ParaView source tree into a Catalyst source tree.
 #
