@@ -24,6 +24,24 @@ In that case, use this property hint as follows.
       </Hints>
     </IntVectorProperty>
 
+ComponentLabels
+-----------------
+Show vector component labels for double vector properties.
+
+A multi-component double vector property may represent several different types
+of coordinates.  It may be useful to provide labels for each component's input
+to designate which type of vector is being represented.
+
+    <DoubleVectorProperty ...>
+      ...
+      <Hints>
+        <ShowComponentLabels>
+          <Label component="0" label="X:"/>
+          ...
+        </ShowComponentLabels>
+      </Hints>
+    </DoubleVectorProperty>
+
 PlaceholderText
 ---------------
 Put a PlaceHolder text in the Text entry widget.
