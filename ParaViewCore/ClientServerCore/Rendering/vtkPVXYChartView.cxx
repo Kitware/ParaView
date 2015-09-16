@@ -76,7 +76,6 @@ vtkPVXYChartView::vtkPVXYChartView()
 
   // Use the buffer id - performance issues are fixed.
   this->ContextView->GetScene()->SetUseBufferId(true);
-  this->ContextView->GetScene()->SetScaleTiles(false);
   this->LogScaleWarningLabel = NULL;
 }
 
