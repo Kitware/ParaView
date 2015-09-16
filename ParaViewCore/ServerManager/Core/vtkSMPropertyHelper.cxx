@@ -504,11 +504,14 @@ vtkSMPropertyHelper::vtkSMPropertyHelper(vtkSMProxy* proxy, const char* pname,
   this->Proxy = proxy;
   this->Quiet = quiet;
 
+  // If pname is NULL, on some platforms the warning macro can segfault
+  assert(pname);
+
   vtkSMProperty *property = proxy->GetProperty(pname);
 
   if(!property)
     {
-    vtkSMPropertyHelperWarningMacro("Failed to locate property: " << pname);
+    vtkSMPropertyHelperWarningMacro("Failed to locate property: " << (pname ? pname : "(null)"));
     }
 
   this->Initialize(property);
