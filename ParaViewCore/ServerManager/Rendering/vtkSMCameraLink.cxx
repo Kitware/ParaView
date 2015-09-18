@@ -364,6 +364,6 @@ void vtkSMCameraLink::LoadState(const vtkSMMessage *msg, vtkSMProxyLocator *loca
 void vtkSMCameraLink::UpdateState()
 {
   this->Superclass::UpdateState();
-  this->State->GetExtension(LinkState::sync_interactive_renders,
+  this->State->SetExtension(LinkState::sync_interactive_renders,
     this->GetSynchronizeInteractiveRenders());
 }
