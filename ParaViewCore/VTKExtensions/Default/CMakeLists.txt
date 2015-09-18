@@ -147,6 +147,9 @@ set(Module_SRCS
   vtkXMLCollectionReader.cxx
   vtkXMLPVDWriter.cxx
 )
+if (PARAVIEW_USE_MPI)
+  list(APPEND Module_SRCS vtkInSituPParticlePathFilter.cxx)
+endif()
 
 # Disabled unless using the OpenGL backend.
 if ("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")

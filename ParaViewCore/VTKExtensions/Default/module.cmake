@@ -1,6 +1,6 @@
 set (_dependencies)
 if (PARAVIEW_USE_MPI)
-  list(APPEND _dependencies vtkIOMPIImage)
+  list(APPEND _dependencies vtkIOMPIImage vtkFiltersParallelFlowPaths)
 elseif()
   list(APPEND _dependencies vtkIOImage)
 endif()
