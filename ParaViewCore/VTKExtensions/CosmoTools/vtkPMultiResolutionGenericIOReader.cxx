@@ -85,7 +85,7 @@ public:
       {
       JSON_READ_ERROR();
       }
-    const Json::Value& levelsArray = root.get("levels",Json::Value::null);
+    const Json::Value& levelsArray = root.get("levels",Json::Value::nullRef);
     if (!levelsArray.isArray())
       {
       JSON_READ_ERROR();
@@ -97,7 +97,7 @@ public:
         {
         JSON_READ_ERROR();
         }
-      const Json::Value& timestepsArray = level.get("timesteps",Json::Value::null);
+      const Json::Value& timestepsArray = level.get("timesteps",Json::Value::nullRef);
       if (!timestepsArray.isArray())
         {
         JSON_READ_ERROR();
@@ -111,8 +111,8 @@ public:
           {
           JSON_READ_ERROR();
           }
-        const Json::Value& time = timestep.get("time",Json::Value::null);
-        const Json::Value& file = timestep.get("file",Json::Value::null);
+        const Json::Value& time = timestep.get("time",Json::Value::nullRef);
+        const Json::Value& file = timestep.get("file",Json::Value::nullRef);
         if (!time.isNumeric())
           {
           JSON_READ_ERROR();

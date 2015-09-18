@@ -146,7 +146,7 @@ public:
         }
       }
 
-    return Json::Value::null;
+    return Json::Value::nullRef;
   }
 
   //----------------------------------------------------------------------------
@@ -170,7 +170,7 @@ public:
         }
       }
 
-    return Json::Value::null;
+    return Json::Value::nullRef;
   }
 
   //----------------------------------------------------------------------------
@@ -473,7 +473,7 @@ public:
 
     Json::Path settingPath(root.c_str());
     Json::Value & jsonValue = settingPath.make(this->SettingCollections[0].Value);
-    jsonValue[leaf] = Json::Value::null;
+    jsonValue[leaf] = Json::Value::nullRef;
 
     if (values.size() > 1)
       {
