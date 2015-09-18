@@ -36,7 +36,11 @@
 #include "vtkSMStringListDomain.h"
 #include "vtkPVServerManagerRenderingModule.h" // needed for exports
 
+#include <set> // For std::set
+
 class vtkPVDataInformation;
+class vtkPVArrayInformation;
+class vtkChartRepresentation;
 
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMChartSeriesSelectionDomain :
   public vtkSMStringListDomain
@@ -103,6 +107,17 @@ protected:
     const std::string& blockName,
     std::vector<vtkStdString>& strings,
     vtkPVDataInformation* dataInfo, int fieldAssociation, bool flattenTable);
+
+  // Description:
+  // Build up the domain with provided array.
+  // Add array component from dataArray to strings. If blockName is non-empty, then it's
+  // used to "uniquify" the array names.
+  virtual void PopulateArrayComponents(
+    vtkChartRepresentation* chartRepr,
+    const std::string& blockName, 
+    std::vector<vtkStdString>& strings,
+    std::set<vtkStdString>& unique_strings, 
+    vtkPVArrayInformation* dataInfo, bool flattenTable);
 
   // Description:
   // Call this method in PopulateAvailableArrays() to override a specific array's

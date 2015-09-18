@@ -17,6 +17,7 @@
 #include "vtkChartRepresentation.h"
 #include "vtkColorSeries.h"
 #include "vtkCommand.h"
+#include "vtkDataObject.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVArrayInformation.h"
@@ -300,19 +301,29 @@ void vtkSMChartSeriesSelectionDomain::PopulateAvailableArrays(
   for (int cc=0; dsa != NULL && cc < dsa->GetNumberOfArrays(); cc++)
     {
     vtkPVArrayInformation* arrayInfo = dsa->GetArrayInformation(cc);
-    if (arrayInfo == NULL || arrayInfo->GetIsPartial() == 1)
-      {
-      continue;
-      }
+    this->PopulateArrayComponents(chartRepr, blockName, strings, uniquestrings,
+                                  arrayInfo, flattenTable);
+    }
 
-    if (arrayInfo->GetName() &&
-      strcmp(arrayInfo->GetName(), "vtkValidPointMask") == 0)
-      {
-      // Skip vtkValidPointMask since that's an internal array used for masking,
-      // not really meant to be plotted.
-      continue;
-      }
+  if (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+    {
+    vtkPVArrayInformation* pointArrayInfo = dataInfo->GetPointArrayInformation();
+    this->PopulateArrayComponents(chartRepr, blockName, strings, uniquestrings,
+                                  pointArrayInfo, flattenTable);
+    }
+}
 
+//----------------------------------------------------------------------------
+// Add array component from arrayInfo to strings. If blockName is non-empty, then it's
+// used to "uniquify" the array names.
+void vtkSMChartSeriesSelectionDomain::PopulateArrayComponents(  
+  vtkChartRepresentation* chartRepr,
+  const std::string& blockName, std::vector<vtkStdString>& strings, 
+  std::set<vtkStdString>& uniquestrings,
+  vtkPVArrayInformation* arrayInfo, bool flattenTable)
+{
+  if (arrayInfo != NULL && arrayInfo->GetIsPartial() != 1)
+    {
     if (arrayInfo->GetNumberOfComponents() > 1 && flattenTable)
       {
       for (int kk=0; kk <= arrayInfo->GetNumberOfComponents(); kk++)
@@ -334,22 +345,26 @@ void vtkSMChartSeriesSelectionDomain::PopulateAvailableArrays(
       }
     else
       {
-      std::string seriesName = chartRepr->GetDefaultSeriesLabel(blockName, arrayInfo->GetName());
-      if (uniquestrings.find(seriesName) == uniquestrings.end())
-        {
-        strings.push_back(seriesName);
-        uniquestrings.insert(seriesName);
-
-        // Special case for Quartile plots. PlotSelectionOverTime filter, when
-        // produces stats, likes to pre-split components in an array into multiple
-        // single component arrays. We still want those to be treated as
-        // components and not be shown by default. Hence, we use this hack.
-        // (See BUG #15512).
-        std::string seriesNameWithoutTableName = chartRepr->GetDefaultSeriesLabel(
-          std::string(), arrayInfo->GetName());
-        if (PotentailComponentNameRe.find(seriesNameWithoutTableName))
+      char* arrayName = arrayInfo->GetName();
+      if (arrayName != NULL)
+        { 
+        std::string seriesName = chartRepr->GetDefaultSeriesLabel(blockName, arrayName);
+        if (uniquestrings.find(seriesName) == uniquestrings.end())
           {
-          this->SetDefaultVisibilityOverride(seriesName, false);
+          strings.push_back(seriesName);
+          uniquestrings.insert(seriesName);
+
+          // Special case for Quartile plots. PlotSelectionOverTime filter, when
+          // produces stats, likes to pre-split components in an array into multiple
+          // single component arrays. We still want those to be treated as
+          // components and not be shown by default. Hence, we use this hack.
+          // (See BUG #15512).
+          std::string seriesNameWithoutTableName = chartRepr->GetDefaultSeriesLabel(
+            std::string(), arrayName);
+          if (PotentailComponentNameRe.find(seriesNameWithoutTableName))
+            {
+            this->SetDefaultVisibilityOverride(seriesName, false);
+            }
           }
         }
       }
