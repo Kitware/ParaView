@@ -68,7 +68,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QPointer>
-#include <QPointer>
+#include <QPainter>
 #include <QSet>
 #include <algorithm>
 
@@ -116,6 +116,7 @@ class pqAnnotationsModel : public QAbstractTableModel
   struct ItemType
     {
     QColor Color;
+    QPixmap Swatch;
     QString Value;
     QString Annotation;
     bool setData(int index, const QVariant& value)
@@ -123,6 +124,7 @@ class pqAnnotationsModel : public QAbstractTableModel
       if (index == 0 && value.canConvert(QVariant::Color))
         {
         this->Color = value.value<QColor>();
+        this->Swatch = createSwatch();
         return true;
         }
       else if (index == 1)
@@ -141,7 +143,7 @@ class pqAnnotationsModel : public QAbstractTableModel
       {
       if (index == 0 && this->Color.isValid())
         {
-        return this->Color;
+        return this->Swatch;
         }
       else if (index == 1)
         {
@@ -151,7 +153,25 @@ class pqAnnotationsModel : public QAbstractTableModel
         {
         return this->Annotation;
         }
+      else if (index == 3 && this->Color.isValid())
+        {
+        return this->Color;
+        }
       return QVariant();
+      }
+    QPixmap createSwatch()
+      {
+      int radius = 17;
+
+      QPixmap pix(radius, radius);
+      pix.fill(QColor(0,0,0,0));
+
+      QPainter painter(&pix);
+      painter.setRenderHint(QPainter::Antialiasing, true);
+      painter.setBrush(QBrush(this->Color));
+      painter.drawEllipse(1, 1, radius-2, radius-2);
+      painter.end();
+      return pix; 
       }
     };
 
@@ -202,17 +222,13 @@ public:
 
   virtual QVariant data(const QModelIndex& idx, int role=Qt::DisplayRole) const
     {
-    if (role == Qt::DecorationRole)
+    if (role == Qt::DecorationRole || role == Qt::DisplayRole)
       {
-      if (idx.column()==0)
-        {
-        QVariant value = this->Items[idx.row()].data(0);
-        return value.isValid()? value : QVariant(this->MissingColorIcon);
-        }
+      return this->Items[idx.row()].data(idx.column());
       }
-    else if (role == Qt::DisplayRole || role == Qt::EditRole)
+    else if (role == Qt::EditRole)
       {
-      return idx.column() == 0? QVariant() : this->Items[idx.row()].data(idx.column());
+      return idx.column() == 0? this->Items[idx.row()].data(3) : this->Items[idx.row()].data(idx.column());
       }
     else if (role == Qt::ToolTipRole || role == Qt::StatusTipRole)
       {
@@ -236,7 +252,7 @@ public:
       switch (section)
         {
       case 0:
-        return ""; // Color
+        return "";
       case 1:
         return "Value";
       case 2:
@@ -367,7 +383,7 @@ public:
       {
       if (this->Items[cc].Color != new_colors[cc])
         {
-        this->Items[cc].Color = new_colors[cc];
+        this->Items[cc].setData(0, new_colors[cc]);
         emit this->dataChanged(this->index(cc, 0), this->index(cc, 0));
         }
       }
@@ -517,7 +533,7 @@ void pqColorAnnotationsPropertyWidget::onDoubleClicked(const QModelIndex& idx)
   if (idx.column() == 0)
     {
     QColor color = this->Internals->Model.data(idx,
-      Qt::DecorationRole).value<QColor>();
+      Qt::EditRole).value<QColor>();
     color = QColorDialog::getColor(color, this, "Choose Annotation Color",
       QColorDialog::DontUseNativeDialog);
     if (color.isValid())
