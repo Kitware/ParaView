@@ -161,7 +161,7 @@ class pqAnnotationsModel : public QAbstractTableModel
       }
     QPixmap createSwatch()
       {
-      int radius = 20;
+      int radius = 17;
 
       QPixmap pix(radius, radius);
       pix.fill(QColor(0,0,0,0));
