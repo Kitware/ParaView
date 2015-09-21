@@ -190,6 +190,36 @@ vtkIdType vtkMaterialInterfaceCommBuffer::Pack(
 }
 //----------------------------------------------------------------------------
 // Pull data from the current location in the buffer
+// into a float array. Before the unpack the array
+// is (re)sized.
+int vtkMaterialInterfaceCommBuffer::UnPack(
+                vtkFloatArray *da,
+                const int nComps,
+                const vtkIdType nTups,
+                const bool copyFlag)
+{
+  int ret=0;
+  float *pData=0;
+  if (copyFlag)
+    {
+    da->SetNumberOfComponents(nComps);
+    da->SetNumberOfTuples(nTups);
+    pData=da->GetPointer(0);
+    // copy into the buffer
+    ret=this->UnPack(pData,nComps,nTups,copyFlag);
+    }
+  else
+    {
+    da->SetNumberOfComponents(nComps);
+    // get a pointer to the buffer
+    ret=this->UnPack(pData,nComps,nTups,copyFlag);
+    vtkIdType arraySize=nComps*nTups;
+    da->SetArray(pData,arraySize,1);
+    }
+  return ret;
+}
+//----------------------------------------------------------------------------
+// Pull data from the current location in the buffer
 // into a double array. Before the unpack the array
 // is (re)sized.
 int vtkMaterialInterfaceCommBuffer::UnPack(

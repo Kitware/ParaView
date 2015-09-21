@@ -66,7 +66,6 @@ public:
                         int extents[6],
                         int realExtents[6], 
                         int realDimensions[3])const;
-  int HadBadGhostCell(int i) const;
   // Read reads in the actual block's information
   int Read(int isAMR, int fileVersion, vtkSpyPlotIStream *stream);
   // Advances the stream to be after the block, information w/r

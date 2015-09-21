@@ -22,42 +22,23 @@
 #ifndef __vtkMaterialInterfaceProcessRing_h
 #define __vtkMaterialInterfaceProcessRing_h
 
-#include <vector>
+#include <vector> // needed for Initialize()
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMaterialInterfaceProcessLoading.h"
 
-class vtkMaterialInterfaceProcessRing
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMaterialInterfaceProcessRing
 {
 public:
   // Description:
-  vtkMaterialInterfaceProcessRing()
-  {
-    this->Clear();
-  }
+  vtkMaterialInterfaceProcessRing();
   // Description:
-  ~vtkMaterialInterfaceProcessRing()
-  {
-    this->Clear();
-  }
+  ~vtkMaterialInterfaceProcessRing();
   // Description:
   // Return the object to an empty state.
-  void Clear()
-  {
-    this->NextElement=0;
-    this->BufferSize=0;
-    this->Buffer.clear();
-  }
+  void Clear();
   // Description:
   // Size buffer and point to first element.
-  void Initialize(int nProcs)
-  {
-    this->NextElement=0;
-    this->BufferSize=nProcs;
-    this->Buffer.resize(nProcs);
-    for (int procId=0; procId<nProcs; ++procId)
-      {
-      this->Buffer[procId]=procId;
-      }
-  }
+  void Initialize(int nProcs);
   // Description:
   // Build from a process loading from a sorted
   // vector of process loading items.
@@ -66,16 +47,7 @@ public:
       vtkIdType upperLoadingBound);
   // Description:
   // Get the next process id from the ring.
-  vtkIdType GetNextId()
-  {
-    vtkIdType id=this->Buffer[this->NextElement];
-    ++this->NextElement;
-    if (this->NextElement==this->BufferSize)
-      {
-      this->NextElement=0;
-      }
-    return id;
-  }
+  vtkIdType GetNextId();
   // Description:
   // Print the state of the ring.
   void Print();
@@ -83,7 +55,8 @@ public:
 private:
   vtkIdType NextElement;
   vtkIdType BufferSize;
-  std::vector<vtkIdType> Buffer;
+  class BufferContainer;
+  BufferContainer *Buffer;
 };
 #endif
 

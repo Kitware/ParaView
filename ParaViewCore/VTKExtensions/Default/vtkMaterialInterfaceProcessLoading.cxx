@@ -19,14 +19,14 @@ using std::endl;
 using std::vector;
 
 //
-ostream &operator<<(ostream &sout, vtkMaterialInterfaceProcessLoading &fp)
+ostream &operator<<(ostream &sout, const vtkMaterialInterfaceProcessLoading &fp)
 {
   sout << "(" << fp.GetId() << "," << fp.GetLoadFactor() << ")";
 
   return sout;
 }
 //
-ostream &operator<<(ostream &sout, vector<vtkMaterialInterfaceProcessLoading> &vfp)
+ostream &operator<<(ostream &sout, const vector<vtkMaterialInterfaceProcessLoading> &vfp)
 {
   size_t n = vfp.size();
   vtkIdType total=0;

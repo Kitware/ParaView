@@ -23,49 +23,31 @@
 #ifndef __vtkMaterialInterfaceIdList_h
 #define __vtkMaterialInterfaceIdList_h
 
-#include <vector>
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMaterialInterfaceIdListItem.h"
 
-class vtkMaterialInterfaceIdList
+#include <vector> // needed for Initialize method
+
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMaterialInterfaceIdList
 {
 public:
-  vtkMaterialInterfaceIdList()
-  {
-    this->Clear();
-  }
-  ~vtkMaterialInterfaceIdList()
-  {
-    this->Clear();
-  }
+  vtkMaterialInterfaceIdList();
+  ~vtkMaterialInterfaceIdList();
   // Description:
   // Return the container to an empty state.
-  void Clear()
-  {
-    this->IdList.clear();
-    this->IsInitialized=false;
-  }
+  void Clear();
   // Description:
   // Initialize the container with a list of id's
   // these must be in ascending order.
-  void Initialize(std::vector<int> ids, bool preSorted=false);
-  // Description:
-  // Initialize the container from the ids that have
-  // been pushed. This must be done before querrying.
-  void Initialize();
-  // Description:
-  // Add a fragment id to the list. Return its index.
-  int PushId();
-  // Description:
-  // Add a fragment id to the list, if it is unique.
-  // Return its index or -1 to indicate its not unique.
-  int PushUniqueId();
+  void Initialize(const std::vector<int>& ids, bool preSorted=false);
   // Description:
   // Given a global id, get the local id, or -1 if the
   // global id is not in the list.
   int GetLocalId(int globalId);
 private:
   bool IsInitialized;
-  std::vector<vtkMaterialInterfaceIdListItem> IdList;
+  class IdListContainer;
+  IdListContainer *IdList;
 };
 #endif
 

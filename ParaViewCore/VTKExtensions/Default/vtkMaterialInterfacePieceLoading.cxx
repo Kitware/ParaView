@@ -21,7 +21,7 @@ using std::cerr;
 using std::endl;
 
 //
-ostream &operator<<(ostream &sout, vtkMaterialInterfacePieceLoading &fp)
+ostream &operator<<(ostream &sout, const vtkMaterialInterfacePieceLoading &fp)
 {
   sout << "(" << fp.GetId() << "," << fp.GetLoading() << ")";
 

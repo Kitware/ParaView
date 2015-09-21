@@ -236,7 +236,7 @@ private:
 #define vtkAMRRegionBitOwner 128
 // mask: The first 7 bits are going to store the degenerate level difference.
 #define vtkAMRRegionBitsDegenerateMask 127
-class vtkAMRDualGridHelperBlock
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAMRDualGridHelperBlock
 {
 public:
   vtkAMRDualGridHelperBlock();
@@ -303,7 +303,7 @@ private:
 //----------------------------------------------------------------------------
 // Material surface point in the face.  The point lies on an edge of the 
 // dual grid and has a material fraction array.
-class vtkAMRDualGridHelperSeed
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAMRDualGridHelperSeed
 {
 public:
   vtkAMRDualGridHelperSeed();
@@ -320,7 +320,7 @@ private:
 //----------------------------------------------------------------------------
 // Neighbor interfaces (Faces) default to the lowest level (resolution) block.
 // We do not actually care about the neighbor blocks yet.
-class vtkAMRDualGridHelperFace
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAMRDualGridHelperFace
 {
 public:
   vtkAMRDualGridHelperFace();

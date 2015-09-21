@@ -26,11 +26,12 @@
 #ifndef __vtkMaterialInterfacePieceTransaction_h
 #define __vtkMaterialInterfacePieceTransaction_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkSystemIncludes.h"
 
 #include <iostream>
 
-class vtkMaterialInterfacePieceTransaction
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMaterialInterfacePieceTransaction
 {
 public:
   enum {TYPE=0,REMOTE_PROC=1,SIZE=2};
@@ -80,6 +81,7 @@ public:
 private:
   int Data[SIZE];
 };
+VTKPVVTKEXTENSIONSDEFAULT_EXPORT
 std::ostream &operator<<(std::ostream &sout, const vtkMaterialInterfacePieceTransaction &ta);
 #endif
 
