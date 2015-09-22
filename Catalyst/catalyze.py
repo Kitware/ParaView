@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 #
 # Scripted used to transform a ParaView source tree into a Catalyst source tree.
 #
@@ -235,7 +236,6 @@ def copy_paths(config, paths):
     error(err)
 
 def create_cmake_script(config, manifest_list):
-  cmake_script='#!/bin/bash\n'
   cs_modules = set()
   python_modules = set()
 
@@ -252,11 +252,25 @@ def create_cmake_script(config, manifest_list):
           python_modules.add(module['name'])
 
   # ClientServer wrap
-  cmake_script += 'cmake \\\n'
-  cmake_script += '  --no-warn-unused-cli\\\n'
-  cmake_script += '  -DPARAVIEW_CS_MODULES:STRING="%s" \\\n' % (';'.join(cs_modules))
-  # Python modules
-  cmake_script+='  -DVTK_WRAP_PYTHON_MODULES:STRING="%s" \\\n' % (';'.join(python_modules))
+  cmake_script='''#!/bin/bash
+cmake="$( which cmake )"
+case "$1" in
+  --cmake=*)
+    cmake="${1#--cmake=}"
+    shift
+    ;;
+  *)
+    ;;
+esac
+
+$cmake \\
+  --no-warn-unused-cli \\
+  -DPARAVIEW_CS_MODULES:STRING="%(cs_modules)s" \\
+  -DVTK_WRAP_PYTHON_MODULES:STRING="%(python_modules)s" \\
+''' % {
+      'cs_modules': ';'.join(cs_modules),
+      'python_modules': ';'.join(python_modules),
+    }
 
   for key, value in cmake_cache(config, manifest_list).items():
     cmake_script += '  -D%s=%s \\\n' % (key, value)
