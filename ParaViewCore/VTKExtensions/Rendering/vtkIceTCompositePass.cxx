@@ -638,6 +638,8 @@ void vtkIceTCompositePass::Draw(const vtkRenderState* render_state,
   vtkOpenGLClearErrorMacro();
 
   GLbitfield clear_mask = 0;
+  glClearColor((GLclampf)(0.0), (GLclampf)(0.0),
+    (GLclampf)(0.0), (GLclampf)(0.0));
   if (!this->DepthOnly)
     {
     if (!render_state->GetRenderer()->Transparent())
@@ -657,6 +659,7 @@ void vtkIceTCompositePass::Draw(const vtkRenderState* render_state,
       }
     glColorMask(GL_FALSE,GL_FALSE,GL_FALSE,GL_FALSE);
     }
+
   glClear(clear_mask);
   if (this->RenderPass)
     {
@@ -1048,15 +1051,12 @@ void vtkIceTCompositePass::PushIceTColorBufferToScreen(
   glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
 
   // per-fragment operations
-  glDisable(GL_ALPHA_TEST);
   glDisable(GL_STENCIL_TEST);
   glDisable(GL_DEPTH_TEST);
   glDisable(GL_BLEND);
   glDisable(GL_INDEX_LOGIC_OP);
   glDisable(GL_COLOR_LOGIC_OP);
 
-
-  glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);
   glPixelStorei(GL_UNPACK_ALIGNMENT,1);// client to server
 
   vtkOpenGLRenderWindow *context=
@@ -1064,12 +1064,23 @@ void vtkIceTCompositePass::PushIceTColorBufferToScreen(
       render_state->GetRenderer()->GetRenderWindow());
 
 #ifdef VTKGL2
+  GLint blendSrcA = GL_ONE;
+  GLint blendDstA = GL_ONE_MINUS_SRC_ALPHA;
+  GLint blendSrcC = GL_SRC_ALPHA;
+  GLint blendDstC = GL_ONE_MINUS_SRC_ALPHA;
+  glGetIntegerv(GL_BLEND_SRC_ALPHA, &blendSrcA);
+  glGetIntegerv(GL_BLEND_DST_ALPHA, &blendDstA);
+  glGetIntegerv(GL_BLEND_SRC_RGB, &blendSrcC);
+  glGetIntegerv(GL_BLEND_DST_RGB, &blendDstC);
   // framebuffers have their color premultiplied by alpha.
   glBlendFuncSeparate(GL_ONE,GL_ONE_MINUS_SRC_ALPHA,
     GL_ONE,GL_ONE_MINUS_SRC_ALPHA);
   this->BackgroundTexture->CopyToFrameBuffer(0, 0, w - 1, h - 1,
                                     0, 0, w, h, NULL, NULL);
 #else
+  glDisable(GL_ALPHA_TEST);
+  glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);
+
   // framebuffers have their color premultiplied by alpha.
   vtkgl::BlendFuncSeparate(GL_ONE,GL_ONE_MINUS_SRC_ALPHA,
     GL_ONE,GL_ONE_MINUS_SRC_ALPHA);
@@ -1123,6 +1134,8 @@ void vtkIceTCompositePass::PushIceTColorBufferToScreen(
 #ifdef VTKGL2
   this->IceTTexture->CopyToFrameBuffer(0, 0, w - 1, h - 1,
                                     0, 0, w, h, NULL, NULL);
+  // restore the blend state
+  glBlendFuncSeparate(blendSrcC, blendDstC, blendSrcA, blendDstA);
 #else
   vtkgl::ActiveTexture(vtkgl::TEXTURE0);
   // fixed-pipeline for vertex and fragment shaders.
