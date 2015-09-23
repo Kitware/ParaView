@@ -148,17 +148,6 @@ void vtkPVProgressHandler::SetSession(vtkPVSession* conn)
 //----------------------------------------------------------------------------
 void vtkPVProgressHandler::PrepareProgress()
 {
-#ifndef PV_DISABLE_PROGRESS_HANDLING
-  SKIP_IF_DISABLED();
-  this->Internals->DisableProgressHandling =
-    this->Session ? this->Session->IsMultiClients() : true;
-#endif
-
-  SKIP_IF_DISABLED();
-
-  this->InvokeEvent(vtkCommand::StartEvent, this);
-  this->Internals->EnableProgress = true;
-
   if (this->AddedHandlers == false)
     {
     vtkMultiProcessController* ds_controller = this->Session->GetController(
@@ -179,6 +168,17 @@ void vtkPVProgressHandler::PrepareProgress()
       }
     }
   this->AddedHandlers = true;
+
+#ifndef PV_DISABLE_PROGRESS_HANDLING
+  SKIP_IF_DISABLED();
+  this->Internals->DisableProgressHandling =
+    this->Session ? this->Session->IsMultiClients() : true;
+#endif
+
+  SKIP_IF_DISABLED();
+
+  this->InvokeEvent(vtkCommand::StartEvent, this);
+  this->Internals->EnableProgress = true;
 }
 
 //----------------------------------------------------------------------------
@@ -367,8 +367,6 @@ bool vtkPVProgressHandler::OnWrongTagEvent(
 void vtkPVProgressHandler::OnMessageEvent(
   vtkObject* vtkNotUsed(caller), unsigned long eventid, void* calldata)
 {
-  SKIP_IF_DISABLED();
-
   if (eventid != vtkCommand::MessageEvent)
     {
     return;
