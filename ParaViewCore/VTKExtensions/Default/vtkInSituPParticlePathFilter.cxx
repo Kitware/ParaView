@@ -237,7 +237,7 @@ void vtkInSituPParticlePathFilter::AssignSeedsToProcessors(
 
 //---------------------------------------------------------------------------
 std::vector<vtkDataSet*> vtkInSituPParticlePathFilter::GetSeedSources(
-  vtkInformationVector* inputVector, int timeStep)
+  vtkInformationVector* inputVector, int vtkNotUsed(timeStep))
 {
   int numSources = inputVector->GetNumberOfInformationObjects();
   std::vector<vtkDataSet*> seedSources;
