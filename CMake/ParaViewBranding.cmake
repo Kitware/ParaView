@@ -135,18 +135,6 @@ FUNCTION(build_paraview_client BPC_NAME)
       "// remains consistent on all systems.\n"
       "IDI_ICON1 ICON \"${BPC_APPLICATION_ICON}\"")
     SET(exe_icon "${CMAKE_CURRENT_BINARY_DIR}/Icon.rc")
-
-    set(dir "${CMAKE_CURRENT_BINARY_DIR}/${BPC_NAME}-icon")
-    set(rctarget "${BPC_NAME}rc")
-    file(MAKE_DIRECTORY "${dir}")
-    if (NOT EXISTS "${dir}/dummy.cxx")
-      file(WRITE "${dir}/dummy.cxx"
-        "int dummy_${BPC_NAME}(int a) { return a; }\n")
-    endif ()
-    file(WRITE "${dir}/CMakeLists.txt"
-      "set_property(DIRECTORY PROPERTY INCLUDE_DIRECTORIES)
-add_library(${rctarget} STATIC dummy.cxx \"${exe_icon}\")\n")
-    add_subdirectory("${dir}" "${dir}/build")
   ENDIF ()
 
   # executable_flags are used to pass options to add_executable(..) call such as
@@ -310,6 +298,7 @@ add_library(${rctarget} STATIC dummy.cxx \"${exe_icon}\")\n")
                  ${BPC_NAME}
                  ${executable_flags}
                  ${BPC_NAME}_main.cxx
+                 ${exe_icon}
                  ${apple_bundle_sources}
                  ${EXE_SRCS}
                  )
@@ -319,7 +308,6 @@ add_library(${rctarget} STATIC dummy.cxx \"${exe_icon}\")\n")
         vtkPVServerManagerApplication
         ${QT_QTMAIN_LIBRARY}
         ${BPC_EXTRA_DEPENDENCIES}
-        ${rctarget}
     )
 
   IF (BPC_MAKE_INITIALIZER_LIBRARY)
