@@ -992,6 +992,9 @@
                                   sourceSelector, filterSelector, dataInfoSelector, settingsSelector, saveOptsSelector) {
         session = session_;
 
+        busyElement = $('.busy').hide();
+        notBusyElement = $('.not-busy').show();
+
         // Initialize data and DOM behavior
         updatePaletteNames();
         addScrollBehavior();

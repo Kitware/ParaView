@@ -1,8 +1,27 @@
 /* ---- Visualizer specific ----- */
 
+.pvw-logo-button {
+    position: relative;
+    background: url('./toolbar_logo.svg');
+    background-repeat: no-repeat;
+    padding: 10px;
+    background-position: 50% 54%;
+    left: -4px;
+}
+
+.pvw-startup-logo {
+    position: relative;
+    background: url('./start_page_image.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 25%;
+    height: 200px;
+}
+
+.bar-height { height: 26px; }
 .head-toolbar span { position: relative; top: 2px; font-size: 16px; }
 .fix-height { position: relative; top: 0; left: 0; }
-.pv-time-input { position: relative; top: 2px; width: 80px; border: solid 1px white; background: none; padding: 2px 10px; }
+.pv-time-input { position: relative; width: 80px; border: solid 1px white; background: none; padding: 1px 10px; }
 
 .active-data-type-label { font-style: italic; }
 
