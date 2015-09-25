@@ -140,6 +140,7 @@ protected:
     {
     this->XRange[0] = this->XRange[1] = 0.0;
     this->DataValid = false;
+    this->ZoomWithMouseWheelOff();
     }
   virtual ~vtkTransferFunctionChartXY() {}
 
