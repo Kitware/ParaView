@@ -44,6 +44,7 @@ public:
 
   vtkGetMacro(ConnectID, int);
   vtkGetMacro(UseOffscreenRendering, int);
+  vtkGetMacro(EGLDeviceIndex, int);
   vtkGetMacro(UseStereoRendering, int);
   vtkGetStringMacro(StereoType);
 
@@ -223,6 +224,7 @@ protected:
 private:
   int ConnectID;
   int UseOffscreenRendering;
+  int EGLDeviceIndex;
   int UseStereoRendering;
   int ReverseConnection;
   int TileDimensions[2];

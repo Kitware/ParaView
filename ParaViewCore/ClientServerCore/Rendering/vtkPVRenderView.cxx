@@ -293,6 +293,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->UseOffscreenRenderingForScreenshots = false;
   this->UseInteractiveRenderingForScreenshots = false;
   this->UseOffscreenRendering = (options->GetUseOffscreenRendering() != 0);
+  this->EGLDeviceIndex = options->GetEGLDeviceIndex();
   this->Selector = vtkPVHardwareSelector::New();
   this->PreviousParallelProjectionStatus = 0;
   this->NeedsOrderedCompositing = false;
@@ -308,6 +309,7 @@ vtkPVRenderView::vtkPVRenderView()
   vtkRenderWindow* window = this->SynchronizedWindows->NewRenderWindow();
   window->SetMultiSamples(0);
   window->SetOffScreenRendering(this->UseOffscreenRendering? 1 : 0);
+    window->SetDeviceIndex(this->EGLDeviceIndex);
 
   this->RenderView = vtkRenderViewBase::New();
   this->RenderView->SetRenderWindow(window);
@@ -494,6 +496,13 @@ void vtkPVRenderView::SetUseOffscreenRendering(bool use_offscreen)
 
   this->UseOffscreenRendering = use_offscreen || process_use_offscreen;
   this->GetRenderWindow()->SetOffScreenRendering(this->UseOffscreenRendering);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetEGLDeviceIndex(int deviceIndex)
+{
+  this->EGLDeviceIndex = deviceIndex;
+  this->GetRenderWindow()->SetDeviceIndex(deviceIndex);
 }
 
 //----------------------------------------------------------------------------

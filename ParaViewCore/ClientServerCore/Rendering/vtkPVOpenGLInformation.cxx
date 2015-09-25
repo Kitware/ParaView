@@ -28,6 +28,7 @@
 #include "vtkProcessModule.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDisplayInformation.h"
+#include "vtkPVOptions.h"
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
 #include "vtkNew.h"
@@ -67,6 +68,8 @@ void vtkPVOpenGLInformation::CopyFromObject(vtkObject* obj)
     {
     renWin = vtkSmartPointer<vtkRenderWindow>::New();
     renWin->SetOffScreenRendering(1);
+    vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
+    renWin->SetDeviceIndex(options->GetEGLDeviceIndex());
     renWin->Render();
     }
   this->SetLocalDisplay(vtkPVDisplayInformation::CanOpenDisplayLocally());

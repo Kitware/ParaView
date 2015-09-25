@@ -69,6 +69,7 @@ vtkPVOptions::vtkPVOptions()
   this->ReverseConnection = 0;
   this->UseStereoRendering = 0;
   this->UseOffscreenRendering = 0;
+  this->EGLDeviceIndex = 0;
   this->ConnectID = 0;
   this->LogFileName = 0;
   this->StereoType = 0;
@@ -181,7 +182,12 @@ void vtkPVOptions::Initialize()
                            "Render offscreen on the satellite processes."
                            " This option only works with software rendering or mangled mesa on Unix.",
                            vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVSERVER|vtkPVOptions::PVBATCH);
-
+#ifdef VTK_USE_OFFSCREEN_EGL
+  this->AddArgument("--egl-device-index", NULL, &this->EGLDeviceIndex,
+                    "Render offscreen through the Native Platform Interface (EGL) on the graphics card "
+                    "specificed by the device index.",
+                    vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVSERVER|vtkPVOptions::PVBATCH);
+#endif
   this->AddBooleanArgument("--stereo", 0, &this->UseStereoRendering,
                            "Tell the application to enable stereo rendering",
                            vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
@@ -419,6 +425,7 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Stereo Rendering: " << (this->UseStereoRendering?"Enabled":"Disabled") << endl;
 
   os << indent << "Offscreen Rendering: " << (this->UseOffscreenRendering?"Enabled":"Disabled") << endl;
+  os << indent << "EGL Device Index: "  << this->EGLDeviceIndex << endl;
 
   os << indent << "Tiled Display: " << (this->TileDimensions[0]?"Enabled":"Disabled") << endl;
   if (this->TileDimensions[0])

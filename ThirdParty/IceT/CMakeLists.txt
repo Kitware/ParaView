@@ -45,6 +45,12 @@ set(ICET_MPI_POSTFLAGS "${VTK_MPI_POSTFLAGS}"  CACHE INTERNAL
 set(ICET_MPI_MAX_NUMPROCS "${VTK_MPI_MAX_NUMPROCS}"  CACHE INTERNAL
   "This is set from VTK_MPI_MAX_NUMPROCS.")
 
+# Set OpenGL variables
+include(vtkOpenGL)
+set(ICET_USE_OSMESA "${VTK_USE_OSMESA}" CACHE INTERNAL
+  "Use Off-Screen Mesa")
+set(ICET_USE_OFFSCREEN_EGL "${VTK_USE_OFFSCREEN_EGL}" CACHE INTERNAL
+  "Use Off-Screen rendering through EGL")
 
 #########################################################################
 # Configure IceT
