@@ -489,7 +489,6 @@
         { "path": "fonts/face_times_bold_italic.cxx" },
         { "path": "fonts/face_times_italic.cxx" },
         { "class": "vtkFreeTypeTools" },
-        { "class": "vtkFreeTypeUtilities" },
         { "class": "vtkMathTextFreeTypeTextRenderer" },
         { "class": "vtkMathTextUtilities" },
         { "class": "vtkTextRendererStringToImage" },
@@ -908,9 +907,6 @@
     },
     { "name": "vtkfreetype",
       "path": "VTK/ThirdParty/freetype"
-    },
-    { "name": "vtkftgl",
-      "path": "VTK/ThirdParty/ftgl"
     },
     { "name": "vtkgl2ps",
       "path": "VTK/ThirdParty/gl2ps"
