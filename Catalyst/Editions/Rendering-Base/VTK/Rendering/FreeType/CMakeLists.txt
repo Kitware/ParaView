@@ -37,7 +37,6 @@ list(APPEND Module_SRCS
 
 set_source_files_properties(
   vtkFreeTypeTools.cxx
-  vtkFreeTypeUtilities.cxx
   WRAP_EXCLUDE
   )
 
