@@ -104,12 +104,12 @@ class CoProcessor(object):
         if not self.__PipelineCreated:
            self.CreatePipeline(datadescription)
            self.__PipelineCreated = True
-
-        simtime = datadescription.GetTime()
-        for name, producer in self.__ProducersMap.iteritems():
-            producer.GetClientSideObject().SetOutput(\
-                datadescription.GetInputDescriptionByName(name).GetGrid(),
-                simtime)
+        else:
+            simtime = datadescription.GetTime()
+            for name, producer in self.__ProducersMap.iteritems():
+                producer.GetClientSideObject().SetOutput(
+                    datadescription.GetInputDescriptionByName(name).GetGrid(),
+                    simtime)
 
     def WriteData(self, datadescription):
         """This method will update all writes present in the pipeline, as
@@ -244,7 +244,7 @@ class CoProcessor(object):
         producer = simple.PVTrivialProducer()
         # we purposefully don't set the time for the PVTrivialProducer here.
         # when we update the pipeline we will do it then.
-        producer.GetClientSideObject().SetOutput(grid)
+        producer.GetClientSideObject().SetOutput(grid, datadescription.GetTime())
 
         if grid.IsA("vtkImageData") == True or \
                 grid.IsA("vtkStructuredGrid") == True or \
