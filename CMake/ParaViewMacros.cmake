@@ -11,11 +11,10 @@
 #------------------------------------------------------------------------------
 FUNCTION(GENERATE_QT_RESOURCE_FROM_FILES resource_file resource_prefix file_list)
   SET (pq_resource_file_contents "<RCC>\n  <qresource prefix=\"${resource_prefix}\">\n")
-  GET_FILENAME_COMPONENT(current_directory ${resource_file} PATH)
   FOREACH (resource ${file_list})
     GET_FILENAME_COMPONENT(alias ${resource} NAME)
     GET_FILENAME_COMPONENT(resource ${resource} ABSOLUTE)
-    FILE(RELATIVE_PATH resource "${current_directory}" "${resource}")
+    GET_FILENAME_COMPONENT(resource ${resource} REALPATH)
     FILE(TO_NATIVE_PATH "${resource}" resource)
     SET (pq_resource_file_contents
       "${pq_resource_file_contents}    <file alias=\"${alias}\">${resource}</file>\n")
