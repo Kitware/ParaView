@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSelectionReaction.h"
 #include <QPointer>
 #include <QCursor>
+#include <QTimer>
 #include "vtkWeakPointer.h"
 
 class pqRenderView;
@@ -68,7 +69,8 @@ public:
     ZOOM_TO_BOX,
     CLEAR_SELECTION,
     SELECT_SURFACE_CELLS_INTERACTIVELY,
-    SELECT_SURFACE_POINTS_INTERACTIVELY
+    SELECT_SURFACE_POINTS_INTERACTIVELY,
+    SELECT_SURFACE_POINTS_TOOLTIP
     };
 
   /// If \c view is NULL, this reaction will track the active-view maintained by
@@ -104,6 +106,13 @@ private slots:
   /// render view to previous interaction mode.
   void endSelection();
 
+  /// makes the pre-selection.
+  void preSelection();
+
+  /// callback called for mouse stop events when in 'interactive selection'
+  /// modes.
+  void onMouseStop();
+
 private:
   /// callback called when the vtkPVRenderView is done with selection.
   void selectionChanged(vtkObject*, unsigned long, void* calldata);
@@ -123,6 +132,9 @@ private:
   // Check this selection is compatible with another type of selection
   bool isCompatible(SelectionMode mode);
 
+  // Display/hide the tooltip of the selected point in mode SELECT_SURFACE_POINTS_TOOLTIP.
+  void UpdateTooltip();
+
 private:
   Q_DISABLE_COPY(pqRenderViewSelectionReaction);
   QPointer<pqRenderView> View;
@@ -132,6 +144,8 @@ private:
   vtkWeakPointer<vtkObject> ObservedObject;
   unsigned long ObserverIds[4];
   QCursor ZoomCursor;
+  QTimer MouseMovingTimer;
+  bool MouseMoving;
 
   static QPointer<pqRenderViewSelectionReaction> ActiveReaction;
 

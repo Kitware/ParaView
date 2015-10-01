@@ -40,6 +40,7 @@ set (Module_SRCS
   vtkSMInteractionUndoStackBuilder.cxx
   vtkSMInteractiveSelectionPipeline.cxx
   vtkSMMultiServerSourceProxy.cxx
+  vtkSMPreselectionPipeline.cxx
   vtkSMPropertyModificationUndoElement.cxx
   vtkSMProxyClipboard.cxx
   vtkSMProxyConfigurationReader.cxx
@@ -47,6 +48,7 @@ set (Module_SRCS
   vtkSMPSWriterProxy.cxx
   vtkSMRenderViewExporterProxy.cxx
   vtkSMTesting.cxx
+  vtkSMTooltipSelectionPipeline.cxx
   vtkSMViewExportHelper.cxx
 )
 

@@ -44,13 +44,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVRenderView.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkSMInteractiveSelectionPipeline.h"
+#include "vtkSMTooltipSelectionPipeline.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSourceProxy.h"
 
+#include <QToolTip>
+
 #include <cassert>
 
 #include "zoom.xpm"
+
+static const int TOOLTIP_WAITING_TIME = 400;
 
 QPointer<pqRenderViewSelectionReaction> pqRenderViewSelectionReaction::ActiveReaction;
 
@@ -61,7 +66,9 @@ pqRenderViewSelectionReaction::pqRenderViewSelectionReaction(
   View(view),
   Mode(mode),
   PreviousRenderViewMode(-1),
-  ZoomCursor(QCursor(QPixmap((const char **)zoom_xpm)))
+  ZoomCursor(QCursor(QPixmap((const char **)zoom_xpm))),
+  MouseMovingTimer(this),
+  MouseMoving(false)
 {
 for (size_t i = 0;
      i < sizeof(this->ObserverIds) / sizeof(this->ObserverIds[0]); ++i)
@@ -91,7 +98,7 @@ for (size_t i = 0;
       }
     }
 
-  if (this->Mode == SELECT_FRUSTUM_CELLS || 
+  if (this->Mode == SELECT_FRUSTUM_CELLS ||
       this->Mode == SELECT_FRUSTUM_POINTS)
     {
     this->DisableSelectionModifiers = true;
@@ -102,6 +109,10 @@ for (size_t i = 0;
     }
 
   this->updateEnableState();
+
+  this->MouseMovingTimer.setSingleShot(true);
+  this->connect(&this->MouseMovingTimer, SIGNAL(timeout()), this,
+    SLOT(onMouseStop()));
 }
 
 //-----------------------------------------------------------------------------
@@ -241,6 +252,18 @@ void pqRenderViewSelectionReaction::beginSelection()
       vtkPVRenderView::INTERACTION_MODE_SELECTION);
     break;
 
+  case SELECT_SURFACE_POINTS_TOOLTIP:
+    pqCoreUtilities::promptUser(
+      "pqTooltipSelection",
+      QMessageBox::Information,
+      "Tooltip Selection Information",
+      "You are entering tooltip selection mode to display points information. "
+      "Simply move the mouse point over the dataset to interactively highlight "
+      "points and display a tooltip with points information.\n\n"
+      "Use the 'Esc' key or the same toolbar button to exit this mode.",
+      QMessageBox::Ok | QMessageBox::Save);
+    break;
+
   case ZOOM_TO_BOX:
     this->View->setCursor(this->ZoomCursor);
     vtkSMPropertyHelper(rmp, "InteractionMode").Set(
@@ -301,6 +324,13 @@ void pqRenderViewSelectionReaction::beginSelection()
       this, &pqRenderViewSelectionReaction::onWheelRotate);
     break;
 
+  case SELECT_SURFACE_POINTS_TOOLTIP:
+    this->ObservedObject = rmp->GetInteractor();
+    this->ObserverIds[0] = this->ObservedObject->AddObserver(
+      vtkCommand::MouseMoveEvent,
+      this, &pqRenderViewSelectionReaction::onMouseMove);
+    break;
+
   default:
     this->ObservedObject = rmp;
     this->ObserverIds[0] = this->ObservedObject->AddObserver(
@@ -333,6 +363,9 @@ void pqRenderViewSelectionReaction::endSelection()
   this->View->setCursor(QCursor());
   this->cleanupObservers();
   this->parentAction()->setChecked(false);
+  this->MouseMovingTimer.stop();
+  this->MouseMoving = false;
+  this->UpdateTooltip();
 }
 
 //-----------------------------------------------------------------------------
@@ -416,9 +449,29 @@ void pqRenderViewSelectionReaction::selectionChanged(
 //-----------------------------------------------------------------------------
 void pqRenderViewSelectionReaction::onMouseMove()
 {
+  switch (this->Mode)
+    {
+    case SELECT_SURFACE_POINTS_TOOLTIP:
+      this->MouseMovingTimer.start(TOOLTIP_WAITING_TIME);
+      this->MouseMoving = true;
+
+    case SELECT_SURFACE_CELLS_INTERACTIVELY:
+    case SELECT_SURFACE_POINTS_INTERACTIVELY:
+      this->preSelection();
+      break;
+
+    default:
+      qCritical("Invalid call to pqRenderViewSelectionReaction::onMouseMove");
+      return;
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderViewSelectionReaction::preSelection()
+{
   if (pqRenderViewSelectionReaction::ActiveReaction != this)
     {
-    qWarning("Unexpected call to onMouseMove.");
+    qWarning("Unexpected call to preSelection.");
     return;
     }
 
@@ -428,13 +481,30 @@ void pqRenderViewSelectionReaction::onMouseMove()
   int x = rmp->GetInteractor()->GetEventPosition()[0];
   int y = rmp->GetInteractor()->GetEventPosition()[1];
   int* size = rmp->GetInteractor()->GetSize();
-  vtkSMInteractiveSelectionPipeline* iSelectionPipeline =
-    vtkSMInteractiveSelectionPipeline::GetInstance();
+
+  vtkSMPreselectionPipeline* pipeline;
+  switch (this->Mode)
+    {
+    case SELECT_SURFACE_CELLS_INTERACTIVELY:
+    case SELECT_SURFACE_POINTS_INTERACTIVELY:
+      pipeline = vtkSMInteractiveSelectionPipeline::GetInstance();
+      break;
+
+    case SELECT_SURFACE_POINTS_TOOLTIP:
+      pipeline = vtkSMTooltipSelectionPipeline::GetInstance();
+      break;
+
+    default:
+      qCritical("Invalid call to pqRenderViewSelectionReaction::preSelection");
+      return;
+    }
+
   if (x < 0 || y < 0 || x >= size[0] || y >= size[1])
     {
     // If the cursor goes out of the render window we hide the
     // interactive selection
-    iSelectionPipeline->Hide(rmp);
+    pipeline->Hide(rmp);
+    this->UpdateTooltip();
     return;
     }
 
@@ -455,15 +525,20 @@ void pqRenderViewSelectionReaction::onMouseMove()
       region, selectedRepresentations.GetPointer(), selectionSources.GetPointer());
     break;
 
+  case SELECT_SURFACE_POINTS_TOOLTIP:
+    status = rmp->SelectSurfacePoints(
+      region, selectedRepresentations.GetPointer(), selectionSources.GetPointer());
+    break;
+
   default:
-    qCritical("Invalid call to pqRenderViewSelectionReaction::onMouseMove");
+    qCritical("Invalid call to pqRenderViewSelectionReaction::preSelection");
     return;
     }
 
   if (status)
     {
     BEGIN_UNDO_EXCLUDE();
-    iSelectionPipeline->Show(
+    pipeline->Show(
       vtkSMSourceProxy::SafeDownCast(selectedRepresentations->GetItemAsObject(0)),
       vtkSMSourceProxy::SafeDownCast(selectionSources->GetItemAsObject(0)),
       rmp);
@@ -471,7 +546,42 @@ void pqRenderViewSelectionReaction::onMouseMove()
     }
   else
     {
-    iSelectionPipeline->Hide(rmp);
+    pipeline->Hide(rmp);
+    }
+  this->UpdateTooltip();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderViewSelectionReaction::onMouseStop()
+{
+  this->MouseMoving = false;
+  this->UpdateTooltip();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderViewSelectionReaction::UpdateTooltip()
+{
+  if (this->Mode != SELECT_SURFACE_POINTS_TOOLTIP)
+    {
+    return;
+    }
+
+  vtkSMTooltipSelectionPipeline* pipeline = vtkSMTooltipSelectionPipeline::GetInstance();
+
+  bool showTooltip;
+  if (pipeline->CanDisplayTooltip(showTooltip))
+    {
+    double tooltipPos[2];
+    std::string tooltipText;
+    if (showTooltip && !this->MouseMoving
+     && pipeline->GetTooltipInfo(tooltipPos, tooltipText))
+      {
+      QToolTip::showText(QPoint(tooltipPos[0], tooltipPos[1]), tooltipText.c_str());
+      }
+    else
+      {
+      QToolTip::hideText();
+      }
     }
 }
 
