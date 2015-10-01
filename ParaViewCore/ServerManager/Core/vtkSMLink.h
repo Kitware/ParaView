@@ -80,6 +80,23 @@ public:
   // invalid state when a property refers to a sub-proxy that does not exist yet.
   virtual void LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator);
 
+  // Description:
+  // Update the internal protobuf state
+  virtual void UpdateState() = 0;
+
+  // Description:
+  // Get the number of object that are involved in this link.
+  virtual unsigned int GetNumberOfLinkedObjects() = 0;
+
+  // Description:
+  // Get the direction of a object involved in this link
+  // (see vtkSMLink::UpdateDirections)
+  virtual int GetLinkedObjectDirection(int index) = 0;
+
+  // Description:
+  // Get a proxy involved in this link.
+  virtual vtkSMProxy* GetLinkedProxy(int index) = 0;
+ 
 protected:
   vtkSMLink();
   ~vtkSMLink();

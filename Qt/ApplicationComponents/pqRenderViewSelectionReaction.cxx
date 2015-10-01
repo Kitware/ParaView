@@ -160,7 +160,7 @@ void pqRenderViewSelectionReaction::updateEnableState()
     {
     if (pqPVApplicationCore* core = pqPVApplicationCore::instance())
       {
-      enabled = core->selectionManager()->getSelectedPort() != NULL;
+      enabled = core->selectionManager()->hasActiveSelection();
       }
     }
   this->parentAction()->setEnabled(enabled);

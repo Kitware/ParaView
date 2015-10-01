@@ -217,12 +217,12 @@ void vtkSMCameraLink::CopyProperties(vtkSMProxy* caller)
     {
     vtkSMProperty* fromProp = caller->GetProperty(props[0]);
 
-    int numObjects = this->GetNumberOfLinkedProxies();
+    int numObjects = this->GetNumberOfLinkedObjects();
     for(int i=0; i<numObjects; i++)
       {
       vtkSMProxy* p = this->GetLinkedProxy(i);
       if(p != caller &&
-         this->GetLinkedProxyDirection(i) == vtkSMLink::OUTPUT)
+         this->GetLinkedObjectDirection(i) == vtkSMLink::OUTPUT)
         {
         vtkSMProperty* toProp = p->GetProperty(props[1]);
         toProp->Copy(fromProp);
@@ -244,11 +244,11 @@ void vtkSMCameraLink::UpdateViews(vtkSMProxy* caller, bool interactive)
   this->Internals->Updating = true;
   this->CopyProperties(caller);
 
-  int numObjects = this->GetNumberOfLinkedProxies();
+  int numObjects = this->GetNumberOfLinkedObjects();
   for(int i=0; i<numObjects; i++)
     {
     vtkSMProxy* p = this->GetLinkedProxy(i);
-    if(this->GetLinkedProxyDirection(i) == vtkSMLink::OUTPUT && p != caller)
+    if(this->GetLinkedObjectDirection(i) == vtkSMLink::OUTPUT && p != caller)
       {
       vtkSMRenderViewProxy* rmp;
       rmp = vtkSMRenderViewProxy::SafeDownCast(p);
@@ -280,12 +280,12 @@ void vtkSMCameraLink::StartInteraction(vtkObject* caller)
     }
 
   this->Internals->Updating = true;
-  int numObjects = this->GetNumberOfLinkedProxies();
+  int numObjects = this->GetNumberOfLinkedObjects();
   for(int i=0; i<numObjects; i++)
     {
     vtkSMRenderViewProxy* rmp = vtkSMRenderViewProxy::SafeDownCast(
       this->GetLinkedProxy(i));
-    if(rmp && this->GetLinkedProxyDirection(i) == vtkSMLink::OUTPUT &&
+    if(rmp && this->GetLinkedObjectDirection(i) == vtkSMLink::OUTPUT &&
       rmp->GetInteractor() != caller)
       {
       rmp->GetInteractor()->InvokeEvent(vtkCommand::StartInteractionEvent);
@@ -303,12 +303,12 @@ void vtkSMCameraLink::EndInteraction(vtkObject* caller)
     }
 
   this->Internals->Updating = true;
-  int numObjects = this->GetNumberOfLinkedProxies();
+  int numObjects = this->GetNumberOfLinkedObjects();
   for(int i=0; i<numObjects; i++)
     {
     vtkSMRenderViewProxy* rmp = vtkSMRenderViewProxy::SafeDownCast(
       this->GetLinkedProxy(i));
-    if(rmp && this->GetLinkedProxyDirection(i) == vtkSMLink::OUTPUT &&
+    if(rmp && this->GetLinkedObjectDirection(i) == vtkSMLink::OUTPUT &&
       rmp->GetInteractor() != caller)
       {
       rmp->GetInteractor()->InvokeEvent(vtkCommand::EndInteractionEvent);

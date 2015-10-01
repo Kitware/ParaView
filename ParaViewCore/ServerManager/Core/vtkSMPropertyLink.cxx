@@ -240,9 +240,17 @@ void vtkSMPropertyLink::RemoveLinkedProperty(vtkSMProxy* proxy,
 }
 
 //-----------------------------------------------------------------------------
-unsigned int vtkSMPropertyLink::GetNumberOfLinkedProperties()
+unsigned int vtkSMPropertyLink::GetNumberOfLinkedObjects()
 {
   return static_cast<unsigned int>(this->Internals->LinkedProperties.size());
+}
+
+//-----------------------------------------------------------------------------
+unsigned int vtkSMPropertyLink::GetNumberOfLinkedProperties()
+{
+  vtkWarningMacro("GetNumberOfLinkedProperties() is deprecated, "
+                  "please use GetNumberOfLinkedObjects() instead");
+  return this->GetNumberOfLinkedObjects();
 }
 
 //-----------------------------------------------------------------------------
@@ -300,7 +308,7 @@ vtkSMProxy* vtkSMPropertyLink::GetLinkedProxy(int index)
 }
 
 //-----------------------------------------------------------------------------
-int vtkSMPropertyLink::GetLinkedPropertyDirection(int index)
+int vtkSMPropertyLink::GetLinkedObjectDirection(int index)
 {
   vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter =
     this->Internals->LinkedProperties.begin();
@@ -315,6 +323,14 @@ int vtkSMPropertyLink::GetLinkedPropertyDirection(int index)
     return NONE;
     }
   return iter->UpdateDirection;
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMPropertyLink::GetLinkedPropertyDirection(int index)
+{
+  vtkWarningMacro("GetLinkedPropertyDirection(int index) is deprecated, "
+                  "please use GetLinkedObjectDirection(int index) instead");
+  return this->GetLinkedObjectDirection(index);
 }
 
 //-----------------------------------------------------------------------------

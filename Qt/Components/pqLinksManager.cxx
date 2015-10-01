@@ -107,6 +107,10 @@ void pqLinksManager::addLink()
                                 editor.selectedProxy2(),
                                 editor.selectedProperty2());
       }
+    else if (editor.linkType() == pqLinksModel::Selection)
+      {
+      model->addSelectionLink(editor.linkName(), editor.selectedProxy1(), editor.selectedProxy2());
+      }
     }
 }
 
@@ -142,6 +146,10 @@ void pqLinksManager::editLink()
                                 editor.selectedProperty1(),
                                 editor.selectedProxy2(),
                                 editor.selectedProperty2());
+      }
+    else if (editor.linkType() == pqLinksModel::Selection)
+      {
+      model->addSelectionLink(editor.linkName(), editor.selectedProxy1(), editor.selectedProxy2());
       }
     }
 }

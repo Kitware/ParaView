@@ -87,6 +87,7 @@ set (Module_SRCS
   vtkSMPropertyGroup.cxx
   vtkSMPropertyHelper.cxx
   vtkSMPropertyIterator.cxx
+  vtkSMNullProxy.cxx
   vtkSMPropertyLink.cxx
   vtkSMProxy.cxx
   vtkSMProxyDefinitionManager.cxx
@@ -102,29 +103,29 @@ set (Module_SRCS
   vtkSMReaderFactory.cxx
   vtkSMRemoteObject.cxx
   vtkSMRemoteObjectUpdateUndoElement.cxx
+  vtkSMSILDomain.cxx
+  vtkSMSILModel.cxx
+  vtkSMSelectionLink.cxx
   vtkSMServerStateLocator.cxx
-  vtkSMSessionClient.cxx
   vtkSMSession.cxx
+  vtkSMSessionClient.cxx
   vtkSMSessionObject.cxx
   vtkSMSessionProxyManager.cxx
   vtkSMSettings.cxx
   vtkSMSettingsProxy.cxx
-  vtkSMSILDomain.cxx
-  vtkSMSILModel.cxx
   vtkSMSourceProxy.cxx
   vtkSMStateLoader.cxx
   vtkSMStateLocator.cxx
   vtkSMStateVersionController.cxx
   vtkSMStringListDomain.cxx
   vtkSMStringVectorProperty.cxx
-  vtkSMUncheckedPropertyHelper.cxx
-  vtkSMUndoElement.cxx
-  vtkSMUndoStackBuilder.cxx
-  vtkSMUndoStack.cxx
-  vtkSMNullProxy.cxx
   vtkSMTimeKeeper.cxx
   vtkSMTimeKeeperProxy.cxx
   vtkSMTrace.cxx
+  vtkSMUncheckedPropertyHelper.cxx
+  vtkSMUndoElement.cxx
+  vtkSMUndoStack.cxx
+  vtkSMUndoStackBuilder.cxx
   vtkSMVectorProperty.cxx
   vtkSMWriterFactory.cxx
   vtkSMWriterProxy.cxx

@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreModule.h"
 #include <QAbstractItemModel>
 
+class vtkCollection;
 class pqProxy;
 class pqRenderView;
 class pqServer;
@@ -60,7 +61,8 @@ public:
     Unknown,
     Proxy,
     Camera,
-    Property
+    Property,
+    Selection
     };
 
 public:
@@ -88,6 +90,11 @@ public:
   vtkSMLink* getLink(const QModelIndex& idx) const;
   /// search for a link and return model index
   QModelIndex findLink(vtkSMLink* link) const;
+
+  /// search for a link using an proxy and a direction
+  /// use a none direction to get input and output
+  int FindLinksFromProxy(vtkSMProxy* inputProxy, int direction, 
+                         vtkCollection* links) const;
 
   /// get the first proxy for a link
   vtkSMProxy* getProxy1(const QModelIndex& idx) const;
@@ -118,6 +125,10 @@ public:
                        vtkSMProxy* proxy1, const QString& prop1,
                        vtkSMProxy* proxy2, const QString& prop2);
 
+  /// add a selection based link
+  void addSelectionLink(const QString& name, 
+                    vtkSMProxy* proxy1, vtkSMProxy* proxy2);
+ 
   /// remove a link by index
   void removeLink(const QModelIndex& idx);
   /// remove a link by name
@@ -132,9 +143,19 @@ public:
   /// this domain is used to get internal linkable proxies
   static vtkSMProxyListDomain* proxyListDomain(vtkSMProxy* proxy);
 
+signals:
+  /// Fired when a link is added
+  void linkAdded(int linkType);
+
+  /// Fired when a link is removed
+  void linkRemoved();
+
 protected slots:
   void onSessionCreated(pqServer*);
   void onSessionRemoved(pqServer*);
+
+  /// Convenience method used by the internal
+  void emitLinkRemoved();
 
 private:
   ItemType getLinkType(vtkSMLink* link) const;
@@ -155,6 +176,9 @@ public:
 
   QString name() const;
   vtkSMLink* link() const;
+
+signals:
+  void linkRemoved();
 
 private slots:
   void proxyModified(pqServerManagerModelItem*);

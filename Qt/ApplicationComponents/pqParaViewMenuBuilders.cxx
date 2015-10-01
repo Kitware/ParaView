@@ -60,6 +60,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFiltersMenuReaction.h"
 #include "pqHelpReaction.h"
 #include "pqIgnoreSourceTimeReaction.h"
+#include "pqLinkSelectionReaction.h"
 #include "pqLoadDataReaction.h"
 #include "pqLoadRestoreWindowLayoutReaction.h"
 #include "pqLoadStateReaction.h"
@@ -67,8 +68,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqManageCustomFiltersReaction.h"
 #include "pqManageLinksReaction.h"
 #include "pqManagePluginsReaction.h"
-#include "pqProxyGroupMenuManager.h"
 #include "pqPVApplicationCore.h"
+#include "pqProxyGroupMenuManager.h"
 #include "pqPythonShellReaction.h"
 #include "pqRecentFilesMenu.h"
 #include "pqRepresentationToolbar.h"
@@ -201,6 +202,8 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
     pqSetName("actionToolsCreateCustomFilter"));
   new pqCameraLinkReaction(menu.addAction("Add Camera Link...") <<
     pqSetName("actionToolsAddCameraLink"));
+  new pqLinkSelectionReaction(menu.addAction("Link with Selection") <<
+    pqSetName("actionToolsLinkSelection"));
   menu.addSeparator();
   new pqManageCustomFiltersReaction(menu.addAction("Manage Custom Filters...")
     << pqSetName("actionToolsManageCustomFilters"));
@@ -276,6 +279,7 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QWidget& widget)
   // File | Open.
   new pqLoadDataReaction(ui.actionPBOpen);
   new pqChangePipelineInputReaction(ui.actionPBChangeInput);
+  new pqLinkSelectionReaction(ui.actionPBLinkSelection);
   new pqCreateCustomFilterReaction(ui.actionPBCreateCustomFilter);
   new pqIgnoreSourceTimeReaction(ui.actionPBIgnoreTime);
   new pqDeleteReaction(ui.actionPBDelete);
