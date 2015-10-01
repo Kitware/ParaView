@@ -199,7 +199,8 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/CameraLink.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ChangingTimestepsInStateFiles.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ChartAxisRangeAndLabels.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/CheckableHeader.xml
+  # Temporarily disabling test till the VTK issue with probe masks is fixed.
+  #  ${CMAKE_CURRENT_SOURCE_DIR}/CheckableHeader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Clip.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditorControls.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditorVolumeControls.xml
