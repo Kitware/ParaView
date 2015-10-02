@@ -62,6 +62,7 @@ protected slots:
   void scaleHalf();
   void scaleTwice();
   void scale(double);
+  void updateWidget(vtkObject* domain);
 
 private:
   Q_DISABLE_COPY(pqDoubleVectorPropertyWidget);

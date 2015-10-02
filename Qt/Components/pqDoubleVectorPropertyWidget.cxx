@@ -65,6 +65,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
                                                            QWidget *parentObject)
   : pqPropertyWidget(smProxy, parentObject)
 {
+  this->setProperty(smProperty);
   this->setChangeAvailableAsChangeFinished(false);
 
   vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(smProperty);
@@ -73,12 +74,6 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
     return;
     }
 
-  vtkPVXMLElement *hints = dvp->GetHints();
-  vtkPVXMLElement *showLabels = NULL;
-  if (hints != NULL)
-    {
-    showLabels = hints->FindNestedElementByName("ShowComponentLabels");
-    }
   
   // find the domain
   vtkSMDoubleRangeDomain *defaultDomain = NULL;
@@ -101,14 +96,105 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
   layoutLocal->setMargin(0);
   layoutLocal->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
 
+  this->setLayout(layoutLocal);
+  
+  this->updateWidget(domain);
+  pqCoreUtilities::connect(domain, vtkCommand::DomainModifiedEvent, this, SLOT(updateWidget(vtkObject*)));
+  
+  if (defaultDomain)
+    {
+    defaultDomain->Delete();
+    }
+}
+//-----------------------------------------------------------------------------
+pqDoubleVectorPropertyWidget::~pqDoubleVectorPropertyWidget()
+{
+}
+//-----------------------------------------------------------------------------
+void pqDoubleVectorPropertyWidget::resetButtonClicked()
+{
+  if (vtkSMProperty* smproperty = this->property())
+    {
+    smproperty->ResetToDomainDefaults(/*use_unchecked_values*/true);
+    emit this->changeAvailable();
+    emit this->changeFinished();
+    }
+  emit this->clearHighlight();
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleVectorPropertyWidget::apply()
+{
+  this->Superclass::apply();
+  emit this->clearHighlight();
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleVectorPropertyWidget::reset()
+{
+  this->Superclass::reset();
+  emit this->clearHighlight();
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleVectorPropertyWidget::scaleHalf()
+{
+  this->scale(0.5);
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleVectorPropertyWidget::scaleTwice()
+{
+  this->scale(2.0);
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleVectorPropertyWidget::scale(double factor)
+{
+  if (vtkSMProperty* smproperty = this->property())
+    {
+    vtkSMUncheckedPropertyHelper helper(smproperty);
+    for (unsigned int cc=0, max=helper.GetNumberOfElements(); cc < max; cc++)
+      {
+      helper.Set(cc, helper.GetAsDouble(cc) * factor);
+      }
+    emit this->changeAvailable();
+    emit this->changeFinished();
+    }
+}
+
+void pqDoubleVectorPropertyWidget::updateWidget(vtkObject* domainObject)
+{
+  vtkSMDomain* domain = vtkSMDoubleRangeDomain::SafeDownCast(domainObject);
+
+  // Clear layout
+  QHBoxLayout* layoutLocal = qobject_cast<QHBoxLayout*>(this->layout());
+  while(layoutLocal->count() > 0)
+    {
+    QLayoutItem *item = layoutLocal->takeAt(0);
+    delete item->widget();
+    delete item;
+    }
+
+  // Fill Layout
+  vtkSMProperty* smProperty = this->property();
+  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(smProperty);
+
+  vtkPVXMLElement *hints = dvp->GetHints();
+  vtkPVXMLElement *showLabels = NULL;
+  if (hints != NULL)
+    {
+    showLabels = hints->FindNestedElementByName("ShowComponentLabels");
+    }
+
   if(vtkSMDoubleRangeDomain *range = vtkSMDoubleRangeDomain::SafeDownCast(domain))
     {
     if((vtkSMBoundsDomain::SafeDownCast(range) ||
       vtkSMArrayRangeDomain::SafeDownCast(range))
-      && smProperty->GetRepeatable())
+      && this->property()->GetRepeatable())
       {
       pqScalarValueListPropertyWidget *widget =
-        new pqScalarValueListPropertyWidget(smProperty, smProxy, this);
+        new pqScalarValueListPropertyWidget(smProperty, this->proxy(), this);
       widget->setObjectName("ScalarValueList");
       widget->setRangeDomain(range);
       this->addPropertyLink(widget, "scalars", SIGNAL(scalarsChanged()), smProperty);
@@ -299,68 +385,5 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
     resetButton->connect(this, SIGNAL(clearHighlight()), SLOT(clear()));
 
     layoutLocal->addWidget(resetButton, 0, Qt::AlignBottom);
-    }
-
-  this->setLayout(layoutLocal);
-
-  if (defaultDomain)
-    {
-    defaultDomain->Delete();
-    }
-}
-//-----------------------------------------------------------------------------
-pqDoubleVectorPropertyWidget::~pqDoubleVectorPropertyWidget()
-{
-}
-//-----------------------------------------------------------------------------
-void pqDoubleVectorPropertyWidget::resetButtonClicked()
-{
-  if (vtkSMProperty* smproperty = this->property())
-    {
-    smproperty->ResetToDomainDefaults(/*use_unchecked_values*/true);
-    emit this->changeAvailable();
-    emit this->changeFinished();
-    }
-  emit this->clearHighlight();
-}
-
-//-----------------------------------------------------------------------------
-void pqDoubleVectorPropertyWidget::apply()
-{
-  this->Superclass::apply();
-  emit this->clearHighlight();
-}
-
-//-----------------------------------------------------------------------------
-void pqDoubleVectorPropertyWidget::reset()
-{
-  this->Superclass::reset();
-  emit this->clearHighlight();
-}
-
-//-----------------------------------------------------------------------------
-void pqDoubleVectorPropertyWidget::scaleHalf()
-{
-  this->scale(0.5);
-}
-
-//-----------------------------------------------------------------------------
-void pqDoubleVectorPropertyWidget::scaleTwice()
-{
-  this->scale(2.0);
-}
-
-//-----------------------------------------------------------------------------
-void pqDoubleVectorPropertyWidget::scale(double factor)
-{
-  if (vtkSMProperty* smproperty = this->property())
-    {
-    vtkSMUncheckedPropertyHelper helper(smproperty);
-    for (unsigned int cc=0, max=helper.GetNumberOfElements(); cc < max; cc++)
-      {
-      helper.Set(cc, helper.GetAsDouble(cc) * factor);
-      }
-    emit this->changeAvailable();
-    emit this->changeFinished();
     }
 }
