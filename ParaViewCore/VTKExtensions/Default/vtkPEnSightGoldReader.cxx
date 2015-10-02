@@ -841,6 +841,7 @@ int vtkPEnSightGoldReader::ReadTensorsPerNode(const char* fileName, const char* 
                                                int timeStep, vtkMultiBlockDataSet *compositeOutput)
 {
   char line[256];
+  int symmTensorOrder[6] = {0, 1, 2, 3, 5, 4};
   int partId, realId, numPts, i, j;
   vtkFloatArray *tensors;
   vtkDataSet *output;
@@ -946,7 +947,8 @@ int vtkPEnSightGoldReader::ReadTensorsPerNode(const char* fileName, const char* 
           //tensors->InsertComponent(j, i, atof(line));
           // Same behaviour as Vector Per Node variables: we inject data as component,
           // and not as tuple.
-          this->InsertVariableComponent(tensors, j, i, &val, realId, 0, SCALAR_PER_NODE);
+          this->InsertVariableComponent(tensors, j, symmTensorOrder[i],
+                                        &val, realId, 0, SCALAR_PER_NODE);
           }
         }
       tensors->SetName(description);
@@ -1344,11 +1346,12 @@ int vtkPEnSightGoldReader::ReadVectorsPerElement(const char* fileName,
 
 //----------------------------------------------------------------------------
 int vtkPEnSightGoldReader::ReadTensorsPerElement(const char* fileName,
-                                                  const char* description,
-                                                  int timeStep,
-                                                  vtkMultiBlockDataSet *compositeOutput)
+                                                 const char* description,
+                                                 int timeStep,
+                                                 vtkMultiBlockDataSet *compositeOutput)
 {
   char line[256];
+  int symmTensorOrder[6] = {0, 1, 2, 3, 5, 4};
   int partId, realId, numCells, numCellsPerElement, i, j, idx;
   vtkFloatArray *tensors;
   int lineRead, elementType;
@@ -1458,7 +1461,8 @@ int vtkPEnSightGoldReader::ReadTensorsPerElement(const char* fileName,
             this->ReadNextDataLine(line);
             value = atof(line);
             //tensors->InsertComponent(j, i, value);
-            this->InsertVariableComponent(tensors,j,i,&value,realId,0,SCALAR_PER_ELEMENT);
+            this->InsertVariableComponent(tensors,j,symmTensorOrder[i],
+                                          &value,realId,0,SCALAR_PER_ELEMENT);
             }
           }
         lineRead = this->ReadNextDataLine(line);
@@ -1488,7 +1492,8 @@ int vtkPEnSightGoldReader::ReadTensorsPerElement(const char* fileName,
               value = atof(line);
               //tensors->InsertComponent(this->GetCellIds(idx, elementType)->GetId(j),
               //                         i, value);
-              this->InsertVariableComponent(tensors, j, i, &value, idx, elementType, SCALAR_PER_ELEMENT);
+              this->InsertVariableComponent(tensors, j, symmTensorOrder[i],
+                                            &value, idx, elementType, SCALAR_PER_ELEMENT);
               }
             }
           lineRead = this->ReadNextDataLine(line);

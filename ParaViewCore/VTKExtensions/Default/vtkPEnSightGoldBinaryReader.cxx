@@ -1893,8 +1893,8 @@ int vtkPEnSightGoldBinaryReader::ReadTensorsPerNode(
       this->ReadFloatArray(comp2, numPts);
       this->ReadFloatArray(comp3, numPts);
       this->ReadFloatArray(comp4, numPts);
-      this->ReadFloatArray(comp5, numPts);
       this->ReadFloatArray(comp6, numPts);
+      this->ReadFloatArray(comp5, numPts);
       for (i = 0; i < numPts; i++)
         {
         tuple[0] = comp1[i];
@@ -2607,8 +2607,8 @@ int vtkPEnSightGoldBinaryReader::ReadTensorsPerElement(
         this->ReadFloatArray(comp2, numCells);
         this->ReadFloatArray(comp3, numCells);
         this->ReadFloatArray(comp4, numCells);
-        this->ReadFloatArray(comp5, numCells);
         this->ReadFloatArray(comp6, numCells);
+        this->ReadFloatArray(comp5, numCells);
         for (i = 0; i < numCells; i++)
           {
           tuple[0] = comp1[i];
@@ -2662,8 +2662,8 @@ int vtkPEnSightGoldBinaryReader::ReadTensorsPerElement(
           this->ReadFloatArray(comp2, numCellsPerElement);
           this->ReadFloatArray(comp3, numCellsPerElement);
           this->ReadFloatArray(comp4, numCellsPerElement);
-          this->ReadFloatArray(comp5, numCellsPerElement);
           this->ReadFloatArray(comp6, numCellsPerElement);
+          this->ReadFloatArray(comp5, numCellsPerElement);
           for (i = 0; i < numCellsPerElement; i++)
             {
             tuple[0] = comp1[i];
