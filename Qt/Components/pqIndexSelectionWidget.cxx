@@ -499,7 +499,7 @@ void pqIndexSelectionWidget::addRow(const QString &key, int current, int size)
       QLabel *label = dynamic_cast<QLabel*>(layoutItem->widget());
       if (label)
         {
-        if (key.compare(label->text(), Qt::CaseInsensitive) < 0)
+        if (key.compare(label->text(), Qt::CaseSensitive) < 0)
           {
           break;
           }

@@ -7232,6 +7232,24 @@
         </IndexSelectionDomain>
       </StringVectorProperty>
       <!-- End dimensions table -->
+      <StringVectorProperty command="GetAllDimensions"
+                            information_only="1"
+                            name="DimensionList">
+        <StringArrayHelper />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetVerticalDimension"
+                            name="VerticalDimension"
+                            label="Vertical Dimension"
+                            number_of_elements="1"
+                            default_values="nVertLevels"
+                            panel_visibility="default">
+        <StringListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="DimensionList" />
+          </RequiredProperties>
+        </StringListDomain>
+      </StringVectorProperty>
       <IntVectorProperty command="SetProjectLatLon"
                          default_values="0"
                          name="ProjectLatLon"
