@@ -7208,6 +7208,30 @@
         <Documentation>This property lists which NetCDF dual-grid cell
         variables to load.</Documentation>
       </StringVectorProperty>
+      <!-- Dimensions table: -->
+      <!-- Elements are [arrayName] [currentIndex] [dimSize]: -->
+      <StringVectorProperty information_only="1"
+                            name="DimensionInfo"
+                            command="Dimension"
+                            si_class="vtkSIIndexSelectionProperty">
+      </StringVectorProperty>
+      <!-- Elements are [arrayName] [currentIndex]: -->
+      <StringVectorProperty command="SetDimensionCurrentIndex"
+                            name="DimensionCurrentIndex"
+                            label="Extra Dimension Indices"
+                            element_types="2 0"
+                            number_of_elements="2"
+                            number_of_elements_per_command="2"
+                            repeat_command="1"
+                            panel_widget="index_selection">
+        <IndexSelectionDomain name="index_selection">
+          <RequiredProperties>
+            <Property function="Info"
+                      name="DimensionInfo" />
+          </RequiredProperties>
+        </IndexSelectionDomain>
+      </StringVectorProperty>
+      <!-- End dimensions table -->
       <IntVectorProperty command="SetProjectLatLon"
                          default_values="0"
                          name="ProjectLatLon"

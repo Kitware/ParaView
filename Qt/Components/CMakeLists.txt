@@ -143,6 +143,8 @@ set (Module_SRCS
   pqImageTip.h
   pqImplicitPlaneWidget.cxx
   pqImplicitPlaneWidget.h
+  pqIndexSelectionWidget.cxx
+  pqIndexSelectionWidget.h
   pqIntMaskPropertyWidget.cxx
   pqIntMaskPropertyWidget.h
   pqIntRangeWidget.cxx
@@ -405,6 +407,7 @@ set (Module_MOC_HDRS
   pqHighlightItemDelegate.h
   pqImageTip.h
   pqImplicitPlaneWidget.h
+  pqIndexSelectionWidget.h
   pqIntMaskPropertyWidget.h
   pqIntRangeWidget.h
   pqIntVectorPropertyWidget.h

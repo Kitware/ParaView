@@ -64,6 +64,7 @@ set (Module_SRCS
   vtkSMGlobalPropertiesLinkUndoElement.cxx
   vtkSMGlobalPropertiesProxy.cxx
   vtkSMIdTypeVectorProperty.cxx
+  vtkSMIndexSelectionDomain.cxx
   vtkSMInputArrayDomain.cxx
   vtkSMInputProperty.cxx
   vtkSMInsituStateLoader.cxx
