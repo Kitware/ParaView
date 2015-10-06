@@ -221,7 +221,6 @@ protected:
   int SimulationPaused;
 
   char* InsituXMLState;
-  vtkSmartPointer<vtkPVXMLElement> XMLState;
   vtkWeakPointer<vtkPVSessionBase> LiveSession;
   vtkSmartPointer<vtkMultiProcessController> Controller;
   vtkSmartPointer<vtkExtractsDeliveryHelper> ExtractsDeliveryHelper;
