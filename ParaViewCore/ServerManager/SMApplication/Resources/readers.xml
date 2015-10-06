@@ -7331,28 +7331,6 @@
         <Documentation>This property specifies where the center will be viewed
         for a lat/lon projection.</Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="GetVerticalLevelRange"
-                         information_only="1"
-                         name="VerticalLevelRangeInfo">
-        <SimpleIntInformationHelper />
-      </IntVectorProperty>
-      <IntVectorProperty command="SetVerticalLevel"
-                         default_values="0"
-                         name="VerticalLevel"
-                         number_of_elements="1">
-        <IntRangeDomain name="range">
-          <RequiredProperties>
-            <Property function="Range"
-                      name="VerticalLevelRangeInfo" />
-          </RequiredProperties>
-        </IntRangeDomain>
-        <Documentation>This property specifies which vertical level is viewed
-        if not in multilayer view. Only the data for that vertical level will
-        be viewed. The grid is essentially the same for each vertical level,
-        however at some ocean levels, especially the lower ones, due to the
-        topography, the grid becomes more sparse where there is
-        land.</Documentation>
-      </IntVectorProperty>
       <DoubleVectorProperty information_only="1"
                             name="TimestepValues"
                             repeatable="1">
