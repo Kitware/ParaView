@@ -170,16 +170,18 @@ void vtkInSituPParticlePathFilter::AssignSeedsToProcessors(
         {
         this->UniqueIdCounter = info.UniqueParticleId+1;
         }
-      info.TimeStepAge          = -info.InjectedStepId;
+      info.TimeStepAge          = this->RestartStep-info.InjectedStepId;
       }
     else
       {
       info.SourceID             = sourceID;
       info.InjectedPointId      = i+ptId;
+      // this->GetReinjectionCounter() really gets the reinjection time step
+      // ignoring the restart step.
       info.InjectedStepId       = this->GetReinjectionCounter()+this->RestartStep;
       info.UniqueParticleId     =-1;
       info.age                  = 0.0;
-      info.TimeStepAge          = -this->RestartStep;
+      info.TimeStepAge          = 0;
       }
     info.rotation             = 0.0;
     info.angularVel           = 0.0;
