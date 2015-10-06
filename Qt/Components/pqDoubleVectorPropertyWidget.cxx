@@ -73,7 +73,6 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
     {
     return;
     }
-
   
   // find the domain
   vtkSMDoubleRangeDomain *defaultDomain = NULL;
@@ -98,8 +97,9 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
 
   this->setLayout(layoutLocal);
   
-  this->updateWidget(domain);
-  pqCoreUtilities::connect(domain, vtkCommand::DomainModifiedEvent, this, SLOT(updateWidget(vtkObject*)));
+  this->propertyDomainModified(domain);
+  pqCoreUtilities::connect(domain, vtkCommand::DomainModifiedEvent, 
+                           this, SLOT(propertyDomainModified(vtkObject*)));
   
   if (defaultDomain)
     {
@@ -163,7 +163,8 @@ void pqDoubleVectorPropertyWidget::scale(double factor)
     }
 }
 
-void pqDoubleVectorPropertyWidget::updateWidget(vtkObject* domainObject)
+//-----------------------------------------------------------------------------
+void pqDoubleVectorPropertyWidget::propertyDomainModified(vtkObject* domainObject)
 {
   vtkSMDomain* domain = vtkSMDoubleRangeDomain::SafeDownCast(domainObject);
 
