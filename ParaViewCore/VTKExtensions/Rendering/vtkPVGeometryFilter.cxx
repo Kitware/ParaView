@@ -1437,7 +1437,13 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
       this->UnstructuredGridGeometryFilter->AddObserver(
                                                 vtkCommand::ProgressEvent,
                                                 this->InternalProgressObserver);
+
+      // Disable point merging as it may prevent the correct visualization
+      // of non-continuous attributes.
+      this->UnstructuredGridGeometryFilter->MergingOff();
+
       this->UnstructuredGridGeometryFilter->Update();
+
       // The internal filter finished.  Remove the observer.
       this->UnstructuredGridGeometryFilter->RemoveObserver(
                                                 this->InternalProgressObserver);
