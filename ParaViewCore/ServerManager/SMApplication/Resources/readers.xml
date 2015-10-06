@@ -7168,6 +7168,16 @@
         <Documentation>This property specifies the file name to read. It should
         be an MPAS format NetCDF file ending in .nc.</Documentation>
       </StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetUseDimensionedArrayNames"
+                         name="UseDimensionedArrayNames"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>This property ensures that the dimension info is always
+        shown in the ParaView GUI.</Documentation>
+      </IntVectorProperty>
       <StringVectorProperty information_only="1"
                             name="PointArrayInfo">
         <ArraySelectionInformationHelper attribute_name="Point" />
