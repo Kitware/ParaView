@@ -23,11 +23,10 @@
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkProp3D.h"
 
-#include "vtkGridAxesHelper.h"
-#include "vtkNew.h"
-#include "vtkSmartPointer.h"
-#include "vtkVector.h"
-#include <deque>
+#include "vtkGridAxesHelper.h" // For face enumeration
+#include "vtkNew.h" // For member variables
+#include "vtkSmartPointer.h" // For member variables
+#include <deque> // For keeping track of tick marks
 
 class vtkActor;
 class vtkCellArray;

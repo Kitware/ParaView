@@ -21,7 +21,7 @@
 #define vtkPGenericIOReader_h
 
 // VTK includes
-#include "vtkUnstructuredGridAlgorithm.h" // Base class
+#include "vtkUnstructuredGridAlgorithm.h"
 #include "vtkPVVTKExtensionsCosmoToolsModule.h" // For export macro
 
 #include <set> // for std::set in protected methods

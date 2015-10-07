@@ -34,7 +34,7 @@
 // finding is on, this output is similar to the second output except with data
 // for each subhalo rather than each halo.  It contains one point per subhalo.
 
-#include "vtkPVVTKExtensionsCosmoToolsModule.h"
+#include "vtkPVVTKExtensionsCosmoToolsModule.h" // For export macro
 #include "vtkUnstructuredGridAlgorithm.h"
 
 class vtkMultiProcessController;

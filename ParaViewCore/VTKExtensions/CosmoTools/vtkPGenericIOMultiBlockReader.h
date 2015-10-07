@@ -20,10 +20,10 @@
 #ifndef vtkPGenericIOMultiBlockReader_h
 #define vtkPGenericIOMultiBlockReader_h
 
-#include "vtkPVVTKExtensionsCosmoToolsModule.h"
-#include "vtkMultiBlockDataSetAlgorithm.h" // parent class
+#include "vtkPVVTKExtensionsCosmoToolsModule.h" // For export macro
+#include "vtkMultiBlockDataSetAlgorithm.h"
 
-#include <set>
+#include <set> // For std::set
 
 class vtkCallbackCommand;
 class vtkDataArraySelection;

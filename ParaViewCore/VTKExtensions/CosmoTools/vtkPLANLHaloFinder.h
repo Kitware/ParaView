@@ -67,7 +67,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkPLANLHaloFinder_h
 #define __vtkPLANLHaloFinder_h
 
-#include "vtkUnstructuredGridAlgorithm.h" // Base class
+#include "vtkUnstructuredGridAlgorithm.h"
 #include "vtkPVVTKExtensionsCosmoToolsModule.h" // For export macro
 
 // Forward declarations
