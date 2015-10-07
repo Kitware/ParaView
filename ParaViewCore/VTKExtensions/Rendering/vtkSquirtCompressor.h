@@ -82,6 +82,8 @@ public:
 protected:
   vtkSquirtCompressor();
   virtual ~vtkSquirtCompressor();
+  int DecompressRGB();
+  int DecompressRGBA();
 
   int SquirtLevel;
 
