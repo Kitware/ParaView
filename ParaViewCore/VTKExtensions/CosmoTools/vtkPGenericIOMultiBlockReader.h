@@ -234,10 +234,8 @@ protected:
 
 
 private:
-  // not implemented
-  vtkPGenericIOMultiBlockReader(const vtkPGenericIOMultiBlockReader& other);
-  vtkPGenericIOMultiBlockReader& operator=(
-      const vtkPGenericIOMultiBlockReader& other);
+  vtkPGenericIOMultiBlockReader(const vtkPGenericIOMultiBlockReader&); // Not implemented
+  void operator=(const vtkPGenericIOMultiBlockReader&); // Not implemented
   // Internal helper class
   class vtkGenericIOMultiBlockMetaData;
   vtkGenericIOMultiBlockMetaData* MetaData;
