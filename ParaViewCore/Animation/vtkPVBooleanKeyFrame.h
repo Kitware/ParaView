@@ -16,8 +16,8 @@
 // .SECTION Description
 // Empty key frame. Can be used to toggle boolean properties.
 
-#ifndef __vtkSMBooleanKeyFrameProxy_h
-#define __vtkSMBooleanKeyFrameProxy_h
+#ifndef vtkSMBooleanKeyFrameProxy_h
+#define vtkSMBooleanKeyFrameProxy_h
 
 #include "vtkPVKeyFrame.h"
 

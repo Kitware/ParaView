@@ -18,8 +18,8 @@
 // vtkPVEnvironmentInformation can be used to get values of environment
 // variables.
 
-#ifndef __vtkPVEnvironmentInformation_h
-#define __vtkPVEnvironmentInformation_h
+#ifndef vtkPVEnvironmentInformation_h
+#define vtkPVEnvironmentInformation_h
 
 #include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
 #include "vtkPVInformation.h"

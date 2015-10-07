@@ -16,8 +16,8 @@
 // .SECTION Description
 //
 
-#ifndef __vtkSMChartRepresentationProxy_h
-#define __vtkSMChartRepresentationProxy_h
+#ifndef vtkSMChartRepresentationProxy_h
+#define vtkSMChartRepresentationProxy_h
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMRepresentationProxy.h"

@@ -1,5 +1,5 @@
-#ifndef __vtkSpyPlotBlockIterator_h
-#define __vtkSpyPlotBlockIterator_h
+#ifndef vtkSpyPlotBlockIterator_h
+#define vtkSpyPlotBlockIterator_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkSpyPlotUniReader.h"

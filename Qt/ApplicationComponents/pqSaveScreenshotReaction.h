@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqSaveScreenshotReaction_h 
-#define __pqSaveScreenshotReaction_h
+#ifndef pqSaveScreenshotReaction_h
+#define pqSaveScreenshotReaction_h
 
 #include "pqReaction.h"
 

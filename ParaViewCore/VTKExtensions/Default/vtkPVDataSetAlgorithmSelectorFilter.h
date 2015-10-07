@@ -21,8 +21,8 @@
 // vtk filter and allow to easily switch from one implementation to another
 // without changing anything in your pipeline.
 
-#ifndef __vtkPVDataSetAlgorithmSelectorFilter_h
-#define __vtkPVDataSetAlgorithmSelectorFilter_h
+#ifndef vtkPVDataSetAlgorithmSelectorFilter_h
+#define vtkPVDataSetAlgorithmSelectorFilter_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkAlgorithm.h"

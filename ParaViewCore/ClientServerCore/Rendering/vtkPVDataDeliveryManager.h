@@ -21,8 +21,8 @@
 // a managing idiosyncrasies like requiring delivering to all nodes,
 // redistributing for ordered compositing, etc.
 
-#ifndef __vtkPVDataDeliveryManager_h
-#define __vtkPVDataDeliveryManager_h
+#ifndef vtkPVDataDeliveryManager_h
+#define vtkPVDataDeliveryManager_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkObject.h"

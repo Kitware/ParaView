@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqStandardServerManagerModelInterface_h 
-#define __pqStandardServerManagerModelInterface_h
+#ifndef pqStandardServerManagerModelInterface_h
+#define pqStandardServerManagerModelInterface_h
 
 #include "pqCoreModule.h"
 #include "pqServerManagerModelInterface.h"

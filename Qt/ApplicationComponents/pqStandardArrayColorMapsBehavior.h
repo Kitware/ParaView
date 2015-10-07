@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqStandardArrayColorMapsBehavior_h
-#define __pqStandardArrayColorMapsBehavior_h
+#ifndef pqStandardArrayColorMapsBehavior_h
+#define pqStandardArrayColorMapsBehavior_h
 
 #include <QObject>
 #include "pqApplicationComponentsModule.h" // for exports.

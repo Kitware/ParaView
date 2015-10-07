@@ -23,8 +23,8 @@
 // .SECTION See Also
 // vtkContourFilter vtkAMRDualContour
 
-#ifndef __vtkPVContourFilter_h
-#define __vtkPVContourFilter_h
+#ifndef vtkPVContourFilter_h
+#define vtkPVContourFilter_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkContourFilter.h"
@@ -71,4 +71,4 @@ private:
  void operator=(const vtkPVContourFilter&);     // Not implemented.
 };
 
-#endif // __vtkPVContourFilter_h
+#endif // vtkPVContourFilter_h

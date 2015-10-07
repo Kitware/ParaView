@@ -22,8 +22,8 @@
 // for this point and cell will contain the integration results
 // for the corresponding input attributes.
 
-#ifndef __vtkGridConnectivity_h
-#define __vtkGridConnectivity_h
+#ifndef vtkGridConnectivity_h
+#define vtkGridConnectivity_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"

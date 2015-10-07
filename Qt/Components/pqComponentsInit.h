@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
-#ifndef __pqComponentsInit_h
-#define __pqComponentsInit_h
+#ifndef pqComponentsInit_h
+#define pqComponentsInit_h
 
 #include "pqComponentsModule.h"
 

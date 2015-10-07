@@ -17,8 +17,8 @@
 // vtkPVPlotTime is used to add a "current-time" marker to the plot when on of
 // the axes in the plots is time. Currently only X-axis as time is supported.
 
-#ifndef __vtkPVPlotTime_h
-#define __vtkPVPlotTime_h
+#ifndef vtkPVPlotTime_h
+#define vtkPVPlotTime_h
 
 #include "vtkPlot.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

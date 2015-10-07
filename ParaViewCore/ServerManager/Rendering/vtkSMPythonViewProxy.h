@@ -16,8 +16,8 @@
 // .SECTION Description
 // vtkSMPythonViewProxy is a view proxy for the vtkPythonView.
 
-#ifndef __vtkSMPythonViewProxy_h
-#define __vtkSMPythonViewProxy_h
+#ifndef vtkSMPythonViewProxy_h
+#define vtkSMPythonViewProxy_h
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMViewProxy.h"
@@ -61,4 +61,4 @@ private:
 
 };
 
-#endif // __vtkSMPythonViewProxy_h
+#endif // vtkSMPythonViewProxy_h

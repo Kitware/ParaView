@@ -20,8 +20,8 @@
 // \internal
 
 
-#ifndef __vtkSpyPlotHistoryReaderPrivate_h
-#define __vtkSpyPlotHistoryReaderPrivate_h
+#ifndef vtkSpyPlotHistoryReaderPrivate_h
+#define vtkSpyPlotHistoryReaderPrivate_h
 
 #include <vtksys/SystemTools.hxx>
 

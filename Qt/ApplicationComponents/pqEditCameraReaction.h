@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqEditCameraReaction_h 
-#define __pqEditCameraReaction_h
+#ifndef pqEditCameraReaction_h
+#define pqEditCameraReaction_h
 
 #include "pqReaction.h"
 #include <QPointer>

@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqFindDataCurrentSelectionFrame_h
-#define __pqFindDataCurrentSelectionFrame_h
+#ifndef pqFindDataCurrentSelectionFrame_h
+#define pqFindDataCurrentSelectionFrame_h
 
 #include <QWidget>
 #include "pqComponentsModule.h"

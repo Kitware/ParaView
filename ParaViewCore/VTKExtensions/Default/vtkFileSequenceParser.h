@@ -21,8 +21,8 @@
 // provided file name.
 // by several vtkPVUpdateSuppressor objects.
 
-#ifndef __vtkFileSequenceParser_h
-#define __vtkFileSequenceParser_h
+#ifndef vtkFileSequenceParser_h
+#define vtkFileSequenceParser_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkObject.h"

@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqAnimationManager_h
-#define __pqAnimationManager_h
+#ifndef pqAnimationManager_h
+#define pqAnimationManager_h
 
 #include "pqComponentsModule.h"
 #include <QObject>

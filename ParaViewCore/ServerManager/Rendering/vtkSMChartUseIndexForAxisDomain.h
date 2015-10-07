@@ -25,8 +25,8 @@
 // Supported Required-Property functions:
 // \li ArraySelection : (required) refers to the property that dictates the
 // array selection.
-#ifndef __vtkSMChartUseIndexForAxisDomain_h
-#define __vtkSMChartUseIndexForAxisDomain_h
+#ifndef vtkSMChartUseIndexForAxisDomain_h
+#define vtkSMChartUseIndexForAxisDomain_h
 
 #include "vtkSMBooleanDomain.h"
 #include "vtkPVServerManagerRenderingModule.h" // needed for exports

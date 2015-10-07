@@ -17,8 +17,8 @@
 // vtkPVLastSelectionInformation is used to obtain the LastSelection from
 // vtkPVRenderView.
 
-#ifndef __vtkPVLastSelectionInformation_h
-#define __vtkPVLastSelectionInformation_h
+#ifndef vtkPVLastSelectionInformation_h
+#define vtkPVLastSelectionInformation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVSelectionInformation.h"

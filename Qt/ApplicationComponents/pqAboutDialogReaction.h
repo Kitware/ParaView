@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqAboutDialogReaction_h 
-#define __pqAboutDialogReaction_h
+#ifndef pqAboutDialogReaction_h
+#define pqAboutDialogReaction_h
 
 #include "pqReaction.h"
 

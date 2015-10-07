@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqCustomViewDialog_h
-#define __pqCustomViewDialog_h
+#ifndef pqCustomViewDialog_h
+#define pqCustomViewDialog_h
 // .NAME pqCustomViewDialog - Dialog for configuring custom view buttons.
 //
 // .SECTION Description

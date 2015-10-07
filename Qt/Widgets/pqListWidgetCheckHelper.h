@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef __pqListWidgetCheckHelper_h
-#define __pqListWidgetCheckHelper_h
+#ifndef pqListWidgetCheckHelper_h
+#define pqListWidgetCheckHelper_h
 
 #include "pqWidgetsModule.h"
 #include <QObject>

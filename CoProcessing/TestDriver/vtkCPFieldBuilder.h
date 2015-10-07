@@ -16,8 +16,8 @@
 // .SECTION Description
 // Abstract class for specifying fields over grids for a test driver.  
 
-#ifndef __vtkCPFieldBuilder_h
-#define __vtkCPFieldBuilder_h
+#ifndef vtkCPFieldBuilder_h
+#define vtkCPFieldBuilder_h
 
 #include "vtkCPBaseFieldBuilder.h"
 #include "vtkPVCatalystTestDriverModule.h" // needed for export macros

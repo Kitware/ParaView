@@ -19,8 +19,8 @@
 // provides different APIs for different types of selections to create.
 // The output selection type depends on the API used most recently.
 
-#ifndef __vtkPVSelectionSource_h
-#define __vtkPVSelectionSource_h
+#ifndef vtkPVSelectionSource_h
+#define vtkPVSelectionSource_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkSelectionAlgorithm.h"

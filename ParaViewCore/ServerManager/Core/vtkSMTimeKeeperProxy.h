@@ -17,8 +17,8 @@
 // We simply pass the TimestepValues and TimeRange properties to the client-side
 // vtkSMTimeKeeper instance so that it can keep those up-to-date.
 
-#ifndef __vtkSMTimeKeeperProxy_h
-#define __vtkSMTimeKeeperProxy_h
+#ifndef vtkSMTimeKeeperProxy_h
+#define vtkSMTimeKeeperProxy_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMProxy.h"

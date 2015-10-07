@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef __pq@BPC_NAME@Initializer
-#define __pq@BPC_NAME@Initializer
+#ifndef pq@BPC_NAME@Initializer_h
+#define pq@BPC_NAME@Initializer_h
 
 class QMainWindow;
 class pqPVApplicationCore;

@@ -20,8 +20,8 @@
 // to vtkDataSetAttributes.  That would eliminate all of the "Information"
 // in ParaView.
 
-#ifndef __vtkPVDataSetAttributesInformation_h
-#define __vtkPVDataSetAttributesInformation_h
+#ifndef vtkPVDataSetAttributesInformation_h
+#define vtkPVDataSetAttributesInformation_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"

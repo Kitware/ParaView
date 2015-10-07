@@ -14,8 +14,8 @@
 =========================================================================*/
 // .NAME pqMultiSliceView - QT GUI that allow multi slice control
 
-#ifndef __pqMultiSliceView_h
-#define __pqMultiSliceView_h
+#ifndef pqMultiSliceView_h
+#define pqMultiSliceView_h
 
 #include "pqCoreModule.h"
 #include "pqRenderView.h"

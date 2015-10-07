@@ -19,8 +19,8 @@
 // and the number of processes which a specified fragment is
 // spread across.
 
-#ifndef __vtkMaterialInterfaceToProcMap_h
-#define __vtkMaterialInterfaceToProcMap_h
+#ifndef vtkMaterialInterfaceToProcMap_h
+#define vtkMaterialInterfaceToProcMap_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 

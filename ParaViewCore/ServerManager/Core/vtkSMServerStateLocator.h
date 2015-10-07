@@ -17,8 +17,8 @@
 // .SECTION Description
 // Retreive a given state from the server.
 
-#ifndef __vtkSMServerStateLocator_h
-#define __vtkSMServerStateLocator_h
+#ifndef vtkSMServerStateLocator_h
+#define vtkSMServerStateLocator_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMStateLocator.h"

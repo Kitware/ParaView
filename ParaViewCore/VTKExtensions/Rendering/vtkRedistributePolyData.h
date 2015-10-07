@@ -20,8 +20,8 @@
 // .NAME vtkRedistributePolyData - redistribute poly cells from other processes
 //                        (special version to color according to processor)
 
-#ifndef __vtkRedistributePolyData_h
-#define __vtkRedistributePolyData_h
+#ifndef vtkRedistributePolyData_h
+#define vtkRedistributePolyData_h
 
 #include "vtkPolyDataAlgorithm.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

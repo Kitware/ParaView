@@ -21,8 +21,8 @@
 // .SECTION See Also
 // vtkSMDomain vtkSMIntVectorProperty
 
-#ifndef __vtkSMBooleanDomain_h
-#define __vtkSMBooleanDomain_h
+#ifndef vtkSMBooleanDomain_h
+#define vtkSMBooleanDomain_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDomain.h"

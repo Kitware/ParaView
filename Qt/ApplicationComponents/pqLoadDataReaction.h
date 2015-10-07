@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqLoadDataReaction_h 
-#define __pqLoadDataReaction_h
+#ifndef pqLoadDataReaction_h
+#define pqLoadDataReaction_h
 
 #include "pqReaction.h"
 #include <QList>

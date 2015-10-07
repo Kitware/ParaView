@@ -29,8 +29,8 @@
 // These changes make it easier to control in ParaView.
 //
 
-#ifndef __vtkPVScalarBarActor_h
-#define __vtkPVScalarBarActor_h
+#ifndef vtkPVScalarBarActor_h
+#define vtkPVScalarBarActor_h
 
 #include "vtkScalarBarActor.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
@@ -204,4 +204,4 @@ private:
   void operator=(const vtkPVScalarBarActor &);          // Not implemented.
 };
 
-#endif //__vtkPVScalarBarActor_h
+#endif //vtkPVScalarBarActor_h

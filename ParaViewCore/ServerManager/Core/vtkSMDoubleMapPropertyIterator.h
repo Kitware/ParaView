@@ -13,8 +13,8 @@
 
 =========================================================================*/
 
-#ifndef __vtkSMDoubleMapPropertyIterator_h
-#define __vtkSMDoubleMapPropertyIterator_h
+#ifndef vtkSMDoubleMapPropertyIterator_h
+#define vtkSMDoubleMapPropertyIterator_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"

@@ -30,8 +30,8 @@
 // </verbatim>
 
 
-#ifndef __vtkPEnSightReader_h
-#define __vtkPEnSightReader_h
+#ifndef vtkPEnSightReader_h
+#define vtkPEnSightReader_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPGenericEnSightReader.h"

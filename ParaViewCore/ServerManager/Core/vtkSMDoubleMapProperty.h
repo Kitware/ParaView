@@ -16,8 +16,8 @@
 // .SECTION Description
 // vtkSMDoubleMapProperty stores a map of vtkIdType keys to double values.
 
-#ifndef __vtkSMDoubleMapProperty_h
-#define __vtkSMDoubleMapProperty_h
+#ifndef vtkSMDoubleMapProperty_h
+#define vtkSMDoubleMapProperty_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMMapProperty.h"
@@ -119,4 +119,4 @@ private:
   vtkSMDoubleMapPropertyPrivate *Private;
 };
 
-#endif // __vtkSMDoubleMapProperty_h
+#endif // vtkSMDoubleMapProperty_h

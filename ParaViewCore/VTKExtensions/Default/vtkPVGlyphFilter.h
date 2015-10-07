@@ -34,8 +34,8 @@
 // several factors. In parallel, this filter ensures that spatial bounds are collected
 // across all ranks for generating identical sample points.
 
-#ifndef __vtkPVGlyphFilter_h
-#define __vtkPVGlyphFilter_h
+#ifndef vtkPVGlyphFilter_h
+#define vtkPVGlyphFilter_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkGlyph3D.h"

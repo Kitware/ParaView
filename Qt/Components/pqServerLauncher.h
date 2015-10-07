@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqServerLauncher_h 
-#define __pqServerLauncher_h
+#ifndef pqServerLauncher_h
+#define pqServerLauncher_h
 
 #include <QObject>
 #include <QProcess> // needed for QProcess::ProcessError.

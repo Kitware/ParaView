@@ -16,7 +16,7 @@
 #include "vtkSMRangeDomainTemplate.txx"
 VTK_SM_RANGE_DOMAIN_TEMPLATE_INSTANTIATE(double);
 
-#define __vtkSMDoubleRangeDomain_cxx
+#define vtkSMDoubleRangeDomain_cxx
 #include "vtkSMDoubleRangeDomain.h"
 
 #include "vtkObjectFactory.h"

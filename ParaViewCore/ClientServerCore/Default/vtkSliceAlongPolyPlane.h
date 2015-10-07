@@ -22,8 +22,8 @@
 // .SECTION See Also
 // vtkCutter vtkPolyPlane
 
-#ifndef __vtkSliceAlongPolyPlane_h
-#define __vtkSliceAlongPolyPlane_h
+#ifndef vtkSliceAlongPolyPlane_h
+#define vtkSliceAlongPolyPlane_h
 
 #include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
 #include "vtkDataObjectAlgorithm.h"

@@ -17,8 +17,8 @@
 // Vector property that manage double value to be set through a method
 // on a vtkObject.
 
-#ifndef __vtkSIDoubleVectorProperty_h
-#define __vtkSIDoubleVectorProperty_h
+#ifndef vtkSIDoubleVectorProperty_h
+#define vtkSIDoubleVectorProperty_h
 
 #include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIVectorProperty.h"

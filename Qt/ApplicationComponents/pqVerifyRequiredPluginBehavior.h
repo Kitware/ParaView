@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqVerifyRequiredPluginBehavior_h
-#define __pqVerifyRequiredPluginBehavior_h
+#ifndef pqVerifyRequiredPluginBehavior_h
+#define pqVerifyRequiredPluginBehavior_h
 
 #include <QObject>
 #include <QSet>

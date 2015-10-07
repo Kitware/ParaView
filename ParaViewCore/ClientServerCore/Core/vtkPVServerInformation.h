@@ -19,8 +19,8 @@
 // At the moment, server information is only on the root.
 
 
-#ifndef __vtkPVServerInformation_h
-#define __vtkPVServerInformation_h
+#ifndef vtkPVServerInformation_h
+#define vtkPVServerInformation_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"

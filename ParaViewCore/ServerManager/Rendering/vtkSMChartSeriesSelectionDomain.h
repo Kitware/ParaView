@@ -30,8 +30,8 @@
 // the state for any series that already set on the property. Thus, it's not a
 // true "reset", but more like "update".
 
-#ifndef __vtkSMChartSeriesSelectionDomain_h
-#define __vtkSMChartSeriesSelectionDomain_h
+#ifndef vtkSMChartSeriesSelectionDomain_h
+#define vtkSMChartSeriesSelectionDomain_h
 
 #include "vtkSMStringListDomain.h"
 #include "vtkPVServerManagerRenderingModule.h" // needed for exports

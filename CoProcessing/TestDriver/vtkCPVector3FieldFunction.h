@@ -16,8 +16,8 @@
 // .SECTION Description
 // Abstract class for specifying vector values at specified points.  
 
-#ifndef __vtkCPVector3FieldFunction_h
-#define __vtkCPVector3FieldFunction_h
+#ifndef vtkCPVector3FieldFunction_h
+#define vtkCPVector3FieldFunction_h
 
 #include "vtkCPTensorFieldFunction.h"
 #include "vtkPVCatalystTestDriverModule.h" // needed for export macros

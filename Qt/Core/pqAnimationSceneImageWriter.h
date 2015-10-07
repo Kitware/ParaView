@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqAnimationSceneImageWriter_h
-#define __pqAnimationSceneImageWriter_h
+#ifndef pqAnimationSceneImageWriter_h
+#define pqAnimationSceneImageWriter_h
 
 #include "vtkSMAnimationSceneImageWriter.h"
 #include "pqCoreModule.h"

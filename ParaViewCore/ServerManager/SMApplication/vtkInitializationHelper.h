@@ -19,8 +19,8 @@
 // python (as opposed to pvpython). It simply initializes the server
 // manager so that it can be used.
 
-#ifndef __vtkInitializationHelper_h
-#define __vtkInitializationHelper_h
+#ifndef vtkInitializationHelper_h
+#define vtkInitializationHelper_h
 
 #include "vtkObject.h"
 #include "vtkPVServerManagerApplicationModule.h" // needed for exports

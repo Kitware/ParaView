@@ -20,8 +20,8 @@
 // for each output port from the vtkAlgorithm. These post-processing filters
 // deal with things like parallelizing the data etc.
 
-#ifndef __vtkSISourceProxy_h
-#define __vtkSISourceProxy_h
+#ifndef vtkSISourceProxy_h
+#define vtkSISourceProxy_h
 
 #include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIProxy.h"

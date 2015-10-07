@@ -25,8 +25,8 @@
 // receive any ErrorEvents and hence will not report any errors that were
 // raised.
 
-#ifndef __vtkCommunicationErrorCatcher_h
-#define __vtkCommunicationErrorCatcher_h
+#ifndef vtkCommunicationErrorCatcher_h
+#define vtkCommunicationErrorCatcher_h
 
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 #include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro

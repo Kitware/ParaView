@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqViewManager_h
-#define __pqViewManager_h
+#ifndef pqViewManager_h
+#define pqViewManager_h
 
 #include "pqTabbedMultiViewWidget.h"
 

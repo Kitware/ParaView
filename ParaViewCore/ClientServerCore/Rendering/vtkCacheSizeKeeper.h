@@ -18,8 +18,8 @@
 // vtkCacheSizeKeeper keeps track of the amount of memory cached
 // by several vtkPVUpdateSuppressor objects.
 
-#ifndef __vtkCacheSizeKeeper_h
-#define __vtkCacheSizeKeeper_h
+#ifndef vtkCacheSizeKeeper_h
+#define vtkCacheSizeKeeper_h
 
 #include "vtkObject.h"
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports

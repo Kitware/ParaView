@@ -19,8 +19,8 @@
 // to another Reader.  The Reader reads from a file selected from a
 // list of files using a FileIndex.
 
-#ifndef __vtkMetaReader_h
-#define __vtkMetaReader_h
+#ifndef vtkMetaReader_h
+#define vtkMetaReader_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkDataObjectAlgorithm.h"

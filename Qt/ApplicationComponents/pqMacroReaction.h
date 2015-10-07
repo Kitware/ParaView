@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqMacroReaction_h
-#define __pqMacroReaction_h
+#ifndef pqMacroReaction_h
+#define pqMacroReaction_h
 
 #include "pqMasterOnlyReaction.h"
 

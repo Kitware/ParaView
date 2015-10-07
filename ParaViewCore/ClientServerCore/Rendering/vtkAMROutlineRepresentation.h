@@ -20,8 +20,8 @@
 // representation can exploit streaming capabilities provided by ParaView's
 // Render View (vtkPVRenderView).
 
-#ifndef __vtkAMROutlineRepresentation_h
-#define __vtkAMROutlineRepresentation_h
+#ifndef vtkAMROutlineRepresentation_h
+#define vtkAMROutlineRepresentation_h
 
 #include "vtkPVDataRepresentation.h"
 #include "vtkSmartPointer.h" // for smart pointer.

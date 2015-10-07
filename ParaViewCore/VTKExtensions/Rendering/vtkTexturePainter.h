@@ -20,8 +20,8 @@
 // uses the bounds of the slice to position the quad. Unlike other image data
 // algorithms, this painter provides API to choose the scalars to upload. If
 // cell data is used, then cell centers are used to position the slice.
-#ifndef __vtkTexturePainter_h
-#define __vtkTexturePainter_h
+#ifndef vtkTexturePainter_h
+#define vtkTexturePainter_h
 
 #include "vtkPainter.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

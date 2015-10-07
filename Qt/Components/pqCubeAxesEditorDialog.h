@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqCubeAxesEditorDialog_h 
-#define __pqCubeAxesEditorDialog_h
+#ifndef pqCubeAxesEditorDialog_h
+#define pqCubeAxesEditorDialog_h
 
 #include <QDialog>
 #include "pqComponentsModule.h"

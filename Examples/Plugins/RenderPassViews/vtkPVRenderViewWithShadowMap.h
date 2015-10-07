@@ -17,8 +17,8 @@
 // vtkPVRenderViewWithShadowMap is a vtkPVRenderView specialization that uses
 // shadow-map render passes for rendering shadows.
 
-#ifndef __vtkPVRenderViewWithShadowMap_h
-#define __vtkPVRenderViewWithShadowMap_h
+#ifndef vtkPVRenderViewWithShadowMap_h
+#define vtkPVRenderViewWithShadowMap_h
 
 #include "vtkPVRenderView.h"
 

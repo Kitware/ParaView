@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqColorAnnotationsPropertyWidget_h
-#define __pqColorAnnotationsPropertyWidget_h
+#ifndef pqColorAnnotationsPropertyWidget_h
+#define pqColorAnnotationsPropertyWidget_h
 
 #include "pqApplicationComponentsModule.h"
 #include "pqPropertyWidget.h"

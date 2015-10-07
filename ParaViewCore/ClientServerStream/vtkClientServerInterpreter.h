@@ -18,8 +18,8 @@
 // vtkClientServerStream.  This allows run-time creation and execution
 // of VTK programs.
 
-#ifndef __vtkClientServerInterpreter_h
-#define __vtkClientServerInterpreter_h
+#ifndef vtkClientServerInterpreter_h
+#define vtkClientServerInterpreter_h
 
 #include "vtkObject.h"
 

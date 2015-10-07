@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqTimerLogReaction_h 
-#define __pqTimerLogReaction_h
+#ifndef pqTimerLogReaction_h
+#define pqTimerLogReaction_h
 
 #include "pqReaction.h"
 

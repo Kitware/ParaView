@@ -20,8 +20,8 @@
 // in order to allow vtkPVDataInformation (and thus ParaView) to handle new
 // data types.
 
-#ifndef __vtkPVDataInformationHelper_h
-#define __vtkPVDataInformationHelper_h
+#ifndef vtkPVDataInformationHelper_h
+#define vtkPVDataInformationHelper_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"

@@ -35,8 +35,8 @@
 //
 // This proxy has no VTK objects that it creates on the server.
 
-#ifndef __vtkSMTimeKeeper_h
-#define __vtkSMTimeKeeper_h
+#ifndef vtkSMTimeKeeper_h
+#define vtkSMTimeKeeper_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkObject.h"

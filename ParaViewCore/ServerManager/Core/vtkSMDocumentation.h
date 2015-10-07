@@ -19,8 +19,8 @@
 // associated with it. This class provides access to the various types
 // of documentation text for every proxy.
 
-#ifndef __vtkSMDocumentation_h
-#define __vtkSMDocumentation_h
+#ifndef vtkSMDocumentation_h
+#define vtkSMDocumentation_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"

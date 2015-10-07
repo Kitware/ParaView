@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqSpreadSheetViewModel_h
-#define __pqSpreadSheetViewModel_h
+#ifndef pqSpreadSheetViewModel_h
+#define pqSpreadSheetViewModel_h
 
 #include <QAbstractTableModel>
 #include <QPair>

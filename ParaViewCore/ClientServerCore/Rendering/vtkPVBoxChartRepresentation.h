@@ -18,8 +18,8 @@
 // subclass for box plots representation. It exposes API from
 // underlying vtkChartBox.
 
-#ifndef __vtkPVBoxChartRepresentation_h
-#define __vtkPVBoxChartRepresentation_h
+#ifndef vtkPVBoxChartRepresentation_h
+#define vtkPVBoxChartRepresentation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkChartRepresentation.h"

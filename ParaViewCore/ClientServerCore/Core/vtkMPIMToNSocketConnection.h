@@ -27,8 +27,8 @@
 // vtkSocketCommunicator's that connect the first N of the M processes on the
 // data server to the N processes on the render server.
 
-#ifndef __vtkMPIMToNSocketConnection_h
-#define __vtkMPIMToNSocketConnection_h
+#ifndef vtkMPIMToNSocketConnection_h
+#define vtkMPIMToNSocketConnection_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"

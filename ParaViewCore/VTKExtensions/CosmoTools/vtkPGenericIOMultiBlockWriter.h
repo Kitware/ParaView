@@ -15,8 +15,8 @@
 // .NAME vtkPGenericIOMultiBlockWriter 
 // .SECTION Description
 
-#ifndef __vtkPGenericIOMultiBlockWriter_h
-#define __vtkPGenericIOMultiBlockWriter_h
+#ifndef vtkPGenericIOMultiBlockWriter_h
+#define vtkPGenericIOMultiBlockWriter_h
 
 #include "vtkWriter.h"
 #include "vtkPVVTKExtensionsCosmoToolsModule.h" // for export macro

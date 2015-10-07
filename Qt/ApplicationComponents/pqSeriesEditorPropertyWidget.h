@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqSeriesEditorPropertyWidget_h
-#define __pqSeriesEditorPropertyWidget_h
+#ifndef pqSeriesEditorPropertyWidget_h
+#define pqSeriesEditorPropertyWidget_h
 
 #include "pqApplicationComponentsModule.h"
 #include "pqPropertyWidget.h"

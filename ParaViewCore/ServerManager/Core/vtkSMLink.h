@@ -18,8 +18,8 @@
 // to connect two properies(or proxies) together, thus when one is updated,
 // the dependent one is also updated accordingly.
 
-#ifndef __vtkSMLink_h
-#define __vtkSMLink_h
+#ifndef vtkSMLink_h
+#define vtkSMLink_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMRemoteObject.h"

@@ -16,8 +16,8 @@
 // .SECTION Description
 // Implementation class used by vtkXYChartRepresentation.
 
-#ifndef __vtkXYChartRepresentationInternals_h
-#define __vtkXYChartRepresentationInternals_h
+#ifndef vtkXYChartRepresentationInternals_h
+#define vtkXYChartRepresentationInternals_h
 
 #include "vtkChartXY.h"
 #include "vtkColor.h"

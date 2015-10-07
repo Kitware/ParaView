@@ -16,8 +16,8 @@
 // .SECTION Description
 // TODO
 
-#ifndef __vtkIntersectFragments_h
-#define __vtkIntersectFragments_h
+#ifndef vtkIntersectFragments_h
+#define vtkIntersectFragments_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"

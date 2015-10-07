@@ -20,8 +20,8 @@
 // .SECTION See Also
 // vtkSMSessionClient
 
-#ifndef __vtkPVSessionServer_h
-#define __vtkPVSessionServer_h
+#ifndef vtkPVSessionServer_h
+#define vtkPVSessionServer_h
 
 #include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkPVSessionBase.h"

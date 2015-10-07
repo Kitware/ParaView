@@ -57,8 +57,8 @@
 // .SECTION See Also
 // vtkSMProperty
 
-#ifndef __vtkSMProxyProperty_h
-#define __vtkSMProxyProperty_h
+#ifndef vtkSMProxyProperty_h
+#define vtkSMProxyProperty_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMProperty.h"

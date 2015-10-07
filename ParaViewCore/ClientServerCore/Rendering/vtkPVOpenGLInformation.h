@@ -17,8 +17,8 @@
 // Get details of OpenGL from the render server.
 
 
-#ifndef __vtkPVOpenGLInformation_h
-#define __vtkPVOpenGLInformation_h
+#ifndef vtkPVOpenGLInformation_h
+#define vtkPVOpenGLInformation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVInformation.h"

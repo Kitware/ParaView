@@ -25,8 +25,8 @@
 // .SECTION See Also
 // vtkAMROutlineRepresentation, vtkAMRStreamingVolumeRepresentation.
 
-#ifndef __vtkAMRStreamingPriorityQueue_h
-#define __vtkAMRStreamingPriorityQueue_h
+#ifndef vtkAMRStreamingPriorityQueue_h
+#define vtkAMRStreamingPriorityQueue_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" // for export macros
 #include "vtkObject.h"

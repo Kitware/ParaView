@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqCameraDialog_h
-#define __pqCameraDialog_h
+#ifndef pqCameraDialog_h
+#define pqCameraDialog_h
 
 #include "pqDialog.h"
 

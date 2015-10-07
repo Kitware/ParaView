@@ -17,8 +17,8 @@
 // Useful for connectivity on multiple processes.  Run connectivity
 // on each processes, then make touching fragments equivalent.
 
-#ifndef __vtkEquivalenceSet_h
-#define __vtkEquivalenceSet_h
+#ifndef vtkEquivalenceSet_h
+#define vtkEquivalenceSet_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkObject.h"

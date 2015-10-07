@@ -13,8 +13,8 @@
 
 =========================================================================*/
 
-#ifndef __vtkPVPlotMatrixView_h
-#define __vtkPVPlotMatrixView_h
+#ifndef vtkPVPlotMatrixView_h
+#define vtkPVPlotMatrixView_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVContextView.h"

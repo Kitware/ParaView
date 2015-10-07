@@ -19,8 +19,8 @@
 // slices from the dataset. This is used for vtkPVMultiSliceView and
 // vtkPVOrthographicSliceView.
 
-#ifndef __vtkGeometrySliceRepresentation_h
-#define __vtkGeometrySliceRepresentation_h
+#ifndef vtkGeometrySliceRepresentation_h
+#define vtkGeometrySliceRepresentation_h
 
 #include "vtkGeometryRepresentation.h"
 

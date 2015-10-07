@@ -23,8 +23,8 @@
 // The fragment to be transacted and the executing process are
 // determined implicitly by where the transaction is stored.
 
-#ifndef __vtkMaterialInterfacePieceTransaction_h
-#define __vtkMaterialInterfacePieceTransaction_h
+#ifndef vtkMaterialInterfacePieceTransaction_h
+#define vtkMaterialInterfacePieceTransaction_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkSystemIncludes.h"

@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqApplyBehavior_h
-#define __pqApplyBehavior_h
+#ifndef pqApplyBehavior_h
+#define pqApplyBehavior_h
 
 #include <QObject>
 #include <QScopedPointer>

@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqLoadRestoreWindowLayoutReaction_h
-#define __pqLoadRestoreWindowLayoutReaction_h
+#ifndef pqLoadRestoreWindowLayoutReaction_h
+#define pqLoadRestoreWindowLayoutReaction_h
 
 #include "pqReaction.h"
 

@@ -16,8 +16,8 @@
 // .SECTION Description
 // Class for specifying cell data fields over grids for a test driver.  
 
-#ifndef __vtkCPCellFieldBuilder_h
-#define __vtkCPCellFieldBuilder_h
+#ifndef vtkCPCellFieldBuilder_h
+#define vtkCPCellFieldBuilder_h
 
 #include "vtkCPFieldBuilder.h"
 #include "vtkPVCatalystTestDriverModule.h" // needed for export macros

@@ -19,8 +19,8 @@
 // image dataset. Currently, it does not support composite datasets, however, we
 // should be able to add such a support in future.
 
-#ifndef __vtkImageSliceRepresentation_h
-#define __vtkImageSliceRepresentation_h
+#ifndef vtkImageSliceRepresentation_h
+#define vtkImageSliceRepresentation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"

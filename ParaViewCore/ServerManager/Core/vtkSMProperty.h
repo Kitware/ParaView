@@ -123,8 +123,8 @@
 //        value as a default.
 //
 
-#ifndef __vtkSMProperty_h
-#define __vtkSMProperty_h
+#ifndef vtkSMProperty_h
+#define vtkSMProperty_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"

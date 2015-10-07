@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqUndoStackBuilder_h
-#define __pqUndoStackBuilder_h
+#ifndef pqUndoStackBuilder_h
+#define pqUndoStackBuilder_h
 
 #include "vtkSMUndoStackBuilder.h"
 #include "pqComponentsModule.h"

@@ -21,8 +21,8 @@
 // RMICallBack are simply set on all of the MultiProcessController inside the
 // composite.
 
-#ifndef __vtkCompositeMultiProcessController_h
-#define __vtkCompositeMultiProcessController_h
+#ifndef vtkCompositeMultiProcessController_h
+#define vtkCompositeMultiProcessController_h
 
 #include "vtkMultiProcessController.h"
 #include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro

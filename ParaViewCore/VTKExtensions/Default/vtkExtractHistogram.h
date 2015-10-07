@@ -13,8 +13,8 @@
 
 =========================================================================*/
 
-#ifndef __vtkExtractHistogram_h
-#define __vtkExtractHistogram_h
+#ifndef vtkExtractHistogram_h
+#define vtkExtractHistogram_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkTableAlgorithm.h"

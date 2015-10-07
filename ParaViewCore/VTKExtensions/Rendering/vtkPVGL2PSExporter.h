@@ -17,8 +17,8 @@
 // This is used to export ParaView renderings to a variety of vector graphics
 // formats.
 
-#ifndef __vtkPVGL2PSExporter_h
-#define __vtkPVGL2PSExporter_h
+#ifndef vtkPVGL2PSExporter_h
+#define vtkPVGL2PSExporter_h
 
 #include "vtkGL2PSExporter.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

@@ -22,8 +22,8 @@
 // .SECTION See Also
 // vtkSMDomain 
 
-#ifndef __vtkSMFixedTypeDomain_h
-#define __vtkSMFixedTypeDomain_h
+#ifndef vtkSMFixedTypeDomain_h
+#define vtkSMFixedTypeDomain_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDomain.h"

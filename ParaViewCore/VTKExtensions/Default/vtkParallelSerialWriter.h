@@ -21,8 +21,8 @@
 // This also makes it possible to write time-series for temporal datasets using
 // simple non-time-aware writers.
 
-#ifndef __vtkParallelSerialWriter_h
-#define __vtkParallelSerialWriter_h
+#ifndef vtkParallelSerialWriter_h
+#define vtkParallelSerialWriter_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkDataObjectAlgorithm.h"

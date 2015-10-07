@@ -16,8 +16,8 @@
 // .SECTION Description
 // Class for creating vtkMultiBlockDataSet grids for a test driver.
 
-#ifndef __vtkCPMultiBlockGridBuilder_h
-#define __vtkCPMultiBlockGridBuilder_h
+#ifndef vtkCPMultiBlockGridBuilder_h
+#define vtkCPMultiBlockGridBuilder_h
 
 #include "vtkCPBaseGridBuilder.h"
 #include "vtkPVCatalystTestDriverModule.h" // needed for export macros

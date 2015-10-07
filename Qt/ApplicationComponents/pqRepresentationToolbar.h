@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqRepresentationToolbar_h 
-#define __pqRepresentationToolbar_h
+#ifndef pqRepresentationToolbar_h
+#define pqRepresentationToolbar_h
 
 #include <QToolBar>
 #include "pqApplicationComponentsModule.h"

@@ -16,8 +16,8 @@
 // .SECTION Description
 // vtkSMCoreUtilities provides miscellaneous utility functions.
 
-#ifndef __vtkSMCoreUtilities_h
-#define __vtkSMCoreUtilities_h
+#ifndef vtkSMCoreUtilities_h
+#define vtkSMCoreUtilities_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkObject.h"

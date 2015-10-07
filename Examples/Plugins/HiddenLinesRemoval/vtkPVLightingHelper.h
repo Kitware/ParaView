@@ -19,8 +19,8 @@
 // to default OpenGL pipeline. Look at vtkPVLightingHelper_s for available
 // GLSL functions.
 
-#ifndef __vtkPVLightingHelper_h
-#define __vtkPVLightingHelper_h
+#ifndef vtkPVLightingHelper_h
+#define vtkPVLightingHelper_h
 
 #include "vtkObject.h"
 #include "vtkShader2.h" // for vtkShader2Type

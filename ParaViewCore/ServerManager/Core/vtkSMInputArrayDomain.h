@@ -40,8 +40,8 @@
 //
 // This domain doesn't support any required properties (to help clean old
 // code, we print a warning if any required properties are specified).
-#ifndef __vtkSMInputArrayDomain_h
-#define __vtkSMInputArrayDomain_h
+#ifndef vtkSMInputArrayDomain_h
+#define vtkSMInputArrayDomain_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDomain.h"

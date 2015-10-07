@@ -24,8 +24,8 @@
 // .SECTION See Also
 // vtkUndoStack vtkUndoSet
 
-#ifndef __vtkUndoElement_h
-#define __vtkUndoElement_h
+#ifndef vtkUndoElement_h
+#define vtkUndoElement_h
 
 #include "vtkObject.h"
 #include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro

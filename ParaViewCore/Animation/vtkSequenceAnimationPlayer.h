@@ -16,8 +16,8 @@
 // .SECTION Description
 //
 
-#ifndef __vtkSequenceAnimationPlayer_h
-#define __vtkSequenceAnimationPlayer_h
+#ifndef vtkSequenceAnimationPlayer_h
+#define vtkSequenceAnimationPlayer_h
 
 #include "vtkAnimationPlayer.h"
 #include "vtkPVAnimationModule.h" // needed for export macro

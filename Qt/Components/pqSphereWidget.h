@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqSphereWidget_h 
-#define __pqSphereWidget_h
+#ifndef pqSphereWidget_h
+#define pqSphereWidget_h
 
 #include "pq3DWidget.h"
 

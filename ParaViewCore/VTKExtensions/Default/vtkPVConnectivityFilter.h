@@ -19,8 +19,8 @@
 // vtkConnectivityFilter has, but we don't want the user to have access to
 // these parameters in the UI.
 
-#ifndef __vtkPVConnectivityFilter_h
-#define __vtkPVConnectivityFilter_h
+#ifndef vtkPVConnectivityFilter_h
+#define vtkPVConnectivityFilter_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkConnectivityFilter.h"

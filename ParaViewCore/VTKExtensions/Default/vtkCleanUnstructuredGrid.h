@@ -24,8 +24,8 @@
 // .SECTION See Also
 // vtkCleanPolyData
 
-#ifndef __vtkCleanUnstructuredGrid_h
-#define __vtkCleanUnstructuredGrid_h
+#ifndef vtkCleanUnstructuredGrid_h
+#define vtkCleanUnstructuredGrid_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkUnstructuredGridAlgorithm.h"

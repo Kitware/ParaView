@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqImageCompressorWidget_h
-#define __pqImageCompressorWidget_h
+#ifndef pqImageCompressorWidget_h
+#define pqImageCompressorWidget_h
 
 #include "pqApplicationComponentsModule.h"
 #include "pqPropertyWidget.h"

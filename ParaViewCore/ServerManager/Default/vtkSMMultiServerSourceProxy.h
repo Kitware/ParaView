@@ -19,8 +19,8 @@
 // when the user want to display a data object that belong to another server
 // into its local built-in view.
 
-#ifndef __vtkSMMultiServerSourceProxy_h
-#define __vtkSMMultiServerSourceProxy_h
+#ifndef vtkSMMultiServerSourceProxy_h
+#define vtkSMMultiServerSourceProxy_h
 
 #include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMSourceProxy.h"

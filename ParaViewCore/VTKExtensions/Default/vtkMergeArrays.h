@@ -20,8 +20,8 @@
 // not check any more.  Any inputs which do not have the correct number
 // of points and cells are ignored.
 
-#ifndef __vtkMergeArrays_h
-#define __vtkMergeArrays_h
+#ifndef vtkMergeArrays_h
+#define vtkMergeArrays_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkDataSetAlgorithm.h"

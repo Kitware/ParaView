@@ -25,8 +25,8 @@
 // .SECTION See Also
 //  vtkArrayCalculator vtkFunctionParser
 
-#ifndef __vtkPVArrayCalculator_h
-#define __vtkPVArrayCalculator_h
+#ifndef vtkPVArrayCalculator_h
+#define vtkPVArrayCalculator_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkArrayCalculator.h"

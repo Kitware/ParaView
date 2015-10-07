@@ -22,8 +22,8 @@
 // .SECTION See Also
 // vtkSMDomain vtkSMProxyProperty
 
-#ifndef __vtkSMProxyListDomain_h
-#define __vtkSMProxyListDomain_h
+#ifndef vtkSMProxyListDomain_h
+#define vtkSMProxyListDomain_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDomain.h"

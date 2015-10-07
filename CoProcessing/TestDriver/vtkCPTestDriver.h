@@ -18,8 +18,8 @@
 // as a framework for creating custom inputs replicating a simulation for 
 // the co-processing library.
 
-#ifndef __vtkCPTestDriver_h
-#define __vtkCPTestDriver_h
+#ifndef vtkCPTestDriver_h
+#define vtkCPTestDriver_h
 
 #include "vtkObject.h"
 #include "vtkPVCatalystTestDriverModule.h" // needed for export macros

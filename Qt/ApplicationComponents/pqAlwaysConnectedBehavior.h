@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqAlwaysConnectedBehavior_h 
-#define __pqAlwaysConnectedBehavior_h
+#ifndef pqAlwaysConnectedBehavior_h
+#define pqAlwaysConnectedBehavior_h
 
 #include <QObject>
 

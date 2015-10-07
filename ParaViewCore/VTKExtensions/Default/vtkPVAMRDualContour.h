@@ -20,8 +20,8 @@
 // .SEE vtkAMRDualContour
 //
 
-#ifndef __vtkPVAMRDualContour_h
-#define __vtkPVAMRDualContour_h
+#ifndef vtkPVAMRDualContour_h
+#define vtkPVAMRDualContour_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkAMRDualContour.h"
@@ -64,4 +64,4 @@ protected:
   vtkPVAMRDualContourInternal* Implementation;
 };
 
-#endif // __vtkPVAMRDualContour_h
+#endif // vtkPVAMRDualContour_h

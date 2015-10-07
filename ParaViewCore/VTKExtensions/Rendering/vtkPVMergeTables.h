@@ -26,8 +26,8 @@
 // .SECTION TODO
 // We may want to merge this functionality into vtkMergeTables filter itself.
 
-#ifndef __vtkPVMergeTables_h
-#define __vtkPVMergeTables_h
+#ifndef vtkPVMergeTables_h
+#define vtkPVMergeTables_h
 
 #include "vtkTableAlgorithm.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

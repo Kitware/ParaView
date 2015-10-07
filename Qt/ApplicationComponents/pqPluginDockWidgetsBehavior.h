@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqPluginDockWidgetsBehavior_h 
-#define __pqPluginDockWidgetsBehavior_h
+#ifndef pqPluginDockWidgetsBehavior_h
+#define pqPluginDockWidgetsBehavior_h
 
 #include <QObject>
 #include "pqApplicationComponentsModule.h"

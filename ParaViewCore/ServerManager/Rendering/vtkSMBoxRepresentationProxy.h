@@ -17,8 +17,8 @@
 // vtkSMBoxRepresentationProxy is a proxy for vtkBoxRepresentation. A
 // specialization is needed to set the tranform on the vtkBoxRepresentation.
 
-#ifndef __vtkSMBoxRepresentationProxy_h
-#define __vtkSMBoxRepresentationProxy_h
+#ifndef vtkSMBoxRepresentationProxy_h
+#define vtkSMBoxRepresentationProxy_h
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMWidgetRepresentationProxy.h"

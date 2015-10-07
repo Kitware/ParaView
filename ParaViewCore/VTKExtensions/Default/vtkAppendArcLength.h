@@ -23,8 +23,8 @@
 // .SECTION Caveats
 // This filter assumes that cells don't share points.
 
-#ifndef __vtkAppendArcLength_h
-#define __vtkAppendArcLength_h
+#ifndef vtkAppendArcLength_h
+#define vtkAppendArcLength_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPolyDataAlgorithm.h"

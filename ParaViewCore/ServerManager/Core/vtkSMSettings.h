@@ -71,8 +71,8 @@
 // defined in the setting collections. SetProxySettings() saves the non-default
 // proxy properties in the highest-priority collection.
 
-#ifndef __vtkSMSettings_h
-#define __vtkSMSettings_h
+#ifndef vtkSMSettings_h
+#define vtkSMSettings_h
 
 #include "vtkObject.h"
 #include "vtkPVServerManagerCoreModule.h" //needed for exports

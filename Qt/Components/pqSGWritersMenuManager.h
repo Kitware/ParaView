@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqSGWritersMenuManager_h
-#define __pqSGWritersMenuManager_h
+#ifndef pqSGWritersMenuManager_h
+#define pqSGWritersMenuManager_h
 
 #include "pqComponentsModule.h"
 #include <QObject>

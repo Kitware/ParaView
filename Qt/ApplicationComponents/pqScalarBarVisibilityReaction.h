@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqScalarBarVisibilityReaction_h
-#define __pqScalarBarVisibilityReaction_h
+#ifndef pqScalarBarVisibilityReaction_h
+#define pqScalarBarVisibilityReaction_h
 
 #include "pqReaction.h"
 #include <QPointer>

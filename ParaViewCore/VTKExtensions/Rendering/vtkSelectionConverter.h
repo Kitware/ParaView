@@ -27,8 +27,8 @@
 // .SECTION See Also
 // vtkSelection
 
-#ifndef __vtkSelectionConverter_h
-#define __vtkSelectionConverter_h
+#ifndef vtkSelectionConverter_h
+#define vtkSelectionConverter_h
 
 #include "vtkObject.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

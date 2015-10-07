@@ -36,8 +36,8 @@
 // removed. Since this class only support removing custom proxies, this event is
 // fired only when a custom proxy is removed.
 
-#ifndef __vtkSIProxyDefinitionManager_h
-#define __vtkSIProxyDefinitionManager_h
+#ifndef vtkSIProxyDefinitionManager_h
+#define vtkSIProxyDefinitionManager_h
 
 #include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIObject.h"

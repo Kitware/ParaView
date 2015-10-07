@@ -18,8 +18,8 @@
 // API with absolute position/rotation/scale change and not incremental one like
 // the vtkTransform does.
 
-#ifndef __vtkPVTransform_h
-#define __vtkPVTransform_h
+#ifndef vtkPVTransform_h
+#define vtkPVTransform_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkTransform.h"

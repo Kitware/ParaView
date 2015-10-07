@@ -18,8 +18,8 @@
 // vtkSMRenderViewExporterProxy is a proxy for vtkExporter subclasses. It makes it
 // possible to export render views using these exporters.
 
-#ifndef __vtkSMRenderViewExporterProxy_h
-#define __vtkSMRenderViewExporterProxy_h
+#ifndef vtkSMRenderViewExporterProxy_h
+#define vtkSMRenderViewExporterProxy_h
 
 #include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMExporterProxy.h"

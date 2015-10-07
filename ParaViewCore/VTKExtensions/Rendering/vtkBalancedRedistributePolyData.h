@@ -19,8 +19,8 @@
 
 // .NAME vtkBalancedRedistributePolyData - do balance of cells on processors
 
-#ifndef __vtkBalancedRedistributePolyData_h
-#define __vtkBalancedRedistributePolyData_h
+#ifndef vtkBalancedRedistributePolyData_h
+#define vtkBalancedRedistributePolyData_h
 
 #include "vtkWeightedRedistributePolyData.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

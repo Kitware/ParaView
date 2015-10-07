@@ -15,8 +15,8 @@
 // .NAME vtkPVInformationKeys -
 // .SECTION Description
 
-#ifndef __vtkPVInformationKeys_h
-#define __vtkPVInformationKeys_h
+#ifndef vtkPVInformationKeys_h
+#define vtkPVInformationKeys_h
 
 #include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
 
@@ -36,5 +36,5 @@ public:
   static vtkInformationDoubleVectorKey* WHOLE_BOUNDING_BOX();
 };
 
-#endif // __vtkPVInformationKeys_h
+#endif // vtkPVInformationKeys_h
 // VTK-HeaderTest-Exclude: vtkPVInformationKeys.h

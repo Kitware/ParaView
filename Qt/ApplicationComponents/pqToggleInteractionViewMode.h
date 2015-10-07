@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqToggleInteractionViewMode_h
-#define __pqToggleInteractionViewMode_h
+#ifndef pqToggleInteractionViewMode_h
+#define pqToggleInteractionViewMode_h
 
 #include "pqReaction.h"
 #include <QPointer>

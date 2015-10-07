@@ -31,8 +31,8 @@
 //
 // One has to pick which mode the exporter is operating in during the OpenFile()
 // call.
-#ifndef __vtkCSVExporter_h
-#define __vtkCSVExporter_h
+#ifndef vtkCSVExporter_h
+#define vtkCSVExporter_h
 
 #include "vtkObject.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

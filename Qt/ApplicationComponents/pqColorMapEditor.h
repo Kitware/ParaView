@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqColorMapEditor_h
-#define __pqColorMapEditor_h
+#ifndef pqColorMapEditor_h
+#define pqColorMapEditor_h
 
 #include "pqApplicationComponentsModule.h"
 #include <QWidget>

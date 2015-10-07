@@ -12,8 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __CAdaptorAPI_h
-#define __CAdaptorAPI_h
+#ifndef CAdaptorAPI_h
+#define CAdaptorAPI_h
 
 #include "vtkPVCatalystModule.h"
 

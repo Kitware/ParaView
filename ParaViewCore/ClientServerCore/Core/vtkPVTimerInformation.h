@@ -16,8 +16,8 @@
 // .SECTION Description
 // I am using this information object to gather timer logs from all processes.
 
-#ifndef __vtkPVTimerInformation_h
-#define __vtkPVTimerInformation_h
+#ifndef vtkPVTimerInformation_h
+#define vtkPVTimerInformation_h
 
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports

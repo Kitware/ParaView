@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqApplicationSettingsReaction_h 
-#define __pqApplicationSettingsReaction_h
+#ifndef pqApplicationSettingsReaction_h
+#define pqApplicationSettingsReaction_h
 
 #include "pqReaction.h"
 #include <QPointer>

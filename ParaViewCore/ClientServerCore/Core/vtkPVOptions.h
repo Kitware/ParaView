@@ -19,8 +19,8 @@
 // These options can be retrieved during run-time, set using configuration file
 // or using Command Line Arguments.
 
-#ifndef __vtkPVOptions_h
-#define __vtkPVOptions_h
+#ifndef vtkPVOptions_h
+#define vtkPVOptions_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkCommandOptions.h"

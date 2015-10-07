@@ -22,8 +22,8 @@ PURPOSE.  See the above copyright notice for more information.
 // this class.  Note that this helper class is not derived from vtkObject 
 // and can be allocated on the static
 
-#ifndef __vtkSpyPlotBlock_h
-#define __vtkSpyPlotBlock_h
+#ifndef vtkSpyPlotBlock_h
+#define vtkSpyPlotBlock_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkSystemIncludes.h"

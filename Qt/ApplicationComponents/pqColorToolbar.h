@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqColorToolbar_h 
-#define __pqColorToolbar_h
+#ifndef pqColorToolbar_h
+#define pqColorToolbar_h
 
 #include <QToolBar>
 #include "pqApplicationComponentsModule.h"

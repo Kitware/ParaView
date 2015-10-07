@@ -21,8 +21,8 @@
 // dynamically. For statically importing plugins, one directly uses
 // PV_PLUGIN_IMPORT() macro defined in vtkPVPlugin.h.
 
-#ifndef __vtkPVPluginLoader_h
-#define __vtkPVPluginLoader_h
+#ifndef vtkPVPluginLoader_h
+#define vtkPVPluginLoader_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"

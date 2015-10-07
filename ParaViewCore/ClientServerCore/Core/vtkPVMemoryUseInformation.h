@@ -17,8 +17,8 @@
 // A vtkClientServerStream serializable container for a single process's
 // instantaneous memory usage.
 
-#ifndef __vtkPVMemoryUseInformation_h
-#define __vtkPVMemoryUseInformation_h
+#ifndef vtkPVMemoryUseInformation_h
+#define vtkPVMemoryUseInformation_h
 
 #include "vtkPVInformation.h"
 

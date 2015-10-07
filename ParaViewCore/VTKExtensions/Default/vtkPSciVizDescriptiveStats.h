@@ -25,8 +25,8 @@
 // .SECTION Thanks
 // Thanks to David Thompson and Philippe Pebay from Sandia National Laboratories 
 // for implementing this class.
-#ifndef __vtkPSciVizDescriptiveStats_h
-#define __vtkPSciVizDescriptiveStats_h
+#ifndef vtkPSciVizDescriptiveStats_h
+#define vtkPSciVizDescriptiveStats_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkSciVizStatistics.h"
@@ -55,4 +55,4 @@ private:
   void operator = ( const vtkPSciVizDescriptiveStats& ); // Not implemented.
 };
 
-#endif // __vtkPSciVizDescriptiveStats_h
+#endif // vtkPSciVizDescriptiveStats_h

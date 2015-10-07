@@ -13,8 +13,8 @@
 
 =========================================================================*/
 
-#ifndef __pqMultiBlockInspectorPanel_h
-#define __pqMultiBlockInspectorPanel_h
+#ifndef pqMultiBlockInspectorPanel_h
+#define pqMultiBlockInspectorPanel_h
 
 #include "pqComponentsModule.h"
 
@@ -156,4 +156,4 @@ private:
   };
 };
 
-#endif // __pqMultiBlockInspectorPanel_h
+#endif // pqMultiBlockInspectorPanel_h

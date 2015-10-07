@@ -20,8 +20,8 @@
 // is a constant time operation, while its inverse
 // glooabl to local id search is not.
 
-#ifndef __vtkMaterialInterfaceIdList_h
-#define __vtkMaterialInterfaceIdList_h
+#ifndef vtkMaterialInterfaceIdList_h
+#define vtkMaterialInterfaceIdList_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMaterialInterfaceIdListItem.h"

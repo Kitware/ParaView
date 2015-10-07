@@ -18,8 +18,8 @@
 // implemented by a server-manager plugin i.e. a plugin that adds new
 // filters/readers/proxies etc. to ParaView.
 
-#ifndef __vtkPVServerManagerPluginInterface_h
-#define __vtkPVServerManagerPluginInterface_h
+#ifndef vtkPVServerManagerPluginInterface_h
+#define vtkPVServerManagerPluginInterface_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkClientServerInterpreterInitializer.h"

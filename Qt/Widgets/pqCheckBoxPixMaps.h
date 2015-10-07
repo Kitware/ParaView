@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqCheckBoxPixMaps_h 
-#define __pqCheckBoxPixMaps_h
+#ifndef pqCheckBoxPixMaps_h
+#define pqCheckBoxPixMaps_h
 
 #include <QObject>
 #include <QPixmap>

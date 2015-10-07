@@ -25,8 +25,8 @@
 // do that before calling Save(). It only provides Magnification which can scale 
 // the size using integral scale factor.
 
-#ifndef __vtkSMAnimationSceneImageWriter_h
-#define __vtkSMAnimationSceneImageWriter_h
+#ifndef vtkSMAnimationSceneImageWriter_h
+#define vtkSMAnimationSceneImageWriter_h
 
 #include "vtkPVAnimationModule.h" //needed for exports
 #include "vtkSMAnimationSceneWriter.h"

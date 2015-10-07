@@ -16,8 +16,8 @@
 // .NAME vtkPVServerSideAnimationPlayer - help class for server side animation
 // saving at disconnection time.
 
-#ifndef __vtkPVServerSideAnimationPlayer_h
-#define __vtkPVServerSideAnimationPlayer_h
+#ifndef vtkPVServerSideAnimationPlayer_h
+#define vtkPVServerSideAnimationPlayer_h
 
 #include "vtkPVAnimationModule.h" //needed for exports
 #include "vtkObject.h"

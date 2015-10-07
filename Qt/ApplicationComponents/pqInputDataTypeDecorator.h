@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqInputDataTypeDecorator_h
-#define __pqInputDataTypeDecorator_h
+#ifndef pqInputDataTypeDecorator_h
+#define pqInputDataTypeDecorator_h
 
 #include "pqApplicationComponentsModule.h"
 #include "pqPropertyWidgetDecorator.h"

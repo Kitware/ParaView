@@ -64,8 +64,8 @@
 //      key, with the reject_key strategy, so that arrays that have this InformationKey
 //      are not visible in the user interface.
 
-#ifndef __vtkSMArrayListDomain_h
-#define __vtkSMArrayListDomain_h
+#ifndef vtkSMArrayListDomain_h
+#define vtkSMArrayListDomain_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMStringListDomain.h"

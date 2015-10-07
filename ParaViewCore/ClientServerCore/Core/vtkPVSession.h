@@ -18,8 +18,8 @@
 // those that are used to communicate between data-server,render-server and
 // client. This is an abstract class.
 
-#ifndef __vtkPVSession_h
-#define __vtkPVSession_h
+#ifndef vtkPVSession_h
+#define vtkPVSession_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkSession.h"

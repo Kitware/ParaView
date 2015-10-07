@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqQVTKWidget_h
-#define __pqQVTKWidget_h
+#ifndef pqQVTKWidget_h
+#define pqQVTKWidget_h
 
 #include "QVTKWidget.h"
 #include "pqCoreModule.h"

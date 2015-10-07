@@ -19,8 +19,8 @@
 // .SECTION See Also
 // vtkSMVectorProperty vtkSMDoubleVectorProperty vtkSMStringVectorProperty
 
-#ifndef __vtkSMIntVectorProperty_h
-#define __vtkSMIntVectorProperty_h
+#ifndef vtkSMIntVectorProperty_h
+#define vtkSMIntVectorProperty_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMVectorProperty.h"

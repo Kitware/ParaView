@@ -16,8 +16,8 @@
 // casting to find the intersection point between the user picking point
 // and the concreate cell underneath.
 
-#ifndef __vtkPVRayCastPickingHelper_h
-#define __vtkPVRayCastPickingHelper_h
+#ifndef vtkPVRayCastPickingHelper_h
+#define vtkPVRayCastPickingHelper_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkObject.h"

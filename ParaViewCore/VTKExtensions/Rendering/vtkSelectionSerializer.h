@@ -21,8 +21,8 @@
 // .SECTION See Also
 // vtkSelection
 
-#ifndef __vtkSelectionSerializer_h
-#define __vtkSelectionSerializer_h
+#ifndef vtkSelectionSerializer_h
+#define vtkSelectionSerializer_h
 
 #include "vtkObject.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

@@ -25,8 +25,8 @@
 //
 // .SECTION Thanks
 // This class was contributed by SciberQuest Inc.
-#ifndef __vtkSMNamedPropertyIterator_h
-#define __vtkSMNamedPropertyIterator_h
+#ifndef vtkSMNamedPropertyIterator_h
+#define vtkSMNamedPropertyIterator_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMPropertyIterator.h"

@@ -15,8 +15,8 @@
 // .NAME vtkSMTextWidgetRepresentationProxy 
 // .SECTION Description
 
-#ifndef __vtkSMTextWidgetRepresentationProxy_h
-#define __vtkSMTextWidgetRepresentationProxy_h
+#ifndef vtkSMTextWidgetRepresentationProxy_h
+#define vtkSMTextWidgetRepresentationProxy_h
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMNewWidgetRepresentationProxy.h"

@@ -16,8 +16,8 @@
 // .SECTION Description
 // ServerImplementation Property to deal with String array as method arguments.
 
-#ifndef __vtkSIStringVectorProperty_h
-#define __vtkSIStringVectorProperty_h
+#ifndef vtkSIStringVectorProperty_h
+#define vtkSIStringVectorProperty_h
 
 #include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIVectorProperty.h"

@@ -17,8 +17,8 @@
 // .SECTION Description
 // vtkSMStateLocator allow a hierarchical way of finding a message state.
 
-#ifndef __vtkSMStateLocator_h
-#define __vtkSMStateLocator_h
+#ifndef vtkSMStateLocator_h
+#define vtkSMStateLocator_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"

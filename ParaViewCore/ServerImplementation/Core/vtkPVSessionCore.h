@@ -20,8 +20,8 @@
 // On the other hand, the vtkSMSession dispatch the request to the right
 // process and therefore to the right vtkPVSessionCore instance.
 
-#ifndef __vtkPVSessionCore_h
-#define __vtkPVSessionCore_h
+#ifndef vtkPVSessionCore_h
+#define vtkPVSessionCore_h
 
 #include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkObject.h"

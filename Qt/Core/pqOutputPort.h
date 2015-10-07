@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqOutputPort_h 
-#define __pqOutputPort_h
+#ifndef pqOutputPort_h
+#define pqOutputPort_h
 
 #include "pqServerManagerModelItem.h"
 #include "pqCoreModule.h"

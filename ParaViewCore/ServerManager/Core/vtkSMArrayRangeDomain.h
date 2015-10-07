@@ -21,8 +21,8 @@
 // .SECTION See Also
 // vtkSMDoubleRangeDomain vtkSMProxyProperty vtkSMStringVectorProperty
 
-#ifndef __vtkSMArrayRangeDomain_h
-#define __vtkSMArrayRangeDomain_h
+#ifndef vtkSMArrayRangeDomain_h
+#define vtkSMArrayRangeDomain_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDoubleRangeDomain.h"

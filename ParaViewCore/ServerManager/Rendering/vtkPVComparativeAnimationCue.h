@@ -20,8 +20,8 @@
 // API i.e. without using properties to allow the user to setup parameter
 // values over the comparative grid.
 
-#ifndef __vtkPVComparativeAnimationCue_h
-#define __vtkPVComparativeAnimationCue_h
+#ifndef vtkPVComparativeAnimationCue_h
+#define vtkPVComparativeAnimationCue_h
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkObject.h"

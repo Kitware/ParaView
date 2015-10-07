@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __ParticleAdaptor_h
-#define __ParticleAdaptor_h
+#ifndef ParticleAdaptor_h
+#define ParticleAdaptor_h
 
 #ifdef __cplusplus
 extern "C" {
@@ -67,4 +67,4 @@ void coprocessorfinalize ();
 } /* extern "C" */
 #endif
 
-#endif /* __ParticleAdaptor_h */
+#endif /* ParticleAdaptor_h */

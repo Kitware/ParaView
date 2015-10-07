@@ -18,8 +18,8 @@
 // vtkSIUnstructuredGridVolumeRepresentationProxy is a concrete representation that can be used
 // to render the unstructured grid volume in a vtkSIRenderViewProxy.
 
-#ifndef __vtkSIUnstructuredGridVolumeRepresentationProxy_h
-#define __vtkSIUnstructuredGridVolumeRepresentationProxy_h
+#ifndef vtkSIUnstructuredGridVolumeRepresentationProxy_h
+#define vtkSIUnstructuredGridVolumeRepresentationProxy_h
 
 #include "vtkPVServerImplementationRenderingModule.h" //needed for exports
 #include "vtkSIProxy.h"

@@ -24,8 +24,8 @@
 // If the field array chosen has as many elements as number of timesteps, the
 // array is assumed to be "temporal" and indexed using the current timestep.
 
-#ifndef __vtkAnnotateGlobalDataFilter_h
-#define __vtkAnnotateGlobalDataFilter_h
+#ifndef vtkAnnotateGlobalDataFilter_h
+#define vtkAnnotateGlobalDataFilter_h
 
 #include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
 #include "vtkPythonAnnotationFilter.h"

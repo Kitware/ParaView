@@ -16,8 +16,8 @@
 // .SECTION Description
 // This is used by vtkPVXMLParser to represent an XML document starting
 // at the root element.
-#ifndef __vtkPVXMLElement_h
-#define __vtkPVXMLElement_h
+#ifndef vtkPVXMLElement_h
+#define vtkPVXMLElement_h
 
 #include "vtkObject.h"
 #include "vtkStdString.h" // needed for vtkStdString.

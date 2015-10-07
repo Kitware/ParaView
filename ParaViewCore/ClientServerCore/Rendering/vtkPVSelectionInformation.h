@@ -19,8 +19,8 @@
 // .SECTION See Also
 // vtkSelection
 
-#ifndef __vtkPVSelectionInformation_h
-#define __vtkPVSelectionInformation_h
+#ifndef vtkPVSelectionInformation_h
+#define vtkPVSelectionInformation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVInformation.h"

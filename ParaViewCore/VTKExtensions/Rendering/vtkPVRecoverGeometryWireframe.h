@@ -36,8 +36,8 @@
 // vtkPVGeometryFilter
 //
 
-#ifndef __vtkPVRecoverGeometryWireframe_h
-#define __vtkPVRecoverGeometryWireframe_h
+#ifndef vtkPVRecoverGeometryWireframe_h
+#define vtkPVRecoverGeometryWireframe_h
 
 #include "vtkPolyDataAlgorithm.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
@@ -71,4 +71,4 @@ private:
   void operator=(const vtkPVRecoverGeometryWireframe &); // Not implemented
 };
 
-#endif //__vtkPVRecoverGeometryWireframe_h
+#endif //vtkPVRecoverGeometryWireframe_h

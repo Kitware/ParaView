@@ -26,8 +26,8 @@
 // correctly and don't suffer from uncanny side effects when that's done
 // repeatedly.
 
-#ifndef __vtkCompositeRepresentation_h
-#define __vtkCompositeRepresentation_h
+#ifndef vtkCompositeRepresentation_h
+#define vtkCompositeRepresentation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"

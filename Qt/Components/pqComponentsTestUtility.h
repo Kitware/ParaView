@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqComponentsTestUtility_h
-#define __pqComponentsTestUtility_h
+#ifndef pqComponentsTestUtility_h
+#define pqComponentsTestUtility_h
 
 #include "pqCoreTestUtility.h"
 #include "pqComponentsModule.h"

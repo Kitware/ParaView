@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqIntMaskPropertyWidget_h
-#define __pqIntMaskPropertyWidget_h
+#ifndef pqIntMaskPropertyWidget_h
+#define pqIntMaskPropertyWidget_h
 
 #include "pqComponentsModule.h"
 #include "pqPropertyWidget.h"

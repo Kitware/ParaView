@@ -31,8 +31,8 @@
 //
 // .SECTION Thanks
 // This class was contribued by SciberQuest Inc.
-#ifndef __vtkSMProxyConfigurationWriter_h
-#define __vtkSMProxyConfigurationWriter_h
+#ifndef vtkSMProxyConfigurationWriter_h
+#define vtkSMProxyConfigurationWriter_h
 
 #include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMObject.h"

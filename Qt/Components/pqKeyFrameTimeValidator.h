@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqKeyFrameTimeValidator_h
-#define __pqKeyFrameTimeValidator_h
+#ifndef pqKeyFrameTimeValidator_h
+#define pqKeyFrameTimeValidator_h
 
 #include <QDoubleValidator>
 #include "pqComponentsModule.h"

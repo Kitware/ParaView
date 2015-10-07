@@ -32,8 +32,8 @@
 // Finally, the summary statistics include the information entropy
 // of the observations.
 
-#ifndef __vtkPSciVizContingencyStats_h
-#define __vtkPSciVizContingencyStats_h
+#ifndef vtkPSciVizContingencyStats_h
+#define vtkPSciVizContingencyStats_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkSciVizStatistics.h"
@@ -57,4 +57,4 @@ private:
   void operator = ( const vtkPSciVizContingencyStats& ); // Not implemented.
 };
 
-#endif // __vtkPSciVizContingencyStats_h
+#endif // vtkPSciVizContingencyStats_h

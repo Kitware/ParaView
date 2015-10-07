@@ -17,8 +17,8 @@
 // .SECTION Description
 // Gather information about data files from vtkEnsembleDataReader.
 
-#ifndef __vtkPVEnsembleDataReaderInformation_h
-#define __vtkPVEnsembleDataReaderInformation_h
+#ifndef vtkPVEnsembleDataReaderInformation_h
+#define vtkPVEnsembleDataReaderInformation_h
 
 #include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
 #include "vtkPVInformation.h"

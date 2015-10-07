@@ -26,8 +26,8 @@
 // the ChartType. Refer to vtkChartXY::AddPlot() for details on what the type
 // must be.
 
-#ifndef __vtkXYChartRepresentation_h
-#define __vtkXYChartRepresentation_h
+#ifndef vtkXYChartRepresentation_h
+#define vtkXYChartRepresentation_h
 
 #include "vtkChartRepresentation.h"
 

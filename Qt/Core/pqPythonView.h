@@ -12,8 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __pqPythonView_h
-#define __pqPythonView_h
+#ifndef pqPythonView_h
+#define pqPythonView_h
 
 #include "pqView.h"
 #include "pqSMProxy.h"

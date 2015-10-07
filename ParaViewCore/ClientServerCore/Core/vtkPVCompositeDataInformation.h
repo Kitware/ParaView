@@ -20,8 +20,8 @@
 // .SECTION See Also
 // vtkHierarchicalBoxDataSet vtkPVDataInformation
 
-#ifndef __vtkPVCompositeDataInformation_h
-#define __vtkPVCompositeDataInformation_h
+#ifndef vtkPVCompositeDataInformation_h
+#define vtkPVCompositeDataInformation_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"

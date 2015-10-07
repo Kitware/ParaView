@@ -26,8 +26,8 @@
 // \li DisplayUserName: Boolean value representing whether the username is visible.
 
 
-#ifndef __vtkEnvironmentAnnotationFilter_h
-#define __vtkEnvironmentAnnotationFilter_h
+#ifndef vtkEnvironmentAnnotationFilter_h
+#define vtkEnvironmentAnnotationFilter_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkTableAlgorithm.h"

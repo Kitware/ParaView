@@ -36,8 +36,8 @@
 // vtkIceTRenderManager, vtkOpenGLIceTRenderer
 //
 
-#ifndef __vtkIceTConstants_h
-#define __vtkIceTConstants_h
+#ifndef vtkIceTConstants_h
+#define vtkIceTConstants_h
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkIceTConstants
@@ -58,6 +58,6 @@ public:
   };
 };
 
-#endif //__vtkIceTConstants_h
+#endif //vtkIceTConstants_h
 
 // VTK-HeaderTest-Exclude: vtkIceTConstants.h

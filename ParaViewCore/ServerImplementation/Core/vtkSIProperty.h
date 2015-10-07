@@ -18,8 +18,8 @@
 // on a VTK object. If overriden, we naturally allow to call a method either
 // to set or get a set of values.
 
-#ifndef __vtkSIProperty_h
-#define __vtkSIProperty_h
+#ifndef vtkSIProperty_h
+#define vtkSIProperty_h
 
 #include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkObject.h"

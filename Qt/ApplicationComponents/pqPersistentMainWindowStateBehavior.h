@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqPersistentMainWindowStateBehavior_h 
-#define __pqPersistentMainWindowStateBehavior_h
+#ifndef pqPersistentMainWindowStateBehavior_h
+#define pqPersistentMainWindowStateBehavior_h
 
 #include <QObject>
 #include "pqApplicationComponentsModule.h"

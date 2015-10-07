@@ -18,8 +18,8 @@
 //  This filter merges connected voroni tesselation regions based on the
 //  global region ID.
 
-#ifndef __vtkPMergeConnected_h
-#define __vtkPMergeConnected_h
+#ifndef vtkPMergeConnected_h
+#define vtkPMergeConnected_h
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vtkPVVTKExtensionsCosmoToolsModule.h" // For export macro

@@ -16,8 +16,8 @@
 // Meta class for clip filter that will allow the user to switch between
 // a regular clip filter or an extract cell by region filter.
 
-#ifndef __vtkPVMetaClipDataSet_h
-#define __vtkPVMetaClipDataSet_h
+#ifndef vtkPVMetaClipDataSet_h
+#define vtkPVMetaClipDataSet_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPVDataSetAlgorithmSelectorFilter.h"

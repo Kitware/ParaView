@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqComparativeContextView_h
-#define __pqComparativeContextView_h
+#ifndef pqComparativeContextView_h
+#define pqComparativeContextView_h
 
 #include "pqContextView.h"
 #include <QPointer>

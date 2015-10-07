@@ -18,8 +18,8 @@
 // between different processes or same process. What types of conversations are
 // possible i.e what protocols are supported, is defined by the subclasses.
 
-#ifndef __vtkSession_h
-#define __vtkSession_h
+#ifndef vtkSession_h
+#define vtkSession_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"

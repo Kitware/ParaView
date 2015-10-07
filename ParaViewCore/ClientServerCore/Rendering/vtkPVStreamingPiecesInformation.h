@@ -20,8 +20,8 @@
 // vtkSMDataDeliveryManager to get information about representations that have
 // pieces to stream from the data-server. 
 
-#ifndef __vtkPVStreamingPiecesInformation_h
-#define __vtkPVStreamingPiecesInformation_h
+#ifndef vtkPVStreamingPiecesInformation_h
+#define vtkPVStreamingPiecesInformation_h
 
 #include "vtkPVInformation.h"
 #include "vtkPVClientServerCoreRenderingModule.h" // needed for export macro

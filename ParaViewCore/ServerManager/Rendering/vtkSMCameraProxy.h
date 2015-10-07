@@ -17,8 +17,8 @@
 // This a proxy for a vtkCamera. This class optimizes UpdatePropertyInformation
 // to use the client side object.
 
-#ifndef __vtkSMCameraProxy_h
-#define __vtkSMCameraProxy_h
+#ifndef vtkSMCameraProxy_h
+#define vtkSMCameraProxy_h
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMProxy.h"

@@ -21,8 +21,8 @@
 // of the output are not related to those of the input. The input point 
 // coordinates themselves are added as point data in the output.
 
-#ifndef __vtkPolyLineToRectilinearGridFilter_h
-#define __vtkPolyLineToRectilinearGridFilter_h
+#ifndef vtkPolyLineToRectilinearGridFilter_h
+#define vtkPolyLineToRectilinearGridFilter_h
 
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports

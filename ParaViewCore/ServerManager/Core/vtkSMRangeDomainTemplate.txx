@@ -12,8 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __vtkSMRangeDomainTemplate_txx
-#define __vtkSMRangeDomainTemplate_txx
+#ifndef vtkSMRangeDomainTemplate_txx
+#define vtkSMRangeDomainTemplate_txx
 
 #include "vtkSMRangeDomainTemplate.h"
 

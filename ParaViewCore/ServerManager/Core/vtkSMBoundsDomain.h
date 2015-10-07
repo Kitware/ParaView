@@ -40,8 +40,8 @@
 // \li \c scale_factor : used in SCALED_EXTENT and APPROXIMATE_CELL_LENGTH mode.
 // Value is a floating point number that is used as the scale factor.
 
-#ifndef __vtkSMBoundsDomain_h
-#define __vtkSMBoundsDomain_h
+#ifndef vtkSMBoundsDomain_h
+#define vtkSMBoundsDomain_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDoubleRangeDomain.h"

@@ -12,8 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __vtkProcessModulePythonInitializePython_h
-#define __vtkProcessModulePythonInitializePython_h
+#ifndef vtkProcessModulePythonInitializePython_h
+#define vtkProcessModulePythonInitializePython_h
 
 #include "vtkPythonInterpreter.h"
 #include <string>

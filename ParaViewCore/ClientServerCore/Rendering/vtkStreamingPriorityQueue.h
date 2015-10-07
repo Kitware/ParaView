@@ -19,8 +19,8 @@
 // queue for steraming based on block bounds. This used by
 // vtkAMRStreamingPriorityQueue.
 
-#ifndef __vtkStreamingPriorityQueue_h
-#define __vtkStreamingPriorityQueue_h
+#ifndef vtkStreamingPriorityQueue_h
+#define vtkStreamingPriorityQueue_h
 
 #include "vtkBoundingBox.h"
 #include "vtkMath.h"

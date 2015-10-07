@@ -20,8 +20,8 @@
 // ensure appropriate time/piece is requested from the upstream. This also helps
 // when caching is employed by the view.
 
-#ifndef __vtkPVDataRepresentationPipeline_h
-#define __vtkPVDataRepresentationPipeline_h
+#ifndef vtkPVDataRepresentationPipeline_h
+#define vtkPVDataRepresentationPipeline_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkCompositeDataPipeline.h"

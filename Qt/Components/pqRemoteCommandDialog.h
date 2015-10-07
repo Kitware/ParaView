@@ -12,8 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __pqRemoteCommandDialog_h
-#define __pqRemoteCommandDialog_h
+#ifndef pqRemoteCommandDialog_h
+#define pqRemoteCommandDialog_h
 
 // .NAME pqRemoteCommandDialog - Dialog for configuring remote commands
 // .SECTION Description

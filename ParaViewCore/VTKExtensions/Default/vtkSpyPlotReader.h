@@ -46,8 +46,8 @@ PURPOSE.  See the above copyright notice for more information.
 // reader removes those wrong ghost cells.
 // - Each time step contains all the cell array name variables
 
-#ifndef __vtkSpyPlotReader_h
-#define __vtkSpyPlotReader_h
+#ifndef vtkSpyPlotReader_h
+#define vtkSpyPlotReader_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkCompositeDataSetAlgorithm.h"

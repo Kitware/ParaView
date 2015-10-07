@@ -24,8 +24,8 @@
 // .SECTION Caveats
 // This representation doesn't support caching currently.
 
-#ifndef __vtkSpreadSheetRepresentation_h
-#define __vtkSpreadSheetRepresentation_h
+#ifndef vtkSpreadSheetRepresentation_h
+#define vtkSpreadSheetRepresentation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"

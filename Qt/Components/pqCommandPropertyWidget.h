@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqCommandPropertyWidget_h
-#define __pqCommandPropertyWidget_h
+#ifndef pqCommandPropertyWidget_h
+#define pqCommandPropertyWidget_h
 
 #include "pqPropertyWidget.h"
 

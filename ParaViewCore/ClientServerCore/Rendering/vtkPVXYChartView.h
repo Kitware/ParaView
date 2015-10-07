@@ -18,8 +18,8 @@
 // in turn inherits vtkPVView -- that creates a vtkChart to perform
 // rendering.
 
-#ifndef __vtkPVXYChartView_h
-#define __vtkPVXYChartView_h
+#ifndef vtkPVXYChartView_h
+#define vtkPVXYChartView_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVContextView.h"

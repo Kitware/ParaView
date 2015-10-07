@@ -19,8 +19,8 @@
 // pure-render-server nodes to avoid odd side effects (We can fix this later if
 // the need arises).
 
-#ifndef __vtkSelectionDeliveryFilter_h
-#define __vtkSelectionDeliveryFilter_h
+#ifndef vtkSelectionDeliveryFilter_h
+#define vtkSelectionDeliveryFilter_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkSelectionAlgorithm.h"

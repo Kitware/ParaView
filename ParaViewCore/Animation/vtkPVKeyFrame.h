@@ -21,8 +21,8 @@
 // key frames. This class can be instantiated to create a no-action key
 // frame.
 
-#ifndef __vtkPVKeyFrame_h
-#define __vtkPVKeyFrame_h
+#ifndef vtkPVKeyFrame_h
+#define vtkPVKeyFrame_h
 
 #include "vtkObject.h"
 #include "vtkPVAnimationModule.h" // needed for export macro

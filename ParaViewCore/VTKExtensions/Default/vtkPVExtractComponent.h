@@ -16,8 +16,8 @@
 // .SECTION Description
 // vtkPVExtractComponent Extract a component of an attribute.
 
-#ifndef __vtkPVExtractComponent_h
-#define __vtkPVExtractComponent_h
+#ifndef vtkPVExtractComponent_h
+#define vtkPVExtractComponent_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkDataSetAlgorithm.h"

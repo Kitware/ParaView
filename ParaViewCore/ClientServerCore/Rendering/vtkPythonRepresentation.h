@@ -18,8 +18,8 @@
 // does not create any intermediate data for display. Instead, it simply
 // fetches data from the server.
 
-#ifndef __vtkPythonRepresentation_h
-#define __vtkPythonRepresentation_h
+#ifndef vtkPythonRepresentation_h
+#define vtkPythonRepresentation_h
 
 #include "vtkPVDataRepresentation.h"
 
@@ -150,4 +150,4 @@ private:
 //ETX
 };
 
-#endif // __vtkPythonRepresentation_h
+#endif // vtkPythonRepresentation_h

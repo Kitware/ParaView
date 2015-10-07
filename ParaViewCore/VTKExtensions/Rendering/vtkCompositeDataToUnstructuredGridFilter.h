@@ -21,8 +21,8 @@
 // subtree to be combined can be chosen using the SubTreeCompositeIndex. If 
 // the SubTreeCompositeIndex is a leaf node, then no appending is required.
 
-#ifndef __vtkCompositeDataToUnstructuredGridFilter_h
-#define __vtkCompositeDataToUnstructuredGridFilter_h
+#ifndef vtkCompositeDataToUnstructuredGridFilter_h
+#define vtkCompositeDataToUnstructuredGridFilter_h
 
 #include "vtkUnstructuredGridAlgorithm.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

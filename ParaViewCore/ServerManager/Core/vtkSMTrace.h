@@ -52,8 +52,8 @@
 // The constructed class instance is \c finalized and deleted when the temporary
 // variable created by the macro goes out of scope (hence the name
 // SM_SCOPED_TRACE).
-#ifndef __vtkSMTrace_h
-#define __vtkSMTrace_h
+#ifndef vtkSMTrace_h
+#define vtkSMTrace_h
 
 #include "vtkPVServerManagerCoreModule.h" // needed for exports
 #include "vtkSmartPointer.h" // needed for iVar
@@ -206,7 +206,7 @@ private:
 
 #define SM_SCOPED_TRACE_0(x, y) x ## y
 #define SM_SCOPED_TRACE_1(x, y) SM_SCOPED_TRACE_0(x, y)
-#define SM_SCOPED_TRACE(__A_TRACE_TYPE) \
-  vtkSMTrace::TraceItem SM_SCOPED_TRACE_1(_trace_item,__LINE__)(#__A_TRACE_TYPE); \
+#define SM_SCOPED_TRACE(_A_TRACE_TYPE) \
+  vtkSMTrace::TraceItem SM_SCOPED_TRACE_1(_trace_item,__LINE__)(#_A_TRACE_TYPE); \
   SM_SCOPED_TRACE_1(_trace_item,__LINE__) = vtkSMTrace::TraceItemArgs()
 #endif

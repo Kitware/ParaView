@@ -32,8 +32,8 @@
 // \li "Max temp is %s" % max(Temp)
 
 
-#ifndef __vtkPythonAnnotationFilter_h
-#define __vtkPythonAnnotationFilter_h
+#ifndef vtkPythonAnnotationFilter_h
+#define vtkPythonAnnotationFilter_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkTableAlgorithm.h"

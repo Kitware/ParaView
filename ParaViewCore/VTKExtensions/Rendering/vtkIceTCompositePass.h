@@ -28,8 +28,8 @@
 // on the root node, it will split the view among all tiles and generate
 // renderings on all processes.
 
-#ifndef __vtkIceTCompositePass_h
-#define __vtkIceTCompositePass_h
+#ifndef vtkIceTCompositePass_h
+#define vtkIceTCompositePass_h
 
 #include "vtkRenderPass.h"
 #include "vtkSynchronizedRenderers.h" //  needed for vtkRawImage.

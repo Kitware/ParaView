@@ -15,8 +15,8 @@
 // .NAME vtkPVDisplayInformation -
 // .SECTION Description
 
-#ifndef __vtkPVDisplayInformation_h
-#define __vtkPVDisplayInformation_h
+#ifndef vtkPVDisplayInformation_h
+#define vtkPVDisplayInformation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVInformation.h"

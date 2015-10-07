@@ -16,8 +16,8 @@
 // .SECTION Description
 //
 
-#ifndef __vtkSMOrthographicSliceViewProxy_h
-#define __vtkSMOrthographicSliceViewProxy_h
+#ifndef vtkSMOrthographicSliceViewProxy_h
+#define vtkSMOrthographicSliceViewProxy_h
 
 #include "vtkSMRenderViewProxy.h"
 class vtkSMRepresentationProxy;

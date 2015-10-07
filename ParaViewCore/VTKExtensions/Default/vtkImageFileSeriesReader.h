@@ -22,8 +22,8 @@
 // pass all filenames to the internal reader and then let it handle the pipeline
 // requests.
 
-#ifndef __vtkImageFileSeriesReader_h
-#define __vtkImageFileSeriesReader_h
+#ifndef vtkImageFileSeriesReader_h
+#define vtkImageFileSeriesReader_h
 
 #include "vtkFileSeriesReader.h"
 

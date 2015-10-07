@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqLockViewSizeCustomDialog_h
-#define __pqLockViewSizeCustomDialog_h
+#ifndef pqLockViewSizeCustomDialog_h
+#define pqLockViewSizeCustomDialog_h
 
 #include <QDialog>
 #include "pqComponentsModule.h"
@@ -66,4 +66,4 @@ private:
   pqUI *ui;
 };
 
-#endif //__pqLockViewSizeCustomDialog_h
+#endif //pqLockViewSizeCustomDialog_h

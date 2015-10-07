@@ -19,8 +19,8 @@
 // http://www.scorec.rpi.edu/software_products.html or contact Scorec for
 // information on PHASTA.
 
-#ifndef __vtkPhastaReader_h
-#define __vtkPhastaReader_h
+#ifndef vtkPhastaReader_h
+#define vtkPhastaReader_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkUnstructuredGridAlgorithm.h"

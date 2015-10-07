@@ -20,8 +20,8 @@
 // This manipulator has not been extended to parallel projection yet.
 // It works in perspective by rotating the camera.
 
-#ifndef __vtkPVTrackballPan_h
-#define __vtkPVTrackballPan_h
+#ifndef vtkPVTrackballPan_h
+#define vtkPVTrackballPan_h
 
 #include "vtkCameraManipulator.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

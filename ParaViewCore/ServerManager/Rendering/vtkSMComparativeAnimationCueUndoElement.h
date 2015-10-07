@@ -15,8 +15,8 @@
 // .NAME vtkSMComparativeAnimationCueUndoElement - UndoElement for ComparativeAnimationCue
 // .SECTION Description
 
-#ifndef __vtkSMComparativeAnimationCueUndoElement_h
-#define __vtkSMComparativeAnimationCueUndoElement_h
+#ifndef vtkSMComparativeAnimationCueUndoElement_h
+#define vtkSMComparativeAnimationCueUndoElement_h
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMUndoElement.h"

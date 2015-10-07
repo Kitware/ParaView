@@ -18,8 +18,8 @@
 // .SECTION Description
 //
 
-#ifndef __vtkTilesHelper_h
-#define __vtkTilesHelper_h
+#ifndef vtkTilesHelper_h
+#define vtkTilesHelper_h
 
 #include "vtkObject.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

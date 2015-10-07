@@ -23,8 +23,8 @@
 // .SECTION See Also
 // vtkGlyph3D, vtkCompositePolyDataMapper2
 
-#ifndef __vtkScatterPlotMapper_h
-#define __vtkScatterPlotMapper_h
+#ifndef vtkScatterPlotMapper_h
+#define vtkScatterPlotMapper_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkCompositePolyDataMapper2.h"

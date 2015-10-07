@@ -19,8 +19,8 @@
 // interface. Concrete implementations of this class can be written to support
 // tcp/ip socket or ssl or ssh based network connections among processes.
 
-#ifndef __vtkNetworkAccessManager_h
-#define __vtkNetworkAccessManager_h
+#ifndef vtkNetworkAccessManager_h
+#define vtkNetworkAccessManager_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"

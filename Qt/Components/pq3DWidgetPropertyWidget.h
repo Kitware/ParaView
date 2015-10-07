@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pq3DWidgetPropertyWidget_h
-#define __pq3DWidgetPropertyWidget_h
+#ifndef pq3DWidgetPropertyWidget_h
+#define pq3DWidgetPropertyWidget_h
 
 #include "pqPropertyWidget.h"
 
@@ -59,4 +59,4 @@ private:
   pq3DWidget *Widget;
 };
 
-#endif // __pq3DWidgetPropertyWidget_h
+#endif // pq3DWidgetPropertyWidget_h

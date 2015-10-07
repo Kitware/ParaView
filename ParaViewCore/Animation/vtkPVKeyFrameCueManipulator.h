@@ -31,8 +31,8 @@
 // .SECTION See Also
 // vtkPVAnimationCue vtkPVCueManipulator
 
-#ifndef __vtkPVKeyFrameCueManipulator_h
-#define __vtkPVKeyFrameCueManipulator_h
+#ifndef vtkPVKeyFrameCueManipulator_h
+#define vtkPVKeyFrameCueManipulator_h
 
 #include "vtkPVCueManipulator.h"
 

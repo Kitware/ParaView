@@ -13,8 +13,8 @@
 
 =========================================================================*/
 
-#ifndef __vtkPVServerOptionsInternals_h
-#define __vtkPVServerOptionsInternals_h
+#ifndef vtkPVServerOptionsInternals_h
+#define vtkPVServerOptionsInternals_h
 
 #include <vector>
 #include <string>

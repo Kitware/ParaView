@@ -20,8 +20,8 @@
 // parallel rendering, tile-displays and client-server. Even if the view is
 // client-only view, it needs to address these other configuration gracefully.
 
-#ifndef __vtkPVView_h
-#define __vtkPVView_h
+#ifndef vtkPVView_h
+#define vtkPVView_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkView.h"

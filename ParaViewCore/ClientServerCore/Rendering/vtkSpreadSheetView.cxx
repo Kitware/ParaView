@@ -534,11 +534,11 @@ bool vtkSpreadSheetView::IsRowSelected(vtkIdType row)
   vtkIdType blockIndex = row / blockSize;
   vtkTable* block = this->FetchBlock(blockIndex);
   vtkIdType blockOffset = row - (blockIndex * blockSize);
-  vtkCharArray* __vtkIsSelected__ = vtkCharArray::SafeDownCast(
+  vtkCharArray* vtkIsSelected = vtkCharArray::SafeDownCast(
     block->GetColumnByName("__vtkIsSelected__"));
-  if (__vtkIsSelected__)
+  if (vtkIsSelected)
     {
-    return __vtkIsSelected__->GetValue(blockOffset) == 1;
+    return vtkIsSelected->GetValue(blockOffset) == 1;
     }
   return false;
 }

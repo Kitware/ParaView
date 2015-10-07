@@ -18,8 +18,8 @@
 // A normal is conputed for a point by averaging normals of surrounding
 // 2D cells.  The vector is then constrained to be perpendicular to the normal.
 
-#ifndef __vtkSurfaceVectors_h
-#define __vtkSurfaceVectors_h
+#ifndef vtkSurfaceVectors_h
+#define vtkSurfaceVectors_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkDataSetAlgorithm.h"

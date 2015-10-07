@@ -21,8 +21,8 @@
 /// pqObjectInspectorWidget to control the apply button state when the first
 /// accept is undone.
 
-#ifndef __pqProxyModifiedStateUndoElement_h
-#define __pqProxyModifiedStateUndoElement_h
+#ifndef pqProxyModifiedStateUndoElement_h
+#define pqProxyModifiedStateUndoElement_h
 
 #include "vtkSMUndoElement.h"
 #include "pqCoreModule.h"

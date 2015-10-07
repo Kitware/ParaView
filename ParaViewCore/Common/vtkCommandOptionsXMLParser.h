@@ -19,8 +19,8 @@
 // These options can be retrieved during run-time, set using configuration file
 // or using Command Line Arguments.
 
-#ifndef __vtkCommandOptionsXMLParser_h
-#define __vtkCommandOptionsXMLParser_h
+#ifndef vtkCommandOptionsXMLParser_h
+#define vtkCommandOptionsXMLParser_h
 
 #include "vtkXMLParser.h"
 #include "vtkCommandOptions.h" // for enum
@@ -82,5 +82,5 @@ private:
   vtkCommandOptionsXMLParserInternal* Internals;
 };
 
-#endif // #ifndef __vtkCommandOptionsXMLParser_h
+#endif // #ifndef vtkCommandOptionsXMLParser_h
 

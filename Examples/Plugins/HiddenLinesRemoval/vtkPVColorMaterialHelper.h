@@ -19,8 +19,8 @@
 // ColorMaterial behaviour of the default OpenGL pipeline. Look at
 // vtkPVColorMaterialHelper_s for available GLSL functions.
 
-#ifndef __vtkPVColorMaterialHelper_h
-#define __vtkPVColorMaterialHelper_h
+#ifndef vtkPVColorMaterialHelper_h
+#define vtkPVColorMaterialHelper_h
 
 #include "vtkObject.h"
 

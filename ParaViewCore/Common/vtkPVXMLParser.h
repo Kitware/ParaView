@@ -16,8 +16,8 @@
 // .SECTION Description
 // This is a subclass of vtkXMLParser that constructs a representation
 // of parsed XML using vtkPVXMLElement.
-#ifndef __vtkPVXMLParser_h
-#define __vtkPVXMLParser_h
+#ifndef vtkPVXMLParser_h
+#define vtkPVXMLParser_h
 
 #include "vtkXMLParser.h"
 #include "vtkPVCommonModule.h" // needed for export macro

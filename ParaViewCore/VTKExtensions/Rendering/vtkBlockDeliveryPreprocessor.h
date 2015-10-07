@@ -19,8 +19,8 @@
 // representation for pre-processing data.
 // It internally uses vtkAttributeDataToTableFilter.
 
-#ifndef __vtkBlockDeliveryPreprocessor_h
-#define __vtkBlockDeliveryPreprocessor_h
+#ifndef vtkBlockDeliveryPreprocessor_h
+#define vtkBlockDeliveryPreprocessor_h
 
 #include "vtkDataObjectAlgorithm.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

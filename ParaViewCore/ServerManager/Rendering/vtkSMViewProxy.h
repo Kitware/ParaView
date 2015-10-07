@@ -26,8 +26,8 @@
 // \li vtkCommand::StartEvent(callData: int:1) -- start of InteractiveRender().
 // \li vtkCommand::EndEvent(callData: int:1) -- end of InteractiveRender().
 
-#ifndef __vtkSMViewProxy_h
-#define __vtkSMViewProxy_h
+#ifndef vtkSMViewProxy_h
+#define vtkSMViewProxy_h
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMProxy.h"

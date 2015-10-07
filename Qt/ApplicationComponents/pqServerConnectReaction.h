@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqServerConnectReaction_h 
-#define __pqServerConnectReaction_h
+#ifndef pqServerConnectReaction_h
+#define pqServerConnectReaction_h
 
 #include "pqReaction.h"
 

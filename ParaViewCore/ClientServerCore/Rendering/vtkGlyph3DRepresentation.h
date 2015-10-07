@@ -19,8 +19,8 @@
 // Note that vtkGlyph3DRepresentation requires that the "glyph" source data is
 // available on all rendering processes.
 
-#ifndef __vtkGlyph3DRepresentation_h
-#define __vtkGlyph3DRepresentation_h
+#ifndef vtkGlyph3DRepresentation_h
+#define vtkGlyph3DRepresentation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkGeometryRepresentation.h"

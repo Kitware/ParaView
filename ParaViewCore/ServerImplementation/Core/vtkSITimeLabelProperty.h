@@ -16,8 +16,8 @@
 // .SECTION Description
 // SIProperty that deals with TimeLabel annotation on Algorithm object type
 
-#ifndef __vtkSITimeLabelProperty_h
-#define __vtkSITimeLabelProperty_h
+#ifndef vtkSITimeLabelProperty_h
+#define vtkSITimeLabelProperty_h
 
 #include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIProperty.h"

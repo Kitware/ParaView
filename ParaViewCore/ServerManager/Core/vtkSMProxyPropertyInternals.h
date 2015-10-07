@@ -12,8 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __vtkSMProxyPropertyInternals_h
-#define __vtkSMProxyPropertyInternals_h
+#ifndef vtkSMProxyPropertyInternals_h
+#define vtkSMProxyPropertyInternals_h
 
 #include "vtkCommand.h"
 #include "vtkSmartPointer.h"

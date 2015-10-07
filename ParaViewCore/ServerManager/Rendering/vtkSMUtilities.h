@@ -16,8 +16,8 @@
 // .SECTION Description
 // vtkSMUtilities defines a collection of useful static methods.
 
-#ifndef __vtkSMUtilities_h
-#define __vtkSMUtilities_h
+#ifndef vtkSMUtilities_h
+#define vtkSMUtilities_h
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMObject.h"

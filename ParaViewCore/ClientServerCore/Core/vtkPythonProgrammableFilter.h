@@ -34,8 +34,8 @@
 // call are defined as Python variables inside both scripts. This allows
 // the developer to keep the scripts the same but change their behaviour
 // using parameters.
-#ifndef __vtkPythonProgrammableFilter_h
-#define __vtkPythonProgrammableFilter_h
+#ifndef vtkPythonProgrammableFilter_h
+#define vtkPythonProgrammableFilter_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkProgrammableFilter.h"

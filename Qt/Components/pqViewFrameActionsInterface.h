@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqViewFrameActionsInterface_h
-#define __pqViewFrameActionsInterface_h
+#ifndef pqViewFrameActionsInterface_h
+#define pqViewFrameActionsInterface_h
 
 #include <QtPlugin>
 #include "pqComponentsModule.h"

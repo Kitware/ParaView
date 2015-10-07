@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqLineEditEventPlayer_h
-#define __pqLineEditEventPlayer_h
+#ifndef pqLineEditEventPlayer_h
+#define pqLineEditEventPlayer_h
 
 #include "pqAbstractStringEventPlayer.h"
 #include "pqWidgetsModule.h"

@@ -17,8 +17,8 @@
 // A vtkStringList holds a list of strings.  
 // We might be able to replace it in the future.
 
-#ifndef __vtkStringList_h
-#define __vtkStringList_h
+#ifndef vtkStringList_h
+#define vtkStringList_h
 
 #include "vtkObject.h"
 #include "vtkPVCommonModule.h" // needed for export macro

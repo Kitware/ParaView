@@ -20,8 +20,8 @@
 // .SECTION See Also
 // vtkSMSessionProxyManager, vtkSMProxyDefinitionManager
 
-#ifndef __vtkSMProxyManager_h
-#define __vtkSMProxyManager_h
+#ifndef vtkSMProxyManager_h
+#define vtkSMProxyManager_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"

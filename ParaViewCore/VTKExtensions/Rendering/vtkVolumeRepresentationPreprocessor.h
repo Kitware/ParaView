@@ -26,8 +26,8 @@
 // .SECTION See Also
 // vtkExtractBlock vtkTriangleFilter
 
-#ifndef __vtkVolumeRepresentationPreprocessor_h
-#define __vtkVolumeRepresentationPreprocessor_h
+#ifndef vtkVolumeRepresentationPreprocessor_h
+#define vtkVolumeRepresentationPreprocessor_h
 
 #include "vtkUnstructuredGridAlgorithm.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

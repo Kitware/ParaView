@@ -13,8 +13,8 @@ PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 
-#ifndef __vtkSMPropertyHelperTest_h
-#define __vtkSMPropertyHelperTest_h
+#ifndef vtkSMPropertyHelperTest_h
+#define vtkSMPropertyHelperTest_h
 
 #include <QtTest>
 

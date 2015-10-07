@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqLineEdit_h
-#define __pqLineEdit_h
+#ifndef pqLineEdit_h
+#define pqLineEdit_h
 
 #include <QLineEdit>
 #include "pqWidgetsModule.h"

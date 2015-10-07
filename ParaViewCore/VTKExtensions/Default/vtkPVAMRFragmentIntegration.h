@@ -20,8 +20,8 @@
 // .SEE vtkAMRFragmentIntegration
 //
 
-#ifndef __vtkPVAMRFragmentIntegration_h
-#define __vtkPVAMRFragmentIntegration_h
+#ifndef vtkPVAMRFragmentIntegration_h
+#define vtkPVAMRFragmentIntegration_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkAMRFragmentIntegration.h"
@@ -76,4 +76,4 @@ protected:
   vtkPVAMRFragmentIntegrationInternal* Implementation;
 };
 
-#endif // __vtkPVAMRFragmentIntegration_h
+#endif // vtkPVAMRFragmentIntegration_h

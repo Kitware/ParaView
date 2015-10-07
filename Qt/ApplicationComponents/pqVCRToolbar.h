@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqVCRToolbar_h 
-#define __pqVCRToolbar_h
+#ifndef pqVCRToolbar_h
+#define pqVCRToolbar_h
 
 #include <QToolBar>
 #include "pqApplicationComponentsModule.h"

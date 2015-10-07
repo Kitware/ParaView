@@ -18,8 +18,8 @@
 // sources.  This is separate from vtkPVDataInformation because the number of
 // outputs can be determined before Update is called.
 
-#ifndef __vtkPVAlgorithmPortsInformation_h
-#define __vtkPVAlgorithmPortsInformation_h
+#ifndef vtkPVAlgorithmPortsInformation_h
+#define vtkPVAlgorithmPortsInformation_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"

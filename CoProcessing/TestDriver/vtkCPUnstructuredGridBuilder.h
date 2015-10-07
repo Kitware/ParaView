@@ -17,8 +17,8 @@
 // Class for creating vtkUnstructuredGrids for a test driver.  Note that
 // the user must call SetPoints(), Allocate(), and InsertNextCell().
 
-#ifndef __vtkCPUnstructuredGridBuilder_h
-#define __vtkCPUnstructuredGridBuilder_h
+#ifndef vtkCPUnstructuredGridBuilder_h
+#define vtkCPUnstructuredGridBuilder_h
 
 #include "vtkCPGridBuilder.h"
 #include "vtkPVCatalystTestDriverModule.h" // needed for export macros

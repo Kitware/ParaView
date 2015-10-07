@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqLiveInsituManager_h
-#define __pqLiveInsituManager_h
+#ifndef pqLiveInsituManager_h
+#define pqLiveInsituManager_h
 
 
 #include <QPointer>

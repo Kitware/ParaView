@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqSelectionAdaptor_h
-#define __pqSelectionAdaptor_h
+#ifndef pqSelectionAdaptor_h
+#define pqSelectionAdaptor_h
 
 #include "pqComponentsModule.h"
 #include <QObject>

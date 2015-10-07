@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqCatalystRemoveBreakpointReaction_h 
-#define __pqCatalystRemoveBreakpointReaction_h
+#ifndef pqCatalystRemoveBreakpointReaction_h
+#define pqCatalystRemoveBreakpointReaction_h
 
 #include "pqReaction.h"
 #include <QPointer>

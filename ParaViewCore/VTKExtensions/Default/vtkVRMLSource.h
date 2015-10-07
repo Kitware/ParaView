@@ -17,8 +17,8 @@
 // Since paraview can only use vtkSources, I am wrapping the VRML importer
 // as a source.  I will loose lights, texture maps and colors,
 
-#ifndef __vtkVRMLSource_h
-#define __vtkVRMLSource_h
+#ifndef vtkVRMLSource_h
+#define vtkVRMLSource_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"

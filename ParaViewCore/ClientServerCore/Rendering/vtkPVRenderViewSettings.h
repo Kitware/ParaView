@@ -20,8 +20,8 @@
 // All class to vtkPVRenderViewSettings::New() returns a reference to the
 // singleton instance.
 
-#ifndef __vtkPVRenderViewSettings_h
-#define __vtkPVRenderViewSettings_h
+#ifndef vtkPVRenderViewSettings_h
+#define vtkPVRenderViewSettings_h
 
 #include "vtkObject.h"
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports

@@ -24,8 +24,8 @@
 // words, if you are using render passes, you should not use this class. Your
 // render passes will  be overridden.
 
-#ifndef __vtkIceTSynchronizedRenderers_h
-#define __vtkIceTSynchronizedRenderers_h
+#ifndef vtkIceTSynchronizedRenderers_h
+#define vtkIceTSynchronizedRenderers_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkSynchronizedRenderers.h"

@@ -20,8 +20,8 @@ PURPOSE.  See the above copyright notice for more information.
 // opened istream
 //
 
-#ifndef __vtkSpyPlotIStream_h
-#define __vtkSpyPlotIStream_h
+#ifndef vtkSpyPlotIStream_h
+#define vtkSpyPlotIStream_h
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkType.h"
 #include "vtkSystemIncludes.h"

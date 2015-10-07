@@ -18,8 +18,8 @@
 // states. This is the base class of deserialization classes that load Protobuf
 // messagess to restore proxy/servermanager state (or part thereof).
 
-#ifndef __vtkSMDeserializerProtobuf_h
-#define __vtkSMDeserializerProtobuf_h
+#ifndef vtkSMDeserializerProtobuf_h
+#define vtkSMDeserializerProtobuf_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDeserializer.h"

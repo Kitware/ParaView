@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
-#ifndef __SignalCatcher_h
-#define __SignalCatcher_h
+#ifndef SignalCatcher_h
+#define SignalCatcher_h
 
 #include <QObject>
 #include <iostream>

@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
-#ifndef __pqCoreInit_h
-#define __pqCoreInit_h
+#ifndef pqCoreInit_h
+#define pqCoreInit_h
 
 #include "pqCoreModule.h"
 

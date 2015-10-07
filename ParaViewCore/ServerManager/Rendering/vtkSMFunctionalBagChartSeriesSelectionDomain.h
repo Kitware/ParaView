@@ -18,8 +18,8 @@
 // vtkSMFunctionalBagChartSeriesSelectionDomain extends vtkSMChartSeriesSelectionDomain to
 // handle default values visibility for bags and outliers.
 
-#ifndef __vtkSMFunctionalBagChartSeriesSelectionDomain_h
-#define __vtkSMFunctionalBagChartSeriesSelectionDomain_h
+#ifndef vtkSMFunctionalBagChartSeriesSelectionDomain_h
+#define vtkSMFunctionalBagChartSeriesSelectionDomain_h
 
 #include "vtkSMChartSeriesSelectionDomain.h"
 #include "vtkPVServerManagerRenderingModule.h" // needed for exports

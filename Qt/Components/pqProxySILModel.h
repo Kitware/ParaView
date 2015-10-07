@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqProxySILModel_h 
-#define __pqProxySILModel_h
+#ifndef pqProxySILModel_h
+#define pqProxySILModel_h
 
 #include <QAbstractProxyModel>
 #include "pqComponentsModule.h"

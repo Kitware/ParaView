@@ -19,8 +19,8 @@
 // server nodes). The content of this entry in the table is shown as text on the
 // rendering nodes.
 
-#ifndef __vtkTextSourceRepresentation_h
-#define __vtkTextSourceRepresentation_h
+#ifndef vtkTextSourceRepresentation_h
+#define vtkTextSourceRepresentation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"

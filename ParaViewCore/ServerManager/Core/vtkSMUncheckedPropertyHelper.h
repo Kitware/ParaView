@@ -13,8 +13,8 @@
 
 =========================================================================*/
 
-#ifndef __vtkSMUncheckedPropertyHelper_h
-#define __vtkSMUncheckedPropertyHelper_h
+#ifndef vtkSMUncheckedPropertyHelper_h
+#define vtkSMUncheckedPropertyHelper_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMPropertyHelper.h"

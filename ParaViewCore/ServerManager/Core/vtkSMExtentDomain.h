@@ -21,8 +21,8 @@
 // .SECTION See Also
 // vtkSMIntRangeDomain
 
-#ifndef __vtkSMExtentDomain_h
-#define __vtkSMExtentDomain_h
+#ifndef vtkSMExtentDomain_h
+#define vtkSMExtentDomain_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMIntRangeDomain.h"

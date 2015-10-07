@@ -18,8 +18,8 @@
 // subclasses that use a image-processing render pass for processing the image
 // before rendering it on the screen.
 
-#ifndef __vtkPVRenderViewWithSobel_h
-#define __vtkPVRenderViewWithSobel_h
+#ifndef vtkPVRenderViewWithSobel_h
+#define vtkPVRenderViewWithSobel_h
 
 #include "vtkPVRenderView.h"
 

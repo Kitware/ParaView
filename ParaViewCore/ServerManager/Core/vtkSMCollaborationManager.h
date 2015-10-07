@@ -33,8 +33,8 @@
 //   => do what you want with the message
 // }
 
-#ifndef __vtkSMCollaborationManager_h
-#define __vtkSMCollaborationManager_h
+#ifndef vtkSMCollaborationManager_h
+#define vtkSMCollaborationManager_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMRemoteObject.h"
@@ -159,4 +159,4 @@ private:
   void operator=(const vtkSMCollaborationManager&);       // Not implemented
 //ETX
 };
-#endif // #ifndef __vtkSMCollaborationManager_h
+#endif // #ifndef vtkSMCollaborationManager_h

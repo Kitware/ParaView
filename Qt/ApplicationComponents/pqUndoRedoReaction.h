@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqUndoRedoReaction_h 
-#define __pqUndoRedoReaction_h
+#ifndef pqUndoRedoReaction_h
+#define pqUndoRedoReaction_h
 
 #include "pqReaction.h"
 

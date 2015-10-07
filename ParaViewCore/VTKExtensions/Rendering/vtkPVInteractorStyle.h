@@ -21,8 +21,8 @@
 // This class fires vtkCommand::StartInteractionEvent and
 // vtkCommand::EndInteractionEvent to signal start and end of interaction.
 
-#ifndef __vtkPVInteractorStyle_h
-#define __vtkPVInteractorStyle_h
+#ifndef vtkPVInteractorStyle_h
+#define vtkPVInteractorStyle_h
 
 #include "vtkInteractorStyleTrackballCamera.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

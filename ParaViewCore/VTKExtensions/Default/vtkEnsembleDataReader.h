@@ -18,8 +18,8 @@
 // file (of extension .pve).
 // 'pve' a simply CSV file with the last column being the relative filename and
 // other columns for each of the variables in the ensemble.
-#ifndef __vtkEnsembleDataReader_h
-#define __vtkEnsembleDataReader_h
+#ifndef vtkEnsembleDataReader_h
+#define vtkEnsembleDataReader_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkDataObjectAlgorithm.h"

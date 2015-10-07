@@ -162,8 +162,8 @@ void pqSpreadSheetView::onAddRepresentation(pqRepresentation* repr)
 void pqSpreadSheetView::updateRepresentationVisibility(
   pqRepresentation* repr, bool visible)
 {
-  static bool __updating_visibility__ = false;
-  if (__updating_visibility__)
+  static bool updating_visibility__ = false;
+  if (updating_visibility__)
     {
     return;
     }

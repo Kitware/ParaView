@@ -16,8 +16,8 @@
 // .SECTION Description
 //
 
-#ifndef __vtkPVCacheKeeperPipeline_h
-#define __vtkPVCacheKeeperPipeline_h
+#ifndef vtkPVCacheKeeperPipeline_h
+#define vtkPVCacheKeeperPipeline_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkCompositeDataPipeline.h"

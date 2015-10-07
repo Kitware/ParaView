@@ -26,8 +26,8 @@
 //
 // This class uses vtkAbstractArray::GetProminentComponentValues().
 
-#ifndef __vtkPVProminentValuesInformation_h
-#define __vtkPVProminentValuesInformation_h
+#ifndef vtkPVProminentValuesInformation_h
+#define vtkPVProminentValuesInformation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVInformation.h"

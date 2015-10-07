@@ -19,8 +19,8 @@
 // By sorted we mean a subset build from a global sort even if some optimisation
 // allow us to skip a global table sorting.
 
-#ifndef __vtkSortedTableStreamer_h
-#define __vtkSortedTableStreamer_h
+#ifndef vtkSortedTableStreamer_h
+#define vtkSortedTableStreamer_h
 
 #include "vtkTableAlgorithm.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

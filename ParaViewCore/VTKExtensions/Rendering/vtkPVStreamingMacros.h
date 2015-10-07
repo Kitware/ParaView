@@ -17,8 +17,8 @@
 // This file simple consolidates arbitrary macros used to debugging/logging for
 // streaming.
 
-#ifndef __vtkPVStreamingMacros_h
-#define __vtkPVStreamingMacros_h
+#ifndef vtkPVStreamingMacros_h
+#define vtkPVStreamingMacros_h
 
 //#ifndef NDEBUG
 //// vtkStreamingStatusMacro simply prints out debugging text. We define the macro

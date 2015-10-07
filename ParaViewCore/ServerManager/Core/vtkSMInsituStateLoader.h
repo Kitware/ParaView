@@ -16,8 +16,8 @@
 // .SECTION Description
 //
 
-#ifndef __vtkSMInsituStateLoader_h
-#define __vtkSMInsituStateLoader_h
+#ifndef vtkSMInsituStateLoader_h
+#define vtkSMInsituStateLoader_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMStateLoader.h"

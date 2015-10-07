@@ -19,8 +19,8 @@
 // vtkSMAnimationSceneWriter that can write the geometry as a data file.
 // This writer can only write the visible geometry in one view.
 
-#ifndef __vtkSMAnimationSceneGeometryWriter_h
-#define __vtkSMAnimationSceneGeometryWriter_h
+#ifndef vtkSMAnimationSceneGeometryWriter_h
+#define vtkSMAnimationSceneGeometryWriter_h
 
 #include "vtkPVAnimationModule.h" //needed for exports
 #include "vtkSMAnimationSceneWriter.h"

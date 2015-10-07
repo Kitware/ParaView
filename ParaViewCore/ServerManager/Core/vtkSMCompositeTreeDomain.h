@@ -24,8 +24,8 @@
 // tree eg. A ( B ( D, E), C (F, G)) becomes: [A,B,D,E,C,F,G], so flat-index of A is
 // 0, while flat-index of C is 4.
 
-#ifndef __vtkSMCompositeTreeDomain_h
-#define __vtkSMCompositeTreeDomain_h
+#ifndef vtkSMCompositeTreeDomain_h
+#define vtkSMCompositeTreeDomain_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDomain.h"

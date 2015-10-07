@@ -20,8 +20,8 @@
 // to the server previous to the modification.
 // The redo action sets the property to the modified value.
 
-#ifndef __vtkSMPropertyModificationUndoElement_h
-#define __vtkSMPropertyModificationUndoElement_h
+#ifndef vtkSMPropertyModificationUndoElement_h
+#define vtkSMPropertyModificationUndoElement_h
 
 #include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMUndoElement.h"

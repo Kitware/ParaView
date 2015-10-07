@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqPythonManager_h
-#define __pqPythonManager_h
+#ifndef pqPythonManager_h
+#define pqPythonManager_h
 
 #include "pqPythonModule.h"
 #include <QObject>

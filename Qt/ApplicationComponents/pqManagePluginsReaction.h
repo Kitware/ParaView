@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqManagePluginsReaction_h 
-#define __pqManagePluginsReaction_h
+#ifndef pqManagePluginsReaction_h
+#define pqManagePluginsReaction_h
 
 #include "pqMasterOnlyReaction.h"
 

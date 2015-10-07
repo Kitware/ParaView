@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqViewMenuManager_h 
-#define __pqViewMenuManager_h
+#ifndef pqViewMenuManager_h
+#define pqViewMenuManager_h
 
 #include <QObject>
 #include "pqApplicationComponentsModule.h"

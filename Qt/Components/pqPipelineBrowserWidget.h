@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqPipelineBrowserWidget_h 
-#define __pqPipelineBrowserWidget_h
+#ifndef pqPipelineBrowserWidget_h
+#define pqPipelineBrowserWidget_h
 
 #include "pqFlatTreeView.h"
 #include "pqComponentsModule.h"

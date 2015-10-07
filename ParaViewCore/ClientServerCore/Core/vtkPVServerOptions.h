@@ -20,8 +20,8 @@
 // These options can be retrieved during run-time, set using configuration file
 // or using Command Line Arguments.
 
-#ifndef __vtkPVServerOptions_h
-#define __vtkPVServerOptions_h
+#ifndef vtkPVServerOptions_h
+#define vtkPVServerOptions_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVOptions.h"
@@ -97,4 +97,4 @@ private:
   vtkPVServerOptionsInternals* Internals;
 };
 
-#endif // #ifndef __vtkPVServerOptions_h
+#endif // #ifndef vtkPVServerOptions_h

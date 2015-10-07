@@ -18,8 +18,8 @@
 // surface.  
 
 
-#ifndef __vtkFlashContour_h
-#define __vtkFlashContour_h
+#ifndef vtkFlashContour_h
+#define vtkFlashContour_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"

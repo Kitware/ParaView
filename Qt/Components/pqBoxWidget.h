@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqBoxWidget_h 
-#define __pqBoxWidget_h
+#ifndef pqBoxWidget_h
+#define pqBoxWidget_h
 
 #include "pq3DWidget.h"
 

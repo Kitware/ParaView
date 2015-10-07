@@ -18,8 +18,8 @@
 // vtkSMSessionClient supports both connecting a pvserver as well as connecting
 // a pvdataserver/pvrenderserver.
 
-#ifndef __vtkSMSessionClient_h
-#define __vtkSMSessionClient_h
+#ifndef vtkSMSessionClient_h
+#define vtkSMSessionClient_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMSession.h"

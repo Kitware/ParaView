@@ -23,8 +23,8 @@
 // loss less compression during a still render. Additionally compressors
 // must be able to seriealize and restore their setting from a stream.
 
-#ifndef __vtkImageCompressor_h
-#define __vtkImageCompressor_h
+#ifndef vtkImageCompressor_h
+#define vtkImageCompressor_h
 
 #include "vtkObject.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

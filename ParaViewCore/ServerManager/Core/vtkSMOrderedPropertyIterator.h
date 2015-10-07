@@ -22,8 +22,8 @@
 // is possible because vtkSMProxy keeps track of the order in which properties
 // were added or exposed in a PropertyNamesInOrder vector.
 
-#ifndef __vtkSMOrderedPropertyIterator_h
-#define __vtkSMOrderedPropertyIterator_h
+#ifndef vtkSMOrderedPropertyIterator_h
+#define vtkSMOrderedPropertyIterator_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"

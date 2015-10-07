@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqDataRepresentation_h
-#define __pqDataRepresentation_h
+#ifndef pqDataRepresentation_h
+#define pqDataRepresentation_h
 
 #include "pqRepresentation.h"
 

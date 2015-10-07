@@ -20,8 +20,8 @@
 // pipeline to execute using the same piece breakdown that is provided
 // in the input file.
 
-#ifndef __vtkTableExtentTranslator_h
-#define __vtkTableExtentTranslator_h
+#ifndef vtkTableExtentTranslator_h
+#define vtkTableExtentTranslator_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" // For export macro
 #include "vtkExtentTranslator.h"

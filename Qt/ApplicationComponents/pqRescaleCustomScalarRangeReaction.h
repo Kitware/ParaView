@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqSetCustomScalarRangeReaction_h
-#define __pqSetCustomScalarRangeReaction_h
+#ifndef pqSetCustomScalarRangeReaction_h
+#define pqSetCustomScalarRangeReaction_h
 
 #include "pqReaction.h"
 

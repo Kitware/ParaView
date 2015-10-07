@@ -31,8 +31,8 @@
 // and move the mouse, you will roll the view.
 //
 
-#ifndef __vtkPVTrackballMultiRotate_h
-#define __vtkPVTrackballMultiRotate_h
+#ifndef vtkPVTrackballMultiRotate_h
+#define vtkPVTrackballMultiRotate_h
 
 #include "vtkCameraManipulator.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
@@ -72,4 +72,4 @@ private:
   void operator=(const vtkPVTrackballMultiRotate &); // Not implemented
 };
 
-#endif //__vtkPVTrackballMultiRotate_h
+#endif //vtkPVTrackballMultiRotate_h

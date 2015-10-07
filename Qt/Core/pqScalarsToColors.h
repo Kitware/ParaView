@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqScalarsToColors_h
-#define __pqScalarsToColors_h
+#ifndef pqScalarsToColors_h
+#define pqScalarsToColors_h
 
 #include "pqProxy.h"
 #include <QPair>

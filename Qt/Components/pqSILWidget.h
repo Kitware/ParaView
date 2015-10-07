@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqSILWidget_h 
-#define __pqSILWidget_h
+#ifndef pqSILWidget_h
+#define pqSILWidget_h
 
 #include <QTabWidget>
 #include <QPointer>

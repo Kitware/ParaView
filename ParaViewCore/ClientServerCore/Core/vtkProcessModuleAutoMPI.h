@@ -57,4 +57,4 @@ private:
 };
 
 
-#endif 	    /* !__vktProcessModuleAutoMPI_h */
+#endif      /* !vtkProcessModuleAutoMPI_h */

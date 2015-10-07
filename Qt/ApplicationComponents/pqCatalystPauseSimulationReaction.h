@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqCatalystPauseSimulationReaction_h 
-#define __pqCatalystPauseSimulationReaction_h
+#ifndef pqCatalystPauseSimulationReaction_h
+#define pqCatalystPauseSimulationReaction_h
 
 #include "pqReaction.h"
 #include <QPointer>

@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqArrayStatusPropertyWidget_h
-#define __pqArrayStatusPropertyWidget_h
+#ifndef pqArrayStatusPropertyWidget_h
+#define pqArrayStatusPropertyWidget_h
 
 #include "pqPropertyWidget.h"
 

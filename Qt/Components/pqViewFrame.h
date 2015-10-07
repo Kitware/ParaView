@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqViewFrame_h 
-#define __pqViewFrame_h
+#ifndef pqViewFrame_h
+#define pqViewFrame_h
 
 #include "pqComponentsModule.h"
 #include <QWidget>

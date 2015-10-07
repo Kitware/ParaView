@@ -23,8 +23,8 @@
 // data set becomes an output of this reader in the order in which
 // they appear in the file.
 
-#ifndef __vtkXMLCollectionReader_h
-#define __vtkXMLCollectionReader_h
+#ifndef vtkXMLCollectionReader_h
+#define vtkXMLCollectionReader_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkXMLReader.h"

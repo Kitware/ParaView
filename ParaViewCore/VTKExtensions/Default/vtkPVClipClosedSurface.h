@@ -17,8 +17,8 @@
 // .SECTION Description
 //  This is a subclass of vtkClipClosedSurface
 
-#ifndef __vtkPVClipClosedSurface_h
-#define __vtkPVClipClosedSurface_h
+#ifndef vtkPVClipClosedSurface_h
+#define vtkPVClipClosedSurface_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkClipClosedSurface.h"

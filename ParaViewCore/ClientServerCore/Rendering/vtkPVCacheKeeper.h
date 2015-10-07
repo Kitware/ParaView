@@ -23,8 +23,8 @@
 // .SECTION See Also
 // vtkPVCacheKeeperPipeline
 
-#ifndef __vtkPVCacheKeeper_h
-#define __vtkPVCacheKeeper_h
+#ifndef vtkPVCacheKeeper_h
+#define vtkPVCacheKeeper_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkDataObjectAlgorithm.h"

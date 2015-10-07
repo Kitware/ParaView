@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqGlyphScaleFactorPropertyWidget_h
-#define __pqGlyphScaleFactorPropertyWidget_h
+#ifndef pqGlyphScaleFactorPropertyWidget_h
+#define pqGlyphScaleFactorPropertyWidget_h
 
 #include "pqApplicationComponentsModule.h"
 #include "pqDoubleVectorPropertyWidget.h"

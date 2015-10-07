@@ -20,8 +20,8 @@
 // Map native simulation code data arrays into the vtkDataArray interface.
 // This is based on the vtkCPExodusIIResultsArrayTemplate.h class in VTK.
 
-#ifndef __vtkCPMappedVectorArrayTemplate_h
-#define __vtkCPMappedVectorArrayTemplate_h
+#ifndef vtkCPMappedVectorArrayTemplate_h
+#define vtkCPMappedVectorArrayTemplate_h
 
 #include "vtkMappedDataArray.h"
 
@@ -117,4 +117,4 @@ private:
 
 #include "vtkCPMappedVectorArrayTemplate.txx"
 
-#endif //__vtkCPMappedVectorArrayTemplate_h
+#endif //vtkCPMappedVectorArrayTemplate_h

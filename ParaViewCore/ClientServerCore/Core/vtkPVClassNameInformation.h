@@ -18,8 +18,8 @@
 // is separate from vtkPVDataInformation because it can be determined before
 // Update is called and because it operates on any VTK object.
 
-#ifndef __vtkPVClassNameInformation_h
-#define __vtkPVClassNameInformation_h
+#ifndef vtkPVClassNameInformation_h
+#define vtkPVClassNameInformation_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"

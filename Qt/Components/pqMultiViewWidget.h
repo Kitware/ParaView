@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqMultiViewWidget_h 
-#define __pqMultiViewWidget_h
+#ifndef pqMultiViewWidget_h
+#define pqMultiViewWidget_h
 
 #include <QWidget>
 #include <QUuid>

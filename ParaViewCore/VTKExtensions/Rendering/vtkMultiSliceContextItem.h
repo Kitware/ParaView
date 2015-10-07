@@ -14,8 +14,8 @@
 =========================================================================*/
 // .NAME vtkMultiSliceContextItem
 
-#ifndef __vtkMultiSliceContextItem_h
-#define __vtkMultiSliceContextItem_h
+#ifndef vtkMultiSliceContextItem_h
+#define vtkMultiSliceContextItem_h
 
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 #include "vtkContextItem.h"

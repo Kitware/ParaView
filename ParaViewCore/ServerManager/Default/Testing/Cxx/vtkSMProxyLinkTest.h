@@ -13,8 +13,8 @@ PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 
-#ifndef __vtkSMProxyLinkTest_h
-#define __vtkSMProxyLinkTest_h
+#ifndef vtkSMProxyLinkTest_h
+#define vtkSMProxyLinkTest_h
 
 #include <QtTest>
 

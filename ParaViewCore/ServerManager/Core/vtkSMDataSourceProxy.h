@@ -21,8 +21,8 @@
 // .SECTION See Also
 // vtkSMSourceProxy
 
-#ifndef __vtkSMDataSourceProxy_h
-#define __vtkSMDataSourceProxy_h
+#ifndef vtkSMDataSourceProxy_h
+#define vtkSMDataSourceProxy_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMSourceProxy.h"

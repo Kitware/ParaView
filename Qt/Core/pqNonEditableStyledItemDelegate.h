@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
-#ifndef __pqNonEditableStyledItemDelegate_h
-#define __pqNonEditableStyledItemDelegate_h
+#ifndef pqNonEditableStyledItemDelegate_h
+#define pqNonEditableStyledItemDelegate_h
 
 #include "pqCoreModule.h"
 

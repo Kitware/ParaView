@@ -20,8 +20,8 @@
 // camera manipulator to be assigned to any button.  This super class
 // might become a subclass of vtkInteractorObserver in the future.
 
-#ifndef __vtkCameraManipulator_h
-#define __vtkCameraManipulator_h
+#ifndef vtkCameraManipulator_h
+#define vtkCameraManipulator_h
 
 #include "vtkObject.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

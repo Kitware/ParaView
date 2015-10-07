@@ -25,8 +25,8 @@
 // vtkPainterPolyDataMapper
 
 
-#ifndef __vtkPVImageSliceMapper_h
-#define __vtkPVImageSliceMapper_h
+#ifndef vtkPVImageSliceMapper_h
+#define vtkPVImageSliceMapper_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkMapper.h"

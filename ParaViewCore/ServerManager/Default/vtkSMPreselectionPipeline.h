@@ -25,8 +25,8 @@
 // vtkSMInteractiveSelectionPipeline vtkSMTooltipSelectionPipeline
 
 
-#ifndef __vtkSMPreselectionPipeline_h
-#define __vtkSMPreselectionPipeline_h
+#ifndef vtkSMPreselectionPipeline_h
+#define vtkSMPreselectionPipeline_h
 
 #include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkWeakPointer.h" // Weak Pointer

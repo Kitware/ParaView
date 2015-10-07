@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqCollaborationEventPlayer_h 
-#define __pqCollaborationEventPlayer_h
+#ifndef pqCollaborationEventPlayer_h
+#define pqCollaborationEventPlayer_h
 
 #include "pqCoreModule.h"
 #include "pqWidgetEventPlayer.h"

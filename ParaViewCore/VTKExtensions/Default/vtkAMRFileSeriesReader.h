@@ -13,8 +13,8 @@
 
 =========================================================================*/
 
-#ifndef __vtkAMRFileSeriesReader_h
-#define __vtkAMRFileSeriesReader_h
+#ifndef vtkAMRFileSeriesReader_h
+#define vtkAMRFileSeriesReader_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkFileSeriesReader.h"

@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqTransferFunctionChartViewWidget_h
-#define __pqTransferFunctionChartViewWidget_h
+#ifndef pqTransferFunctionChartViewWidget_h
+#define pqTransferFunctionChartViewWidget_h
 
 #include "pqDeprecatedModule.h"
 #include <QWidget>

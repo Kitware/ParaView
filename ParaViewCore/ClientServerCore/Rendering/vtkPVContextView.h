@@ -17,8 +17,8 @@
 // vtkPVContextView adopts vtkContextView so that it can be used in ParaView
 // configurations.
 
-#ifndef __vtkPVContextView_h
-#define __vtkPVContextView_h
+#ifndef vtkPVContextView_h
+#define vtkPVContextView_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVView.h"

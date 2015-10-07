@@ -18,8 +18,8 @@
 // subclass for parallel coordinates representation. It exposes API from
 // underlying vtkChartParallelCoordinates.
 
-#ifndef __vtkPVParallelCoordinatesRepresentation_h
-#define __vtkPVParallelCoordinatesRepresentation_h
+#ifndef vtkPVParallelCoordinatesRepresentation_h
+#define vtkPVParallelCoordinatesRepresentation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkChartRepresentation.h"

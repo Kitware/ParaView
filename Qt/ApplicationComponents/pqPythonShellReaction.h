@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqPythonShellReaction_h 
-#define __pqPythonShellReaction_h
+#ifndef pqPythonShellReaction_h
+#define pqPythonShellReaction_h
 
 #include "pqReaction.h"
 #include "pqApplicationComponentsModule.h"

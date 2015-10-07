@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqTabbedMultiViewWidget_h 
-#define __pqTabbedMultiViewWidget_h
+#ifndef pqTabbedMultiViewWidget_h
+#define pqTabbedMultiViewWidget_h
 
 #include <QTabWidget> // needed for QTabWidget.
 #include <QTabBar> // needed for QTabBar::ButtonPosition

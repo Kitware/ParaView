@@ -20,8 +20,8 @@
 // processes. vtkPVRenderView uses the information about what process it has
 // been created on to decide what part of the "rendering" happens on the
 // process.
-#ifndef __vtkPVRenderView_h
-#define __vtkPVRenderView_h
+#ifndef vtkPVRenderView_h
+#define vtkPVRenderView_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVView.h"

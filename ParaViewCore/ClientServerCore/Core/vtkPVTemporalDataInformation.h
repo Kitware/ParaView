@@ -20,8 +20,8 @@
 // internally uses vtkPVDataInformation to collect information about each
 // timestep.
 
-#ifndef __vtkPVTemporalDataInformation_h
-#define __vtkPVTemporalDataInformation_h
+#ifndef vtkPVTemporalDataInformation_h
+#define vtkPVTemporalDataInformation_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"

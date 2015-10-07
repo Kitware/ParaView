@@ -17,8 +17,8 @@
 // .SECTION Description
 //
 
-#ifndef __vtkPVSynchronizedRenderer_h
-#define __vtkPVSynchronizedRenderer_h
+#ifndef vtkPVSynchronizedRenderer_h
+#define vtkPVSynchronizedRenderer_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkObject.h"

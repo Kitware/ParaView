@@ -19,8 +19,8 @@
 // multiple input arrays are ranges for area plots. All properties, like color,
 // label etc. are specified collectively.
 
-#ifndef __vtkQuartileChartRepresentation_h
-#define __vtkQuartileChartRepresentation_h
+#ifndef vtkQuartileChartRepresentation_h
+#define vtkQuartileChartRepresentation_h
 
 #include "vtkXYChartRepresentation.h"
 

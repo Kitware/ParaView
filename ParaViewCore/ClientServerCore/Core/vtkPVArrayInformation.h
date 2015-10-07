@@ -21,8 +21,8 @@
 // Note:  I could just use vtkDataArray objects and store the range
 // as values in the array.  This would eliminate this object.
 
-#ifndef __vtkPVArrayInformation_h
-#define __vtkPVArrayInformation_h
+#ifndef vtkPVArrayInformation_h
+#define vtkPVArrayInformation_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"

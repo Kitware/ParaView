@@ -19,8 +19,8 @@
 // This is a singleton. All calls to vtkPVGeneralSettings::New() return a
 // pointer to the same global instance (with reference count incremented as
 // expected).
-#ifndef __vtkPVGeneralSettings_h
-#define __vtkPVGeneralSettings_h
+#ifndef vtkPVGeneralSettings_h
+#define vtkPVGeneralSettings_h
 
 #include "vtkObject.h"
 #include "vtkPVServerManagerDefaultModule.h" //needed for exports

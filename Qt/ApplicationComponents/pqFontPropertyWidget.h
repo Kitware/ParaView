@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqFontPropertyWidget_h
-#define __pqFontPropertyWidget_h
+#ifndef pqFontPropertyWidget_h
+#define pqFontPropertyWidget_h
 
 #include "pqApplicationComponentsModule.h"
 #include "pqPropertyGroupWidget.h"

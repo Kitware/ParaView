@@ -17,8 +17,8 @@
 // vtkSIProxy is the server-implementation for a vtkSMProxy that helps the
 // vtkSMProxy with managing/updating VTK objects.
 
-#ifndef __vtkSIProxy_h
-#define __vtkSIProxy_h
+#ifndef vtkSIProxy_h
+#define vtkSIProxy_h
 
 #include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIObject.h"

@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqTreeWidgetSelectionHelper_h 
-#define __pqTreeWidgetSelectionHelper_h
+#ifndef pqTreeWidgetSelectionHelper_h
+#define pqTreeWidgetSelectionHelper_h
 
 #include <QObject>
 #include "pqWidgetsModule.h"

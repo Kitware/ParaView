@@ -19,8 +19,8 @@
 // .SECTION See Also
 // vtkPVDataRepresentationPipeline
 
-#ifndef __vtkPVDataRepresentation_h
-#define __vtkPVDataRepresentation_h
+#ifndef vtkPVDataRepresentation_h
+#define vtkPVDataRepresentation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkDataRepresentation.h"

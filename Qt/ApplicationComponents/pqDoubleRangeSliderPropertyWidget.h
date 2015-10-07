@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqDoubleRangeSliderPropertyWidget_h
-#define __pqDoubleRangeSliderPropertyWidget_h
+#ifndef pqDoubleRangeSliderPropertyWidget_h
+#define pqDoubleRangeSliderPropertyWidget_h
 
 #include "pqApplicationComponentsModule.h"
 #include "pqPropertyWidget.h"

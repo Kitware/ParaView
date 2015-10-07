@@ -19,8 +19,8 @@
 // get confused.  This filter creates empty arrays on node zero if there
 // are no cells or points in that partition.
 
-#ifndef __vtkCompleteArrays_h
-#define __vtkCompleteArrays_h
+#ifndef vtkCompleteArrays_h
+#define vtkCompleteArrays_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkDataSetAlgorithm.h"

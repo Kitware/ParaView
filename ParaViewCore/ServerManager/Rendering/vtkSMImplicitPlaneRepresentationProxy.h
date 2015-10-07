@@ -17,8 +17,8 @@
 // Specialized proxy for implicit planes. Overrides the default appearance
 // of VTK implicit plane representation.
 
-#ifndef __vtkSMImplicitPlaneRepresentationProxy_h
-#define __vtkSMImplicitPlaneRepresentationProxy_h
+#ifndef vtkSMImplicitPlaneRepresentationProxy_h
+#define vtkSMImplicitPlaneRepresentationProxy_h
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMWidgetRepresentationProxy.h"

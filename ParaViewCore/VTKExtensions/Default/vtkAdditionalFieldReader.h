@@ -16,8 +16,8 @@
 // .SECTION Description
 //
 
-#ifndef __vtkAdditionalFieldReader_h
-#define __vtkAdditionalFieldReader_h
+#ifndef vtkAdditionalFieldReader_h
+#define vtkAdditionalFieldReader_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPassInputTypeAlgorithm.h"

@@ -22,8 +22,8 @@
 // External logic must explicitly calls InvalidateCachedSelection() to ensure
 // that the cache is not reused.
 
-#ifndef __vtkPVHardwareSelector_h
-#define __vtkPVHardwareSelector_h
+#ifndef vtkPVHardwareSelector_h
+#define vtkPVHardwareSelector_h
 
 #include "vtkOpenGLHardwareSelector.h"
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports

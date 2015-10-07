@@ -21,8 +21,8 @@
 // As is clear from  the equation, the amplitude of the wave
 // is obtained from the value of the keyframe.
 
-#ifndef __vtkPVSinusoidKeyFrame_h
-#define __vtkPVSinusoidKeyFrame_h
+#ifndef vtkPVSinusoidKeyFrame_h
+#define vtkPVSinusoidKeyFrame_h
 
 #include "vtkPVKeyFrame.h"
 

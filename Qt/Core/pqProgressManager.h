@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqProgressManager_h
-#define __pqProgressManager_h
+#ifndef pqProgressManager_h
+#define pqProgressManager_h
 
 #include "pqCoreModule.h"
 #include <QObject>

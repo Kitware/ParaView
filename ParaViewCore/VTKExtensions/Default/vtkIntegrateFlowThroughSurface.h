@@ -19,8 +19,8 @@
 // dot product with the normal.  It then integrates this dot value
 // to get net flow through the surface.
 
-#ifndef __vtkIntegrateFlowThroughSurface_h
-#define __vtkIntegrateFlowThroughSurface_h
+#ifndef vtkIntegrateFlowThroughSurface_h
+#define vtkIntegrateFlowThroughSurface_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkUnstructuredGridAlgorithm.h"

@@ -22,8 +22,8 @@
 // For SelectionRepresentation, the client is expected to setup the input (look
 // at vtkSMPVRepresentationProxy).
 
-#ifndef __vtkPVCompositeRepresentation_h
-#define __vtkPVCompositeRepresentation_h
+#ifndef vtkPVCompositeRepresentation_h
+#define vtkPVCompositeRepresentation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkCompositeRepresentation.h"

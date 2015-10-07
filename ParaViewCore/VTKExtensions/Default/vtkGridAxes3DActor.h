@@ -15,8 +15,8 @@
 // .NAME vtkGridAxes3DActor
 // .SECTION Description
 
-#ifndef __vtkGridAxes3DActor_h
-#define __vtkGridAxes3DActor_h
+#ifndef vtkGridAxes3DActor_h
+#define vtkGridAxes3DActor_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkProp3D.h"
