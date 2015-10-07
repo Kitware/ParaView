@@ -26,6 +26,9 @@
 // information. The output of this filter will always be a single vtkPolyData 
 // that contains exactly one point and one cell (a VTK_VERTEX).
 
+#ifndef vtkMinMax_h
+#define vtkMinMax_h
+
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPolyDataAlgorithm.h"
 
@@ -107,3 +110,5 @@ private:
   void operator=(const vtkMinMax&); // Not implemented.
 
 };
+
+#endif

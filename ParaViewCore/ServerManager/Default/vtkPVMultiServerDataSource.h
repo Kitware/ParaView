@@ -16,8 +16,8 @@
 // .SECTION Description
 // VTK class that handle the fetch of remote data
 
-#ifndef __vtkMultiServerDataSource_h
-#define __vtkMultiServerDataSource_h
+#ifndef vtkPVMultiServerDataSource_h
+#define vtkPVMultiServerDataSource_h
 
 #include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkDataObjectAlgorithm.h"

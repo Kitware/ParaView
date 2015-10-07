@@ -18,8 +18,8 @@
 // This file provides some common utility functions that are used in the
 // implementation of GenericIO readers.
 
-#ifndef VTKGENERICIOUTILITIES_H_
-#define VTKGENERICIOUTILITIES_H_
+#ifndef vtkGenericIOUtilities_h
+#define vtkGenericIOUtilities_h
 
 #include "vtkType.h"
 
@@ -122,4 +122,4 @@ inline void SafeDeleteString(char* & str)
 
 }
 
-#endif /* VTKGENERICIOUTILITIES_H_ */
+#endif /* vtkGenericIOUtilities_h */

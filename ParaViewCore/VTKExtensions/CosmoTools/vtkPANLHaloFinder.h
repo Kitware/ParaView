@@ -12,8 +12,8 @@
  PURPOSE.  See the above copyright notice for more information.
 
  =========================================================================*/
-#ifndef VTKPANLHALOFINDER_H
-#define VTKPANLHALOFINDER_H
+#ifndef vtkPANLHaloFinder_h
+#define vtkPANLHaloFinder_h
 
 // .NAME vtkPANLHaloFinder.h -- Compute halos (clusters of particles)
 //
@@ -256,4 +256,4 @@ private:
   void FindCenters(vtkUnstructuredGrid* allParticles, vtkUnstructuredGrid* fofProperties);
 };
 
-#endif // VTKPANLHALOFINDER_H
+#endif // vtkPANLHaloFinder_h

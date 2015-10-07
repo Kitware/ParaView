@@ -17,8 +17,8 @@
 // .SECTION Description
 //  Creates a vtkUnstructuredGrid instance from a GenericIO file.
 
-#ifndef VTKPGENERICIOREADER_H_
-#define VTKPGENERICIOREADER_H_
+#ifndef vtkPGenericIOReader_h
+#define vtkPGenericIOReader_h
 
 // VTK includes
 #include "vtkUnstructuredGridAlgorithm.h" // Base class
@@ -295,4 +295,4 @@ private:
   void operator=(const vtkPGenericIOReader&); // Not implemented.
 };
 
-#endif /* VTKPGENERICIOREADER_H_ */
+#endif /* vtkPGenericIOReader_h */

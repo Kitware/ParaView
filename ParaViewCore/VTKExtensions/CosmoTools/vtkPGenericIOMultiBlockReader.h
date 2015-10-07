@@ -17,6 +17,9 @@
 // .SECTION Description
 //  Creates a vtkMultiBlockDataSet from a GenericIO file
 
+#ifndef vtkPGenericIOMultiBlockReader_h
+#define vtkPGenericIOMultiBlockReader_h
+
 #include "vtkPVVTKExtensionsCosmoToolsModule.h"
 #include "vtkMultiBlockDataSetAlgorithm.h" // parent class
 
@@ -239,3 +242,5 @@ private:
   class vtkGenericIOMultiBlockMetaData;
   vtkGenericIOMultiBlockMetaData* MetaData;
 };
+
+#endif

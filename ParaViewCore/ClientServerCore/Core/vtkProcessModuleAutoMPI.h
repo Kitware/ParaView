@@ -12,8 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef   	__vtkProcessModuleAutoMPI_h
-# define   	__vtkProcessModuleAutoMPI_h
+#ifndef vtkProcessModuleAutoMPI_h
+#define vtkProcessModuleAutoMPI_h
 
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports

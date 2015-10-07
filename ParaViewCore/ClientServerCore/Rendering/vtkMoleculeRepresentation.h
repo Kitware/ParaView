@@ -13,8 +13,8 @@
 
 =========================================================================*/
 
-#ifndef _vtkMoleculeRepresentation_h
-#define _vtkMoleculeRepresentation_h
+#ifndef vtkMoleculeRepresentation_h
+#define vtkMoleculeRepresentation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"
@@ -59,4 +59,4 @@ private:
 //ETX
 };
 
-#endif // _vtkMoleculeRepresentation_h
+#endif // vtkMoleculeRepresentation_h

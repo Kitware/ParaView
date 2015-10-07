@@ -36,8 +36,8 @@
 // .SECTION See Also
 // vtkIceTRenderManager
 
-#ifndef _vtkIceTContext_h
-#define _vtkIceTContext_h
+#ifndef vtkIceTContext_h
+#define vtkIceTContext_h
 
 #include "vtkObject.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
@@ -96,5 +96,5 @@ private:
   vtkIceTContextOpaqueHandle *Context;
 };
 
-#endif //_vtkIceTContext_h
+#endif //vtkIceTContext_h
 

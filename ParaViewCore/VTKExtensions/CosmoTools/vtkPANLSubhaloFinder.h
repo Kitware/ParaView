@@ -12,8 +12,8 @@
  PURPOSE.  See the above copyright notice for more information.
 
  =========================================================================*/
-#ifndef VTKPANLSUBHALOFINDER_H
-#define VTKPANLSUBHALOFINDER_H
+#ifndef vtkPANLSubhaloFinder_h
+#define vtkPANLSubhaloFinder_h
 
 // .NAME vtkPANLSubhaloFinder -- finds subhalos of requested halos
 //

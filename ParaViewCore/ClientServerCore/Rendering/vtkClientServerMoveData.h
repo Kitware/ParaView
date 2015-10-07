@@ -23,6 +23,9 @@
 // .SECTION Warning
 // This filter may change the output in RequestData().
 
+#ifndef vtkClientServerMoveData_h
+#define vtkClientServerMoveData_h
+
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkDataObjectAlgorithm.h"
 
@@ -117,3 +120,5 @@ private:
   void operator=(const vtkClientServerMoveData&); // Not implemented.
 //ETX
 };
+
+#endif
