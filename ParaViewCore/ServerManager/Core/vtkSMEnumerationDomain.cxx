@@ -114,7 +114,7 @@ int vtkSMEnumerationDomain::GetEntryValue(const char* text, int& valid)
     return -1;
     }
 
-  vtkSMEnumerationDomainInternals::EntriesType::iterator iter = 
+  vtkSMEnumerationDomainInternals::EntriesType::iterator iter =
     this->EInternals->Entries.begin();
   for (; iter != this->EInternals->Entries.end(); ++iter)
     {
@@ -164,7 +164,7 @@ int vtkSMEnumerationDomain::IsInDomain(int val, unsigned int& idx)
   unsigned int numEntries = this->GetNumberOfEntries();
   if (numEntries == 0)
     {
-    return 1;
+    return 0;
     }
 
   for (unsigned int i=0; i<numEntries; i++)

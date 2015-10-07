@@ -138,10 +138,10 @@ void vtkSMArrayRangeDomain::Update(
 
   if (!arrayInfo)
     {
-    return;
+    std::vector<vtkEntry> values;
+    this->SetEntries(values);
     }
-
-  if (component_number < arrayInfo->GetNumberOfComponents())
+  else if (component_number < arrayInfo->GetNumberOfComponents())
     {
     // a particular component was chosen, add ranges for that.
     std::vector<vtkEntry> values(1);

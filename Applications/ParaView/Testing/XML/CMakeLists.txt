@@ -230,6 +230,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/Flow2.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Fractal2D.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/FunctionalBagPlots.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/GlyphUseCellCenters.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ImageVolumeRendering.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/InteractiveSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadPartiallyUpdatedStateFiles.xml

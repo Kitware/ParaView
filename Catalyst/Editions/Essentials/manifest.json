@@ -81,6 +81,7 @@
       "path":"VTK/Filters/General",
       "include":[
         { "path":"vtkTableBasedClipCases.h" },
+        { "class":"vtkCellCenters" },
         { "class":"vtkClipDataSet" },
         { "class":"vtkClipVolume" },
         { "class":"vtkPassArrays" },

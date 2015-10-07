@@ -59,9 +59,14 @@ signals:
 protected slots:
   /// called when the user clicks the "reset" button for a specific property.
   virtual void resetButtonClicked();
+
   void scaleHalf();
   void scaleTwice();
   void scale(double);
+
+  // Called when the user changes the property domain
+  // Will change the visual aspect of the property
+  void propertyDomainModified(vtkObject* domain);
 
 private:
   Q_DISABLE_COPY(pqDoubleVectorPropertyWidget);
