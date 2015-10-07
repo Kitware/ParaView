@@ -17,8 +17,8 @@
 // vtkUncertaintySurfaceRepresentation extends vtkGeometryRepresentation
 // render surfaces with both value and uncertainty data.
 
-#ifndef __vtkUncertaintySurfaceRepresentation_h
-#define __vtkUncertaintySurfaceRepresentation_h
+#ifndef vtkUncertaintySurfaceRepresentation_h
+#define vtkUncertaintySurfaceRepresentation_h
 
 #include "vtkGeometryRepresentation.h"
 
@@ -68,4 +68,4 @@ private:
   vtkUncertaintySurfacePainter *Painter;
 };
 
-#endif // __vtkUncertaintySurfaceRepresentation_h
+#endif // vtkUncertaintySurfaceRepresentation_h

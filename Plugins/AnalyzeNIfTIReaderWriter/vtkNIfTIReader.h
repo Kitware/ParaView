@@ -20,8 +20,8 @@
 // .SECTION See Also
 // vtkNIfTIWriter vtkAnalyzeReader vtkAnalyzeWriter
 
-#ifndef __vtkNIfTIReader_h
-#define __vtkNIfTIReader_h
+#ifndef vtkNIfTIReader_h
+#define vtkNIfTIReader_h
 
 #include "vtkImageReader.h"
 

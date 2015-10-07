@@ -6,8 +6,8 @@
  */
 /*------------------------------------------------------------------------------*/
 
-#ifndef __GW_Matrix4x4_h_
-#define __GW_Matrix4x4_h_
+#ifndef GW_Matrix4x4_h
+#define GW_Matrix4x4_h
 
 #include "GW_MathsConfig.h"
 #include "GW_Maths.h"
@@ -739,7 +739,7 @@ public:
 
 
 
-#endif // __GW_Matrix4x4_h_
+#endif // GW_Matrix4x4_h
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright (C) 2009 Gabriel Peyre

@@ -20,8 +20,8 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
-#ifndef __pqGlobalPlotter_h
-#define __pqGlobalPlotter_h
+#ifndef pqGlobalPlotter_h
+#define pqGlobalPlotter_h
 
 #include "pqPlotter.h"
 
@@ -62,4 +62,4 @@ protected:
 
 };
 
-#endif // __pqGlobalPlotter_h
+#endif // pqGlobalPlotter_h

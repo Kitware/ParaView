@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __vtkVRInteractorStyleFactory_h
-#define __vtkVRInteractorStyleFactory_h
+#ifndef vtkVRInteractorStyleFactory_h
+#define vtkVRInteractorStyleFactory_h
 
 #include "vtkObject.h"
 
@@ -87,4 +87,4 @@ protected:
 
 };
 
-#endif // __vtkVRInteractorStyleFactory_h
+#endif // vtkVRInteractorStyleFactory_h

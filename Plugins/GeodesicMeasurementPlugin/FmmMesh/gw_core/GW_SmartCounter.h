@@ -7,8 +7,8 @@
  */
 /*------------------------------------------------------------------------------*/
 
-#ifndef __GW_SmartCounter_h_
-#define __GW_SmartCounter_h_
+#ifndef GW_SmartCounter_h
+#define GW_SmartCounter_h
 
 #include "GW_Config.h"
 
@@ -83,7 +83,7 @@ private:
 #endif
 
 
-#endif // __GW_SmartCounter_h_
+#endif // GW_SmartCounter_h
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright (C) 2000-2001 The Orion3D Rewiew Board                         //

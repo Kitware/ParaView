@@ -7,8 +7,8 @@
 Copyright 2012 SciberQuest Inc.
 
 */
-#ifndef __DataArrayTraits_h
-#define __DataArrayTraits_h
+#ifndef DataArrayTraits_h
+#define DataArrayTraits_h
 
 class vtkFloatArray;
 class vtkDoubleArray;

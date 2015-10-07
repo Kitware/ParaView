@@ -19,8 +19,8 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
-#ifndef __pqSierraPlotToolsDataLoadManager_h
-#define __pqSierraPlotToolsDataLoadManager_h
+#ifndef pqSierraPlotToolsDataLoadManager_h
+#define pqSierraPlotToolsDataLoadManager_h
 
 #include <QDialog>
 
@@ -53,4 +53,4 @@ private:
   pqUI *ui;
 };
 
-#endif //__pqSierraPlotToolsDataLoadManager_h
+#endif //pqSierraPlotToolsDataLoadManager_h

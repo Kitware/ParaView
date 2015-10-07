@@ -6,8 +6,8 @@
 
 Copyright 2012 SciberQuest Inc.
 */
-#ifndef __CUDAGlobalMemoryManager_h
-#define __CUDAGlobalMemoryManager_h
+#ifndef CUDAGlobalMemoryManager_h
+#define CUDAGlobalMemoryManager_h
 
 //#define CUDAMemoryManagerDEBUG
 

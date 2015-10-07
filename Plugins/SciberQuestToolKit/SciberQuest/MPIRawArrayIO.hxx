@@ -6,8 +6,8 @@
 
 Copyright 2012 SciberQuest Inc.
 */
-#ifndef __MPIRawArrayIO_hxx
-#define __MPIRawArrayIO_hxx
+#ifndef MPIRawArrayIO_hxx
+#define MPIRawArrayIO_hxx
 
 #include "CartesianExtent.h"
 #include "SQMacros.h"

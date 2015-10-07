@@ -20,8 +20,8 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
-#ifndef __pqSierraPlotToolsUtils_h
-#define __pqSierraPlotToolsUtils_h
+#ifndef pqSierraPlotToolsUtils_h
+#define pqSierraPlotToolsUtils_h
 
 #include <QList>
 #include <QMap>
@@ -48,4 +48,4 @@ protected:
 
 };
 
-#endif // __pqSierraPlotToolsUtils_h
+#endif // pqSierraPlotToolsUtils_h

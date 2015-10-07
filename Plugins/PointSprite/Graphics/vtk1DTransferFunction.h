@@ -29,8 +29,8 @@
 // .SECTION Description:
 // vtk1DTransferFunction subclasses map an array to a 1D array.
 
-#ifndef __vtk1DTransferFunction_h
-#define __vtk1DTransferFunction_h
+#ifndef vtk1DTransferFunction_h
+#define vtk1DTransferFunction_h
 
 #include "vtkPointSpriteGraphicsModule.h" //needed for exports
 #include "vtkObject.h"

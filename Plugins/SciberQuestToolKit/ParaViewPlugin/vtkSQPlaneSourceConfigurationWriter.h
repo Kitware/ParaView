@@ -38,8 +38,8 @@
 //
 // .SECTION Thanks
 // This class was contributed by SciberQuest Inc.
-#ifndef __vtkSQPlaneSourceConfigurationWriter_h
-#define __vtkSQPlaneSourceConfigurationWriter_h
+#ifndef vtkSQPlaneSourceConfigurationWriter_h
+#define vtkSQPlaneSourceConfigurationWriter_h
 
 #include "vtkSMProxyConfigurationWriter.h"
 

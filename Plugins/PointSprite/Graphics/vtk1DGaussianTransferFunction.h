@@ -29,8 +29,8 @@
 // .SECTION Description - 1D transfer function that maps values
 // to the max of a set af gaussians
 
-#ifndef __vtk1DGaussianTransferFunction_h
-#define __vtk1DGaussianTransferFunction_h
+#ifndef vtk1DGaussianTransferFunction_h
+#define vtk1DGaussianTransferFunction_h
 
 #include "vtkPointSpriteGraphicsModule.h" //needed for exports
 #include "vtk1DTransferFunction.h"

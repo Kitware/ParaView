@@ -22,8 +22,8 @@
 // .SECTION See Also
 // vtkPistonInformationHelper.h vtkPVDataInformation.h
 
-#ifndef __vtkPVDataSetToPiston_h
-#define __vtkPVDataSetToPiston_h
+#ifndef vtkPVDataSetToPiston_h
+#define vtkPVDataSetToPiston_h
 
 #include "vtkDataSetToPiston.h"
 

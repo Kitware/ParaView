@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __pOstream_h
-#define __pOstream_h
+#ifndef postream_h
+#define postream_h
 
 #include "vtkSciberQuestModule.h" // for export macro
 #include <iostream> // for ostream

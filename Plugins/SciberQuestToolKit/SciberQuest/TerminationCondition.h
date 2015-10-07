@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __TerminationCondition_h
-#define __TerminationCondition_h
+#ifndef TerminationCondition_h
+#define TerminationCondition_h
 
 #include "CartesianBounds.h" // for CartesianBounds
 #include "FieldLine.h" // for FieldLine

@@ -6,8 +6,8 @@
  */
 /*------------------------------------------------------------------------------*/
 
-#ifndef __GW_Vector3D_h_
-#define __GW_Vector3D_h_
+#ifndef GW_Vector3D_h
+#define GW_Vector3D_h
 
 #include "GW_MathsConfig.h"
 #include "GW_VectorStatic.h" // here
@@ -104,7 +104,7 @@ GW_END_NAMESPACE
 
 
 
-#endif // __GW_Vector3D_h_
+#endif // GW_Vector3D_h
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) Gabriel Peyré

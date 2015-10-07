@@ -1,5 +1,5 @@
-#ifndef __H5PARTPRIVATE_H
-#define __H5PARTPRIVATE_H
+#ifndef H5PartPrivate_h
+#define H5PartPrivate_h
 
 #define H5PART_GROUPNAME_STEP "Step"
 

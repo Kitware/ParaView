@@ -35,8 +35,8 @@
 // surfaces.
 // TODO verify that VTK rk45 implementation increases step size!!
 
-#ifndef __vtkSQFieldTracer_h
-#define __vtkSQFieldTracer_h
+#ifndef vtkSQFieldTracer_h
+#define vtkSQFieldTracer_h
 
 #include "vtkSciberQuestModule.h" // for export macro
 #include "vtkDataSetAlgorithm.h"

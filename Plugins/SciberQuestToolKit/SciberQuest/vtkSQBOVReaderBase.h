@@ -37,8 +37,8 @@
 // .SECTION See Also
 // BOVReader
 
-#ifndef __vtkSQBOVReaderBase_h
-#define __vtkSQBOVReaderBase_h
+#ifndef vtkSQBOVReaderBase_h
+#define vtkSQBOVReaderBase_h
 
 #include "vtkSciberQuestModule.h" // for export macro
 #include "vtkDataSetAlgorithm.h"

@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __XMLUtils_h
-#define __XMLUtils_h
+#ifndef XMLUtils_h
+#define XMLUtils_h
 
 #include "vtkPVXMLElement.h" // for vtkPVXMLElement
 #include "vtkXMLDataElement.h" // for vtkXMLDataElement

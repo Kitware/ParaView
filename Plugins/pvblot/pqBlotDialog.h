@@ -19,8 +19,8 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
-#ifndef __pqBlotDialog_h
-#define __pqBlotDialog_h
+#ifndef pqBlotDialog_h
+#define pqBlotDialog_h
 
 #include <QDialog>
 
@@ -85,4 +85,4 @@ protected:
   QString Command;
 };
 
-#endif //__pqBlotDialog_h
+#endif //pqBlotDialog_h

@@ -6,8 +6,8 @@
  */
 /*------------------------------------------------------------------------------*/
 
-#ifndef __GW_Matrix2x2_h_
-#define __GW_Matrix2x2_h_
+#ifndef GW_Matrix2x2_h
+#define GW_Matrix2x2_h
 
 #include "GW_MathsConfig.h"
 #include "GW_Maths.h"
@@ -209,7 +209,7 @@ public:
 } // End namespace GW
 
 
-#endif // __GW_Matrix2x2_h_
+#endif // GW_Matrix2x2_h
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright (C) 2009 Gabriel Peyre

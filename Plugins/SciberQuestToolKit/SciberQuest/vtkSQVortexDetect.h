@@ -17,8 +17,8 @@
 // .SECTION Caveats
 // .SECTION See Also
 
-#ifndef __vtkSQVortexDetect_h
-#define __vtkSQVortexDetect_h
+#ifndef vtkSQVortexDetect_h
+#define vtkSQVortexDetect_h
 
 #include "vtkSciberQuestModule.h" // for export macro
 #include "vtkDataSetAlgorithm.h"

@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __PrintUtils_h
-#define __PrintUtils_h
+#ifndef PrintUtils_h
+#define PrintUtils_h
 
 //BTX
 #include <iostream> // for ostream

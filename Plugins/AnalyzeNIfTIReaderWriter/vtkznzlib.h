@@ -40,8 +40,8 @@ NB: seeks for writable files with compression are quite restricted
 // .SECTION See Also
 // 
 
-#ifndef __vtkznzlib_h
-#define __vtkznzlib_h
+#ifndef vtkznzlib_h
+#define vtkznzlib_h
 
 #include "vtkObject.h"
 

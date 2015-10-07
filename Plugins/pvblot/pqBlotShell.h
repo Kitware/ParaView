@@ -19,8 +19,8 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
-#ifndef __pqBlotWidget_h
-#define __pqBlotWidget_h
+#ifndef pqBlotWidget_h
+#define pqBlotWidget_h
 
 #include <QWidget>
 
@@ -93,4 +93,4 @@ private:
   void operator=(const pqBlotShell &);  // Not implemented
 };
 
-#endif //__pqBlotWidget_h
+#endif //pqBlotWidget_h

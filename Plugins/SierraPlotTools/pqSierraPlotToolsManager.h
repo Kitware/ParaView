@@ -19,8 +19,8 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
-#ifndef __pqSierraPlotToolsManager_h
-#define __pqSierraPlotToolsManager_h
+#ifndef pqSierraPlotToolsManager_h
+#define pqSierraPlotToolsManager_h
 
 #include <QObject>
 
@@ -132,4 +132,4 @@ private:
   void operator=(const pqSierraPlotToolsManager &);        // Not implemented
 };
 
-#endif //__pqSierraPlotToolsManager_h
+#endif //pqSierraPlotToolsManager_h

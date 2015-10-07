@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __vtkSQPlaneSourceCellGenerator_h
-#define __vtkSQPlaneSourceCellGenerator_h
+#ifndef vtkSQPlaneSourceCellGenerator_h
+#define vtkSQPlaneSourceCellGenerator_h
 
 #include "vtkSciberQuestModule.h" // for export macro
 #include "vtkSQCellGenerator.h"

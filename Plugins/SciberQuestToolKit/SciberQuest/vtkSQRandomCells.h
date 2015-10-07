@@ -32,8 +32,8 @@
 // Pass a specified number of randomly selected cells from input
 // to ouput.
 
-#ifndef __vtkSQRandomCells_h
-#define __vtkSQRandomCells_h
+#ifndef vtkSQRandomCells_h
+#define vtkSQRandomCells_h
 
 #include "vtkSciberQuestModule.h" // for export macro
 #include "vtkDataSetAlgorithm.h"

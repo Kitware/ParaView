@@ -38,8 +38,8 @@
 //
 // .SECTION Thanks
 // This class was contributed by SciberQuest Inc.
-#ifndef __vtkSQPlaneSourceConfigurationFileInfo_h
-#define __vtkSQPlaneSourceConfigurationFileInfo_h
+#ifndef vtkSQPlaneSourceConfigurationFileInfo_h
+#define vtkSQPlaneSourceConfigurationFileInfo_h
 
 #include "vtkObject.h"
 

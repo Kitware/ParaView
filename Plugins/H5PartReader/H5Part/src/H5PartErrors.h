@@ -1,5 +1,5 @@
-#ifndef __H5PARTERRORS_H
-#define __H5PARTERRORS_H
+#ifndef H5PartErrors_h
+#define H5PartErrors_h
 
 
 /***************** Error Handling ***************/

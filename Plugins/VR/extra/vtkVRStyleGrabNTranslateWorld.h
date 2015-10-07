@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __vtkVRStyleGrabNTranslateWorld_h
-#define __vtkVRStyleGrabNTranslateWorld_h
+#ifndef vtkVRStyleGrabNTranslateWorld_h
+#define vtkVRStyleGrabNTranslateWorld_h
 
 #include "vtkVRInteractorStyle.h"
 #include "vtkSmartPointer.h"

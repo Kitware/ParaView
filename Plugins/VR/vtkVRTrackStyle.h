@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __vtkVRTrackStyle_h_
-#define __vtkVRTrackStyle_h_
+#ifndef vtkVRTrackStyle_h_
+#define vtkVRTrackStyle_h_
 
 #include "vtkVRInteractorStyle.h"
 
@@ -61,4 +61,4 @@ private:
   void operator=(const vtkVRTrackStyle&); // Not implemented.
 };
 
-#endif //__vtkVRTrackStyle.h_
+#endif //vtkVRTrackStyle.h_

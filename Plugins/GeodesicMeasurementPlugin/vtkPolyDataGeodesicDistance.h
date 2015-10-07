@@ -25,8 +25,8 @@
 // Serves as a base class for algorithms that trace a geodesic path on a
 // polygonal dataset.
 
-#ifndef __vtkPolyDataGeodesicDistance_h
-#define __vtkPolyDataGeodesicDistance_h
+#ifndef vtkPolyDataGeodesicDistance_h
+#define vtkPolyDataGeodesicDistance_h
 
 #include "vtkFiltersModelingModule.h" // For export macro
 #include "vtkPolyDataAlgorithm.h"

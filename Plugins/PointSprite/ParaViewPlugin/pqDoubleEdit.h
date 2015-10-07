@@ -27,8 +27,8 @@
 //
 // </verbatim>
 
-#ifndef __pqDoubleEdit_h__
-#define __pqDoubleEdit_h__
+#ifndef pqDoubleEdit_h
+#define pqDoubleEdit_h
 
 #include <QLineEdit>
 
@@ -52,4 +52,4 @@ protected slots :
   void  valueEdited(const QString&);
 
 };
-#endif// __pqDoubleEdit_h__
+#endif// pqDoubleEdit_h

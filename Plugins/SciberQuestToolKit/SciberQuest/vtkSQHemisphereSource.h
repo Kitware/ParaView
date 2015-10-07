@@ -32,8 +32,8 @@
 // Source that provides a polydata sphere as 2 hemispheres on 2 outputs.
 //
 
-#ifndef __vtkSQHemisphereSource_h
-#define __vtkSQHemisphereSource_h
+#ifndef vtkSQHemisphereSource_h
+#define vtkSQHemisphereSource_h
 
 #include "vtkSciberQuestModule.h" // for export macro
 #include "vtkPolyDataAlgorithm.h"

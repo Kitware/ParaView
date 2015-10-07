@@ -35,8 +35,8 @@
 // also possible to generate random points only on the surface of the
 // sphere.
 
-#ifndef __vtkSQRandomSeedPoints_h
-#define __vtkSQRandomSeedPoints_h
+#ifndef vtkSQRandomSeedPoints_h
+#define vtkSQRandomSeedPoints_h
 
 #include "vtkSciberQuestModule.h" // for export macro
 #include "vtkPolyDataAlgorithm.h"

@@ -13,8 +13,8 @@
 
 =========================================================================*/
 
-#ifndef __vtkUncertaintySurfacePainter_h
-#define __vtkUncertaintySurfacePainter_h
+#ifndef vtkUncertaintySurfacePainter_h
+#define vtkUncertaintySurfacePainter_h
 
 #include "vtkPainter.h"
 #include "vtkSmartPointer.h"
@@ -113,4 +113,4 @@ private:
   GLuint GradTextureId;
 };
 
-#endif // __vtkUncertaintySurfacePainter_h
+#endif // vtkUncertaintySurfacePainter_h

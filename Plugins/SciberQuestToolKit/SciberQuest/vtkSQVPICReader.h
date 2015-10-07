@@ -23,8 +23,8 @@
 // vtkPolyDataReader vtkStructuredPointsReader vtkStructuredGridReader
 // vtkUnstructuredGridReader vtkRectilinearGridReader
 
-#ifndef __vtkSQVPICReader_h
-#define __vtkSQVPICReader_h
+#ifndef vtkSQVPICReader_h
+#define vtkSQVPICReader_h
 
 #include "vtkSciberQuestModule.h" // for export macro
 #include "vtkImageAlgorithm.h"

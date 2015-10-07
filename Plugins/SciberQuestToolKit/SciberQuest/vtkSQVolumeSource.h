@@ -32,8 +32,8 @@
 // Creates a volume composed of hexahedra cells on a latice.
 // This is the 3D counterpart to the plane source.
 
-#ifndef __vtkSQVolumeSource_h
-#define __vtkSQVolumeSource_h
+#ifndef vtkSQVolumeSource_h
+#define vtkSQVolumeSource_h
 
 #include "vtkSciberQuestModule.h" // for export macro
 #include "vtkUnstructuredGridAlgorithm.h"

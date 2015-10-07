@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __ParaViewVRPN_h
-#define __ParaViewVRPN_h
+#ifndef pqVRPNConnection_h
+#define pqVRPNConnection_h
 
 #include <QtCore/QObject>
 

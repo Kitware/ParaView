@@ -32,8 +32,8 @@
 // if not, the widget will be disabled automatically.
 // It also provides the user with an option to load new images as textures.
 
-#ifndef __pqPointSpriteTextureComboBox_h
-#define __pqPointSpriteTextureComboBox_h
+#ifndef pqPointSpriteTextureComboBox_h
+#define pqPointSpriteTextureComboBox_h
 
 #include "pqTextureComboBox.h"
 

@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqPointSpriteControls_h
-#define __pqPointSpriteControls_h
+#ifndef pqPointSpriteControls_h
+#define pqPointSpriteControls_h
 
 #include "pqPropertyWidget.h"
 #include <QPointer>

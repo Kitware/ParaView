@@ -16,8 +16,8 @@
 // .SECTION Description
 //
 
-#ifndef __vtkShearedWaveletSource_h
-#define __vtkShearedWaveletSource_h
+#ifndef vtkShearedWaveletSource_h
+#define vtkShearedWaveletSource_h
 
 #include "vtkUnstructuredGridAlgorithm.h"
 

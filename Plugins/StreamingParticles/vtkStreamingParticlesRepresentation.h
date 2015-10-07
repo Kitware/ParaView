@@ -18,8 +18,8 @@
 // vtkStreamingParticlesRepresentation is a simple representation for multiblock
 // datasets that with streaming capabilities.
 
-#ifndef __vtkStreamingParticlesRepresentation_h
-#define __vtkStreamingParticlesRepresentation_h
+#ifndef vtkStreamingParticlesRepresentation_h
+#define vtkStreamingParticlesRepresentation_h
 
 #include "vtkPVDataRepresentation.h"
 #include "vtkSmartPointer.h" // for smart pointer.

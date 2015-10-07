@@ -28,8 +28,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __CPUConvolutionDriver_h
-#define __CPUConvolutionDriver_h
+#ifndef CPUConvolutionDriver_h
+#define CPUConvolutionDriver_h
 
 class vtkDataArray;
 class CartesianExtent;

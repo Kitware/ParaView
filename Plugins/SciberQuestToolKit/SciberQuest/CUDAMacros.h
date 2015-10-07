@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __CUDAMacros_h
-#define __CUDAMacros_h
+#ifndef CUDAMacros_h
+#define CUDAMacros_h
 
 #if defined SQTK_CUDA
 #include <cuda.h> // standard cuda header

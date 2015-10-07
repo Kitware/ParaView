@@ -6,8 +6,8 @@
  */
 /*------------------------------------------------------------------------------*/
 
-#ifndef __GW_MatrixStatic_h_
-#define __GW_MatrixStatic_h_
+#ifndef GW_MatrixStatic_h
+#define GW_MatrixStatic_h
 
 #include "GW_MathsConfig.h"
 #include "GW_MatrixNxP.h"
@@ -968,7 +968,7 @@ GW_MatrixStatic<r_size,c_size,v_type> operator - (const GW_MatrixStatic<r_size,c
 } // End namespace GW
 
 
-#endif // __GW_MatrixStatic_h_
+#endif // GW_MatrixStatic_h
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright (C) 2009 Gabriel Peyre

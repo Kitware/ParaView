@@ -27,8 +27,8 @@
 //
 // </verbatim>
 
-#ifndef __pqTransferFunctionEditor_h
-#define __pqTransferFunctionEditor_h
+#ifndef pqTransferFunctionEditor_h
+#define pqTransferFunctionEditor_h
 
 #include <QWidget>
 

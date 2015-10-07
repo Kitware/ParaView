@@ -50,8 +50,8 @@
 // Modified to work with the dynamic load ballancing of the SQ Field Tracer.
 //
 
-#ifndef __vtkSQLineSource_h
-#define __vtkSQLineSource_h
+#ifndef vtkSQLineSource_h
+#define vtkSQLineSource_h
 
 #include "vtkSciberQuestModule.h" // for export macro
 #include "vtkPolyDataAlgorithm.h"

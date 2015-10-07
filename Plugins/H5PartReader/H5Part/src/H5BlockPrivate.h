@@ -1,5 +1,5 @@
-#ifndef __H5BLOCKPRIVATE_H
-#define __H5BLOCKPRIVATE_H
+#ifndef H5BlockPrivate_h
+#define H5BlockPrivate_h
 
 #define H5BLOCK_GROUPNAME_BLOCK "Block"
 

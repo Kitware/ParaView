@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __vtkVRQueue_h
-#define __vtkVRQueue_h
+#ifndef vtkVRQueue_h
+#define vtkVRQueue_h
 
 #include "vtkObject.h"
 #include "vtkNew.h"
@@ -106,4 +106,4 @@ private:
   vtkNew<vtkConditionVariable> CondVar;
 
 };
-#endif // __vtkVRQueue_h
+#endif // vtkVRQueue_h

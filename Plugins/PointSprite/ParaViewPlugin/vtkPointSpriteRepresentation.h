@@ -17,8 +17,8 @@
 // vtkPointSpriteRepresentation is an extension for vtkGeometryRepresentation
 // that renders point-sprites at all point locations.
 
-#ifndef __vtkPointSpriteRepresentation_h
-#define __vtkPointSpriteRepresentation_h
+#ifndef vtkPointSpriteRepresentation_h
+#define vtkPointSpriteRepresentation_h
 
 #include "vtkGeometryRepresentation.h"
 

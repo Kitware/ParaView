@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqPythonQtWrapperFactory_h
-#define __pqPythonQtWrapperFactory_h
+#ifndef pqPythonQtWrapperFactory_h
+#define pqPythonQtWrapperFactory_h
 
 #include <PythonQtCppWrapperFactory.h>
 

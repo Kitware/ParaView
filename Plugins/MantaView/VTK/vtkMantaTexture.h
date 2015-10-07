@@ -62,8 +62,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // .SECTION Description
 //
 
-#ifndef __vtkMantaTexture_h
-#define __vtkMantaTexture_h
+#ifndef vtkMantaTexture_h
+#define vtkMantaTexture_h
 
 #include "vtkMantaModule.h"
 #include "vtkTexture.h"

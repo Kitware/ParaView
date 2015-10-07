@@ -6,8 +6,8 @@
 
 Copyright 2012 SciberQuest Inc.
 */
-#ifndef __CUDAMemoryManager_h
-#define __CUDAMemoryManager_h
+#ifndef CUDAMemoryManager_h
+#define CUDAMemoryManager_h
 
 #include "SQMacros.h"
 class vtkDataArray;

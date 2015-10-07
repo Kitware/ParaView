@@ -76,8 +76,8 @@
 // .SECTION Thanks
 // Michael Finch for absolute scalar radius
 
-#ifndef __vtkSQTubeFilter_h
-#define __vtkSQTubeFilter_h
+#ifndef vtkSQTubeFilter_h
+#define vtkSQTubeFilter_h
 
 #include "vtkSciberQuestModule.h" // for export macro
 #include "vtkDataSetAlgorithm.h"

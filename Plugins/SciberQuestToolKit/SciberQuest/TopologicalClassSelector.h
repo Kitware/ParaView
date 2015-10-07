@@ -28,8 +28,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __TopologicalClassSelector_h
-#define __TopologicalClassSelector_h
+#ifndef TopologicalClassSelector_h
+#define TopologicalClassSelector_h
 
 class vtkDataSet;
 class vtkAppendFilter;

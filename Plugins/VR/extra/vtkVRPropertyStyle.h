@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __vtkVRPropertyStyle_h
-#define __vtkVRPropertyStyle_h
+#ifndef vtkVRPropertyStyle_h
+#define vtkVRPropertyStyle_h
 
 #include "vtkVRInteractorStyle.h"
 #include "vtkSmartPointer.h"

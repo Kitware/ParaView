@@ -1,7 +1,7 @@
 // -*- c++ -*-
 
-#ifndef __pqGMVReaderPanel_h
-#define __pqGMVReaderPanel_h
+#ifndef pqGMVReaderPanel_h
+#define pqGMVReaderPanel_h
 
 // ParaView Server Manager includes
 #include <vtkSMIntVectorProperty.h>
@@ -56,4 +56,4 @@ protected slots:
 
 };
 
-#endif //__pqGMVReaderPanel_h
+#endif //pqGMVReaderPanel_h

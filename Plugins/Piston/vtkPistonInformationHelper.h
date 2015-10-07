@@ -20,8 +20,8 @@
 // the corresponding vtkPVDataInformation with information from a
 // PistonDataObject.
 
-#ifndef __vtkPistonInformationHelper_h
-#define __vtkPistonInformationHelper_h
+#ifndef vtkPistonInformationHelper_h
+#define vtkPistonInformationHelper_h
 
 #include "vtkPVDataInformationHelper.h"
 

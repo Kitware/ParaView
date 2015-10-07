@@ -62,8 +62,8 @@
 //
 // .SECTION Caveats
 
-#ifndef __vtkSQFieldTopologySelect_h
-#define __vtkSQFieldTopologySelect_h
+#ifndef vtkSQFieldTopologySelect_h
+#define vtkSQFieldTopologySelect_h
 
 
 #include "vtkSciberQuestModule.h" // for export macro

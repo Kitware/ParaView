@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __vtkSQKernelConvolution_h
-#define __vtkSQKernelConvolution_h
+#ifndef vtkSQKernelConvolution_h
+#define vtkSQKernelConvolution_h
 
 #include <set> // for set
 #include <string> // for string

@@ -71,8 +71,8 @@
 // of the first axis (Origin->Point1) with the second (Origin->Point2). This
 // also affects the normals to the generated polygons.
 
-#ifndef __vtkSQPlaneSource_h
-#define __vtkSQPlaneSource_h
+#ifndef vtkSQPlaneSource_h
+#define vtkSQPlaneSource_h
 
 #include "vtkSciberQuestModule.h" // for export macro
 #include "vtkPolyDataAlgorithm.h"

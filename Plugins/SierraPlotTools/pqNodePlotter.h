@@ -20,8 +20,8 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
-#ifndef __pqNodePlotter_h
-#define __pqNodePlotter_h
+#ifndef pqNodePlotter_h
+#define pqNodePlotter_h
 
 #include <QString>
 #include "pqPlotter.h"
@@ -71,4 +71,4 @@ public:
 //=============================================================================
 //class pqSierraPlotToolsManager::pqInternal::NodePlotter
 
-#endif // __pqNodePlotter_h
+#endif // pqNodePlotter_h

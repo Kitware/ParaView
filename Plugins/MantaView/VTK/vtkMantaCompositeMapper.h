@@ -17,8 +17,8 @@
 // This class is an adapter between composite data produced by the data
 // processing pipeline and the non composite capable vtkMantaPolyDataMapper.
 
-#ifndef __vtkMantaCompositeMapper_h
-#define __vtkMantaCompositeMapper_h
+#ifndef vtkMantaCompositeMapper_h
+#define vtkMantaCompositeMapper_h
 
 #include "vtkCompositePolyDataMapper.h"
 #include "vtkMantaModule.h"

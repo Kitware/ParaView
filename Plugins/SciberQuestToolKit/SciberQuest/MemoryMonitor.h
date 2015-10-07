@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __MemoryMonitor_h
-#define __MemoryMonitor_h
+#ifndef MemoryMonitor_h
+#define MemoryMonitor_h
 
 class MemoryMonitor
 {

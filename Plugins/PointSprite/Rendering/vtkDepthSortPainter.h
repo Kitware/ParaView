@@ -33,8 +33,8 @@
 // This painter is useful with the point sprite painter
 // to sort points when depth peeling is disabled.
 
-#ifndef __vtkDepthSortPainter_h
-#define __vtkDepthSortPainter_h
+#ifndef vtkDepthSortPainter_h
+#define vtkDepthSortPainter_h
 
 
 #include "vtkPointSpriteRenderingModule.h" //needed for exports
@@ -153,5 +153,5 @@ private:
   void operator=(const vtkDepthSortPainter &);  // Not implemented.
 };
 
-#endif //__vtkDepthSortPainter_h
+#endif //vtkDepthSortPainter_h
 

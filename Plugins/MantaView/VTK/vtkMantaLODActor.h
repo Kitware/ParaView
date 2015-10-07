@@ -62,8 +62,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // .SECTION Description
 //
 
-#ifndef __vtkMantaLODActor_h
-#define __vtkMantaLODActor_h
+#ifndef vtkMantaLODActor_h
+#define vtkMantaLODActor_h
 
 #include "vtkMantaModule.h"
 #include "vtkPVLODActor.h"

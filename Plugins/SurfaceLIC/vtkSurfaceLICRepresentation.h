@@ -17,8 +17,8 @@
 // vtkSurfaceLICRepresentation extends vtkGeometryRepresentation to use surface
 // lic when rendering surfaces.
 
-#ifndef __vtkSurfaceLICRepresentation_h
-#define __vtkSurfaceLICRepresentation_h
+#ifndef vtkSurfaceLICRepresentation_h
+#define vtkSurfaceLICRepresentation_h
 
 #include "vtkGeometryRepresentation.h"
 

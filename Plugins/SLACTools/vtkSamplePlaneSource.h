@@ -31,8 +31,8 @@
 // will cover the entire geometry.
 //
 
-#ifndef __vtkSamplePlaneSource_h
-#define __vtkSamplePlaneSource_h
+#ifndef vtkSamplePlaneSource_h
+#define vtkSamplePlaneSource_h
 
 #include "vtkPolyDataAlgorithm.h"
 
@@ -101,4 +101,4 @@ private:
   void operator=(const vtkSamplePlaneSource &);       // Not implemented
 };
 
-#endif //__vtkSamplePlaneSource_h
+#endif //vtkSamplePlaneSource_h

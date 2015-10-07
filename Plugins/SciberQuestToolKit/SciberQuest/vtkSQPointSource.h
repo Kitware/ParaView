@@ -50,8 +50,8 @@
 // sphere.
 // Modified so that downstream work can be parallelized on cell id.
 
-#ifndef __vtkSQPointSource_h
-#define __vtkSQPointSource_h
+#ifndef vtkSQPointSource_h
+#define vtkSQPointSource_h
 
 #include "vtkSciberQuestModule.h" // for export macro
 #include "vtkPolyDataAlgorithm.h"

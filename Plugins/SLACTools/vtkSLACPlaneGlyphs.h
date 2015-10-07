@@ -27,8 +27,8 @@
 // the glyphs to look nice on electric field data.
 //
 
-#ifndef __vtkSLACPlaneGlyphs_h
-#define __vtkSLACPlaneGlyphs_h
+#ifndef vtkSLACPlaneGlyphs_h
+#define vtkSLACPlaneGlyphs_h
 
 #include "vtkPolyDataAlgorithm.h"
 
@@ -74,5 +74,5 @@ private:
   void operator=(const vtkSLACPlaneGlyphs &);
 };
 
-#endif //__vtkSLACPlaneGlyphs_h
+#endif //vtkSLACPlaneGlyphs_h
 

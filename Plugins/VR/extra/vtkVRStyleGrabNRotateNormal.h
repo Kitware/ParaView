@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __vtkVRStyleGrabNRotateSliceNormal_h
-#define __vtkVRStyleGrabNRotateSliceNormal_h
+#ifndef vtkVRStyleGrabNRotateSliceNormal_h
+#define vtkVRStyleGrabNRotateSliceNormal_h
 
 #include "vtkVRStyleGrabNUpdateMatrix.h"
 #include "vtkSmartPointer.h"

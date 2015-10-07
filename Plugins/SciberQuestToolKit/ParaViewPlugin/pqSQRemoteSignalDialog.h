@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __pqSQRemoteSignalDialog_h
-#define __pqSQRemoteSignalDialog_h
+#ifndef pqSQRemoteSignalDialog_h
+#define pqSQRemoteSignalDialog_h
 // .NAME pqSQRemoteSignalDialog - Dialog for configuring server side signals
 //
 // .SECTION Description

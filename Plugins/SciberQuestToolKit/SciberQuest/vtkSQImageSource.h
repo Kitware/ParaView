@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __vtkSQImageSource_h
-#define __vtkSQImageSource_h
+#ifndef vtkSQImageSource_h
+#define vtkSQImageSource_h
 
 #include "vtkSciberQuestModule.h" // for export macro
 #include "vtkImageAlgorithm.h"

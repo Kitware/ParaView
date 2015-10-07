@@ -6,8 +6,8 @@
 
 Copyright 2012 SciberQuest Inc.
 */
-#ifndef __SharedArray_h
-#define __SharedArray_h
+#ifndef SharedArray_h
+#define SharedArray_h
 
 #include "RefCountedPointer.h"
 #include <cstdlib>

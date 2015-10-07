@@ -40,8 +40,8 @@
 // .SECTION See Also
 // BOVWriter
 
-#ifndef __vtkSQBOVWriter_h
-#define __vtkSQBOVWriter_h
+#ifndef vtkSQBOVWriter_h
+#define vtkSQBOVWriter_h
 
 #include "vtkSciberQuestModule.h" // for export macro
 #include "vtkDataSetAlgorithm.h"

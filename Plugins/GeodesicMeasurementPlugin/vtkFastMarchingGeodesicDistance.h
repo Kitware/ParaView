@@ -70,8 +70,8 @@
 //    Remeshing and Parameterization", Progress in Nonlinear Differential
 //    Equations and Their Applications, 2005.
 
-#ifndef __vtkFastMarchingGeodesicDistance_h
-#define __vtkFastMarchingGeodesicDistance_h
+#ifndef vtkFastMarchingGeodesicDistance_h
+#define vtkFastMarchingGeodesicDistance_h
 
 #include "vtkPolyDataGeodesicDistance.h"
 

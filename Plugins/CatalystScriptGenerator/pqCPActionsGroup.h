@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqCPActionsGroup_h
-#define __pqCPActionsGroup_h
+#ifndef pqCPActionsGroup_h
+#define pqCPActionsGroup_h
 
 #include <QActionGroup>
 

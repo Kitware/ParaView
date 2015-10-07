@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __GhostTransaction_h
-#define __GhostTransaction_h
+#ifndef GhostTransaction_h
+#define GhostTransaction_h
 
 #include "CartesianExtent.h" // for CartesianExtent
 #include "SQMacros.h" // for sqErrorMacro

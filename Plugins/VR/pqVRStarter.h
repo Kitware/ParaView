@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqVRStarter_h
-#define __pqVRStarter_h
+#ifndef pqVRStarter_h
+#define pqVRStarter_h
 #include <QObject>
 
 class QTimer;

@@ -13,8 +13,8 @@
 
 =========================================================================*/
 
-#ifndef __vtkForceTime_h_
-#define __vtkForceTime_h_
+#ifndef vtkForceTime_h_
+#define vtkForceTime_h_
 
 #include "vtkDataObjectAlgorithm.h"
 
@@ -59,4 +59,4 @@ private:
   void operator=(const vtkForceTime&);  // Not implemented.
 };
 
-#endif //__vtkForceTime_h_
+#endif //vtkForceTime_h_

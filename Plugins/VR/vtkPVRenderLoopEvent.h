@@ -16,8 +16,8 @@
 // .SECTION Description
 // vtkPVRenderLoopEvent
 
-#ifndef __vtkPVRenderLoopEvent_h
-#define __vtkPVRenderLoopEvent_h
+#ifndef vtkPVRenderLoopEvent_h
+#define vtkPVRenderLoopEvent_h
 // --------------------------------------------------------------------includes
 #include "vtkObject.h"
 
@@ -53,4 +53,4 @@ private:
 
 };
 
-#endif // __vtkPVRenderLoopEvent_h
+#endif // vtkPVRenderLoopEvent_h

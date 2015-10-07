@@ -19,8 +19,8 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
-#ifndef __pqResizingScrollArea_H
-#define __pqResizingScrollArea_H
+#ifndef pqResizingScrollArea_h
+#define pqResizingScrollArea_h
 
 #include <QScrollArea>
 
@@ -39,4 +39,4 @@ public:
   QSize sizeHint() const;
 };
 
-#endif //__pqResizingScrollArea_H
+#endif //pqResizingScrollArea_h

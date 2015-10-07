@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __BOVArrayImageIterator_h
-#define __BOVArrayImageIterator_h
+#ifndef BOVArrayImageIterator_h
+#define BOVArrayImageIterator_h
 
 #include "BOVScalarImage.h" // for BOVScalarImage
 #include "BOVVectorImage.h" // for BOVVectorImage

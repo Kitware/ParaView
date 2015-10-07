@@ -63,8 +63,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // vtkMantaProperty is a concrete implementation of the abstract class
 // vtkProperty. vtkMantaProperty interfaces to the Manta Raytracer library.
 
-#ifndef __vtkMantaProperty_h
-#define __vtkMantaProperty_h
+#ifndef vtkMantaProperty_h
+#define vtkMantaProperty_h
 
 #include "vtkMantaModule.h"
 #include "vtkProperty.h"

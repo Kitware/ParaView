@@ -8,8 +8,8 @@ Copyright 2012 SciberQuest Inc.
 
 */
 
-#ifndef __DataArrayCopierImpl_h
-#define __DataArrayCopierImpl_h
+#ifndef DataArrayCopierImpl_h
+#define DataArrayCopierImpl_h
 
 #include "DataArrayCopier.h"
 #include "DataArrayTraits.hxx"

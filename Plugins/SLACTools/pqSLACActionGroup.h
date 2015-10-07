@@ -19,8 +19,8 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
-#ifndef __pqSLACActionGroup_h
-#define __pqSLACActionGroup_h
+#ifndef pqSLACActionGroup_h
+#define pqSLACActionGroup_h
 
 #include <QActionGroup>
 
@@ -37,4 +37,4 @@ private:
   void operator=(const pqSLACActionGroup &);        // Not implemented
 };
 
-#endif //__pqSLACActionGroup_h
+#endif //pqSLACActionGroup_h

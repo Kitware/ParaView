@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __PolyDataCellCopier_h
-#define __PolyDataCellCopier_h
+#ifndef PolyDataCellCopier_h
+#define PolyDataCellCopier_h
 
 #include "CellCopier.h"
 #include "IdBlock.h" // For IdBlock
