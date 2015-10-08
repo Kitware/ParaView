@@ -9298,15 +9298,16 @@ source.</Documentation>
         <Documentation>Compute vorticity and angular rotation of particles as
         they progress</Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetDisableResetCache"
-                         default_values="0"
-                         name="DisableResetCache"
-                         number_of_elements="1"
-                         panel_visibility="never">
-        <BooleanDomain name="bool" />
-        <Documentation>Prevents cache from getting reset so that new computation
-          always start from previous results.</Documentation>
-      </IntVectorProperty>
+      <DoubleVectorProperty command="SetTerminalSpeed"
+                            default_values="0.000000000001"
+                            label="Terminal Speed"
+                            name="TerminalSpeed"
+                            number_of_elements="1"
+                            panel_visibility="advanced" >
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property specifies the terminal speed, below which
+        particle advection/integration is terminated.</Documentation>
+      </DoubleVectorProperty>
     </SourceProxy>
     <!-- ==================================================================== -->
     <SourceProxy class="vtkStreaklineFilter"

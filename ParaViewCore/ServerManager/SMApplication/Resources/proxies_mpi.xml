@@ -118,6 +118,15 @@
         <Documentation>For restarted simulations set the first time step. Default is 0.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetDisableResetCache"
+                         default_values="0"
+                         name="DisableResetCache"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>Prevents cache from getting reset so that new computation
+          always start from previous results.</Documentation>
+      </IntVectorProperty>
       <!-- End vtkInSituPParticlePathFilter -->
     </SourceProxy>
   </ProxyGroup>
