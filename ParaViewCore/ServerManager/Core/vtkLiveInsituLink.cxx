@@ -817,12 +817,13 @@ void vtkLiveInsituLink::InsituUpdate(double time, vtkIdType timeStep)
   // ** here on, all the code is executed on all processes (root and
   // satellites).
 
+  vtkSmartPointer<vtkPVXMLElement> xmlState;
   if (buffer && buffer_size > 0)
     {
     vtkNew<vtkPVXMLParser> parser;
     if (parser->Parse(buffer))
       {
-      this->XMLState = parser->GetRootElement();
+      xmlState = parser->GetRootElement();
       }
     }
   delete[] buffer;
@@ -840,12 +841,12 @@ void vtkLiveInsituLink::InsituUpdate(double time, vtkIdType timeStep)
     }
 
 
-  if (this->XMLState)
+  if (xmlState)
     {
     vtkNew<vtkSMInsituStateLoader> loader;
     loader->KeepIdMappingOn();
     loader->SetSessionProxyManager(this->InsituProxyManager);
-    this->InsituProxyManager->LoadXMLState(this->XMLState, loader.GetPointer());
+    this->InsituProxyManager->LoadXMLState(xmlState, loader.GetPointer());
     int mappingSize = 0;
     vtkTypeUInt32* inSituMapping = loader->GetMappingArray(mappingSize);
     // Save mapping outside that scope

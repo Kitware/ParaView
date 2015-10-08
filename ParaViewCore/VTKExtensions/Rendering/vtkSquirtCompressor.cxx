@@ -21,6 +21,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkMultiProcessStream.h"
 #include <sstream>
+#include <algorithm>
 
 vtkStandardNewMacro(vtkSquirtCompressor);
 
@@ -160,7 +161,7 @@ int vtkSquirtCompressor::Compress()
         }
 
       // Record Run length
-      *((unsigned char*)_rawCompressedBuffer+comp_index*4+3) =(unsigned char)count;
+      reinterpret_cast<unsigned char*>(_rawCompressedBuffer)[comp_index*4+3] = static_cast<unsigned char>(count);
       comp_index++;
 
       count = 0;
@@ -183,8 +184,30 @@ int vtkSquirtCompressor::Decompress()
     return VTK_ERROR;
     }
 
+  vtkUnsignedCharArray* out = this->GetOutput();
+
+  // We assume that 'out' has exactly the same number of component set as the
+  // input before compression.
+  switch (out->GetNumberOfComponents())
+    {
+  case 3:
+    return this->DecompressRGB();
+  case 4:
+    return this->DecompressRGBA();
+
+  default:
+    vtkErrorMacro("SQUIRT only support 3 or 4 component arrays.");
+    return VTK_ERROR;
+    }
+}
+
+//-----------------------------------------------------------------------------
+int vtkSquirtCompressor::DecompressRGBA()
+{
   vtkUnsignedCharArray* in = this->GetInput();
   vtkUnsignedCharArray* out = this->GetOutput();
+  assert(out->GetNumberOfComponents() == 4);
+
   int count=0;
   int index=0;
   unsigned int current_color;
@@ -207,25 +230,66 @@ int vtkSquirtCompressor::Decompress()
     // Get run length count;
     count = *((unsigned char*)&current_color+3);
 
-    if (out->GetNumberOfComponents() == 4)
-      {
-      *((unsigned char*)&current_color+3) = (count & 0x80) != 0? 0xff : 0;
-      count &= 0x7f;
-      }
-    else
-      {
-      *((unsigned char*)&current_color+3) = 0xff;
-      }
+    *((unsigned char*)&current_color+3) = (count & 0x80) != 0? 0xff : 0;
+    count &= 0x7f;
 
     // Set color
     _rawColorBuffer[index++] = current_color;
 
     // Blast color into color buffer
     for(int j=0; j< count; j++)
+      {
       _rawColorBuffer[index++] = current_color;
+      }
     }
   return VTK_OK;
 }
+
+//-----------------------------------------------------------------------------
+int vtkSquirtCompressor::DecompressRGB()
+{
+  vtkUnsignedCharArray* in = this->GetInput();
+  vtkUnsignedCharArray* out = this->GetOutput();
+  assert(out->GetNumberOfComponents() == 4);
+
+  int count=0;
+  unsigned int current_color;
+  unsigned char* _rawColorBuffer;
+  unsigned int* _rawCompressedBuffer;
+
+  // Get compressed buffer size
+  int CompSize = in->GetNumberOfTuples()/4; /// NOTE 1->4
+
+  // Access raw arrays directly
+  _rawColorBuffer = (unsigned char*)out->GetPointer(0);
+  _rawCompressedBuffer = (unsigned int*)in->GetPointer(0);
+
+  // Go through compress buffer and extract RLE format into color buffer
+  for(int i=0; i<CompSize; i++)
+    {
+    // Get color and count
+    current_color = _rawCompressedBuffer[i];
+
+    // Get run length count;
+    count = *((unsigned char*)&current_color+3);
+
+    *((unsigned char*)&current_color+3) = 0xff;
+
+    unsigned char current_color_rgb[3];
+    std::copy(reinterpret_cast<const unsigned char*>(&current_color),
+      reinterpret_cast<const unsigned char*>(&current_color) +3, current_color_rgb);
+    std::copy(current_color_rgb, current_color_rgb + 3, _rawColorBuffer);
+    _rawColorBuffer+=3;
+    for(int j=0; j< count; j++)
+      {
+      std::copy(current_color_rgb, current_color_rgb + 3, _rawColorBuffer);
+      _rawColorBuffer+=3;
+      }
+    }
+  return VTK_OK;
+}
+
+
 
 //-----------------------------------------------------------------------------
 void vtkSquirtCompressor::SaveConfiguration(vtkMultiProcessStream *stream)
