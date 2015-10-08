@@ -8,6 +8,7 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMaskPoints.h"
+#include "vtkMatrix4x4.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
@@ -162,7 +163,9 @@ int vtkPointGaussianRepresentation::ProcessViewRequest(
       vtkPVRenderView::SetPiece(inInfo, this, tmpData.GetPointer());
       }
     // 2. Provide the bounds.
-    vtkPVRenderView::SetGeometryBounds(inInfo, bounds);
+    vtkNew<vtkMatrix4x4> matrix;
+    this->Actor->GetMatrix(matrix.GetPointer());
+    vtkPVRenderView::SetGeometryBounds(inInfo, bounds, matrix.GetPointer());
     outInfo->Set(vtkPVRenderView::NEED_ORDERED_COMPOSITING(), 1);
     }
   else if (request_type == vtkPVView::REQUEST_RENDER())
