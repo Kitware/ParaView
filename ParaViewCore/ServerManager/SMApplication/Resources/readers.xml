@@ -7242,6 +7242,19 @@
         </IndexSelectionDomain>
       </StringVectorProperty>
       <!-- End dimensions table -->
+      <IntVectorProperty command="SetShowMultilayerView"
+                         default_values="0"
+                         name="ShowMultilayerView"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This property indicates whether to show multiple layers
+        in one view, with each vertical level having the same thickness,
+        specified by the layer thickness slider. For ocean data, the layers
+        correspond to data at vertical level whose number increases towards the
+        center of the sphere. For atmospheric data, the layers correspond to
+        data at vertical levels increasing away from the
+        center.</Documentation>
+      </IntVectorProperty>
       <StringVectorProperty command="GetAllDimensions"
                             information_only="1"
                             name="DimensionList">
@@ -7259,6 +7272,11 @@
                       name="DimensionList" />
           </RequiredProperties>
         </StringListDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="ShowMultilayerView" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
       </StringVectorProperty>
       <IntVectorProperty command="SetProjectLatLon"
                          default_values="0"
@@ -7267,19 +7285,6 @@
         <BooleanDomain name="bool" />
         <Documentation>This property indicates whether to view the data in the
         lat/lon projection.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetShowMultilayerView"
-                         default_values="0"
-                         name="ShowMultilayerView"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>This property indicates whether to show multiple layers
-        in one view, with each vertical level having the same thickness,
-        specified by the layer thickness slider. For ocean data, the layers
-        correspond to data at vertical level whose number increases towards the
-        center of the sphere. For atmospheric data, the layers correspond to
-        data at vertical levels increasing away from the
-        center.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetIsAtmosphere"
                          default_values="0"

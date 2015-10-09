@@ -283,6 +283,11 @@ pqIndexSelectionWidget::pqIndexSelectionWidget(vtkSMProxy *proxy,
 
   this->addPropertyLink(this, this->PushPropertyName, SIGNAL(widgetModified()),
                         pushProp);
+
+  if (this->Internals->widgetMap.empty())
+    {
+    this->hide();
+    }
 }
 
 //------------------------------------------------------------------------------
