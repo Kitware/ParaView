@@ -333,6 +333,13 @@ public:
   vtkGetMacro(UseOffscreenRendering, bool);
 
   // Description:
+  // Get/Set the EGL device index (graphics card) used for rendering. This needs to
+  // be set before rendering. The graphics card needs to have the right extensions
+  // for this to work.
+  virtual void SetEGLDeviceIndex(int);
+  vtkGetMacro(EGLDeviceIndex, int);
+
+  // Description:
   // Returns if remote-rendering is possible on the current group of processes.
   vtkGetMacro(RemoteRenderingAvailable, bool);
   void RemoteRenderingAvailableOff()
@@ -727,6 +734,7 @@ protected:
   vtkBoundingBox GeometryBounds;
 
   bool UseOffscreenRendering;
+  int EGLDeviceIndex;
   bool UseOffscreenRenderingForScreenshots;
   bool UseInteractiveRenderingForScreenshots;
   bool NeedsOrderedCompositing;
