@@ -39,6 +39,9 @@
 // example when a run starts in one actor whose reduced color matches the
 // background the background is colored with the actor color.
 //
+// The compressor uses a modified SQUIRT implementation where encode 4-bit
+// opacity information as well. This is needed to improve background color
+// blending for translucent renderings in ParaView.
 // .SECTION Thanks
 // Thanks to Sandia National Laboratories for this compression technique
 
