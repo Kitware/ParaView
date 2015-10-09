@@ -54,7 +54,7 @@ public:
   void Begin();
 
   // Description:
-  // Go to the beginning of one group.
+  // Go to the beginning of one group, and set mode to iterate over one group.
   void Begin(const char* groupName);
 
   // Description:
