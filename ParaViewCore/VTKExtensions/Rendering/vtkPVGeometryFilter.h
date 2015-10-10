@@ -91,7 +91,9 @@ public:
   // Description:
   // Whether to triangulate mesh for rendering. This parameter avoid
   // rendering issues of non-convex polygons.
-  vtkSetMacro(Triangulate, int);
+  // This option has no effect when using OpenGL2 rendering backend. OpenGL2
+  // rendering always triangulates polygonal meshes.
+  virtual void SetTriangulate(int val);
   vtkGetMacro(Triangulate, int);
   vtkBooleanMacro(Triangulate, int);
 
