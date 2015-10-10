@@ -45,11 +45,11 @@ void vtkPVDefaultPass::Render(const vtkRenderState* render_state)
   GLint saved_matrix_mode;
   glGetIntegerv(GL_MATRIX_MODE, &saved_matrix_mode);
   glMatrixMode(GL_MODELVIEW);
-  #endif
 
   // initialize to false
   this->SetLastRenderingUsedDepthPeeling(
     render_state->GetRenderer(), false);
+  #endif
 
   this->UpdateGeometry(renderer);
 

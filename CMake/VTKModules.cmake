@@ -350,6 +350,9 @@ set(_vtk_modules
 if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
   list(APPEND _vtk_modules vtkRenderingLIC vtkIOExport)
   list(APPEND _vtk_mpi_modules vtkRenderingParallelLIC)
+else()
+  list(APPEND _vtk_modules vtkRenderingLICOpenGL2)
+  list(APPEND _vtk_mpi_modules vtkRenderingParallelLIC)
 endif()
 
 if (PARAVIEW_USE_MPI)

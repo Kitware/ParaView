@@ -22,9 +22,14 @@
 
 #include "vtkGeometryRepresentation.h"
 
-class vtkSurfaceLICPainter;
-class vtkInformationRequestKey;
 class vtkInformation;
+class vtkInformationRequestKey;
+
+#ifndef VTKGL2
+class vtkSurfaceLICPainter;
+#else
+class vtkCompositeSurfaceLICMapper;
+#endif
 
 class VTK_EXPORT vtkSurfaceLICRepresentation : public vtkGeometryRepresentation
 {
@@ -98,8 +103,13 @@ protected:
   // Overridden method to set parameters on vtkProperty and vtkMapper.
   void UpdateColoringParameters();
 
+#ifndef VTKGL2
   vtkSurfaceLICPainter* Painter;
   vtkSurfaceLICPainter* LODPainter;
+#else
+  vtkCompositeSurfaceLICMapper* SurfaceLICMapper;
+  vtkCompositeSurfaceLICMapper* SurfaceLICLODMapper;
+#endif
 
   bool UseLICForLOD;
 private:
