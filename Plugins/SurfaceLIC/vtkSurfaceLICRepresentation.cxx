@@ -254,6 +254,9 @@ void vtkSurfaceLICRepresentation::SelectInputVectors(int a, int b, int c,
   int attributeMode, const char* name)
 {
 #ifndef VTKGL2
+  (void) a;
+  (void) b;
+  (void) c;
   this->Painter->SetInputArrayToProcess(attributeMode, name);
   this->LODPainter->SetInputArrayToProcess(attributeMode, name);
 #else
