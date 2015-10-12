@@ -81,6 +81,21 @@ void vtkPointGaussianRepresentation::SetVisibility(bool val)
 }
 
 //----------------------------------------------------------------------------
+void vtkPointGaussianRepresentation::SetMapScalars(int val)
+{
+  if (val != 0 && val != 1)
+    {
+    vtkWarningMacro(<< "Invalid parameter for vtkPointGaussianRepresentation::SetMapScalars: " << val);
+    val = 0;
+    }
+  int mapToColorMode[] = {
+    VTK_COLOR_MODE_DIRECT_SCALARS,
+    VTK_COLOR_MODE_MAP_SCALARS
+  };
+  this->Mapper->SetColorMode(mapToColorMode[val]);
+}
+
+//----------------------------------------------------------------------------
 int vtkPointGaussianRepresentation::FillInputPortInformation(
   int vtkNotUsed(port), vtkInformation* info)
 {
