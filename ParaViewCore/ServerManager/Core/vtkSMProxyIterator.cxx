@@ -66,6 +66,7 @@ void vtkSMProxyIterator::Begin(const char* groupName)
     vtkWarningMacro("ProxyManager is not set. Can not perform operation: Begin()");
     return;
     }
+  this->SetModeToOneGroup();
   this->Internals->GroupIterator = 
     pm->Internals->RegisteredProxyMap.find(groupName);
   if (this->Internals->GroupIterator!=pm->Internals->RegisteredProxyMap.end())

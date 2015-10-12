@@ -67,6 +67,15 @@ location. See the original
 [merge request](https://gitlab.kitware.com/paraview/paraview/merge_requests/167)
 for details.
 
+###Changes to `vtkSMProxyIterator`###
+
+`vtkSMProxyIterator::Begin(const char* groupName)` now additionally
+sets the iterator mode to iterate over one group. This will likely
+break any code that uses this method, since the iterated data list will
+change. To recover the original functionality of the iterator, simply call
+`vtkSMProxyIterator::SetModeToAll()` after calling
+`vtkSMProxyIterator::Begin(const char* groupName)`.
+
 Changes in 4.3
 --------------
 
