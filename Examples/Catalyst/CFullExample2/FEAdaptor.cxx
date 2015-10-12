@@ -125,3 +125,11 @@ void CatalystCoProcess(unsigned int numberOfPoints, double* pointsData,
     processor->CoProcess(dataDescription);
     }
 }
+
+void CatalystFinalize()
+{  // Used to free grid if it was used
+  if(VTKGrid)
+    {
+    VTKGrid = NULL;
+    }
+}

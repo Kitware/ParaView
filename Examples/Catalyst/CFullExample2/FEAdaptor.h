@@ -9,6 +9,7 @@ extern "C"
                          unsigned int numberOfCells, unsigned int* cellsDAta,
                          double* velocityData, float* pressureData, double time,
                          unsigned int timeStep, int lastTimeStep);
+  void CatalystFinalize();
 #ifdef __cplusplus
 }
 #endif

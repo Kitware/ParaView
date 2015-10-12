@@ -38,6 +38,12 @@ int main(int argc, char* argv[])
 
 #ifdef USE_CATALYST
   int fileNameLength = 0;
+  if(argc < 2)
+    {
+    printf("Must pass in a Catalyst script\n");
+    MPI_Finalize();
+    return 1;
+    }
   fileNameLength = strlen(argv[1]);
   coprocessorinitializewithpython(argv[1], &fileNameLength);
   int i;
@@ -67,6 +73,7 @@ int main(int argc, char* argv[])
     }
 
 #ifdef USE_CATALYST
+  CatalystFinalize();
   coprocessorfinalize();
 #endif
   MPI_Finalize();

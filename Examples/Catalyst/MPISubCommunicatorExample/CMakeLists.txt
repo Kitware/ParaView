@@ -17,6 +17,7 @@ option(BUILD_TESTING "Build Testing" OFF)
 # Setup testing.
 if (BUILD_TESTING)
   include(CTest)
-  add_test(MPISubCommunicatorExampleTest MPISubCommunicatorExample
+  add_test(NAME MPISubCommunicatorExampleTest COMMAND MPISubCommunicatorExample
     ${CMAKE_CURRENT_SOURCE_DIR}/SampleScripts/feslicescript.py)
+  set_tests_properties(MPISubCommunicatorExampleTest PROPERTIES LABELS "PARAVIEW;CATALYST")
 endif()

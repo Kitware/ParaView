@@ -37,5 +37,6 @@ option(BUILD_TESTING "Build Testing" OFF)
 # Setup testing.
 if (BUILD_TESTING)
   include(CTest)
-  add_test(CxxVTKPipelineExampleTest CxxVTKPipelineExample 10 output)
+  add_test(NAME CxxVTKPipelineExampleTest COMMAND CxxVTKPipelineExample 10 output)
+  set_tests_properties(CxxVTKPipelineExampleTest PROPERTIES LABELS "PARAVIEW;CATALYST")
 endif()
