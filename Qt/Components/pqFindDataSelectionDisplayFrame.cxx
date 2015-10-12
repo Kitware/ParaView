@@ -320,7 +320,10 @@ public:
   // update it's visibility.
   void showFrustum(bool val)
     {
-    Q_ASSERT(this->View != NULL && this->Port != NULL);
+    if (!this->View || !this->Port)
+      {
+      return;
+      }
 
     vtkSMSourceProxy* selSource = this->Port->getSelectionInput();
     if (!selSource || strcmp(selSource->GetXMLName(), "FrustumSelectionSource") != 0)
