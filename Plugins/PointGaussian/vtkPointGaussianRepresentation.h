@@ -51,6 +51,11 @@ public:
   // Use to set whether the data in this representation is visible or not
   virtual void SetVisibility(bool val);
 
+  // Description:
+  // Use to make sure scalars will be mapped through lookup table, and not
+  // inadvertently used as colors by themselves.
+  virtual void SetMapScalars(int val);
+
   //***************************************************************************
   // Forwarded to Actor.
   virtual void SetOrientation(double, double, double);
