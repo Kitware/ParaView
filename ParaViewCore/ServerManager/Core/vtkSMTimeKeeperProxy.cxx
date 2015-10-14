@@ -19,6 +19,7 @@
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTimeKeeper.h"
+#include "vtkSMTrace.h"
 
 #include <algorithm>
 
@@ -126,6 +127,13 @@ bool vtkSMTimeKeeperProxy::SetSuppressTimeSource(vtkSMProxy* proxy, bool suppres
 {
   if (proxy)
     {
+    SM_SCOPED_TRACE(CallMethod)
+      .arg(this)
+      .arg("SetSuppressTimeSource")
+      .arg(proxy)
+      .arg(suppress)
+      .arg("comment", (suppress? "ignore time" : "don't ignore time"));
+
     vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
       this->GetProperty("SuppressedTimeSources"));
     if (suppress && pp->IsProxyAdded(proxy) == false)

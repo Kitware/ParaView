@@ -1118,6 +1118,15 @@ def RemoveCameraLink(linkName):
 # Animation methods
 #==============================================================================
 
+def GetTimeKeeper():
+    """Returns the time-keeper for the active session. Timekeeper is often used
+    to manage time step information known to the ParaView application."""
+    if not servermanager.ActiveConnection:
+        raise RuntimeError, "Missing active session"
+    session = servermanager.ActiveConnection.Session
+    controller = servermanager.ParaViewPipelineController()
+    return controller.FindTimeKeeper(session)
+
 def GetAnimationScene():
     """Returns the application-wide animation scene. ParaView has only one
     global animation scene. This method provides access to that. Users are
