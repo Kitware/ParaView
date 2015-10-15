@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
 #include "pqWidgetRangeDomain.h"
+#include "pqSignalAdaptors.h"
 #include "vtkDataObject.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkPVDataInformation.h"
@@ -259,8 +260,10 @@ void pqPointSpriteControls::setRepresentation(pqPipelineRepresentation* repr)
         {
         this->Internals->RenderMode->addItem(item.toString());
         }
-    this->Internals->Links.addPropertyLink(this->Internals->RenderMode,
-      "currentText", SIGNAL(currentIndexChanged(int)),
+
+    pqSignalAdaptorComboBox *adaptor = new pqSignalAdaptorComboBox(this->Internals->RenderMode);
+    this->Internals->Links.addPropertyLink(
+      adaptor, "currentText", SIGNAL(currentTextChanged(QString)),
       this->Internals->RepresentationProxy, prop);
     this->Internals->RenderMode->setEnabled(true);
     }
