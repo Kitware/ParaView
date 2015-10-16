@@ -3185,8 +3185,79 @@
         <ReaderFactory extensions="dem"
                        file_description="Digital Elevation Map Files" />
       </Hints>
-      <!-- End DEMReader -->
     </SourceProxy>
+      <!-- End DEMReader -->
+    <SourceProxy class="vtkPTSReader"
+                 label="PTS Reader"
+                 name="PTSReader">
+      <Documentation long_help="Reads a PTS ASCII Point Cloud file."
+                     short_help="Read a pointset in PTS format">The PTS reader
+                     reads  ASCII PTS Point Cloud files containing
+                     points as well as optional intensity and color information. The default
+                     file extension is .pts. This reader produces a
+                     polydata set of a single vertex cell containing all of
+                     the points.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the PTS
+        (ASCII Point Cloud) reader.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetLimitToMaxNumberOfPoints"
+                         name="LimitNumberOfPointsRead"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Limits the number of points read in from file
+        </Documentation>
+      </IntVectorProperty>
+       <IntVectorProperty command="SetMaxNumberOfPoints"
+                         name="MaxNumberOfPoints"
+                         default_values="100000"
+                         number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="LimitNumberOfPointsRead"
+                                   value="1" />
+        </Hints>
+        <Documentation>
+          Specify the max number of point to be read.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetLimitReadToBounds"
+                         name="LimitPointCloudToBounds"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Restrict the point to cloud to a specified volume.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="0"
+                            command="SetReadBounds"
+                            name="ReadBounds"
+                            number_of_elements="6"
+                            default_values="0 100 0 100 0 100">
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="LimitPointCloudToBounds"
+                                   value="1" />
+        </Hints>
+        <Documentation>Define the spatial volume that wil restrict the
+        extent of the point cloud [xmin, xmax, ymin, ymax, zmin, zmax]</Documentation>
+
+      </DoubleVectorProperty>
+       <Hints>
+        <ReaderFactory extensions="pts"
+                       file_description="PTS (Point Cloud)  Files" />
+      </Hints>
+    </SourceProxy>
+      <!-- End PTSReader -->
     <SourceProxy class="vtkPVDReader"
                  label="PVD Reader"
                  name="PVDReader">
