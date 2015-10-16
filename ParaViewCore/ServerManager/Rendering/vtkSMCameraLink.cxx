@@ -365,5 +365,5 @@ void vtkSMCameraLink::UpdateState()
 {
   this->Superclass::UpdateState();
   this->State->SetExtension(LinkState::sync_interactive_renders,
-    this->GetSynchronizeInteractiveRenders());
+    !!this->GetSynchronizeInteractiveRenders());
 }
