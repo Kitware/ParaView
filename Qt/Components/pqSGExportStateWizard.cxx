@@ -233,8 +233,9 @@ pqSGExportStateWizard::pqSGExportStateWizard(
   for(QList<pqPipelineFilter*>::Iterator it=filters.begin();
       it!=filters.end();it++)
     {
-    if (!strcmp((*it)->getProxy()->GetVTKClassName(), "vtkPVContourFilter") ||
-        !strcmp((*it)->getProxy()->GetVTKClassName(), "vtkPVMetaSliceDataSet"))
+    if ((*it)->getProxy()->GetVTKClassName() &&
+        (!strcmp((*it)->getProxy()->GetVTKClassName(), "vtkPVContourFilter") ||
+         !strcmp((*it)->getProxy()->GetVTKClassName(), "vtkPVMetaSliceDataSet")))
       {
       pqCinemaTrack *track = new pqCinemaTrack(this->Internals->cinemaContainer, parentFlags, *it);
       this->Internals->cinemaContainer->addWidget(track);

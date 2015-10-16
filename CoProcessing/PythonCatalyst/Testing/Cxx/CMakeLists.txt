@@ -17,7 +17,7 @@ vtk_module_test_executable(CoProcessingCompareImagesTester CompareImages.cxx)
 # a simple test to see if the input is changing, i.e. that the initial
 # pipeline is having it's trivial producer updated with a new grid
 add_test(NAME CoProcessingTestInput
-  COMMAND pvpython ${CMAKE_CURRENT_SOURCE_DIR}/waveletdriver.py
+  COMMAND pvbatch -sym ${CMAKE_CURRENT_SOURCE_DIR}/waveletdriver.py
   ${CMAKE_CURRENT_SOURCE_DIR}/TestInput.py 4
   )
 set_tests_properties(CoProcessingTestInput PROPERTIES LABELS "${CP_LABELS}")
@@ -81,14 +81,6 @@ set_tests_properties(CoProcessingProgrammableFilter PROPERTIES LABELS "${CP_LABE
 #-    COMMAND CoProcessingProgrammableFilter
 #-    ${CMAKE_CURRENT_SOURCE_DIR}/cpprogrammablefilter.py)
 
-
-
-
-
-
-
-
-
 if (NOT PARAVIEW_USE_MPI)
   add_test(NAME CoProcessingTestPythonScript
     COMMAND ${CMAKE_COMMAND}
@@ -151,23 +143,41 @@ if (PARAVIEW_BUILD_QT_GUI)
       -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:paraview>
       -DCOPROCESSING_TEST_DIR:PATH=${PARAVIEW_TEST_DIR}
       -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Plugins/CatalystScriptGenerator/Testing/CatalystGUI.xml
-      -DPVPYTHON_EXECUTABLE:FILEPATH=$<TARGET_FILE:pvpython>
+      -DPVBATCH_EXECUTABLE:FILEPATH=$<TARGET_FILE:pvbatch>
       -DCOPROCESSING_DRIVER_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/waveletdriver.py
       -DCOPROCESSING_IMAGE_TESTER:FILEPATH=$<TARGET_FILE:CoProcessingCompareImagesTester>
       -DCOPROCESSING_DATA_DIR:PATH=${PARAVIEW_TEST_OUTPUT_BASELINE_DIR}
       -DCOPROCESSING_OUTPUTCHECK_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/outputcheck.py
+      -DTEST_NAME:STRING=CoProcessingFullWorkflow
       -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
     set_tests_properties(CoProcessingFullWorkflow PROPERTIES RUN_SERIAL ON)
     set_tests_properties(CoProcessingFullWorkflow PROPERTIES LABELS "${CP_LABELS}")
+
+    ExternalData_add_test(ParaViewData NAME CoProcessingFullWorkflowWithPlots
+      COMMAND ${CMAKE_COMMAND}
+      -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:paraview>
+      -DCOPROCESSING_TEST_DIR:PATH=${PARAVIEW_TEST_DIR}
+      -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Plugins/CatalystScriptGenerator/Testing/CatalystGUIPlots.xml
+      -DPVBATCH_EXECUTABLE:FILEPATH=$<TARGET_FILE:pvbatch>
+      -DCOPROCESSING_DRIVER_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/waveletdriver.py
+      -DCOPROCESSING_IMAGE_TESTER:FILEPATH=$<TARGET_FILE:CoProcessingCompareImagesTester>
+      -DCOPROCESSING_DATA_DIR:PATH=${PARAVIEW_TEST_OUTPUT_BASELINE_DIR}
+      -DCOPROCESSING_OUTPUTCHECK_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/outputcheck.py
+      -DTEST_NAME:STRING=CoProcessingFullWorkflowWithPlots
+      -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake
+      DATA{${PARAVIEW_TEST_BASELINE_DIR}/CPFullWorkflowPlot1.png}
+      DATA{${PARAVIEW_TEST_BASELINE_DIR}/CPFullWorkflowPlot2.png} )
+    set_tests_properties(CoProcessingFullWorkflowWithPlots PROPERTIES RUN_SERIAL ON)
+    set_tests_properties(CoProcessingFullWorkflowWithPlots PROPERTIES LABELS "${CP_LABELS}")
 
     add_test(NAME CoProcessingFullWorkflowCinema
       COMMAND ${CMAKE_COMMAND}
       -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:paraview>
       -DCOPROCESSING_TEST_DIR:PATH=${PARAVIEW_TEST_DIR}
       -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Plugins/CatalystScriptGenerator/Testing/CatalystCinemaGUI.xml
-      -DDO_CINEMA_TEST:BOOL=TRUE
-      -DPVPYTHON_EXECUTABLE:FILEPATH=$<TARGET_FILE:pvpython>
+      -DPVBATCH_EXECUTABLE:FILEPATH=$<TARGET_FILE:pvbatch>
       -DCOPROCESSING_DRIVER_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/waveletdriver.py
+      -DTEST_NAME:STRING=CoProcessingFullWorkflowCinema
       -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
     set_tests_properties(CoProcessingFullWorkflowCinema PROPERTIES RUN_SERIAL ON)
     set_tests_properties(CoProcessingFullWorkflowCinema PROPERTIES LABELS "${CP_LABELS}")
