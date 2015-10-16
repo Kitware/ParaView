@@ -33,6 +33,12 @@ if (PARAVIEW_BUILD_QT_GUI)
   list (APPEND examples_dependencies pqApplicationComponents)
 endif()
 
+set(ENABLE_CATALYST OFF)
+if (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_USE_MPI AND PARAVIEW_ENABLE_CATALYST AND NOT WIN32)
+  list (APPEND examples_dependencies vtkPVPythonCatalyst)
+  set (ENABLE_CATALYST ON)
+endif()
+
 add_custom_command(
   OUTPUT "${ParaView_BINARY_DIR}/ParaViewExamples.done"
   COMMAND ${CMAKE_CTEST_COMMAND}
@@ -54,6 +60,8 @@ add_custom_command(
                        -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
                        -DCMAKE_LIBRARY_OUTPUT_DIRECTORY:PATH=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
                        -DCMAKE_RUNTIME_OUTPUT_DIRECTORY:PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+                       -DBUILD_TESTING:BOOL=${BUILD_TESTING}
+                       -DENABLE_CATALYST:BOOL=${ENABLE_CATALYST}
                        ${extra_params}
                        --no-warn-unused-cli
   COMMAND ${CMAKE_COMMAND} -E touch

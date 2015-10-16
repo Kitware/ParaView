@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.8)
-project(CatalystExamples CXX C Fortran)
+project(CatalystExamples CXX C)
 
 set(USE_CATALYST ON CACHE BOOL "Link the simulator with Catalyst")
 if(USE_CATALYST)
@@ -21,10 +21,15 @@ if (BUILD_TESTING)
   include(CTest)
 endif()
 
-option(BUILD_FORTRAN_EXAMPLES "Build Fortran Examples" ON)
+# Theoretically, CheckFortran should not be needed, but
+# enable_language(OPTIONAL) fails with Ninja generator.
+include(CheckFortran)
+if(CMAKE_Fortran_COMPILER)
+  enable_language(Fortran OPTIONAL)
+endif()
 
 add_subdirectory(CxxOverlappingAMRExample)
-if(BUILD_FORTRAN_EXAMPLES)
+if(CMAKE_Fortran_COMPILER_WORKS)
   add_subdirectory(Fortran90FullExample)
   add_subdirectory(FortranPoissonSolver)
 endif()

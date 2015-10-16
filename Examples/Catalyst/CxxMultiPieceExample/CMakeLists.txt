@@ -33,5 +33,6 @@ option(BUILD_TESTING "Build Testing" OFF)
 # Setup testing.
 if (BUILD_TESTING)
   include(CTest)
-  add_test(CxxMultiPieceExampleTest CxxMultiPieceExample ${CMAKE_CURRENT_SOURCE_DIR}/SampleScripts/feslicescript.py)
+  add_test(NAME CxxMultiPieceExampleTest COMMAND CxxMultiPieceExample ${CMAKE_CURRENT_SOURCE_DIR}/SampleScripts/feslicescript.py)
+  set_tests_properties(CxxMultiPieceExampleTest PROPERTIES LABELS "PARAVIEW;CATALYST")
 endif()
