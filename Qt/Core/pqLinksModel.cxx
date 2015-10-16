@@ -59,6 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqUndoStack.h"
 
 class pqLinksModel::pqInternal : public vtkCommand
 {
@@ -102,6 +103,7 @@ public:
           this->Model->emitLinkRemoved();
           this->LinkObjects.erase(iter);
           this->Model->endResetModel();
+          CLEAR_UNDO_STACK();
           break;
           }
         }
@@ -455,6 +457,8 @@ void pqLinksModel::addProxyLink(const QString& name,
 {
   vtkSMSessionProxyManager* pxm = this->Internal->Server->proxyManager();
   vtkSMProxyLink* link = vtkSMProxyLink::New();
+  pxm->RegisterLink(name.toLatin1().data(), link);
+
   // bi-directional link
   link->AddLinkedProxy(inputProxy, vtkSMLink::INPUT);
   link->AddLinkedProxy(outputProxy, vtkSMLink::OUTPUT);
@@ -473,11 +477,9 @@ void pqLinksModel::addProxyLink(const QString& name,
       }
     }
   iter->Delete();
-
-  pxm->RegisterLink(name.toLatin1().data(), link);
   link->Delete();
-
   emit this->linkAdded(pqLinksModel::Proxy);
+  CLEAR_UNDO_STACK();
 }
 
 void pqLinksModel::addCameraLink(const QString& name,
@@ -486,14 +488,16 @@ void pqLinksModel::addCameraLink(const QString& name,
 {
   vtkSMSessionProxyManager* pxm = this->Internal->Server->proxyManager();
   vtkSMCameraLink* link = vtkSMCameraLink::New();
+  pxm->RegisterLink(name.toLatin1().data(), link);
+
   // bi-directional link
   link->AddLinkedProxy(inputProxy, vtkSMLink::INPUT);
   link->AddLinkedProxy(outputProxy, vtkSMLink::OUTPUT);
   link->AddLinkedProxy(outputProxy, vtkSMLink::INPUT);
   link->AddLinkedProxy(inputProxy, vtkSMLink::OUTPUT);
-  pxm->RegisterLink(name.toLatin1().data(), link);
   link->Delete();
   emit this->linkAdded(pqLinksModel::Camera);
+  CLEAR_UNDO_STACK();
 }
 
 void pqLinksModel::addPropertyLink(const QString& name,
@@ -504,6 +508,7 @@ void pqLinksModel::addPropertyLink(const QString& name,
 {
   vtkSMSessionProxyManager* pxm = this->Internal->Server->proxyManager();
   vtkSMPropertyLink* link = vtkSMPropertyLink::New();
+  pxm->RegisterLink(name.toLatin1().data(), link);
   
   // bi-directional link
   link->AddLinkedProperty(inputProxy,
@@ -518,9 +523,9 @@ void pqLinksModel::addPropertyLink(const QString& name,
   link->AddLinkedProperty(inputProxy,
                           inputProp.toLatin1().data(),
                           vtkSMLink::OUTPUT);
-  pxm->RegisterLink(name.toLatin1().data(), link);
   link->Delete();
   emit this->linkAdded(pqLinksModel::Property);
+  CLEAR_UNDO_STACK();
 }
 
 void pqLinksModel::addSelectionLink(const QString& name,
@@ -529,16 +534,17 @@ void pqLinksModel::addSelectionLink(const QString& name,
 {
   vtkSMSessionProxyManager* pxm = this->Internal->Server->proxyManager();
   vtkSMSelectionLink* link = vtkSMSelectionLink::New();
+  pxm->RegisterLink(name.toLatin1().data(), link);
+
   // bi-directional link
   link->AddLinkedSelection(inputProxy, vtkSMLink::OUTPUT);
   link->AddLinkedSelection(outputProxy, vtkSMLink::OUTPUT);
   link->AddLinkedSelection(outputProxy, vtkSMLink::INPUT);
   link->AddLinkedSelection(inputProxy, vtkSMLink::INPUT);
   
-  // Register
-  pxm->RegisterLink(name.toLatin1().data(), link);
   link->Delete();
   emit this->linkAdded(pqLinksModel::Selection);
+  CLEAR_UNDO_STACK();
 }
 
 void pqLinksModel::removeLink(const QModelIndex& idx)
@@ -563,6 +569,7 @@ void pqLinksModel::removeLink(const QString& name)
     vtkSMSessionProxyManager* pxm = this->Internal->Server->proxyManager();
     pxm->UnRegisterLink(name.toLatin1().data());
     this->emitLinkRemoved();
+    CLEAR_UNDO_STACK();
     }
 }
 
