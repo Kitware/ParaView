@@ -15,6 +15,7 @@
 #include "vtkPVParallelCoordinatesRepresentation.h"
 
 #include "vtkChartParallelCoordinates.h"
+#include "vtkCSVExporter.h"
 #include "vtkObjectFactory.h"
 #include "vtkPen.h"
 #include "vtkPlot.h"
@@ -164,4 +165,25 @@ void vtkPVParallelCoordinatesRepresentation::PrepareForRendering()
         }
       }
     }
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVParallelCoordinatesRepresentation::Export(vtkCSVExporter* exporter)
+{
+  vtkChartParallelCoordinates* chart = this->GetChart();
+  vtkTable* plotInput = this->GetLocalOutput();
+  if (!plotInput || this->GetVisibility() == false)
+    {
+    return false;
+    }
+  const vtkIdType numCols = plotInput->GetNumberOfColumns();
+  for (vtkIdType cc=0; cc < numCols; cc++)
+    {
+    std::string name = plotInput->GetColumnName(cc);
+    if (chart->GetColumnVisibility(name))
+      {
+      exporter->AddColumn(plotInput->GetColumnByName(name.c_str()), name.c_str());
+      }
+    }
+  return true;
 }

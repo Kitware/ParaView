@@ -64,6 +64,12 @@ public:
   // Sets the opacity for the lines in the plot.
   vtkSetMacro(Opacity, double);
 
+  // Description:
+  // Called by vtkPVContextView::Export() to export the representation's data to
+  // a CSV file. Return false on failure which will call the exporting process
+  // to abort and raise an error. Default implementation simply returns false.
+  virtual bool Export(vtkCSVExporter* exporter);
+
 //BTX
 protected:
   vtkPVParallelCoordinatesRepresentation();

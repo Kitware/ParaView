@@ -21,6 +21,7 @@
 #include "vtkCommand.h"
 #include "vtkContextInteractorStyle.h"
 #include "vtkContextView.h"
+#include "vtkCSVExporter.h"
 #include "vtkInformation.h"
 #include "vtkInformationIntegerKey.h"
 #include "vtkMultiProcessStream.h"
@@ -358,6 +359,25 @@ bool vtkPVContextView::MapSelectionToInput(vtkSelection* sel)
   // error! we cannot have  a selection created in the view, there's no visible
   // representation!
   return false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVContextView::Export(vtkCSVExporter* exporter)
+{
+  exporter->Open(vtkCSVExporter::STREAM_COLUMNS);
+  for (int cc=0, max=this->GetNumberOfRepresentations(); cc < max; cc++)
+    {
+    vtkChartRepresentation* repr = vtkChartRepresentation::SafeDownCast(
+      this->GetRepresentation(cc));
+    if (repr && repr->GetVisibility() && !repr->Export(exporter))
+      {
+      exporter->Abort();
+      vtkErrorMacro("Failed to export to CSV. Exporting may not be supported by this view.");
+      return false;
+      }
+    }
+  exporter->Close();
+  return true;
 }
 
 //----------------------------------------------------------------------------

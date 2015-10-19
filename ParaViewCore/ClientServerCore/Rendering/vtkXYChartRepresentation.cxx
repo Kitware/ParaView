@@ -291,3 +291,10 @@ void vtkXYChartRepresentation::PrepareForRendering()
   this->Internals->UpdatePlotProperties(this);
   assert(this->UseIndexForXAxis == true || this->XAxisSeriesName != NULL);
 }
+
+//----------------------------------------------------------------------------
+bool vtkXYChartRepresentation::Export(vtkCSVExporter* exporter)
+{
+  assert(this->GetVisibility() == true);
+  return this->Internals->Export(this, exporter);
+}

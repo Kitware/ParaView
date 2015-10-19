@@ -30,6 +30,7 @@ class vtkChart;
 class vtkChartRepresentation;
 class vtkContextInteractorStyle;
 class vtkContextView;
+class vtkCSVExporter;
 class vtkInformationIntegerKey;
 class vtkRenderWindow;
 class vtkRenderWindowInteractor;
@@ -114,6 +115,13 @@ public:
   // selection is available. Subclasses should override MapSelectionToInput() to
   // convert the selection, as appropriate.
   vtkSelection* GetSelection();
+
+  // Description:
+  // Export the contents of this view using the exporter.
+  // Called vtkChartRepresentation::Export() on all visible representations.
+  // This is expected to called only on the client side after a render/update.
+  // Thus all data is expected to available on the local process.
+  virtual bool Export(vtkCSVExporter* exporter);
 
 //BTX
 protected:
