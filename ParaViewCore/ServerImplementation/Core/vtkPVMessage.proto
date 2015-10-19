@@ -62,10 +62,10 @@ message DefinitionHeader
 {
   extend Message {
     // The classname for the driver process i.e. the client, typically
-    required string client_class = 10;
+    optional string client_class = 10;
 
     // The classname for the process where the processing occurs
-    required string server_class = 11;
+    optional string server_class = 11;
   }
 }
 
@@ -100,8 +100,8 @@ message ProxyState
     }
 
   extend Message {
-    required string     xml_group           = 20;
-    required string     xml_name            = 21;
+    optional string     xml_group           = 20;
+    optional string     xml_name            = 21;
     optional string     xml_sub_proxy_name  = 22;
     repeated Property   property            = 23;
     repeated SubProxy   subproxy            = 24;
@@ -206,7 +206,7 @@ message MousePointer {
   }
 
   extend Message {
-    required uint32 view      = 70;
+    optional uint32 view      = 70;
     optional double x         = 71 [default = 0];
     optional double y         = 72 [default = 0];
     optional bool   forceShow = 73 [default = false];
@@ -219,7 +219,7 @@ message MousePointer {
 message ChartViewBounds {
 
   extend Message {
-    required uint32 view  = 75;
+    optional uint32 view  = 75;
     repeated double range = 76;
   }
 }
@@ -242,8 +242,8 @@ message ClientsInformation {
 
 message ChatMessage {
   extend Message {
-    required uint32 author = 84;
-    required string txt    = 85;
+    optional uint32 author = 84;
+    optional string txt    = 85;
   }
 }
 
@@ -256,7 +256,7 @@ message QtEvent {
   }
 
   extend Message {
-    required QtEventType type  = 98;
+    optional QtEventType type  = 98;
   }
 }
 
