@@ -270,12 +270,12 @@ void pqDoubleVectorPropertyWidget::propertyDomainModified(vtkObject* domainObjec
           {
           pqLineEdit *lineEdit = new pqLineEdit(this);
           lineEdit->setValidator(new QDoubleValidator(lineEdit));
-          lineEdit->setObjectName(QString("LineEdit%1").arg(i));
+          lineEdit->setObjectName(QString("LineEdit%1").arg(2*i));
           lineEdit->setTextAndResetCursor(
-            QVariant(vtkSMPropertyHelper(smProperty).GetAsDouble(i)).toString());
+            QVariant(vtkSMPropertyHelper(smProperty).GetAsDouble(2*i)).toString());
           if (showLabels)
             {
-            pqLabel *label = new pqLabel(componentLabels[i],this);
+            pqLabel *label = new pqLabel(componentLabels[2*i],this);
             label->setAlignment(Qt::AlignTop|Qt::AlignHCenter);
             gridLayout->addWidget(label, (i * 2), 0);
             gridLayout->addWidget(lineEdit, (i * 2) + 1, 0);
@@ -285,18 +285,18 @@ void pqDoubleVectorPropertyWidget::propertyDomainModified(vtkObject* domainObjec
             gridLayout->addWidget(lineEdit, i, 0);
             }
           this->addPropertyLink(lineEdit, "text2",
-                                SIGNAL(textChanged(const QString&)), dvp, i);
+                                SIGNAL(textChanged(const QString&)), dvp, 2*i);
           this->connect(lineEdit, SIGNAL(textChangedAndEditingFinished()),
                         this, SIGNAL(changeFinished()));
 
           lineEdit = new pqLineEdit(this);
           lineEdit->setValidator(new QDoubleValidator(lineEdit));
-          lineEdit->setObjectName(QString("LineEdit%1").arg(i+3));
+          lineEdit->setObjectName(QString("LineEdit%1").arg(2*i+1));
           lineEdit->setTextAndResetCursor(
-            QVariant(vtkSMPropertyHelper(smProperty).GetAsDouble(i + 3)).toString());
+            QVariant(vtkSMPropertyHelper(smProperty).GetAsDouble(2*i + 1)).toString());
           if (showLabels)
             {
-            pqLabel *label = new pqLabel(componentLabels[i + 3],this);
+            pqLabel *label = new pqLabel(componentLabels[2*i + 1],this);
             label->setAlignment(Qt::AlignTop|Qt::AlignHCenter);
             gridLayout->addWidget(label, (i * 2), 1);
             gridLayout->addWidget(lineEdit, (i * 2) + 1, 1);
@@ -306,7 +306,7 @@ void pqDoubleVectorPropertyWidget::propertyDomainModified(vtkObject* domainObjec
             gridLayout->addWidget(lineEdit, i, 1);
             }
           this->addPropertyLink(lineEdit, "text2",
-                                SIGNAL(textChanged(const QString&)), dvp, i + 3);
+                                SIGNAL(textChanged(const QString&)), dvp, 2*i + 1);
           this->connect(lineEdit, SIGNAL(textChangedAndEditingFinished()),
                         this, SIGNAL(changeFinished()));
           }
