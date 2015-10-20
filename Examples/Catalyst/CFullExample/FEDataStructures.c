@@ -51,7 +51,6 @@ void InitializeGrid(Grid* grid, const unsigned int numPoints[3], const double sp
     }
   grid->NumberOfPoints = numPoints[1]*numPoints[2]*numXPoints;
   // create the hex cells
-  unsigned int cellPoints[8];
   if(grid->Cells != 0)
     {
     free(grid->Cells);
