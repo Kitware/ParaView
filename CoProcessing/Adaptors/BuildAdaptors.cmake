@@ -40,7 +40,7 @@ make_directory("${BINARY_DIR}")
 #------------------------------------------------------------------------------
 # Function to easy adding separate custom-commands to build the adaptors.
 #------------------------------------------------------------------------------
-function(build_adaptor name fortran_options)
+function(build_adaptor name language_options)
   string(TOLOWER "${name}" lname)
   add_custom_command(
     OUTPUT "${BINARY_DIR}/${lname}.done"
@@ -55,13 +55,11 @@ function(build_adaptor name fortran_options)
             --build-makeprogram ${CMAKE_MAKE_PROGRAM}
             --build-options -DParaView_DIR:PATH=${ParaView_BINARY_DIR}
                             -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-                            -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
-                            -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
                             -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
                             -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
                             -DCMAKE_LIBRARY_OUTPUT_DIRECTORY:PATH=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
                             -DCMAKE_RUNTIME_OUTPUT_DIRECTORY:PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-                            ${fortran_options}
+                            ${language_options}
                             ${extra_params}
     COMMAND ${CMAKE_COMMAND}
             -E touch "${BINARY_DIR}/${lname}.done"
@@ -76,13 +74,17 @@ endfunction()
 # Adaptors
 #------------------------------------------------------------------------------
 build_adaptor(NPICAdaptor
-              COMMENT "Building NPIC Adaptor"
-              DEPENDS vtkPVCatalyst)
+  "-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
+  "-DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}"
+  COMMENT "Building NPIC Adaptor"
+  DEPENDS vtkPVCatalyst)
 
 if (PARAVIEW_USE_MPI)
-    build_adaptor(ParticleAdaptor
-                  COMMENT "Building Particle Adaptor"
-                  DEPENDS vtkPVCatalyst)
+  build_adaptor(ParticleAdaptor
+    "-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
+    "-DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}"
+    COMMENT "Building Particle Adaptor"
+    DEPENDS vtkPVCatalyst)
 endif()
 
 #------------------------------------------------------------------------------
@@ -96,6 +98,8 @@ if (CMAKE_Fortran_COMPILER_WORKS)
   mark_as_advanced(BUILD_PHASTA_ADAPTOR)
   if(BUILD_PHASTA_ADAPTOR)
     build_adaptor(PhastaAdaptor
+      "-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
+      "-DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}"
       "-DCMAKE_Fortran_COMPILER:FILEPATH=${CMAKE_Fortran_COMPILER}"
       COMMENT "Building Phasta Adaptor"
       DEPENDS vtkPVCatalyst)
@@ -108,6 +112,14 @@ endif()
 if (PARAVIEW_ENABLE_PYTHON AND NOT WIN32)
   # Add CTHAdaptor if Python is enabled.
   build_adaptor(CTHAdaptor
-                COMMENT "Building CTH Adaptor"
-                DEPENDS vtkPVPythonCatalyst)
+    "-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
+    "-DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}"
+    COMMENT "Building CTH Adaptor"
+    DEPENDS vtkPVPythonCatalyst)
+
+  if (PARAVIEW_USE_MPI)
+      build_adaptor(CamAdaptor
+                    COMMENT "Building Cam Adaptor"
+                    DEPENDS vtkPVCatalyst)
+  endif()
 endif()

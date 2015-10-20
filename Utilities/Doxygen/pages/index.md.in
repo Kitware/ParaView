@@ -16,6 +16,7 @@ Page | Description
 [Proxy Hints](@ref ProxyHints) | ServerManager XML hints for Proxies.
 [Property Hints](@ref PropertyHints) | ServerManager XML hints for Properties.
 [Proxy Documentation Formatting](@ref ProxyDocumentationFormatting) | Formatting options for proxy documentation.
+[Community Admosphere Model (CAM5) Catalyst Adaptor](@ref Cam5Adaptor) | Analyze Cam5 output with ParaView Catalyst.
 
 Design/Implementation Details
 -----------------------------

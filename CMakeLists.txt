@@ -877,7 +877,7 @@ endif()
 
 
 #-----------------------------------------------------------------------------
-if (PARAVIEW_BUILD_CATALYST_ADAPTORS)
+if (PARAVIEW_BUILD_CATALYST_ADAPTORS AND NOT WIN32)
   # BuildAdaptors.cmake builds the adaptors as a separate project. We mark is
   # OPTIONAL for Catalyst packages that don't have the adaptors included.
   include(${CMAKE_CURRENT_SOURCE_DIR}/CoProcessing/Adaptors/BuildAdaptors.cmake

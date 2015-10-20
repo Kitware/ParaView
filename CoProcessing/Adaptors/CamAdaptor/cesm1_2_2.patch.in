@@ -1,0 +1,229 @@
+Index: bld/Makefile.in
+===================================================================
+--- bld/Makefile.in	(revision 73748)
++++ bld/Makefile.in	(working copy)
+@@ -42,6 +42,8 @@
+ #               Use this to replace default Fortran compiler optimization.
+ # COSP_LIBDIR   Directory where COSP library will be built.
+ # MCT_LIBDIR    Directory where MCT library will be built.
++# CATALYST_LDFLAGS Catalyst linking flags
++# CATALYST_INC  Search path for Catalyst mod files
+ #
+ # Note: An internal implementation of the ESMF time-manager interface is provided
+ #       with the sequential CCSM distribution in models/utils/esmf_wrf_timemgr.
+@@ -68,7 +70,7 @@
+ dirs := . $(shell cat Filepath)
+ 
+ # Set cpp search path, include netcdf
+-cpp_dirs := $(dirs) $(INC_NETCDF) $(INC_MPI) $(INC_PNETCDF)
++cpp_dirs := $(dirs) $(INC_NETCDF) $(INC_MPI) $(INC_PNETCDF) $(CATALYST_INC)
+ cpp_path := $(foreach dir,$(cpp_dirs),-I$(dir)) # format for command line
+ 
+ # Expand any tildes in directory names. Change spaces to colons.
+@@ -113,7 +115,7 @@
+ endif
+ 
+ $(MODEL_EXEDIR)/$(EXENAME): $(OBJS)
+-	$(LINKER) -o $@ $(OBJS) $(NC_LDFLAGS) $(LDFLAGS)
++	$(LINKER) -o $@ $(OBJS) $(NC_LDFLAGS) $(LDFLAGS) $(CATALYST_LDFLAGS)
+ 
+ ifneq ($(strip $(COSP_LIBDIR)),)
+ # Rules to build COSP in its own library.  Add abortutils dependency so
+Index: bld/configure
+===================================================================
+--- bld/configure	(revision 73748)
++++ bld/configure	(working copy)
+@@ -187,6 +187,7 @@
+ 
+      -cache <file>      Name of output cache file (default: config_cache.xml).
+      -cachedir <file>   Name of directory where output cache file is written (default: CAM build directory).
++     -catalyst          Link with ParaView Catalyst.
+      -ccsm_seq          Switch to specify that CAM is being built from within sequential CCSM scripts.
+      -help [or -h]      Print usage to STDOUT.
+      -silent [or -s]    Turns on silent mode - only fatal messages issued.
+@@ -290,6 +291,7 @@
+     "cache=s"                   => \$opts{'cache'},
+     "cachedir=s"                => \$opts{'cachedir'},
+     "carma=s"                   => \$opts{'carma'},
++    "catalyst"                  => \$opts{'catalyst'},
+     "cam_bld=s"                 => \$opts{'cam_bld'},
+     "cam_exe=s"                 => \$opts{'cam_exe'},
+     "cam_exedir=s"              => \$opts{'cam_exedir'},
+@@ -516,6 +518,8 @@
+ my $ccsm_seq = (defined $opts{'ccsm_seq'}) ? 1 : 0;
+ $cfg_ref->set('ccsm_seq', $ccsm_seq);
+ 
++my $catalyst = (defined $opts{'catalyst'}) ? 1 : 0;
++
+ # Note that when building within the CCSM scripts the CAM Makefile is not written
+ # since the CCSM build does not use it.  Many of the checks to ensure that a working
+ # CAM Makefile is produced are disabled when the ccsm option is set.  Use the $cam_build
+@@ -1949,6 +1953,16 @@
+     $cfg_cppdefs .= " -DCLUBB_REAL_TYPE=dp";
+ }
+ 
++if ($catalyst) {
++    $cfg_cppdefs .= " -DCATALYST";
++    if ($dyn_pkg eq 'se') {
++        $cfg_cppdefs .= " -DCATALYST_SE";
++    }
++    if ($dyn_pkg eq 'fv') {
++        $cfg_cppdefs .= " -DCATALYST_FV";
++    }
++}
++
+ #-----------------------------------------------------------------------------------------------
+ # External libraries ###########################################################################
+ #-----------------------------------------------------------------------------------------------
+@@ -2083,6 +2097,18 @@
+     }
+ }
+ 
++# Catalyst
++my $catalyst_ldflags = "";
++my $catalyst_inc = "";
++if ($catalyst) {
++    my $catalyst_build_dir = "@CMAKE_BINARY_DIR@/../../../lib";
++    $catalyst_ldflags = "-L${catalyst_build_dir} -lCamAdaptor";
++    my $catalyst_src_dir = "@CMAKE_SOURCE_DIR@";
++    $catalyst_inc = "${catalyst_build_dir} $catalyst_src_dir";
++}
++
++
++
+ # PNetCDF library
+ my $pnc_lib = '';
+ if ($cam_build) {
+@@ -2810,6 +2836,8 @@
+ INC_NETCDF   := $nc_inc
+ LIB_NETCDF   := $nc_lib
+ NC_LDFLAGS   := $nc_ldflags
++CATALYST_LDFLAGS := $catalyst_ldflags
++CATALYST_INC := $catalyst_inc
+ MOD_NETCDF   := $nc_mod
+ INC_PNETCDF  := $pnc_inc
+ LIB_PNETCDF  := $pnc_lib
+Index: src/cpl_mct/atm_comp_mct.F90
+===================================================================
+--- src/cpl_mct/atm_comp_mct.F90	(revision 73748)
++++ src/cpl_mct/atm_comp_mct.F90	(working copy)
+@@ -111,6 +111,36 @@
+ CONTAINS
+ !================================================================================
+ 
++  subroutine se_catalyst_init()
++
++    !-----------------------------------------------------------------------
++    !
++    ! Arguments
++    !
++
++    !
++    ! Locals
++    !
++    write(*,'(a)') "catalyst_init - once for each processor"
++    call se_coprocessorinitializewithpython(&
++         "@CMAKE_SOURCE_DIR@/se_coprocess.py"//CHAR(0))
++  end subroutine se_catalyst_init
++
++  subroutine fv_catalyst_init()
++
++    !-----------------------------------------------------------------------
++    !
++    ! Arguments
++    !
++
++    !
++    ! Locals
++    !
++    write(*,'(a)') "catalyst_init - once for each processor"
++    call fv_coprocessorinitializewithpython(&
++         "@CMAKE_SOURCE_DIR@/fv_coprocess.py"//CHAR(0))
++  end subroutine fv_catalyst_init
++
+   subroutine atm_init_mct( EClock, cdata_a, x2a_a, a2x_a, NLFilename )
+ 
+     !-----------------------------------------------------------------------
+@@ -174,6 +204,16 @@
+       call memmon_dump_fort('memmon.out','atm_init_mct:start::',lbnum)
+     endif                      
+ #endif                         
++#if (defined CATALYST )
++    ! call catalsyt_init only once (the second time atm_init_mct is called)
++    if(.not. present(NLFilename)) then
++#  if (defined CATALYST_FV)
++       call fv_catalyst_init()
++#  elif (defined CATALYST_SE)
++       call se_catalyst_init()
++#  endif
++    endif
++#endif
+     call seq_cdata_setptrs(cdata_a, ID=ATMID, mpicom=mpicom_atm, &
+          gsMap=gsMap_atm, dom=dom_a, infodata=infodata)
+ 
+@@ -650,6 +690,13 @@
+     type(mct_aVect)             ,intent(inout) :: x2a_a
+     type(mct_aVect)             ,intent(inout) :: a2x_a
+ 
++
++#  if (defined CATALYST_FV)
++       call fv_catalyst_finalize()
++#  elif (defined CATALYST_SE)
++       call se_catalyst_finalize()
++#  endif
++
+     call cam_final( cam_out, cam_in )
+ 
+   end subroutine atm_final_mct
+Index: src/physics/cam/physpkg.F90
+===================================================================
+--- src/physics/cam/physpkg.F90	(revision 73748)
++++ src/physics/cam/physpkg.F90	(working copy)
+@@ -70,7 +70,24 @@
+   !
+   ! Private module data
+   !
++  interface
++     logical function  fv_requestdatadescription(timeStep, time)
++       integer, intent(in) :: timeStep
++       real(8), intent(in)    :: time
++     end function  fv_requestdatadescription
++     logical function  fv_needtocreategrid()
++     end function  fv_needtocreategrid
+ 
++     logical function  se_requestdatadescription(timeStep, time)
++       integer, intent(in) :: timeStep
++       real(8), intent(in)    :: time
++     end function  se_requestdatadescription
++     logical function  se_needtocreategrid()
++     end function  se_needtocreategrid
++  end interface
++
++
++
+   !======================================================================= 
+ contains
+ 
+@@ -821,6 +838,11 @@
+ 
+ end subroutine phys_init
+ 
++#if (defined CATALYST)
++include "catalyst_add_and_coprocess.F90"
++#endif
++
++
+   !
+   !-----------------------------------------------------------------------
+   !
+@@ -958,6 +980,10 @@
+ #endif
+     end if
+ 
++#if (defined CATALYST )
++    call catalyst_add_and_coprocess(phys_state);
++#endif
++
+ end subroutine phys_run1
+ 
+   !
