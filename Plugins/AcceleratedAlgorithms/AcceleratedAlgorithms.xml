@@ -1,32 +1,12 @@
 <ServerManagerConfiguration>
-  <ProxyGroup name="settings">
-
-    <SettingsProxy name="AcceleratedAlgorithmsSettings" label="AcceleratedAlgorithms"
-      processes="client|dataserver|renderserver">
-      <Documentation>
-        Settings for the AcceleratedAlgorithms plugin.
-      </Documentation>
-
-      <IntVectorProperty name="TestOption"
-        number_of_elements="1"
-        default_values="0">
-        <Documentation>
-          This is a simple boolean test option.
-        </Documentation>
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <Hints>
-        <UseDocumentationForLabels />
-      </Hints>
-    </SettingsProxy>
-
-  </ProxyGroup>
-
   <ProxyGroup name="filters">
     <SourceProxy class="vtkFlyingEdges3D"
-                 name="FlyingEdges3D">
-      <Documentation long_help=""
-                     short_help=""></Documentation>
+                 name="FlyingEdges3D" label="Flying Edges 3D">
+      <Documentation short_help="Generates isosurfaces from 3D image data (volume).">
+      Generates an isosurface from 3D image data (volume). It
+      implements the algorithm in: Flying Edges: A High-Performance
+      Scalable Isocontouring Algorithm by Schroeder, Maynard,
+      Geveci.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -136,19 +116,23 @@
       </DoubleVectorProperty>
       <Hints>
         <Visibility replace_input="2" />
+        <ShowInMenu category="Accelerated Algorithms" />
       </Hints>
 
       <PropertyGroup label="Isosurfaces">
         <Property name="ContourValues" />
       </PropertyGroup>
 
-      <!-- End Contour -->
+      <!-- End FlyingEdges3D -->
     </SourceProxy>
 
     <SourceProxy class="vtkFlyingEdges2D"
-                 name="FlyingEdges2D">
-      <Documentation long_help=""
-                     short_help=""></Documentation>
+                 name="FlyingEdges2D" label="Flying Edges 2D">
+      <Documentation short_help="Generates isoline(s) from a structured grid.">
+        Generates isoline(s) from a structured grid. It implements the
+        algorithm in: Flying Edges: A High-Performance Scalable
+        Isocontouring Algorithm by Schroeder, Maynard, Geveci.
+      </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -210,14 +194,69 @@
       </DoubleVectorProperty>
       <Hints>
         <Visibility replace_input="2" />
+        <ShowInMenu category="Accelerated Algorithms" />
       </Hints>
 
       <PropertyGroup label="Isosurfaces">
         <Property name="ContourValues" />
       </PropertyGroup>
 
-      <!-- End Contour -->
+      <!-- End FlyingEdges2D -->
     </SourceProxy>
 
+    <SourceProxy class="vtkFlyingEdgesPlaneCutter"
+                 label="Flying Edges Plane Cutter"
+                 name="FlyingEdgesPlaneCutter">
+      <Documentation short_help="Cut a volume with a plane and generates a polygonal cut surface">
+        Flying Edges Plane Cutter is a specialization of the
+        FlyingEdges algorithm to cut a volume with a single plane. It
+        is designed for performance and an exploratory, fast workflow.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Slice
+        filter.</Documentation>
+      </InputProperty>
+      <ProxyProperty command="SetPlane"
+                     label="Slice Type"
+                     name="Plane">
+        <ProxyGroupDomain name="groups">
+          <Group name="implicit_functions" />
+        </ProxyGroupDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="implicit_functions"
+                 name="Plane" />
+        </ProxyListDomain>
+        <Documentation>This property sets the parameters of the slice
+        function.</Documentation>
+      </ProxyProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetValue"
+                            label="Slice Offset Value"
+                            name="ContourValue"
+                            panel_visibility="advanced">
+        <BoundsDomain mode="magnitude"
+                      name="bounds">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>The values in this property specify an
+        offset value for the slice.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <Visibility replace_input="2" />
+        <ShowInMenu category="Accelerated Algorithms" />
+      </Hints>
+      <!-- FlyingEdgesPlaneCutter -->
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
