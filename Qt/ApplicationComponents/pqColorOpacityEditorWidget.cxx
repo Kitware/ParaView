@@ -359,8 +359,9 @@ void pqColorOpacityEditorWidget::setScalarOpacityFunctionProxy(pqSMProxy sofProx
   if (internals.ScalarOpacityFunctionProxy)
     {
     // cleanup old property links.
-    this->removePropertyLink(
+    this->links().removePropertyLink(
       this, "xvmsPoints", SIGNAL(xvmsPointsChanged()),
+      internals.ScalarOpacityFunctionProxy,
       internals.ScalarOpacityFunctionProxy->GetProperty("Points"));
     }
   internals.ScalarOpacityFunctionProxy = newSofProxy;
@@ -370,8 +371,9 @@ void pqColorOpacityEditorWidget::setScalarOpacityFunctionProxy(pqSMProxy sofProx
     ui.OpacityEditor->initialize(
       vtkScalarsToColors::SafeDownCast(this->proxy()->GetClientSideObject()), false, pwf, true);
     // add new property links.
-    this->addPropertyLink(
+    this->links().addPropertyLink(
       this, "xvmsPoints", SIGNAL(xvmsPointsChanged()),
+      internals.ScalarOpacityFunctionProxy,
       internals.ScalarOpacityFunctionProxy->GetProperty("Points"));
     }
   ui.OpacityEditor->setVisible(newSofProxy != NULL);
