@@ -29,6 +29,7 @@
 #include "vtkPVDataRepresentation.h"
 #include "vtkProperty.h" // needed for VTK_POINTS etc.
 
+class vtkCompositeDataDisplayAttributes;
 class vtkCompositePolyDataMapper2;
 class vtkMapper;
 class vtkPVCacheKeeper;
@@ -200,8 +201,12 @@ public:
 
   // Description:
   // Convenience method to get bounds from a dataset/composite dataset.
+  // If a vtkCompositeDataDisplayAttributes \a cdAttributes is provided and
+  // if the input data \a dataObject is vtkCompositeDataSet, only visible
+  // blocks of the data will be used to compute the bounds.
   // Returns true if valid bounds were computed.
-  static bool GetBounds(vtkDataObject* dataObject, double bounds[6]);
+  static bool GetBounds(vtkDataObject* dataObject, double bounds[6],
+                        vtkCompositeDataDisplayAttributes* cdAttributes);
 
 //BTX
 protected:

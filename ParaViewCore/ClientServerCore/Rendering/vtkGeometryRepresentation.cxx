@@ -442,32 +442,26 @@ int vtkGeometryRepresentation::RequestData(vtkInformation* request,
   this->CacheKeeper->Update();
 
   // Determine data bounds.
-  this->GetBounds(this->CacheKeeper->GetOutputDataObject(0),
-    this->DataBounds);
+  vtkCompositePolyDataMapper2 *cpm =
+    vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper);
+  this->GetBounds(this->CacheKeeper->GetOutputDataObject(0), this->DataBounds,
+                  cpm ? cpm->GetCompositeDataDisplayAttributes() : NULL);
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }
 
 //----------------------------------------------------------------------------
 bool vtkGeometryRepresentation::GetBounds(
-  vtkDataObject* dataObject, double bounds[6])
+  vtkDataObject* dataObject, double bounds[6],
+  vtkCompositeDataDisplayAttributes* cdAttributes)
 {
   vtkMath::UninitializeBounds(bounds);
   if (vtkCompositeDataSet* cd = vtkCompositeDataSet::SafeDownCast(dataObject))
     {
-    vtkBoundingBox bbox;
-    vtkCompositeDataIterator* iter = cd->NewIterator();
-    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    // computing bounds with only visible blocks
+    vtkCompositeDataDisplayAttributes::ComputeVisibleBounds(
+      cdAttributes, cd, bounds);
+    if (vtkBoundingBox::IsValid(bounds))
       {
-      vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
-      if (ds)
-        {
-        bbox.AddBounds(ds->GetBounds());
-        }
-      }
-    iter->Delete();
-    if (bbox.IsValid())
-      {
-      bbox.GetBounds(bounds);
       return true;
       }
     }

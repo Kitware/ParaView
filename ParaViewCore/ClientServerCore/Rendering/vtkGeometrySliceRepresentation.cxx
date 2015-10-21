@@ -173,7 +173,7 @@ public:
     // vtkGeometrySliceRepresentation::RequestData().
     vtkDataObject* output = vtkDataObject::GetData(outputVector, 0);
     double inputBds[6];
-    vtkGeometryRepresentation::GetBounds(inputDO, inputBds);
+    vtkGeometryRepresentation::GetBounds(inputDO, inputBds, NULL);
     vtkGSRGeometryFilter::CacheBounds(output, inputBds);
     return ret;
     }
