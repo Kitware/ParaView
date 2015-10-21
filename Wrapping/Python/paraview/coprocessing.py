@@ -390,24 +390,17 @@ class CoProcessor(object):
             input = rep.Input
             input.UpdatePipeline(time) #make sure range is up-to-date
             lut = rep.LookupTable
-            if rep.ColorAttributeType == 'POINT_DATA' or rep.ColorAttributeType == "POINTS":
-                datainformation = input.GetPointDataInformation()
-            elif rep.ColorAttributeType == 'CELL_DATA' or rep.ColorAttributeType == "CELLS":
-                datainformation = input.GetCellDataInformation()
-            else:
-                print 'something strange with color attribute type', rep.ColorAttributeType
 
-            if datainformation.GetArray(rep.ColorArrayName) == None:
-                # there is no array on this process. it's possible
-                # that this process has no points or cells
+            colorArrayInfo = rep.GetArrayInformationForColorArray()
+            if not colorArrayInfo:
                 continue
 
             if lut.VectorMode != 'Magnitude' or \
-               datainformation.GetArray(rep.ColorArrayName).GetNumberOfComponents() == 1:
-                datarange = datainformation.GetArray(rep.ColorArrayName).GetRange(lut.VectorComponent)
+               colorArrayInfo.GetNumberOfComponents() == 1:
+                datarange = colorArrayInfo.GetComponentRange(lut.VectorComponent)
             else:
                 # -1 corresponds to the magnitude.
-                datarange = datainformation.GetArray(rep.ColorArrayName).GetRange(-1)
+                datarange = colorArrayInfo.GetComponentRange(-1)
 
             import vtkParallelCorePython
             import paraview.vtk as vtk
