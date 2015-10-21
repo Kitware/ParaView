@@ -1,0 +1,261 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <!-- ================================================================== -->
+    <SourceProxy name="vtkCDIReader" class="vtkCDIReader" label="CDIReader">
+      <Documentation
+        long_help="Reads CDI/ICON netCDF data."
+        short_help="Reads CDI/ICON netCDF data.">
+      </Documentation>
+      <StringVectorProperty
+            name="FileName"
+            animateable="0"
+            command="SetFileName"
+            number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the netCDF file name for the CDI/ICON reader.
+        </Documentation>
+      </StringVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="nc"
+                      file_description="CDI netCDF Reader (ICON)" />
+    </Hints>
+
+      <StringVectorProperty command="GetAllDimensions"
+                            information_only="1"
+                            name="DimensionInfo">
+        <StringArrayHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animatelable="0"
+                            command="SetDimensions"
+                            name="Dimensions"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <StringListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="DimensionInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Documentation>Load the grid with the given dimensions. Arrays that
+        conform to these dimensions will be displayed and loaded.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="GetVariableDimensions"
+                            information_only="1"
+                            name="VariableDimensionInfo">
+        <StringArrayHelper />
+      </StringVectorProperty>
+      <StringVectorProperty command="GetAllVariableArrayNames"
+                            information_only="1"
+                            name="VariableArrayInfo">
+        <StringArrayHelper />
+      </StringVectorProperty>
+
+    <!--Gui Parameter -->
+    <StringVectorProperty
+        name="PointArrayInfo"
+        information_only="1">
+    <ArraySelectionInformationHelper attribute_name="Point"/>
+    </StringVectorProperty>
+
+    <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="2"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="PointArrayInfo" >
+    <ArraySelectionDomain name="array_list" >
+        <RequiredProperties>
+            <Property name="PointArrayInfo" function="ArrayList"/>
+        </RequiredProperties>
+    </ArraySelectionDomain>
+        <Documentation>
+          This list shows the available ICON point variables.
+        </Documentation>
+    </StringVectorProperty>
+
+    <StringVectorProperty
+        name="CellArrayInfo"
+        information_only="1" >
+    <ArraySelectionInformationHelper attribute_name="Cell"/>
+    </StringVectorProperty>
+
+    <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="2"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="CellArrayInfo" >
+    <ArraySelectionDomain name="array_list" >
+        <RequiredProperties>
+            <Property name="CellArrayInfo" function="ArrayList"/>
+        </RequiredProperties>
+    </ArraySelectionDomain>
+        <Documentation>
+          This list shows the available ICON cell variables.
+        </Documentation>
+    </StringVectorProperty>
+
+    <StringVectorProperty
+        name="DomainArrayInfo"
+        information_only="1" >
+    <ArraySelectionInformationHelper attribute_name="Domain"/>
+    </StringVectorProperty>
+
+    <StringVectorProperty
+        name="DomainArrayStatus"
+        command="SetDomainArrayStatus"
+        number_of_elements="2"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="DomainArrayInfo" >
+    <ArraySelectionDomain name="array_list" >
+        <RequiredProperties>
+            <Property name="DomainArrayInfo" function="ArrayList"/>
+        </RequiredProperties>
+    </ArraySelectionDomain>
+        <Documentation>
+          This list shows the available ICON domain variables (for simulation performance analysis).
+        </Documentation>
+    </StringVectorProperty>
+
+    <IntVectorProperty
+        name="Project Lat/Lon"
+        command="SetProjectLatLon"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool" />
+        <Documentation>
+          Switch on for equidistant cylindrical (lat/lon) projection.
+        </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="Project Cassini"
+        command="SetProjectCassini"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool" />
+        <Documentation>
+          Switch on for Cassini projection.
+        </Documentation>
+    </IntVectorProperty>
+
+      <IntVectorProperty
+        name="UseTopography"
+        label="Use Topography (wet_c)"
+        command="SetTopography"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool" />
+        <Documentation>
+          Switch on to remove land structure contained in the variable "wet_c".
+        </Documentation>
+    </IntVectorProperty>
+
+      <IntVectorProperty
+        name="SetInvertTopography"
+        label="Use Land/Sea for Masking (Off = Sea; On = Land)"
+        command="InvertTopography"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool" />
+        <Documentation>
+          Switch to either remove land or sea structure contained within the variable "wet_c".
+        </Documentation>
+    </IntVectorProperty>
+
+      <IntVectorProperty
+        name="InvertZ"
+        label="Invert Z-Axis"
+        command="SetInvertZAxis"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool" />
+        <Documentation>
+          Switch on to invert the rendering of the z-axis.
+        </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="Show3DSurface"
+        label="Show 3D Surface"
+        command="SetShowMultilayerView"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool" />
+        <Documentation>
+          Switch on for 3D rendering of the data. 2D arrays display the same value on all levels.
+        </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="LayerThicknessRangeInfo"
+        command="GetLayerThicknessRange"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="LayerThickness"
+        label="3D Surface Thickness"
+        command="SetLayerThickness"
+        number_of_elements="1"
+        default_values="10">
+      <IntRangeDomain name="LayerThicknessRange">
+      <RequiredProperties>
+        <Property name="LayerThicknessRangeInfo" function="Range"/>
+      </RequiredProperties>
+      </IntRangeDomain>
+      <Documentation>
+      Adjust the layer thickness for 3D rendering.
+      </Documentation>   <Hints>
+    <!-- Visibility Element can be used to suggest the GUI about
+          visibility of this filter (or its input) on creation.
+          replace_input="0" implies that the input visibility is not
+            changed on creation of this filter (defaults to "1")
+      -->
+    <Visibility replace_input="1" />
+  </Hints>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="VerticalLevelRangeInfo"
+        command="GetVerticalLevelRange"
+        information_only="1">
+      <SimpleIntInformationHelper/>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="VerticalLevel"
+        command="SetVerticalLevel"
+        number_of_elements="1"
+        default_values="0">
+      <IntRangeDomain name="range" >
+        <RequiredProperties>
+          <Property name="VerticalLevelRangeInfo" function="Range"/>
+        </RequiredProperties>
+      </IntRangeDomain>
+      <Documentation>
+      Adjust the vertical level that is displayed. This is only available for 3D data sets.
+      </Documentation>
+    </IntVectorProperty>
+
+    <DoubleVectorProperty
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+      <TimeStepsInformationHelper/>
+    </DoubleVectorProperty>
+
+    </SourceProxy>
+    <!-- End ICONReader -->
+  </ProxyGroup>
+  <!-- End Filters Group -->
+</ServerManagerConfiguration>
