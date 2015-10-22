@@ -91,7 +91,12 @@ pqFlatTreeViewEventPlayer::pqFlatTreeViewEventPlayer(QObject* p)
 
 bool pqFlatTreeViewEventPlayer::playEvent(QObject* Object, const QString& Command, const QString& Arguments, bool& Error)
 {
-  pqFlatTreeView* const object = qobject_cast<pqFlatTreeView*>(Object);
+  pqFlatTreeView* object = qobject_cast<pqFlatTreeView*>(Object);
+  if(!object)
+    {
+    // mouse events go to the viewport widget
+    object = qobject_cast<pqFlatTreeView*>(Object->parent());
+    }
   if(!object)
     {
     return false;
@@ -147,7 +152,10 @@ bool pqFlatTreeViewEventPlayer::playEvent(QObject* Object, const QString& Comman
       }
     }
     
-  qCritical() << "Unknown abstract item command: " << Command << "\n";
-  Error = true;
+  if (!this->Superclass::playEvent(Object, Command, Arguments, Error))
+    {
+    qCritical() << "Unknown abstract item command: " << Command << "\n";
+    Error = true;
+    }
   return true;
 }

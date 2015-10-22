@@ -31,9 +31,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqQVTKWidgetEventTranslator.h"
+#include "pqCoreTestUtility.h"
+#include "pqFileDialog.h"
+#include "pqApplicationCore.h"
+#include "pqCoreUtilities.h"
+#include "pqEventTypes.h"
+
+#include "vtkRenderWindow.h"
 
 #include <QEvent>
 #include <QMouseEvent>
+#include <QDebug>
 
 #include "QVTKWidget.h"
 pqQVTKWidgetEventTranslator::pqQVTKWidgetEventTranslator(QObject* p)
@@ -46,88 +54,159 @@ pqQVTKWidgetEventTranslator::~pqQVTKWidgetEventTranslator()
 }
 
 bool pqQVTKWidgetEventTranslator::translateEvent(QObject* Object, 
-                                                  QEvent* Event, 
-                                                  bool& /*Error*/)
+                                                  QEvent* Event,
+                                                  int eventType, 
+                                                  bool& error)
 {
-  QVTKWidget* const object = qobject_cast<QVTKWidget*>(Object);
-  if(!object)
+  QVTKWidget* const widget = qobject_cast<QVTKWidget*>(Object);
+  if(!widget)
     {
     return false;
     }
-    
-  bool handled = false;
-  switch(Event->type())
+
+  if (eventType == pqEventTypes::ACTION_EVENT)
     {
-  case QEvent::ContextMenu:
-    handled=true;
-    break;
-
-  case QEvent::MouseButtonPress:
+    switch(Event->type())
       {
-      QMouseEvent* mouseEvent = dynamic_cast<QMouseEvent*>(Event);
-      if (mouseEvent)
+      // ContextMenu are supported via mousePress
+      case QEvent::ContextMenu:
         {
-        QSize size = object->size();
-        double normalized_x = mouseEvent->x()/static_cast<double>(size.width());
-        double normalized_y = mouseEvent->y()/static_cast<double>(size.height());
-        emit recordEvent(Object, "mousePress", QString("(%1,%2,%3,%4,%5)")
-          .arg(normalized_x)
-          .arg(normalized_y)
-          .arg(mouseEvent->button())
-          .arg(mouseEvent->buttons())
-          .arg(mouseEvent->modifiers()));
+        return true;
+        break;
         }
-      }
-    handled = true;
-    break;
-
-  case QEvent::MouseButtonRelease:
-      {
-      QMouseEvent* mouseEvent = dynamic_cast<QMouseEvent*>(Event);
-      if (mouseEvent)
+      case QEvent::MouseButtonPress:
         {
-        QSize size = object->size();
-        double normalized_x = mouseEvent->x()/static_cast<double>(size.width());
-        double normalized_y = mouseEvent->y()/static_cast<double>(size.height());
-        // Move to the place where the mouse was released and then release it.
-        // This mimicks drag without actually having to save all the intermediate
-        // mouse move positions.
-        emit recordEvent(Object, "mouseMove", QString("(%1,%2,%3,%4,%5)")
-          .arg(normalized_x)
-          .arg(normalized_y)
-          .arg(mouseEvent->button())
-          .arg(mouseEvent->buttons())
-          .arg(mouseEvent->modifiers()));
-        emit recordEvent(Object, "mouseRelease", QString("(%1,%2,%3,%4,%5)")
-          .arg(normalized_x)
-          .arg(normalized_y)
-          .arg(mouseEvent->button())
-          .arg(mouseEvent->buttons())
-          .arg(mouseEvent->modifiers()));
+        QMouseEvent* mouseEvent = dynamic_cast<QMouseEvent*>(Event);
+        if (mouseEvent)
+          {
+          QSize size = widget->size();
+          double normalized_x = mouseEvent->x()/static_cast<double>(size.width());
+          double normalized_y = mouseEvent->y()/static_cast<double>(size.height());
+          emit recordEvent(widget, "mousePress", QString("(%1,%2,%3,%4,%5)")
+                           .arg(normalized_x)
+                           .arg(normalized_y)
+                           .arg(mouseEvent->button())
+                           .arg(mouseEvent->buttons())
+                           .arg(mouseEvent->modifiers()));
+          }
+        return true;
+        break;
         }
-      }
-    handled = true;
-    break;
-    
-  case QEvent::KeyPress:
-  case QEvent::KeyRelease:
-    {
-    QKeyEvent* ke = static_cast<QKeyEvent*>(Event);
-    QString data =QString("%1:%2:%3:%4:%5:%6")
-      .arg(ke->type())
-      .arg(ke->key())
-      .arg(static_cast<int>(ke->modifiers()))
-      .arg(ke->text())
-      .arg(ke->isAutoRepeat())
-      .arg(ke->count());
-    emit recordEvent(Object, "keyEvent", data);
-    }
-    break;
 
-  default:
-    break;
-    }
+      case QEvent::MouseButtonRelease:
+        {
+        QMouseEvent* mouseEvent = dynamic_cast<QMouseEvent*>(Event);
+        if (mouseEvent)
+          {
+          QSize size = widget->size();
+          double normalized_x = mouseEvent->x()/static_cast<double>(size.width());
+          double normalized_y = mouseEvent->y()/static_cast<double>(size.height());
+          // Move to the place where the mouse was released and then release it.
+          // This mimicks drag without actually having to save all the intermediate
+          // mouse move positions.
+          emit recordEvent(widget, "mouseMove", QString("(%1,%2,%3,%4,%5)")
+                           .arg(normalized_x)
+                           .arg(normalized_y)
+                           .arg(mouseEvent->button())
+                           .arg(mouseEvent->buttons())
+                           .arg(mouseEvent->modifiers()));
+          emit recordEvent(widget, "mouseRelease", QString("(%1,%2,%3,%4,%5)")
+                           .arg(normalized_x)
+                           .arg(normalized_y)
+                           .arg(mouseEvent->button())
+                           .arg(mouseEvent->buttons())
+                           .arg(mouseEvent->modifiers()));
+          }
+        return true;
+        break;
+        }
       
-  return handled;
-}
+      case QEvent::KeyPress:
+      case QEvent::KeyRelease:
+        {
+        QKeyEvent* ke = static_cast<QKeyEvent*>(Event);
+        QString data =QString("%1:%2:%3:%4:%5:%6")
+          .arg(ke->type())
+          .arg(ke->key())
+          .arg(static_cast<int>(ke->modifiers()))
+          .arg(ke->text())
+          .arg(ke->isAutoRepeat())
+          .arg(ke->count());
+        emit recordEvent(widget, "keyEvent", data);
+        return true;
+        break;
+        }
+      
+      default:
+        {
+        break;
+        }
+      }
+    }
+  else if (eventType == pqEventTypes::CHECK_EVENT)
+    {
+    if (Event->type() == QEvent::MouseButtonRelease)
+      {
+      // Dir to save the image in
+      QDir baselineDir(pqCoreTestUtility::BaselineDirectory());
 
+      // Resize widget to 300x300
+      int width = 300, height = 300;
+      QSize old_size = widget->maximumSize();
+      widget->setMaximumSize(width, height);
+      widget->resize(width, height);
+
+      // Setup File Save Dialog
+      QString filters;
+      filters += "PNG image (*.png)";
+      filters += ";;BMP image (*.bmp)";
+      filters += ";;TIFF image (*.tif)";
+      filters += ";;PPM image (*.ppm)";
+      filters += ";;JPG image (*.jpg)";
+      pqFileDialog file_dialog(NULL, pqCoreUtilities::mainWidget(),
+        tr("Save Screenshot:"), baselineDir.path(), filters);
+      file_dialog.setObjectName("FileSaveScreenshotDialog");
+      file_dialog.setFileMode(pqFileDialog::AnyFile);
+
+      // Pause recording whilie selecting file to save
+      pqTestUtility* testUtil = pqApplicationCore::instance()->testUtility();
+      testUtil->pauseRecords(true);
+
+      // Execute file save dialog
+      if (file_dialog.exec() != QDialog::Accepted)
+        {
+        error = false;
+        testUtil->pauseRecords(false);
+        widget->setMaximumSize(old_size);
+        return true;
+        }
+      QString file = file_dialog.getSelectedFiles()[0];
+
+      // Save screenshot
+      int offRen = widget->GetRenderWindow()->GetOffScreenRendering();
+      widget->GetRenderWindow()->SetOffScreenRendering(1);
+      pqCoreTestUtility::SaveScreenshot(widget->GetRenderWindow(), file);
+      widget->GetRenderWindow()->SetOffScreenRendering(offRen);
+
+      // Get a relative to saved file
+      QString relPathFile = baselineDir.relativeFilePath(file);
+
+      // Restore recording
+      testUtil->pauseRecords(false);
+
+      // Restore widget size 
+      widget->setMaximumSize(old_size);
+      widget->resize(old_size);
+
+      // Emit record signal
+      emit recordEvent(Object, pqCoreTestUtility::PQ_COMPAREVIEW_PROPERTY_NAME, 
+                       "$PARAVIEW_TEST_BASELINE_DIR/" + relPathFile, pqEventTypes::CHECK_EVENT);
+      return true;
+      }
+    if (Event->type() == QEvent::MouseMove)
+      {
+      return true;
+      }
+    }
+  return this->Superclass::translateEvent(Object, Event, eventType, error);
+}

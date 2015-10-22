@@ -48,6 +48,7 @@ public:
   pqPluginTreeWidgetEventTranslator(QObject* parentObject = 0);
   ~pqPluginTreeWidgetEventTranslator();
 
+  using Superclass::translateEvent;
   virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);
 
 private slots:

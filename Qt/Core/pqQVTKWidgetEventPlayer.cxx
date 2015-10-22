@@ -48,7 +48,7 @@ pqQVTKWidgetEventPlayer::pqQVTKWidgetEventPlayer(QObject* p)
 
 bool pqQVTKWidgetEventPlayer::playEvent(QObject* Object, 
          const QString& Command, const QString& Arguments, 
-         bool& /*Error*/)
+         bool& Error)
 {
   QVTKWidget* widget = qobject_cast<QVTKWidget*>(Object);
   if(widget)
@@ -76,6 +76,6 @@ bool pqQVTKWidgetEventPlayer::playEvent(QObject* Object,
       return true;
       }
     }
-  return false;
+  return this->Superclass::playEvent(Object, Command, Arguments, Error);
 }
 

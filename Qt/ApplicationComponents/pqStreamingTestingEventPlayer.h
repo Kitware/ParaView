@@ -50,6 +50,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqStreamingTestingEventPlayer : public pqWi
 
 public:
   pqStreamingTestingEventPlayer(QObject* p) : Superclass(p) { }
+  using Superclass::playEvent;
   virtual bool playEvent(QObject*,
     const QString& command, const QString& arguments, bool& error);
 

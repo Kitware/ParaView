@@ -47,6 +47,7 @@ public:
   pqCollaborationEventPlayer(QObject *parent=NULL);
   virtual ~pqCollaborationEventPlayer();
 
+  using Superclass::playEvent;
   virtual bool playEvent(QObject* object,
     const QString& command,
     const QString& arguments, bool& error);

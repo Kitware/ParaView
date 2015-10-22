@@ -44,7 +44,7 @@ pqFileDialogEventTranslator::pqFileDialogEventTranslator(QObject* p)
 {
 }
 
-bool pqFileDialogEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool& /*Error*/)
+bool pqFileDialogEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool& Error)
 {
   // Capture input for pqFileDialog and all its children ...
   pqFileDialog* object = 0;
@@ -63,9 +63,10 @@ bool pqFileDialogEventTranslator::translateEvent(QObject* Object, QEvent* Event,
     this->CurrentObject = object;
     connect(object, SIGNAL(fileAccepted(const QString&)), this, SLOT(onFilesSelected(const QString&)));
     connect(object, SIGNAL(rejected()), this, SLOT(onCancelled()));
+    return true;
     }
       
-  return true;
+  return this->Superclass::translateEvent(Object, Event, Error);
 }
 
 void pqFileDialogEventTranslator::onFilesSelected(const QString& file)

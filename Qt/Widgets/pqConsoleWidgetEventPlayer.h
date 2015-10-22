@@ -46,6 +46,7 @@ public:
   virtual ~pqConsoleWidgetEventPlayer();
 
   /// Callback to play a command.
+  using Superclass::playEvent;
   virtual bool playEvent(QObject* target,
     const QString& cmd, const QString& args, bool& errorFlag);
 

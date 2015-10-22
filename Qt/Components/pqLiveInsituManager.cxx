@@ -76,6 +76,7 @@ public:
   {
   }
 
+  using Superclass::playEvent;
   virtual bool playEvent(
     QObject*,
     const QString& command, const QString& arguments, bool& error)

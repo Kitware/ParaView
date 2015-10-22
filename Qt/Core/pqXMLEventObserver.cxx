@@ -30,7 +30,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
+#include "pqEventTypes.h"
 #include "pqXMLEventObserver.h"
+#include "pqCoreTestUtility.h"
 
 #include <QTextStream>
 
@@ -44,7 +46,6 @@ static const QString textToXML(const QString& string)
   result.replace("'", "&apos;");
   result.replace("\"", "&quot;");
   result.replace("\n", "&#xA;");
-  
   return result;
 }
 
@@ -76,18 +77,48 @@ void pqXMLEventObserver::setStream(QTextStream* stream)
 
 
 void pqXMLEventObserver::onRecordEvent(
-  const QString& Widget,
-  const QString& Command,
-  const QString& Arguments)
+  const QString& widget,
+  const QString& command,
+  const QString& arguments,
+  const int& eventType)                                   
 {
-  if(this->Stream)
+  // Check Event
+  if (eventType == pqEventTypes::CHECK_EVENT)
     {
-    *this->Stream
-      << "  <pqevent "
-      << "object=\"" << textToXML(Widget).toLatin1().data() << "\" "
-      << "command=\"" << textToXML(Command).toLatin1().data() << "\" "
-      << "arguments=\"" << textToXML(Arguments).toLatin1().data() << "\" "
-      << "/>\n";
+    if(this->Stream)
+      {
+      // save a pqcompareview event when command is PQ_COMPAREVIEW_PROPERTY_NAME, is it too sketchy ?
+      if (command == pqCoreTestUtility::PQ_COMPAREVIEW_PROPERTY_NAME)
+        {
+        *this->Stream
+          << "  <pqcompareview "
+          << "object=\"" << textToXML(widget).toLatin1().data() << "\" "
+          << "baseline=\"" << textToXML(arguments).toLatin1().data() << "\" "
+          << "threshold=\"5\" "
+          << "/>\n";
+        }
+      else
+        {
+      *this->Stream
+        << "  <pqcheck "
+        << "object=\"" << textToXML(widget).toLatin1().data() << "\" "
+        << "property=\"" << textToXML(command).toLatin1().data() << "\" "
+        << "arguments=\"" << textToXML(arguments).toLatin1().data() << "\" "
+        << "/>\n";
+        }
+      }
+    }
+  // Event
+  else
+    {
+    if(this->Stream)
+      {
+      *this->Stream
+        << "  <pqevent "
+        << "object=\"" << textToXML(widget).toLatin1().data() << "\" "
+        << "command=\"" << textToXML(command).toLatin1().data() << "\" "
+        << "arguments=\"" << textToXML(arguments).toLatin1().data() << "\" "
+        << "/>\n";
+      }
     }
 }
-

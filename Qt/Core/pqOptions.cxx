@@ -71,6 +71,7 @@ static int AddTestImageThreshold(const char*, const char* value, void* call_data
 //-----------------------------------------------------------------------------
 pqOptions::pqOptions()
 {
+  this->BaselineDirectory = 0;
   this->TestDirectory = 0;
   this->DataDirectory = 0;
   this->ExitAppWhenTestsDone = 0;
@@ -85,6 +86,7 @@ pqOptions::pqOptions()
 //-----------------------------------------------------------------------------
 pqOptions::~pqOptions()
 {
+  this->SetBaselineDirectory(0);
   this->SetTestDirectory(0);
   this->SetDataDirectory(0);
   this->SetServerResourceName(0);
@@ -96,7 +98,11 @@ pqOptions::~pqOptions()
 void pqOptions::Initialize()
 {
   this->Superclass::Initialize();
-  
+ 
+  this->AddArgument("--baseline-directory", NULL,
+    &this->TestDirectory,
+    "Set the baseline directory where test recorder will store baseline images.");
+ 
   this->AddArgument("--test-directory", NULL,
     &this->TestDirectory,
     "Set the temporary directory where test-case output will be stored.");
@@ -127,7 +133,7 @@ void pqOptions::Initialize()
     &::AddTestImageThreshold, this,
     "Add test image threshold. "
     "Can be used multiple times to specify multiple image thresholds for "
-    "multiple tests in order.");
+    "multiple tests in order. When recording test can be a directory to record image in");
 
   this->AddArgument("--script", NULL,
     &this->PythonScript,
