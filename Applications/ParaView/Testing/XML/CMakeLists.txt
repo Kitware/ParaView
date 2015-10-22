@@ -518,6 +518,7 @@ SET (ColorEditorVolumeControls_THRESHOLD 300)
 # Plot image leeway.
 set (SpreadSheet2_THRESHOLD 50)
 set (PlotOverTimeAutoApply_THRESHOLD 50)
+set (ExportLinePlotToCSV_THRESHOLD 30)
 set (PlotOverTimeAutoApply_DISABLE_CRS TRUE) # since this uses surface selection.
 
 
