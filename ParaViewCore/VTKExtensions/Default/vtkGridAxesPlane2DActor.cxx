@@ -26,6 +26,7 @@
 #include "vtkProperty.h"
 #include "vtkRenderer.h"
 #include "vtkVectorOperators.h"
+#include "vtkMatrix4x4.h"
 
 #include <algorithm>
 #include <cassert>
@@ -265,6 +266,9 @@ bool vtkGridAxesPlane2DActor::UpdateTicks(vtkViewport* viewport)
   const vtkTuple<vtkVector2d, 4>& viewportNormals = this->Helper->GetViewportNormals();
   const vtkTuple<vtkVector2d, 4>& viewportPoints = this->Helper->GetViewportPointsAsDouble();
 
+  vtkNew<vtkMatrix4x4> inverted;
+  vtkMatrix4x4::Invert(this->GetMatrix(), inverted.GetPointer());
+
   double offsets[4];
   vtkNew<vtkCoordinate> coordinate;
 
@@ -299,6 +303,10 @@ bool vtkGridAxesPlane2DActor::UpdateTicks(vtkViewport* viewport)
     vtkVector3d direction = gridPoints[(cc+1)%4] - gridPoints[cc];
     vtkVector3d next = gridPoints[(cc+2)%4] - gridPoints[(cc+1)%4];
     vtkVector3d normal = direction.Cross(direction.Cross(next)).Normalized();
+
+    double n[] = { normal[0], normal[1], normal[2], 0.0 };
+    inverted->MultiplyPoint(n, n);
+    normal[0] = n[0];  normal[1] = n[1];  normal[2] = n[2];
 
     // We need to compute the length of the tick.
     points[1] = ((this->TickDirection & TICK_DIRECTION_OUTWARDS) != 0)?
