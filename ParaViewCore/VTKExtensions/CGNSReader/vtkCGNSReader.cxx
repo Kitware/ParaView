@@ -2707,6 +2707,7 @@ int vtkCGNSReader::CanReadFile(const char *name)
   double rootId;
   double childId;
   float FileVersion = 0.0;
+  int intFileVersion = 0;
   char dataType[CGIO_MAX_DATATYPE_LENGTH+1];
   char errmsg[CGIO_MAX_ERROR_LENGTH+1];
   int ndim = 0;
@@ -2773,11 +2774,13 @@ int vtkCGNSReader::CanReadFile(const char *name)
   // Check that the library version is at least as recent as the one used
   //   to create the file being read
 
-  if ((FileVersion*1000) > CGNS_VERSION)
+  intFileVersion = static_cast<int>(FileVersion * 1000 + 0.5);
+
+  if (intFileVersion > CGNS_VERSION)
     {
     // This code allows reading version newer than the lib,
     // as long as the 1st digit of the versions are equal
-    if ((FileVersion) > (CGNS_VERSION / 1000))
+    if ((intFileVersion / 1000) > (CGNS_VERSION / 1000))
       {
       vtkErrorMacro(<< "The file " << name <<
                     " was written with a more recent version"
@@ -2786,13 +2789,13 @@ int vtkCGNSReader::CanReadFile(const char *name)
       ierr = 0;
       }
     // warn only if different in second digit
-    if ((FileVersion*10) > (CGNS_VERSION / 100))
+    if ((intFileVersion / 100) > (CGNS_VERSION / 100))
       {
       vtkWarningMacro(<< "The file being read is more recent"
                        "than the CGNS library used");
       }
     }
-  if ((FileVersion*100) < 255)
+  if ((intFileVersion / 10) < 255)
     {
     vtkWarningMacro(<< "The file being read was written with an old version"
                     "of the CGNS library. Please update your file"
