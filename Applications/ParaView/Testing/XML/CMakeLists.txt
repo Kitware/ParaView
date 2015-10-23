@@ -220,6 +220,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/EnSightTensorInversion.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/EnSightTensorInversionBin.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExodusXML.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ExportLinePlotToCSV.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExportX3dPOVVRML.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExTimeseries.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExTimeseries2.xml
@@ -517,6 +518,7 @@ SET (ColorEditorVolumeControls_THRESHOLD 300)
 # Plot image leeway.
 set (SpreadSheet2_THRESHOLD 50)
 set (PlotOverTimeAutoApply_THRESHOLD 50)
+set (ExportLinePlotToCSV_THRESHOLD 30)
 set (PlotOverTimeAutoApply_DISABLE_CRS TRUE) # since this uses surface selection.
 
 

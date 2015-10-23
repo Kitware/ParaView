@@ -35,6 +35,7 @@
 #include <map> // needed for map
 
 class vtkChartSelectionRepresentation;
+class vtkCSVExporter;
 class vtkMultiBlockDataSet;
 class vtkPVCacheKeeper;
 class vtkPVContextView;
@@ -131,6 +132,13 @@ public:
   // sel in place and return false is the selection is not applicable to this
   // representation or the conversion cannot be made.
   virtual bool MapSelectionToView(vtkSelection* sel);
+
+  // Description:
+  // Called by vtkPVContextView::Export() to export the representation's data to
+  // a CSV file. Return false on failure which will call the exporting process
+  // to abort and raise an error. Default implementation simply returns false.
+  virtual bool Export(vtkCSVExporter* vtkNotUsed(exporter))
+    { return false; }
 
 //BTX
 protected:

@@ -17,13 +17,15 @@
 #include "vtkAnnotationLink.h"
 #include "vtkAxis.h"
 #include "vtkChartBox.h"
-#include "vtkChartWarning.h"
 #include "vtkChartLegend.h"
 #include "vtkChartParallelCoordinates.h"
+#include "vtkChartWarning.h"
 #include "vtkChartXY.h"
 #include "vtkCommand.h"
+#include "vtkContextMouseEvent.h"
 #include "vtkContextScene.h"
 #include "vtkContextView.h"
+#include "vtkCSVExporter.h"
 #include "vtkDoubleArray.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
@@ -32,7 +34,6 @@
 #include "vtkStringArray.h"
 #include "vtkTextProperty.h"
 #include "vtkXYChartRepresentation.h"
-#include "vtkContextMouseEvent.h"
 
 #include <string>
 #include <sstream>
