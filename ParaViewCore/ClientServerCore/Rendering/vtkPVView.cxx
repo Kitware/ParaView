@@ -202,9 +202,12 @@ bool vtkPVView::InCaveDisplayMode()
 //----------------------------------------------------------------------------
 bool vtkPVView::GetLocalProcessSupportsInteraction()
 {
-  return this->SynchronizedWindows->GetLocalProcessIsDriver();
-//  return (this->SynchronizedWindows->GetMode() == vtkPVSynchronizedRenderWindows::CLIENT ||
-//    this->SynchronizedWindows->GetMode() == vtkPVSynchronizedRenderWindows::BUILTIN)
+  // Remember that in batch mode, we should not create interaction on any of the
+  // ranks since all views share the same render window. Setting up interactor
+  // on even the root node will have unintended side effects since all views
+  // share the render window.
+  return this->SynchronizedWindows->GetLocalProcessIsDriver() &&
+    this->SynchronizedWindows->GetMode() != vtkPVSynchronizedRenderWindows::BATCH;
 }
 
 //----------------------------------------------------------------------------
