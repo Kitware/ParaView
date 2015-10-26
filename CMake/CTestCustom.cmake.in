@@ -105,6 +105,10 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
 
   # ignore incorrect inline warnings from ICC for Eigen.
   "Eigen.*warning #2196"
+
+  # ignore warnings from cdilib.c
+  "CDIReader.cdilib.c"
+  "netcdf.h.* warning: shadowed declaration is here"
 )
 
 #------------------------------------------------------------------------------
