@@ -1,8 +1,8 @@
 from paraview.simple import *
 from paraview import smtesting
 import vtk
-import vtk.vtkRenderingLIC
-import os
+
+opengl2 = not hasattr(vtk, "vtkSurfaceLICPainter")
 
 paraview.simple._DisableFirstRenderCameraReset()
 
@@ -12,16 +12,25 @@ saveImage = False
 # check for driver support first
 rw = vtk.vtkRenderWindow()
 rw.Render()
-em = rw.GetExtensionManager()
-painter = vtk.vtkRenderingLIC.vtkSurfaceLICPainter()
-ok = painter.IsSupported(rw)
-print
-print 'SurfaceLIC %s Supported by:\n  %s\n  %s\n  %s\n'%(
-      'is' if(ok) else 'is not',
-      em.GetDriverGLVersion(),
-      em.GetDriverGLVendor(),
-      em.GetDriverGLRenderer())
-del painter
+
+if opengl2:
+    mapper = vtk.vtkSurfaceLICMapper()
+    ok = mapper.IsSupported(rw)
+    print
+    print 'SurfaceLIC %s Supported by the OpenGL drivers\n'%\
+          'is' if(ok) else 'is not'
+    del mapper
+else:
+    em = rw.GetExtensionManager()
+    painter = vtk.vtkRenderingLIC.vtkSurfaceLICPainter()
+    ok = painter.IsSupported(rw)
+    print
+    print 'SurfaceLIC %s Supported by:\n  %s\n  %s\n  %s\n'%(
+          'is' if(ok) else 'is not',
+          em.GetDriverGLVersion(),
+          em.GetDriverGLVendor(),
+          em.GetDriverGLRenderer())
+    del painter
 del rw
 
 if ok:
