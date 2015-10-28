@@ -4,10 +4,13 @@ paraview_test_load_baselines_dirs(""
 paraview_test_load_data_dirs(SurfaceLIC
   shuttle-surf
   )
-paraview_test_load_data(SurfaceLIC
-  #office.binary.vtk # Downloaded by ParaViewData
-  shuttle-surf.vtm
-  )
+
+set(data_files shuttle-surf.vtm)
+if(NOT PARAVIEW_BUILD_QT_GUI)
+    list(APPEND data_files office.binary.vtk)
+endif()
+paraview_test_load_data(SurfaceLIC ${data_files})
+
 paraview_test_data_target(SurfaceLIC)
 
 # Surface LIC Plugin testing
