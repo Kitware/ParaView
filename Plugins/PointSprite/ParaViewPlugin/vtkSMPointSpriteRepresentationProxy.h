@@ -33,8 +33,8 @@
 // This code doesn nothing since all we have done is changed the types in the
 // xml description to create sprite mappers etc.
 
-#ifndef __vtkSMPointSpriteRepresentationProxy_h
-#define __vtkSMPointSpriteRepresentationProxy_h
+#ifndef vtkSMPointSpriteRepresentationProxy_h
+#define vtkSMPointSpriteRepresentationProxy_h
 
 #include "vtkSMRepresentationProxy.h"
 

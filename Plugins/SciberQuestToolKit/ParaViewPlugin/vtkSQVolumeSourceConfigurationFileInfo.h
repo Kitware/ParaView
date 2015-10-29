@@ -38,8 +38,8 @@
 //
 // .SECTION Thanks
 // This class was contributed by SciberQuest Inc.
-#ifndef __vtkSQVolumeSourceConfigurationFileInfo_h
-#define __vtkSQVolumeSourceConfigurationFileInfo_h
+#ifndef vtkSQVolumeSourceConfigurationFileInfo_h
+#define vtkSQVolumeSourceConfigurationFileInfo_h
 
 #include "vtkObject.h"
 

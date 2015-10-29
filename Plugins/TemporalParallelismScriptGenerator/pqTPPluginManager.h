@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqTPPluginManager_h
-#define __pqTPPluginManager_h
+#ifndef pqTPPluginManager_h
+#define pqTPPluginManager_h
 
 #include <pqSGPluginManager.h>
 

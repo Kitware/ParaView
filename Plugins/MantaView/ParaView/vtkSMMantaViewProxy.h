@@ -65,8 +65,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // also initializes the client server wrapped vtkManta library for
 // paraview.
 
-#ifndef __vtkSMMantaViewProxy_h
-#define __vtkSMMantaViewProxy_h
+#ifndef vtkSMMantaViewProxy_h
+#define vtkSMMantaViewProxy_h
 
 #include "vtkSMRenderViewProxy.h"
 

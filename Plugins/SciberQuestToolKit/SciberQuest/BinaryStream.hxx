@@ -6,8 +6,8 @@
 
 Copyright 2012 SciberQuest Inc.
 */
-#ifndef __BinaryStream_hxx
-#define __BinaryStream_hxx
+#ifndef BinaryStream_hxx
+#define BinaryStream_hxx
 
 #include "SharedArray.hxx"
 

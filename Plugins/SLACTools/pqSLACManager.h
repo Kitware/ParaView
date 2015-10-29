@@ -19,8 +19,8 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
-#ifndef __pqSLACManager_h
-#define __pqSLACManager_h
+#ifndef pqSLACManager_h
+#define pqSLACManager_h
 
 #include <QObject>
 
@@ -138,4 +138,4 @@ private:
   void operator=(const pqSLACManager &);        // Not implemented
 };
 
-#endif //__pqSLACManager_h
+#endif //pqSLACManager_h

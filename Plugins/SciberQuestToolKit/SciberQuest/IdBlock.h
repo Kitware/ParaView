@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __IdBlock_h
-#define __IdBlock_h
+#ifndef IdBlock_h
+#define IdBlock_h
 
 #include <iostream> // for ostream
 

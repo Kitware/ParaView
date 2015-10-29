@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __PoincareMapData_h
-#define __PoincareMapData_h
+#ifndef PoincareMapData_h
+#define PoincareMapData_h
 
 #include "FieldTraceData.h" // for FieldTraceData
 

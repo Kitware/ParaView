@@ -66,6 +66,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkMultiBlockDataSetAlgorithm.h" // Base class
 #include "vtkPVVTKExtensionsCosmoToolsModule.h" // For export macro
+#include "vtkMultiBlockDataSetAlgorithm.h"
 
 // C/C++ includes
 #include <string> // For C++ string

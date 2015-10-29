@@ -17,8 +17,8 @@
 // vtkPistonRepresentation is a representation for showing vtkPistonDataObjects.
 // It uses vtkPistonMapper to draw the data while keeping it on the GPU.
 
-#ifndef __vtkPistonRepresentation_h
-#define __vtkPistonRepresentation_h
+#ifndef vtkPistonRepresentation_h
+#define vtkPistonRepresentation_h
 
 #include "vtkPVDataRepresentation.h"
 

@@ -27,8 +27,8 @@
 // .SECTION See Also
 // vtkStreamingParticlesRepresentation, vtkAMRStreamingPriorityQueue
 
-#ifndef __vtkStreamingParticlesPriorityQueue_h
-#define __vtkStreamingParticlesPriorityQueue_h
+#ifndef vtkStreamingParticlesPriorityQueue_h
+#define vtkStreamingParticlesPriorityQueue_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" // for export macros
 #include "vtkObject.h"

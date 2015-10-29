@@ -27,8 +27,8 @@
 //
 // </verbatim>
 
-#ifndef __pqTransferFunctionDialog_h
-#define __pqTransferFunctionDialog_h
+#ifndef pqTransferFunctionDialog_h
+#define pqTransferFunctionDialog_h
 
 #include <QDialog>
 

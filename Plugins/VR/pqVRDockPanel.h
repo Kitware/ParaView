@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqVRDockPanel_h
-#define __pqVRDockPanel_h
+#ifndef pqVRDockPanel_h
+#define pqVRDockPanel_h
 
 #include <QDockWidget>
 

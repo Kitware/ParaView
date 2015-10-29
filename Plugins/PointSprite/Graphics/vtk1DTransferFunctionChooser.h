@@ -29,8 +29,8 @@
 // .SECTION Description
 // Chooses between vtk1DLookupTableTransferFunction and vtk1DGaussianTransferFunction
 
-#ifndef __vtk1DTransferFunctionChooser_h
-#define __vtk1DTransferFunctionChooser_h
+#ifndef vtk1DTransferFunctionChooser_h
+#define vtk1DTransferFunctionChooser_h
 
 #include "vtkPointSpriteGraphicsModule.h" //needed for exports
 #include "vtk1DTransferFunction.h"

@@ -32,8 +32,8 @@
 // or create a circular mask.
 
 
-#ifndef __vtkImageSpriteSource_h
-#define __vtkImageSpriteSource_h
+#ifndef vtkImageSpriteSource_h
+#define vtkImageSpriteSource_h
 
 #include "vtkPointSpriteRenderingModule.h" //needed for exports
 #include "vtkImageAlgorithm.h"

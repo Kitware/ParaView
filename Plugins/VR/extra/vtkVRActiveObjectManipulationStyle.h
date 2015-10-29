@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __vtkVRActiveObjectManipulationStyle_h_
-#define __vtkVRActiveObjectManipulationStyle_h_
+#ifndef vtkVRActiveObjectManipulationStyle_h_
+#define vtkVRActiveObjectManipulationStyle_h_
 
 #include "vtkVRInteractorStyle.h"
 
@@ -57,4 +57,4 @@ protected:
 protected:
 };
 
-#endif //__vtkVRActiveObjectManipulationStyle.h_
+#endif //vtkVRActiveObjectManipulationStyle.h_

@@ -19,8 +19,8 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
-#ifndef __pqSLACDataLoadManager_h
-#define __pqSLACDataLoadManager_h
+#ifndef pqSLACDataLoadManager_h
+#define pqSLACDataLoadManager_h
 
 #include <QDialog>
 
@@ -53,4 +53,4 @@ private:
   pqUI *ui;
 };
 
-#endif //__pqSLACDataLoadManager_h
+#endif //pqSLACDataLoadManager_h

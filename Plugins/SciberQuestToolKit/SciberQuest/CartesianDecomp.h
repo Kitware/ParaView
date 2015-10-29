@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __CartesianDecomp_h
-#define __CartesianDecomp_h
+#ifndef CartesianDecomp_h
+#define CartesianDecomp_h
 
 
 #include "RefCountedPointer.h" // for RefCountedPointer

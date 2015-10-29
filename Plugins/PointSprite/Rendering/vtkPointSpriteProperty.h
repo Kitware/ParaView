@@ -31,8 +31,8 @@
 // It manages the point sprite shader programs, and link the radius parameter to
 // the VertexAttribute in the mapper if the radius is varying.
 
-#ifndef __vtkPointSpriteProperty_h_
-#define __vtkPointSpriteProperty_h_
+#ifndef vtkPointSpriteProperty_h
+#define vtkPointSpriteProperty_h
 
 #include "vtkPointSpriteRenderingModule.h" //needed for exports
 #include "vtkOpenGLProperty.h"
@@ -193,4 +193,4 @@ private:
   //ETX
 };
 
-#endif// __vtkPointSpriteFilter_h_
+#endif// vtkPointSpriteFilter_h

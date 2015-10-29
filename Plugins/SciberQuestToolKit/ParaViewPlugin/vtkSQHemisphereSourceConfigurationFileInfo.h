@@ -23,8 +23,8 @@
 //
 // .SECTION Thanks
 // This class was contributed by SciberQuest Inc.
-#ifndef __vtkSQHemisphereSourceConfigurationFileInfo_h
-#define __vtkSQHemisphereSourceConfigurationFileInfo_h
+#ifndef vtkSQHemisphereSourceConfigurationFileInfo_h
+#define vtkSQHemisphereSourceConfigurationFileInfo_h
 
 #include "vtkObject.h"
 

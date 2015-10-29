@@ -20,8 +20,8 @@
 -------------------------------------------------------------------------*/
 
 
-#ifndef __warningState_h
-#define __warningState_h
+#ifndef warningState_h
+#define warningState_h
 
 #if defined(DISABLE_NOISY_COMPILE_WARNINGS)
 // disables certain "noisy" compile warnings (e.g. Qt creates a plethora of 4127 and 4512)
@@ -32,4 +32,4 @@
 #endif
 #endif
 
-#endif //__warningState_h
+#endif //warningState_h

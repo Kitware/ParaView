@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqPythonQtMethodHelpers_h
-#define __pqPythonQtMethodHelpers_h
+#ifndef pqPythonQtMethodHelpers_h
+#define pqPythonQtMethodHelpers_h
 
 #include "pqServerManagerModel.h"
 #include "pqProxy.h"

@@ -13,10 +13,10 @@
 
 =========================================================================*/
 
-#ifndef __vtkPVVRConfig_h
-#define __vtkPVVRConfig_h
+#ifndef vtkPVVRConfig_h
+#define vtkPVVRConfig_h
 
 #cmakedefine PARAVIEW_USE_VRPN
 #cmakedefine PARAVIEW_USE_VRUI
 
-#endif // __vtkPVVRConfig.h_h
+#endif // vtkPVVRConfig.h_h

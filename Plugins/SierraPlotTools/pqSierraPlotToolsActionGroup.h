@@ -19,8 +19,8 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
-#ifndef __pqSierraPlotToolsActionGroup_h
-#define __pqSierraPlotToolsActionGroup_h
+#ifndef pqSierraPlotToolsActionGroup_h
+#define pqSierraPlotToolsActionGroup_h
 
 #include <QActionGroup>
 
@@ -37,4 +37,4 @@ private:
   void operator=(const pqSierraPlotToolsActionGroup &);        // Not implemented
 };
 
-#endif //__pqSierraPlotToolsActionGroup_h
+#endif //pqSierraPlotToolsActionGroup_h

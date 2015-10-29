@@ -63,8 +63,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // vtkMantaLight is a concrete implementation of the abstract class vtkLight.
 // vtkMantaLight interfaces to the Manta Raytracer library.
 
-#ifndef __vtkMantaLight_h
-#define __vtkMantaLight_h
+#ifndef vtkMantaLight_h
+#define vtkMantaLight_h
 
 #include "vtkMantaModule.h"
 #include "vtkLight.h"

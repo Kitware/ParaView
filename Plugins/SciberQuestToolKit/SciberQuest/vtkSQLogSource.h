@@ -35,8 +35,8 @@
 // is written by the mpi root rank when this object is destroyed. Therefor
 // this object must destroyed before MPI_Finalize is invoked.
 
-#ifndef __vtkSQLogSource_h
-#define __vtkSQLogSource_h
+#ifndef vtkSQLogSource_h
+#define vtkSQLogSource_h
 
 #include "vtkSciberQuestModule.h" // for export macro
 #include "vtkPolyDataAlgorithm.h"

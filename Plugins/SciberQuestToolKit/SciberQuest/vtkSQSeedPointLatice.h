@@ -34,8 +34,8 @@
 // more dense in the center of the dataset.
 
 
-#ifndef __vtkSQSeedPointLatice_h
-#define __vtkSQSeedPointLatice_h
+#ifndef vtkSQSeedPointLatice_h
+#define vtkSQSeedPointLatice_h
 
 #include "vtkSciberQuestModule.h" // for export macro
 #include "vtkPolyDataAlgorithm.h"

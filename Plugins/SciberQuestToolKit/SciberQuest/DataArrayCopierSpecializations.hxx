@@ -7,8 +7,8 @@
 Copyright 2012 SciberQuest Inc.
 
 */
-#ifndef __DataArrayCopierSpecializations_h
-#define __DataArrayCopierSpecializations_h
+#ifndef DataArrayCopierSpecializations_h
+#define DataArrayCopierSpecializations_h
 
 #include "DataArrayCopierImpl.hxx"
 

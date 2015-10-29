@@ -36,8 +36,8 @@
 // magnetic reconnection using electron agyrotropy",
 // Jack Scudder and William Daughton
 
-#ifndef __vtkSQAgyrotropyFilter_h
-#define __vtkSQAgyrotropyFilter_h
+#ifndef vtkSQAgyrotropyFilter_h
+#define vtkSQAgyrotropyFilter_h
 
 #include "vtkSciberQuestModule.h" // for export macro
 #include "vtkDataSetAlgorithm.h"

@@ -20,8 +20,8 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
-#ifndef __pqVariableVariablePlotter_h
-#define __pqVariableVariablePlotter_h
+#ifndef pqVariableVariablePlotter_h
+#define pqVariableVariablePlotter_h
 
 #include "pqPlotter.h"
 
@@ -40,4 +40,4 @@ public:
   }
 };
 
-#endif // __pqVariableVariablePlotter_h
+#endif // pqVariableVariablePlotter_h

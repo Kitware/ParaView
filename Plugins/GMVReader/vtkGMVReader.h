@@ -42,8 +42,8 @@
 // type generic.
 
 
-#ifndef __vtkGMVReader_h
-#define __vtkGMVReader_h
+#ifndef vtkGMVReader_h
+#define vtkGMVReader_h
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vtkDataSet.h"
@@ -313,4 +313,4 @@ private:
   int GetLabel(char *string, int number, char *label);
 };
 
-#endif // __vtkGMVReader_h
+#endif // vtkGMVReader_h

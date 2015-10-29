@@ -16,8 +16,8 @@
 // .SECTION Description
 // A 3D view that uses the manta ray tracer instead of openGL for rendering
 
-#ifndef __vtkPVMantaView_h
-#define __vtkPVMantaView_h
+#ifndef vtkPVMantaView_h
+#define vtkPVMantaView_h
 
 #include "vtkPVRenderView.h"
 

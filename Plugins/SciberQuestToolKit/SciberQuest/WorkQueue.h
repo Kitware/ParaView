@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __WorkQueue_h
-#define __WorkQueue_h
+#ifndef WorkQueue_h
+#define WorkQueue_h
 
 #include "IdBlock.h"
 

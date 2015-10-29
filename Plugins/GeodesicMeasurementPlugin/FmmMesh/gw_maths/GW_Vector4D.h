@@ -7,8 +7,8 @@
  */
 /*------------------------------------------------------------------------------*/
 
-#ifndef __GW_Vector4D_h_
-#define __GW_Vector4D_h_
+#ifndef GW_Vector4D_h
+#define GW_Vector4D_h
 
 #include "GW_MathsConfig.h"
 #include "GW_Maths.h"
@@ -63,7 +63,7 @@ public:
 } // End namespace GW
 
 
-#endif // __GW_Vector4D_h_
+#endif // GW_Vector4D_h
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright (C) 2009 Gabriel Peyre

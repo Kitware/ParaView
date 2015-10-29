@@ -17,10 +17,13 @@
 // .SECTION Description
 //  Creates a vtkMultiBlockDataSet from a GenericIO file
 
-#include "vtkPVVTKExtensionsCosmoToolsModule.h"
-#include "vtkMultiBlockDataSetAlgorithm.h" // parent class
+#ifndef vtkPGenericIOMultiBlockReader_h
+#define vtkPGenericIOMultiBlockReader_h
 
-#include <set>
+#include "vtkPVVTKExtensionsCosmoToolsModule.h" // For export macro
+#include "vtkMultiBlockDataSetAlgorithm.h"
+
+#include <set> // For std::set
 
 class vtkCallbackCommand;
 class vtkDataArraySelection;
@@ -231,11 +234,11 @@ protected:
 
 
 private:
-  // not implemented
-  vtkPGenericIOMultiBlockReader(const vtkPGenericIOMultiBlockReader& other);
-  vtkPGenericIOMultiBlockReader& operator=(
-      const vtkPGenericIOMultiBlockReader& other);
+  vtkPGenericIOMultiBlockReader(const vtkPGenericIOMultiBlockReader&); // Not implemented
+  void operator=(const vtkPGenericIOMultiBlockReader&); // Not implemented
   // Internal helper class
   class vtkGenericIOMultiBlockMetaData;
   vtkGenericIOMultiBlockMetaData* MetaData;
 };
+
+#endif

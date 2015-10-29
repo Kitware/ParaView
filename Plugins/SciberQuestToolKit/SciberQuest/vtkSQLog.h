@@ -36,8 +36,8 @@
 //  writes the data to the disk in rank order.
 //
 
-#ifndef __vtkSQLog_h
-#define __vtkSQLog_h
+#ifndef vtkSQLog_h
+#define vtkSQLog_h
 
 #define vtkSQLogDEBUG -1
 //#ifdef SQTK_DEBUG

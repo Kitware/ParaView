@@ -1,5 +1,5 @@
-#ifndef _H5Part_H_
-#define _H5Part_H_
+#ifndef H5Part_h
+#define H5Part_h
 
 #include <stdlib.h>
 #include <stdarg.h>

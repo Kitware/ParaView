@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __vtkVRGrabWorldStyle_h_
-#define __vtkVRGrabWorldStyle_h_
+#ifndef vtkVRGrabWorldStyle_h_
+#define vtkVRGrabWorldStyle_h_
 
 #include "vtkVRTrackStyle.h"
 #include "vtkNew.h"
@@ -75,4 +75,4 @@ private:
   float GetSpeedFactor(vtkCamera *cam);
 };
 
-#endif //__vtkVRGrabWorldStyle.h_
+#endif //vtkVRGrabWorldStyle.h_

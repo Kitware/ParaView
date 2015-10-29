@@ -61,8 +61,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // .NAME vtkManta.h - 
 // .SECTION Description
 //
-#ifndef __vtkManta_h
-#define __vtkManta_h
+#ifndef vtkManta_h
+#define vtkManta_h
 
 #include "vtkConfigure.h"
 #include "vtkMantaModule.h"

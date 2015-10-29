@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __CartesianDataBlock_h
-#define __CartesianDataBlock_h
+#ifndef CartesianDataBlock_h
+#define CartesianDataBlock_h
 
 #include <iostream> // for ostream
 

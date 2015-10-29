@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqVRAddConnectionDialog_h
-#define __pqVRAddConnectionDialog_h
+#ifndef pqVRAddConnectionDialog_h
+#define pqVRAddConnectionDialog_h
 
 #include <QDialog>
 

@@ -67,8 +67,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // vtkMantaPolyDataMapper is a geometric PolyDataMapper for the Manta
 // Raytracer library.
 
-#ifndef __vtkMantaPolyDataMapper_h
-#define __vtkMantaPolyDataMapper_h
+#ifndef vtkMantaPolyDataMapper_h
+#define vtkMantaPolyDataMapper_h
 
 #include "vtkMantaModule.h"
 #include "vtkPolyDataMapper.h"

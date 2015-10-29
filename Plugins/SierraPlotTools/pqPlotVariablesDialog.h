@@ -19,8 +19,8 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
-#ifndef __pqPlotVariablesDialog_h
-#define __pqPlotVariablesDialog_h
+#ifndef pqPlotVariablesDialog_h
+#define pqPlotVariablesDialog_h
 
 #include <QDialog>
 #include <QLabel>
@@ -108,4 +108,4 @@ private:
   pqInternal * Internal;
 };
 
-#endif //__pqPlotVariablesDialog_h
+#endif //pqPlotVariablesDialog_h

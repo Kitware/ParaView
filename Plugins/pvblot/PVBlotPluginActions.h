@@ -19,8 +19,8 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
-#ifndef __PVBlotPluginActions_h
-#define __PVBlotPluginActions_h
+#ifndef PVBlotPluginActions_h
+#define PVBlotPluginActions_h
 
 #include <QActionGroup>
 
@@ -49,4 +49,4 @@ private:
   void operator=(const PVBlotPluginActions &);          // Not implemented
 };
 
-#endif //__PVBlotPluginActions_h
+#endif //PVBlotPluginActions_h

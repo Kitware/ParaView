@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __BOVReader_h
-#define __BOVReader_h
+#ifndef BOVReader_h
+#define BOVReader_h
 
 #ifdef SQTK_WITHOUT_MPI
 typedef void *MPI_Comm;

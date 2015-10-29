@@ -16,8 +16,8 @@
 // .SECTION Description
 // vtkVRPNCallBackHandlers
 
-#ifndef __vtkVRPNCallBackHandlers_h
-#define __vtkVRPNCallBackHandlers_h
+#ifndef vtkVRPNCallBackHandlers_h
+#define vtkVRPNCallBackHandlers_h
 
 #include <vector>
 #include <iostream>
@@ -31,4 +31,4 @@ void VRPN_CALLBACK handleAnalogChange(void* userdata, const vrpn_ANALOGCB b);
 void VRPN_CALLBACK handleButtonChange(void* userdata, vrpn_BUTTONCB b);
 void VRPN_CALLBACK handleTrackerChange(void *userdata, const vrpn_TRACKERCB t);
 
-#endif // __vtkVRPNCallBackHandlers_h
+#endif // vtkVRPNCallBackHandlers_h

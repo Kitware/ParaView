@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __fsutil_h
-#define __fsutil_h
+#ifndef FsUtils_h
+#define FsUtils_h
 
 #include <vector> // for vector
 #include <string> // for string

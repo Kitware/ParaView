@@ -63,8 +63,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // vtkMantaRenderer is a concrete implementation of the abstract class
 // vtkRenderer. vtkMantaRenderer interfaces to the Manta graphics library.
 
-#ifndef __vtkMantaRenderer_h
-#define __vtkMantaRenderer_h
+#ifndef vtkMantaRenderer_h
+#define vtkMantaRenderer_h
 
 #include "vtkMantaModule.h"
 #include "vtkOpenGLRenderer.h"

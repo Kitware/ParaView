@@ -16,8 +16,8 @@
 // .SECTION Description
 //
 
-#ifndef __vtkAdiosPixieReader_h
-#define __vtkAdiosPixieReader_h
+#ifndef vtkAdiosPixieReader_h
+#define vtkAdiosPixieReader_h
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
 

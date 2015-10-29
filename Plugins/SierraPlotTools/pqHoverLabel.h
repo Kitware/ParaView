@@ -19,8 +19,8 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
-#ifndef __pqHoverLabel_h
-#define __pqHoverLabel_h
+#ifndef pqHoverLabel_h
+#define pqHoverLabel_h
 
 #include <QLabel>
 
@@ -44,4 +44,4 @@ public:
   pqPlotter * plotter;
 };
 
-#endif //__pqHoverLabel_h
+#endif //pqHoverLabel_h

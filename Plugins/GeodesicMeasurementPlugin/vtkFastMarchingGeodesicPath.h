@@ -54,8 +54,8 @@
 // 2. Peyre, Cohen, "Geodesic Computations for Fast and Accurate Surface
 //    Remeshing and Parameterization", Progress in Nonlinear Differential
 //    Equations and Their Applications, 2005.
-#ifndef __vtkFastMarchingGeodesicPath_h
-#define __vtkFastMarchingGeodesicPath_h
+#ifndef vtkFastMarchingGeodesicPath_h
+#define vtkFastMarchingGeodesicPath_h
 
 #include "vtkGeodesicPath.h"
 

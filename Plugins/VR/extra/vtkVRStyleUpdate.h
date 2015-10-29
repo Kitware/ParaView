@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __vtkVRStyleUpdate_h_
-#define __vtkVRStyleUpdate_h_
+#ifndef vtkVRStyleUpdate_h_
+#define vtkVRStyleUpdate_h_
 
 #include "vtkVRStyleTracking.h"
 
@@ -67,4 +67,4 @@ protected:
   vtkTransform *InitialInvertedPose;
 };
 
-#endif //__vtkVRStyleUpdate.h_
+#endif //vtkVRStyleUpdate.h_

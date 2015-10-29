@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
-#ifndef __pqVRPNEventListener_h
-#define __pqVRPNEventListener_h
+#ifndef pqVRPNEventListener_h
+#define pqVRPNEventListener_h
 
 #include <QtCore/QList>
 #include <QtCore/QMutex>

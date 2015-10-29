@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __LogBuffer_h
-#define __LogBuffer_h
+#ifndef LogBuffer_h
+#define LogBuffer_h
 
 #include <sstream> // for ostringstream
 

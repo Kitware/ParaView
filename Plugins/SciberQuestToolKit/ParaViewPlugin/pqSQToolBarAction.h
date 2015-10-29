@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqSQToolbarActions_h
-#define __pqSQToolbarActions_h
+#ifndef pqSQToolbarActions_h
+#define pqSQToolbarActions_h
 
 #include <QActionGroup>
 class pqSQToolbarActions : public QActionGroup

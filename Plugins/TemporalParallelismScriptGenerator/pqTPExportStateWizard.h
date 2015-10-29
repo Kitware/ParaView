@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqTPExportStateWizard_h
-#define __pqTPExportStateWizard_h
+#ifndef pqTPExportStateWizard_h
+#define pqTPExportStateWizard_h
 
 #include "pqSGExportStateWizard.h"
 

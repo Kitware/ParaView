@@ -6,8 +6,8 @@
 
 Copyright 2012 SciberQuest Inc.
 */
-#ifndef __Numerics_hxx
-#define __Numerics_hxx
+#ifndef Numerics_hxx
+#define Numerics_hxx
 
 #include<iostream>
 

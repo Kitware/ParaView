@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __vtkVRHeadTrackingStyle_h_
-#define __vtkVRHeadTrackingStyle_h_
+#ifndef vtkVRHeadTrackingStyle_h_
+#define vtkVRHeadTrackingStyle_h_
 
 #include "vtkVRInteractorStyle.h"
 
@@ -74,4 +74,4 @@ protected:
   bool IsFoundProxyProperty;
 };
 
-#endif //__vtkVRHeadTrackingStyle.h_
+#endif //vtkVRHeadTrackingStyle.h_

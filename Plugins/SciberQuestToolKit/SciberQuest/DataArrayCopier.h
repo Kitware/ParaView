@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __DataArrayCopier_h
-#define __DataArrayCopier_h
+#ifndef DataArrayCopier_h
+#define DataArrayCopier_h
 
 #include "IdBlock.h" // for IdBlock
 

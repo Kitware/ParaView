@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __CellIdIterator_h
-#define __CellIdIterator_h
+#ifndef CellIdIterator_h
+#define CellIdIterator_h
 
 #include <cstdlib> // for size_t
 

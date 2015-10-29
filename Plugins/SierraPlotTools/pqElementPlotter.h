@@ -20,8 +20,8 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
-#ifndef __pqElementPlotter_h
-#define __pqElementPlotter_h
+#ifndef pqElementPlotter_h
+#define pqElementPlotter_h
 
 #include "pqPlotter.h"
 
@@ -66,4 +66,4 @@ public:
   virtual QString getPlotterTextEditObjectName();
 };
 
-#endif // __pqElementPlotter_h
+#endif // pqElementPlotter_h

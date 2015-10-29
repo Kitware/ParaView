@@ -60,8 +60,8 @@ extern "C"
 #include <adios_error.h>
 }
 
-#ifndef __vtkAdiosInternals_v2_h
-#define __vtkAdiosInternals_v2_h
+#ifndef vtkAdiosInternals_v2_h
+#define vtkAdiosInternals_v2_h
 
 //*****************************************************************************
 class AdiosGlobal;   // Internal class used to handle adios initialization

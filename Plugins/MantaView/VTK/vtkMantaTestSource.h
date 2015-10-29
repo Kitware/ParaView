@@ -19,8 +19,8 @@
 // produced data is invariant with respect to the number of processors.
 // Configuration options change the charactersitics of the generated "scene"
 
-#ifndef __vtkMantaTestSource_h
-#define __vtkMantaTestSource_h
+#ifndef vtkMantaTestSource_h
+#define vtkMantaTestSource_h
 
 #include "vtkMantaModule.h"
 #include "vtkPolyDataAlgorithm.h"

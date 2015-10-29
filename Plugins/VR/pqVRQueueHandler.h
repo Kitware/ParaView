@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __vtkVRQueueHandler_h
-#define __vtkVRQueueHandler_h
+#ifndef vtkVRQueueHandler_h
+#define vtkVRQueueHandler_h
 
 #include <QtCore/QObject>
 #include <QtCore/QPointer>

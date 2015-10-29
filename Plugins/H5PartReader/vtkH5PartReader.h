@@ -41,8 +41,8 @@
 // CSCS - Swiss National Supercomputing Centre for creating and contributing
 // this class.
 
-#ifndef __vtkH5PartReader_h
-#define __vtkH5PartReader_h
+#ifndef vtkH5PartReader_h
+#define vtkH5PartReader_h
 
 #include "vtkPVConfig.h"     // For PARAVIEW_USE_MPI 
 #include "vtkPolyDataAlgorithm.h"

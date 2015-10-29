@@ -33,8 +33,8 @@
 // in the Multiply mode, the two colors are scaled to 0-1, multiplied, and rescaled to 0-255.
 // in the Add mode, the two components are simply added and clamped to 0-255.
 
-#ifndef __vtkTwoScalarsToColorsPainter_h__
-#define __vtkTwoScalarsToColorsPainter_h__
+#ifndef vtkTwoScalarsToColorsPainter_h
+#define vtkTwoScalarsToColorsPainter_h
 
 #include "vtkPointSpriteRenderingModule.h" //needed for exports
 #include "vtkOpenGLScalarsToColorsPainter.h"

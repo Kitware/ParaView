@@ -63,8 +63,8 @@
 // .SECTION Caveats
 
 
-#ifndef __vtkSQFieldTopologySplit_h
-#define __vtkSQFieldTopologySplit_h
+#ifndef vtkSQFieldTopologySplit_h
+#define vtkSQFieldTopologySplit_h
 
 #include "vtkSciberQuestModule.h" // for export macro
 #include "vtkDataSetAlgorithm.h"

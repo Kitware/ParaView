@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __pqSQMacros_h
-#define __pqSQMacros_h
+#ifndef pqSQMacros_h
+#define pqSQMacros_h
 
 #define pqSQErrorMacro(os,estr)                    \
     os                                             \

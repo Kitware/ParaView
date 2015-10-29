@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __StreamlineData_h
-#define __StreamlineData_h
+#ifndef StreamlineData_h
+#define StreamlineData_h
 
 #include "FieldTopologyMapData.h"
 

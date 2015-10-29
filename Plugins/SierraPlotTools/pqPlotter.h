@@ -20,8 +20,8 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
-#ifndef __pqPlotter_h
-#define __pqPlotter_h
+#ifndef pqPlotter_h
+#define pqPlotter_h
 
 #include <QList>
 #include <QMap>
@@ -125,4 +125,4 @@ protected:
 
 };
 
-#endif // __pqPlotter_h
+#endif // pqPlotter_h

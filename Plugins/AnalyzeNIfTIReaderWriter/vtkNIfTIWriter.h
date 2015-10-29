@@ -19,8 +19,8 @@
 // .SECTION See Also
 // vtkNIfTIReader vtkAnalayzeReader vtkAnalyzeWriter
 
-#ifndef __vtkNIfTIWriter_h
-#define __vtkNIfTIWriter_h
+#ifndef vtkNIfTIWriter_h
+#define vtkNIfTIWriter_h
 
 #include "vtkImageWriter.h"
 

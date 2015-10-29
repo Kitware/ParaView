@@ -20,8 +20,8 @@
 // own Manta side resources and that the engine itself will be destructed
 // when the wrapper is.
 
-#ifndef __vtkMantaManager_h
-#define __vtkMantaManager_h
+#ifndef vtkMantaManager_h
+#define vtkMantaManager_h
 
 #include "vtkObject.h"
 #include "vtkMantaModule.h"

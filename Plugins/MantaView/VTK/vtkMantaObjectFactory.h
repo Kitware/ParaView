@@ -61,8 +61,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // .NAME vtkMantaObjectFactory - 
 // .SECTION Description
 //
-#ifndef __vtkMantaObjectFactory_h
-#define __vtkMantaObjectFactory_h
+#ifndef vtkMantaObjectFactory_h
+#define vtkMantaObjectFactory_h
 
 #include "vtkMantaModule.h"
 #include "vtkObjectFactory.h"

@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __vtkVRGenericStyle_h_
-#define __vtkVRGenericStyle_h_
+#ifndef vtkVRGenericStyle_h_
+#define vtkVRGenericStyle_h_
 
 #include "vtkVRInteractorStyle.h"
 
@@ -68,4 +68,4 @@ protected:
 protected:
 };
 
-#endif //__vtkVRGenericStyle.h_
+#endif //vtkVRGenericStyle.h_

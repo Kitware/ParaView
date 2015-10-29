@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __CUDATupleIndex_h
-#define __CUDATupleIndex_h
+#ifndef CUDATupleIndex_h
+#define CUDATupleIndex_h
 
 #include "CartesianExtent.h" // for CartesianExtent
 #include "CUDAMemoryManager.hxx" // for CUDAMemoryManager

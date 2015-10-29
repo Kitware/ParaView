@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __pqSQTranslateDialog_h
-#define __pqSQTranslateDialog_h
+#ifndef pqSQTranslateDialog_h
+#define pqSQTranslateDialog_h
 
 // .NAME pqSQTranslateDialog - Dialog for entering translation
 

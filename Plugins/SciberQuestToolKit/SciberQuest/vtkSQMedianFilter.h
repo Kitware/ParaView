@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __vtkSQMedianFilter_h
-#define __vtkSQMedianFilter_h
+#ifndef vtkSQMedianFilter_h
+#define vtkSQMedianFilter_h
 
 #include "vtkSciberQuestModule.h" // for export macro
 #include "vtkDataSetAlgorithm.h"

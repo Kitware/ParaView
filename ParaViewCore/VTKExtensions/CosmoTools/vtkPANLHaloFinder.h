@@ -12,8 +12,8 @@
  PURPOSE.  See the above copyright notice for more information.
 
  =========================================================================*/
-#ifndef VTKPANLHALOFINDER_H
-#define VTKPANLHALOFINDER_H
+#ifndef vtkPANLHaloFinder_h
+#define vtkPANLHaloFinder_h
 
 // .NAME vtkPANLHaloFinder.h -- Compute halos (clusters of particles)
 //
@@ -34,7 +34,7 @@
 // finding is on, this output is similar to the second output except with data
 // for each subhalo rather than each halo.  It contains one point per subhalo.
 
-#include "vtkPVVTKExtensionsCosmoToolsModule.h"
+#include "vtkPVVTKExtensionsCosmoToolsModule.h" // For export macro
 #include "vtkUnstructuredGridAlgorithm.h"
 
 class vtkMultiProcessController;
@@ -248,6 +248,9 @@ protected:
   class vtkInternals;
   vtkInternals* Internal;
 private:
+  vtkPANLHaloFinder(const vtkPANLHaloFinder&); // Not implemented
+  void operator=(const vtkPANLHaloFinder&); // Not implemented
+
   void ExtractDataArrays(vtkUnstructuredGrid* input, vtkIdType offset);
   void DistributeInput();
   void CreateGhostParticles();
@@ -256,4 +259,4 @@ private:
   void FindCenters(vtkUnstructuredGrid* allParticles, vtkUnstructuredGrid* fofProperties);
 };
 
-#endif // VTKPANLHALOFINDER_H
+#endif // vtkPANLHaloFinder_h

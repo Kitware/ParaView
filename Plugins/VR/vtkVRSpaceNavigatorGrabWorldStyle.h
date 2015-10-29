@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __vtkVRSpaceNavigatorGrabWorldStyle_h_
-#define __vtkVRSpaceNavigatorGrabWorldStyle_h_
+#ifndef vtkVRSpaceNavigatorGrabWorldStyle_h_
+#define vtkVRSpaceNavigatorGrabWorldStyle_h_
 
 #include "vtkVRInteractorStyle.h"
 
@@ -60,4 +60,4 @@ private:
   void operator=(const vtkVRSpaceNavigatorGrabWorldStyle&); // Not implemented.
 };
 
-#endif //__vtkVRSpaceNavigatorGrabWorldStyle.h_
+#endif //vtkVRSpaceNavigatorGrabWorldStyle.h_

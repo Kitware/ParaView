@@ -17,8 +17,8 @@
 // vtkArrowGlyphFilter glyphs arrows using the independent variables
 // for radius and length
 
-#ifndef __vtkArrowGlyphFilter_h
-#define __vtkArrowGlyphFilter_h
+#ifndef vtkArrowGlyphFilter_h
+#define vtkArrowGlyphFilter_h
 
 #include "vtkSmartPointer.h"
 #include "vtkPolyDataAlgorithm.h"

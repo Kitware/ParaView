@@ -32,8 +32,8 @@
 // .SECTION See Also
 // vtkSQFieldTracer
 
-#ifndef __vtkSQBOVMetaReader_h
-#define __vtkSQBOVMetaReader_h
+#ifndef vtkSQBOVMetaReader_h
+#define vtkSQBOVMetaReader_h
 // #define vtkSQBOVReaderDEBUG
 
 #include "vtkSciberQuestModule.h" // for export macro

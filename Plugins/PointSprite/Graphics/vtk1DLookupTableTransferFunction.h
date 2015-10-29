@@ -29,8 +29,8 @@
 // .SECTION Description - 1D transfer function that uses a lookup table
 // to map the values.
 
-#ifndef __vtk1DLookupTableTransferFunction_h
-#define __vtk1DLookupTableTransferFunction_h
+#ifndef vtk1DLookupTableTransferFunction_h
+#define vtk1DLookupTableTransferFunction_h
 
 #include "vtkPointSpriteGraphicsModule.h" //needed for exports
 #include "vtk1DTransferFunction.h"

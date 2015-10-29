@@ -30,8 +30,8 @@
 // Combines vtkTexture and vtkImageSpriteSource. This makes it simple for
 // applications to create textures for point sprites.
 
-#ifndef __vtkSMSpriteTextureProxy_h
-#define __vtkSMSpriteTextureProxy_h
+#ifndef vtkSMSpriteTextureProxy_h
+#define vtkSMSpriteTextureProxy_h
 
 #include "vtkSMSourceProxy.h"
 

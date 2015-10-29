@@ -7,8 +7,8 @@
 Copyright 2012 SciberQuest Inc.
 
 */
-#ifndef __Tuple_h
-#define __Tuple_h
+#ifndef Tuple_h
+#define Tuple_h
 
 #include <vector>
 #include <iostream>

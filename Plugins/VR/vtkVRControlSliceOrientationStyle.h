@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __vtkVRControlSliceOrientationStyle_h
-#define __vtkVRControlSliceOrientationStyle_h
+#ifndef vtkVRControlSliceOrientationStyle_h
+#define vtkVRControlSliceOrientationStyle_h
 
 #include "vtkVRInteractorStyle.h"
 #include "vtkNew.h"

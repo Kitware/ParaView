@@ -6,8 +6,8 @@
 
 Copyright 2012 SciberQuest Inc.
 */
-#ifndef __PriorityQueue_h
-#define __PriorityQueue_h
+#ifndef PriorityQueue_h
+#define PriorityQueue_h
 
 #include "SQMacros.h"
 

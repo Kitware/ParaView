@@ -28,8 +28,8 @@
 // the flow.
 //
 
-#ifndef __vtkMomentGlyphs_h
-#define __vtkMomentGlyphs_h
+#ifndef vtkMomentGlyphs_h
+#define vtkMomentGlyphs_h
 
 #include "vtkPolyDataAlgorithm.h"
 
@@ -94,4 +94,4 @@ private:
   void operator=(const vtkMomentGlyphs &);          // Not implemented
 };
 
-#endif //__vtkMomentGlyphs_h
+#endif //vtkMomentGlyphs_h

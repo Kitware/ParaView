@@ -13,8 +13,8 @@
 
 =========================================================================*/
 
-#ifndef __vtkUncertaintySurfaceDefaultPainter_h
-#define __vtkUncertaintySurfaceDefaultPainter_h
+#ifndef vtkUncertaintySurfaceDefaultPainter_h
+#define vtkUncertaintySurfaceDefaultPainter_h
 
 #include "vtkDefaultPainter.h"
 
@@ -44,4 +44,4 @@ private:
   vtkUncertaintySurfacePainter* UncertaintySurfacePainter;
 };
 
-#endif // __vtkUncertaintySurfaceDefaultPainter_h
+#endif // vtkUncertaintySurfaceDefaultPainter_h

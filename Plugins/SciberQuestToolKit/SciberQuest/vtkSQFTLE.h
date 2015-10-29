@@ -35,8 +35,8 @@
 // .SECTION Caveats
 // .SECTION See Also
 
-#ifndef __vtkSQFTLE_h
-#define __vtkSQFTLE_h
+#ifndef vtkSQFTLE_h
+#define vtkSQFTLE_h
 
 #include "vtkSciberQuestModule.h" // for export macro
 #include "vtkDataSetAlgorithm.h"

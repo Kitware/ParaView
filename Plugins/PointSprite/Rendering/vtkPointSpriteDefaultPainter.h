@@ -30,8 +30,8 @@
 // The vtkPointSpriteDefaultPainter replaces the vtkScalarsToColorsPainter by a vtkTwoScalarsToColorsPainter
 // and add a vtkDepthSortPainter in the painter chain.
 
-#ifndef __vtkPointSpriteDefaultPainter_h__
-#define __vtkPointSpriteDefaultPainter_h__
+#ifndef vtkPointSpriteDefaultPainter_h
+#define vtkPointSpriteDefaultPainter_h
 
 #include "vtkPointSpriteRenderingModule.h" //needed for exports
 #include "vtkDefaultPainter.h"

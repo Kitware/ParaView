@@ -38,8 +38,8 @@
 //
 // .SECTION Thanks
 // This class was contributed by SciberQuest Inc.
-#ifndef __vtkSQHemisphereSourceConfigurationWriter_h
-#define __vtkSQHemisphereSourceConfigurationWriter_h
+#ifndef vtkSQHemisphereSourceConfigurationWriter_h
+#define vtkSQHemisphereSourceConfigurationWriter_h
 
 #include "vtkSMProxyConfigurationWriter.h"
 

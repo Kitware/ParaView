@@ -12,8 +12,8 @@
  PURPOSE.  See the above copyright notice for more information.
 
  =========================================================================*/
-#ifndef VTKPANLSUBHALOFINDER_H
-#define VTKPANLSUBHALOFINDER_H
+#ifndef vtkPANLSubhaloFinder_h
+#define vtkPANLSubhaloFinder_h
 
 // .NAME vtkPANLSubhaloFinder -- finds subhalos of requested halos
 //
@@ -184,6 +184,9 @@ protected:
   class vtkInternals;
   vtkInternals* Internal;
 private:
+  vtkPANLSubhaloFinder(const vtkPANLSubhaloFinder&); // Not implemented
+  void operator=(const vtkPANLSubhaloFinder&); // Not implemented
+
   void ExecuteSubHaloFinder(vtkUnstructuredGrid* input,
                             vtkUnstructuredGrid* allParticles,
                             vtkUnstructuredGrid* subFofProperties);

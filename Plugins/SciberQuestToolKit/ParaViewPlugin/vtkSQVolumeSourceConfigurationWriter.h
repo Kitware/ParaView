@@ -38,8 +38,8 @@
 //
 // .SECTION Thanks
 // This class was contributed by SciberQuest Inc.
-#ifndef __vtkSQVolumeSourceConfigurationWriter_h
-#define __vtkSQVolumeSourceConfigurationWriter_h
+#ifndef vtkSQVolumeSourceConfigurationWriter_h
+#define vtkSQVolumeSourceConfigurationWriter_h
 
 #include "vtkSMProxyConfigurationWriter.h"
 

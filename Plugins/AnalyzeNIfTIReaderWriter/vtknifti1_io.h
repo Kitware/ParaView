@@ -42,8 +42,8 @@
 // .SECTION See Also
 // 
 
-#ifndef __vtknifti1_io_h
-#define __vtknifti1_io_h
+#ifndef vtknifti1_io_h
+#define vtknifti1_io_h
 
 #include "vtkObject.h"
 

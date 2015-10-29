@@ -1,5 +1,5 @@
-#ifndef __H5BLOCKERRORS_H
-#define __H5BLOCKERRORS_H
+#ifndef H5BlockErrors_h
+#define H5BlockErrors_h
 
 #define _err_handler H5PartGetErrorHandler()
 

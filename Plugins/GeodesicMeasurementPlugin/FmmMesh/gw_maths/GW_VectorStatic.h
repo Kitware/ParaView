@@ -6,8 +6,8 @@
  */
 /*------------------------------------------------------------------------------*/
 
-#ifndef __GW_VectorStatic_h_
-#define __GW_VectorStatic_h_
+#ifndef GW_VectorStatic_h
+#define GW_VectorStatic_h
 
 #include "GW_MathsConfig.h"
 #include <string.h>
@@ -493,7 +493,7 @@ std::ostream& operator<<(std::ostream &s, GW_VectorStatic<v_size,v_type> &v)
 GW_END_NAMESPACE
 
 
-#endif // __GW_VectorStatic_h_
+#endif // GW_VectorStatic_h
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) Gabriel Peyré

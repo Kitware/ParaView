@@ -41,8 +41,8 @@ Ph.D. thesis of Christian BOUCHENY.
 // that uses an image-processing render pass for processing the image
 // before rendering it on the screen.
 
-#ifndef __vtkPVRenderViewWithEDL_h
-#define __vtkPVRenderViewWithEDL_h
+#ifndef vtkPVRenderViewWithEDL_h
+#define vtkPVRenderViewWithEDL_h
 
 #include "vtkPVRenderView.h"
 

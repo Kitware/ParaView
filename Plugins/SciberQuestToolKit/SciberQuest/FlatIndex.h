@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __FlatIndex_h
-#define __FlatIndex_h
+#ifndef FlatIndex_h
+#define FlatIndex_h
 #include <cstdlib> // for size_t
 
 class CartesianExtent;

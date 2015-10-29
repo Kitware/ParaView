@@ -29,8 +29,8 @@
 // scalar representation to the vector representation.
 //
 
-#ifndef __vtkMomentVectors_h
-#define __vtkMomentVectors_h
+#ifndef vtkMomentVectors_h
+#define vtkMomentVectors_h
 
 #include "vtkDataSetAlgorithm.h"
 
@@ -96,4 +96,4 @@ private:
   void operator=(const vtkMomentVectors &);         // Not implemented
 };
 
-#endif //__vtkMomentVectors_h
+#endif //vtkMomentVectors_h

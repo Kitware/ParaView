@@ -63,8 +63,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // vtkMantaActor is a concrete implementation of the abstract class vtkActor.
 // vtkMantaActor interfaces to the Manta Raytracer library.
 
-#ifndef __vtkMantaActor_h
-#define __vtkMantaActor_h
+#ifndef vtkMantaActor_h
+#define vtkMantaActor_h
 
 #include "vtkMantaModule.h"
 #include "vtkActor.h"

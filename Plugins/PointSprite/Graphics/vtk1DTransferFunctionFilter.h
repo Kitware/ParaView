@@ -34,8 +34,8 @@
 // The output array will have the same association as the input array : point data
 // will be mapped to point data, cell data to cell data...
 
-#ifndef vtk1DTransferFunctionFilter_H_
-#define vtk1DTransferFunctionFilter_H_
+#ifndef vtk1DTransferFunctionFilter_h
+#define vtk1DTransferFunctionFilter_h
 
 #include "vtkPointSpriteGraphicsModule.h" //needed for exports
 #include "vtkPassInputTypeAlgorithm.h"
@@ -128,4 +128,4 @@ private:
   void operator=(const vtk1DTransferFunctionFilter&); // Not implemented.
 };
 
-#endif /* vtk1DTransferFunctionFilter_H_ */
+#endif /* vtk1DTransferFunctionFilter_h */

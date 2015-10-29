@@ -32,8 +32,8 @@
 // Given a threshold value and an array replace entries below the threshold
 // with a low value and entries above the partition with a high value.
 
-#ifndef __vtkSQBinaryThreshold_h
-#define __vtkSQBinaryThreshold_h
+#ifndef vtkSQBinaryThreshold_h
+#define vtkSQBinaryThreshold_h
 
 #include "vtkSciberQuestModule.h" // for export macro
 #include "vtkDataSetAlgorithm.h"

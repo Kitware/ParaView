@@ -32,8 +32,8 @@
 // set.
 //
 
-#ifndef __vtkTemporalRanges_h
-#define __vtkTemporalRanges_h
+#ifndef vtkTemporalRanges_h
+#define vtkTemporalRanges_h
 
 #include "vtkTableAlgorithm.h"
 
@@ -98,4 +98,4 @@ private:
   void operator=(const vtkTemporalRanges &);    // Not implemented
 };
 
-#endif //__vtkTemporalRanges_h
+#endif //vtkTemporalRanges_h

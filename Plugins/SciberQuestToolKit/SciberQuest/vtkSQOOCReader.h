@@ -27,8 +27,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __vtkSQOOCReader_h
-#define __vtkSQOOCReader_h
+#ifndef vtkSQOOCReader_h
+#define vtkSQOOCReader_h
 
 #include "vtkSciberQuestModule.h" // for export macro
 #include "vtkObject.h"

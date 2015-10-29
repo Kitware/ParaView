@@ -28,8 +28,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __CUDAConvolutionDriver_h
-#define __CUDAConvolutionDriver_h
+#ifndef CUDAConvolutionDriver_h
+#define CUDAConvolutionDriver_h
 
 #include "vtkSciberQuestModule.h" // for export
 #include <algorithm> // for min
