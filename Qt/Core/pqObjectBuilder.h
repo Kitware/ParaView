@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqObjectBuilder_h
-#define __pqObjectBuilder_h
+#ifndef pqObjectBuilder_h
+#define pqObjectBuilder_h
 
 #include <QObject>
 #include "pqCoreModule.h"

@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqPolyLineWidget_h 
-#define __pqPolyLineWidget_h
+#ifndef pqPolyLineWidget_h
+#define pqPolyLineWidget_h
 
 #include "pq3DWidget.h"
 #include <QColor>

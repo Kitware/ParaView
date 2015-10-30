@@ -23,8 +23,8 @@
 // .SECTION See Also
 // vtkPVInteractorStyle
 
-#ifndef __vtkCameraManipulatorGUIHelper_h
-#define __vtkCameraManipulatorGUIHelper_h
+#ifndef vtkCameraManipulatorGUIHelper_h
+#define vtkCameraManipulatorGUIHelper_h
 
 #include "vtkObject.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

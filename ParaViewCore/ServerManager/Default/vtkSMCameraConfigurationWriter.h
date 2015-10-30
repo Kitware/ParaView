@@ -23,8 +23,8 @@
 //
 // .SECTION Thanks
 // This class was contributed by SciberQuest Inc.
-#ifndef __vtkSMCameraConfigurationWriter_h
-#define __vtkSMCameraConfigurationWriter_h
+#ifndef vtkSMCameraConfigurationWriter_h
+#define vtkSMCameraConfigurationWriter_h
 
 #include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMProxyConfigurationWriter.h"

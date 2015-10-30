@@ -14,8 +14,8 @@
 =========================================================================*/
 // Simply provided for backwards compatibility. Use vtkCPProcessor instead.
 
-#ifndef __vtkCPPythonProcessor_h
-#define __vtkCPPythonProcessor_h
+#ifndef vtkCPPythonProcessor_h
+#define vtkCPPythonProcessor_h
 
 #warning Please use vtkCPProcessor directly. vtkCPPythonProcessor is \
          no longer available/needed.

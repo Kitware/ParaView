@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqCalculatorWidget_h
-#define __pqCalculatorWidget_h
+#ifndef pqCalculatorWidget_h
+#define pqCalculatorWidget_h
 
 #include "pqPropertyWidget.h"
 

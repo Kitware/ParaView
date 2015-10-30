@@ -20,8 +20,8 @@
 // Basically, we expose the state management API of RemoteObject to handle
 // registration and unregistration of proxies.
 
-#ifndef __vtkSMPipelineState_h
-#define __vtkSMPipelineState_h
+#ifndef vtkSMPipelineState_h
+#define vtkSMPipelineState_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMRemoteObject.h"
@@ -71,4 +71,4 @@ private:
 //ETX
 };
 
-#endif // #ifndef __vtkSMPipelineState_h
+#endif // #ifndef vtkSMPipelineState_h

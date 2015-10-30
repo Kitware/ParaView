@@ -22,8 +22,8 @@
 // Like all animation proxies, this is a client side only proxy with no
 // VTK objects created on the server side.
 
-#ifndef __vtkPVCameraCueManipulator_h
-#define __vtkPVCameraCueManipulator_h
+#ifndef vtkPVCameraCueManipulator_h
+#define vtkPVCameraCueManipulator_h
 
 #include "vtkPVAnimationModule.h" //needed for exports
 #include "vtkPVKeyFrameCueManipulator.h"

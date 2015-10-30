@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqDistanceWidget_h 
-#define __pqDistanceWidget_h
+#ifndef pqDistanceWidget_h
+#define pqDistanceWidget_h
 
 #include "pqLineWidget.h"
 #include "pqComponentsModule.h"

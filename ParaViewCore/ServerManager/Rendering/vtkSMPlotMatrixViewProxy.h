@@ -14,8 +14,8 @@ PURPOSE.  See the above copyright notice for more information.
 =========================================================================*/
 // .NAME vtkSMPlotMatrixViewProxy - Proxy class for plot matrix view
 
-#ifndef __vtkSMPlotMatrixViewProxy_h
-#define __vtkSMPlotMatrixViewProxy_h
+#ifndef vtkSMPlotMatrixViewProxy_h
+#define vtkSMPlotMatrixViewProxy_h
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMContextViewProxy.h"

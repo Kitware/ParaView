@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqLiveInsituVisualizationManager_h 
-#define __pqLiveInsituVisualizationManager_h
+#ifndef pqLiveInsituVisualizationManager_h
+#define pqLiveInsituVisualizationManager_h
 
 #include <QObject>
 #include "pqComponentsModule.h"

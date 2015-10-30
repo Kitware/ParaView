@@ -1204,15 +1204,15 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css)
 
 #define CSS_ARGUMENT_BEGIN() \
   {\
-  int __vtk__css_argument_int_counter = 0
+  int _vtk__css_argument_int_counter = 0
 
 #define CSS_GET_NEXT_ARGUMENT(css, msg, var)\
-  css->GetArgument(msg, __vtk__css_argument_int_counter++, var)
+  css->GetArgument(msg, _vtk__css_argument_int_counter++, var)
 
 #define CSS_GET_NEXT_ARGUMENT2(css, msg, var, len)\
-  css->GetArgument(msg, __vtk__css_argument_int_counter++, var, len)
+  css->GetArgument(msg, _vtk__css_argument_int_counter++, var, len)
 
-#define CSS_GET_CUR_INDEX() __vtk__css_argument_int_counter
+#define CSS_GET_CUR_INDEX() _vtk__css_argument_int_counter
 
 #define CSS_ARGUMENT_END() \
   }

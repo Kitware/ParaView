@@ -13,8 +13,8 @@
 
 =========================================================================*/
 
-#ifndef __vtkPVGUIPluginInterface_h
-#define __vtkPVGUIPluginInterface_h
+#ifndef vtkPVGUIPluginInterface_h
+#define vtkPVGUIPluginInterface_h
 
 #include <QObjectList> // For the list of interfaces
 #include "pqCoreModule.h" // For export macro

@@ -18,8 +18,8 @@
 // vtkPVDefaultPass is a simple render pass that encapsulates the traditional
 // OpenGL pipeline (minus the camera).
 
-#ifndef __vtkPVDefaultPass_h
-#define __vtkPVDefaultPass_h
+#ifndef vtkPVDefaultPass_h
+#define vtkPVDefaultPass_h
 
 #include "vtkRenderPass.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

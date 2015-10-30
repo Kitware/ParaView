@@ -18,8 +18,8 @@
 // vtkSMRenderViewProxy is a 3D view consisting for a render window and two
 // renderers: 1 for 3D geometry and 1 for overlayed 2D geometry.
 
-#ifndef __vtkSMRenderViewProxy_h
-#define __vtkSMRenderViewProxy_h
+#ifndef vtkSMRenderViewProxy_h
+#define vtkSMRenderViewProxy_h
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMViewProxy.h"

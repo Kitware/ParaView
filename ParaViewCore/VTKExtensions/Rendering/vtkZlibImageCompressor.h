@@ -23,8 +23,8 @@
 // .SECTION Thanks
 // SciberQuest Inc. contributed this class.
 
-#ifndef __vtkZlibImageCompressor_h
-#define __vtkZlibImageCompressor_h
+#ifndef vtkZlibImageCompressor_h
+#define vtkZlibImageCompressor_h
 
 #include "vtkImageCompressor.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

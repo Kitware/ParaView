@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqStreamingTestingEventPlayer_h
-#define __pqStreamingTestingEventPlayer_h
+#ifndef pqStreamingTestingEventPlayer_h
+#define pqStreamingTestingEventPlayer_h
 
 #include "pqWidgetEventPlayer.h"
 #include "pqApplicationComponentsModule.h"

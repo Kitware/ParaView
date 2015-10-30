@@ -16,8 +16,8 @@
 // .SECTION Description
 // SIProperty that deals with TimeRange on Algorithm object type
 
-#ifndef __vtkSITimeStepsProperty_h
-#define __vtkSITimeStepsProperty_h
+#ifndef vtkSITimeStepsProperty_h
+#define vtkSITimeStepsProperty_h
 
 #include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIProperty.h"

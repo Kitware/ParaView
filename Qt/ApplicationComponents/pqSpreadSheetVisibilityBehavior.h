@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqSpreadSheetVisibilityBehavior_h 
-#define __pqSpreadSheetVisibilityBehavior_h
+#ifndef pqSpreadSheetVisibilityBehavior_h
+#define pqSpreadSheetVisibilityBehavior_h
 
 #include <QObject>
 #include "pqApplicationComponentsModule.h"

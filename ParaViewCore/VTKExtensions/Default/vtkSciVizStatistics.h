@@ -31,8 +31,8 @@
 // Thanks to David Thompson and Philippe Pebay from Sandia National Laboratories 
 // for implementing this class. Updated by Philippe Pebay, Kitware SAS 2012
 
-#ifndef __vtkSciVizStatistics_h
-#define __vtkSciVizStatistics_h
+#ifndef vtkSciVizStatistics_h
+#define vtkSciVizStatistics_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkTableAlgorithm.h"
@@ -177,4 +177,4 @@ private:
   void operator = ( const vtkSciVizStatistics& ); // Not implemented.
 };
 
-#endif // __vtkSciVizStatistics_h
+#endif // vtkSciVizStatistics_h

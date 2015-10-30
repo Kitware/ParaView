@@ -17,8 +17,8 @@
 // Data type to represent a node in a multiprocess job
 // and its current loading state.
 
-#ifndef __vtkMaterialInterfaceProcessLoading_h
-#define __vtkMaterialInterfaceProcessLoading_h
+#ifndef vtkMaterialInterfaceProcessLoading_h
+#define vtkMaterialInterfaceProcessLoading_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 

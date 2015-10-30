@@ -17,8 +17,8 @@
 // This class contains several static methods that help with the
 // complicated selection task.
 
-#ifndef __vtkSMSelectionHelper_h
-#define __vtkSMSelectionHelper_h
+#ifndef vtkSMSelectionHelper_h
+#define vtkSMSelectionHelper_h
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMObject.h"

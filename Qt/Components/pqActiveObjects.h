@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqActiveObjects_h 
-#define __pqActiveObjects_h
+#ifndef pqActiveObjects_h
+#define pqActiveObjects_h
 
 #include <QObject>
 #include <QPointer>

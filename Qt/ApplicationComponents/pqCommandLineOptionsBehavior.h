@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqCommandLineOptionsBehavior_h 
-#define __pqCommandLineOptionsBehavior_h
+#ifndef pqCommandLineOptionsBehavior_h
+#define pqCommandLineOptionsBehavior_h
 
 #include <QObject>
 #include "pqApplicationComponentsModule.h"

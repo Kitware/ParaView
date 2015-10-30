@@ -18,8 +18,8 @@
 // manipulate the camera, the viewpoint of the scene.
 // Moving the mouse down zooms in. Up zooms out.
 
-#ifndef __vtkPVTrackballZoom_h
-#define __vtkPVTrackballZoom_h
+#ifndef vtkPVTrackballZoom_h
+#define vtkPVTrackballZoom_h
 
 #include "vtkCameraManipulator.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

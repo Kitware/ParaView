@@ -18,11 +18,11 @@
 // vtkSMDoubleRangeDomain is a type-specific specialization for
 // vtkSMRangeDomainTemplate.
 
-#ifndef __vtkSMDoubleRangeDomain_h
-#define __vtkSMDoubleRangeDomain_h
+#ifndef vtkSMDoubleRangeDomain_h
+#define vtkSMDoubleRangeDomain_h
 
 // Tell the template header how to give our superclass a DLL interface.
-#if !defined(__vtkSMDoubleRangeDomain_cxx)
+#if !defined(vtkSMDoubleRangeDomain_cxx)
 # define VTK_DATA_ARRAY_TEMPLATE_TYPE double
 #endif
 
@@ -85,7 +85,7 @@ private:
   typedef vtkSMRangeDomainTemplate<double> RealSuperclass;
 };
 
-#if !defined(__vtkSMDoubleRangeDomain_cxx)
+#if !defined(vtkSMDoubleRangeDomain_cxx)
 # undef VTK_DATA_ARRAY_TEMPLATE_TYPE
 #endif
 

@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqCameraManipulatorWidget_h
-#define __pqCameraManipulatorWidget_h
+#ifndef pqCameraManipulatorWidget_h
+#define pqCameraManipulatorWidget_h
 
 
 #include "pqApplicationComponentsModule.h"

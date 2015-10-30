@@ -20,8 +20,8 @@
 // specified inside the XML definition of the property with the attribute
 // argument_type=[VTK, SMProxy, SIProxy].
 
-#ifndef __vtkSIProxyProperty_h
-#define __vtkSIProxyProperty_h
+#ifndef vtkSIProxyProperty_h
+#define vtkSIProxyProperty_h
 
 #include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIProperty.h"

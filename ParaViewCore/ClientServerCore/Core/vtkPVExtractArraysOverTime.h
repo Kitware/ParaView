@@ -22,8 +22,8 @@
 // vtkExtractArraysOverTime
 // vtkPExtractArraysOverTime
 
-#ifndef __vtkPVExtractArraysOverTime_h
-#define __vtkPVExtractArraysOverTime_h
+#ifndef vtkPVExtractArraysOverTime_h
+#define vtkPVExtractArraysOverTime_h
 
 #include "vtkPVClientServerCoreCoreModule.h" // For export macro
 #include "vtkPExtractArraysOverTime.h"
@@ -44,4 +44,4 @@ private:
   void operator=(const vtkPVExtractArraysOverTime&);  // Not implemented.
 };
 
-#endif // __vtkPVExtractArraysOverTime_h
+#endif // vtkPVExtractArraysOverTime_h

@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqUndoRedoBehavior_h 
-#define __pqUndoRedoBehavior_h
+#ifndef pqUndoRedoBehavior_h
+#define pqUndoRedoBehavior_h
 
 #include <QObject>
 #include "pqApplicationComponentsModule.h"

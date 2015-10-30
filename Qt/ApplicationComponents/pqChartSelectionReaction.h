@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqChartSelectionReaction_h 
-#define __pqChartSelectionReaction_h
+#ifndef pqChartSelectionReaction_h
+#define pqChartSelectionReaction_h
 
 #include "pqSelectionReaction.h"
 #include <QPointer> // needed for QPointer.

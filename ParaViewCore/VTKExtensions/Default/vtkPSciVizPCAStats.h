@@ -40,8 +40,8 @@
 // column labeled "Mean") and the eigenvectors (as row vectors) in an
 // additional NxN matrix.
 
-#ifndef __vtkPSciVizPCAStats_h
-#define __vtkPSciVizPCAStats_h
+#ifndef vtkPSciVizPCAStats_h
+#define vtkPSciVizPCAStats_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkSciVizStatistics.h"
@@ -87,4 +87,4 @@ private:
   void operator = ( const vtkPSciVizPCAStats& ); // Not implemented.
 };
 
-#endif // __vtkPSciVizPCAStats_h
+#endif // vtkPSciVizPCAStats_h

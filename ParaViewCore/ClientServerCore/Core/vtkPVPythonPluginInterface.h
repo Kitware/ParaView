@@ -17,8 +17,8 @@
 // vtkPVPythonPluginInterface defines the interface required by ParaView plugins
 // that add python modules to ParaView.
 
-#ifndef __vtkPVPythonPluginInterface_h
-#define __vtkPVPythonPluginInterface_h
+#ifndef vtkPVPythonPluginInterface_h
+#define vtkPVPythonPluginInterface_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"

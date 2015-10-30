@@ -23,8 +23,8 @@
 //#define vtkAMRDualContourDEBUG
 //#define vtkAMRDualContourPROFILE
 
-#ifndef __vtkAMRDualContour_h
-#define __vtkAMRDualContour_h
+#ifndef vtkAMRDualContour_h
+#define vtkAMRDualContour_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"

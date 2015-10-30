@@ -16,8 +16,8 @@
 // Meta class for slice filter that will allow the user to switch between
 // a regular cutter filter or an extract cell by region filter.
 
-#ifndef __vtkPVMetaSliceDataSet_h
-#define __vtkPVMetaSliceDataSet_h
+#ifndef vtkPVMetaSliceDataSet_h
+#define vtkPVMetaSliceDataSet_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPVDataSetAlgorithmSelectorFilter.h"

@@ -13,8 +13,8 @@
 
 =========================================================================*/
 
-#ifndef __vtkExtractScatterPlot_h
-#define __vtkExtractScatterPlot_h
+#ifndef vtkExtractScatterPlot_h
+#define vtkExtractScatterPlot_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPolyDataAlgorithm.h"

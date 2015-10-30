@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqEditColorMapReaction_h 
-#define __pqEditColorMapReaction_h
+#ifndef pqEditColorMapReaction_h
+#define pqEditColorMapReaction_h
 
 #include "pqReaction.h"
 

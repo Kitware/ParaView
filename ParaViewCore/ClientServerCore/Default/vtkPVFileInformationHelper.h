@@ -22,8 +22,8 @@
 // One creates a server side representation of vtkPVFileInformationHelper and
 // sets attributes on it, then requests a gather information on the helper object.
 
-#ifndef __vtkPVFileInformationHelper_h
-#define __vtkPVFileInformationHelper_h
+#ifndef vtkPVFileInformationHelper_h
+#define vtkPVFileInformationHelper_h
 
 #include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
 #include "vtkObject.h"

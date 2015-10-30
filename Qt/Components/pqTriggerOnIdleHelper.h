@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqTriggerOnIdleHelper_h 
-#define __pqTriggerOnIdleHelper_h
+#ifndef pqTriggerOnIdleHelper_h
+#define pqTriggerOnIdleHelper_h
 
 #include <QObject>
 #include <QPointer>

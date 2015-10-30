@@ -18,8 +18,8 @@
 // support for rendering back and front faces separately (with different
 // visibility and properties).
 
-#ifndef __vtkGeometryRepresentationWithFaces_h
-#define __vtkGeometryRepresentationWithFaces_h
+#ifndef vtkGeometryRepresentationWithFaces_h
+#define vtkGeometryRepresentationWithFaces_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkGeometryRepresentation.h"

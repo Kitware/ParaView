@@ -24,8 +24,8 @@
 // Get polygons only works for poly data and it does not work propelry for the
 // triangle strips.
 
-#ifndef __vtkPVDataInformation_h
-#define __vtkPVDataInformation_h
+#ifndef vtkPVDataInformation_h
+#define vtkPVDataInformation_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"

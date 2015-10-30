@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqExodusIIVariableSelectionWidget_h
-#define __pqExodusIIVariableSelectionWidget_h
+#ifndef pqExodusIIVariableSelectionWidget_h
+#define pqExodusIIVariableSelectionWidget_h
 
 #include "pqTreeWidget.h"
 #include "pqComponentsModule.h"

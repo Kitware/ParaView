@@ -18,8 +18,8 @@
 // May want to remove GetHighestFieldOrder as it is just a place holder 
 // for now.
 
-#ifndef __vtkCPBaseFieldBuilder_h
-#define __vtkCPBaseFieldBuilder_h
+#ifndef vtkCPBaseFieldBuilder_h
+#define vtkCPBaseFieldBuilder_h
 
 #include "vtkObject.h"
 #include "vtkPVCatalystTestDriverModule.h" // needed for export macros

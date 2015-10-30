@@ -61,8 +61,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // .NAME vtkACosmoReader - Adaptively read a binary cosmology data file
 //
 
-#ifndef __vtkACosmoReader_h
-#define __vtkACosmoReader_h
+#ifndef vtkACosmoReader_h
+#define vtkACosmoReader_h
 
 #include "vtkMultiBlockDataSetAlgorithm.h" // Base class
 #include "vtkPVVTKExtensionsCosmoToolsModule.h" // For export macro

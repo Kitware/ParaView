@@ -26,8 +26,8 @@
 // CompositeDataSet as input.
 //
 
-#ifndef __vtkMergeCompositeDataSet_h
-#define __vtkMergeCompositeDataSet_h
+#ifndef vtkMergeCompositeDataSet_h
+#define vtkMergeCompositeDataSet_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkVertexGlyphFilter.h"
@@ -52,4 +52,4 @@ private:
   void operator=(const vtkMergeCompositeDataSet &);    // Not implemented
 };
 
-#endif //__vtkMergeCompositeDataSet_h
+#endif //vtkMergeCompositeDataSet_h

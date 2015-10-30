@@ -16,8 +16,8 @@
 // .SECTION Description
 // SIProperty that deals with SIL data extraction to get the property value
 
-#ifndef __vtkSISILProperty_h
-#define __vtkSISILProperty_h
+#ifndef vtkSISILProperty_h
+#define vtkSISILProperty_h
 
 #include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIProperty.h"

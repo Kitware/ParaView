@@ -13,8 +13,8 @@
 
 =========================================================================*/
 // THIS IS A GENERATED FILE -- DO NOT EDIT ---
-#ifndef __vtkPVInitializer_h
-#define __vtkPVInitializer_h
+#ifndef vtkPVInitializer_h
+#define vtkPVInitializer_h
 #include "vtkPVConfig.h"
 #include "vtkSMGeneratedModules.h" // vtkPVConfig must be included before this
                                    // file.

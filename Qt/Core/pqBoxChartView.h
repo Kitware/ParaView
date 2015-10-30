@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqBoxChartView_h
-#define __pqBoxChartView_h
+#ifndef pqBoxChartView_h
+#define pqBoxChartView_h
 
 #include "pqContextView.h"
 

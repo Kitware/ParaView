@@ -25,8 +25,8 @@
 // The addition of a transformation matrix was supported by CEA/DIF 
 // Commissariat a l'Energie Atomique, Centre DAM Ile-De-France, Arpajon, France.
 
-#ifndef __vtkDataLabelRepresentation_h
-#define __vtkDataLabelRepresentation_h
+#ifndef vtkDataLabelRepresentation_h
+#define vtkDataLabelRepresentation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer.

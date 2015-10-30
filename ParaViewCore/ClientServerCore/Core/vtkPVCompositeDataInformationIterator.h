@@ -18,8 +18,8 @@
 // vtkPVCompositeDataInformationIterator is an iterator used to iterate over
 // data information for a composite data set.
 
-#ifndef __vtkPVCompositeDataInformationIterator_h
-#define __vtkPVCompositeDataInformationIterator_h
+#ifndef vtkPVCompositeDataInformationIterator_h
+#define vtkPVCompositeDataInformationIterator_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"

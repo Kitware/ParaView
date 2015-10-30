@@ -16,8 +16,8 @@
 // .SECTION Description
 // vtkSMSession is the default ParaView session. This class can be used as the
 // session for non-client-server configurations eg. builtin mode or batch.
-#ifndef __vtkSMSession_h
-#define __vtkSMSession_h
+#ifndef vtkSMSession_h
+#define vtkSMSession_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkPVSessionBase.h"

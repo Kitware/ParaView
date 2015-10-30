@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqCrashRecoveryBehavior_h 
-#define __pqCrashRecoveryBehavior_h
+#ifndef pqCrashRecoveryBehavior_h
+#define pqCrashRecoveryBehavior_h
 
 #include <QObject>
 #include <QTimer>

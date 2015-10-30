@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqContextView_h
-#define __pqContextView_h
+#ifndef pqContextView_h
+#define pqContextView_h
 
 #include "pqView.h"
 #include "vtkType.h"

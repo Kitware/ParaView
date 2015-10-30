@@ -16,8 +16,8 @@
 // .SECTION Description
 // vtkSMDomainIterator iterates over the domains of a property.
 
-#ifndef __vtkSMDomainIterator_h
-#define __vtkSMDomainIterator_h
+#ifndef vtkSMDomainIterator_h
+#define vtkSMDomainIterator_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"

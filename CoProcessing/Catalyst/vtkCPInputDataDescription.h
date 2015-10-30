@@ -12,8 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __vtkCPInputDataDescription_h
-#define __vtkCPInputDataDescription_h
+#ifndef vtkCPInputDataDescription_h
+#define vtkCPInputDataDescription_h
 
 class vtkDataObject;
 class vtkDataSet;

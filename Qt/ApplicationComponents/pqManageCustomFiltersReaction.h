@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqManageCustomFiltersReaction_h 
-#define __pqManageCustomFiltersReaction_h
+#ifndef pqManageCustomFiltersReaction_h
+#define pqManageCustomFiltersReaction_h
 
 #include "pqMasterOnlyReaction.h"
 

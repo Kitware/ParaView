@@ -16,8 +16,8 @@
 // .SECTION Description
 //
 
-#ifndef __vtkVisibleLinesPolyDataMapper_h
-#define __vtkVisibleLinesPolyDataMapper_h
+#ifndef vtkVisibleLinesPolyDataMapper_h
+#define vtkVisibleLinesPolyDataMapper_h
 
 #include "vtkPainterPolyDataMapper.h"
 

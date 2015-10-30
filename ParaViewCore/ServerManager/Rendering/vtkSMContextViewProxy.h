@@ -17,8 +17,8 @@
 // vtkSMContextViewProxy is an abstract base class for all vtkContextView
 // subclasses.
 
-#ifndef __vtkSMContextViewProxy_h
-#define __vtkSMContextViewProxy_h
+#ifndef vtkSMContextViewProxy_h
+#define vtkSMContextViewProxy_h
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMViewProxy.h"

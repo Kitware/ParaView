@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqProxySelection_h
-#define __pqProxySelection_h
+#ifndef pqProxySelection_h
+#define pqProxySelection_h
 
 #include <QSet>
 #include "pqCoreModule.h"

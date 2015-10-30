@@ -20,8 +20,8 @@
 // concept of a resolution level with 0 being the lowest resolution and the
 // resolution increases as the level number increases.
 
-#ifndef __vtkPMultiResolutionGenericIOReader_h
-#define __vtkPMultiResolutionGenericIOReader_h
+#ifndef vtkPMultiResolutionGenericIOReader_h
+#define vtkPMultiResolutionGenericIOReader_h
 
 #include "vtkPVVTKExtensionsCosmoToolsModule.h" // For export macro
 #include "vtkMultiBlockDataSetAlgorithm.h"

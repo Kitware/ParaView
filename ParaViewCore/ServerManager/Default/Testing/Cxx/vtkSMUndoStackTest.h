@@ -13,8 +13,8 @@ PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 
-#ifndef __vtkSMUndoStackTest_h
-#define __vtkSMUndoStackTest_h
+#ifndef vtkSMUndoStackTest_h
+#define vtkSMUndoStackTest_h
 
 #include <QtTest>
 

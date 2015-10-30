@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqOpacityTableModel_h
-#define __pqOpacityTableModel_h
+#ifndef pqOpacityTableModel_h
+#define pqOpacityTableModel_h
 
 #include <QAbstractTableModel>
 

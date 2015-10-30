@@ -22,8 +22,8 @@
 // vtkHandleRepresentation vtkHandleWidget
 
 
-#ifndef __vtkPointHandleRepresentationSphere_h
-#define __vtkPointHandleRepresentationSphere_h
+#ifndef vtkPointHandleRepresentationSphere_h
+#define vtkPointHandleRepresentationSphere_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkHandleRepresentation.h"

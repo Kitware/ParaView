@@ -18,8 +18,8 @@
 // is the base class of deserialization classes that load XMLs to restore
 // servermanager state (or part thereof).
 
-#ifndef __vtkSMDeserializerXML_h
-#define __vtkSMDeserializerXML_h
+#ifndef vtkSMDeserializerXML_h
+#define vtkSMDeserializerXML_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDeserializer.h"

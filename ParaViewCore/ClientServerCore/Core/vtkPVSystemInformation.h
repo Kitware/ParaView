@@ -20,8 +20,8 @@
 // from all processes involved. Implementation uses vtksys::SystemInformation to
 // obtain the relevant information for each of the processes.
 
-#ifndef __vtkPVSystemInformation_h
-#define __vtkPVSystemInformation_h
+#ifndef vtkPVSystemInformation_h
+#define vtkPVSystemInformation_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkProcessModule.h" // needed for vtkProcessModule::ProcessTypes

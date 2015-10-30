@@ -22,8 +22,8 @@
 // string and value is the integer value.
 // @endverbatim
 
-#ifndef __vtkSMEnumerationDomain_h
-#define __vtkSMEnumerationDomain_h
+#ifndef vtkSMEnumerationDomain_h
+#define vtkSMEnumerationDomain_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDomain.h"

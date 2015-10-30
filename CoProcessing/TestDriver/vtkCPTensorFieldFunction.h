@@ -16,8 +16,8 @@
 // .SECTION Description
 // Abstract class for specifying tensor fields at specified points.  
 
-#ifndef __vtkCPTensorFieldFunction_h
-#define __vtkCPTensorFieldFunction_h
+#ifndef vtkCPTensorFieldFunction_h
+#define vtkCPTensorFieldFunction_h
 
 #include "vtkObject.h"
 #include "vtkPVCatalystTestDriverModule.h" // needed for export macros

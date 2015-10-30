@@ -29,8 +29,8 @@
 //
 // </verbatim>
 
-#ifndef __vtkPEnSightGoldBinaryReader_h
-#define __vtkPEnSightGoldBinaryReader_h
+#ifndef vtkPEnSightGoldBinaryReader_h
+#define vtkPEnSightGoldBinaryReader_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPEnSightReader.h"

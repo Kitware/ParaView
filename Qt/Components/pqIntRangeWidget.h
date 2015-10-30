@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqIntRangeWidget_h
-#define __pqIntRangeWidget_h
+#ifndef pqIntRangeWidget_h
+#define pqIntRangeWidget_h
 
 #include <QWidget>
 #include "pqComponentsModule.h"

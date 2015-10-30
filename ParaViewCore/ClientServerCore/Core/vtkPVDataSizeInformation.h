@@ -20,8 +20,8 @@
 // only returns the data size and nothing more. The data size can also be
 // obtained from vtkPVDataInformation.
 
-#ifndef __vtkPVDataSizeInformation_h
-#define __vtkPVDataSizeInformation_h
+#ifndef vtkPVDataSizeInformation_h
+#define vtkPVDataSizeInformation_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"

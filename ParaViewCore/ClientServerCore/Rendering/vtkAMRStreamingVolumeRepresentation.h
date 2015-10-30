@@ -18,8 +18,8 @@
 // vtkAMRStreamingVolumeRepresentation  is a representation used for volume
 // rendering AMR datasets with ability to stream blocks from the input pipeline.
 
-#ifndef __vtkAMRStreamingVolumeRepresentation_h
-#define __vtkAMRStreamingVolumeRepresentation_h
+#ifndef vtkAMRStreamingVolumeRepresentation_h
+#define vtkAMRStreamingVolumeRepresentation_h
 
 #include "vtkPVDataRepresentation.h"
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer.

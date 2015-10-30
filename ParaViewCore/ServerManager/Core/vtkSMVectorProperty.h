@@ -20,8 +20,8 @@
 // values are distributed to the different invocations is controlled
 // by several parameters.
 
-#ifndef __vtkSMVectorProperty_h
-#define __vtkSMVectorProperty_h
+#ifndef vtkSMVectorProperty_h
+#define vtkSMVectorProperty_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMProperty.h"

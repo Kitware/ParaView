@@ -20,8 +20,8 @@
 // instances to render the 3 slices in vtkPVOrthographicSliceView's orthographic
 // views.
 
-#ifndef __vtkPVCompositeOrthographicSliceRepresentation_h
-#define __vtkPVCompositeOrthographicSliceRepresentation_h
+#ifndef vtkPVCompositeOrthographicSliceRepresentation_h
+#define vtkPVCompositeOrthographicSliceRepresentation_h
 
 #include "vtkPVCompositeRepresentation.h"
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer.

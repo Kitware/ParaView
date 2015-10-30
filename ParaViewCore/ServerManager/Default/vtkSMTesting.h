@@ -19,8 +19,8 @@
 // VTK need not by python wrapped, hence we cannot use vtkTesting in python 
 // testing.
 
-#ifndef __vtkSMTesting_h
-#define __vtkSMTesting_h
+#ifndef vtkSMTesting_h
+#define vtkSMTesting_h
 
 #include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMObject.h"

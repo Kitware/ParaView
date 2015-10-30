@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqAnimatableProxyComboBox_h 
-#define __pqAnimatableProxyComboBox_h
+#ifndef pqAnimatableProxyComboBox_h
+#define pqAnimatableProxyComboBox_h
 
 #include <QComboBox>
 #include "pqComponentsModule.h"

@@ -17,8 +17,8 @@
 // .SECTION Description
 // Gather information about cache size from vtkCacheSizeKeeper.
 
-#ifndef __vtkPVCacheSizeInformation_h
-#define __vtkPVCacheSizeInformation_h
+#ifndef vtkPVCacheSizeInformation_h
+#define vtkPVCacheSizeInformation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVInformation.h"

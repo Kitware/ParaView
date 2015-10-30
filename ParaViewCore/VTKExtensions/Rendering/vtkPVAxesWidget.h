@@ -18,8 +18,8 @@
 // This widget creates and manages its own vtkPVAxesActor.
 
 
-#ifndef __vtkPVAxesWidget_h
-#define __vtkPVAxesWidget_h
+#ifndef vtkPVAxesWidget_h
+#define vtkPVAxesWidget_h
 
 #include "vtkInteractorObserver.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

@@ -12,8 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __vtkCPPythonAdaptorAPI_h
-#define __vtkCPPythonAdaptorAPI_h
+#ifndef vtkCPPythonAdaptorAPI_h
+#define vtkCPPythonAdaptorAPI_h
 
 #include "vtkCPAdaptorAPI.h"
 #include "vtkPVPythonCatalystModule.h" // For windows import/export of shared libraries

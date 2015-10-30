@@ -21,8 +21,8 @@
 //   Output 0: A multiblock containing tables of fragments, one block 
 //             for each requested material
 
-#ifndef __vtkAMRFragmentIntegration_h
-#define __vtkAMRFragmentIntegration_h
+#ifndef vtkAMRFragmentIntegration_h
+#define vtkAMRFragmentIntegration_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"
@@ -64,6 +64,6 @@ private:
   //ETX
 };
 
-#endif /* __vtkAMRFragmentIntegration_h */
+#endif /* vtkAMRFragmentIntegration_h */
 //
 // VTK-HeaderTest-Exclude: vtkAMRFragmentIntegration.h

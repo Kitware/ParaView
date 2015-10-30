@@ -18,8 +18,8 @@
 // At the time when the link is created every output property is synchornized 
 // with the first input property.
 
-#ifndef __vtkSMPropertyLink_h
-#define __vtkSMPropertyLink_h
+#ifndef vtkSMPropertyLink_h
+#define vtkSMPropertyLink_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMLink.h"

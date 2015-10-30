@@ -12,8 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __pqMemoryInspectorPanel_h
-#define __pqMemoryInspectorPanel_h
+#ifndef pqMemoryInspectorPanel_h
+#define pqMemoryInspectorPanel_h
 
 #include "pqComponentsModule.h"
 #include <QWidget>

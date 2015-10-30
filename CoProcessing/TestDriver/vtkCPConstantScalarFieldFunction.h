@@ -16,8 +16,8 @@
 // .SECTION Description
 // Class for specifying a constant scalar field.
 
-#ifndef __vtkCPConstantScalarFieldFunction_h
-#define __vtkCPConstantScalarFieldFunction_h
+#ifndef vtkCPConstantScalarFieldFunction_h
+#define vtkCPConstantScalarFieldFunction_h
 
 #include "vtkCPScalarFieldFunction.h"
 #include "vtkPVCatalystTestDriverModule.h" // needed for export macros

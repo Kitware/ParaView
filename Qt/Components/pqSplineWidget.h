@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqSplineWidget_h 
-#define __pqSplineWidget_h
+#ifndef pqSplineWidget_h
+#define pqSplineWidget_h
 
 #include "pq3DWidget.h"
 #include <QColor>

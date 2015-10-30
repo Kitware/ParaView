@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __SourceToolbarActions_h
-#define __SourceToolbarActions_h
+#ifndef SourceToolbarActions_h
+#define SourceToolbarActions_h
 
 #include <QActionGroup>
 /// This example illustrates adding a toolbar to ParaView to create a sphere and

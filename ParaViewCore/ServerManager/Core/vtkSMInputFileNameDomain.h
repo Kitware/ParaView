@@ -22,8 +22,8 @@
 // .SECTION See Also
 // vtkSMDomain vtkSMStringVectorProperty
 
-#ifndef __vtkSMInputFileNameDomain_h
-#define __vtkSMInputFileNameDomain_h
+#ifndef vtkSMInputFileNameDomain_h
+#define vtkSMInputFileNameDomain_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMStringListDomain.h"

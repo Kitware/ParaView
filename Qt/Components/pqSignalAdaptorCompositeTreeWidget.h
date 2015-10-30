@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqSignalAdaptorCompositeTreeWidget_h 
-#define __pqSignalAdaptorCompositeTreeWidget_h
+#ifndef pqSignalAdaptorCompositeTreeWidget_h
+#define pqSignalAdaptorCompositeTreeWidget_h
 
 #include <QObject>
 #include <QVariant>

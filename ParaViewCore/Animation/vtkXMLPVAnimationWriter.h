@@ -17,8 +17,8 @@
 // vtkXMLPVAnimationWriter is used to save all parts of a current
 // source to a file with pieces spread across ther server processes.
 
-#ifndef __vtkXMLPVAnimationWriter_h
-#define __vtkXMLPVAnimationWriter_h
+#ifndef vtkXMLPVAnimationWriter_h
+#define vtkXMLPVAnimationWriter_h
 
 #include "vtkPVAnimationModule.h" //needed for exports
 #include "vtkXMLPVDWriter.h"

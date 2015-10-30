@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqOrbitCreatorDialog_h 
-#define __pqOrbitCreatorDialog_h
+#ifndef pqOrbitCreatorDialog_h
+#define pqOrbitCreatorDialog_h
 
 #include <QDialog>
 #include <QList>

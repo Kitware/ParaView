@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqFixPathsInStateFilesBehavior_h
-#define __pqFixPathsInStateFilesBehavior_h
+#ifndef pqFixPathsInStateFilesBehavior_h
+#define pqFixPathsInStateFilesBehavior_h
 
 #include <QObject>
 #include "pqApplicationComponentsModule.h"

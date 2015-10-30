@@ -16,8 +16,8 @@
 // .SECTION Description
 //
 
-#ifndef __vtkCameraInterpolator2_h
-#define __vtkCameraInterpolator2_h
+#ifndef vtkCameraInterpolator2_h
+#define vtkCameraInterpolator2_h
 
 #include "vtkObject.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

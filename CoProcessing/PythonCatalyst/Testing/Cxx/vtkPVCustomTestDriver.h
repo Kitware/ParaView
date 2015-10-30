@@ -18,8 +18,8 @@
 // scalar point field named "Pressure".  It runs a python script
 // using ParaView.
 
-#ifndef __vtkPVCustomTestDriver_h
-#define __vtkPVCustomTestDriver_h
+#ifndef vtkPVCustomTestDriver_h
+#define vtkPVCustomTestDriver_h
 
 #include "vtkCPTestDriver.h"
 

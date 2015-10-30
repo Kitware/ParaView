@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqPropertyWidgetDecorator_h
-#define __pqPropertyWidgetDecorator_h
+#ifndef pqPropertyWidgetDecorator_h
+#define pqPropertyWidgetDecorator_h
 
 #include "pqPropertyWidget.h"
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer

@@ -18,8 +18,8 @@
 // and host information from a render server.  This information is used by
 // the data server to make the connections to the render server processes.
 
-#ifndef __vtkMPIMToNSocketConnectionPortInformation_h
-#define __vtkMPIMToNSocketConnectionPortInformation_h
+#ifndef vtkMPIMToNSocketConnectionPortInformation_h
+#define vtkMPIMToNSocketConnectionPortInformation_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"

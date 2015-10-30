@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqDisplayRepresentationWidget_h
-#define __pqDisplayRepresentationWidget_h
+#ifndef pqDisplayRepresentationWidget_h
+#define pqDisplayRepresentationWidget_h
 
 #include "pqComponentsModule.h"
 #include <QWidget>

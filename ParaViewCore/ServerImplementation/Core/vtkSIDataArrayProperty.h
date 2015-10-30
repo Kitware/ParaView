@@ -16,8 +16,8 @@
 // .SECTION Description
 // SIProperty that deals with vtkDataArray object type
 
-#ifndef __vtkSIDataArrayProperty_h
-#define __vtkSIDataArrayProperty_h
+#ifndef vtkSIDataArrayProperty_h
+#define vtkSIDataArrayProperty_h
 
 #include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIProperty.h"

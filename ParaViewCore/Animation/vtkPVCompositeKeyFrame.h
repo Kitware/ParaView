@@ -21,8 +21,8 @@
 // active type. This is helpful in GUIs that allow for switching the
 // type of keyframe on the fly without much effort from the GUI.
 
-#ifndef __vtkPVCompositeKeyFrame_h
-#define __vtkPVCompositeKeyFrame_h
+#ifndef vtkPVCompositeKeyFrame_h
+#define vtkPVCompositeKeyFrame_h
 
 #include "vtkPVKeyFrame.h"
 

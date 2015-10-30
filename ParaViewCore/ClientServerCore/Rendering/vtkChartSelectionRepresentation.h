@@ -17,8 +17,8 @@
 // vtkChartSelectionRepresentation is a representation for the Cube-Axes that shows a
 // bounding box with labels around any input dataset.
 
-#ifndef __vtkChartSelectionRepresentation_h
-#define __vtkChartSelectionRepresentation_h
+#ifndef vtkChartSelectionRepresentation_h
+#define vtkChartSelectionRepresentation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"

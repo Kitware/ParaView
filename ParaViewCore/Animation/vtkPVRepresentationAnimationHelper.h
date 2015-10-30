@@ -20,8 +20,8 @@
 // set up an animation cue that will affect properties on all representations
 // for a source without directly referring to the representation proxies.
 
-#ifndef __vtkPVRepresentationAnimationHelper_h
-#define __vtkPVRepresentationAnimationHelper_h
+#ifndef vtkPVRepresentationAnimationHelper_h
+#define vtkPVRepresentationAnimationHelper_h
 
 #include "vtkPVAnimationModule.h" //needed for exports
 #include "vtkSMProxy.h"

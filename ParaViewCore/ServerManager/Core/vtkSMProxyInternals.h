@@ -13,8 +13,8 @@
 
 =========================================================================*/
 
-#ifndef __vtkSMProxyInternals_h
-#define __vtkSMProxyInternals_h
+#ifndef vtkSMProxyInternals_h
+#define vtkSMProxyInternals_h
 
 #include "vtkClientServerStream.h"
 #include "vtkSMProperty.h"

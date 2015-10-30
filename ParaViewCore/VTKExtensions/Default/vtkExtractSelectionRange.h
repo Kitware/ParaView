@@ -18,8 +18,8 @@
 // This is an internal filter designed to be used to "compute visible range" for
 // a dataset.
 
-#ifndef __vtkExtractSelectionRange_h
-#define __vtkExtractSelectionRange_h
+#ifndef vtkExtractSelectionRange_h
+#define vtkExtractSelectionRange_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkTableAlgorithm.h"

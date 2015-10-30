@@ -16,8 +16,8 @@
 // .SECTION Description
 // Subclasses of this class are used to get information from the server.
 
-#ifndef __vtkPVInformation_h
-#define __vtkPVInformation_h
+#ifndef vtkPVInformation_h
+#define vtkPVInformation_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"

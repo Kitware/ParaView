@@ -24,8 +24,8 @@
 // .SECTION Thanks
 // Thanks to .
 
-#ifndef __CGNS_READER_INTERNAL__
-#define __CGNS_READER_INTERNAL__
+#ifndef vtkCGNSReaderInternal_h
+#define vtkCGNSReaderInternal_h
 
 #include "vtkPVConfig.h"     // For PARAVIEW_USE_MPI
 
@@ -471,5 +471,5 @@ int get_XYZ_mesh(const int cgioNum, const std::vector<double>& gridChildId,
 
 }
 
-#endif //__CGNS_READER_INTERNAL__
+#endif //vtkCGNSReaderInternal_h
 // VTK-HeaderTest-Exclude: vtkCGNSReaderInternal.h

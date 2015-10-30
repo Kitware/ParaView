@@ -20,8 +20,8 @@
 // on the camera A. Similary whenever camera A->UpdateVTKObjects() is called,
 // B->UpdateVTKObjects() is also fired.
 
-#ifndef __vtkSMCameraLink_h
-#define __vtkSMCameraLink_h
+#ifndef vtkSMCameraLink_h
+#define vtkSMCameraLink_h
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMProxyLink.h"

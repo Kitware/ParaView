@@ -21,8 +21,8 @@
 // modified paraview state to its object.
 // @ingroup LiveInsitu
 
-#ifndef __vtkSMLiveInsituLinkProxy_h
-#define __vtkSMLiveInsituLinkProxy_h
+#ifndef vtkSMLiveInsituLinkProxy_h
+#define vtkSMLiveInsituLinkProxy_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMProxy.h"

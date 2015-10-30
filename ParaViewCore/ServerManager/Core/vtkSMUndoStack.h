@@ -32,8 +32,8 @@
 // vtkSMUndoStackBuilder
 
 
-#ifndef __vtkSMUndoStack_h
-#define __vtkSMUndoStack_h
+#ifndef vtkSMUndoStack_h
+#define vtkSMUndoStack_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkUndoStack.h"

@@ -24,8 +24,8 @@
 // Interpolate cell centered data to point data, and the inverse if needed
 // by the filter.
 
-#ifndef __vtkPVPostFilterExecutive_h
-#define __vtkPVPostFilterExecutive_h
+#ifndef vtkPVPostFilterExecutive_h
+#define vtkPVPostFilterExecutive_h
 
 #include "vtkPVCompositeDataPipeline.h"
 

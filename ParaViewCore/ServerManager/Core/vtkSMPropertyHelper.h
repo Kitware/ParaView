@@ -54,8 +54,8 @@
 // This class is not wrapped, hence not available in any of the wrapped
 // languagues such as python.
 
-#ifndef __vtkSMPropertyHelper_h
-#define __vtkSMPropertyHelper_h
+#ifndef vtkSMPropertyHelper_h
+#define vtkSMPropertyHelper_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"

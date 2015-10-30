@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqComparativeVisPanel_h 
-#define __pqComparativeVisPanel_h
+#ifndef pqComparativeVisPanel_h
+#define pqComparativeVisPanel_h
 
 #include <QWidget>
 #include "pqComponentsModule.h"

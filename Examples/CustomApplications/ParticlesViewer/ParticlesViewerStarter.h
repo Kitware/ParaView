@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __ParticlesViewerStarter_h 
-#define __ParticlesViewerStarter_h
+#ifndef ParticlesViewerStarter_h
+#define ParticlesViewerStarter_h
 
 #include <QObject>
 

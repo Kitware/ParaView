@@ -28,8 +28,8 @@
 // vtkCommand::EndEvent from vtkCompositeAnimationPlayer to mark the start and
 // end of animation playback.
 
-#ifndef __vtkSMAnimationScene_h
-#define __vtkSMAnimationScene_h
+#ifndef vtkSMAnimationScene_h
+#define vtkSMAnimationScene_h
 
 #include "vtkPVAnimationModule.h" //needed for exports
 #include "vtkAnimationCue.h"

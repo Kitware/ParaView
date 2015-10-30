@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqAutoLoadPluginXMLBehavior_h 
-#define __pqAutoLoadPluginXMLBehavior_h
+#ifndef pqAutoLoadPluginXMLBehavior_h
+#define pqAutoLoadPluginXMLBehavior_h
 
 #include <QObject>
 #include <QSet>

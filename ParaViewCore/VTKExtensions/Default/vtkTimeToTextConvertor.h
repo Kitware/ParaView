@@ -20,8 +20,8 @@
 // The input to this filter is optional. If no input is specified, it will show
 // produce request time in the output.
 
-#ifndef __vtkTimeToTextConvertor_h
-#define __vtkTimeToTextConvertor_h
+#ifndef vtkTimeToTextConvertor_h
+#define vtkTimeToTextConvertor_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkTableAlgorithm.h"

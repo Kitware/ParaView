@@ -23,8 +23,8 @@
 
 
 
-#ifndef __vtkPVArrowSource_h
-#define __vtkPVArrowSource_h
+#ifndef vtkPVArrowSource_h
+#define vtkPVArrowSource_h
 
 #include "vtkArrowSource.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

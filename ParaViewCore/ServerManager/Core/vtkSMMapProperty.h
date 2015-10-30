@@ -17,8 +17,8 @@
 // vtkSMMapProperty defines an interface common for all map properties.
 // A map property stores a set of keys and values.
 
-#ifndef __vtkSMMapProperty_h
-#define __vtkSMMapProperty_h
+#ifndef vtkSMMapProperty_h
+#define vtkSMMapProperty_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMProperty.h"
@@ -53,4 +53,4 @@ private:
   void operator=(const vtkSMMapProperty&); // Not implemented
 };
 
-#endif // __vtkSMMapProperty_h
+#endif // vtkSMMapProperty_h

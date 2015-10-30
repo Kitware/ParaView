@@ -24,8 +24,8 @@
 // \li \c Input : (optional) refers to a property that provides the data-producer.
 //                When present will be used to come up with default
 //                representation type using data information.
-#ifndef __vtkSMRepresentationTypeDomain_h
-#define __vtkSMRepresentationTypeDomain_h
+#ifndef vtkSMRepresentationTypeDomain_h
+#define vtkSMRepresentationTypeDomain_h
 
 #include "vtkSMStringListDomain.h"
 #include "vtkPVServerManagerRenderingModule.h" // needed for export macro.

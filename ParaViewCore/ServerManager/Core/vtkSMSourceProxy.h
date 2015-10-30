@@ -27,8 +27,8 @@
 // .SECTION See Also
 // vtkSMProxy vtkSMOutputPort vtkSMInputProperty
 
-#ifndef __vtkSMSourceProxy_h
-#define __vtkSMSourceProxy_h
+#ifndef vtkSMSourceProxy_h
+#define vtkSMSourceProxy_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMProxy.h"

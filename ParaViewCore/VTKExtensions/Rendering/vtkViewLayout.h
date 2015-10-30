@@ -17,8 +17,8 @@
 // vtkViewLayout is the server-side object corresponding to
 // vtkSMViewLayoutProxy.
 
-#ifndef __vtkViewLayout_h
-#define __vtkViewLayout_h
+#ifndef vtkViewLayout_h
+#define vtkViewLayout_h
 
 #include "vtkObject.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

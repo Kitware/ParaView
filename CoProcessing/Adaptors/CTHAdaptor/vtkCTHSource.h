@@ -1,5 +1,5 @@
-#ifndef __vtkCTHSource_h
-#define __vtkCTHSource_h
+#ifndef vtkCTHSource_h
+#define vtkCTHSource_h
 
 #include "vtkBoundingBox.h"
 #include "vtkSmartPointer.h"
@@ -108,4 +108,4 @@ private:
   void operator = (const vtkCTHSource&); // Not implemented 
 };
 
-#endif /* __vtkCTHSource_h */
+#endif /* vtkCTHSource_h */

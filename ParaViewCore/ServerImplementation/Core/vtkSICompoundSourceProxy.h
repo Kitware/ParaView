@@ -19,8 +19,8 @@
 // It provides the mapping to the exposed output port to the underneath
 // internal sub-proxy.
 
-#ifndef __vtkSICompoundSourceProxy_h
-#define __vtkSICompoundSourceProxy_h
+#ifndef vtkSICompoundSourceProxy_h
+#define vtkSICompoundSourceProxy_h
 
 #include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSISourceProxy.h"

@@ -1,5 +1,5 @@
-#ifndef __pqRemoteCommandTemplateDialog_h
-#define __pqRemoteCommandTemplateDialog_h
+#ifndef pqRemoteCommandTemplateDialog_h
+#define pqRemoteCommandTemplateDialog_h
 // .NAME pqRemoteCommandTemplateDialog - Dialog for configuring server side signals
 // .SECTION Description
 

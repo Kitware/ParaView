@@ -12,8 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __vtkMaterialInterfaceCommBuffer_h
-#define __vtkMaterialInterfaceCommBuffer_h
+#ifndef vtkMaterialInterfaceCommBuffer_h
+#define vtkMaterialInterfaceCommBuffer_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkSystemIncludes.h"

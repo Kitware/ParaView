@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqExpanderButton_h
-#define __pqExpanderButton_h
+#ifndef pqExpanderButton_h
+#define pqExpanderButton_h
 
 #include <QFrame>
 #include "pqWidgetsModule.h"

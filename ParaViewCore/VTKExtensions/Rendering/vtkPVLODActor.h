@@ -22,8 +22,8 @@
 // .SECTION see also
 // vtkActor vtkRenderer vtkLODProp3D vtkLODActor
 
-#ifndef __vtkPVLODActor_h
-#define __vtkPVLODActor_h
+#ifndef vtkPVLODActor_h
+#define vtkPVLODActor_h
 
 #include "vtkActor.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

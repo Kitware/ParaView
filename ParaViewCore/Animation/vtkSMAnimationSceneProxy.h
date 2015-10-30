@@ -18,8 +18,8 @@
 // client-side VTK-object to call UpdatePropertyInformation() every time that
 // happens.
 
-#ifndef __vtkSMAnimationSceneProxy_h
-#define __vtkSMAnimationSceneProxy_h
+#ifndef vtkSMAnimationSceneProxy_h
+#define vtkSMAnimationSceneProxy_h
 
 #include "vtkPVAnimationModule.h" //needed for exports
 #include "vtkSMProxy.h"

@@ -30,8 +30,8 @@
 // .SECTION Thanks
 // Thanks to .
 
-#ifndef __vtkCGNSReader_h
-#define __vtkCGNSReader_h
+#ifndef vtkCGNSReader_h
+#define vtkCGNSReader_h
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vtkPVVTKExtensionsCGNSReaderModule.h" // for export macro
@@ -206,4 +206,4 @@ private:
   int ActualTimeStep;
 };
 
-#endif // __vtkCGNSReader_h
+#endif // vtkCGNSReader_h

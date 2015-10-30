@@ -16,8 +16,8 @@
 // .SECTION Description
 // Animation player that plays in real time.
 
-#ifndef __vtkRealtimeAnimationPlayer_h
-#define __vtkRealtimeAnimationPlayer_h
+#ifndef vtkRealtimeAnimationPlayer_h
+#define vtkRealtimeAnimationPlayer_h
 
 #include "vtkAnimationPlayer.h"
 #include "vtkPVAnimationModule.h" // needed for export macro

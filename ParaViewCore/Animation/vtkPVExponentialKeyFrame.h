@@ -16,8 +16,8 @@
 // .SECTION Description
 // Interplates lineraly between consequtive key frames.
 
-#ifndef __vtkPVExponentialKeyFrame_h
-#define __vtkPVExponentialKeyFrame_h
+#ifndef vtkPVExponentialKeyFrame_h
+#define vtkPVExponentialKeyFrame_h
 
 #include "vtkPVKeyFrame.h"
 

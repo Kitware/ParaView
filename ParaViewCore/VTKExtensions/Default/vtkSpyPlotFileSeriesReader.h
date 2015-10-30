@@ -22,8 +22,8 @@
  * statement of authorship are reproduced on all copies.
  */
 
-#ifndef __vtkSpyPlotFileSeriesReader_h
-#define __vtkSpyPlotFileSeriesReader_h
+#ifndef vtkSpyPlotFileSeriesReader_h
+#define vtkSpyPlotFileSeriesReader_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkFileSeriesReader.h"
@@ -47,4 +47,4 @@ private:
   void operator=(const vtkSpyPlotFileSeriesReader&); // Not implemented.
 };
 
-#endif /* __vtkSpyPlotFileSeriesReader_h */
+#endif /* vtkSpyPlotFileSeriesReader_h */

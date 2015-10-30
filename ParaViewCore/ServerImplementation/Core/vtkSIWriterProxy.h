@@ -16,8 +16,8 @@
 // .SECTION Description
 // ServerImplementation for WriterProxy
 
-#ifndef __vtkSIWriterProxy_h
-#define __vtkSIWriterProxy_h
+#ifndef vtkSIWriterProxy_h
+#define vtkSIWriterProxy_h
 
 #include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSISourceProxy.h"

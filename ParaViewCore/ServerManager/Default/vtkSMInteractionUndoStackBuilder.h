@@ -19,8 +19,8 @@
 // This class can create undo elements for only one render view
 // at a time.
 
-#ifndef __vtkSMInteractionUndoStackBuilder_h
-#define __vtkSMInteractionUndoStackBuilder_h
+#ifndef vtkSMInteractionUndoStackBuilder_h
+#define vtkSMInteractionUndoStackBuilder_h
 
 #include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMObject.h"

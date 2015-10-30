@@ -1,5 +1,5 @@
-#ifndef __vtkCTHDataArray_h
-#define __vtkCTHDataArray_h
+#ifndef vtkCTHDataArray_h
+#define vtkCTHDataArray_h
 
 // #include "vtksnlIOWin32Header.h"
 
@@ -279,4 +279,4 @@ private:
   void operator= (const vtkCTHDataArray&); // Not implemented
 };
 
-#endif /* __vtkCTHDataArray_h */
+#endif /* vtkCTHDataArray_h */

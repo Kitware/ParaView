@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqSearchBox_h
-#define __pqSearchBox_h
+#ifndef pqSearchBox_h
+#define pqSearchBox_h
 
 #include <QWidget>
 #include <QScopedPointer>

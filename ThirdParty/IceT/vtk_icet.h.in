@@ -12,8 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __vtk_icet_h
-#define __vtk_icet_h
+#ifndef vtk_icet_h
+#define vtk_icet_h
 
 /* Use the icet library configured for VTK.  */
 #cmakedefine VTK_USE_SYSTEM_ICET

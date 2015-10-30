@@ -20,8 +20,8 @@
 // .SECTION See Also
 // vtkThreshold vtkPVClipDataSet
 
-#ifndef __vtkIsoVolume_h
-#define __vtkIsoVolume_h
+#ifndef vtkIsoVolume_h
+#define vtkIsoVolume_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkDataObjectAlgorithm.h"
@@ -72,4 +72,4 @@ private:
   void operator=(const vtkIsoVolume&);  // Not implemented.
 };
 
-#endif // __vtkIsoVolume_h
+#endif // vtkIsoVolume_h

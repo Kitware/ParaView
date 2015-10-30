@@ -16,8 +16,8 @@
 // .SECTION Description
 // Abstract class for creating grids for a test driver.  
 
-#ifndef __vtkCPBaseGridBuilder_h
-#define __vtkCPBaseGridBuilder_h
+#ifndef vtkCPBaseGridBuilder_h
+#define vtkCPBaseGridBuilder_h
 
 #include "vtkObject.h"
 #include "vtkPVCatalystTestDriverModule.h" // needed for export macros

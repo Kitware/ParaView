@@ -18,8 +18,8 @@
 // vtkNetworkAccessManager that uses tcp/ip sockets for communication between
 // processes. It supports urls that use "tcp" as their protocol specifier.
 
-#ifndef __vtkTCPNetworkAccessManager_h
-#define __vtkTCPNetworkAccessManager_h
+#ifndef vtkTCPNetworkAccessManager_h
+#define vtkTCPNetworkAccessManager_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkNetworkAccessManager.h"

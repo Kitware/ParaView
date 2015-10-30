@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqSaveAnimationReaction_h 
-#define __pqSaveAnimationReaction_h
+#ifndef pqSaveAnimationReaction_h
+#define pqSaveAnimationReaction_h
 
 #include "pqReaction.h"
 

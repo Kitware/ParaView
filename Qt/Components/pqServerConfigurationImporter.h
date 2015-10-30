@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqServerConfigurationImporter_h 
-#define __pqServerConfigurationImporter_h
+#ifndef pqServerConfigurationImporter_h
+#define pqServerConfigurationImporter_h
 
 #include <QObject>
 #include <QList>

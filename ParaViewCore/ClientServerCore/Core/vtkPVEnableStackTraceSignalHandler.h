@@ -17,8 +17,8 @@
 // When run on the process it enables a stacktrace signal handler for
 // common errors.
 
-#ifndef __vtkPVEnableStackTraceSignalHandler_h
-#define __vtkPVEnableStackTraceSignalHandler_h
+#ifndef vtkPVEnableStackTraceSignalHandler_h
+#define vtkPVEnableStackTraceSignalHandler_h
 
 #include "vtkPVInformation.h"
 

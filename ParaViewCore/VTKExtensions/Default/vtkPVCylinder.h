@@ -16,8 +16,8 @@
 // .SECTION Description
 // vtkPVCylinder extends vtkCylinder to add ParaView specific API.
 
-#ifndef __vtkPVCylinder_h
-#define __vtkPVCylinder_h
+#ifndef vtkPVCylinder_h
+#define vtkPVCylinder_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkCylinder.h"

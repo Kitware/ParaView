@@ -19,8 +19,8 @@
 // priority queue such that only those processes with loading
 // less than a specified tolerance are included.
 
-#ifndef __vtkMaterialInterfaceProcessRing_h
-#define __vtkMaterialInterfaceProcessRing_h
+#ifndef vtkMaterialInterfaceProcessRing_h
+#define vtkMaterialInterfaceProcessRing_h
 
 #include <vector> // needed for Initialize()
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports

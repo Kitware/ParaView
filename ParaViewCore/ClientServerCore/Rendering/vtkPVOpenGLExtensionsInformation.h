@@ -18,8 +18,8 @@
 // Information object that can be used to obtain OpenGL extension
 // information. The object from which the information is obtained
 // should be a render window.
-#ifndef __vtkPVOpenGLExtensionsInformation_h
-#define __vtkPVOpenGLExtensionsInformation_h
+#ifndef vtkPVOpenGLExtensionsInformation_h
+#define vtkPVOpenGLExtensionsInformation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVInformation.h"

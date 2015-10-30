@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqProxyGroupMenuManager_h 
-#define __pqProxyGroupMenuManager_h
+#ifndef pqProxyGroupMenuManager_h
+#define pqProxyGroupMenuManager_h
 
 #include <QMenu>
 #include "pqApplicationComponentsModule.h"

@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqRenderViewBase_h 
-#define __pqRenderViewBase_h
+#ifndef pqRenderViewBase_h
+#define pqRenderViewBase_h
 
 #include "pqView.h"
 #include "pqSMProxy.h" //needed for pqSMProxy.

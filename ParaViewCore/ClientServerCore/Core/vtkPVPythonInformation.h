@@ -17,8 +17,8 @@
 // Get details of python availabilty on the root server.
 
 
-#ifndef __vtkPVPythonInformation_h
-#define __vtkPVPythonInformation_h
+#ifndef vtkPVPythonInformation_h
+#define vtkPVPythonInformation_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"

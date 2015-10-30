@@ -18,8 +18,8 @@
 // vtkPVPluginsInformation is used to collect information about plugins tracked
 // by vtkPVPluginTracker.
 
-#ifndef __vtkPVPluginsInformation_h
-#define __vtkPVPluginsInformation_h
+#ifndef vtkPVPluginsInformation_h
+#define vtkPVPluginsInformation_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"

@@ -71,8 +71,8 @@
 //  vtkMultiBlockDataSetAlgorithm 
 
 
-#ifndef __vtkRectilinearGridConnectivity_h
-#define __vtkRectilinearGridConnectivity_h
+#ifndef vtkRectilinearGridConnectivity_h
+#define vtkRectilinearGridConnectivity_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"

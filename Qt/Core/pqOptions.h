@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef __pqOptions_h
-#define __pqOptions_h
+#ifndef pqOptions_h
+#define pqOptions_h
 
 #include "pqCoreModule.h"
 #include <vtkPVOptions.h>
@@ -138,5 +138,5 @@ private:
   void operator=(const pqOptions &);
 };
 
-#endif //__pqOptions_h
+#endif //pqOptions_h
 

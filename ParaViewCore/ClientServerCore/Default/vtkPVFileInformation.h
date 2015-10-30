@@ -21,8 +21,8 @@
 // .SECTION See Also
 // vtkPVFileInformationHelper
 
-#ifndef __vtkPVFileInformation_h
-#define __vtkPVFileInformation_h
+#ifndef vtkPVFileInformation_h
+#define vtkPVFileInformation_h
 
 #include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
 #include "vtkPVInformation.h"

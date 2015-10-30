@@ -29,8 +29,8 @@
 // as well as output ports of the subproxies.
 
 
-#ifndef __vtkSMCompoundSourceProxy_h
-#define __vtkSMCompoundSourceProxy_h
+#ifndef vtkSMCompoundSourceProxy_h
+#define vtkSMCompoundSourceProxy_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMSourceProxy.h"

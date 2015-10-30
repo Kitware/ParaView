@@ -16,8 +16,8 @@
 // .SECTION Description
 // Is a utility proxy to create/delete/rename directories.
 
-#ifndef __vtkSMDirectoryProxy_h
-#define __vtkSMDirectoryProxy_h
+#ifndef vtkSMDirectoryProxy_h
+#define vtkSMDirectoryProxy_h
 
 #include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMProxy.h"

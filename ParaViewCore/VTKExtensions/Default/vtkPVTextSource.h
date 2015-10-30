@@ -17,8 +17,8 @@
 // .SECTION Description
 // vtkPVTextSource is used to generate a table with a single string. 
 
-#ifndef __vtkPVTextSource_h
-#define __vtkPVTextSource_h
+#ifndef vtkPVTextSource_h
+#define vtkPVTextSource_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkTableAlgorithm.h"

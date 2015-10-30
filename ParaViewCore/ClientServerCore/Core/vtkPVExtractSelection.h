@@ -37,8 +37,8 @@
 // .SECTION See Also
 // vtkExtractSelection vtkSelection
 
-#ifndef __vtkPVExtractSelection_h
-#define __vtkPVExtractSelection_h
+#ifndef vtkPVExtractSelection_h
+#define vtkPVExtractSelection_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkExtractSelection.h"

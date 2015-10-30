@@ -29,8 +29,8 @@
 // like vtkSMParaViewPipelineController, this class also uses vtkObjectFactory
 // mechanisms to enable overriding by clients at compile time.
 
-#ifndef __vtkSMParaViewPipelineControllerWithRendering_h
-#define __vtkSMParaViewPipelineControllerWithRendering_h
+#ifndef vtkSMParaViewPipelineControllerWithRendering_h
+#define vtkSMParaViewPipelineControllerWithRendering_h
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMParaViewPipelineController.h"

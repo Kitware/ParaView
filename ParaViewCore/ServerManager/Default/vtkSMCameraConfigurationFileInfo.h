@@ -23,8 +23,8 @@
 //
 // .SECTION Thanks
 // This class was contributed by SciberQuest Inc.
-#ifndef __vtkSMCameraConfigurationFileInfo_h
-#define __vtkSMCameraConfigurationFileInfo_h
+#ifndef vtkSMCameraConfigurationFileInfo_h
+#define vtkSMCameraConfigurationFileInfo_h
 
 #include "vtkObject.h"
 

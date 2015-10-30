@@ -17,8 +17,8 @@
 // vtkPVSessionCoreInterpreterHelper is used by vtkPVSessionCore to avoid a
 // circular reference between the vtkPVSessionCore instance and its Interpreter.
 
-#ifndef __vtkPVSessionCoreInterpreterHelper_h
-#define __vtkPVSessionCoreInterpreterHelper_h
+#ifndef vtkPVSessionCoreInterpreterHelper_h
+#define vtkPVSessionCoreInterpreterHelper_h
 
 #include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkObject.h"

@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqSelectionReaction_h 
-#define __pqSelectionReaction_h
+#ifndef pqSelectionReaction_h
+#define pqSelectionReaction_h
 
 #include "pqReaction.h"
 #include <QPointer> // needed for QPointer.

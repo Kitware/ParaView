@@ -20,8 +20,8 @@
 // your mapper cannot, then simply use an append filter internally to
 // merge the blocks into a single polydata. 
 
-#ifndef __vtkMySpecialPolyDataMapper_h
-#define __vtkMySpecialPolyDataMapper_h
+#ifndef vtkMySpecialPolyDataMapper_h
+#define vtkMySpecialPolyDataMapper_h
 
 #include "vtkCompositePolyDataMapper2.h"
 

@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqPVAnimationWidget_h 
-#define __pqPVAnimationWidget_h
+#ifndef pqPVAnimationWidget_h
+#define pqPVAnimationWidget_h
 
 #include "pqAnimationViewWidget.h"
 #include "pqApplicationComponentsModule.h"

@@ -35,8 +35,8 @@
 // \li fired to indicate end of progress handling
 // \li \c calldata: vtkPVProgressHandler*
 
-#ifndef __vtkPVProgressHandler_h
-#define __vtkPVProgressHandler_h
+#ifndef vtkPVProgressHandler_h
+#define vtkPVProgressHandler_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"

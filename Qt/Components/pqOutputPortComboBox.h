@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqOutputPortComboBox_h 
-#define __pqOutputPortComboBox_h
+#ifndef pqOutputPortComboBox_h
+#define pqOutputPortComboBox_h
 
 #include <QComboBox>
 #include "pqComponentsModule.h"

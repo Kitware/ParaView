@@ -17,8 +17,8 @@
 // Object that is managed by vtkPVSessionCore which wrap concrete class such as
 // the vtk ones.
 
-#ifndef __vtkSIObject_h
-#define __vtkSIObject_h
+#ifndef vtkSIObject_h
+#define vtkSIObject_h
 
 #include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkObject.h"
@@ -98,4 +98,4 @@ private:
 //ETX
 };
 
-#endif // #ifndef __vtkSIObject_h
+#endif // #ifndef vtkSIObject_h

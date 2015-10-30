@@ -14,8 +14,8 @@
 =========================================================================*/
 // .NAME vtkPVImageReader - ImageReader that automatically switch between
 // vtkMPIImageReader or vtkImageReader based on the build setup.
-#ifndef __vtkPVImageReader_h
-#define __vtkPVImageReader_h
+#ifndef vtkPVImageReader_h
+#define vtkPVImageReader_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPVConfig.h" // for PARAVIEW_USE_MPI

@@ -21,8 +21,8 @@
 // used to represent both commands and results for
 // vtkClientServerInterpreter, but they may be used for any purpose.
 
-#ifndef __vtkClientServerStream_h
-#define __vtkClientServerStream_h
+#ifndef vtkClientServerStream_h
+#define vtkClientServerStream_h
 
 #include "vtkClientServerID.h"
 #include "vtkVariant.h"

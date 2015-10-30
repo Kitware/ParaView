@@ -23,8 +23,8 @@
 // interpreter instances. However ParaView no longer has need for that and hence
 // that functionality is no longer made public.
 
-#ifndef __vtkClientServerInterpreterInitializer_h
-#define __vtkClientServerInterpreterInitializer_h
+#ifndef vtkClientServerInterpreterInitializer_h
+#define vtkClientServerInterpreterInitializer_h
 
 #include "vtkObject.h"
 #include "vtkPVCommonModule.h" // needed for export macro

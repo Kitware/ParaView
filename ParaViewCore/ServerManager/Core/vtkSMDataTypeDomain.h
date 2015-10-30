@@ -26,8 +26,8 @@
 // .SECTION See Also
 // vtkSMDomain  vtkSMSourceProxy
 
-#ifndef __vtkSMDataTypeDomain_h
-#define __vtkSMDataTypeDomain_h
+#ifndef vtkSMDataTypeDomain_h
+#define vtkSMDataTypeDomain_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDomain.h"

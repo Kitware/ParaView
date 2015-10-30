@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqAxesToolbar_h 
-#define __pqAxesToolbar_h
+#ifndef pqAxesToolbar_h
+#define pqAxesToolbar_h
 
 #include <QToolBar>
 #include "pqApplicationComponentsModule.h"

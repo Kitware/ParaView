@@ -20,8 +20,8 @@
 // that must be included in the transposed table. This filter can also
 // be use to extract a non transposed table made by the selected columns.
 
-#ifndef __vtkPVTransposeTable_h
-#define __vtkPVTransposeTable_h
+#ifndef vtkPVTransposeTable_h
+#define vtkPVTransposeTable_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkTransposeTable.h"
@@ -64,4 +64,4 @@ private:
   void operator = ( const vtkPVTransposeTable& ); // Not implemented.
 };
 
-#endif // __vtkPVTransposeTable_h
+#endif // vtkPVTransposeTable_h

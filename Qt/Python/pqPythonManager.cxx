@@ -67,8 +67,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QTimer>
 
-#define __mySTR_HELPER(x) #x
-#define __mySTR(x) __mySTR_HELPER(x)
+#define mySTR_HELPER(x) #x
+#define mySTR(x) __mySTR_HELPER(x)
 
 //-----------------------------------------------------------------------------
 class pqPythonManager::pqInternal

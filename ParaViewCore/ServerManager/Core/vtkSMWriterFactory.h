@@ -26,8 +26,8 @@
 // Once the factory has been configured, the API to create writers, get
 // available writers etc. can be used.
 
-#ifndef __vtkSMWriterFactory_h
-#define __vtkSMWriterFactory_h
+#ifndef vtkSMWriterFactory_h
+#define vtkSMWriterFactory_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"

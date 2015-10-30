@@ -20,8 +20,8 @@
 // set the text for the three axes. The text will follow the camera.
 
 
-#ifndef __vtkPVAxesActor_h
-#define __vtkPVAxesActor_h
+#ifndef vtkPVAxesActor_h
+#define vtkPVAxesActor_h
 
 #include "vtkProp3D.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

@@ -16,8 +16,8 @@
 // .SECTION Description
 // IdType ServerSide Property use to set IdType array as method parameter.
 
-#ifndef __vtkSIIdTypeVectorProperty_h
-#define __vtkSIIdTypeVectorProperty_h
+#ifndef vtkSIIdTypeVectorProperty_h
+#define vtkSIIdTypeVectorProperty_h
 
 #include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIVectorProperty.h"

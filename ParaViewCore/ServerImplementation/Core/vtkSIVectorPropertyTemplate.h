@@ -16,8 +16,8 @@
 // .SECTION Description
 //
 
-#ifndef __vtkSIVectorPropertyTemplate_h
-#define __vtkSIVectorPropertyTemplate_h
+#ifndef vtkSIVectorPropertyTemplate_h
+#define vtkSIVectorPropertyTemplate_h
 
 #include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIVectorProperty.h"

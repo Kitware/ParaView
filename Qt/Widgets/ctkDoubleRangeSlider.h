@@ -49,8 +49,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef __ctkDoubleRangeSlider_h
-#define __ctkDoubleRangeSlider_h
+#ifndef ctkDoubleRangeSlider_h
+#define ctkDoubleRangeSlider_h
 
 // Qt includes
 #include <QWidget>

@@ -16,8 +16,8 @@
 // .SECTION Description
 // vtkPVBox extends vtkBox to add ParaView specific API.
 
-#ifndef __vtkPVBox_h
-#define __vtkPVBox_h
+#ifndef vtkPVBox_h
+#define vtkPVBox_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkBox.h"

@@ -16,8 +16,8 @@
 //
 // .SECTION Description
 
-#ifndef __vtkPVExtractBagPlots_h
-#define __vtkPVExtractBagPlots_h
+#ifndef vtkPVExtractBagPlots_h
+#define vtkPVExtractBagPlots_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"
@@ -81,4 +81,4 @@ private:
   void operator = ( const vtkPVExtractBagPlots& ); // Not implemented.
 };
 
-#endif // __vtkPVExtractBagPlots_h
+#endif // vtkPVExtractBagPlots_h

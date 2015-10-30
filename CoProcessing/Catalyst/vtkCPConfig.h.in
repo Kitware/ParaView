@@ -12,8 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __vtkCPPythonScriptPipelineConfig_h
-#define __vtkCPPythonScriptPipelineConfig_h
+#ifndef vtkCPPythonScriptPipelineConfig_h
+#define vtkCPPythonScriptPipelineConfig_h
 
 // These variables are used to locate the python module files since we cannot
 // reply on the executable path to locate python module files.

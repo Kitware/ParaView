@@ -23,8 +23,8 @@
 // use PushToStack(). 
 // Applications can subclass vtkSMUndoStackBuilder to record GUI related
 // changes and add them to the undo stack.
-#ifndef __vtkSMUndoStackBuilder_h
-#define __vtkSMUndoStackBuilder_h
+#ifndef vtkSMUndoStackBuilder_h
+#define vtkSMUndoStackBuilder_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"

@@ -16,8 +16,8 @@
 // .SECTION Description
 // vtkPConvertSelection is a parallel aware vtkConvertSelection subclass.
 
-#ifndef __vtkPConvertSelection_h
-#define __vtkPConvertSelection_h
+#ifndef vtkPConvertSelection_h
+#define vtkPConvertSelection_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkConvertSelection.h"
@@ -53,4 +53,4 @@ private:
 //ETX
 };
 
-#endif // __vtkPConvertSelection_h
+#endif // vtkPConvertSelection_h

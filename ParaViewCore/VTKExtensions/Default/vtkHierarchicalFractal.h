@@ -22,8 +22,8 @@
 // If GenerateRectilinearGrids is true then this filter outputs
 // vtkHierarchicalBoxDataSet otherwise it generates a vtkMultiBlockDataSet.
 
-#ifndef __vtkHierarchicalFractal_h
-#define __vtkHierarchicalFractal_h
+#ifndef vtkHierarchicalFractal_h
+#define vtkHierarchicalFractal_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkCompositeDataSetAlgorithm.h"

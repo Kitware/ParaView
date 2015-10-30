@@ -17,8 +17,8 @@
 // This filter defaults to using the outline filter unless the input
 // is a structured volume.
 
-#ifndef __vtkPVGeometryFilter_h
-#define __vtkPVGeometryFilter_h
+#ifndef vtkPVGeometryFilter_h
+#define vtkPVGeometryFilter_h
 
 #include "vtkDataObjectAlgorithm.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

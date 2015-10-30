@@ -19,8 +19,8 @@
 // on the client process and produce the output image data on a client and
 // render-server processes.
 
-#ifndef __vtkNetworkImageSource_h
-#define __vtkNetworkImageSource_h
+#ifndef vtkNetworkImageSource_h
+#define vtkNetworkImageSource_h
 
 #include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
 #include "vtkImageAlgorithm.h"

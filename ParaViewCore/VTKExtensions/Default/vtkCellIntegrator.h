@@ -20,8 +20,8 @@
 // polygons, quads and tetrahedra. All other 3D cells are triangulated
 // during volume calculation. In such cases, the result may not be exact.
 
-#ifndef __vtkCellIntegrator_h
-#define __vtkCellIntegrator_h
+#ifndef vtkCellIntegrator_h
+#define vtkCellIntegrator_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkObject.h"

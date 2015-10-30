@@ -19,8 +19,8 @@
 // time. If more than one representation is added to this view, only the first
 // visible representation will be shown.
 
-#ifndef __vtkSpreadSheetView_h
-#define __vtkSpreadSheetView_h
+#ifndef vtkSpreadSheetView_h
+#define vtkSpreadSheetView_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVView.h"

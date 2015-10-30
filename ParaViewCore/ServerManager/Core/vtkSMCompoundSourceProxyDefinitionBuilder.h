@@ -22,8 +22,8 @@
 // .SECTION See Also
 // vtkSMCompoundSourceProxy
 
-#ifndef __vtkSMCompoundSourceProxyDefinitionBuilder_h
-#define __vtkSMCompoundSourceProxyDefinitionBuilder_h
+#ifndef vtkSMCompoundSourceProxyDefinitionBuilder_h
+#define vtkSMCompoundSourceProxyDefinitionBuilder_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"

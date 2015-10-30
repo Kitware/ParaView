@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqLightsEditor_h 
-#define __pqLightsEditor_h
+#ifndef pqLightsEditor_h
+#define pqLightsEditor_h
 
 #include <QDialog>
 #include "pqApplicationComponentsModule.h"

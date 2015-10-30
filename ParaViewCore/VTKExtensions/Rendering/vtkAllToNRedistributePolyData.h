@@ -19,8 +19,8 @@
 
 // .NAME vtkAllToNRedistributePolyData - do balanced redistribution of cells on from all to n processors
 
-#ifndef __vtkAllToNRedistributePolyData_h
-#define __vtkAllToNRedistributePolyData_h
+#ifndef vtkAllToNRedistributePolyData_h
+#define vtkAllToNRedistributePolyData_h
 
 #include "vtkWeightedRedistributePolyData.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

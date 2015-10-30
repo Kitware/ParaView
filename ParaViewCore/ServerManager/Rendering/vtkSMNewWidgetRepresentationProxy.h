@@ -20,8 +20,8 @@
 // vtkPVGeometryFilter to convert non-polydata input to polydata that can be
 // rendered. It supports rendering the data as a surface, wireframe or points.
 
-#ifndef __vtkSMNewWidgetRepresentationProxy_h
-#define __vtkSMNewWidgetRepresentationProxy_h
+#ifndef vtkSMNewWidgetRepresentationProxy_h
+#define vtkSMNewWidgetRepresentationProxy_h
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMProxy.h"

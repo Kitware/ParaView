@@ -27,8 +27,8 @@
 // to pass through the results of any one node instead of aggregating all of
 // them together.
 
-#ifndef __vtkReductionFilter_h
-#define __vtkReductionFilter_h
+#ifndef vtkReductionFilter_h
+#define vtkReductionFilter_h
 
 #include "vtkDataObjectAlgorithm.h"
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer.

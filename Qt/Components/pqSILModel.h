@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqSILModel_h 
-#define __pqSILModel_h
+#ifndef pqSILModel_h
+#define pqSILModel_h
 
 #include <QAbstractItemModel>
 #include <QVector>

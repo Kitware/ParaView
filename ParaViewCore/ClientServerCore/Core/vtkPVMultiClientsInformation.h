@@ -18,8 +18,8 @@
 // as well as their ids.
 
 
-#ifndef __vtkPVMultiClientsInformation_h
-#define __vtkPVMultiClientsInformation_h
+#ifndef vtkPVMultiClientsInformation_h
+#define vtkPVMultiClientsInformation_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"

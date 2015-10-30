@@ -45,8 +45,8 @@
 // .SECTION Thanks
 // Thanks to Sandia National Laboratories for this compression technique
 
-#ifndef __vtkSquirtCompressor_h
-#define __vtkSquirtCompressor_h
+#ifndef vtkSquirtCompressor_h
+#define vtkSquirtCompressor_h
 
 #include "vtkImageCompressor.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

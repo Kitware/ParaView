@@ -16,8 +16,8 @@
 // .SECTION Description
 // SIProperty that deals with ArraySelection object
 
-#ifndef __vtkSIArraySelectionProperty_h
-#define __vtkSIArraySelectionProperty_h
+#ifndef vtkSIArraySelectionProperty_h
+#define vtkSIArraySelectionProperty_h
 
 #include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIProperty.h"

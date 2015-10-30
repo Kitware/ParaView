@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqPropertyLinksConnection_h
-#define __pqPropertyLinksConnection_h
+#ifndef pqPropertyLinksConnection_h
+#define pqPropertyLinksConnection_h
 
 #include <QObject>
 #include <QPointer>

@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pq3DWidgetInterface_h 
-#define __pq3DWidgetInterface_h
+#ifndef pq3DWidgetInterface_h
+#define pq3DWidgetInterface_h
 
 #include <QtPlugin>
 #include "pqComponentsModule.h"

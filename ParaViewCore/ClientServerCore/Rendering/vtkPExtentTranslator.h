@@ -19,8 +19,8 @@
 // information about image extents on all the ranks. This is resurrected version
 // of vtkPVTrivialExtentTranslator.
 
-#ifndef __vtkPExtentTranslator_h
-#define __vtkPExtentTranslator_h
+#ifndef vtkPExtentTranslator_h
+#define vtkPExtentTranslator_h
 
 #include "vtkExtentTranslator.h"
 #include "vtkPVClientServerCoreRenderingModule.h" // needed for export macro

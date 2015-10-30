@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqSurfaceRepresentationBehavior_h
-#define __pqSurfaceRepresentationBehavior_h
+#ifndef pqSurfaceRepresentationBehavior_h
+#define pqSurfaceRepresentationBehavior_h
 
 #include <QObject>
 

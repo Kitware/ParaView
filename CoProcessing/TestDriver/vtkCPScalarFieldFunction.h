@@ -16,8 +16,8 @@
 // .SECTION Description
 // Abstract class for specifying scalars at specified points.  
 
-#ifndef __vtkCPScalarFieldFunction_h
-#define __vtkCPScalarFieldFunction_h
+#ifndef vtkCPScalarFieldFunction_h
+#define vtkCPScalarFieldFunction_h
 
 #include "vtkCPTensorFieldFunction.h"
 #include "vtkPVCatalystTestDriverModule.h" // needed for export macros

@@ -21,8 +21,8 @@
 // vtkPVRepresentedArrayListSettings::New() returns a reference to the
 // singleton instance.
 
-#ifndef __vtkPVRepresentedArrayListSettings_h
-#define __vtkPVRepresentedArrayListSettings_h
+#ifndef vtkPVRepresentedArrayListSettings_h
+#define vtkPVRepresentedArrayListSettings_h
 
 #include "vtkObject.h"
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports

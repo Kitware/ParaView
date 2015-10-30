@@ -20,8 +20,8 @@ PURPOSE.  See the above copyright notice for more information.
 // has a subproxy name "Writer" that this proxy represents a meta-writer which
 // uses the given writer as the writer to write each component.
 
-#ifndef __vtkSMWriterProxy_h
-#define __vtkSMWriterProxy_h
+#ifndef vtkSMWriterProxy_h
+#define vtkSMWriterProxy_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMSourceProxy.h"

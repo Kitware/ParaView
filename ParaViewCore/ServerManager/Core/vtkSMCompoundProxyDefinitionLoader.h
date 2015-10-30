@@ -21,8 +21,8 @@
 // .SECTION See Also
 // vtkPVXMLElement vtkPVXMLParser vtkSMProxyManager
 
-#ifndef __vtkSMCompoundProxyDefinitionLoader_h
-#define __vtkSMCompoundProxyDefinitionLoader_h
+#ifndef vtkSMCompoundProxyDefinitionLoader_h
+#define vtkSMCompoundProxyDefinitionLoader_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDeserializerXML.h"

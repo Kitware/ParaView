@@ -17,8 +17,8 @@
 // vtkCubeAxesRepresentation is a representation for the Cube-Axes that shows a
 // bounding box with labels around any input dataset.
 
-#ifndef __vtkCubeAxesRepresentation_h
-#define __vtkCubeAxesRepresentation_h
+#ifndef vtkCubeAxesRepresentation_h
+#define vtkCubeAxesRepresentation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"

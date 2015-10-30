@@ -17,8 +17,8 @@
 // .SECTION Description
 // vtkSMBagChartSeriesListDomain extends vtkSMChartSeriesListDomain to
 // setup defaults specific for bag plot representations.
-#ifndef __vtkSMBagChartSeriesListDomain_h
-#define __vtkSMBagChartSeriesListDomain_h
+#ifndef vtkSMBagChartSeriesListDomain_h
+#define vtkSMBagChartSeriesListDomain_h
 
 #include "vtkSMChartSeriesListDomain.h"
 #include "vtkPVServerManagerRenderingModule.h" // needed for exports

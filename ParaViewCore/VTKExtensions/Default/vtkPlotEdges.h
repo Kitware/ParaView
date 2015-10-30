@@ -16,8 +16,8 @@
 // .SECTION Description
 
 
-#ifndef __vtkPlotEdges_h
-#define __vtkPlotEdges_h
+#ifndef vtkPlotEdges_h
+#define vtkPlotEdges_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"

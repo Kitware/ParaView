@@ -17,8 +17,8 @@
 // vtkUpdateSuppressorPipeline is designed to for with vtkPVUpdateSuppressor.
 // It stops all update extent and data requests.
 
-#ifndef __vtkUpdateSuppressorPipeline_h
-#define __vtkUpdateSuppressorPipeline_h
+#ifndef vtkUpdateSuppressorPipeline_h
+#define vtkUpdateSuppressorPipeline_h
 
 #include "vtkCompositeDataPipeline.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqHighlightablePushButton_h
-#define __pqHighlightablePushButton_h
+#ifndef pqHighlightablePushButton_h
+#define pqHighlightablePushButton_h
 
 #include <QPushButton>
 #include <QScopedPointer>

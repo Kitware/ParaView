@@ -16,8 +16,8 @@
 // .SECTION Description
 //
 
-#ifndef __vtkSMRepresentationProxy_h
-#define __vtkSMRepresentationProxy_h
+#ifndef vtkSMRepresentationProxy_h
+#define vtkSMRepresentationProxy_h
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMSourceProxy.h"

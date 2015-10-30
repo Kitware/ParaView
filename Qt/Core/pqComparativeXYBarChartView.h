@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqComparativeXYBarChartView_h
-#define __pqComparativeXYBarChartView_h
+#ifndef pqComparativeXYBarChartView_h
+#define pqComparativeXYBarChartView_h
 
 #include "pqComparativeContextView.h"
 

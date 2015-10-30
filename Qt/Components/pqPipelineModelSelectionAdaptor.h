@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqPipelineModelSelectionAdaptor_h
-#define __pqPipelineModelSelectionAdaptor_h
+#ifndef pqPipelineModelSelectionAdaptor_h
+#define pqPipelineModelSelectionAdaptor_h
 
 #include "pqSelectionAdaptor.h"
 

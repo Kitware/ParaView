@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqIgnoreSourceTimeReaction_h 
-#define __pqIgnoreSourceTimeReaction_h
+#ifndef pqIgnoreSourceTimeReaction_h
+#define pqIgnoreSourceTimeReaction_h
 
 #include "pqReaction.h"
 

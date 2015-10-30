@@ -25,8 +25,8 @@
 //
 // The streaming components of this class are experimental and will be changed.
 
-#ifndef __vtkSMDataDeliveryManager_h
-#define __vtkSMDataDeliveryManager_h
+#ifndef vtkSMDataDeliveryManager_h
+#define vtkSMDataDeliveryManager_h
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMObject.h"

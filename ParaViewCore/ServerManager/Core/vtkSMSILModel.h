@@ -30,8 +30,8 @@
 // \li vtkCommand::UpdateDataEvent -- fired when the check state of any element
 // changes. calldata = vertexid for the element whose check state changed.
 
-#ifndef __vtkSMSILModel_h 
-#define __vtkSMSILModel_h
+#ifndef vtkSMSILModel_h 
+#define vtkSMSILModel_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"

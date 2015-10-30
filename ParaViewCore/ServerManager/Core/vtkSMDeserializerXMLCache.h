@@ -17,8 +17,8 @@
 // vtkSMDeserializerXMLCache is used to deserialize proxies from previously
 // stored XML states.
 
-#ifndef __vtkSMDeserializerXMLCache_h
-#define __vtkSMDeserializerXMLCache_h
+#ifndef vtkSMDeserializerXMLCache_h
+#define vtkSMDeserializerXMLCache_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDeserializerXML.h"

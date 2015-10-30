@@ -16,8 +16,8 @@
 // corresponding to a scalar bar or color legend in a Render View.
 // .SECTION Description
 
-#ifndef __vtkSMScalarBarWidgetRepresentationProxy_h
-#define __vtkSMScalarBarWidgetRepresentationProxy_h
+#ifndef vtkSMScalarBarWidgetRepresentationProxy_h
+#define vtkSMScalarBarWidgetRepresentationProxy_h
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMNewWidgetRepresentationProxy.h"

@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqStandardColorLinkAdaptor_h
-#define __pqStandardColorLinkAdaptor_h
+#ifndef pqStandardColorLinkAdaptor_h
+#define pqStandardColorLinkAdaptor_h
 
 #include <QObject>
 #include "pqDeprecatedModule.h"

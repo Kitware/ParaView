@@ -16,8 +16,8 @@
 // .SECTION Description
 // vtkSMNullProxy stands for a 0 on the server side.
 
-#ifndef __vtkSMNullProxy_h
-#define __vtkSMNullProxy_h
+#ifndef vtkSMNullProxy_h
+#define vtkSMNullProxy_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMProxy.h"

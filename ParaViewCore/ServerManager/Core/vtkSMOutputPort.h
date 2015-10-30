@@ -24,8 +24,8 @@
 // minimal, we leave this as a sub-class of a Proxy with GlobalID=0 and
 // Session=NULL.
 
-#ifndef __vtkSMOutputPort_h
-#define __vtkSMOutputPort_h
+#ifndef vtkSMOutputPort_h
+#define vtkSMOutputPort_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMProxy.h"

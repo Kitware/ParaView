@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqChangePipelineInputReaction_h 
-#define __pqChangePipelineInputReaction_h
+#ifndef pqChangePipelineInputReaction_h
+#define pqChangePipelineInputReaction_h
 
 #include "pqReaction.h"
 

@@ -26,8 +26,8 @@
 // Supported Required-Property functions:
 // \li \c ArrayList : points a string-vector property that produces the
 // (array_name, status) tuples. This is typically an information-only property.
-#ifndef __vtkSMArraySelectionDomain_h
-#define __vtkSMArraySelectionDomain_h
+#ifndef vtkSMArraySelectionDomain_h
+#define vtkSMArraySelectionDomain_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMStringListDomain.h"

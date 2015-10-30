@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqObjectPickingBehavior_h
-#define __pqObjectPickingBehavior_h
+#ifndef pqObjectPickingBehavior_h
+#define pqObjectPickingBehavior_h
 
 #include <QObject>
 #include <QPoint>

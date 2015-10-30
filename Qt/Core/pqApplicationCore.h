@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqApplicationCore_h
-#define __pqApplicationCore_h
+#ifndef pqApplicationCore_h
+#define pqApplicationCore_h
 
 #include "pqCoreModule.h"
 #include <QObject>

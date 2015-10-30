@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqStandardViewFrameActionsImplementation_h
-#define __pqStandardViewFrameActionsImplementation_h
+#ifndef pqStandardViewFrameActionsImplementation_h
+#define pqStandardViewFrameActionsImplementation_h
 
 #include "pqViewFrameActionsInterface.h"
 #include "pqApplicationComponentsModule.h" // needed for export macros

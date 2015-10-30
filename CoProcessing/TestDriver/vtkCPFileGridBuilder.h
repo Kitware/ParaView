@@ -16,8 +16,8 @@
 // .SECTION Description
 // Class for creating grids from a VTK file.  
 
-#ifndef __vtkCPFileGridBuilder_h
-#define __vtkCPFileGridBuilder_h
+#ifndef vtkCPFileGridBuilder_h
+#define vtkCPFileGridBuilder_h
 
 #include "vtkCPGridBuilder.h"
 #include "vtkPVCatalystTestDriverModule.h" // needed for export macros

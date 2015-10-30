@@ -26,8 +26,8 @@
 // locate proxies registered using specific names under specific groups. Thus,
 // the state is maintained by the proxy manager itself.
 
-#ifndef __vtkSMTransferFunctionManager_h
-#define __vtkSMTransferFunctionManager_h
+#ifndef vtkSMTransferFunctionManager_h
+#define vtkSMTransferFunctionManager_h
 
 #include "vtkSMObject.h"
 #include "vtkPVServerManagerRenderingModule.h" // needed for export macro

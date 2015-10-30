@@ -13,8 +13,8 @@
 
 =========================================================================*/
 
-#ifndef __vtkMaterialInterfaceUtilities_h
-#define __vtkMaterialInterfaceUtilities_h
+#ifndef vtkMaterialInterfaceUtilities_h
+#define vtkMaterialInterfaceUtilities_h
 
 // Vtk
 #include<vtkCommunicator.h>

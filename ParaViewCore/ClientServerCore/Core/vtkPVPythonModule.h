@@ -27,8 +27,8 @@
 // (such as its name).
 //
 
-#ifndef __vtkPVPythonModule_h
-#define __vtkPVPythonModule_h
+#ifndef vtkPVPythonModule_h
+#define vtkPVPythonModule_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"
@@ -88,4 +88,4 @@ private:
   void operator=(const vtkPVPythonModule &);    // Not implemented
 };
 
-#endif //__vtkPVPythonModule_h
+#endif //vtkPVPythonModule_h

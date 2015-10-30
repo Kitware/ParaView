@@ -17,11 +17,11 @@
 // .SECTION Description
 // vtkSMIntRangeDomain is a type specific extension to
 // vtkSMRangeDomainTemplate for ints.
-#ifndef __vtkSMIntRangeDomain_h
-#define __vtkSMIntRangeDomain_h
+#ifndef vtkSMIntRangeDomain_h
+#define vtkSMIntRangeDomain_h
 
 // Tell the template header how to give our superclass a DLL interface.
-#if !defined(__vtkSMIntRangeDomain_cxx)
+#if !defined(vtkSMIntRangeDomain_cxx)
 # define VTK_DATA_ARRAY_TEMPLATE_TYPE int
 #endif
 
@@ -83,7 +83,7 @@ private:
   typedef vtkSMRangeDomainTemplate<int> RealSuperclass;
 };
 
-#if !defined(__vtkSMIntRangeDomain_cxx)
+#if !defined(vtkSMIntRangeDomain_cxx)
 # undef VTK_DATA_ARRAY_TEMPLATE_TYPE
 #endif
 

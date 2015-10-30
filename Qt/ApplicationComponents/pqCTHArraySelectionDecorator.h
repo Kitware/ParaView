@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqCTHArraySelectionDecorator_h
-#define __pqCTHArraySelectionDecorator_h
+#ifndef pqCTHArraySelectionDecorator_h
+#define pqCTHArraySelectionDecorator_h
 
 #include "pqApplicationComponentsModule.h"
 #include "pqPropertyWidgetDecorator.h"

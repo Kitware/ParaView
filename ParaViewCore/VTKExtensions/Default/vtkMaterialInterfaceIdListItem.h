@@ -16,8 +16,8 @@
 // .SECTION Description
 // Elemental data type for fragment id list conatiners.
 
-#ifndef __vtkMaterialInterfaceIdListItem_h
-#define __vtkMaterialInterfaceIdListItem_h
+#ifndef vtkMaterialInterfaceIdListItem_h
+#define vtkMaterialInterfaceIdListItem_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 

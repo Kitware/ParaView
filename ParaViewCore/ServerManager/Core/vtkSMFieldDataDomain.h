@@ -36,8 +36,8 @@
 // .SECTION See Also
 // vtkSMEnumerationDomain vtkSMProxyProperty
 
-#ifndef __vtkSMFieldDataDomain_h
-#define __vtkSMFieldDataDomain_h
+#ifndef vtkSMFieldDataDomain_h
+#define vtkSMFieldDataDomain_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMEnumerationDomain.h"

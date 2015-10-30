@@ -23,8 +23,8 @@
 // - 2: Output of the second internal vtkCutter filter
 // - 3: Output of the third internal vtkCutter filter
 
-#ifndef __vtkThreeSliceFilter_h
-#define __vtkThreeSliceFilter_h
+#ifndef vtkThreeSliceFilter_h
+#define vtkThreeSliceFilter_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPolyDataAlgorithm.h"

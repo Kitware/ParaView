@@ -13,8 +13,8 @@ PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 
-#ifndef __vtkSMDoubleVectorPropertyTest_h
-#define __vtkSMDoubleVectorPropertyTest_h
+#ifndef vtkSMDoubleVectorPropertyTest_h
+#define vtkSMDoubleVectorPropertyTest_h
 
 #include <QtTest>
 

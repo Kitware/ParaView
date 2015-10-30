@@ -18,8 +18,8 @@
 // vtkClientServerSynchronizedRenderers except that it optionally uses image
 // compressors to compress the image before transmitting.
 
-#ifndef __vtkPVClientServerSynchronizedRenderers_h
-#define __vtkPVClientServerSynchronizedRenderers_h
+#ifndef vtkPVClientServerSynchronizedRenderers_h
+#define vtkPVClientServerSynchronizedRenderers_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkSynchronizedRenderers.h"

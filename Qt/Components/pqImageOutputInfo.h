@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqImageOutputInfo_h
-#define __pqImageOutputInfo_h
+#ifndef pqImageOutputInfo_h
+#define pqImageOutputInfo_h
 
 #include "pqComponentsModule.h"
 #include <QString>

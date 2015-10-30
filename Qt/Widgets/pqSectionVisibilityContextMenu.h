@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqSectionVisibilityContextMenu_h
-#define __pqSectionVisibilityContextMenu_h
+#ifndef pqSectionVisibilityContextMenu_h
+#define pqSectionVisibilityContextMenu_h
 
 
 // In case of QTableView, or any other spreadsheet-like view, the user

@@ -17,8 +17,8 @@
 // ServerSide Property use to set int array as method argument.
 
 
-#ifndef __vtkSIIntVectorProperty_h
-#define __vtkSIIntVectorProperty_h
+#ifndef vtkSIIntVectorProperty_h
+#define vtkSIIntVectorProperty_h
 
 #include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIVectorProperty.h"

@@ -22,8 +22,8 @@
 //   Output 0: A multiblock containing tables of fragments, one block 
 //             for each requested material
 
-#ifndef __vtkAMRFragmentsFilter_h
-#define __vtkAMRFragmentsFilter_h
+#ifndef vtkAMRFragmentsFilter_h
+#define vtkAMRFragmentsFilter_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"
@@ -108,4 +108,4 @@ private:
   void operator=(const vtkAMRFragmentsFilter&); // Not implemented.
 };
 
-#endif /* __vtkAMRFragmentsFilter_h */
+#endif /* vtkAMRFragmentsFilter_h */

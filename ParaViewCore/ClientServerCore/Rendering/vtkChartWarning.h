@@ -19,8 +19,8 @@
 // This is a vtkContextItem that can be placed into a vtkContextScene. It draws
 // a block of the given dimensions, and reacts to mouse events.
 
-#ifndef __vtkChartWarning_h
-#define __vtkChartWarning_h
+#ifndef vtkChartWarning_h
+#define vtkChartWarning_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" // For export macro
 #include "vtkBlockItem.h"
@@ -62,4 +62,4 @@ private:
 //ETX
 };
 
-#endif //__vtkChartWarning_h
+#endif //vtkChartWarning_h

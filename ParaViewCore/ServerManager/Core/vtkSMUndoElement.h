@@ -19,8 +19,8 @@
 // This class keeps the session, so undoelement could work accross a set of
 // communication Sessions.
 
-#ifndef __vtkSMUndoElement_h
-#define __vtkSMUndoElement_h
+#ifndef vtkSMUndoElement_h
+#define vtkSMUndoElement_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkUndoElement.h"

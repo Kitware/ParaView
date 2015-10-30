@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqFileDialogRecentDirsModel_h 
-#define __pqFileDialogRecentDirsModel_h
+#ifndef pqFileDialogRecentDirsModel_h
+#define pqFileDialogRecentDirsModel_h
 
 #include <QAbstractListModel>
 #include <QStringList>

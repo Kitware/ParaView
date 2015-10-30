@@ -64,8 +64,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // grid of all particles and assigns each particle a halo id.
 //
 
-#ifndef __vtkPLANLHaloFinder_h
-#define __vtkPLANLHaloFinder_h
+#ifndef vtkPLANLHaloFinder_h
+#define vtkPLANLHaloFinder_h
 
 #include "vtkUnstructuredGridAlgorithm.h"
 #include "vtkPVVTKExtensionsCosmoToolsModule.h" // For export macro
@@ -289,4 +289,4 @@ class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPLANLHaloFinder :
 
 };
 
-#endif //  __vtkPLANLHaloFinder_h
+#endif //  vtkPLANLHaloFinder_h

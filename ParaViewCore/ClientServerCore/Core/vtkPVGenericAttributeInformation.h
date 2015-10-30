@@ -19,8 +19,8 @@
 // the data directly.  At the moment, this object is only a container
 // and has no useful methods for operating on data.
 
-#ifndef __vtkPVGenericAttributeInformation_h
-#define __vtkPVGenericAttributeInformation_h
+#ifndef vtkPVGenericAttributeInformation_h
+#define vtkPVGenericAttributeInformation_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVArrayInformation.h"

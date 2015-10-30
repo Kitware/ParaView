@@ -17,8 +17,8 @@
 // .SECTION Description
 // vtkSMSessionObject provides methods to set and get the relative session
 
-#ifndef __vtkSMSessionObject_h
-#define __vtkSMSessionObject_h
+#ifndef vtkSMSessionObject_h
+#define vtkSMSessionObject_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"

@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqAnimationScene_h
-#define __pqAnimationScene_h
+#ifndef pqAnimationScene_h
+#define pqAnimationScene_h
 
 #include "pqProxy.h"
 #include <QPair>

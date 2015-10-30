@@ -28,8 +28,8 @@
 // result, domains ideally should only fire that event when their values change
 // for real not just potentially changed.
 
-#ifndef __vtkSMDomain_h
-#define __vtkSMDomain_h
+#ifndef vtkSMDomain_h
+#define vtkSMDomain_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMSessionObject.h"

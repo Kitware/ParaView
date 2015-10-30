@@ -20,8 +20,8 @@
 // datasets. If the input is a composite dataset, the output is a multiblock
 // with vtkTable leaves.
 
-#ifndef __vtkAttributeDataToTableFilter_h
-#define __vtkAttributeDataToTableFilter_h
+#ifndef vtkAttributeDataToTableFilter_h
+#define vtkAttributeDataToTableFilter_h
 
 #include "vtkTableAlgorithm.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

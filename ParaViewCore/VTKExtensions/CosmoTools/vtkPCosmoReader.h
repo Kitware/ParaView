@@ -80,8 +80,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // name ending in the processor number.
 //
 
-#ifndef __vtkPCosmoReader_h
-#define __vtkPCosmoReader_h
+#ifndef vtkPCosmoReader_h
+#define vtkPCosmoReader_h
 
 #include "vtkUnstructuredGridAlgorithm.h"
 #include "vtkPVVTKExtensionsCosmoToolsModule.h" // For export macro

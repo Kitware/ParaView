@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqConsoleWidgetEventTranslator_h
-#define __pqConsoleWidgetEventTranslator_h
+#ifndef pqConsoleWidgetEventTranslator_h
+#define pqConsoleWidgetEventTranslator_h
 
 #include "pqWidgetEventTranslator.h"
 #include "pqWidgetsModule.h" // needed for EXPORT macro.

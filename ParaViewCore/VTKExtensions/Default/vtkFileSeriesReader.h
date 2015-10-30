@@ -44,8 +44,8 @@
 // UseMetaFile toggles between these two methods of specifying files.
 //
 
-#ifndef __vtkFileSeriesReader_h
-#define __vtkFileSeriesReader_h
+#ifndef vtkFileSeriesReader_h
+#define vtkFileSeriesReader_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMetaReader.h"

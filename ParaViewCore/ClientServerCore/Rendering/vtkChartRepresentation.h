@@ -23,8 +23,8 @@
 // UpdatePipeline() on the representation proxy and then access the delivered
 // vtkTable on the client.
 
-#ifndef __vtkChartRepresentation_h
-#define __vtkChartRepresentation_h
+#ifndef vtkChartRepresentation_h
+#define vtkChartRepresentation_h
 
 #include "vtkPVDataRepresentation.h"
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer

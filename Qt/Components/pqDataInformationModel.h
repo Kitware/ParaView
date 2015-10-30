@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqDataInformationModel_h
-#define __pqDataInformationModel_h
+#ifndef pqDataInformationModel_h
+#define pqDataInformationModel_h
 
 #include "pqComponentsModule.h"
 #include <QAbstractTableModel>

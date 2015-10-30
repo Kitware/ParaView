@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqDebug_h
-#define __pqDebug_h
+#ifndef pqDebug_h
+#define pqDebug_h
 
 #include <QDebug>
 #include "pqCoreModule.h"

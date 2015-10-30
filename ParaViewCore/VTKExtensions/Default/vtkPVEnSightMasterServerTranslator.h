@@ -15,8 +15,8 @@
 // .NAME vtkPVEnSightMasterServerTranslator - 
 // .SECTION Description
 
-#ifndef __vtkPVEnSightMasterServerTranslator_h
-#define __vtkPVEnSightMasterServerTranslator_h
+#ifndef vtkPVEnSightMasterServerTranslator_h
+#define vtkPVEnSightMasterServerTranslator_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkExtentTranslator.h"

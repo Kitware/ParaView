@@ -26,8 +26,8 @@
 // If the application is managing calling of vtkRenderWindow::Render() on all
 // processes, then one should disable RenderEventPropagation flag.
 
-#ifndef __vtkPVSynchronizedRenderWindows_h
-#define __vtkPVSynchronizedRenderWindows_h
+#ifndef vtkPVSynchronizedRenderWindows_h
+#define vtkPVSynchronizedRenderWindows_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkObject.h"

@@ -16,8 +16,8 @@
 // .SECTION Description
 //  Proxy for vtkPVGL2PSExporter
 
-#ifndef __vtkSMGL2PSExporterProxy_h
-#define __vtkSMGL2PSExporterProxy_h
+#ifndef vtkSMGL2PSExporterProxy_h
+#define vtkSMGL2PSExporterProxy_h
 
 #include "vtkSMRenderViewExporterProxy.h"
 #include "vtkPVServerManagerDefaultModule.h" //needed for exports

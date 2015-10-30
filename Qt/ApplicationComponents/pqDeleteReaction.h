@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqDeleteReaction_h 
-#define __pqDeleteReaction_h
+#ifndef pqDeleteReaction_h
+#define pqDeleteReaction_h
 
 #include "pqReaction.h"
 

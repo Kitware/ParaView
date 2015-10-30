@@ -18,8 +18,8 @@ PURPOSE.  See the above copyright notice for more information.
 // objects. It is responsible of setting the internal writer that is
 // configured as a sub-proxy.
 
-#ifndef __vtkSMPSWriterProxy_h
-#define __vtkSMPSWriterProxy_h
+#ifndef vtkSMPSWriterProxy_h
+#define vtkSMPSWriterProxy_h
 
 #include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMPWriterProxy.h"

@@ -19,8 +19,8 @@ PURPOSE.  See the above copyright notice for more information.
 // The only extra functionality provided by this class is that it sets up the
 // piece information on the writer.
 
-#ifndef __vtkSMPWriterProxy_h
-#define __vtkSMPWriterProxy_h
+#ifndef vtkSMPWriterProxy_h
+#define vtkSMPWriterProxy_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMWriterProxy.h"

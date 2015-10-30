@@ -30,8 +30,8 @@
 // Supported XML attributes
 // \li hide_partial_arrays : when set to 1, partial arrays will not be shown in
 // the domain (default).
-#ifndef __vtkSMChartSeriesListDomain_h
-#define __vtkSMChartSeriesListDomain_h
+#ifndef vtkSMChartSeriesListDomain_h
+#define vtkSMChartSeriesListDomain_h
 
 #include "vtkSMStringListDomain.h"
 #include "vtkPVServerManagerRenderingModule.h" // needed for exports

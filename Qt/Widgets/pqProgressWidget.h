@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqProgressWidget_h
-#define __pqProgressWidget_h
+#ifndef pqProgressWidget_h
+#define pqProgressWidget_h
 
 
 #include <QWidget>

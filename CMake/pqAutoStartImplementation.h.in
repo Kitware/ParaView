@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __@ARG_CLASS_NAME@Implementation_h
-#define __@ARG_CLASS_NAME@Implementation_h
+#ifndef @ARG_CLASS_NAME@Implementation_h
+#define @ARG_CLASS_NAME@Implementation_h
 
 #include <QObject>
 #include "pqAutoStartInterface.h"

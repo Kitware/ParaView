@@ -19,8 +19,8 @@
 // .SECTION See Also
 // vtkPVXMLParser vtkPVXMLElement
 
-#ifndef __vtkSMStateLoader_h
-#define __vtkSMStateLoader_h
+#ifndef vtkSMStateLoader_h
+#define vtkSMStateLoader_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDeserializerXML.h"

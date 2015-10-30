@@ -19,8 +19,8 @@
 // These options can be retrieved during run-time, set using configuration file
 // or using Command Line Arguments.
 
-#ifndef __vtkCommandOptions_h
-#define __vtkCommandOptions_h
+#ifndef vtkCommandOptions_h
+#define vtkCommandOptions_h
 
 #include "vtkObject.h"
 #include "vtkPVCommonModule.h" // needed for export macro

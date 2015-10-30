@@ -16,8 +16,8 @@
 // .SECTION Description
 // This class handles array selection in a way that makes ParaView happy.
 
-#ifndef __vtkSciVizStatisticsPrivate_h
-#define __vtkSciVizStatisticsPrivate_h
+#ifndef vtkSciVizStatisticsPrivate_h
+#define vtkSciVizStatisticsPrivate_h
 
 #include "vtkStatisticsAlgorithmPrivate.h"
 
@@ -31,7 +31,7 @@ public:
 };
 
 
-#endif // __vtkSciVizStatisticsPrivate_h
+#endif // vtkSciVizStatisticsPrivate_h
 
 
 // VTK-HeaderTest-Exclude: vtkSciVizStatisticsPrivate.h

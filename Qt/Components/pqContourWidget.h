@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqContourWidget_h
-#define __pqContourWidget_h
+#ifndef pqContourWidget_h
+#define pqContourWidget_h
 
 #include "pq3DWidget.h"
 #include <QColor>

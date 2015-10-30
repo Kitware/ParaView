@@ -24,8 +24,8 @@
 // order using the unstructured grid. In which case, however data will be
 // transferred among processing.
 
-#ifndef __vtkStructuredGridVolumeRepresentation_h
-#define __vtkStructuredGridVolumeRepresentation_h
+#ifndef vtkStructuredGridVolumeRepresentation_h
+#define vtkStructuredGridVolumeRepresentation_h
 
 #include "vtkUnstructuredGridVolumeRepresentation.h"
 

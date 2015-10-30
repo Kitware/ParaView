@@ -22,8 +22,8 @@
 // from a coprocessing adaptor.  If not available, it will compute the 
 // information.
 
-#ifndef __vtkAMRDualGridHelper_h
-#define __vtkAMRDualGridHelper_h
+#ifndef vtkAMRDualGridHelper_h
+#define vtkAMRDualGridHelper_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkObject.h"

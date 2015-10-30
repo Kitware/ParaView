@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqComparativePlotView_h
-#define __pqComparativePlotView_h
+#ifndef pqComparativePlotView_h
+#define pqComparativePlotView_h
 
 #include "pqPlotView.h"
 

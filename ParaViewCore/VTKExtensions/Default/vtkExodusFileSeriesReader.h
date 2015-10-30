@@ -33,8 +33,8 @@
 // restores the information.
 //
 
-#ifndef __vtkExodusFileSeriesReader_h
-#define __vtkExodusFileSeriesReader_h
+#ifndef vtkExodusFileSeriesReader_h
+#define vtkExodusFileSeriesReader_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkFileSeriesReader.h"
@@ -68,4 +68,4 @@ private:
   void operator=(const vtkExodusFileSeriesReader &);    // Not implemented
 };
 
-#endif //__vtkExodusFileSeriesReader_h
+#endif //vtkExodusFileSeriesReader_h

@@ -17,8 +17,8 @@
 // vtkPVTrackballRotate allows the user to interactively
 // manipulate the camera, the viewpoint of the scene.
 
-#ifndef __vtkPVTrackballRotate_h
-#define __vtkPVTrackballRotate_h
+#ifndef vtkPVTrackballRotate_h
+#define vtkPVTrackballRotate_h
 
 #include "vtkCameraManipulator.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

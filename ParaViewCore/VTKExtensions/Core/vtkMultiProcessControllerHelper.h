@@ -18,8 +18,8 @@
 // vtkMultiProcessControllerHelper is collection of assorted helper
 // routines dealing with communication.
 
-#ifndef __vtkMultiProcessControllerHelper_h
-#define __vtkMultiProcessControllerHelper_h
+#ifndef vtkMultiProcessControllerHelper_h
+#define vtkMultiProcessControllerHelper_h
 
 #include "vtkObject.h"
 #include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro

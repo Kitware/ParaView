@@ -17,8 +17,8 @@
 // Information object used to retreived the SIL graph from a file reader or
 // any compatible source.
 
-#ifndef __vtkPVSILInformation_h
-#define __vtkPVSILInformation_h
+#ifndef vtkPVSILInformation_h
+#define vtkPVSILInformation_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"

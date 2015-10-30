@@ -22,8 +22,8 @@
 // When debugging issues with plugins try setting the PV_PLUGIN_DEBUG
 // environment variable on all the processes where you are trying to load the
 // plugin. That will print extra information as the plugin is being loaded.
-#ifndef __vtkPVPlugin_h
-#define __vtkPVPlugin_h
+#ifndef vtkPVPlugin_h
+#define vtkPVPlugin_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"
@@ -92,7 +92,7 @@ typedef vtkPVPlugin* (C_DECL *pv_plugin_query_instance_fptr)();
 #endif
 
 /// TODO: add compiler version.
-#define __PV_PLUGIN_VERIFICATION_STRING__ "paraviewplugin|" CMAKE_CXX_COMPILER_ID "|" PARAVIEW_VERSION
+#define _PV_PLUGIN_VERIFICATION_STRING "paraviewplugin|" CMAKE_CXX_COMPILER_ID "|" PARAVIEW_VERSION
 
 // vtkPVPluginLoader checks for existence of this function
 // to determine if the shared-library is a paraview-server-manager plugin or
@@ -101,15 +101,15 @@ typedef vtkPVPlugin* (C_DECL *pv_plugin_query_instance_fptr)();
 // builds, plugins cannot be loaded at runtime (only at compile time) so
 // verification is not necessary.
 #ifdef BUILD_SHARED_LIBS
-# define __PV_PLUGIN_GLOBAL_FUNCTIONS(PLUGIN) \
+# define _PV_PLUGIN_GLOBAL_FUNCTIONS(PLUGIN) \
   C_EXPORT const char* C_DECL pv_plugin_query_verification_data()\
-  { return __PV_PLUGIN_VERIFICATION_STRING__; } \
+  { return _PV_PLUGIN_VERIFICATION_STRING; } \
   C_EXPORT vtkPVPlugin* C_DECL pv_plugin_instance() \
   { return pv_plugin_instance_##PLUGIN(); }
 #else // BUILD_SHARED_LIBS
 // define empty export. When building static, we don't want to define the global
 // functions.
-# define __PV_PLUGIN_GLOBAL_FUNCTIONS(PLUGIN)
+# define _PV_PLUGIN_GLOBAL_FUNCTIONS(PLUGIN)
 #endif // BUILD_SHARED_LIBS
 
 // vtkPVPluginLoader uses this function to obtain the vtkPVPlugin instance  for
@@ -122,7 +122,7 @@ typedef vtkPVPlugin* (C_DECL *pv_plugin_query_instance_fptr)();
     static PLUGINCLASS instance;\
     return &instance;\
   }\
-  __PV_PLUGIN_GLOBAL_FUNCTIONS(PLUGIN);
+  _PV_PLUGIN_GLOBAL_FUNCTIONS(PLUGIN);
 
 // PV_PLUGIN_IMPORT_INIT and PV_PLUGIN_IMPORT are provided to make it possible
 // to import a plugin at compile time. In static builds, the only way to use a
@@ -137,6 +137,6 @@ typedef vtkPVPlugin* (C_DECL *pv_plugin_query_instance_fptr)();
 # define PV_PLUGIN_IMPORT(PLUGIN)\
   vtkPVPlugin::ImportPlugin(pv_plugin_instance_##PLUGIN());
 
-#endif // __vtkPVPlugin_h
+#endif // vtkPVPlugin_h
 // VTK-HeaderTest-Exclude: vtkPVPlugin.h
 

@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqRescaleVisibleScalarRangeReaction_h
-#define __pqRescaleVisibleScalarRangeReaction_h
+#ifndef pqRescaleVisibleScalarRangeReaction_h
+#define pqRescaleVisibleScalarRangeReaction_h
 
 #include "pqReaction.h"
 

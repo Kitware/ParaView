@@ -21,8 +21,8 @@
 // the  on every process that it is loaded.
 // Whenever a plugin is registered, this class fires a vtkCommand::RegisterEvent
 // that handlers can listen to, to process the plugin.
-#ifndef __vtkPVPluginTracker_h
-#define __vtkPVPluginTracker_h
+#ifndef vtkPVPluginTracker_h
+#define vtkPVPluginTracker_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"

@@ -17,8 +17,8 @@
 // vtkPVCameraAnimationCue is a specialization of the vtkPVKeyFrameAnimationCue suitable
 // for animating cameras from a vtkPVRenderView.
 
-#ifndef __vtkPVCameraAnimationCue_h
-#define __vtkPVCameraAnimationCue_h
+#ifndef vtkPVCameraAnimationCue_h
+#define vtkPVCameraAnimationCue_h
 
 #include "vtkPVAnimationModule.h" //needed for exports
 #include "vtkPVKeyFrameAnimationCue.h"

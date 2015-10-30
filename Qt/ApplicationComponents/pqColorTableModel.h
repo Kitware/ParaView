@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqColorTableModel_h
-#define __pqColorTableModel_h
+#ifndef pqColorTableModel_h
+#define pqColorTableModel_h
 
 #include <QAbstractTableModel>
 #include "pqApplicationComponentsModule.h"

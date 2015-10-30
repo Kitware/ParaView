@@ -20,8 +20,8 @@
 // Note that ForceUpdate() may not result in input updating at all if it has
 // been already updated by some other means.
 
-#ifndef __vtkPVUpdateSuppressor_h
-#define __vtkPVUpdateSuppressor_h
+#ifndef vtkPVUpdateSuppressor_h
+#define vtkPVUpdateSuppressor_h
 
 #include "vtkDataObjectAlgorithm.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

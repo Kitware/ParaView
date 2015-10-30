@@ -27,8 +27,8 @@
 // Data is assessed by assigning a cluster center and distance to the
 // cluster to each point in the input data set.
 
-#ifndef __vtkPSciVizKMeans_h
-#define __vtkPSciVizKMeans_h
+#ifndef vtkPSciVizKMeans_h
+#define vtkPSciVizKMeans_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkSciVizStatistics.h"
@@ -76,4 +76,4 @@ private:
   void operator = ( const vtkPSciVizKMeans& ); // Not implemented.
 };
 
-#endif // __vtkPSciVizKMeans_h
+#endif // vtkPSciVizKMeans_h

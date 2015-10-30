@@ -31,8 +31,8 @@
 // .SECTION See Also
 // vtkPVAnimationCue vtkAnimationCue
 
-#ifndef __vtkPVCueManipulator_h
-#define __vtkPVCueManipulator_h
+#ifndef vtkPVCueManipulator_h
+#define vtkPVCueManipulator_h
 
 #include "vtkObject.h"
 #include "vtkPVAnimationModule.h" // needed for export macro

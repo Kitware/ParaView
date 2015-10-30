@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqSettingsDialog_h
-#define __pqSettingsDialog_h
+#ifndef pqSettingsDialog_h
+#define pqSettingsDialog_h
 
 #include <QDialog>
 #include "pqComponentsModule.h"

@@ -15,8 +15,8 @@
 // .NAME vtkPVHistogramChartRepresentation
 // .SECTION Description
 
-#ifndef __vtkPVHistogramChartRepresentation_h
-#define __vtkPVHistogramChartRepresentation_h
+#ifndef vtkPVHistogramChartRepresentation_h
+#define vtkPVHistogramChartRepresentation_h
 
 #include "vtkXYChartRepresentation.h"
 

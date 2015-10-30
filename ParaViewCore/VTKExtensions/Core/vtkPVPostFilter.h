@@ -22,8 +22,8 @@
 //  Interpolate cell centered data to point data, and the inverse if needed
 // by the filter.
 
-#ifndef __vtkPVPostFilter_h
-#define __vtkPVPostFilter_h
+#ifndef vtkPVPostFilter_h
+#define vtkPVPostFilter_h
 
 #include "vtkDataObjectAlgorithm.h"
 #include "vtkStdString.h" // needed for: vtkStdString

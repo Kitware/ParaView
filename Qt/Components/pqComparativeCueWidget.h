@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqComparativeCueWidget_h 
-#define __pqComparativeCueWidget_h
+#ifndef pqComparativeCueWidget_h
+#define pqComparativeCueWidget_h
 
 #include <QTableWidget>
 #include "pqComponentsModule.h"

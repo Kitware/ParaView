@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqDataTimeStepBehavior_h 
-#define __pqDataTimeStepBehavior_h
+#ifndef pqDataTimeStepBehavior_h
+#define pqDataTimeStepBehavior_h
 
 #include <QObject>
 #include "pqApplicationComponentsModule.h"

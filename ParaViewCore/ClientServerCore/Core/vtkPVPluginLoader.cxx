@@ -393,11 +393,11 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
 
   // Validate the signature. If the signature is invalid, then this plugin is
   // totally bogus (even for the GUI layer).
-  if (pv_verfication_data != __PV_PLUGIN_VERIFICATION_STRING__)
+  if (pv_verfication_data != _PV_PLUGIN_VERIFICATION_STRING)
     {
     std::ostringstream error;
     error << "Mismatch in versions: \n" <<
-      "ParaView Signature: " << __PV_PLUGIN_VERIFICATION_STRING__ << "\n"
+      "ParaView Signature: " << _PV_PLUGIN_VERIFICATION_STRING << "\n"
       "Plugin Signature: " << pv_verfication_data.c_str();
     vtkPVPluginLoaderErrorMacro(error.str().c_str());
     vtkDynamicLoader::CloseLibrary(lib);

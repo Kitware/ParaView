@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqServerConfigurationCollection_h 
-#define __pqServerConfigurationCollection_h
+#ifndef pqServerConfigurationCollection_h
+#define pqServerConfigurationCollection_h
 
 #include <QObject>
 #include <QMap>

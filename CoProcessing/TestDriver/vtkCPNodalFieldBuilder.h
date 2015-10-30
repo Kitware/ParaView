@@ -16,8 +16,8 @@
 // .SECTION Description
 // Class for specifying nodal fields over grids for a test driver.  
 
-#ifndef __vtkCPNodalFieldBuilder_h
-#define __vtkCPNodalFieldBuilder_h
+#ifndef vtkCPNodalFieldBuilder_h
+#define vtkCPNodalFieldBuilder_h
 
 #include "vtkCPFieldBuilder.h"
 #include "vtkPVCatalystTestDriverModule.h" // needed for export macros

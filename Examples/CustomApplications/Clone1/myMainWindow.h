@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __myMainWindow_h 
-#define __myMainWindow_h
+#ifndef myMainWindow_h
+#define myMainWindow_h
 
 #include <QMainWindow>
 

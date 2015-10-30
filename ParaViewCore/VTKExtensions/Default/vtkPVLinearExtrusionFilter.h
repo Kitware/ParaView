@@ -18,8 +18,8 @@
 // The only difference is changing the default extrusion type to vector
 // extrusion
 
-#ifndef __vtkPVLinearExtrusionFilter_h
-#define __vtkPVLinearExtrusionFilter_h
+#ifndef vtkPVLinearExtrusionFilter_h
+#define vtkPVLinearExtrusionFilter_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPLinearExtrusionFilter.h"

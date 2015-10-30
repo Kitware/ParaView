@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqMultiSliceAxisWidget_h
-#define __pqMultiSliceAxisWidget_h
+#ifndef pqMultiSliceAxisWidget_h
+#define pqMultiSliceAxisWidget_h
 
 #include "pqCoreModule.h"
 

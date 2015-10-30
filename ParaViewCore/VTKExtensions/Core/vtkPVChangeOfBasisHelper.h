@@ -17,8 +17,8 @@
 // vtkPVChangeOfBasisHelper is designed for ORNL-SNS use-cases where we needed
 // to add support for different basis.
 
-#ifndef __vtkPVChangeOfBasisHelper_h
-#define __vtkPVChangeOfBasisHelper_h
+#ifndef vtkPVChangeOfBasisHelper_h
+#define vtkPVChangeOfBasisHelper_h
 
 #include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
 #include "vtkObject.h"

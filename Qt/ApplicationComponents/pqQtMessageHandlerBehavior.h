@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqQtMessageHandlerBehavior_h 
-#define __pqQtMessageHandlerBehavior_h
+#ifndef pqQtMessageHandlerBehavior_h
+#define pqQtMessageHandlerBehavior_h
 
 #include <QObject>
 #include "pqApplicationComponentsModule.h"

@@ -21,8 +21,8 @@
 // arrays e.g. "ColorArrayName" property of geometry representations. This
 // domain extends vtkSMArrayListDomain to add arrays from represented data
 // for representations.
-#ifndef __vtkSMRepresentedArrayListDomain_h
-#define __vtkSMRepresentedArrayListDomain_h
+#ifndef vtkSMRepresentedArrayListDomain_h
+#define vtkSMRepresentedArrayListDomain_h
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMArrayListDomain.h"

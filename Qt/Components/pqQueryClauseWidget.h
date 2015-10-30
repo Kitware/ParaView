@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqQueryClauseWidget_h 
-#define __pqQueryClauseWidget_h
+#ifndef pqQueryClauseWidget_h
+#define pqQueryClauseWidget_h
 
 #include <QWidget>
 #include "pqComponentsModule.h"

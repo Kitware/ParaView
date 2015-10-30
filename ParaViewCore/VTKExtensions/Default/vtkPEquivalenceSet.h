@@ -17,8 +17,8 @@
 // Same as EquivalenceSet, but resolving is a global operation.
 // .SEE vtkEquivalenceSet
 
-#ifndef __vtkPEquivalenceSet_h
-#define __vtkPEquivalenceSet_h
+#ifndef vtkPEquivalenceSet_h
+#define vtkPEquivalenceSet_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkEquivalenceSet.h"
@@ -42,4 +42,4 @@ private:
   void operator=(const vtkPEquivalenceSet&);  // Not implemented.
 };
 
-#endif /* __vtkPEquivalenceSet_h */
+#endif /* vtkPEquivalenceSet_h */

@@ -17,8 +17,8 @@
 // vtkCleanArrays is a filter used to remove (or fill up) partial arrays in a
 // vtkDataSet across processes. Empty dataset on any processes is ignored i.e.
 // it does not affect the arrays on any processes.
-#ifndef __vtkCleanArrays_h
-#define __vtkCleanArrays_h
+#ifndef vtkCleanArrays_h
+#define vtkCleanArrays_h
 
 #include "vtkDataSetAlgorithm.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

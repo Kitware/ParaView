@@ -18,8 +18,8 @@
 // single combined rectilinear grid. Inputs are appends based on
 // their extents.
 
-#ifndef __vtkAppendRectilinearGrid_h
-#define __vtkAppendRectilinearGrid_h
+#ifndef vtkAppendRectilinearGrid_h
+#define vtkAppendRectilinearGrid_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkRectilinearGridAlgorithm.h"

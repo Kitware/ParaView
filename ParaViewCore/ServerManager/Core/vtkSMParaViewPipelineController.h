@@ -16,8 +16,8 @@
 // .SECTION Description
 //
 
-#ifndef __vtkSMParaViewPipelineController_h
-#define __vtkSMParaViewPipelineController_h
+#ifndef vtkSMParaViewPipelineController_h
+#define vtkSMParaViewPipelineController_h
 
 #include "vtkSMObject.h"
 

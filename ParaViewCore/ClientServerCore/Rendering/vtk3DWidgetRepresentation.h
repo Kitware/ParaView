@@ -18,8 +18,8 @@
 // and their representations. It makes it possible to add 3D widgets to
 // vtkPVRenderView.
 
-#ifndef __vtk3DWidgetRepresentation_h
-#define __vtk3DWidgetRepresentation_h
+#ifndef vtk3DWidgetRepresentation_h
+#define vtk3DWidgetRepresentation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkDataRepresentation.h"

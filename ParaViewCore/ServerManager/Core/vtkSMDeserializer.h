@@ -18,8 +18,8 @@
 // states. This is the base class of deserialization classes that load
 // XMLs/Protobuf/? to restore servermanager state (or part thereof).
 
-#ifndef __vtkSMDeserializer_h
-#define __vtkSMDeserializer_h
+#ifndef vtkSMDeserializer_h
+#define vtkSMDeserializer_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkObject.h"

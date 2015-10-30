@@ -16,8 +16,8 @@
 // .SECTION Description
 //
 
-#ifndef __vtkExtractsDeliveryHelper_h
-#define __vtkExtractsDeliveryHelper_h
+#ifndef vtkExtractsDeliveryHelper_h
+#define vtkExtractsDeliveryHelper_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"

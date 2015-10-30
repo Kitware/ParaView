@@ -25,8 +25,8 @@
 // .SECTION Thanks
 // Thanks to .
 
-#ifndef __CGIO_HELPERS_INTERNAL__
-#define __CGIO_HELPERS_INTERNAL__
+#ifndef cgio_helpers_h
+#define cgio_helpers_h
 
 #include <vector>
 #include <map>
@@ -113,4 +113,4 @@ int readBaseReferenceState(int cgioNum, double nodeId, CGNSRead::BaseInformation
 int readZoneInfo(int cgioNum, double nodeId, CGNSRead::BaseInformation& baseInfo);
 
 }
-#endif //__CGIO_HELPERS_INTERNAL__
+#endif //cgio_helpers_h

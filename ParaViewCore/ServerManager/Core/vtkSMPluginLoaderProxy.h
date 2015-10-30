@@ -18,8 +18,8 @@
 // renderserver processes. Simply call vtkSMPluginLoaderProxy::LoadPlugin() with
 // the right path to load the plugin remotely.
 
-#ifndef __vtkSMPluginLoaderProxy_h
-#define __vtkSMPluginLoaderProxy_h
+#ifndef vtkSMPluginLoaderProxy_h
+#define vtkSMPluginLoaderProxy_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMProxy.h"

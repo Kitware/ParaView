@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef __pqItemViewSearchWidget_h
-#define __pqItemViewSearchWidget_h
+#ifndef pqItemViewSearchWidget_h
+#define pqItemViewSearchWidget_h
 
 #include "pqComponentsModule.h"
 #include <QDialog>

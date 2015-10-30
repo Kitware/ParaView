@@ -18,8 +18,8 @@
 // 
 
 
-#ifndef __vtkSMTestDriver_h
-#define __vtkSMTestDriver_h
+#ifndef vtkSMTestDriver_h
+#define vtkSMTestDriver_h
 
 #include <string>
 #include <vector>

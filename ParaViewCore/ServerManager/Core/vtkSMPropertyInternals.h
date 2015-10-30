@@ -13,8 +13,8 @@
 
 =========================================================================*/
 
-#ifndef __vtkSMPropertyInternals_h
-#define __vtkSMPropertyInternals_h
+#ifndef vtkSMPropertyInternals_h
+#define vtkSMPropertyInternals_h
 
 #include "vtkSMDomain.h"
 #include "vtkSMProperty.h"

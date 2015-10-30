@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqPresetToPixmap_h
-#define __pqPresetToPixmap_h
+#ifndef pqPresetToPixmap_h
+#define pqPresetToPixmap_h
 
 #include <QObject>
 #include <QScopedPointer>

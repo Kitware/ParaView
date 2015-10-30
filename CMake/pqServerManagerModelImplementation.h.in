@@ -1,8 +1,8 @@
 /// Generated file. Do not edit.
 
 
-#ifndef __@ARG_TYPE@ServerManagerModelImplementation_h
-#define __@ARG_TYPE@ServerManagerModelImplementation_h
+#ifndef @ARG_TYPE@ServerManagerModelImplementation_h
+#define @ARG_TYPE@ServerManagerModelImplementation_h
 
 #include "pqServerManagerModelInterface.h"
 

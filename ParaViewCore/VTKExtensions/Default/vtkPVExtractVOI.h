@@ -21,8 +21,8 @@
 // .SECTION See Also
 // vtkExtractVOI vtkExtractGrid vtkExtractRectilinearGrid
 
-#ifndef __vtkPVExtractVOI_h
-#define __vtkPVExtractVOI_h
+#ifndef vtkPVExtractVOI_h
+#define vtkPVExtractVOI_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkDataSetAlgorithm.h"

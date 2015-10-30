@@ -18,8 +18,8 @@
 // Abstract class involved in ServerManager class hierarchy that has a
 // corresponding SIObject which can be local or remote.
 
-#ifndef __vtkSMRemoteObject_h
-#define __vtkSMRemoteObject_h
+#ifndef vtkSMRemoteObject_h
+#define vtkSMRemoteObject_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMSessionObject.h"
@@ -189,4 +189,4 @@ public:
 VTKPVSERVERMANAGERCORE_EXPORT vtkClientServerStream& operator<< (vtkClientServerStream& stream,
   const SIOBJECT& manipulator);
 
-#endif // #ifndef __vtkSMRemoteObject_h
+#endif // #ifndef vtkSMRemoteObject_h

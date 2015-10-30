@@ -17,8 +17,8 @@
 // A vtkClientServerStream serializable conatiner of information describing
 // memory configuration of the host of a single process.
 
-#ifndef __vtkPVSystemConfigInformation_h
-#define __vtkPVSystemConfigInformation_h
+#ifndef vtkPVSystemConfigInformation_h
+#define vtkPVSystemConfigInformation_h
 
 #include "vtkPVInformation.h"
 

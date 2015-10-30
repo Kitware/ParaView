@@ -21,8 +21,8 @@
 // In those configurations, it merely delivers a outline for the image to the
 // client and render-server and those nodes simply render the outline.
 
-#ifndef __vtkImageVolumeRepresentation_h
-#define __vtkImageVolumeRepresentation_h
+#ifndef vtkImageVolumeRepresentation_h
+#define vtkImageVolumeRepresentation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"

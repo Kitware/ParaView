@@ -19,8 +19,8 @@
 // representation type is VTK_WIREFRAME, then it will automatically remove the
 // hidden lines. 
 
-#ifndef __vtkVisibleLinesPainter_h
-#define __vtkVisibleLinesPainter_h
+#ifndef vtkVisibleLinesPainter_h
+#define vtkVisibleLinesPainter_h
 
 #include "vtkOpenGLRepresentationPainter.h"
 

@@ -16,8 +16,8 @@
 // .SECTION Description
 // Class for creating vtkUniformGrids for a test driver.  
 
-#ifndef __vtkCPUniformGridBuilder_h
-#define __vtkCPUniformGridBuilder_h
+#ifndef vtkCPUniformGridBuilder_h
+#define vtkCPUniformGridBuilder_h
 
 #include "vtkCPGridBuilder.h"
 #include "vtkPVCatalystTestDriverModule.h" // needed for export macros

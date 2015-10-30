@@ -62,8 +62,8 @@
 // row is required - hence the N+1 rows and the final entry of the column
 // named "Column".
 
-#ifndef __vtkPSciVizMultiCorrelativeStats_h
-#define __vtkPSciVizMultiCorrelativeStats_h
+#ifndef vtkPSciVizMultiCorrelativeStats_h
+#define vtkPSciVizMultiCorrelativeStats_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkSciVizStatistics.h"
@@ -87,4 +87,4 @@ private:
   void operator = ( const vtkPSciVizMultiCorrelativeStats& ); // Not implemented.
 };
 
-#endif // __vtkPSciVizMultiCorrelativeStats_h
+#endif // vtkPSciVizMultiCorrelativeStats_h

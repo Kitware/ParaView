@@ -20,8 +20,8 @@
 // cells are decimated.  I use a variation of degenerate points/cells
 // used for level transitions.
 
-#ifndef __vtkAMRDualClip_h
-#define __vtkAMRDualClip_h
+#ifndef vtkAMRDualClip_h
+#define vtkAMRDualClip_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"

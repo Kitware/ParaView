@@ -16,8 +16,8 @@
 // .SECTION Description
 //
 
-#ifndef __vtkMPICompositeManager_h
-#define __vtkMPICompositeManager_h
+#ifndef vtkMPICompositeManager_h
+#define vtkMPICompositeManager_h
 
 #include "vtkCompositeRenderManager.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

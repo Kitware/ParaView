@@ -26,8 +26,8 @@
 //
 // Internally this filter uses vtkPProbeFilter and vtkExtractSelection.
 
-#ifndef __vtkHybridProbeFilter_h
-#define __vtkHybridProbeFilter_h
+#ifndef vtkHybridProbeFilter_h
+#define vtkHybridProbeFilter_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkDataObjectAlgorithm.h"

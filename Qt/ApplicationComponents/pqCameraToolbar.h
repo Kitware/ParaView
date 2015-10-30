@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqCameraToolbar_h 
-#define __pqCameraToolbar_h
+#ifndef pqCameraToolbar_h
+#define pqCameraToolbar_h
 
 #include <QToolBar>
 #include "pqApplicationComponentsModule.h"

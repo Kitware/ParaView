@@ -19,8 +19,8 @@ PURPOSE.  See the above copyright notice for more information.
 // and columns represent points and properties for the points
 
 
-#ifndef __vtkSpyPlotHistoryReader_h
-#define __vtkSpyPlotHistoryReader_h
+#ifndef vtkSpyPlotHistoryReader_h
+#define vtkSpyPlotHistoryReader_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkTableAlgorithm.h"

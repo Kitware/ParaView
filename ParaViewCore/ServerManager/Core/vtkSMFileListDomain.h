@@ -16,8 +16,8 @@
 // .SECTION Description
 // vtkSMFileListDomain represents a domain consisting of a list of
 // filenames. It only works with vtkSMStringVectorProperty. 
-#ifndef __vtkSMFileListDomain_h
-#define __vtkSMFileListDomain_h
+#ifndef vtkSMFileListDomain_h
+#define vtkSMFileListDomain_h
 
 #include "vtkSMStringListDomain.h"
 

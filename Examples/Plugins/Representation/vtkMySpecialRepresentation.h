@@ -16,8 +16,8 @@
 // .SECTION Description
 //
 
-#ifndef __vtkMySpecialRepresentation_h
-#define __vtkMySpecialRepresentation_h
+#ifndef vtkMySpecialRepresentation_h
+#define vtkMySpecialRepresentation_h
 
 #include "vtkGeometryRepresentationWithFaces.h"
 

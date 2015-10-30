@@ -33,8 +33,8 @@
 // vtkLiveInsituLink).
 // @ingroup LiveInsitu
 
-#ifndef __vtkLiveInsituLink_h
-#define __vtkLiveInsituLink_h
+#ifndef vtkLiveInsituLink_h
+#define vtkLiveInsituLink_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 

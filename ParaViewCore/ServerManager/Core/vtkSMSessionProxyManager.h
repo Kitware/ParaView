@@ -101,8 +101,8 @@
 //       </SourceProxy>
 // </pre>
 
-#ifndef __vtkSMSessionProxyManager_h
-#define __vtkSMSessionProxyManager_h
+#ifndef vtkSMSessionProxyManager_h
+#define vtkSMSessionProxyManager_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMSessionObject.h"

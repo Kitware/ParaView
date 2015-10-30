@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqSignalAdaptorSILModel_h 
-#define __pqSignalAdaptorSILModel_h
+#ifndef pqSignalAdaptorSILModel_h
+#define pqSignalAdaptorSILModel_h
 
 #include <QObject>
 #include "pqComponentsModule.h"

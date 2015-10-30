@@ -27,8 +27,8 @@
 // views. It provides helper functions for controlling transfer functions,
 // scalar coloring, etc.
 
-#ifndef __vtkSMPVRepresentationProxy_h
-#define __vtkSMPVRepresentationProxy_h
+#ifndef vtkSMPVRepresentationProxy_h
+#define vtkSMPVRepresentationProxy_h
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMRepresentationProxy.h"

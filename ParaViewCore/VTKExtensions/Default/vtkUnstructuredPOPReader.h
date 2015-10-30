@@ -29,8 +29,8 @@
 // a GRID.nc file in the same directory as the main file.  This is used
 // to map from tripolar logical coordinates to lat-lon coordinates.
 
-#ifndef __vtkUnstructuredPOPReader_h
-#define __vtkUnstructuredPOPReader_h
+#ifndef vtkUnstructuredPOPReader_h
+#define vtkUnstructuredPOPReader_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkUnstructuredGridAlgorithm.h"

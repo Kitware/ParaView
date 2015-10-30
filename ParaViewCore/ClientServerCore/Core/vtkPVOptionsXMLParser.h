@@ -19,8 +19,8 @@
 // These options can be retrieved during run-time, set using configuration file
 // or using Command Line Arguments.
 
-#ifndef __vtkPVOptionsXMLParser_h
-#define __vtkPVOptionsXMLParser_h
+#ifndef vtkPVOptionsXMLParser_h
+#define vtkPVOptionsXMLParser_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkCommandOptionsXMLParser.h"
@@ -44,5 +44,5 @@ private:
   void operator=(const vtkPVOptionsXMLParser&); // Not implemented
 };
 
-#endif // #ifndef __vtkPVOptionsXMLParser_h
+#endif // #ifndef vtkPVOptionsXMLParser_h
 

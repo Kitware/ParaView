@@ -20,8 +20,8 @@
 // on the proxy A. Similary whenever proxy A->UpdateVTKObjects() is called,
 // B->UpdateVTKObjects() is also fired.
 
-#ifndef __vtkSMProxyLink_h
-#define __vtkSMProxyLink_h
+#ifndef vtkSMProxyLink_h
+#define vtkSMProxyLink_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMLink.h"

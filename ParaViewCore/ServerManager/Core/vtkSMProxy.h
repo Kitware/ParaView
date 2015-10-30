@@ -117,8 +117,8 @@
 // .SECTION See Also
 // vtkSMProxyManager vtkSMProperty vtkSMSourceProxy vtkSMPropertyIterator
 
-#ifndef __vtkSMProxy_h
-#define __vtkSMProxy_h
+#ifndef vtkSMProxy_h
+#define vtkSMProxy_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMRemoteObject.h"

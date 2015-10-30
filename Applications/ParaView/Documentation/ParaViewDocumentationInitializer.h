@@ -1,5 +1,5 @@
-#ifndef __ParaViewDocumentationInitializer_h
-#define __ParaViewDocumentationInitializer_h
+#ifndef ParaViewDocumentationInitializer_h
+#define ParaViewDocumentationInitializer_h
 
 void PARAVIEW_DOCUMENTATION_INIT();
 

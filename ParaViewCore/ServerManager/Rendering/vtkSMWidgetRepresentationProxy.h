@@ -19,8 +19,8 @@
 // appearance of server-side representation to the client-side 
 // representation
 
-#ifndef __vtkSMWidgetRepresentationProxy_h
-#define __vtkSMWidgetRepresentationProxy_h
+#ifndef vtkSMWidgetRepresentationProxy_h
+#define vtkSMWidgetRepresentationProxy_h
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMProxy.h"

@@ -12,8 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __vtkCPAdaptorAPI_h
-#define __vtkCPAdaptorAPI_h
+#ifndef vtkCPAdaptorAPI_h
+#define vtkCPAdaptorAPI_h
 
 #include "vtkPVCatalystModule.h" // For windows import/export of shared libraries
 #include "vtkObject.h"

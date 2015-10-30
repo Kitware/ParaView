@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqCinemaTrack_h
-#define __pqCinemaTrack_h
+#ifndef pqCinemaTrack_h
+#define pqCinemaTrack_h
 
 #include "pqComponentsModule.h"
 #include <QString>

@@ -20,8 +20,8 @@
 // Update: This filter can now support delivering vtkUniformGridAMR datasets in
 // PASS_THROUGH and/or COLLECT modes.
 
-#ifndef __vtkMPIMoveData_h
-#define __vtkMPIMoveData_h
+#ifndef vtkMPIMoveData_h
+#define vtkMPIMoveData_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPassInputTypeAlgorithm.h"

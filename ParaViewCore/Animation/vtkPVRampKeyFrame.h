@@ -16,8 +16,8 @@
 // .SECTION Description
 // Interplates lineraly between consequtive key frames.
 
-#ifndef __vtkPVRampKeyFrame_h
-#define __vtkPVRampKeyFrame_h
+#ifndef vtkPVRampKeyFrame_h
+#define vtkPVRampKeyFrame_h
 
 #include "vtkPVKeyFrame.h"
 

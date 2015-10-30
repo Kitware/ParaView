@@ -19,8 +19,8 @@
 // ParaView's client-server streams to create new classes. Thus we don't have to
 // do any additional initialization as needed for vtkInstantiator to work.
 
-#ifndef __vtkPVInstantiator_h
-#define __vtkPVInstantiator_h
+#ifndef vtkPVInstantiator_h
+#define vtkPVInstantiator_h
 
 #include "vtkObject.h"
 #include "vtkPVCommonModule.h" // needed for export macro

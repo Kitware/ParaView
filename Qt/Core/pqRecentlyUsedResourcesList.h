@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqRecentlyUsedResourcesList_h 
-#define __pqRecentlyUsedResourcesList_h
+#ifndef pqRecentlyUsedResourcesList_h
+#define pqRecentlyUsedResourcesList_h
 
 #include <QObject>
 #include <QList>

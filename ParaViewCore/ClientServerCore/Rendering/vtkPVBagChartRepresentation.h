@@ -18,8 +18,8 @@
 // subclass for bag plots representation. It exposes API from
 // underlying vtkXYChart and vtkPlotBag.
 
-#ifndef __vtkPVBagChartRepresentation_h
-#define __vtkPVBagChartRepresentation_h
+#ifndef vtkPVBagChartRepresentation_h
+#define vtkPVBagChartRepresentation_h
 
 #include "vtkChartRepresentation.h"
 

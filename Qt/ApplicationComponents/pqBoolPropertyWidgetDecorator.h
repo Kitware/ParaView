@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqBoolPropertyWidgetDecorator_h
-#define __pqBoolPropertyWidgetDecorator_h
+#ifndef pqBoolPropertyWidgetDecorator_h
+#define pqBoolPropertyWidgetDecorator_h
 
 #include "pqApplicationComponentsModule.h"
 #include "pqPropertyWidgetDecorator.h"

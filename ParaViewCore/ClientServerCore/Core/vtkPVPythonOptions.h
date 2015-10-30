@@ -19,8 +19,8 @@
 // These options can be retrieved during run-time, set using configuration file
 // or using Command Line Arguments.
 
-#ifndef __vtkPVPythonOptions_h
-#define __vtkPVPythonOptions_h
+#ifndef vtkPVPythonOptions_h
+#define vtkPVPythonOptions_h
 
 #include "vtkPVOptions.h"
 
@@ -66,4 +66,4 @@ private:
   void operator=(const vtkPVPythonOptions&); // Not implemented
 };
 
-#endif // #ifndef __vtkPVPythonOptions_h
+#endif // #ifndef vtkPVPythonOptions_h

@@ -16,8 +16,8 @@
 // .SECTION Description
 // Object that managed multi-client communication and provide the group awareness
 
-#ifndef __vtkSICollaborationManager_h
-#define __vtkSICollaborationManager_h
+#ifndef vtkSICollaborationManager_h
+#define vtkSICollaborationManager_h
 
 #include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIObject.h"
@@ -59,4 +59,4 @@ private:
 //ETX
 };
 
-#endif // #ifndef __vtkSICollaborationManager_h
+#endif // #ifndef vtkSICollaborationManager_h

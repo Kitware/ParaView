@@ -15,8 +15,8 @@
 // .NAME vtkPVEnSightMasterServerReader2 - 
 // .SECTION Description
 
-#ifndef __vtkPVEnSightMasterServerReader2_h
-#define __vtkPVEnSightMasterServerReader2_h
+#ifndef vtkPVEnSightMasterServerReader2_h
+#define vtkPVEnSightMasterServerReader2_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPGenericEnSightReader.h"

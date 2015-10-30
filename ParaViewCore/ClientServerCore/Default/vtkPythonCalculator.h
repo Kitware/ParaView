@@ -27,8 +27,8 @@
 // arrays (i.e. arrays['array_name']). The points can be accessed using the
 // points variable.
 
-#ifndef __vtkPythonCalculator_h
-#define __vtkPythonCalculator_h
+#ifndef vtkPythonCalculator_h
+#define vtkPythonCalculator_h
 
 #include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
 #include "vtkProgrammableFilter.h"

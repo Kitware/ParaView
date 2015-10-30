@@ -21,8 +21,8 @@
 // FIXME: This class is currrently non-functional. I need to re-energize this
 // class. It's falling down the priority chain for now.
 
-#ifndef __vtkSMGlobalPropertiesLinkUndoElement_h
-#define __vtkSMGlobalPropertiesLinkUndoElement_h
+#ifndef vtkSMGlobalPropertiesLinkUndoElement_h
+#define vtkSMGlobalPropertiesLinkUndoElement_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMUndoElement.h"

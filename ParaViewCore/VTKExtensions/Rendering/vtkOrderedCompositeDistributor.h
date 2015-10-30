@@ -36,8 +36,8 @@
 // turn ordered compositing on and off.
 //
 
-#ifndef __vtkOrderedCompositeDistributor_h
-#define __vtkOrderedCompositeDistributor_h
+#ifndef vtkOrderedCompositeDistributor_h
+#define vtkOrderedCompositeDistributor_h
 
 #include "vtkPointSetAlgorithm.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
@@ -97,4 +97,4 @@ private:
   void operator=(const vtkOrderedCompositeDistributor &);  // Not implemented.
 };
 
-#endif //__vtkOrderedCompositeDistributor_h
+#endif //vtkOrderedCompositeDistributor_h

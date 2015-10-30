@@ -18,8 +18,8 @@
 // Player to play an animation scene through a discrete set of time values.
 // FramesPerTimestep controls how many frames are generated for each time value.
 
-#ifndef __vtkTimestepsAnimationPlayer_h
-#define __vtkTimestepsAnimationPlayer_h
+#ifndef vtkTimestepsAnimationPlayer_h
+#define vtkTimestepsAnimationPlayer_h
 
 #include "vtkAnimationPlayer.h"
 #include "vtkPVAnimationModule.h" // needed for export macro

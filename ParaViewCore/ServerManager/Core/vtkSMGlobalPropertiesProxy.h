@@ -43,8 +43,8 @@
 // hints on the property, we can in future add support for respecting hints at
 // the proxy level if needed.
 
-#ifndef __vtkSMGlobalPropertiesProxy_h
-#define __vtkSMGlobalPropertiesProxy_h
+#ifndef vtkSMGlobalPropertiesProxy_h
+#define vtkSMGlobalPropertiesProxy_h
 
 #include "vtkSMProxy.h"
 #include "vtkPVServerManagerCoreModule.h" //needed for exports

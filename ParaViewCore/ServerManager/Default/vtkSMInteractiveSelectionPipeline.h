@@ -25,8 +25,8 @@
 // vtkSMPreselectionPipeline vtkSMTooltipSelectionPipeline
 
 
-#ifndef __vtkSMInteractiveSelectionPipeline_h
-#define __vtkSMInteractiveSelectionPipeline_h
+#ifndef vtkSMInteractiveSelectionPipeline_h
+#define vtkSMInteractiveSelectionPipeline_h
 
 #include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMPreselectionPipeline.h"

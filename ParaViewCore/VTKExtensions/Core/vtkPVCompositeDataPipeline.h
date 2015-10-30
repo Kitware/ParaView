@@ -22,8 +22,8 @@
 //     vtkPVPostFilter is used to automatically extract components or generated
 //     derived arrays such as magnitude array for vectors.
 
-#ifndef __vtkPVCompositeDataPipeline_h
-#define __vtkPVCompositeDataPipeline_h
+#ifndef vtkPVCompositeDataPipeline_h
+#define vtkPVCompositeDataPipeline_h
 
 #include "vtkCompositeDataPipeline.h"
 #include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro

@@ -40,8 +40,8 @@
 //  traversing the tree in inorder, and recording only the leaf
 //  IDs.
 
-#ifndef __vtkKdTreeGenerator_h
-#define __vtkKdTreeGenerator_h
+#ifndef vtkKdTreeGenerator_h
+#define vtkKdTreeGenerator_h
 
 #include "vtkObject.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro

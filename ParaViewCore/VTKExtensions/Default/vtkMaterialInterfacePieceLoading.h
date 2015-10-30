@@ -17,8 +17,8 @@
 // Data structure that describes a fragment's loading.
 // Holds its id and its loading factor.
 
-#ifndef __vtkMaterialInterfacePieceLoading_h
-#define __vtkMaterialInterfacePieceLoading_h
+#ifndef vtkMaterialInterfacePieceLoading_h
+#define vtkMaterialInterfacePieceLoading_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkSystemIncludes.h"

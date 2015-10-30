@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqStandardLegacyCustomPanels_h
-#define __pqStandardLegacyCustomPanels_h
+#ifndef pqStandardLegacyCustomPanels_h
+#define pqStandardLegacyCustomPanels_h
 
 #include <QObject>
 #include "pqObjectPanelInterface.h"

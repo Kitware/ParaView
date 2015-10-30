@@ -41,8 +41,8 @@
 // XML with valid values as "min", "max" or "mid". If none is specified, "mid"
 // is assumed.
 
-#ifndef __vtkSMRangeDomainTemplate_h
-#define __vtkSMRangeDomainTemplate_h
+#ifndef vtkSMRangeDomainTemplate_h
+#define vtkSMRangeDomainTemplate_h
 
 #include "vtkSMDomain.h"
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
@@ -201,7 +201,7 @@ private:
 # define VTK_SM_RANGE_DOMAIN_TEMPLATE_INSTANTIATE(T)
 #endif // !defined(VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION)
 
-#endif // !defined(__vtkSMRangeDomainTemplate_h)
+#endif // !defined(vtkSMRangeDomainTemplate_h)
 
 // This portion must be OUTSIDE the include blockers.  Each
 // vtkSMRangeDomainTemplate subclass uses this to give its instantiation

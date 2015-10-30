@@ -17,8 +17,8 @@ PURPOSE.  See the above copyright notice for more information.
 // Extracted from vtkSpyPlotReader
 //-----------------------------------------------------------------------------
 //=============================================================================
-#ifndef __vtkSpyPlotReaderMap_h
-#define __vtkSpyPlotReaderMap_h
+#ifndef vtkSpyPlotReaderMap_h
+#define vtkSpyPlotReaderMap_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkSystemIncludes.h"

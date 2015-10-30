@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqColorChooserButtonWithPalettes_h
-#define __pqColorChooserButtonWithPalettes_h
+#ifndef pqColorChooserButtonWithPalettes_h
+#define pqColorChooserButtonWithPalettes_h
 
 #include "pqColorChooserButton.h"
 #include "pqComponentsModule.h"

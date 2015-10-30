@@ -18,8 +18,8 @@
 // UnstructuredGrid is built directly from a vtkUniformGrid to demonstrate
 // how to input a grid into the coprocessor.
 
-#ifndef __vtkCustomUnstructuredGridBuilder_h
-#define __vtkCustomUnstructuredGridBuilder_h
+#ifndef vtkCustomUnstructuredGridBuilder_h
+#define vtkCustomUnstructuredGridBuilder_h
 
 #include "vtkCPUnstructuredGridBuilder.h"
 

@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqArrayListDomain_h
-#define __pqArrayListDomain_h
+#ifndef pqArrayListDomain_h
+#define pqArrayListDomain_h
 
 #include <QObject>
 #include "pqComponentsModule.h"

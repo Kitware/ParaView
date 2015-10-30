@@ -23,8 +23,8 @@
 // correctly. We use this helper to keep buffered images from all views so that
 // they can be restored.
 
-#ifndef __vtkTileDisplayHelper_h
-#define __vtkTileDisplayHelper_h
+#ifndef vtkTileDisplayHelper_h
+#define vtkTileDisplayHelper_h
 
 #include "vtkObject.h"
 #include "vtkSynchronizedRenderers.h" // needed for vtkRawImage.

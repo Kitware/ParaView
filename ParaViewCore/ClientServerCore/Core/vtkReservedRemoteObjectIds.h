@@ -22,8 +22,8 @@
 //  - Only one instance in a session
 //  - It has to be shared across clients
 
-#ifndef __vtkReservedRemoteObjectIds_h
-#define __vtkReservedRemoteObjectIds_h
+#ifndef vtkReservedRemoteObjectIds_h
+#define vtkReservedRemoteObjectIds_h
 
 struct VTKPVCLIENTSERVERCORECORE_EXPORT vtkReservedRemoteObjectIds
 {

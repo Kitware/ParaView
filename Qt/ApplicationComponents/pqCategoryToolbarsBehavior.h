@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqCategoryToolbarsBehavior_h 
-#define __pqCategoryToolbarsBehavior_h
+#ifndef pqCategoryToolbarsBehavior_h
+#define pqCategoryToolbarsBehavior_h
 
 #include <QObject>
 #include <QPointer>

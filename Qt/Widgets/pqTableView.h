@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqTableView_h
-#define __pqTableView_h
+#ifndef pqTableView_h
+#define pqTableView_h
 
 #include <QTableView>
 #include "pqWidgetsModule.h" // for export macro

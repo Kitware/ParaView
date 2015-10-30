@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqUndoStack_h
-#define __pqUndoStack_h
+#ifndef pqUndoStack_h
+#define pqUndoStack_h
 
 #include "pqCoreModule.h"
 #include <QObject>

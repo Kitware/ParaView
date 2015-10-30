@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqDisplayPolicy_h
-#define __pqDisplayPolicy_h
+#ifndef pqDisplayPolicy_h
+#define pqDisplayPolicy_h
 
 #include <QObject>
 #include "pqCoreModule.h" // Needed for PQCORE_EXPORT macro

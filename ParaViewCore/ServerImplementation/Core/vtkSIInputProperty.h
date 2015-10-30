@@ -18,8 +18,8 @@
 // For that we need the object on which we should get the Port and its port
 // number.
 
-#ifndef __vtkSIInputProperty_h
-#define __vtkSIInputProperty_h
+#ifndef vtkSIInputProperty_h
+#define vtkSIInputProperty_h
 
 #include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIProxyProperty.h"

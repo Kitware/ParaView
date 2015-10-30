@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
-#ifndef __pqTextEditTest_h
-#define __pqTextEditTest_h
+#ifndef pqTextEditTest_h
+#define pqTextEditTest_h
 
 #include <QObject>
 

@@ -22,8 +22,8 @@
 // or all. Only selected attributes will be reduced according to the 
 // type choosen, all other attributes are those at the first input.
 
-#ifndef __vtkAttributeDataReductionFilter_h
-#define __vtkAttributeDataReductionFilter_h
+#ifndef vtkAttributeDataReductionFilter_h
+#define vtkAttributeDataReductionFilter_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkDataObjectAlgorithm.h"

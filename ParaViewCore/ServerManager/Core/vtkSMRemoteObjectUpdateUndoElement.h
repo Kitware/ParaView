@@ -18,8 +18,8 @@
 // vtkSMMessage form. It works with any proxy and RemoteObject. It is a very
 // generic undoElement.
 
-#ifndef __vtkSMRemoteObjectUpdateUndoElement_h
-#define __vtkSMRemoteObjectUpdateUndoElement_h
+#ifndef vtkSMRemoteObjectUpdateUndoElement_h
+#define vtkSMRemoteObjectUpdateUndoElement_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMUndoElement.h"

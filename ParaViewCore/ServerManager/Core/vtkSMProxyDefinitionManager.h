@@ -19,8 +19,8 @@
 // should use API on this class to add/update xml definitions to ensure that
 // the xmls are processed/updated correctly on all the processes.
 
-#ifndef __vtkSMProxyDefinitionManager_h
-#define __vtkSMProxyDefinitionManager_h
+#ifndef vtkSMProxyDefinitionManager_h
+#define vtkSMProxyDefinitionManager_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMRemoteObject.h"

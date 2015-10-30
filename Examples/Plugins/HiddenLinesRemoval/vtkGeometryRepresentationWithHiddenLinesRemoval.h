@@ -16,8 +16,8 @@
 // .SECTION Description
 //
 
-#ifndef __vtkGeometryRepresentationWithHiddenLinesRemoval_h
-#define __vtkGeometryRepresentationWithHiddenLinesRemoval_h
+#ifndef vtkGeometryRepresentationWithHiddenLinesRemoval_h
+#define vtkGeometryRepresentationWithHiddenLinesRemoval_h
 
 #include "vtkGeometryRepresentationWithFaces.h"
 

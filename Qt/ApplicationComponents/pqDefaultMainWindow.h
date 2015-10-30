@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqDefaultMainWindow_h 
-#define __pqDefaultMainWindow_h
+#ifndef pqDefaultMainWindow_h
+#define pqDefaultMainWindow_h
 
 #include <QMainWindow>
 #include "pqApplicationComponentsModule.h"

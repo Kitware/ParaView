@@ -13,8 +13,8 @@
 
 =========================================================================*/
 
-#ifndef __vtkPVConfig_h
-#define __vtkPVConfig_h
+#ifndef vtkPVConfig_h
+#define vtkPVConfig_h
 
 #cmakedefine PARAVIEW_USE_ICE_T
 #cmakedefine PARAVIEW_USE_VISITBRIDGE

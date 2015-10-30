@@ -13,8 +13,8 @@
 
 =========================================================================*/
 
-#ifndef __vtkSMPropertyGroup_h
-#define __vtkSMPropertyGroup_h
+#ifndef vtkSMPropertyGroup_h
+#define vtkSMPropertyGroup_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"

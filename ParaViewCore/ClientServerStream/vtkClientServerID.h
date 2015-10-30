@@ -19,8 +19,8 @@
 // integer, this class allows vtkClientServerStream to identify the
 // integer as an object identifier.
 
-#ifndef __vtkClientServerID_h
-#define __vtkClientServerID_h
+#ifndef vtkClientServerID_h
+#define vtkClientServerID_h
 
 #include "vtkClientServerModule.h" // Top-level vtkClientServer header.
 #include "vtkSystemIncludes.h" // vtkTypeUInt32

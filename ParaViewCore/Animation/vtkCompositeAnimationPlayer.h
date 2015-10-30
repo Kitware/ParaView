@@ -18,8 +18,8 @@
 // using the active player. It provides API to add animation players and then
 // set one of them as the active one.
 
-#ifndef __vtkCompositeAnimationPlayer_h
-#define __vtkCompositeAnimationPlayer_h
+#ifndef vtkCompositeAnimationPlayer_h
+#define vtkCompositeAnimationPlayer_h
 
 #include "vtkAnimationPlayer.h"
 #include "vtkPVAnimationModule.h" // needed for export macro

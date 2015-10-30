@@ -17,8 +17,8 @@
 // Map property that manage double value to be set through a method
 // on a vtkObject.
 
-#ifndef __vtkSIDoubleMapProperty_h
-#define __vtkSIDoubleMapProperty_h
+#ifndef vtkSIDoubleMapProperty_h
+#define vtkSIDoubleMapProperty_h
 
 #include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIProperty.h"

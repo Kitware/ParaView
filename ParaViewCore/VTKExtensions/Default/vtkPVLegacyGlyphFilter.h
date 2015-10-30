@@ -17,8 +17,8 @@
 // .SECTION Description
 // This is a subclass of vtkGlyph3D that allows selection of input scalars
 
-#ifndef __vtkPVLegacyGlyphFilter_h
-#define __vtkPVLegacyGlyphFilter_h
+#ifndef vtkPVLegacyGlyphFilter_h
+#define vtkPVLegacyGlyphFilter_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkGlyph3D.h"

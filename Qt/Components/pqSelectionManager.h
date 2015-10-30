@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqSelectionManager_h
-#define __pqSelectionManager_h
+#ifndef pqSelectionManager_h
+#define pqSelectionManager_h
 
 #include "pqComponentsModule.h"
 

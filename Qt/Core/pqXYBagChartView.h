@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqXYBagChartView_h
-#define __pqXYBagChartView_h
+#ifndef pqXYBagChartView_h
+#define pqXYBagChartView_h
 
 #include "pqContextView.h"
 

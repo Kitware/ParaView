@@ -23,8 +23,8 @@
 // .SECTION See Also
 // vtkGlyph3D
 
-#ifndef __vtkScatterPlotPainter_h
-#define __vtkScatterPlotPainter_h
+#ifndef vtkScatterPlotPainter_h
+#define vtkScatterPlotPainter_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPainter.h"
