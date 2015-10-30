@@ -84,6 +84,9 @@ protected slots:
   /// Called when checkbox "Show Only Selected Elements" is updated
   void onSelectionOnly();
 
+  /// Called when the "Font Size" property is updated
+  void onFontSizeChanged();
+
   /// Create a QWidget for the view's viewport.
   virtual QWidget* createWidget();
 private:

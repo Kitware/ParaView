@@ -127,6 +127,19 @@ pqSpreadSheetView::pqSpreadSheetView(
     this, SLOT(onSelectionOnly()));
   this->onSelectionOnly();
 
+  this->getConnector()->Connect(
+    viewModule->GetProperty("CellFontSize"),
+    vtkCommand::ModifiedEvent,
+    this, SLOT(onFontSizeChanged()));
+
+  this->getConnector()->Connect(
+    viewModule->GetProperty("HeaderFontSize"),
+    vtkCommand::ModifiedEvent,
+    this, SLOT(onFontSizeChanged()));
+
+  this->onFontSizeChanged();
+
+
   foreach(pqRepresentation* rep, this->getRepresentations())
     {
     this->onAddRepresentation(rep);
@@ -250,6 +263,21 @@ void pqSpreadSheetView::onSelectionOnly()
     this->Internal->Table->setSelectionModel(
       &this->Internal->SelectionModel);
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqSpreadSheetView::onFontSizeChanged()
+{
+  int cellFontSize = vtkSMPropertyHelper(this->getProxy(), "CellFontSize", 9).GetAsInt();
+  int headerFontSize = vtkSMPropertyHelper(this->getProxy(), "HeaderFontSize", 9).GetAsInt();
+
+  // Setting header fonts directly does not work consistently, so we
+  // set a stylesheet instead.
+  QString style;
+  style = QString("QTableView { font-size: %2pt; }\n"
+                  "QHeaderView { font-size: %1pt; }")
+    .arg(headerFontSize).arg(cellFontSize);
+  this->Internal->Table->setStyleSheet(style);
 }
 
 //-----------------------------------------------------------------------------

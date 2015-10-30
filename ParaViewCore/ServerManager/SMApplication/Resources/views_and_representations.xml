@@ -3018,6 +3018,20 @@
                label="SpreadSheet View"
                processes="client|dataserver|renderserver"
                representation_name="SpreadSheetRepresentation">
+      <IntVectorProperty name="CellFontSize"
+                         default_values="9"
+                         number_of_elements="1">
+        <IntRangeDomain min="1" max="48" name="range" />
+        <Documentation>Sets the font size for cells in the
+        spreadsheet.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="HeaderFontSize"
+                         default_values="9"
+                         number_of_elements="1">
+        <IntRangeDomain min="1" max="48" name="range" />
+        <Documentation>Sets the font size for row and column headers
+        in the spreadsheet.</Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetShowExtractedSelection"
                          default_values="0"
                          name="SelectionOnly"
