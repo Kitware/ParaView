@@ -36,8 +36,8 @@
 // .SECTION See Also
 //
 
-#ifndef _vtkCellPointsFilter_h
-#define _vtkCellPointsFilter_h
+#ifndef vtkCellPointsFilter_h
+#define vtkCellPointsFilter_h
 
 #include "vtkPointSpriteGraphicsModule.h" //needed for exports
 #include "vtkPolyDataAlgorithm.h"
