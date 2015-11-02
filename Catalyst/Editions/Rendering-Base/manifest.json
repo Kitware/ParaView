@@ -719,6 +719,7 @@
         { "class": "vtkContextScene" },
         { "class": "vtkContextTransform" },
         { "class": "vtkPen" },
+        { "class": "vtkPropItem"},
         { "class": "vtkTooltipItem" }
       ],
       "replace": [
