@@ -1,0 +1,49 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <SourceProxy name="ThickenCells" class="vtkThickenLayeredCells" label="Thicken Layered Cells">
+      <Documentation>
+        Filter to thicken cells in layers using average thickeness along edges between layers.
+      </Documentation>
+      <InputProperty
+        name="Input"
+        command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+         <InputArrayDomain attribute_type="cell"
+                          name="input_array"
+                          number_of_components="1" />
+      </InputProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+        element_types="0 0 0 0 2"
+        name="SelectThickness"
+        label="Thickness"
+        number_of_elements="5"
+        default_values="0">
+        <ArrayListDomain attribute_type="Scalars" name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>Select the 'thickness' array.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+        element_types="0 0 0 0 2"
+        name="SelectLayer"
+        label="Layer"
+        number_of_elements="5"
+        default_values="1">
+        <ArrayListDomain attribute_type="Scalars" name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>Select the 'layer' array.</Documentation>
+      </StringVectorProperty>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
