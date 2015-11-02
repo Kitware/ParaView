@@ -241,7 +241,7 @@ class CoProcessor(object):
 
         grid = datadescription.GetInputDescriptionByName(inputname).GetGrid()
 
-        producer = simple.PVTrivialProducer()
+        producer = simple.PVTrivialProducer(guiName=inputname)
         # we purposefully don't set the time for the PVTrivialProducer here.
         # when we update the pipeline we will do it then.
         producer.GetClientSideObject().SetOutput(grid, datadescription.GetTime())
