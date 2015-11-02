@@ -48,6 +48,11 @@ set_source_files_properties(
   vtkCPCxxHelper
   WRAP_EXCLUDE)
 
+set_source_files_properties(
+  vtkCPProcessor
+  PROPERTIES
+  WRAP_EXCLUDE_PYTHON 1)
+
 set (${vtk-module}_HDRS CAdaptorAPI.h)
 
 configure_file(vtkCPConfig.h.in
