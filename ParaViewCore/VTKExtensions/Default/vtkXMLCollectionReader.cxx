@@ -552,6 +552,16 @@ void vtkXMLCollectionReader::ReadXMLDataImpl()
                       actualOutput);
       block->SetNumberOfBlocks(updateNumPieces);
       block->SetBlock(updatePiece, actualOutput);
+
+      // Set the block name from the DataSet name attribute, if any
+      vtkXMLDataElement* ds =
+        this->Internal->RestrictedDataSets[i];
+      const char* name = ds? ds->GetAttribute("name") : 0;
+      if(name)
+        {
+        output->GetMetaData(i)->Set(vtkCompositeDataSet::NAME(), name);
+        }
+
       actualOutput->Delete();
       }
     }
