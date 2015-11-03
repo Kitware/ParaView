@@ -4,6 +4,17 @@ Major API Changes             {#MajorAPIChanges}
 This page documents major API/design changes between different versions since we
 started tracking these (starting after version 4.2).
 
+Changes in 5.0
+--------------
+
+###Changed *Source* property to **GlyphType** on certain representations###
+
+*Source* property on representations, which was not exposed in the UI has been
+changed to *GlyphType* to better match its role. Since this property was not
+exposed earlier, this change should not affect any users except custom
+applications that explicitly used this property.
+
+
 Changes in 4.4
 --------------
 
