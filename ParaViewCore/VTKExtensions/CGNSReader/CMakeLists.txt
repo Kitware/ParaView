@@ -42,8 +42,10 @@ vtkCGNSReader.cxx
 set_source_files_properties(
   vtkCGNSReaderInternal
   cgio_helpers
-
-  WRAP_EXCLUDE
+  PROPERTIES
+    WRAP_EXCLUDE 1
+    WRAP_EXCLUDE_PYTHON 1
+    SKIP_HEADER_INSTALL 1
 )
 
 vtk_module_library(vtkPVVTKExtensionsCGNSReader ${Module_SRCS})
