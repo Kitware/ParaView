@@ -221,7 +221,7 @@ void vtkPVDiscretizableColorTransferFunction::SetNumberOfIndexedColorsInFullSet(
 //-----------------------------------------------------------------------------
 void vtkPVDiscretizableColorTransferFunction::SetIndexedColorInFullSet(unsigned int index, double r, double g, double b)
 {
-  if (index >= this->IndexedColorsInFullSet->GetNumberOfTuples())
+  if (index >= static_cast<unsigned int>(this->IndexedColorsInFullSet->GetNumberOfTuples()))
     {
     this->SetNumberOfIndexedColorsInFullSet(index+1);
     this->Modified();
@@ -247,7 +247,7 @@ int vtkPVDiscretizableColorTransferFunction::GetNumberOfIndexedColorsInFullSet()
 //-----------------------------------------------------------------------------
 void vtkPVDiscretizableColorTransferFunction::GetIndexedColorInFullSet(unsigned int index, double rgb[3])
 {
-  if (index >= this->IndexedColorsInFullSet->GetNumberOfTuples())
+  if (index >= static_cast<unsigned int>(this->IndexedColorsInFullSet->GetNumberOfTuples()))
     {
     vtkErrorMacro(<< "Index out of range. Color not set.");
     return;
