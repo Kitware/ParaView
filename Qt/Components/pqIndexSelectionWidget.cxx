@@ -98,14 +98,14 @@ struct Widgets
 
 //------------------------------------------------------------------------------
 Widgets::Widgets(pqIndexSelectionWidget *parent,
-                 const QString &key, int current, int size)
+                 const QString &key, int cur, int sz)
   : layout(new QHBoxLayout),
     label(new QLabel(key, parent)),
     slider(new QSlider(Qt::Horizontal, parent)),
     edit(new pqLineEdit(parent))
 {
-  this->setSize(size);
-  this->setCurrent(current);
+  this->setSize(sz);
+  this->setCurrent(cur);
 
   this->slider->setObjectName("Slider");
   this->edit->setObjectName("LineEdit");
@@ -162,35 +162,35 @@ Widgets::~Widgets()
 }
 
 //------------------------------------------------------------------------------
-void Widgets::setCurrent(int current)
+void Widgets::setCurrent(int cur)
 {
-  this->setCurrentSlider(current);
-  this->setCurrentEdit(current);
+  this->setCurrentSlider(cur);
+  this->setCurrentEdit(cur);
 }
 
 //------------------------------------------------------------------------------
-void Widgets::setCurrentSlider(int current)
+void Widgets::setCurrentSlider(int cur)
 {
-  current = clamp(current, this->slider->minimum(), this->slider->maximum());
+  cur = clamp(cur, this->slider->minimum(), this->slider->maximum());
   bool oldBlock = this->slider->blockSignals(true);
-  this->slider->setValue(current);
+  this->slider->setValue(cur);
   this->slider->blockSignals(oldBlock);
 }
 
 //------------------------------------------------------------------------------
-void Widgets::setCurrentEdit(int current)
+void Widgets::setCurrentEdit(int cur)
 {
-  current = clamp(current, this->slider->minimum(), this->slider->maximum());
+  cur = clamp(cur, this->slider->minimum(), this->slider->maximum());
   bool oldBlock = this->edit->blockSignals(true);
-  this->edit->setTextAndResetCursor(QString::number(current));
+  this->edit->setTextAndResetCursor(QString::number(cur));
   this->edit->blockSignals(oldBlock);
 }
 
 //------------------------------------------------------------------------------
-void Widgets::setSize(int size)
+void Widgets::setSize(int sz)
 {
   bool oldBlock = this->slider->blockSignals(true);
-  this->slider->setRange(0, size - 1);
+  this->slider->setRange(0, sz - 1);
   this->slider->blockSignals(oldBlock);
 }
 
@@ -237,10 +237,10 @@ public:
 };
 
 //------------------------------------------------------------------------------
-pqIndexSelectionWidget::pqIndexSelectionWidget(vtkSMProxy *proxy,
+pqIndexSelectionWidget::pqIndexSelectionWidget(vtkSMProxy *pxy,
                                                vtkSMProperty *pushProp,
-                                               QWidget *parent)
-  : Superclass(proxy, parent),
+                                               QWidget *parentW)
+  : Superclass(pxy, parentW),
     PropertyUpdatePending(false),
     IgnorePushPropertyUpdates(false),
     GroupBox(new QGroupBox(QString(pushProp->GetXMLLabel()), this)),
@@ -263,7 +263,7 @@ pqIndexSelectionWidget::pqIndexSelectionWidget(vtkSMProxy *proxy,
     return;
     }
 
-  this->setPushPropertyName(proxy->GetPropertyName(pushProp));
+  this->setPushPropertyName(pxy->GetPropertyName(pushProp));
 
   this->installEventFilter(this);
 
@@ -466,14 +466,14 @@ void pqIndexSelectionWidget::buildWidget(vtkSMProperty *infoProp)
   for (int i = 0; i < strings->GetNumberOfStrings(); i += 3)
     {
     QString key(strings->GetString(i));
-    int current = QByteArray(strings->GetString(i + 1)).toInt(&ok);
+    int cur = QByteArray(strings->GetString(i + 1)).toInt(&ok);
     if (!ok)
       {
       qWarning() << "Error parsing index info: invalid current index"
                  << strings->GetString(i + 1);
       continue;
       }
-    int size = QByteArray(strings->GetString(i + 2)).toInt(&ok);
+    int sz = QByteArray(strings->GetString(i + 2)).toInt(&ok);
     if (!ok)
       {
       qWarning() << "Error parsing index info: invalid size"
@@ -481,7 +481,7 @@ void pqIndexSelectionWidget::buildWidget(vtkSMProperty *infoProp)
       continue;
       }
 
-    this->addRow(key, current, size);
+    this->addRow(key, cur, sz);
     }
 
   // Force update the property
@@ -489,9 +489,9 @@ void pqIndexSelectionWidget::buildWidget(vtkSMProperty *infoProp)
 }
 
 //------------------------------------------------------------------------------
-void pqIndexSelectionWidget::addRow(const QString &key, int current, int size)
+void pqIndexSelectionWidget::addRow(const QString &key, int current, int sz)
 {
-  Widgets *widgets = new Widgets(this, key, current, size);
+  Widgets *widgets = new Widgets(this, key, current, sz);
   this->Internals->widgetMap.insert(key, widgets);
 
   // Keep the list alphabetic:

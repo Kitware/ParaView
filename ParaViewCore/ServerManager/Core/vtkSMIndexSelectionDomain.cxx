@@ -53,7 +53,8 @@ int vtkSMIndexSelectionDomain::SetDefaultValues(vtkSMProperty *property,
   if (svpOut && svpInfo && svpInfo->GetNumberOfElements() % 3 == 0)
     {
     svpOut->SetNumberOfElements(svpInfo->GetNumberOfElements() / 3 * 2);
-    for (int infoIdx = 0, outIdx = 0; infoIdx < svpInfo->GetNumberOfElements();
+    for (unsigned int infoIdx = 0, outIdx = 0;
+         infoIdx < svpInfo->GetNumberOfElements();
          infoIdx += 3, outIdx += 2)
       {
       // Copy the dimension name
