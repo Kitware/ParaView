@@ -19,8 +19,8 @@
 // See the vtkMPASReader proxy in readers.xml for how the properties should be
 // set up for this domain.
 
-#ifndef __vtkSMIndexSelectionDomain_h
-#define __vtkSMIndexSelectionDomain_h
+#ifndef vtkSMIndexSelectionDomain_h
+#define vtkSMIndexSelectionDomain_h
 
 #include "vtkPVServerManagerCoreModule.h" // For export macro
 #include "vtkSMDomain.h"
@@ -48,4 +48,4 @@ private:
   void operator=(const vtkSMIndexSelectionDomain &);   // Not implemented.
 };
 
-#endif //__vtkSMIndexSelectionDomain_h
+#endif // vtkSMIndexSelectionDomain_h

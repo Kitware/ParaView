@@ -21,8 +21,8 @@
 // int GetDimensionSize(std::string)
 // void SetCurrentDimensionIndex(std::string, int)
 
-#ifndef __vtkSIIndexSelectionProperty_h
-#define __vtkSIIndexSelectionProperty_h
+#ifndef vtkSIIndexSelectionProperty_h
+#define vtkSIIndexSelectionProperty_h
 
 #include "vtkPVServerImplementationCoreModule.h" // needed for exports
 #include "vtkSIProperty.h"
