@@ -23,6 +23,17 @@
 
 #include <map>
 
+
+//#define vtkPVHardwareSelectorDEBUG
+#ifdef vtkPVHardwareSelectorDEBUG
+#include "vtkPNMWriter.h"
+#include "vtkImageImport.h"
+#include "vtkNew.h"
+#include "vtkProcessModule.h"
+#include <sstream>
+#include "vtkWindows.h"  // OK on Unix etc
+#endif
+
 class vtkPVHardwareSelector::vtkInternals
 {
 public:
@@ -166,4 +177,45 @@ int vtkPVHardwareSelector::GetPropID(int vtkNotUsed(idx), vtkProp* prop)
 void vtkPVHardwareSelector::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+
+//----------------------------------------------------------------------------
+// just add debug output if compiled with vtkOpenGLHardwareSelectorDEBUG
+void vtkPVHardwareSelector::SavePixelBuffer(int passNo)
+{
+  this->Superclass::SavePixelBuffer(passNo);
+
+#ifdef vtkPVHardwareSelectorDEBUG
+
+  vtkNew<vtkImageImport> ii;
+  ii->SetImportVoidPointer(this->PixBuffer[passNo],1);
+  ii->SetDataScalarTypeToUnsignedChar();
+  ii->SetNumberOfScalarComponents(3);
+  ii->SetDataExtent(this->Area[0], this->Area[2], this->Area[1], this->Area[3], 0, 0);
+  ii->SetWholeExtent(this->Area[0], this->Area[2], this->Area[1], this->Area[3], 0, 0);
+
+  // hardcode the path so you can find where MPI etc leaves all these files
+  std::string fname = "C:/Users/ken.martin/pickbuffer_";
+
+  std::ostringstream toString;
+  toString.str("");
+  toString.clear();
+  // is there a platform generic way of doing this?
+  //  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  //  toString << pm->GetPartitionId();
+  //  toString << pm->GetGlobalController()->GetLocalProcessId();
+#if defined(_WIN32)
+  toString << GetCurrentProcessId();
+#endif
+  fname += toString.str();
+  fname += "_";
+  fname += ('0'+passNo);
+  fname += ".pnm";
+  vtkNew<vtkPNMWriter> pw;
+  pw->SetInputConnection(ii->GetOutputPort());
+  pw->SetFileName(fname.c_str());
+  pw->Write();
+  cerr << "wrote to " << fname << "\n";
+#endif
 }

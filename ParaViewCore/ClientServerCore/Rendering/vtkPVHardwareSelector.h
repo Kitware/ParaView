@@ -84,6 +84,8 @@ protected:
   // Return false if CaptureBuffers() is false
   bool PrepareSelect();
 
+  virtual void SavePixelBuffer(int passNo);
+
   vtkTimeStamp CaptureTime;
   int UniqueId;
   vtkWeakPointer<vtkPVSynchronizedRenderWindows> SynchronizedWindows;
