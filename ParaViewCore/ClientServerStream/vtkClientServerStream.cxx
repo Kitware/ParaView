@@ -56,7 +56,7 @@
 // Define some traits for vtkType types.
 template <class T> struct vtkClientServerTypeTraits;
 #define VTK_CLIENT_SERVER_TYPE_TRAIT(in, out)           \
-  VTK_TEMPLATE_SPECIALIZE                               \
+  template<>                                            \
   struct vtkClientServerTypeTraits< in >                \
   {                                                     \
     /* Type identifier for value of this type. */       \

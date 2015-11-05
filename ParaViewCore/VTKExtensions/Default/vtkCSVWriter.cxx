@@ -120,7 +120,7 @@ void vtkCSVWriterGetDataString(
 }
 
 //-----------------------------------------------------------------------------
-VTK_TEMPLATE_SPECIALIZE
+template<>
 void vtkCSVWriterGetDataString(
   vtkArrayIteratorTemplate<vtkStdString>* iter, vtkIdType tupleIndex,
   ofstream* stream, vtkCSVWriter* writer, bool* first)
@@ -150,7 +150,7 @@ void vtkCSVWriterGetDataString(
 }
 
 //-----------------------------------------------------------------------------
-VTK_TEMPLATE_SPECIALIZE
+template<>
 void vtkCSVWriterGetDataString(
   vtkArrayIteratorTemplate<char>* iter, vtkIdType tupleIndex,
   ofstream* stream, vtkCSVWriter* writer, bool* first)
@@ -180,7 +180,7 @@ void vtkCSVWriterGetDataString(
 }
 
 //-----------------------------------------------------------------------------
-VTK_TEMPLATE_SPECIALIZE
+template<>
 void vtkCSVWriterGetDataString(
   vtkArrayIteratorTemplate<unsigned char>* iter, vtkIdType tupleIndex,
   ofstream* stream, vtkCSVWriter* writer, bool* first)

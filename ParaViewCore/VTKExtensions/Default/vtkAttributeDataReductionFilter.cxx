@@ -121,7 +121,7 @@ void vtkAttributeDataReductionFilterReduce(vtkAttributeDataReductionFilter* self
 }
 
 //-----------------------------------------------------------------------------
-VTK_TEMPLATE_SPECIALIZE
+template<>
 void vtkAttributeDataReductionFilterReduce(vtkAttributeDataReductionFilter*,
   vtkArrayIteratorTemplate<vtkStdString>* , 
   vtkArrayIteratorTemplate<vtkStdString>*, double, double)
@@ -130,7 +130,7 @@ void vtkAttributeDataReductionFilterReduce(vtkAttributeDataReductionFilter*,
 }
 
 //-----------------------------------------------------------------------------
-VTK_TEMPLATE_SPECIALIZE
+template<>
 void vtkAttributeDataReductionFilterReduce(vtkAttributeDataReductionFilter*,
   vtkBitArrayIterator* , vtkBitArrayIterator*, double, double)
 {
