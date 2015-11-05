@@ -1126,12 +1126,18 @@ int classUsesStdString(ClassInfo *data)
   return 0;
 }
 
+#if defined(_MSC_VER) && _MSC_VER < 1900
+# define snprintf _snprintf
+#endif
+
 /* print the parsed structures */
 int main(int argc, char *argv[])
 {
   OptionInfo *options;
   FileInfo *fileInfo;
   ClassInfo *data;
+  NamespaceInfo *ns;
+  char nsname[1024];
   FILE *fp;
   NewClassInfo *classData;
   int i;
@@ -1152,6 +1158,28 @@ int main(int argc, char *argv[])
     }
 
   data = fileInfo->MainClass;
+  nsname[0] = '\0';
+  ns = fileInfo->Contents;
+  while (!data && ns)
+    {
+    if (ns->Name)
+      {
+      size_t namelen = strlen(nsname);
+      snprintf(nsname + namelen, sizeof(nsname) - namelen, "::%s", ns->Name);
+      }
+    if (ns->NumberOfClasses > 0)
+      {
+      data = ns->Classes[0];
+      }
+    if (ns->NumberOfNamespaces > 0)
+      {
+      ns = ns->Namespaces[0];
+      }
+    else
+      {
+      ns = NULL;
+      }
+    }
 
   if(!data)
     {
@@ -1194,6 +1222,10 @@ int main(int argc, char *argv[])
   if (!strcmp("vtkObjectBase",data->Name))
     {
     fprintf(fp,"#include <sstream>\n");
+    }
+  if (*nsname)
+    {
+    fprintf(fp,"using namespace %s;\n", nsname);
     }
   if (!data->IsAbstract)
     {
