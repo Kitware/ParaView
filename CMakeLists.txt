@@ -382,7 +382,7 @@ elseif (APPLE AND NOT PARAVIEW_DO_UNIX_STYLE_INSTALLS)
     CACHE PATH
     "Location where the *.app bundle must be installed.")
   set(CMAKE_INSTALL_NAME_DIR "@executable_path/../Libraries")
-  set(PV_INSTALL_PLUGIN_DIR "plugins")
+  set(PV_INSTALL_PLUGIN_DIR "Plugins")
 
   # ensure that we don't build forwarding executables on apple.
   set(VTK_BUILD_FORWARDING_EXECUTABLES FALSE)
