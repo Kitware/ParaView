@@ -14,7 +14,7 @@ PURPOSE.  See the above copyright notice for more information.
 =========================================================================*/
 #include "vtkInitializationHelper.h"
 #include "vtkProcessModule.h"
-#include "vtkPVServerOptions.h"
+#include "vtkPVOptions.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 int TestXMLSaveLoadState(int argc, char* argv[])
 {
-  vtkPVServerOptions* options = vtkPVServerOptions::New();
+  vtkPVOptions* options = vtkPVOptions::New();
   vtkInitializationHelper::Initialize( argc, argv,
                                        vtkProcessModule::PROCESS_CLIENT,
                                        options );

@@ -1304,7 +1304,7 @@ void vtkSMSettings::SetSettingDescription(const char* settingName, const char* d
 {
   Json::Path settingPath(settingName);
   Json::Value & settingValue = settingPath.make(this->Internal->SettingCollections[0].Value);
-  settingValue.setComment(description, Json::commentBefore);
+  settingValue.setComment(std::string(description), Json::commentBefore);
 }
 
 //----------------------------------------------------------------------------
@@ -1430,7 +1430,7 @@ bool vtkSMSettings::DeserializeFromJSON(
   xml->AddAttribute("name", proxy->GetXMLName());
   for (Json::Value::const_iterator iter = value.begin(); iter != value.end(); ++iter)
     {
-    vtkSMProperty* prop = proxy->GetProperty(iter.memberName());
+    vtkSMProperty* prop = proxy->GetProperty(iter.name().c_str());
     if (!prop)
       {
       continue;
@@ -1441,7 +1441,7 @@ bool vtkSMSettings::DeserializeFromJSON(
 
     vtkNew<vtkPVXMLElement> propXML;
     propXML->SetName("Property");
-    propXML->AddAttribute("name", iter.memberName());
+    propXML->AddAttribute("name", iter.name().c_str());
     if ((*iter).isArray() || (*iter).isObject())
       {
       propXML->AddAttribute("number_of_elements", static_cast<int>((*iter).size()));

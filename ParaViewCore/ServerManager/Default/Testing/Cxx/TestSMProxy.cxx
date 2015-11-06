@@ -16,12 +16,12 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMProxyTest.h"
 
 #include "vtkInitializationHelper.h"
-#include "vtkPVServerOptions.h"
+#include "vtkPVOptions.h"
 #include "vtkProcessModule.h"
 
 int TestSMProxy(int argc, char *argv[])
 {
-  vtkPVServerOptions* options = vtkPVServerOptions::New();
+  vtkPVOptions* options = vtkPVOptions::New();
   vtkInitializationHelper::Initialize(argc, argv,
                                       vtkProcessModule::PROCESS_CLIENT,
                                       options);

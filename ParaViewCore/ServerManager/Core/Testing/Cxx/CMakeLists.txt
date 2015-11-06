@@ -3,8 +3,12 @@ paraview_add_test_cxx(${vtk-module}CxxTests tests
   TestSessionProxyManager.cxx
   TestSettings.cxx
   )
+
+if(NOT PARAVIEW_BUILD_QT_GUI)
+  paraview_test_load_data("" can.ex2)
+endif()
 paraview_add_test_cxx(${vtk-module}CxxTests tmp_tests
-  NO_DATA NO_VALID
+  NO_VALID
   TestParaViewPipelineController.cxx
   )
 list(APPEND tests
