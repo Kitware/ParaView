@@ -1138,6 +1138,12 @@ int main(int argc, char *argv[])
   ClassInfo *data;
   NamespaceInfo *ns;
   char nsname[1024];
+  struct {
+    NamespaceInfo *ns;
+    size_t nsnamepos;
+    int n;
+  } nsstack[32];
+  size_t nspos;
   FILE *fp;
   NewClassInfo *classData;
   int i;
@@ -1158,8 +1164,15 @@ int main(int argc, char *argv[])
     }
 
   data = fileInfo->MainClass;
-  nsname[0] = '\0';
-  ns = fileInfo->Contents;
+
+  /* Set up the stack. */
+  nspos = 0;
+  nsstack[nspos].ns = fileInfo->Contents;
+  nsstack[nspos].nsnamepos = 0;
+  nsstack[nspos].n = 0;
+  nsname[nsstack[nspos].nsnamepos] = '\0';
+  ns = nsstack[nspos].ns;
+
   while (!data && ns)
     {
     if (ns->Name)
@@ -1167,17 +1180,40 @@ int main(int argc, char *argv[])
       size_t namelen = strlen(nsname);
       snprintf(nsname + namelen, sizeof(nsname) - namelen, "::%s", ns->Name);
       }
+
     if (ns->NumberOfClasses > 0)
       {
       data = ns->Classes[0];
+      break;
       }
-    if (ns->NumberOfNamespaces > 0)
+
+    if (ns->NumberOfNamespaces > nsstack[nspos].n)
       {
-      ns = ns->Namespaces[0];
+      /* Use the next namespace. */
+      ns = ns->Namespaces[nsstack[nspos].n];
+      nsstack[nspos].n++;
+
+      /* Go deeper. */
+      nspos++;
+      nsstack[nspos].ns = ns;
+      nsstack[nspos].nsnamepos = strlen(nsname);
+      nsstack[nspos].n = 0;
       }
     else
       {
-      ns = NULL;
+      if (nspos)
+        {
+        --nspos;
+        /* Reset the namespace name. */
+        nsname[nsstack[nspos].nsnamepos] = '\0';
+        /* Go back up the stack. */
+        ns = nsstack[nspos].ns;
+        }
+      else
+        {
+        /* Nothing left to search. */
+        ns = NULL;
+        }
       }
     }
 
