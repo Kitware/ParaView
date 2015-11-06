@@ -216,6 +216,8 @@ void vtkPVAxesWidget::ExecuteEvent(vtkObject *vtkNotUsed(o),
     return;
     }
 
+  this->SquareRenderer();
+
   vtkCamera *cam = this->ParentRenderer->GetActiveCamera();
   double pos[3], fp[3], viewup[3];
   cam->GetPosition(pos);
@@ -227,8 +229,6 @@ void vtkPVAxesWidget::ExecuteEvent(vtkObject *vtkNotUsed(o),
   cam->SetFocalPoint(fp);
   cam->SetViewUp(viewup);
   this->Renderer->ResetCamera();
-
-  this->SquareRenderer();
 }
 
 void vtkPVAxesWidget::UpdateCursorIcon()
