@@ -141,20 +141,28 @@ const char *determine_mesa_version()
   return "mesa-llvm";
 }
 
-int get_driver_cache_path(const char *this_exe_path, char *driver_cache_path)
+int get_driver_cache_user_path(const char *this_exe_path,
+  char *driver_cache_path)
 {
   const char *home = getenv("HOME");
   if (!home)
     {
     home = getpwuid(getuid())->pw_dir;
     }
-  strncpy(driver_cache_path, home, strlen(home));
-  strcat(driver_cache_path, "/");
-  strcat(driver_cache_path, ".paraview");
+  if (!home)
+    {
+    return 0;
+    }
+  strncpy(driver_cache_path, home, strlen(home) + 1);
+  strcat(driver_cache_path, "/.config/ParaView/ParaViewMesaConfig.ini");
+  //fprintf(stdout, "User cache = %s\n", driver_cache_path);
   return 1;
+}
 
+int get_driver_cache_site_path(const char *this_exe_path,
+  char *driver_cache_path)
+{
   // Get directory containing true paraview executable.
-#if 0
   char self_path[KWSYS_SHARED_FORWARD_MAXPATH] = { 0 };
   char throwaway_ldpath[KWSYS_SHARED_FORWARD_MAXPATH] = { 0 };
   char exe[KWSYS_SHARED_FORWARD_MAXPATH] = { 0 };
@@ -169,11 +177,11 @@ int get_driver_cache_path(const char *this_exe_path, char *driver_cache_path)
     strncpy(driver_install_path, exe, last_slash - exe + 1);
 
     strcat(driver_cache_path, driver_install_path);
-    strcat(driver_cache_path, "pv_driver");
+    strcat(driver_cache_path, "ParaViewMesaConfig.ini");
+    //fprintf(stdout, "Site cache = %s\n", driver_cache_path);
     return 1;
     }
   return 0;
-#endif
 }
 
 int append_driver_to_ldpath(const char *this_exe_path, const char *driver)
@@ -233,8 +241,17 @@ int main(int argc, char** argv)
   char driver_choice[MAX_DRIVER_CHOICE] = { 0 };
   char driver_cache_path[KWSYS_SHARED_FORWARD_MAXPATH] = { 0 };
 
-  // See if there's a cached choice already
-  get_driver_cache_path(argv[0], driver_cache_path);
+  // Check for site-wide config first
+  get_driver_cache_site_path(argv[0], driver_cache_path);
+  driver_cache = fopen(driver_cache_path, "r");
+  if (driver_cache)
+    {
+      fgets(driver_choice, sizeof(driver_choice), driver_cache);
+      fclose(driver_cache);
+    }
+
+  // If there is a user config, override the site config
+  get_driver_cache_user_path(argv[0], driver_cache_path);
   driver_cache = fopen(driver_cache_path, "r");
   if (driver_cache)
     {
