@@ -80,6 +80,13 @@ set (Module_SRCS
   vtkEnvironmentAnnotationFilter.cxx
 )
 
+set(PARAVIEW_PLUGIN_LOADER_PATHS ""
+  CACHE STRING "Extra paths to search for plugins")
+if (PARAVIEW_PLUGIN_LOADER_PATHS)
+  set_source_files_properties(vtkPVPluginLoader.cxx
+    PROPERTIES
+      COMPILE_DEFINITIONS PARAVIEW_PLUGIN_LOADER_PATHS=\"${PARAVIEW_PLUGIN_LOADER_PATHS}\")
+endif ()
 
 if (PARAVIEW_ENABLE_PYTHON)
   list(APPEND Module_SRCS
