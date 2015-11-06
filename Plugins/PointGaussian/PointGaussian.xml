@@ -141,7 +141,7 @@
         </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetSplatSize"
-                            default_values="1.0"
+                            default_values="0.0"
                             name="GaussianRadius"
                             label="Gaussian Radius"
                             number_of_elements="1">
@@ -150,6 +150,18 @@
           The radius of the gaussian blur for each point.
         </Documentation>
       </DoubleVectorProperty>
+      <IntVectorProperty command="SetEmissive"
+                         default_values="0"
+                         name="Emissive"
+                         number_of_elements="1">
+        <Hints>
+          <NoDefault />
+        </Hints>
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Should the splat be emissive lke a light source or not. For cosmology emissive should be on. For scanned point clouds typically it woudl be off.
+        </Documentation>
+      </IntVectorProperty>
       <DoubleVectorProperty command="SetColor"
                             default_values="1.0 1.0 1.0"
                             name="Color"
@@ -209,6 +221,13 @@
         <Documentation>
           The specular color of the model
         </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPointSize"
+                            default_values="2.0"
+                            name="PointSize"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           name="range" />
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetPosition"
                             default_values="0 0 0"
@@ -285,6 +304,7 @@
           <Property name="OpacityByArray" />
           <Property name="OpacityTransferFunction" />
           <Property name="OpacityArray" />
+          <Property name="Emissive" />
           <Property name="CustomShader" />
           <Property name="Color" />
         </ExposedProperties>
@@ -317,6 +337,7 @@
           <Property name="OpacityByArray" />
           <Property name="OpacityTransferFunction" />
           <Property name="OpacityArray" />
+          <Property name="Emissive" />
           <Property name="CustomShader" />
           <Property name="Color" />
         </ExposedProperties>

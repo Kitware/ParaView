@@ -52,6 +52,10 @@ public:
   virtual void SetVisibility(bool val);
 
   // Description:
+  // Use to set whether the splat emits light
+  virtual void SetEmissive(bool val);
+
+  // Description:
   // Use to make sure scalars will be mapped through lookup table, and not
   // inadvertently used as colors by themselves.
   virtual void SetMapScalars(int val);
