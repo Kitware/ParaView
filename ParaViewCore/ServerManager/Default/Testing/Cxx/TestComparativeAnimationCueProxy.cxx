@@ -17,7 +17,7 @@
 
 #include "vtkInitializationHelper.h"
 #include "vtkProcessModule.h"
-#include "vtkPVServerOptions.h"
+#include "vtkPVOptions.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
@@ -36,7 +36,7 @@
 int TestComparativeAnimationCueProxy(int argc, char* argv[])
 {
   // Initialization
-  vtkPVServerOptions* options = vtkPVServerOptions::New();
+  vtkPVOptions* options = vtkPVOptions::New();
   vtkInitializationHelper::Initialize(argc, argv,
                                       vtkProcessModule::PROCESS_CLIENT,
                                       options);

@@ -104,8 +104,9 @@ int TestSettings(int argc, char* argv[])
 
   // Test saving different number of repeatable property values
   vtkSmartPointer<vtkSMProxy> contour;
-  contour.TakeReference(pxm->NewProxy("filters", "GenericContour"));
+  contour.TakeReference(pxm->NewProxy("filters", "Contour"));
   controller->PreInitializeProxy(contour);
+  vtkSMPropertyHelper(contour, "Input").Set(sphere);
   controller->PostInitializeProxy(contour);
 
   vtkSMDoubleVectorProperty* contourValuesProperty =

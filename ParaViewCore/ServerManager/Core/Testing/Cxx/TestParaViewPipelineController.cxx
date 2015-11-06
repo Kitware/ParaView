@@ -68,9 +68,11 @@ int TestParaViewPipelineController(int argc, char* argv[])
     exodusReader.TakeReference(pxm->NewProxy("sources", "ExodusIIReader"));
 
     controller->PreInitializeProxy(exodusReader);
-    vtkSMPropertyHelper(exodusReader, "FileName").Set(
-      "/home/utkarsh/Kitware/ParaView3/ParaViewData/Data/can.ex2");
-     // "/Users/utkarsh/Kitware/ParaView3/ParaViewData/Data/can.ex2");
+
+    char* fname = vtkTestUtilities::ExpandDataFileName(argc, argv, "can.ex2");
+    vtkSMPropertyHelper(exodusReader, "FileName").Set(fname);
+    delete []fname;
+
     vtkSMPropertyHelper(exodusReader, "ApplyDisplacements").Set(0);
     exodusReader->UpdateVTKObjects();
 

@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkMultiProcessController.h"
 #include "vtkNetworkAccessManager.h"
 #include "vtkProcessModule.h"
-#include "vtkPVServerOptions.h"
+#include "vtkPVOptions.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSession.h"
@@ -32,7 +32,7 @@ PURPOSE.  See the above copyright notice for more information.
 int TestProxyAnnotation(int argc, char* argv[])
 {
   int ret_val = EXIT_SUCCESS;
-  vtkPVServerOptions* options = vtkPVServerOptions::New();
+  vtkPVOptions* options = vtkPVOptions::New();
   bool success = true;
   vtkInitializationHelper::Initialize(argc, argv,
     vtkProcessModule::PROCESS_CLIENT, options);
