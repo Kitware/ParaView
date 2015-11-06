@@ -154,9 +154,6 @@
                          default_values="0"
                          name="Emissive"
                          number_of_elements="1">
-        <Hints>
-          <NoDefault />
-        </Hints>
         <BooleanDomain name="bool" />
         <Documentation>
           Should the splat be emissive lke a light source or not. For cosmology emissive should be on. For scanned point clouds typically it woudl be off.
