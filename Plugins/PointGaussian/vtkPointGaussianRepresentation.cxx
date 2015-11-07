@@ -81,6 +81,12 @@ void vtkPointGaussianRepresentation::SetVisibility(bool val)
 }
 
 //----------------------------------------------------------------------------
+void vtkPointGaussianRepresentation::SetEmissive(bool val)
+{
+  this->Mapper->SetEmissive(val);
+}
+
+//----------------------------------------------------------------------------
 void vtkPointGaussianRepresentation::SetMapScalars(int val)
 {
   if (val != 0 && val != 1)
