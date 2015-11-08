@@ -63,7 +63,8 @@ void run_cpuid(uint32_t eax, uint32_t ecx, uint32_t* abcd)
 #if defined(_MSC_VER)
   __cpuidex(abcd, eax, ecx);
 #else
-  uint32_t ebx, edx;
+  uint32_t ebx = 0;
+  uint32_t edx = 0;
 # if defined( __i386__ ) && defined ( __PIC__ )
   /* in case of PIC under 32-bit EBX cannot be clobbered */
   __asm__ ("movl %%ebx, %%edi \n\t cpuid \n\t xchgl %%ebx, %%edi" : "=D" (ebx),
@@ -141,8 +142,7 @@ const char *determine_mesa_version()
   return "mesa-llvm";
 }
 
-int get_driver_cache_user_path(const char *this_exe_path,
-  char *driver_cache_path)
+int get_driver_cache_user_path(char *driver_cache_path)
 {
   const char *home = getenv("HOME");
   if (!home)
@@ -189,11 +189,9 @@ int append_driver_to_ldpath(const char *this_exe_path, const char *driver)
   char self_path[KWSYS_SHARED_FORWARD_MAXPATH] = { 0 };
   char throwaway_ldpath[KWSYS_SHARED_FORWARD_MAXPATH] = { 0 };
   char exe[KWSYS_SHARED_FORWARD_MAXPATH] = { 0 };
-  char cache_path[KWSYS_SHARED_FORWARD_MAXPATH] = { 0 };
-  FILE *cache = NULL;
 
   // Use default native driver, so don't update LD_LIBRARY_PATH
-  if (!driver || driver && driver[0] == '\0')
+  if (!driver || (driver && driver[0] == '\0'))
     {
     return 0;
     }
@@ -237,7 +235,6 @@ int main(int argc, char** argv)
   char **true_argv = malloc(argc * sizeof(char*));
   int result = 0;
   FILE *driver_cache = NULL;
-  int driver_changed = 0;
   char driver_choice[MAX_DRIVER_CHOICE] = { 0 };
   char driver_cache_path[KWSYS_SHARED_FORWARD_MAXPATH] = { 0 };
 
@@ -246,16 +243,16 @@ int main(int argc, char** argv)
   driver_cache = fopen(driver_cache_path, "r");
   if (driver_cache)
     {
-      fgets(driver_choice, sizeof(driver_choice), driver_cache);
+      (void)fgets(driver_choice, sizeof(driver_choice), driver_cache);
       fclose(driver_cache);
     }
 
   // If there is a user config, override the site config
-  get_driver_cache_user_path(argv[0], driver_cache_path);
+  get_driver_cache_user_path(driver_cache_path);
   driver_cache = fopen(driver_cache_path, "r");
   if (driver_cache)
     {
-    fgets(driver_choice, sizeof(driver_choice), driver_cache);
+    (void)fgets(driver_choice, sizeof(driver_choice), driver_cache);
     fclose(driver_cache);
     }
 
@@ -265,19 +262,16 @@ int main(int argc, char** argv)
     if (strcmp(argv[i], "--native") == 0)
       {
       driver_choice[0] = '\0';
-      driver_changed = 1;
       }
     else if (strcmp(argv[i], "--mesa") == 0)
       {
       strncpy(driver_choice, determine_mesa_version(), MAX_DRIVER_CHOICE);
-      driver_changed = 1;
       }
     else if (strcmp(argv[i], "--mesa-llvm") == 0      ||
              strcmp(argv[i], "--mesa-swr-avx") == 0   ||
              strcmp(argv[i], "--mesa-swr-avx2") == 0)
       {
       strncpy(driver_choice, argv[i] + 2, MAX_DRIVER_CHOICE);
-      driver_changed = 1;
       }
     else
       {
@@ -291,6 +285,7 @@ int main(int argc, char** argv)
 
   // Only read the config file
 #if 0
+  //int driver_changed = 0;
   // Update the cache if we changed driver
   if (driver_changed)
     {
