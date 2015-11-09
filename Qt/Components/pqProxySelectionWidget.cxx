@@ -149,13 +149,13 @@ void pqProxySelectionWidget::setProxy(pqSMProxy var)
 
   int index = proxies.indexOf(var.GetPointer());
 
-  if(var.GetPointer() && index != this->Internal->Combo->currentIndex())
-    {
-    this->Internal->Combo->setCurrentIndex(index);
-    }
-  else if(var.GetPointer() && index < 0)
+  if(var.GetPointer() && index < 0 && this->Internal->Combo->count() > 0)
     {
     qDebug() << "Selected proxy value not in the list: " << var->GetXMLLabel();
+    }
+  else if (var.GetPointer() && index != this->Internal->Combo->currentIndex())
+    {
+    this->Internal->Combo->setCurrentIndex(index);
     }
 }
 
