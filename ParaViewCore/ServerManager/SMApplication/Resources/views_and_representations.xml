@@ -3321,28 +3321,32 @@
                proxygroup="representations"
                proxyname="Glyph3DRepresentation"></Proxy>
         <ExposedProperties>
-          <Property name="Masking"
-                    panel_visibility="never" />
-          <Property name="MeshVisibility"
-                    panel_visibility="never" />
-          <Property name="Orient"
-                    panel_visibility="never" />
-          <Property name="OrientationMode"
-                    panel_visibility="never" />
-          <Property name="ScaleFactor"
-                    panel_visibility="never" />
-          <Property name="ScaleMode"
-                    panel_visibility="never" />
-          <Property name="Scaling"
-                    panel_visibility="never" />
-          <Property name="SelectMaskArray"
-                    panel_visibility="never" />
-          <Property name="SelectOrientationVectors"
-                    panel_visibility="never" />
-          <Property name="SelectScaleArray"
-                    panel_visibility="never" />
-          <Property name="Source"
-                    panel_visibility="never" />
+          <PropertyGroup label="Glyph Parameters"
+                         panel_visibility="advanced">
+            <Property name="Masking"
+                      panel_visibility="never" />
+            <Property name="MeshVisibility"
+                      panel_visibility="never" />
+            <Property name="Orient"
+                      panel_visibility="never" />
+            <Property name="OrientationMode"
+                      panel_visibility="never" />
+            <Property name="ScaleFactor"
+                      panel_visibility="never" />
+            <Property name="ScaleMode"
+                      panel_visibility="never" />
+            <Property name="Scaling"
+                      panel_visibility="never" />
+            <Property name="SelectMaskArray"
+                      panel_visibility="never" />
+            <Property name="SelectOrientationVectors"
+                      panel_visibility="never" />
+            <Property name="SelectScaleArray"
+                      panel_visibility="never" />
+            <Property name="GlyphType"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="3d glyphs"/>
+          </PropertyGroup>
         </ExposedProperties>
         <ShareProperties subproxy="SurfaceRepresentation">
           <Exception name="Input" />
@@ -4328,13 +4332,26 @@
       </InputProperty>
       <InputProperty command="SetInputConnection"
                      label="Glyph Type"
-                     name="Source"
+                     name="GlyphType"
                      panel_visibility="advanced"
                      port_index="1">
         <Documentation>Specify the source objects.</Documentation>
         <DataTypeDomain name="input_type">
           <DataType value="vtkPolyData" />
         </DataTypeDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="sources" name="ArrowSource" />
+          <Proxy group="sources" name="ConeSource" />
+          <Proxy group="sources" name="CubeSource" />
+          <Proxy group="sources" name="CylinderSource" />
+          <Proxy group="sources" name="LineSource" />
+          <Proxy group="sources" name="SphereSource" />
+          <Proxy group="sources" name="GlyphSource2D" />
+        </ProxyListDomain>
+        <Hints>
+          <ProxyPropertyWidget selected_proxy_panel_visibility="advanced" />
+          <!-- show the selected proxy's panel, only in advanced mode. -->
+        </Hints>
       </InputProperty>
       <IntVectorProperty command="SetMeshVisibility"
                          default_values="0"

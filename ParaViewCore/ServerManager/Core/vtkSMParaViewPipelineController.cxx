@@ -49,7 +49,9 @@ class vtkSMParaViewPipelineController::vtkInternals
 public:
   typedef std::map<void*, vtkTimeStamp> TimeStampsMap;
   TimeStampsMap InitializationTimeStamps;
+  std::set<void*> ProxiesBeingUnRegistered;
 };
+
 
 namespace
 {
@@ -106,7 +108,38 @@ namespace
       }
     return NULL;
     }
+
+  class vtkPrepareForUnregisteringScopedObj
+  {
+    void* Proxy;
+    std::set<void*> &ProxiesBeingUnRegistered;
+  public:
+    vtkPrepareForUnregisteringScopedObj(void* proxy, std::set<void*>& theset) :
+      Proxy(proxy),
+      ProxiesBeingUnRegistered(theset)
+      {
+      this->ProxiesBeingUnRegistered.insert(this->Proxy);
+      }
+    ~vtkPrepareForUnregisteringScopedObj()
+      {
+      this->ProxiesBeingUnRegistered.erase(this->Proxy);
+      }
+  private:
+    vtkPrepareForUnregisteringScopedObj(const vtkPrepareForUnregisteringScopedObj&);
+    void operator=(const vtkPrepareForUnregisteringScopedObj&);
+  };
 }
+
+//---------------------------------------------------------------------------------------------------------
+// This macros makes it easier to avoid running into unregistering loops due to dependency cycles
+// when unregistering proxies. Any concrete method that unregisters proxies should simply call this macro.
+#define PREPARE_FOR_UNREGISTERING(arg)\
+  if (!arg) { return false; } \
+if (this->Internals->ProxiesBeingUnRegistered.find(arg) != this->Internals->ProxiesBeingUnRegistered.end()) \
+{ \
+  return true; \
+} \
+vtkPrepareForUnregisteringScopedObj __tmp(arg, this->Internals->ProxiesBeingUnRegistered);
 
 vtkObjectFactoryNewMacro(vtkSMParaViewPipelineController);
 //----------------------------------------------------------------------------
@@ -615,10 +648,7 @@ bool vtkSMParaViewPipelineController::RegisterPipelineProxy(
 //----------------------------------------------------------------------------
 bool vtkSMParaViewPipelineController::UnRegisterPipelineProxy(vtkSMProxy* proxy)
 {
-  if (!proxy)
-    {
-    return false;
-    }
+  PREPARE_FOR_UNREGISTERING(proxy);
 
   vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
   const char* _proxyname = pxm->GetProxyName("sources", proxy);
@@ -696,10 +726,7 @@ bool vtkSMParaViewPipelineController::RegisterViewProxy(
 bool vtkSMParaViewPipelineController::UnRegisterViewProxy(
   vtkSMProxy* proxy, bool unregister_representations/*=true*/)
 {
-  if (!proxy)
-    {
-    return false;
-    }
+  PREPARE_FOR_UNREGISTERING(proxy);
 
   vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
   const char* _proxyname = pxm->GetProxyName("views", proxy);
@@ -787,10 +814,7 @@ bool vtkSMParaViewPipelineController::RegisterRepresentationProxy(vtkSMProxy* pr
 //----------------------------------------------------------------------------
 bool vtkSMParaViewPipelineController::UnRegisterRepresentationProxy(vtkSMProxy* proxy)
 {
-  if (!proxy)
-    {
-    return false;
-    }
+  PREPARE_FOR_UNREGISTERING(proxy);
 
   vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
   std::string groupname("representations");
@@ -885,10 +909,7 @@ bool vtkSMParaViewPipelineController::RegisterAnimationProxy(vtkSMProxy* proxy)
 //----------------------------------------------------------------------------
 bool vtkSMParaViewPipelineController::UnRegisterAnimationProxy(vtkSMProxy* proxy)
 {
-  if (!proxy)
-    {
-    return false;
-    }
+  PREPARE_FOR_UNREGISTERING(proxy);
 
   vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
   const char* _proxyname = pxm->GetProxyName("animation", proxy);
@@ -1225,6 +1246,7 @@ bool vtkSMParaViewPipelineController::UnRegisterProxy(vtkSMProxy* proxy)
     return false;
     }
 
+
   SM_SCOPED_TRACE(CleanupAccessor).arg("proxy", proxy);
 
   // determine what type of proxy is this, based on that, we can finalize it.
@@ -1251,6 +1273,8 @@ bool vtkSMParaViewPipelineController::UnRegisterProxy(vtkSMProxy* proxy)
     }
   else
     {
+    PREPARE_FOR_UNREGISTERING(proxy);
+
     const char* known_groups[] = {
       "lookup_tables", "piecewise_functions", "layouts", NULL };
     for (int cc=0; known_groups[cc] != NULL; ++cc)

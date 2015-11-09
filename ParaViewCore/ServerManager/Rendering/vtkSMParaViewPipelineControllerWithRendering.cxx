@@ -22,9 +22,9 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSMProxySelectionModel.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
@@ -172,6 +172,13 @@ namespace
         // LookupTable/ScalarOpacityFunction properties. How are those to be
         // copied over esp. since they depend on how ColorArrayName property was
         // copied.
+        continue;
+        }
+      if (vtkSMProxyProperty::SafeDownCast(source))
+        {
+        // HACK: we skip proxy properties. Without this change, the properties
+        // like GlyphType end up inheriting the value from the upstream
+        // representation, which is incorrect.
         continue;
         }
       if (dest && source &&
