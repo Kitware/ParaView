@@ -91,7 +91,7 @@
 #   )
 # 
 ###############################################################################
-include(vtkForwardingExecutable)
+include(pvForwardingExecutable)
 
 FUNCTION(build_paraview_client BPC_NAME)
   PV_PARSE_ARGUMENTS(BPC 
@@ -291,7 +291,7 @@ FUNCTION(build_paraview_client BPC_NAME)
   SET (PV_EXE_LIST ${BPC_NAME})
 
   # needed to set up shared forwarding correctly.
-  vtk_add_executable_with_forwarding2(pv_exe_suffix
+  pv_add_executable_with_forwarding2(pv_exe_suffix
                  "${PARAVIEW_LIBRARY_DIRS}"
                  "../${PARAVIEW_INSTALL_LIB_DIR}"
                  "${BPC_INSTALL_LIBRARY_DIR}"

@@ -412,12 +412,13 @@ endmacro()
 #------------------------------------------------------------------------------
 # replacement for vtk-add executable that also adds the install rules.
 #------------------------------------------------------------------------------
-include(vtkForwardingExecutable)
+include(pvForwardingExecutable)
 
 function(pv_add_executable name)
   set (VTK_EXE_SUFFIX)
   if(UNIX AND VTK_BUILD_FORWARDING_EXECUTABLES)
-    vtk_add_executable_with_forwarding(VTK_EXE_SUFFIX ${name} ${ARGN})
+    set(PV_INSTALL_LIBRARY_DIR ${VTK_INSTALL_LIBRARY_DIR})
+    pv_add_executable_with_forwarding(VTK_EXE_SUFFIX ${name} ${ARGN})
     set_property(GLOBAL APPEND PROPERTY VTK_TARGETS ${name})
   else()
     add_executable(${name} ${ARGN})
