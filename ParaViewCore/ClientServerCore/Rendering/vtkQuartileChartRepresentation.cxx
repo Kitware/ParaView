@@ -70,7 +70,7 @@ public:
         }
       return plot;
       }
-    else if ((role == "avg")|| role.empty())
+    else if ((role == "avg") || (role == "med") || role.empty())
       {
       assert(self);
       vtkChartXY* chartXY = self->GetChart();
@@ -112,7 +112,8 @@ protected:
     vtkQuartileChartRepresentation* qcr = vtkQuartileChartRepresentation::SafeDownCast(self);
     if ( (role == "minmax" && qcr->GetRangeVisibility() == false) ||
       (role == "q1q3" && qcr->GetQuartileVisibility() == false) ||
-      (role == "avg" && qcr->GetAverageVisibility() == false) )
+      (role == "avg" && qcr->GetAverageVisibility() == false) ||
+      (role == "med" && qcr->GetMedianVisibility() == false))
       {
       plot->SetVisible(false);
       return false;
@@ -135,6 +136,11 @@ protected:
       }
     else if (role.empty() == false)
       {
+      if (role == "med")
+        {
+        plot->GetBrush()->SetOpacityF(0.3);
+        plot->GetPen()->SetOpacityF(0.3);
+        }
       plot->SetLabel(role + " " + plot->GetLabel());
       }
     return true;
@@ -146,7 +152,8 @@ vtkStandardNewMacro(vtkQuartileChartRepresentation);
 vtkQuartileChartRepresentation::vtkQuartileChartRepresentation()
   : QuartileVisibility(true),
   RangeVisibility(true),
-  AverageVisibility(true)
+  AverageVisibility(true),
+  MedianVisibility(true)
 {
   delete this->Internals;
   this->Internals = new vtkQCRInternals();
@@ -176,4 +183,5 @@ void vtkQuartileChartRepresentation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "QuartileVisibility: " << this->QuartileVisibility << endl;
   os << indent << "RangeVisibility: " << this->RangeVisibility << endl;
   os << indent << "AverageVisibility: " << this->AverageVisibility << endl;
+  os << indent << "MedianVisibility: " << this->MedianVisibility << endl;
 }

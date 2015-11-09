@@ -52,6 +52,11 @@ public:
   vtkSetMacro(AverageVisibility, bool);
   vtkGetMacro(AverageVisibility, bool);
 
+  // Description:
+  // When set to true, the med curve is rendered.
+  vtkSetMacro(MedianVisibility, bool);
+  vtkGetMacro(MedianVisibility, bool);
+
 //BTX
 protected:
   vtkQuartileChartRepresentation();
@@ -60,6 +65,7 @@ protected:
   bool QuartileVisibility;
   bool RangeVisibility;
   bool AverageVisibility;
+  bool MedianVisibility;
 
 private:
   vtkQuartileChartRepresentation(const vtkQuartileChartRepresentation&); // Not implemented
