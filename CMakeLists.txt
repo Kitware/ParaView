@@ -93,12 +93,12 @@ include(CMakeDependentOption)
 # Setup ParaView Environment
 #------------------------------------------------------------------------------
 # Determine ParaView Source Version
-set (PARAVIEW_VERSION_MAJOR 4)
-set (PARAVIEW_VERSION_MINOR 4)
+set (PARAVIEW_VERSION_MAJOR 5)
+set (PARAVIEW_VERSION_MINOR 0)
 set (PARAVIEW_VERSION_PATCH 0)
-set (PARAVIEW_VERSION_PATCH_EXTRA)
-set (PARAVIEW_VERSION "4.4")
-set (PARAVIEW_VERSION_FULL "4.4.0")
+set (PARAVIEW_VERSION_PATCH_EXTRA "RC1")
+set (PARAVIEW_VERSION "5.0")
+set (PARAVIEW_VERSION_FULL "5.0.0-RC1")
 
 determine_version(${ParaView_SOURCE_DIR} ${GIT_EXECUTABLE} "PARAVIEW")
 
