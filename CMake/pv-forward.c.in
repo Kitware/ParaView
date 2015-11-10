@@ -256,13 +256,6 @@ int append_driver_to_ldpath(const char *this_exe_path, const char *driver)
     return 0;
     }
 
-  // Check for a newline in the driver name
-  char *newline = strchr(driver, '\n');
-  if (newline)
-    {
-      *newline = '\0';
-    }
-
   kwsys_shared_forward_self_path(this_exe_path, self_path);
   kwsys_shared_forward_get_settings(self_path, throwaway_ldpath, exe);
 
@@ -316,7 +309,20 @@ int main(int argc, char** argv)
     fclose(driver_cache);
     }
 
-  // Check for driver specification; forward all other args
+  // Check for a newline in the driver name
+  char *newline = strchr(driver_choice, '\n');
+  if (newline)
+    {
+      *newline = '\0';
+    }
+
+  // If config contains "mesa", determine which mesa to use.
+  if (strlen(driver_choice) && !strcmp(driver_choice, "mesa"))
+    {
+    strncpy(driver_choice, determine_mesa_version(), MAX_DRIVER_CHOICE);
+    }
+
+  // Check for single-run driver specification; forward all other args
   for (; i < argc; ++i)
     {
     if (strcmp(argv[i], "--native") == 0)
