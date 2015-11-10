@@ -1126,12 +1126,24 @@ int classUsesStdString(ClassInfo *data)
   return 0;
 }
 
+#if defined(_MSC_VER) && _MSC_VER < 1900
+# define snprintf _snprintf
+#endif
+
 /* print the parsed structures */
 int main(int argc, char *argv[])
 {
   OptionInfo *options;
   FileInfo *fileInfo;
   ClassInfo *data;
+  NamespaceInfo *ns;
+  char nsname[1024];
+  struct {
+    NamespaceInfo *ns;
+    size_t nsnamepos;
+    int n;
+  } nsstack[32];
+  size_t nspos;
   FILE *fp;
   NewClassInfo *classData;
   int i;
@@ -1152,6 +1164,58 @@ int main(int argc, char *argv[])
     }
 
   data = fileInfo->MainClass;
+
+  /* Set up the stack. */
+  nspos = 0;
+  nsstack[nspos].ns = fileInfo->Contents;
+  nsstack[nspos].nsnamepos = 0;
+  nsstack[nspos].n = 0;
+  nsname[nsstack[nspos].nsnamepos] = '\0';
+  ns = nsstack[nspos].ns;
+
+  while (!data && ns)
+    {
+    if (ns->Name)
+      {
+      size_t namelen = strlen(nsname);
+      snprintf(nsname + namelen, sizeof(nsname) - namelen, "::%s", ns->Name);
+      }
+
+    if (ns->NumberOfClasses > 0)
+      {
+      data = ns->Classes[0];
+      break;
+      }
+
+    if (ns->NumberOfNamespaces > nsstack[nspos].n)
+      {
+      /* Use the next namespace. */
+      ns = ns->Namespaces[nsstack[nspos].n];
+      nsstack[nspos].n++;
+
+      /* Go deeper. */
+      nspos++;
+      nsstack[nspos].ns = ns;
+      nsstack[nspos].nsnamepos = strlen(nsname);
+      nsstack[nspos].n = 0;
+      }
+    else
+      {
+      if (nspos)
+        {
+        --nspos;
+        /* Reset the namespace name. */
+        nsname[nsstack[nspos].nsnamepos] = '\0';
+        /* Go back up the stack. */
+        ns = nsstack[nspos].ns;
+        }
+      else
+        {
+        /* Nothing left to search. */
+        ns = NULL;
+        }
+      }
+    }
 
   if(!data)
     {
@@ -1194,6 +1258,10 @@ int main(int argc, char *argv[])
   if (!strcmp("vtkObjectBase",data->Name))
     {
     fprintf(fp,"#include <sstream>\n");
+    }
+  if (*nsname)
+    {
+    fprintf(fp,"using namespace %s;\n", nsname);
     }
   if (!data->IsAbstract)
     {
