@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqSMProxy_h
 #define _pqSMProxy_h
 
+#include "pqCoreModule.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProxy.h"
 #include <QMetaType>
@@ -43,5 +44,6 @@ typedef vtkSmartPointer<vtkSMProxy> pqSMProxy;
 /// declare pqSMProxy for use with QVariant
 Q_DECLARE_METATYPE(pqSMProxy)
 
-#endif
+extern PQCORE_EXPORT const int pqSMProxyMetaTypeId;
 
+#endif

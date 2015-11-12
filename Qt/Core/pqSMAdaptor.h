@@ -54,6 +54,9 @@ protected:
   pqSMAdaptor();
   ~pqSMAdaptor();
 
+private:
+  static const int metaId;
+
 public:
 
   /// enumeration for types of properties this class handles
