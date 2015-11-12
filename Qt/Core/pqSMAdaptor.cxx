@@ -82,7 +82,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStringList>
 #include <set>
 
-static const int metaId = qRegisterMetaType<QList<QList<QVariant> > >();
+const int pqSMAdaptor::metaId = qRegisterMetaType<QList<QList<QVariant> > >();
 
 namespace
 {

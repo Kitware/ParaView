@@ -32,9 +32,5 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqSMProxy.h"
 
-#include <QGlobalStatic>
-
 // register meta type for pqSMProxy
-static const int pqSMProxyMetaTypeId = qRegisterMetaType<pqSMProxy>("pqSMProxy");
-
-
+const int pqSMProxyMetaTypeId = qRegisterMetaType<pqSMProxy>("pqSMProxy");
