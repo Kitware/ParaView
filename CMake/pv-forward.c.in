@@ -285,11 +285,13 @@ int main(int argc, char** argv)
   int i = 0;
   int true_argc = 0;
   int true_i = 0;
-  char **true_argv = malloc(argc * sizeof(char*));
+  char **true_argv = malloc((argc + 1) * sizeof(char*));
   int result = 0;
   FILE *driver_cache = NULL;
   char driver_choice[MAX_DRIVER_CHOICE] = { 0 };
   char driver_cache_path[KWSYS_SHARED_FORWARD_MAXPATH] = { 0 };
+
+  true_argv[argc] = NULL;
 
   // Check for site-wide config first
   get_driver_cache_site_path(argv[0], driver_cache_path);
