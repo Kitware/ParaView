@@ -186,29 +186,6 @@ void rayBoxIntersection (double r, double v[3])
   vtkMath::MultiplyScalar(v, minT);
 }
 
-// Debugging printouts
-void printCreateGrid(int* dim, double* lonCoord, double* latCoord,
-                     double* levCoord, int* nCells2d, int* myRank)
-{
-
-std::ostringstream ostr;
-ostr << "\nDimensions: ";
-ostr << dim[0] << ", " << dim[1] << ", " << dim[2] << std::endl;
-ostr << "lon: ";
-for (int i = 0; i < dim[0]; ++i)
-  ostr << lonCoord[i] << " ";
-ostr << "\nlat: ";
-for (int i = 0; i < dim[1]; ++i)
-  ostr << latCoord[i] << " ";
-ostr << "\nlev: ";
-for (int i = 0; i < dim[2]; ++i)
-  ostr << levCoord[i] << " ";
-ostr << endl;
-ostr << "\nnCells2d: " << *nCells2d
-<< "\nmyRank: " << *myRank << endl;
-std::cerr << ostr.str();
-}
-
 };
 
 namespace CamAdaptor
