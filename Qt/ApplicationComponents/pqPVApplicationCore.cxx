@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqItemViewSearchWidget.h"
 #include "pqOptions.h"
+#include "pqPropertiesPanel.h"
 #include "pqQuickLaunchDialog.h"
 #include "pqSelectionManager.h"
 #include "pqSetName.h"
@@ -132,7 +133,13 @@ void pqPVApplicationCore::quickLaunch()
           }
         }
       }
+    // If shift modifier is pressed, let's force the auto apply
+    bool forceAutoApply = QApplication::keyboardModifiers() & Qt::ShiftModifier;
+    bool autoApplyState = pqPropertiesPanel::autoApply();
+    pqPropertiesPanel::setAutoApply(autoApplyState || forceAutoApply);
     dialog.exec();
+    // Restore the auto apply state
+    pqPropertiesPanel::setAutoApply(autoApplyState);
     }
 }
 

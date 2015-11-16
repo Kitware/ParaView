@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -78,7 +78,7 @@ pqQuickLaunchDialog::~pqQuickLaunchDialog()
 //-----------------------------------------------------------------------------
 bool pqQuickLaunchDialog::eventFilter (QObject *watched, QEvent *evt)
 {
-  if (evt->type() == QEvent::KeyPress) 
+  if (evt->type() == QEvent::KeyPress)
     {
     QKeyEvent *keyEvent = static_cast<QKeyEvent*>(evt);
     int key = keyEvent->key();
@@ -166,13 +166,17 @@ void pqQuickLaunchDialog::updateSearch()
   QStringList searchComponents = this->Internal->SearchString.split(" ",
     QString::SkipEmptyParts);
 
+  QString regExpStr = searchComponents.join(".*");
+  QRegExp regExp("^" + regExpStr, Qt::CaseInsensitive);
+  QRegExp regExp2(".*" + regExpStr, Qt::CaseInsensitive);
   QStringList searchSpace = this->Internal->Items.keys();
+  QStringList searchSpace2 = searchSpace;
+  searchSpace = searchSpace.filter(regExp);
+  searchSpace += searchSpace2.filter(regExp2);
+  searchSpace.removeDuplicates();
 
-  foreach (QString component, searchComponents)
-    {
-    searchSpace = searchSpace.filter(component, Qt::CaseInsensitive);
-    }
-
+  int currentRow = -1;
+  int i = 0;
   foreach (QString key, searchSpace)
     {
     QListWidgetItem *item = new QListWidgetItem(this->Internal->Items[key]);
@@ -181,9 +185,17 @@ void pqQuickLaunchDialog::updateSearch()
       {
       item->setFlags(item->flags()&~Qt::ItemIsEnabled);
       }
+    else
+      {
+      if (currentRow == -1)
+        {
+        currentRow = i;
+        }
+      }
     this->Internal->options->addItem(item);
+    i++;
     }
-  this->Internal->options->setCurrentRow(0);
+  this->Internal->options->setCurrentRow(currentRow);
 }
 
 //-----------------------------------------------------------------------------
@@ -197,7 +209,7 @@ void pqQuickLaunchDialog::currentRowChanged(int row)
     {
     return;
     }
-  QAction* action = this->Internal->Actions[item->data(Qt::UserRole).toString()]; 
+  QAction* action = this->Internal->Actions[item->data(Qt::UserRole).toString()];
   if (action)
     {
     this->Internal->selection->setText(action->text());
