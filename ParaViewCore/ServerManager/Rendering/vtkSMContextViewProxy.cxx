@@ -15,10 +15,12 @@
 #include "vtkSMContextViewProxy.h"
 
 #include "vtkAxis.h"
+#include "vtkChartLegend.h"
 #include "vtkChartXY.h"
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkContextInteractorStyle.h"
+#include "vtkContextScene.h"
 #include "vtkContextView.h"
 #include "vtkErrorCode.h"
 #include "vtkEventForwarderCommand.h"
@@ -115,6 +117,10 @@ void vtkSMContextViewProxy::CreateVTKObjects()
   this->GetContextItem()->AddObserver(
     vtkCommand::InteractionEvent, this,
     &vtkSMContextViewProxy::OnInteractionEvent);
+
+  this->ChartView->GetScene()->AddObserver(
+    vtkCommand::LeftButtonReleaseEvent, this,
+    &vtkSMContextViewProxy::OnLeftButtonReleaseEvent);
 }
 
 //----------------------------------------------------------------------------
@@ -262,6 +268,20 @@ void vtkSMContextViewProxy::OnInteractionEvent()
 
     // Note: OnInteractionEvent gets called before this->StillRender() gets called
     // as a consequence of this interaction.
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMContextViewProxy::OnLeftButtonReleaseEvent()
+{
+  vtkChartXY *chartXY = vtkChartXY::SafeDownCast(this->GetContextItem());
+  if (chartXY)
+    {
+    int pos[2];
+    pos[0] = static_cast<int>(chartXY->GetLegend()->GetPointVector().GetX());
+    pos[1] = static_cast<int>(chartXY->GetLegend()->GetPointVector().GetY());
+    vtkSMPropertyHelper(this, "LegendPosition", true).Set(pos, 2);
+    this->UpdateVTKObjects();
     }
 }
 

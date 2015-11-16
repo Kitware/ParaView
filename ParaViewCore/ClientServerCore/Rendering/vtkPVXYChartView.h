@@ -151,6 +151,10 @@ public:
   void SetLegendLocation(int location);
 
   // Description:
+  // Set the legend position.
+  void SetLegendPosition(int x, int y);
+
+  // Description:
   // Set the legend font family.
   void SetLegendFontFamily(const char* family);
 

@@ -370,7 +370,22 @@ void vtkPVXYChartView::SetLegendLocation(int location)
         legend->SetHorizontalAlignment(vtkChartLegend::CENTER);
         legend->SetVerticalAlignment(vtkChartLegend::BOTTOM);
         break;
+      case 8: // CUSTOM
+        legend->SetHorizontalAlignment(vtkChartLegend::CUSTOM);
+        legend->SetVerticalAlignment(vtkChartLegend::CUSTOM);
+        break;
+      default:
+        break;
       }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetLegendPosition(int x, int y)
+{
+  if (this->Chart)
+    {
+    this->Chart->GetLegend()->SetPoint(vtkVector2f(x, y));
     }
 }
 
