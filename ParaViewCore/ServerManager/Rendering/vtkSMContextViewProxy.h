@@ -98,6 +98,11 @@ protected:
   void OnInteractionEvent();
 
   // Description:
+  // Used to update the legend position on interaction event.
+  // This also fires the vtkCommand::InteractionEvent.
+  void OnLeftButtonReleaseEvent();
+
+  // Description:
   // Overridden to update ChartAxes ranges on every render. This ensures that
   // the property's values are up-to-date.
   virtual void PostRender(bool interactive);

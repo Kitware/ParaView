@@ -190,7 +190,24 @@
                  value="6" />
           <Entry text="Bottom"
                  value="7" />
+         <Entry text="Custom"
+                 value="8" />
         </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetLegendPosition"
+                         default_values="0 0"
+                         name="LegendPosition"
+                         panel_visibility="default"
+                         number_of_elements="2">
+        <Documentation>Set the legend position in the view for
+          custom location.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="LegendLocation"
+                                   value="8" />
+          <!-- show this widget when LegendLocation==8 (ie.Custom) -->
+        </Hints>
       </IntVectorProperty>
       <StringVectorProperty command="SetLegendFontFamily"
                             default_values="Arial"
@@ -296,6 +313,7 @@
       <PropertyGroup label="Annotation">
         <Property name="ShowLegend"/>
         <Property name="LegendLocation"/>
+        <Property name="LegendPosition"/>
         <Property name="HideTimeMarker" />
       </PropertyGroup>
       <PropertyGroup label="Tooltip"
@@ -7439,6 +7457,7 @@
           <PropertyGroup label="Legend">
             <Property name="ShowLegend"/>
             <Property name="LegendLocation"/>
+            <Property name="LegendPosition"/>
           </PropertyGroup>
           <PropertyGroup label="Legend Properties"
                          panel_widget="FontEditor"
@@ -7646,6 +7665,7 @@
           <PropertyGroup label="Legend">
             <Property name="ShowLegend"/>
             <Property name="LegendLocation"/>
+            <Property name="LegendPosition"/>
           </PropertyGroup>
           <PropertyGroup label="Legend Properties"
                          panel_widget="FontEditor"
