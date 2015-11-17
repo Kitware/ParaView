@@ -6373,6 +6373,24 @@
           Set whether to render the area for the min/max range, if available.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty name="ShowAverage"
+                         command="SetAverageVisibility"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether to render the line for the average value, if available.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="ShowMedian"
+                         command="SetMedianVisibility"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether to render the line for the median value, if available.
+        </Documentation>
+      </IntVectorProperty>
     </ChartRepresentationProxy>
 
     <!-- =================================================================== -->
