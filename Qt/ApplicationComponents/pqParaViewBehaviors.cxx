@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -135,6 +135,10 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   QShortcut *ctrlSpace = new QShortcut(Qt::CTRL + Qt::Key_Space,
     mainWindow);
   QObject::connect(ctrlSpace, SIGNAL(activated()),
+    pqApplicationCore::instance(), SLOT(quickLaunch()));
+  QShortcut *ctrlShiftSpace = new QShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_Space,
+    mainWindow);
+  QObject::connect(ctrlShiftSpace, SIGNAL(activated()),
     pqApplicationCore::instance(), SLOT(quickLaunch()));
   QShortcut *altSpace = new QShortcut(Qt::ALT + Qt::Key_Space,
     mainWindow);
