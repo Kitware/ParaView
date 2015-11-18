@@ -52,6 +52,7 @@ set(Module_SRCS
   vtkPVDiscretizableColorTransferFunction.cxx
   vtkPVGeometryFilter.cxx
   vtkPVGL2PSExporter.cxx
+  vtkPVInteractiveViewLinkRepresentation.cxx
   vtkPVInteractorStyle.cxx
   vtkPVJoystickFly.cxx
   vtkPVJoystickFlyIn.cxx

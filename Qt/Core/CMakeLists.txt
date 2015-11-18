@@ -93,6 +93,8 @@ set(Module_SRCS
   pqGraphLayoutStrategyInterface.h
   pqImageUtil.cxx
   pqImageUtil.h
+  pqInteractiveViewLink.cxx
+  pqInteractiveViewLink.h
   pqInterfaceTracker.cxx
   pqInterfaceTracker.h
   pqLinksModel.cxx
@@ -248,6 +250,7 @@ set (Module_MOC_HDRS
   pqFileDialogRecentDirsModel.h
   pqFlatTreeViewEventPlayer.h
   pqFlatTreeViewEventTranslator.h
+  pqInteractiveViewLink.h
   pqInterfaceTracker.h
   pqLinksModel.h
   pqLinkViewWidget.h

@@ -92,7 +92,7 @@ void pqLinksManager::addLink()
 
       if(inP->IsA("vtkSMRenderViewProxy") && outP->IsA("vtkSMRenderViewProxy"))
         {
-        model->addCameraLink(editor.linkName(), inP, outP);
+        model->addCameraLink(editor.linkName(), inP, outP, editor.interactiveViewLinkChecked());
         }
       else
         {
@@ -132,7 +132,7 @@ void pqLinksManager::editLink()
 
       if(inP->IsA("vtkSMRenderViewProxy") && outP->IsA("vtkSMRenderViewProxy"))
         {
-        model->addCameraLink(editor.linkName(), inP, outP);
+        model->addCameraLink(editor.linkName(), inP, outP, editor.interactiveViewLinkChecked());
         }
       else
         {

@@ -75,6 +75,9 @@ public:
   /// get the second selected property
   QString selectedProperty2();
 
+  /// Get the check state of interactive view link check box
+  bool interactiveViewLinkChecked();
+
 private slots:
   void currentProxy1Changed(const QModelIndex& cur, const QModelIndex&);
   void currentProxy2Changed(const QModelIndex& cur, const QModelIndex&);
