@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
+#include "pqLiveInsituManager.h"
 #include "pqPipelineFilter.h"
 #include "pqPropertiesPanel.h"
 #include "pqProxyModifiedStateUndoElement.h"
@@ -45,9 +46,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataInformation.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkSMAnimationSceneProxy.h"
+#include "vtkSMLiveInsituLinkProxy.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMSession.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMViewProxy.h"
@@ -151,11 +154,22 @@ void pqApplyBehavior::applied(pqPropertiesPanel*)
       pqActiveObjects::instance().activeServer()->session()));
 
 
+  pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
+
+  //---------------------------------------------------------------------------
+  // If there is a catalyst session, push its updates to the server
+  foreach (pqServer* server, smmodel->findItems<pqServer*>())
+    {
+    if (pqLiveInsituManager::isInsituServer(server))
+      {
+      pqLiveInsituManager::linkProxy(server)->PushUpdatedStates();
+      }
+    }
+
   QList<pqView*> dirty_views;
 
   //---------------------------------------------------------------------------
   // find views that need updating and update them.
-  pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
   foreach (pqView* view, smmodel->findItems<pqView*>())
     {
     if (view && view->getViewProxy()->GetNeedsUpdate())

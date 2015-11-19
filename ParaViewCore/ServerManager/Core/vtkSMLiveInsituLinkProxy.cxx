@@ -258,15 +258,27 @@ void vtkSMLiveInsituLinkProxy::PushUpdatedState()
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkSMLiveInsituLinkProxy::MarkStateDirty()
 {
   this->StateDirty = true;
   vtkSMLiveInsituLinkProxyDebugMacro(<< "MarkStateDirty");
-  if (vtkSMPropertyHelper(this, "SimulationPaused").GetAsInt())
+  if (!(vtkSMPropertyHelper(this, "SimulationPaused").GetAsInt()))
     {
-    PushUpdatedState();
+    this->LiveChanged();
     }
-  this->LiveChanged();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMLiveInsituLinkProxy::PushUpdatedStates()
+{
+  // This method is called when the simulation is paused, once all of the
+  // updates have been affected.
+  if (this->StateDirty == true)
+    {
+    this->PushUpdatedState();
+    this->LiveChanged();
+    }
 }
 
 
