@@ -238,6 +238,7 @@ void vtkInitializationHelper::Initialize(int argc, char**argv,
   // These are always loaded (not merely located).
   vtkNew<vtkPVPluginLoader> loader;
   loader->LoadPluginsFromPluginSearchPath();
+  loader->LoadPluginsFromPluginConfigFile();
 
   vtkInitializationHelper::SaveUserSettingsFileDuringFinalization = false;
   // Load settings files on client-processes.

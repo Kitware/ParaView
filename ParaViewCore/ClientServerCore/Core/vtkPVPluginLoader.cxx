@@ -295,6 +295,35 @@ void vtkPVPluginLoader::LoadPluginsFromPluginSearchPath()
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVPluginLoader::LoadPluginsFromPluginConfigFile()
+{
+#ifdef BUILD_SHARED_LIBS
+  const char* configFiles = vtksys::SystemTools::GetEnv("PV_PLUGIN_CONFIG_FILE");
+  if (configFiles != NULL)
+    {
+    vtkPVPluginLoaderDebugMacro(
+      "Loading Plugins from standard PV_PLUGIN_CONFIG_FILE \n"
+      << configFiles);
+
+    std::vector<std::string> paths;
+    vtksys::SystemTools::Split(configFiles, paths, ENV_PATH_SEP);
+    for (size_t cc = 0; cc < paths.size(); cc++)
+      {
+      std::vector<std::string> subpaths;
+      vtksys::SystemTools::Split(paths[cc].c_str(), subpaths, ';');
+      for (size_t scc = 0; scc < subpaths.size(); scc++)
+        {
+        vtkPVPluginTracker::GetInstance()->
+          LoadPluginConfigurationXML(subpaths[scc].c_str(), true);
+        }
+      }
+    }
+#else
+  vtkPVPluginLoaderDebugMacro(
+    "Static build. Skipping PV_PLUGIN_CONFIG_FILE.");
+#endif
+}
+//-----------------------------------------------------------------------------
 void vtkPVPluginLoader::LoadPluginsFromPath(const char* path)
 {
   vtkPVPluginLoaderDebugMacro("Loading plugins in Path: " << path);
@@ -310,7 +339,7 @@ void vtkPVPluginLoader::LoadPluginsFromPath(const char* path)
     std::string ext =
       vtksys::SystemTools::GetFilenameLastExtension(dir.GetFile(cc));
     if (ext == ".so" || ext == ".dll" || ext == ".xml" || ext == ".dylib" ||
-      ext == ".xml" || ext == ".sl")
+        ext == ".xml" || ext == ".sl")
       {
       std::string file = dir.GetPath();
       file += "/";

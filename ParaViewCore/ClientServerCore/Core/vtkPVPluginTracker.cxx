@@ -234,7 +234,7 @@ void vtkPVPluginTracker::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPluginTracker::LoadPluginConfigurationXML(const char* filename)
+void vtkPVPluginTracker::LoadPluginConfigurationXML(const char* filename, bool forceLoad)
 {
   bool debug_plugin = vtksys::SystemTools::GetEnv("PV_PLUGIN_DEBUG") != NULL;
   vtkPVPluginTrackerDebugMacro("Loading plugin configuration xml: " << filename);
@@ -254,11 +254,11 @@ void vtkPVPluginTracker::LoadPluginConfigurationXML(const char* filename)
     return;
     }
 
-  this->LoadPluginConfigurationXML(parser->GetRootElement());
+  this->LoadPluginConfigurationXML(parser->GetRootElement(), forceLoad);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPluginTracker::LoadPluginConfigurationXMLFromString(const char* xmlcontents)
+void vtkPVPluginTracker::LoadPluginConfigurationXMLFromString(const char* xmlcontents, bool forceLoad)
 {
   bool debug_plugin = vtksys::SystemTools::GetEnv("PV_PLUGIN_DEBUG") != NULL;
   vtkSmartPointer<vtkPVXMLParser> parser = vtkSmartPointer<vtkPVXMLParser>::New();
@@ -269,11 +269,11 @@ void vtkPVPluginTracker::LoadPluginConfigurationXMLFromString(const char* xmlcon
     return;
     }
 
-  this->LoadPluginConfigurationXML(parser->GetRootElement());
+  this->LoadPluginConfigurationXML(parser->GetRootElement(), forceLoad);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPluginTracker::LoadPluginConfigurationXML(vtkPVXMLElement* root)
+void vtkPVPluginTracker::LoadPluginConfigurationXML(vtkPVXMLElement* root, bool forceLoad)
 {
   if (root == NULL)
     {
@@ -294,11 +294,12 @@ void vtkPVPluginTracker::LoadPluginConfigurationXML(vtkPVXMLElement* root)
     if (child && child->GetName() && strcmp(child->GetName(), "Plugin") == 0)
       {
       std::string name = child->GetAttributeOrEmpty("name");
-      int auto_load;
-      if (name.empty() || !child->GetScalarAttribute("auto_load", &auto_load))
+      int auto_load = 0;
+      child->GetScalarAttribute("auto_load", &auto_load);
+      if (name.empty())
         {
         vtkPVPluginTrackerDebugMacro(
-          "Missing required attribute name or auto_load. Skipping element.");
+          "Missing required attribute name. Skipping element.");
         continue;
         }
       vtkPVPluginTrackerDebugMacro("Trying to locate plugin with name: " << name.c_str());
@@ -328,7 +329,7 @@ void vtkPVPluginTracker::LoadPluginConfigurationXML(vtkPVXMLElement* root)
         }
       vtkPVPluginTrackerDebugMacro("--- Found " << plugin_filename);
       unsigned int index = this->RegisterAvailablePlugin(plugin_filename.c_str());
-      if (auto_load && !this->GetPluginLoaded(index))
+      if ((auto_load || forceLoad) && !this->GetPluginLoaded(index))
         {
         // load the plugin.
         vtkPVPluginLoader* loader = vtkPVPluginLoader::New();
