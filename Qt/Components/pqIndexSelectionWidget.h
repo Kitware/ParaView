@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
-#ifndef __pqIndexSelectionWidget_h
-#define __pqIndexSelectionWidget_h
+#ifndef pqIndexSelectionWidget_h
+#define pqIndexSelectionWidget_h
 
 #include "pqComponentsModule.h"
 #include "pqPropertyWidget.h"
@@ -98,4 +98,4 @@ private:
   pqInternals* Internals;
 };
 
-#endif
+#endif // pqIndexSelectionWidget_h

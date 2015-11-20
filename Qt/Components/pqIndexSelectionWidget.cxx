@@ -136,28 +136,12 @@ Widgets::Widgets(pqIndexSelectionWidget *parent,
 //------------------------------------------------------------------------------
 Widgets::~Widgets()
 {
+  // It's possible for this to not have a parent set if the widget was not
+  // added to an external layout, so ensure that it gets cleaned up.
   if (this->layout)
     {
     this->layout->deleteLater();
     this->layout = NULL;
-    }
-
-  if (this->label)
-    {
-    this->label->deleteLater();
-    this->label = NULL;
-    }
-
-  if (this->slider)
-    {
-    this->slider->deleteLater();
-    this->slider = NULL;
-    }
-
-  if (this->edit)
-    {
-    this->edit->deleteLater();
-    this->edit = NULL;
     }
 }
 
@@ -501,7 +485,7 @@ void pqIndexSelectionWidget::addRow(const QString &key, int current, int sz)
     QLayoutItem *layoutItem = this->Form->itemAt(row, QFormLayout::LabelRole);
     if (layoutItem)
       {
-      QLabel *label = dynamic_cast<QLabel*>(layoutItem->widget());
+      QLabel *label = qobject_cast<QLabel*>(layoutItem->widget());
       if (label)
         {
         if (key.compare(label->text(), Qt::CaseSensitive) < 0)
