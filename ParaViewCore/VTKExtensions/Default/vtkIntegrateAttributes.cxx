@@ -40,10 +40,29 @@ vtkStandardNewMacro(vtkIntegrateAttributes);
 class vtkIntegrateAttributes::vtkFieldList :
   public vtkDataSetAttributes::FieldList
 {
+  typedef vtkDataSetAttributes::FieldList Superclass;
 public:
   vtkFieldList(int numInputs) : vtkDataSetAttributes::FieldList(numInputs) { }
   void SetFieldIndex(int i, int index)
       { this->vtkDataSetAttributes::FieldList::SetFieldIndex(i, index); }
+  // This method is same as vtkFieldList::InitializeFieldList followed by logic
+  // to mark non-vtkDataArray fields are invalid. Thus, effectively skipping
+  // them.
+  void InitializeFieldListForDataArrays(vtkDataSetAttributes* dsa)
+    {
+    this->Superclass::InitializeFieldList(dsa);
+    for (int i = vtkDataSetAttributes::NUM_ATTRIBUTES; i < this->GetNumberOfFields(); i++)
+      {
+      if (this->GetFieldIndex(i) >= 0)
+        {
+        vtkAbstractArray* aa = dsa->GetAbstractArray(this->GetFieldName(i));
+        if (vtkDataArray::SafeDownCast(aa) == NULL)
+          {
+          this->SetFieldIndex(i, -1);
+          }
+        }
+      }
+    }
 };
 
 //-----------------------------------------------------------------------------
@@ -377,8 +396,8 @@ int vtkIntegrateAttributes::RequestData(vtkInformation*,
           }
         if (index == 0)
           {
-          pdList.InitializeFieldList(ds->GetPointData());
-          cdList.InitializeFieldList(ds->GetCellData());
+          pdList.InitializeFieldListForDataArrays(ds->GetPointData());
+          cdList.InitializeFieldListForDataArrays(ds->GetCellData());
           }
         else
           {
@@ -424,8 +443,8 @@ int vtkIntegrateAttributes::RequestData(vtkInformation*,
     // Set all values to 0.  All output attributes are type double.
     vtkFieldList pdList(1);
     vtkFieldList cdList(1);
-    pdList.InitializeFieldList(dsInput->GetPointData());
-    cdList.InitializeFieldList(dsInput->GetCellData());
+    pdList.InitializeFieldListForDataArrays(dsInput->GetPointData());
+    cdList.InitializeFieldListForDataArrays(dsInput->GetCellData());
     this->AllocateAttributes(pdList, output->GetPointData());
     this->AllocateAttributes(cdList, output->GetCellData());
     this->ExecuteBlock(dsInput, output, 0, pdList, cdList);
