@@ -227,14 +227,6 @@
         <Documentation>When set the EndTime will not be changed when the data
         time steps change.</Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetCaching"
-                         default_values="0"
-                         name="Caching"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Indicates if cache is to be used while playing the
-        animation.</Documentation>
-      </IntVectorProperty>
       <ProxyProperty argument_type="SMProxy"
                      command="SetTimeKeeper"
                      name="TimeKeeper">
