@@ -443,6 +443,11 @@ int vtkGeometryRepresentation::RequestData(vtkInformation* request,
     }
   this->CacheKeeper->Update();
 
+  // HACK: To overcome issue with PolyDataMapper (OpenGL2). It doesn't recreate
+  // VBO/IBOs when using data from cache. I suspect it's because the blocks in
+  // the MB dataset have older MTime.
+  this->Mapper->Modified();
+
   // Determine data bounds.
   vtkCompositePolyDataMapper2 *cpm =
     vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper);
