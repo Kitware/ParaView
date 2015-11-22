@@ -176,6 +176,13 @@ protected:
   vtkPVView();
   ~vtkPVView();
 
+  // Description:
+  // Overridden to check that the representation has View setup properly. Older
+  // implementations of vtkPVDataRepresentations::AddToView() subclasses didn't
+  // call the superclass implementations. We check that that's not the case and
+  // warn.
+  virtual void AddRepresentationInternal(vtkDataRepresentation* rep);
+
   // vtkPVSynchronizedRenderWindows is used to ensure that this view participates
   // in tile-display configurations. Even if your view subclass a simple
   // Qt-based client-side view that does not render anything on the

@@ -371,12 +371,14 @@ bool vtkGeometrySliceRepresentation::AddToView(vtkView* view)
   if (rview && this->Mode != ALL_SLICES)
     {
     rview->GetRenderer(this->Mode + vtkPVOrthographicSliceView::SAGITTAL_VIEW_RENDERER)->AddActor(this->Actor);
-    return true;
     }
-
-  if (vtkPVRenderView* rvview = vtkPVRenderView::SafeDownCast(view))
+  else if (vtkPVRenderView* rvview = vtkPVRenderView::SafeDownCast(view))
     {
     rvview->GetRenderer()->AddActor(this->Internals->OutlineActor.GetPointer());
+    }
+  else
+    {
+    return false;
     }
   return this->Superclass::AddToView(view);
 }
@@ -388,11 +390,14 @@ bool vtkGeometrySliceRepresentation::RemoveFromView(vtkView* view)
   if (rview && this->Mode != ALL_SLICES)
     {
     rview->GetRenderer(this->Mode + vtkPVOrthographicSliceView::SAGITTAL_VIEW_RENDERER)->RemoveActor(this->Actor);
-    return true;
     }
-  if (vtkPVRenderView* rvview = vtkPVRenderView::SafeDownCast(view))
+  else if (vtkPVRenderView* rvview = vtkPVRenderView::SafeDownCast(view))
     {
     rvview->GetRenderer()->RemoveActor(this->Internals->OutlineActor.GetPointer());
+    }
+  else
+    {
+    return false;
     }
   return this->Superclass::RemoveFromView(view);
 }

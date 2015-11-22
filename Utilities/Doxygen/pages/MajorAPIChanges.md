@@ -15,6 +15,24 @@ exposed earlier, this change should not affect any users except custom
 applications that explicitly used this property.
 
 
+###Changes to caching infrastructure in **vtkPVDataRepresentation** and subclasses###
+
+To avoid extra work and sync issues when propagating **UseCache** and
+**CacheKey** flags from a vtkPVView to vtkPVDataRepresentation,
+vtkPVDataRepresentation was updated to directly obtain thet values for these
+flags from the view. To enable this, vtkPVDataRepresentation saves a weak
+reference to the View it's being added to in vtkPVDataRepresentation::AddToView
+and vtkPVDataRepresentation::RemoveFromView. Subclasses of
+vtkPVDataRepresentation didn't consistently call the superclass implementation,
+hence any representation subclass should ensure that it calls the superclass
+implementations of AddToView and RemoveFromView for this to work correctly.
+vtkPVView::AddRepresentationInternal checks for this and will raise a runtime
+error if a representaiton is encountered that didn't properly set its View.
+
+The above change also makes **vtkPVDataRepresentation::SetUseCache** and
+**vtkPVDataRepresentation::SetCacheKey** obsolete. Subclasses no longer need to
+provide any implementation for these methods and they should simply be removed.
+
 Changes in 4.4
 --------------
 

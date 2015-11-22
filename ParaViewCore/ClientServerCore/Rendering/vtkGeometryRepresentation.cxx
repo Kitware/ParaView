@@ -414,6 +414,8 @@ int vtkGeometryRepresentation::RequestData(vtkInformation* request,
   // Pass caching information to the cache keeper.
   this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
   this->CacheKeeper->SetCacheTime(this->GetCacheKey());
+  //cout << this << ": Using Cache (" << this->GetCacheKey() << ") : is_cached = " <<
+  //  this->IsCached(this->GetCacheKey()) << " && use_cache = " <<  this->GetUseCache() << endl;
 
   if (inputVector[0]->GetNumberOfInformationObjects()==1)
     {
@@ -514,7 +516,7 @@ bool vtkGeometryRepresentation::AddToView(vtkView* view)
     // Indicate that this is prop that we are rendering when hardware selection
     // is enabled.
     rview->RegisterPropForHardwareSelection(this, this->GetRenderedProp());
-    return true;
+    return this->Superclass::AddToView(view);
     }
   return false;
 }
@@ -527,7 +529,7 @@ bool vtkGeometryRepresentation::RemoveFromView(vtkView* view)
     {
     rview->GetRenderer()->RemoveActor(this->Actor);
     rview->UnRegisterPropForHardwareSelection(this, this->GetRenderedProp());
-    return true;
+    return this->Superclass::RemoveFromView(view);
     }
   return false;
 }

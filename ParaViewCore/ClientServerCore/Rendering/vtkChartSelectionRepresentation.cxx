@@ -61,9 +61,9 @@ bool vtkChartSelectionRepresentation::AddToView(vtkView* view)
   vtkPVContextView* pvview = vtkPVContextView::SafeDownCast(view);
   if (pvview)
     {
-    this->View = pvview;
+    this->ContextView = pvview;
     this->EnableServerSideRendering = pvview->InTileDisplayMode();
-    return true;
+    return this->Superclass::AddToView(view);
     }
   return false;
 }
@@ -71,11 +71,11 @@ bool vtkChartSelectionRepresentation::AddToView(vtkView* view)
 //----------------------------------------------------------------------------
 bool vtkChartSelectionRepresentation::RemoveFromView(vtkView* view)
 {
-  if (view == this->View.GetPointer())
+  if (view == this->ContextView.GetPointer())
     {
-    this->View = NULL;
+    this->ContextView = NULL;
     this->EnableServerSideRendering = false;
-    return true;
+    return this->Superclass::RemoveFromView(view);
     }
   return false;
 }
@@ -173,9 +173,9 @@ int vtkChartSelectionRepresentation::RequestData(vtkInformation* request,
     localSelection = vtkSelection::SafeDownCast(courier->GetOutputDataObject(0));
     }
 
-  if (this->View)
+  if (this->ContextView)
     {
-    this->View->SetSelection(this->ChartRepresentation, localSelection);
+    this->ContextView->SetSelection(this->ChartRepresentation, localSelection);
     }
 
   return this->Superclass::RequestData(request, inputVector, outputVector);

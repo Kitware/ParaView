@@ -146,20 +146,6 @@ void vtkPVCompositeRepresentation::SetUpdateTime(double time)
   this->SelectionRepresentation->SetUpdateTime(time);
   this->Superclass::SetUpdateTime(time);
 }
-//----------------------------------------------------------------------------
-void vtkPVCompositeRepresentation::SetUseCache(bool val)
-{
-  this->CubeAxesRepresentation->SetUseCache(val);
-  this->SelectionRepresentation->SetUseCache(val);
-  this->Superclass::SetUseCache(val);
-}
-//----------------------------------------------------------------------------
-void vtkPVCompositeRepresentation::SetCacheKey(double val)
-{
-  this->CubeAxesRepresentation->SetCacheKey(val);
-  this->SelectionRepresentation->SetCacheKey(val);
-  this->Superclass::SetCacheKey(val);
-}
 
 //----------------------------------------------------------------------------
 void vtkPVCompositeRepresentation::SetForceUseCache(bool val)

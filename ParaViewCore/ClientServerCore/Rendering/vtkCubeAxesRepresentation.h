@@ -206,7 +206,7 @@ protected:
   // Returns true if the removal succeeds.
   virtual bool RemoveFromView(vtkView* view);
 
-  vtkWeakPointer<vtkPVRenderView> View;
+  vtkWeakPointer<vtkPVRenderView> RenderView;
   vtkSmartPointer<vtkPolyData> OutlineGeometry;
   vtkCubeAxesActor* CubeAxesActor;
   double Position[3];

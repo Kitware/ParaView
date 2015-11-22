@@ -71,7 +71,7 @@ protected:
   // Returns true if the removal succeeds.
   virtual bool RemoveFromView(vtkView* view);
 
-  vtkWeakPointer<vtkPVContextView> View;
+  vtkWeakPointer<vtkPVContextView> ContextView;
   vtkWeakPointer<vtkChartRepresentation> ChartRepresentation;
 
   // Flag updated in AddToView to indicate if the configuration requires

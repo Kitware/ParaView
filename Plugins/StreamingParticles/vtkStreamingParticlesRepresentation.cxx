@@ -528,7 +528,7 @@ bool vtkStreamingParticlesRepresentation::AddToView(vtkView* view)
   if (rview)
     {
     rview->GetRenderer()->AddActor(this->Actor);
-    return true;
+    return this->Superclass::AddToView(view);
     }
   return false;
 }
@@ -540,7 +540,7 @@ bool vtkStreamingParticlesRepresentation::RemoveFromView(vtkView* view)
   if (rview)
     {
     rview->GetRenderer()->RemoveActor(this->Actor);
-    return true;
+    return this->Superclass::RemoveFromView(view);
     }
   return false;
 }
