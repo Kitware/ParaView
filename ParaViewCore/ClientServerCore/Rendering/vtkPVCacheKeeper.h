@@ -61,6 +61,15 @@ public:
   vtkGetMacro(CachingEnabled, bool);
   vtkBooleanMacro(CachingEnabled, bool);
 
+  // Description:
+  // These methods are used for testing. Using this global state we can add
+  // checks to ensure that cache was used or not used for a particular sequence
+  // of actions.
+  static void ClearCacheStateFlags();
+  static int GetCacheHits();
+  static int GetCacheMisses();
+  static int GetCacheSkips();
+
 //BTX
 protected:
   vtkPVCacheKeeper();
@@ -90,11 +99,14 @@ protected:
 private:
   vtkPVCacheKeeper(const vtkPVCacheKeeper&); // Not implemented
   void operator=(const vtkPVCacheKeeper&); // Not implemented
- 
+
   class vtkCacheMap;
   vtkCacheMap* Cache;
+
+  static int CacheHit;
+  static int CacheMiss;
+  static int CacheSkips;
 //ETX
 };
 
 #endif
-

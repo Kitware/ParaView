@@ -44,6 +44,10 @@ public:
 vtkStandardNewMacro(vtkPVCacheKeeper);
 vtkCxxSetObjectMacro(vtkPVCacheKeeper, CacheSizeKeeper, vtkCacheSizeKeeper);
 //----------------------------------------------------------------------------
+int vtkPVCacheKeeper::CacheHit = 0;
+int vtkPVCacheKeeper::CacheMiss = 0;
+int vtkPVCacheKeeper::CacheSkips = 0;
+//----------------------------------------------------------------------------
 vtkPVCacheKeeper::vtkPVCacheKeeper()
 {
   this->Cache = new vtkPVCacheKeeper::vtkCacheMap();
@@ -164,20 +168,49 @@ int vtkPVCacheKeeper::RequestData(vtkInformation* vtkNotUsed(reqInfo),
       {
       output->ShallowCopy((*this->Cache)[this->CacheTime]);
       //cout << this << " using Cache: " << this->CacheTime << endl;
+      vtkPVCacheKeeper::CacheHit++;
       }
     else
       {
       output->ShallowCopy(input);
       this->SaveData(output);
       //cout << this << " Saving cache: " << this->CacheTime << endl;
+      vtkPVCacheKeeper::CacheMiss++;
       }
     }
   else
     {
     output->ShallowCopy(input);
+    vtkPVCacheKeeper::CacheSkips++;
     //cout << this << " Not using cache" << endl;
     }
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCacheKeeper::ClearCacheStateFlags()
+{
+  vtkPVCacheKeeper::CacheHit = 0;
+  vtkPVCacheKeeper::CacheMiss = 0;
+  vtkPVCacheKeeper::CacheSkips = 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVCacheKeeper::GetCacheHits()
+{
+  return vtkPVCacheKeeper::CacheHit;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVCacheKeeper::GetCacheMisses()
+{
+  return vtkPVCacheKeeper::CacheMiss;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVCacheKeeper::GetCacheSkips()
+{
+  return vtkPVCacheKeeper::CacheSkips;
 }
 
 //----------------------------------------------------------------------------
@@ -185,5 +218,3 @@ void vtkPVCacheKeeper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
-

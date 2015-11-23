@@ -20,6 +20,7 @@ paraview_test_load_data(""
 # Add python script names here.
 set(PY_TESTS
   Animation.py
+  AnimationCache.py,NO_VALID
   ProxyPropertyLinks.py
   PythonPVSimpleCone.py
   PythonPVSimpleExII.py
