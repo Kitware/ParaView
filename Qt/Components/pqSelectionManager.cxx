@@ -268,7 +268,7 @@ void pqSelectionManager::select(pqOutputPort* selectedPort)
         selectionLinks->GetItemAsObject(i));
       if (selectionLink != NULL)
         {
-        for (int j = 0; j < selectionLink->GetNumberOfLinkedObjects(); j++)
+        for (unsigned int j = 0; j < selectionLink->GetNumberOfLinkedObjects(); j++)
           {
           // Find output proxy in the selection link
           if (selectionLink->GetLinkedObjectDirection(j) == vtkSMLink::OUTPUT)
@@ -334,7 +334,7 @@ void pqSelectionManager::onLinkRemoved()
   foreach (pqOutputPort* port, this->Implementation->SelectedPorts)
     {
     vtkSMSourceProxy* proxy = port->getSourceProxy();
-    for (int i = 0; i < proxy->GetNumberOfOutputPorts(); i++)
+    for (unsigned int i = 0; i < proxy->GetNumberOfOutputPorts(); i++)
       {
       // if the port contains a selection
       if (port->getSourceProxy()->GetSelectionInput(i) != NULL)
@@ -342,6 +342,11 @@ void pqSelectionManager::onLinkRemoved()
         // Reupdate current selection with the found selected port
         this->select(port);
         return;
+        }
+      // If not, render it in case it has just been cleaned
+      else
+        {
+        port->renderAllViews(false);
         }
       }
     }

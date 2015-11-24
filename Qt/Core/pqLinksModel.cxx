@@ -391,7 +391,7 @@ int pqLinksModel::FindLinksFromProxy(vtkSMProxy* proxy, int direction, vtkCollec
       {
       tmpName = pxm->GetLinkName(i);
       tmpLink = pxm->GetRegisteredLink(tmpName);
-      for (int j = 0; j < tmpLink->GetNumberOfLinkedObjects(); j++)
+      for (unsigned int j = 0; j < tmpLink->GetNumberOfLinkedObjects(); j++)
         {
         if ((direction == vtkSMLink::NONE || 
              tmpLink->GetLinkedObjectDirection(j) == direction ) 

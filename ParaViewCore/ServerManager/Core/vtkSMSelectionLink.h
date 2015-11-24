@@ -15,11 +15,11 @@
 // .NAME vtkSMSelectionLink -
 // .SECTION Description
 // Creates a link between two properties. Can create M->N links.
-// At the time when the link is created every output Selection is synchornized
+// At the time when the link is created every output Selection is synchronized
 // with the first input Selection.
 
-#ifndef __vtkSMSelectionLink_h
-#define __vtkSMSelectionLink_h
+#ifndef vtkSMSelectionLink_h
+#define vtkSMSelectionLink_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMLink.h"
@@ -39,7 +39,7 @@ public:
 
   // Description:
   // Add a selection to the link. updateDir determines whether
-  // the proxy used is an input ou an output. When a selection of an input proxy
+  // the proxy used is an input or an output. When a selection of an input proxy
   // changes, it's selection is set to all other output proxies in the link.
   // A selection can be set to be both input and output by adding 2 links, one
   // to INPUT and the other to OUTPUT
@@ -68,7 +68,6 @@ public:
 
   // Description:
   // This method is used to initialize the object to the given protobuf state
-  // TODO
   virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator);
 
 protected:
@@ -88,15 +87,15 @@ protected:
 
   // Description:
   // Not implemented
-  virtual void UpdateVTKObjects(vtkSMProxy* caller){};
+  virtual void UpdateVTKObjects(vtkSMProxy* vtkNotUsed(caller)){};
 
   // Description:
   // Not implemented
-  virtual void PropertyModified(vtkSMProxy* caller, const char* pname){};
+  virtual void PropertyModified(vtkSMProxy* vtkNotUsed(caller), const char* vtkNotUsed(pname)){};
 
   // Description:
   // Not implemented
-  virtual void UpdateProperty(vtkSMProxy* caller, const char* pname){};
+  virtual void UpdateProperty(vtkSMProxy* vtkNotUsed(caller), const char* vtkNotUsed(pname)){};
 
   // Description:
   // This method find the caller in the link and update selection output accordingly

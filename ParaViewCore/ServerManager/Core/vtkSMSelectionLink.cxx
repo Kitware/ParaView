@@ -270,21 +270,6 @@ int vtkSMSelectionLink::GetLinkedObjectDirection(int index)
 }
 
 //-----------------------------------------------------------------------------
-/*void vtkSMSelectionLink::UpdateVTKObjects(vtkSMProxy* caller)
-  {
-  vtkSMSelectionLinkInternals::LinkedSelectionType::iterator iter =
-  this->Internals->LinkedSelections.begin();
-  for(; iter != this->Internals->LinkedSelections.end(); ++iter)
-  {
-  if ((iter->Proxy.GetPointer() != caller) &&
-  (iter->UpdateDirection & OUTPUT))
-  {
-  iter->Proxy.GetPointer()->UpdateVTKObjects();
-  }
-  }
-  }*/
-
-//-----------------------------------------------------------------------------
 void vtkSMSelectionLink::SaveXMLState(const char* linkname, vtkPVXMLElement* parent)
 {
   vtkPVXMLElement* root = vtkPVXMLElement::New();

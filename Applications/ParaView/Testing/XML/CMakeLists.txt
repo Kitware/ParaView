@@ -462,6 +462,11 @@ set(CheckSelectedBlocks_DISABLE_CRS TRUE)
 set(SelectionModifiersCells_DISABLE_CRS TRUE)
 set(SelectionModifiersBlocks_DISABLE_CRS TRUE)
 set(SelectionModifiersPoints_DISABLE_CRS TRUE)
+set(SelectionLinkBasic_DISABLE_CRS TRUE)
+set(SelectionLinkInitial_DISABLE_CRS TRUE)
+set(SelectionLinkMultiple_DISABLE_CRS TRUE)
+set(SelectionLinkRemove_DISABLE_CRS TRUE)
+set(SelectionLinkReaction_DISABLE_CRS TRUE)
 
 # These tests cannot be run using ctest -j since they are affected by focus
 # changed events.
@@ -555,6 +560,14 @@ IF (PARAVIEW_USE_MPI)
   # Hence disable them.
   set (FunctionalBagPlots_DISABLE_CS TRUE)
   set (FunctionalBagPlots_DISABLE_CRS TRUE)
+
+  # Selection link may highlight incorrect ID in parallel,
+  # hence disable them.
+  set(SelectionLinkBasic_DISABLE_CS TRUE)
+  set(SelectionLinkInitial_DISABLE_CS TRUE)
+  set(SelectionLinkMultiple_DISABLE_CS TRUE)
+  set(SelectionLinkRemove_DISABLE_CS TRUE)
+  set(SelectionLinkReaction_DISABLE_CS TRUE)
 ENDIF ()
 
 # Composite Surface Selection is currently broken in everything but bultin
