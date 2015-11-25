@@ -254,7 +254,7 @@ class CoProcessor(object):
 
         # Save the producer for easy access in UpdateProducers() call.
         self.__ProducersMap[inputname] = producer
-        producer.UpdatePipeline()
+        producer.UpdatePipeline(datadescription.GetTime())
         return producer
 
     def RegisterExporter(self, exporter):

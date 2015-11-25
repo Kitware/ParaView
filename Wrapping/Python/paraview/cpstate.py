@@ -142,7 +142,8 @@ class ViewAccessor(smtrace.RealProxyAccessor):
            trace.append([
               "coprocessor.RegisterView(%s," % self,
               "    filename='%s', freq=%s, fittoscreen=%s, magnification=%s, width=%s, height=%s, cinema=%s)" %\
-                  (params[0], params[1], params[2], params[3], params[4], params[5], params[6])])
+                  (params[0], params[1], params[2], params[3], params[4], params[5], params[6]),
+              "%s.ViewTime = datadescription.GetTime()" % self])
            trace.append_separator()
         return trace.raw_data()
 
