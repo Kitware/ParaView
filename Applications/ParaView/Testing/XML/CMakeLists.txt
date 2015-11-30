@@ -321,6 +321,13 @@ if(NOT APPLE)
     )
 endif()
 
+# This test makes use of "Point Gaussian" representation, only available with OpenGL2
+if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
+  list(APPEND TESTS_WITH_BASELINES
+    ${CMAKE_CURRENT_SOURCE_DIR}/BackgroundColorCheck.xml
+    )
+endif()
+
 
 if (PARAVIEW_USE_MPI)
   list(APPEND TESTS_WITH_BASELINES
