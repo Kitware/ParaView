@@ -82,7 +82,11 @@
 #include "vtkTrackballPan.h"
 #include "vtkTrackballPan.h"
 #include "vtkTrivialProducer.h"
+#ifdef VTKGL2
+#include "vtkValuePass.h"
+#else
 #include "vtkValuePasses.h"
+#endif
 #include "vtkVector.h"
 #include "vtkWeakPointer.h"
 #include "vtkWindowToImageFilter.h"
@@ -105,7 +109,11 @@ class vtkPVRenderView::vtkInternals
 {
   std::map<int, vtkWeakPointer<vtkPVDataRepresentation> > PropMap;
 public:
+#ifdef VTKGL2
+  vtkNew<vtkValuePass> ValuePasses;
+#else
   vtkNew<vtkValuePasses> ValuePasses;
+#endif
   vtkRenderPass *SavedRenderPass;
   int FieldAssociation;
   int FieldAttributeType;
@@ -2680,25 +2688,6 @@ void vtkPVRenderView::CaptureZBuffer()
     this->Internals->ArrayHolder->DeepCopy
       (this->Internals->ZGrabber->GetOutput()->GetPointData()->GetScalars());
     }
-  /*
-  cerr << this->Internals->ArrayHolder << endl;
-  float val = -1;
-  int cnt = 0;
-  for (int i = 0; i < this->Internals->ArrayHolder->GetNumberOfTuples(); i++)
-    {
-    float nv = this->Internals->ArrayHolder->GetValue(i);
-    if (fabs(nv-val)<0.01)
-      {
-      cnt++;
-      }
-    else
-      {
-      cerr << cnt << " " << nv << "'s" << endl;
-      cnt = 0;
-      val = nv;
-      }
-    }
-  */
 }
 
 //------------------------------------------------------------------------------
