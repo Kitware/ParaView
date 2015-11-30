@@ -576,7 +576,11 @@ void pqRenderViewSelectionReaction::UpdateTooltip()
     if (showTooltip && !this->MouseMoving
      && pipeline->GetTooltipInfo(tooltipPos, tooltipText))
       {
-      QToolTip::showText(QPoint(tooltipPos[0], tooltipPos[1]), tooltipText.c_str());
+      QWidget* widget = this->View->widget();
+      // Convert renderer based position to a global position
+      QPoint pos = widget->mapToGlobal(
+        QPoint(tooltipPos[0], widget->size().height() - tooltipPos[1]));
+      QToolTip::showText(pos, tooltipText.c_str());
       }
     else
       {
