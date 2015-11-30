@@ -3230,7 +3230,8 @@ void pqFlatTreeView::layoutItem(pqFlatTreeViewItem *item, int &point,
       }
 
     int preferredWidth = 0;
-    int preferredHeight = 0;
+    // default to the maximum of the height by the font metrics, and the indent width
+    int preferredHeight = std::max(fm.height(), this->IndentWidth);
     for(i = 0; i < item->Cells.size(); i++)
       {
       if(item->Cells[i]->Width == 0 || this->FontChanged)
@@ -3251,10 +3252,6 @@ void pqFlatTreeView::layoutItem(pqFlatTreeViewItem *item, int &point,
         else
           {
           item->Cells[i]->Width = this->getDataWidth(index, fm);
-          if(fm.height() > preferredHeight)
-            {
-            preferredHeight = fm.height();
-            }
           }
         }
 
@@ -3267,13 +3264,9 @@ void pqFlatTreeView::layoutItem(pqFlatTreeViewItem *item, int &point,
         }
       }
 
-    // Save the preferred height for the item. If no font hints were
-    // found, use the default height.
+
+    // Save the preferred height for the item.
     item->Height = preferredHeight;
-    if(item->Height < this->IndentWidth)
-      {
-      item->Height = this->IndentWidth;
-      }
 
     // Add padding to the height for the vertical connection. Increment
     // the starting point for the next item.
