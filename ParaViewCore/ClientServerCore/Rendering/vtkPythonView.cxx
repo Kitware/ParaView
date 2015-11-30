@@ -482,7 +482,7 @@ int vtkPythonView::RunSimpleStringWithCustomLocals(const char* code)
 
   PyObject* context = this->Internals->GetCustomLocalsPyObject();
   
-  vtkPythonScopeGilEnsurer gilEnsurer();
+  vtkPythonScopeGilEnsurer gilEnsurer;
   vtkSmartPyObject result(PyRun_String(const_cast<char*>(buffer.c_str()),
                                          Py_file_input, context, context));
 
