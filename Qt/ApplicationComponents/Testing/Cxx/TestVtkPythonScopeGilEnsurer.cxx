@@ -4,19 +4,13 @@
 
 #include <iostream>
 
-#define MESSAGE(a)
-
-static void init_python(int argc, char **argv)
-{
-}
-
 int main(int argc, char ** argv)
 {
   // set stdout to line buffering (aka C++ std::cout)
   setvbuf(stdout, (char *)NULL, _IOLBF, BUFSIZ);
 
   // Initialize Python
-  Py_SetProgramName("PythonApp");
+  Py_SetProgramName((char*)("PythonApp"));
   Py_Initialize(); // Initialize the interpreter
   PySys_SetArgv(argc, argv);
   PyRun_SimpleString("import threading\n");
@@ -32,7 +26,7 @@ int main(int argc, char ** argv)
     PyRun_SimpleString("import base64");
     PyObject * sysmod = PyImport_AddModule("sys");
     PyObject* sysdict = PyModule_GetDict(sysmod);
-    PyObject* tmp = PyDict_GetItemString(sysdict, "modules");
+    PyDict_GetItemString(sysdict, "modules");
     }
 
   // Now the Qt part:
