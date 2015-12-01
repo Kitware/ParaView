@@ -12,8 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 ==============================================================================*/
-
-// .NAME vtkSMIndexSelectionDomain - Domain for IndexSelection widgets
+// .NAME vtkSMIndexSelectionDomain - Select names from an indexed string list.
 //
 // .SECTION Description
 // See the vtkMPASReader proxy in readers.xml for how the properties should be

@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSIIndexSelectionProperty - InformationOnly property
+// .NAME vtkSIIndexSelectionProperty - Select names from an indexed string list.
 // .SECTION Description
 // Expected Methods on reader (assuming command="Dimension"):
 // int GetNumberOfDimensions()

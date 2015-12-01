@@ -98,14 +98,14 @@ struct Widgets
 
 //------------------------------------------------------------------------------
 Widgets::Widgets(pqIndexSelectionWidget *parent,
-                 const QString &key, int cur, int sz)
+                 const QString &key, int current_, int size_)
   : layout(new QHBoxLayout),
     label(new QLabel(key, parent)),
     slider(new QSlider(Qt::Horizontal, parent)),
     edit(new pqLineEdit(parent))
 {
-  this->setSize(sz);
-  this->setCurrent(cur);
+  this->setSize(size_);
+  this->setCurrent(current_);
 
   this->slider->setObjectName("Slider");
   this->edit->setObjectName("LineEdit");
