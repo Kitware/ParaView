@@ -613,7 +613,7 @@ public:
   // Tells view that it should draw a particular array component
   // to the screen such that the pixels can be read back and
   // decoded to obtain the values.
-  void SetDrawCells(int choice);
+  void SetDrawCells(bool choice);
   void SetArrayNameToDraw(const char *name);
   void SetArrayNumberToDraw(int fieldAttributeType);
   void SetArrayComponentToDraw(int comp);

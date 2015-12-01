@@ -114,7 +114,7 @@ public:
 #else
   vtkNew<vtkValuePasses> ValuePasses;
 #endif
-  vtkRenderPass *SavedRenderPass;
+  vtkSmartPointer<vtkRenderPass> SavedRenderPass;
   int FieldAssociation;
   int FieldAttributeType;
   std::string FieldName;
@@ -517,10 +517,8 @@ vtkPVRenderView::~vtkPVRenderView()
     this->PolygonStyle = 0;
     }
 
-  if (this->Internals->SavedRenderPass)
-    {
-    this->Internals->SavedRenderPass->UnRegister(NULL);
-    }
+  this->Internals->SavedRenderPass = NULL;
+  
   delete this->Internals;
   this->Internals = NULL;
 }
@@ -2526,7 +2524,7 @@ void vtkPVRenderView::BuildAnnotationText(ostream& str)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SetDrawCells(int choice)
+void vtkPVRenderView::SetDrawCells(bool choice)
 {
   bool mod = false;
   if (choice)
@@ -2620,10 +2618,6 @@ void vtkPVRenderView::StartCaptureValues()
   if (not this->Internals->IsInCapture)
     {
     this->Internals->SavedRenderPass = this->SynchronizedRenderers->GetRenderPass();
-    if (this->Internals->SavedRenderPass != NULL)
-      {
-      this->Internals->SavedRenderPass->Register(NULL);
-      }
     this->Internals->SavedOrientationState = (this->OrientationWidget->GetEnabled() != 0);
     this->Internals->SavedAnnotationState = this->ShowAnnotation;
     this->SetOrientationAxesVisibility(false);
@@ -2650,11 +2644,7 @@ void vtkPVRenderView::StopCaptureValues()
 {
   this->Internals->IsInCapture = false;
   this->SynchronizedRenderers->SetRenderPass(this->Internals->SavedRenderPass);
-  if (this->Internals->SavedRenderPass)
-    {
-    this->Internals->SavedRenderPass->UnRegister(NULL);
-    this->Internals->SavedRenderPass = NULL;
-    }
+  this->Internals->SavedRenderPass = NULL;
   this->SetOrientationAxesVisibility(this->Internals->SavedOrientationState);
   this->SetShowAnnotation(this->Internals->SavedAnnotationState);
 }
