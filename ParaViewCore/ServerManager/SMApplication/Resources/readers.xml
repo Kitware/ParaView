@@ -7168,6 +7168,16 @@
         <Documentation>This property specifies the file name to read. It should
         be an MPAS format NetCDF file ending in .nc.</Documentation>
       </StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetUseDimensionedArrayNames"
+                         name="UseDimensionedArrayNames"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>This property ensures that the dimension info is always
+        shown in the ParaView GUI.</Documentation>
+      </IntVectorProperty>
       <StringVectorProperty information_only="1"
                             name="PointArrayInfo">
         <ArraySelectionInformationHelper attribute_name="Point" />
@@ -7208,14 +7218,30 @@
         <Documentation>This property lists which NetCDF dual-grid cell
         variables to load.</Documentation>
       </StringVectorProperty>
-      <IntVectorProperty command="SetProjectLatLon"
-                         default_values="0"
-                         name="ProjectLatLon"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>This property indicates whether to view the data in the
-        lat/lon projection.</Documentation>
-      </IntVectorProperty>
+      <!-- Dimensions table: -->
+      <!-- Elements are [arrayName] [currentIndex] [dimSize]: -->
+      <StringVectorProperty information_only="1"
+                            name="DimensionInfo"
+                            command="Dimension"
+                            si_class="vtkSIIndexSelectionProperty">
+      </StringVectorProperty>
+      <!-- Elements are [arrayName] [currentIndex]: -->
+      <StringVectorProperty command="SetDimensionCurrentIndex"
+                            name="DimensionCurrentIndex"
+                            label="Extra Dimension Indices"
+                            element_types="2 0"
+                            number_of_elements="2"
+                            number_of_elements_per_command="2"
+                            repeat_command="1"
+                            panel_widget="index_selection">
+        <IndexSelectionDomain name="index_selection">
+          <RequiredProperties>
+            <Property function="Info"
+                      name="DimensionInfo" />
+          </RequiredProperties>
+        </IndexSelectionDomain>
+      </StringVectorProperty>
+      <!-- End dimensions table -->
       <IntVectorProperty command="SetShowMultilayerView"
                          default_values="0"
                          name="ShowMultilayerView"
@@ -7228,6 +7254,37 @@
         center of the sphere. For atmospheric data, the layers correspond to
         data at vertical levels increasing away from the
         center.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="GetAllDimensions"
+                            information_only="1"
+                            name="DimensionList">
+        <StringArrayHelper />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetVerticalDimension"
+                            name="VerticalDimension"
+                            label="Vertical Dimension"
+                            number_of_elements="1"
+                            default_values="nVertLevels"
+                            panel_visibility="default">
+        <StringListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="DimensionList" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="ShowMultilayerView" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetProjectLatLon"
+                         default_values="0"
+                         name="ProjectLatLon"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This property indicates whether to view the data in the
+        lat/lon projection.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetIsAtmosphere"
                          default_values="0"
@@ -7278,28 +7335,6 @@
         </IntRangeDomain>
         <Documentation>This property specifies where the center will be viewed
         for a lat/lon projection.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="GetVerticalLevelRange"
-                         information_only="1"
-                         name="VerticalLevelRangeInfo">
-        <SimpleIntInformationHelper />
-      </IntVectorProperty>
-      <IntVectorProperty command="SetVerticalLevel"
-                         default_values="0"
-                         name="VerticalLevel"
-                         number_of_elements="1">
-        <IntRangeDomain name="range">
-          <RequiredProperties>
-            <Property function="Range"
-                      name="VerticalLevelRangeInfo" />
-          </RequiredProperties>
-        </IntRangeDomain>
-        <Documentation>This property specifies which vertical level is viewed
-        if not in multilayer view. Only the data for that vertical level will
-        be viewed. The grid is essentially the same for each vertical level,
-        however at some ocean levels, especially the lower ones, due to the
-        topography, the grid becomes more sparse where there is
-        land.</Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty information_only="1"
                             name="TimestepValues"

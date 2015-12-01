@@ -79,6 +79,7 @@ public:
   pqView* view() const;
   vtkSMProxy* proxy() const;
   vtkSMProperty* property() const;
+  using Superclass::property; // Don't hide superclass method
 
   /// Forward calls to vtkSMProperty. Are overwritten by pqPropertyGroupWidget 
   ///   to forward calls to vtkSMPropertyGroup

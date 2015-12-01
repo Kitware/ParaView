@@ -36,6 +36,7 @@ set (Module_SRCS
   vtkPVSessionCoreInterpreterHelper.cxx
   vtkPVSessionServer.cxx
   vtkSIArraySelectionProperty.cxx
+  vtkSIIndexSelectionProperty.cxx
   vtkSICollaborationManager.cxx
   vtkSICompoundSourceProxy.cxx
   vtkSIDataArrayProperty.cxx

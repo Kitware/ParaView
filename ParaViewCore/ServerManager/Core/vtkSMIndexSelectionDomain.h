@@ -1,0 +1,50 @@
+/*==============================================================================
+
+  Program:   Visualization Toolkit
+  Module:    vtkSMIndexSelectionDomain.h
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+==============================================================================*/
+// .NAME vtkSMIndexSelectionDomain - Select names from an indexed string list.
+//
+// .SECTION Description
+// See the vtkMPASReader proxy in readers.xml for how the properties should be
+// set up for this domain.
+
+#ifndef vtkSMIndexSelectionDomain_h
+#define vtkSMIndexSelectionDomain_h
+
+#include "vtkPVServerManagerCoreModule.h" // For export macro
+#include "vtkSMDomain.h"
+
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMIndexSelectionDomain
+    : public vtkSMDomain
+{
+public:
+  vtkTypeMacro(vtkSMIndexSelectionDomain, vtkSMDomain)
+  virtual void PrintSelf(ostream &os, vtkIndent indent);
+  static vtkSMIndexSelectionDomain *New();
+
+  virtual int IsInDomain(vtkSMProperty *property);
+
+  virtual int SetDefaultValues(vtkSMProperty *prop, bool use_unchecked_values);
+
+  vtkSMProperty* GetInfoProperty() { return this->GetRequiredProperty("Info"); }
+
+protected:
+  vtkSMIndexSelectionDomain();
+  ~vtkSMIndexSelectionDomain();
+
+private:
+  vtkSMIndexSelectionDomain(const vtkSMIndexSelectionDomain &); // Not implemented.
+  void operator=(const vtkSMIndexSelectionDomain &);   // Not implemented.
+};
+
+#endif // vtkSMIndexSelectionDomain_h

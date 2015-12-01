@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqGenericPropertyWidgetDecorator.h"
 #include "pqGlyphScaleFactorPropertyWidget.h"
 #include "pqImageCompressorWidget.h"
+#include "pqIndexSelectionWidget.h"
 #include "pqInputDataTypeDecorator.h"
 #include "pqIntMaskPropertyWidget.h"
 #include "pqLightsEditor.h"
@@ -139,6 +140,10 @@ pqStandardPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy *smProxy,
   else if (name == "image_compressor_config")
     {
     return new pqImageCompressorWidget(smProxy, smProperty);
+    }
+  else if (name == "index_selection")
+    {
+    return new pqIndexSelectionWidget(smProxy, smProperty);
     }
   else if (name == "camera_manipulator")
     {
