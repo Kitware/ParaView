@@ -91,55 +91,6 @@
         </ProxyProperty>
         <ProxyProperty command="SetActiveRepresentationForComposite"
                        name="ActiveRepresentation"/>
-
-        <Property
-            name="StartCaptureValues"
-            animateable="0"
-            command="StartCaptureValues">
-        </Property>
-        <IntVectorProperty
-            name="SetDrawCells"
-            animateable="0"
-            command="SetDrawCells"
-            default_values="0"
-            number_of_elements="1">
-        </IntVectorProperty>
-        <StringVectorProperty
-            name="SetArrayNameToDraw"
-            animateable="0"
-            command="SetArrayNameToDraw"
-            default_values=""
-            number_of_elements="1">
-        </StringVectorProperty>
-        <IntVectorProperty
-            name="SetArrayNumberToDraw"
-            animateable="0"
-            command="SetArrayNumberToDraw"
-            default_values="0"
-            number_of_elements="1">
-        </IntVectorProperty>
-        <IntVectorProperty
-            name="SetArrayComponentToDraw"
-            animateable="0"
-            command="SetArrayComponentToDraw"
-            default_values="0"
-            number_of_elements="1">
-        </IntVectorProperty>
-        <DoubleVectorProperty
-            name="SetScalarRange"
-            argument_is_array="0"
-            animateable="0"
-            command="SetScalarRange"
-            default_values="0.0 -1.0"
-            number_of_elements="2">
-        </DoubleVectorProperty>
-
-        <Property
-            name="StopCaptureValues"
-            animateable="0"
-            command="StopCaptureValues">
-        </Property>
-
     </RenderViewProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
