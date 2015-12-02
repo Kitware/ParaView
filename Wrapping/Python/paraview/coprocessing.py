@@ -612,3 +612,27 @@ class CoProcessor(object):
         #TODO: I am thinking it will go like this
         #first time for the view - call pv_introspect to create the the store and cache that
         #subsequently, recover from the cache and call explore to append
+
+        import paraview.cinemaIO.cinema_store as CS
+        import paraview.cinemaIO.explorers as explorers
+        import paraview.cinemaIO.pv_explorers as pv_explorers
+        import paraview.cinemaIO.pv_introspect as pv_introspect
+
+        pm = servermanager.vtkProcessModule.GetProcessModule()
+        pid = pm.GetPartitionId()
+
+        #load or create the cinema store for this view
+        import os.path
+        vfname = view.cpFileName
+        vfname = vfname[0:vfname.rfind("_")] #strip _num.ext
+        fname = os.path.join(os.path.dirname(vfname),
+                             "cinema",
+                             os.path.basename(vfname),
+                             "info.json")
+        print fname
+        view.LockBounds = 1
+        p = pv_introspect.inspect()
+        l = pv_introspect.munch_tree(p)
+        cs = pv_introspect.make_cinema_store(l, fname)
+        pv_introspect.explore(cs, p)
+        view.LockBounds = 0

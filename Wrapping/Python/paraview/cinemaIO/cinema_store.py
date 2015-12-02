@@ -627,7 +627,7 @@ class FileStore(Store):
 
         if not document.data == None:
             doctype = self.determine_type(document.descriptor)
-            if doctype == 'RGB':
+            if doctype == 'RGB' or doctype == 'VALUE':
                 imageslice = document.data
                 pimg = PIL.Image.fromarray(imageslice)
                 pimg.save(fname)

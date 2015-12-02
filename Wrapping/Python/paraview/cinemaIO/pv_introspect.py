@@ -46,6 +46,11 @@ def inspect():
 
         #skip the invisible
         rep = paraview.simple.GetDisplayProperties(proxy)
+        if rep == None:
+            #for example, writers in catalyst pipeline
+            #todo: is it possible for these to have decendents that are visible?
+            continue
+
         listElt['visibility'] = rep.Visibility
 
         parentId = '0'
@@ -112,11 +117,11 @@ def make_cinema_store(levels, ocsfname, _phis=None, _thetas=None):
     phis = _phis
     if phis==None:
         phis = [0,45,90,135,180,225,270,315,360]
-        phis = [0,180,360]
+        #phis = [0,180,360]
     thetas = _thetas
     if thetas==None:
         thetas = [0,20,40,60,80,100,120,140,160,180]
-        thetas = [0,90,180]
+        #thetas = [0,90,180]
 
     def add_control_and_colors(snames, layername):
         """

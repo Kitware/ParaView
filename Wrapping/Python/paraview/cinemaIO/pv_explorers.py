@@ -34,11 +34,13 @@
 
 import explorers
 import paraview.simple as simple
-import paraview.vtk as vtk
 import numpy as np
 import paraview
 from paraview.vtk.numpy_interface import dataset_adapter as dsa
 from paraview import numpy_support as numpy_support
+
+def rgb2grey(rgb):
+    return np.dot(rgb[...,:3], [0.299, 0.587, 0.144])
 
 class ImageExplorer(explorers.Explorer):
     """
@@ -48,7 +50,7 @@ class ImageExplorer(explorers.Explorer):
     def __init__(self,
                 cinema_store, parameters, tracks,
                 view=None,
-                iSave=False):
+                iSave=True):
         super(ImageExplorer, self).__init__(cinema_store, parameters, tracks)
         self.view = view
         self.CaptureDepth = False
@@ -74,25 +76,29 @@ class ImageExplorer(explorers.Explorer):
             document.data = imageslice
             self.CaptureDepth = False
         else:
-            image = self.view.CaptureWindow(1)
+            image = None
+            imageslice = None
             if self.CaptureLuminance:
-                #TODO: this assumes openGL1 back end
                 rep = simple.GetRepresentation()
-                rep.DiffuseColor = [1,1,1]
-                rep.ColorArrayName = None
-                rth = vtk.vtkImageRGBToHSI()
-                rth.SetInputData(image)
-                ec = vtk.vtkImageExtractComponents()
-                ec.SetInputConnection(rth.GetOutputPort())
-                ec.SetComponents(2,2,2)
-                ec.Update()
-                image = ec.GetOutput()
-            npview = dsa.WrapDataObject(image)
-            idata = npview.PointData[0]
-            ext = image.GetExtent()
-            width = ext[1] - ext[0] + 1
-            height = ext[3] - ext[2] + 1
-            imageslice = np.flipud(idata.reshape(height,width,3))
+                if rep != None:
+                    rep.DiffuseColor = [1,1,1]
+                    rep.ColorArrayName = None
+                image = self.view.CaptureWindow(1)
+                ext = image.GetExtent()
+                width = ext[1] - ext[0] + 1
+                height = ext[3] - ext[2] + 1
+                image = image.GetPointData().GetScalars()
+                image = numpy_support.vtk_to_numpy(image)
+                idata = rgb2grey(image).reshape(height,width).astype('uint8')
+                imageslice = np.dstack((idata,idata,idata))
+            else:
+                image = self.view.CaptureWindow(1)
+                npview = dsa.WrapDataObject(image)
+                idata = npview.PointData[0]
+                ext = image.GetExtent()
+                width = ext[1] - ext[0] + 1
+                height = ext[3] - ext[2] + 1
+                imageslice = np.flipud(idata.reshape(height,width,3))
             #import Image
             #img = Image.fromarray(imageslice)
             #img.show()
@@ -291,6 +297,9 @@ class Color(explorers.Track):
 
     def execute(self, doc):
         if not self.parameter in doc.descriptor:
+            return
+        if self.rep == None:
+            #TODO: probably a bad sign
             return
         o = doc.descriptor[self.parameter]
         spec = self.colorlist.getColor(o)
