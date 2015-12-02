@@ -136,8 +136,7 @@ vtkStdString vtkSMTrace::GetState(
       vtkGenericWarningMacro("Failed to generate state.");
       throw 1;
       }
-    vtkStdString s(PyString_AsString(result));
-    return s;
+    return vtkStdString(PyString_AsString(result));
     }
   catch (int)
     {
@@ -204,8 +203,7 @@ vtkStdString vtkSMTrace::StopTrace()
     // no error.
     if (Py_None != _stop_trace_internal.GetPointer() && _stop_trace_internal.GetPointer() != NULL)
       {
-      vtkStdString s(PyString_AsString(_stop_trace_internal));
-      return s;
+      return vtkStdString(PyString_AsString(_stop_trace_internal));
       }
     else
       {
@@ -235,7 +233,7 @@ vtkStdString vtkSMTrace::GetCurrentTrace()
   if (active->CheckForError() == false && get_current_trace_output)
     {
     // no error.
-    return PyString_AsString(get_current_trace_output);
+    return vtkStdString(PyString_AsString(get_current_trace_output));
     }
 #endif
   return vtkStdString();
@@ -526,7 +524,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(double val)
     int ret = PyList_Append(this->Internals->GetPositionalArgs(), valObj);
     (void)ret;
     assert(ret == 0);
-    #endif
+#endif
     }
   (void)val;
   return *this;
@@ -544,7 +542,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(bool val)
     int ret = PyList_Append(this->Internals->GetPositionalArgs(), valObj);
     (void)ret;
     assert(ret == 0);
-    #endif
+#endif
     }
   (void)val;
   return *this;
@@ -579,7 +577,7 @@ vtkSMTrace::TraceItem::~TraceItem()
     vtkSmartPyObject reply(
       PyObject_CallMethod(this->Internals->PyItem,
         const_cast<char*>("finalize"), NULL));
-        tracer->CheckForError();
+    tracer->CheckForError();
     tracer->InvokeEvent(vtkCommand::UpdateEvent);
     }
 #endif
@@ -633,7 +631,7 @@ void vtkSMTrace::TraceItem::operator=(const TraceItemArgs& arguments)
     this->Internals->PyItem.TakeReference(
       PyObject_Call(tracer->GetCreateItemFunction(), args, NULL));
     tracer->CheckForError();
-        }
+    }
 #endif
   (void)arguments;
 }
