@@ -184,17 +184,14 @@ void pqPythonSyntaxHighlighter::rehighlightSyntax()
 
     QByteArray bytes = text.trimmed().toUtf8();
   
-   char* resultingTextAsCString; 
-      { 
-      vtkPythonScopeGilEnsurer gilEnsurer;
-      vtkSmartPyObject unicode(PyUnicode_DecodeUTF8(bytes.data(),bytes.size(),NULL));
-      vtkSmartPyObject args(Py_BuildValue("OOO",unicode.GetPointer(),
-        this->Internals->PythonLexer.GetPointer(),this->Internals->HtmlFormatter.GetPointer()));
-      vtkSmartPyObject resultingText(PyObject_Call(this->Internals->HighlightFunction,args,NULL));
+    vtkPythonScopeGilEnsurer gilEnsurer;
+    vtkSmartPyObject unicode(PyUnicode_DecodeUTF8(bytes.data(),bytes.size(),NULL));
+    vtkSmartPyObject args(Py_BuildValue("OOO",unicode.GetPointer(),
+      this->Internals->PythonLexer.GetPointer(),this->Internals->HtmlFormatter.GetPointer()));
+    vtkSmartPyObject resultingText(PyObject_Call(this->Internals->HighlightFunction,args,NULL));
 
-      vtkSmartPyObject resultingTextBytes(PyUnicode_AsUTF8String(resultingText));
-      resultingTextAsCString = PyString_AsString(resultingTextBytes);
-      }
+    vtkSmartPyObject resultingTextBytes(PyUnicode_AsUTF8String(resultingText));
+    char* resultingTextAsCString = PyString_AsString(resultingTextBytes);
 
     QString pygmentsOutput = QString::fromUtf8(resultingTextAsCString);
 
