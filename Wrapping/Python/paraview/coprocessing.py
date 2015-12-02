@@ -151,7 +151,11 @@ class CoProcessor(object):
                     self.RescaleDataRange(view, datadescription.GetTime())
                 cinemaOptions = view.cpCinemaOptions
                 if cinemaOptions and 'camera' in cinemaOptions:
-                    dirname = self.UpdateCinema(view, datadescription)
+                    dirname = None
+                    if 'composite' in cinemaOptions:
+                        dirname = self.UpdateCinemaComposite(view, datadescription)
+                    else:
+                        dirname = self.UpdateCinema(view, datadescription)
                     if dirname:
                         cinema_dirs.append(dirname)
                 else:
@@ -438,6 +442,7 @@ class CoProcessor(object):
                    lut.RGBPoints.SetData(newrgbpoints)
 
     def UpdateCinema(self, view, datadescription):
+        """ called from catalyst at each timestep to add to the cinema "SPEC A" database """
         if not view.IsA("vtkSMRenderViewProxy") == True:
             return
 
@@ -599,3 +604,11 @@ class CoProcessor(object):
             proxy.SetPropertyWithName(property, value)
 
         return os.path.basename(vfname)
+
+    def UpdateCinemaComposite(self, view, datadescription):
+        """ called from catalyst at each timestep to add to the cinema "SPEC B" database """
+        if not view.IsA("vtkSMRenderViewProxy") == True:
+            return
+        #TODO: I am thinking it will go like this
+        #first time for the view - call pv_introspect to create the the store and cache that
+        #subsequently, recover from the cache and call explore to append
