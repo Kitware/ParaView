@@ -165,8 +165,8 @@ void DataArrayCopierImpl<T>::Copy(vtkIdType id)
   // expecting scalars, vectors, and tensors
   typename DataArrayTraits<T>::InternalType val[9];
 
-  this->Input->GetTupleValue(id,val);
-  this->Output->InsertNextTupleValue(val);
+  this->Input->GetTypedTuple(id,val);
+  this->Output->InsertNextTypedTuple(val);
 }
 
 //-----------------------------------------------------------------------------

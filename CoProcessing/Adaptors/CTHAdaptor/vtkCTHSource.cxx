@@ -547,7 +547,7 @@ void vtkCTHSource::AddNeighborArray (Block& b)
     for (int j = 0; j < NeighborArray->GetNumberOfTuples (); j ++) 
       {
       int compare;
-      NeighborArray->GetTupleValue (j, &compare);
+      NeighborArray->GetTypedTuple (j, &compare);
       if (b.neighbor_proc[i] == compare)
         {
         present = true;
@@ -556,7 +556,7 @@ void vtkCTHSource::AddNeighborArray (Block& b)
       }
     if (!present) 
       {
-      NeighborArray->InsertNextTupleValue (&(b.neighbor_proc[i]));
+      NeighborArray->InsertNextTypedTuple (&(b.neighbor_proc[i]));
       }
 
     }

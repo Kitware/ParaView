@@ -60,7 +60,7 @@ public:
   void LookupTypedValue(Scalar value, vtkIdList *ids);
   Scalar GetValue(vtkIdType idx);
   Scalar& GetValueReference(vtkIdType idx);
-  void GetTupleValue(vtkIdType idx, Scalar *t);
+  void GetTypedTuple(vtkIdType idx, Scalar *t) const;
 
   // Description:
   // This container is read only -- this method does nothing but print a
@@ -92,9 +92,9 @@ public:
   void RemoveTuple(vtkIdType id);
   void RemoveFirstTuple();
   void RemoveLastTuple();
-  void SetTupleValue(vtkIdType i, const Scalar *t);
-  void InsertTupleValue(vtkIdType i, const Scalar *t);
-  vtkIdType InsertNextTupleValue(const Scalar *t);
+  void SetTypedTuple(vtkIdType i, const Scalar *t);
+  void InsertTypedTuple(vtkIdType i, const Scalar *t);
+  vtkIdType InsertNextTypedTuple(const Scalar *t);
   void SetValue(vtkIdType idx, Scalar value);
   vtkIdType InsertNextValue(Scalar v);
   void InsertValue(vtkIdType idx, Scalar v);

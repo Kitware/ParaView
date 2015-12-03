@@ -297,7 +297,7 @@ void vtkAttributeDataToTableFilter::Decorate(vtkTable* output,
     dArray->SetName("STRUCTURED_DIMENSIONS");
     dArray->SetNumberOfComponents(3);
     dArray->SetNumberOfTuples(1);
-    dArray->SetTupleValue(0, dimensions);
+    dArray->SetTypedTuple(0, dimensions);
     output->GetFieldData()->AddArray(dArray);
     dArray->Delete();
     }

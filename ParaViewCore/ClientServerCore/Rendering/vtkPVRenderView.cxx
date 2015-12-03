@@ -811,7 +811,7 @@ void vtkPVRenderView::OnPolygonSelectionEvent()
       {
       const vtkVector2i &v = points[j];
       int pos[2] = {v[0], v[1]};
-      polygonPointsArray->SetTupleValue(j, pos);
+      polygonPointsArray->SetTypedTuple(j, pos);
       }
 
     this->InvokeEvent(vtkCommand::SelectionChangedEvent,

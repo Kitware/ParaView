@@ -487,8 +487,8 @@ void vtkPANLHaloFinder::ExecuteHaloFinder(vtkUnstructuredGrid *allParticles,
     vel[0] = this->Internal->fofXVel[i];
     vel[1] = this->Internal->fofYVel[i];
     vel[2] = this->Internal->fofZVel[i];
-    fofCenterOfMass->SetTupleValue(i,com);
-    haloVelocity->SetTupleValue(i,vel);
+    fofCenterOfMass->SetTypedTuple(i,com);
+    haloVelocity->SetTypedTuple(i,vel);
     velocityDispersion->SetValue(i,this->Internal->fofVelDisp[i]);
     mass->SetValue(i,this->Internal->fofMass[i]);
     count->SetValue(i,fofHaloCount[i]);
@@ -656,8 +656,8 @@ void vtkPANLHaloFinder::ExecuteSubHaloFinder(vtkUnstructuredGrid *allParticles,
     vel[0] = subAvgVX[i];
     vel[1] = subAvgVY[i];
     vel[2] = subAvgVZ[i];
-    fofCenterOfMass->SetTupleValue(i,com);
-    haloVelocity->SetTupleValue(i,vel);
+    fofCenterOfMass->SetTypedTuple(i,com);
+    haloVelocity->SetTypedTuple(i,vel);
     velocityDispersion->SetValue(i,subVelDisp[i]);
     mass->SetValue(i,subMass[i]);
     count->SetValue(i,parentFOFCount[i]);
@@ -737,7 +737,7 @@ void vtkPANLHaloFinder::FindCenters(vtkUnstructuredGrid* allParticles,
       center[1] = point[1];
       center[2] = point[2];
       }
-    centers->SetTupleValue(halo,center);
+    centers->SetTypedTuple(halo,center);
     }
   fofProperties->GetPointData()->AddArray(centers.GetPointer());
 }

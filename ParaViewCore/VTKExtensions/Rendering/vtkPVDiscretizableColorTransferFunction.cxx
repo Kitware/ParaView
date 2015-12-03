@@ -229,11 +229,11 @@ void vtkPVDiscretizableColorTransferFunction::SetIndexedColorInFullSet(unsigned 
 
   //double *currentRGB = static_cast<double*>(this->IndexedColorsInFullSet->GetVoidPointer(index));
   double currentRGB[3];
-  this->IndexedColorsInFullSet->GetTupleValue(index, currentRGB);
+  this->IndexedColorsInFullSet->GetTypedTuple(index, currentRGB);
   if (currentRGB[0] != r || currentRGB[1] != g || currentRGB[2] != b)
     {
     double rgb[3] = {r, g, b};
-    this->IndexedColorsInFullSet->SetTupleValue(index, rgb);
+    this->IndexedColorsInFullSet->SetTypedTuple(index, rgb);
     this->Modified();
     }
 }
@@ -253,7 +253,7 @@ void vtkPVDiscretizableColorTransferFunction::GetIndexedColorInFullSet(unsigned 
     return;
     }
 
-  this->IndexedColorsInFullSet->GetTupleValue(index, rgb);
+  this->IndexedColorsInFullSet->GetTypedTuple(index, rgb);
 }
 
 //-----------------------------------------------------------------------------

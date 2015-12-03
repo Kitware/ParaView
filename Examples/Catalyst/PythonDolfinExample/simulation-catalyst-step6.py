@@ -120,7 +120,7 @@ def Values2VTKArray(values,n,name):
             a = []
             for j in range(ncomps):
                 a.append(values[i+j*n])
-            array.SetTupleValue(i, a)
+            array.SetTypedTuple(i, a)
 
     array.SetName(name)
     return array

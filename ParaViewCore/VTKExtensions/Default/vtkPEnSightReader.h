@@ -471,7 +471,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPEnSightReader : public vtkPGenericEnS
               if( (n >= this->ImplicitSplitDimensionBeginIndex) && (n < this->ImplicitSplitDimensionEndIndex) )
                 {
                 vtkIdType nn = n;
-                array->SetTupleValue(index,&nn);
+                array->SetTypedTuple(index,&nn);
                 index++;
                 }
               }
@@ -498,7 +498,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPEnSightReader : public vtkPGenericEnS
               min = ii;
             if( ii > max )
               max = ii;
-            array->SetTupleValue(id, &ii);
+            array->SetTypedTuple(id, &ii);
             }
           }
         return array;

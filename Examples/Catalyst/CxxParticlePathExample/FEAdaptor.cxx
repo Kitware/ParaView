@@ -71,7 +71,7 @@ namespace
       {
       double values[3] = {velocityData[i], velocityData[i+numTuples],
                           velocityData[i+2*numTuples]};
-      velocity->SetTupleValue(i, values);
+      velocity->SetTypedTuple(i, values);
       }
 
     vtkFloatArray* pressure = vtkFloatArray::SafeDownCast(

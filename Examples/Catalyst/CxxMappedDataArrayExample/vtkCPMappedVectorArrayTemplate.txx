@@ -219,7 +219,7 @@ template <class Scalar> Scalar& vtkCPMappedVectorArrayTemplate<Scalar>
 
 //------------------------------------------------------------------------------
 template <class Scalar> void vtkCPMappedVectorArrayTemplate<Scalar>
-::GetTupleValue(vtkIdType tupleId, Scalar *tuple)
+::GetTypedTuple(vtkIdType tupleId, Scalar *tuple) const
 {
   tuple[0] = this->Array[tupleId];
   tuple[1] = this->Array[tupleId+this->GetNumberOfTuples()];
@@ -414,7 +414,7 @@ template <class Scalar> void vtkCPMappedVectorArrayTemplate<Scalar>
 
 //------------------------------------------------------------------------------
 template <class Scalar> void vtkCPMappedVectorArrayTemplate<Scalar>
-::SetTupleValue(vtkIdType, const Scalar*)
+::SetTypedTuple(vtkIdType, const Scalar*)
 {
   vtkErrorMacro("Read only container.")
   return;
@@ -422,7 +422,7 @@ template <class Scalar> void vtkCPMappedVectorArrayTemplate<Scalar>
 
 //------------------------------------------------------------------------------
 template <class Scalar> void vtkCPMappedVectorArrayTemplate<Scalar>
-::InsertTupleValue(vtkIdType, const Scalar*)
+::InsertTypedTuple(vtkIdType, const Scalar*)
 {
   vtkErrorMacro("Read only container.")
   return;
@@ -430,7 +430,7 @@ template <class Scalar> void vtkCPMappedVectorArrayTemplate<Scalar>
 
 //------------------------------------------------------------------------------
 template <class Scalar> vtkIdType vtkCPMappedVectorArrayTemplate<Scalar>
-::InsertNextTupleValue(const Scalar *)
+::InsertNextTypedTuple(const Scalar *)
 {
   vtkErrorMacro("Read only container.")
   return -1;

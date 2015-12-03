@@ -1048,7 +1048,7 @@ void vtkScatterPlotPainter::RenderPoints(vtkRenderer *vtkNotUsed(ren),
       else*/ if(colors)
       {
       unsigned char rgba[4];
-      colors->GetTupleValue(inPtId, rgba);
+      colors->GetTypedTuple(inPtId, rgba);
       glColor4ub(rgba[0], rgba[1], rgba[2], rgba[3]);
       }
 
@@ -1426,7 +1426,7 @@ void vtkScatterPlotPainter::RenderGlyphs(vtkRenderer *ren, vtkActor *actor,
       else*/ if(colors)
       {
       unsigned char rgba[4];
-      colors->GetTupleValue(inPtId, rgba);
+      colors->GetTypedTuple(inPtId, rgba);
       glColor4ub(rgba[0], rgba[1], rgba[2], rgba[3]);
       }
 

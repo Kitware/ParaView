@@ -152,13 +152,13 @@ namespace
       {
       for(size_t j=0;j<scalarArrays.size();j++)
         {
-        scalarArrays[j]->GetTupleValue(i, values+j);
+        scalarArrays[j]->GetTypedTuple(i, values+j);
         }
       if(values[0] < -1e+31)
         {
         values[0] = values[1] = values[2] = 0;
         }
-      vectorArray->SetTupleValue(i, values);
+      vectorArray->SetTypedTuple(i, values);
       }
     // remove the old arrays
     for(std::vector<std::string>::iterator it=scalarArrayNames.begin();
@@ -577,7 +577,7 @@ int vtkUnstructuredPOPReader::ProcessGrid(
               point[0] = x[ix];
               ind[0] = static_cast<int>(ix);
               vtkIdType id = ix + iy*count[2] + iz*count[2]*count[1];
-              indexArray->SetTupleValue(id, ind);
+              indexArray->SetTypedTuple(id, ind);
               points->SetPoint(id, point);
               }
             }
@@ -852,7 +852,7 @@ bool vtkUnstructuredPOPReader::Transform(
             vit!=vectorArrays.end();vit++)
           {
           float values[3];
-          (*vit)->GetTupleValue(index, values);
+          (*vit)->GetTypedTuple(index, values);
 
           size_t startIndex = latlonIndex;
           size_t endIndex = latlonIndex+1;
@@ -910,7 +910,7 @@ bool vtkUnstructuredPOPReader::Transform(
           vals[1] += values[1] * (endPos[1] - startPos[1]) / norm;
           vals[2] += values[1] * (endPos[2] - startPos[2]) / norm;
 
-          (*vit)->SetTupleValue(index, vals);
+          (*vit)->SetTypedTuple(index, vals);
           }
 
         }

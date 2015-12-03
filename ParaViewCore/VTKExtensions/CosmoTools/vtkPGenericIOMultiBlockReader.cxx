@@ -901,7 +901,7 @@ vtkUnstructuredGrid* vtkPGenericIOMultiBlockReader::LoadBlock(int blockId)
     coords->SetNumberOfComponents(3);
     coords->SetNumberOfTuples(1);
     coords->SetName("genericio_block_coords");
-    coords->SetTupleValue(0,(vtkTypeUInt64*)this->MetaData->Blocks[blockId].coords);
+    coords->SetTypedTuple(0,(vtkTypeUInt64*)this->MetaData->Blocks[blockId].coords);
     grid->GetFieldData()->AddArray(coords);
     }
 
@@ -1016,11 +1016,11 @@ int vtkPGenericIOMultiBlockReader::RequestData(
   scale->SetName("genericio_phys_scale");
 
   this->Reader->GetGlobalDimensions(tmpDims);
-  dims->InsertNextTupleValue((vtkTypeUInt64*)tmpDims);
+  dims->InsertNextTypedTuple((vtkTypeUInt64*)tmpDims);
   this->Reader->GetPhysOrigin(tmpDouble);
-  origin->InsertNextTupleValue(tmpDouble);
+  origin->InsertNextTypedTuple(tmpDouble);
   this->Reader->GetPhysScale(tmpDouble);
-  scale->InsertNextTupleValue(tmpDouble);
+  scale->InsertNextTypedTuple(tmpDouble);
 
   output->GetFieldData()->AddArray(origin);
   output->GetFieldData()->AddArray(scale);

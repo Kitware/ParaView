@@ -90,7 +90,7 @@ void vtkCustomUnstructuredGridBuilder::BuildGrid()
     velocity[0] = xyz[0]*xyz[0];
     velocity[1] = xyz[1];
     velocity[2] = xyz[2]+5.;
-    pointField->SetTupleValue(i, velocity);
+    pointField->SetTypedTuple(i, velocity);
     }
   this->SetPoints(points);
   points->Delete();
@@ -118,7 +118,7 @@ void vtkCustomUnstructuredGridBuilder::BuildGrid()
       this->InsertNextCell(cell->GetCellType(), cell->GetPointIds());
     // Set the pressure to the X value of the cell centroid.
     this->ComputeCellCentroid(cell, xyz);
-    cellField->InsertTupleValue(cellId, xyz);
+    cellField->InsertTypedTuple(cellId, xyz);
     }
   cell->Delete();
 }
