@@ -125,6 +125,11 @@
     <string>Export Scene...</string>
    </property>
   </action>
+  <action name="actionExportCinema">
+    <property name="text">
+      <string>Export Cinema...</string>
+    </property>
+  </action>
   <action name="actionFileSaveWindowLayout">
    <property name="text">
     <string>Save Window Layout...</string>
@@ -156,6 +161,7 @@
   <addaction name="actionFileSaveData"/>
   <addaction name="actionFileSaveScreenshot"/>
   <addaction name="actionExport"/>
+  <addaction name="actionExportCinema"/>
   <addaction name="separator"/>
   <addaction name="actionFileSaveAnimation"/>
   <addaction name="actionFileSaveGeometry"/>

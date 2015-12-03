@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCreateCustomFilterReaction.h"
 #include "pqDataQueryReaction.h"
 #include "pqDeleteReaction.h"
+#include "pqExportCinemaReaction.h"
 #include "pqExportReaction.h"
 #include "pqFiltersMenuReaction.h"
 #include "pqHelpReaction.h"
@@ -126,6 +127,7 @@ void pqParaViewMenuBuilders::buildFileMenu(QMenu& menu)
   new pqSaveAnimationGeometryReaction(ui.actionFileSaveGeometry);
 
   new pqExportReaction(ui.actionExport);
+  new pqExportCinemaReaction(ui.actionExportCinema);
   new pqSaveDataReaction(ui.actionFileSaveData);
 
   new pqLoadRestoreWindowLayoutReaction(true, ui.actionFileLoadWindowLayout);
