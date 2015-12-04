@@ -190,10 +190,13 @@ template <class Scalar> void vtkCPMappedVectorArrayTemplate<Scalar>
 }
 
 //------------------------------------------------------------------------------
-template <class Scalar> Scalar vtkCPMappedVectorArrayTemplate<Scalar>
-::GetValue(vtkIdType idx)
+template <class Scalar>
+typename vtkCPMappedVectorArrayTemplate<Scalar>::ValueType
+vtkCPMappedVectorArrayTemplate<Scalar>::GetValue(vtkIdType idx) const
 {
-  return this->GetValueReference(idx);
+  // Work around const-correct inconsistencies:
+  typedef vtkCPMappedVectorArrayTemplate<Scalar> ThisClass;
+  return const_cast<ThisClass*>(this)->GetValueReference(idx);
 }
 
 //------------------------------------------------------------------------------
@@ -221,9 +224,13 @@ template <class Scalar> Scalar& vtkCPMappedVectorArrayTemplate<Scalar>
 template <class Scalar> void vtkCPMappedVectorArrayTemplate<Scalar>
 ::GetTypedTuple(vtkIdType tupleId, Scalar *tuple) const
 {
+  // Work around const-correct inconsistencies:
+  typedef vtkCPMappedVectorArrayTemplate<Scalar> ThisClass;
+  vtkIdType numTuples = const_cast<ThisClass*>(this)->GetNumberOfTuples();
+
   tuple[0] = this->Array[tupleId];
-  tuple[1] = this->Array[tupleId+this->GetNumberOfTuples()];
-  tuple[2] = this->Array[tupleId+2*this->GetNumberOfTuples()];
+  tuple[1] = this->Array[tupleId + numTuples];
+  tuple[2] = this->Array[tupleId + 2 * numTuples];
 }
 
 //------------------------------------------------------------------------------

@@ -29,15 +29,17 @@
 #include "vtkObjectFactory.h" // for vtkStandardNewMacro
 
 template <class Scalar>
-class vtkCPMappedVectorArrayTemplate:
-    public vtkTypeTemplate<vtkCPMappedVectorArrayTemplate<Scalar>,
-                           vtkMappedDataArray<Scalar> >
+class vtkCPMappedVectorArrayTemplate: public vtkMappedDataArray<Scalar>
 {
 public:
+  vtkAbstractTemplateTypeMacro(vtkCPMappedVectorArrayTemplate<Scalar>,
+                               vtkMappedDataArray<Scalar>)
   vtkMappedDataArrayNewInstanceMacro(
       vtkCPMappedVectorArrayTemplate<Scalar>)
   static vtkCPMappedVectorArrayTemplate *New();
   virtual void PrintSelf(ostream &os, vtkIndent indent);
+
+  typedef typename Superclass::ValueType ValueType;
 
   // Description:
   // Set the raw scalar arrays for the coordinate set. This class takes
@@ -58,7 +60,7 @@ public:
   void GetTuple(vtkIdType i, double *tuple);
   vtkIdType LookupTypedValue(Scalar value);
   void LookupTypedValue(Scalar value, vtkIdList *ids);
-  Scalar GetValue(vtkIdType idx);
+  ValueType GetValue(vtkIdType idx) const;
   Scalar& GetValueReference(vtkIdType idx);
   void GetTypedTuple(vtkIdType idx, Scalar *t) const;
 
