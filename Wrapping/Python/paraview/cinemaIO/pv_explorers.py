@@ -76,7 +76,6 @@ class ImageExplorer(explorers.Explorer):
             document.data = imageslice
             self.CaptureDepth = False
         else:
-            image = None
             imageslice = None
             if self.CaptureLuminance:
                 rep = simple.GetRepresentation()
@@ -87,10 +86,11 @@ class ImageExplorer(explorers.Explorer):
                 ext = image.GetExtent()
                 width = ext[1] - ext[0] + 1
                 height = ext[3] - ext[2] + 1
-                image = image.GetPointData().GetScalars()
-                image = numpy_support.vtk_to_numpy(image)
-                idata = rgb2grey(image).reshape(height,width).astype('uint8')
+                imagescalars = image.GetPointData().GetScalars()
+                idata = numpy_support.vtk_to_numpy(imagescalars)
+                idata = np.flipud(rgb2grey(idata).reshape(height,width).astype('uint8'))
                 imageslice = np.dstack((idata,idata,idata))
+                image.UnRegister(None)
             else:
                 image = self.view.CaptureWindow(1)
                 npview = dsa.WrapDataObject(image)
@@ -99,6 +99,7 @@ class ImageExplorer(explorers.Explorer):
                 width = ext[1] - ext[0] + 1
                 height = ext[3] - ext[2] + 1
                 imageslice = np.flipud(idata.reshape(height,width,3))
+                image.UnRegister(None)
             #import Image
             #img = Image.fromarray(imageslice)
             #img.show()
