@@ -113,7 +113,7 @@ void pqExportCinemaReaction::exportActiveView()
     script += "import paraview.cinemaIO.pv_introspect as pvi\n";
     script += "pvi.record(csname=\"";
     script += path.c_str();
-    script += "\", sfname=None, test=False)\n";
+    script += "\")\n";
 
     vtkPythonInterpreter::Initialize();
     vtkPythonInterpreter::RunSimpleString(script.c_str());

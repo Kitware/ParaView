@@ -346,19 +346,15 @@ def explore(cs, proxies):
             view_proxy.ViewTime=t
             e.explore({'time':float_limiter(t)})
 
-def record(csname="/tmp/test_pv/info.json",
-        sfname="/Users/demarle/Desktop/cinema/example_pipeline.pvsm",
-        test=False):
-    if sfname!=None:
-        paraview.simple.LoadState(sfname)
+def record(csname="/tmp/test_pv/info.json"):
     paraview.simple.Render()
     view = paraview.simple.GetActiveView()
     view.LockBounds = 1
     p = inspect()
     l = munch_tree(p)
     cs = make_cinema_store(l, csname)
-    if test:
-        testexplore(cs)
-    else:
-        explore(cs, p)
+    #if test:
+    #    testexplore(cs)
+    #else:
+    explore(cs, p)
     view.LockBounds = 0
