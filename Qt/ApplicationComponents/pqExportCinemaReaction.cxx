@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialog.h"
 #include "pqProxyWidget.h"
 #include "vtkNew.h"
+#include "vtkPVConfig.h" // needed for PARAVIEW_ENABLE_PYTHON
 #ifdef PARAVIEW_ENABLE_PYTHON
 # include "vtkPythonInterpreter.h"
 #endif
@@ -106,9 +107,9 @@ void pqExportCinemaReaction::exportActiveView()
     path += "/info.json";
 
     std::string script;
-    script += "import cinema_store\n";
     script += "import paraview\n";
     script += "import paraview.simple\n";
+    script += "import paraview.cinemaIO.cinema_store\n";
     script += "import paraview.cinemaIO.pv_introspect as pvi\n";
     script += "pvi.record(csname=\"";
     script += path.c_str();
