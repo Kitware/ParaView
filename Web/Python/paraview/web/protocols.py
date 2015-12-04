@@ -192,6 +192,7 @@ class ParaViewWebMouseHandler(ParaViewWebProtocol):
         #pvevent.SetKeyCode(event["charCode"])
         retVal = self.getApplication().HandleInteractionEvent(view.SMProxy, pvevent)
         del pvevent
+
         return retVal
 
 # =============================================================================
@@ -204,11 +205,11 @@ class ParaViewWebViewPort(ParaViewWebProtocol):
 
     # RpcName: resetCamera => viewport.camera.reset
     @exportRpc("viewport.camera.reset")
-    def resetCamera(self, view):
+    def resetCamera(self, viewId):
         """
         RPC callback to reset camera.
         """
-        view = self.getView(view)
+        view = self.getView(viewId)
         simple.Render(view)
         simple.ResetCamera(view)
         try:
@@ -217,30 +218,33 @@ class ParaViewWebViewPort(ParaViewWebProtocol):
             pass
 
         self.getApplication().InvalidateCache(view.SMProxy)
+
         return view.GetGlobalIDAsString()
 
     # RpcName: updateOrientationAxesVisibility => viewport.axes.orientation.visibility.update
     @exportRpc("viewport.axes.orientation.visibility.update")
-    def updateOrientationAxesVisibility(self, view, showAxis):
+    def updateOrientationAxesVisibility(self, viewId, showAxis):
         """
         RPC callback to show/hide OrientationAxis.
         """
-        view = self.getView(view)
+        view = self.getView(viewId)
         view.OrientationAxesVisibility = (showAxis if 1 else 0);
 
         self.getApplication().InvalidateCache(view.SMProxy)
+
         return view.GetGlobalIDAsString()
 
     # RpcName: updateCenterAxesVisibility => viewport.axes.center.visibility.update
     @exportRpc("viewport.axes.center.visibility.update")
-    def updateCenterAxesVisibility(self, view, showAxis):
+    def updateCenterAxesVisibility(self, viewId, showAxis):
         """
         RPC callback to show/hide CenterAxesVisibility.
         """
-        view = self.getView(view)
+        view = self.getView(viewId)
         view.CenterAxesVisibility = (showAxis if 1 else 0);
 
         self.getApplication().InvalidateCache(view.SMProxy)
+
         return view.GetGlobalIDAsString()
 
     # RpcName: updateCamera => viewport.camera.update
