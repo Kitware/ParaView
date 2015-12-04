@@ -36,7 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialog.h"
 #include "pqProxyWidget.h"
 #include "vtkNew.h"
-#include "vtkPythonInterpreter.h"
+#ifdef PARAVIEW_ENABLE_PYTHON
+# include "vtkPythonInterpreter.h"
+#endif
 #include "vtkSmartPointer.h"
 #include "vtkSMExporterProxy.h"
 #include "vtkSMExporterProxy.h"
@@ -84,6 +86,7 @@ void pqExportCinemaReaction::updateEnableState()
 //-----------------------------------------------------------------------------
 void pqExportCinemaReaction::exportActiveView()
 {
+#ifdef PARAVIEW_ENABLE_PYTHON
   pqView* view = pqActiveObjects::instance().activeView();
   if (!view) { return ;}
   vtkSMViewProxy* viewProxy = view->getViewProxy();
@@ -114,4 +117,5 @@ void pqExportCinemaReaction::exportActiveView()
     vtkPythonInterpreter::Initialize();
     vtkPythonInterpreter::RunSimpleString(script.c_str());
     }
+#endif
 }

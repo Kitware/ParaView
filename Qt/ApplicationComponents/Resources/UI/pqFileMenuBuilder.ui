@@ -161,7 +161,6 @@
   <addaction name="actionFileSaveData"/>
   <addaction name="actionFileSaveScreenshot"/>
   <addaction name="actionExport"/>
-  <addaction name="actionExportCinema"/>
   <addaction name="separator"/>
   <addaction name="actionFileSaveAnimation"/>
   <addaction name="actionFileSaveGeometry"/>

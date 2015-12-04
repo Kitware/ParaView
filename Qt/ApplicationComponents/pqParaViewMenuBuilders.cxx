@@ -127,7 +127,10 @@ void pqParaViewMenuBuilders::buildFileMenu(QMenu& menu)
   new pqSaveAnimationGeometryReaction(ui.actionFileSaveGeometry);
 
   new pqExportReaction(ui.actionExport);
-  new pqExportCinemaReaction(ui.actionExportCinema);
+#ifdef PARAVIEW_ENABLE_PYTHON
+  new pqExportCinemaReaction(menu.addAction("Export Cinema...")
+                             << pqSetName("actionExportCinema"));
+#endif
   new pqSaveDataReaction(ui.actionFileSaveData);
 
   new pqLoadRestoreWindowLayoutReaction(true, ui.actionFileLoadWindowLayout);
