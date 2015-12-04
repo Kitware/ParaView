@@ -1220,7 +1220,7 @@ int main(int argc, char *argv[])
   if(!data)
     {
     fclose(fp);
-    exit(0);
+    exit(1);
     }
 
   /* get the hierarchy info for accurate typing */
