@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPVExtractVOI.h"
 
+#include "vtkCompositeDataPipeline.h"
 #include "vtkExtentTranslator.h"
 #include "vtkGarbageCollector.h"
 #include "vtkImageData.h"
@@ -178,6 +179,20 @@ int vtkPVExtractVOI::RequestData(vtkInformation* request,
                                  vtkInformationVector** inputVector, 
                                  vtkInformationVector* outputVector)
 {
+  // This filter does not support subsampling composite datasets. Detect and
+  // fail gracefully when this happens:
+  bool isSubSampling = this->SampleRate[0] != 1 ||
+                       this->SampleRate[1] != 1 ||
+                       this->SampleRate[2] != 1;
+  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+  if (isSubSampling &&
+      inInfo->Has(vtkCompositeDataPipeline::COMPOSITE_DATA_META_DATA()))
+    {
+    vtkErrorMacro("The Extract Subset filter does not support subsampling on "
+                  "composite datasets.");
+    return 1;
+    }
+
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
   vtkDataSet* output = 
     vtkDataSet::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
