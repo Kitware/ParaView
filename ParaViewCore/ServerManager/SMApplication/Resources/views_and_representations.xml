@@ -2350,6 +2350,20 @@
         encode values from a particular array and returns to normal
         behavior.</Documentation>
       </Property>
+      <Property
+          name="StartCaptureLuminance"
+          command="StartCaptureLuminance"
+          >
+        <Documentation>Initiates a render state where lighting contributions are
+        encoded into RGB.</Documentation>
+      </Property>
+      <Property
+          name="StopCaptureLuminance"
+          command="StopCaptureLuminance"
+        >
+        <Documentation>Terminantes the render state where lighting contributions
+        are encoded into RGB.</Documentation>
+      </Property>
       <PropertyGroup label="Orientation Axes">
         <Property name="OrientationAxesVisibility"/>
         <Property name="OrientationAxesInteractivity"/>
@@ -2412,6 +2426,8 @@
         <Property name="ArrayComponentToDraw"/>
         <Property name="ScalarRange"/>
         <Property name="StopCaptureValues" />
+        <Property name="StartCaptureLuminance" />
+        <Property name="StopCaptureLuminance" />
       </PropertyGroup>
     </RenderViewProxy>
 
