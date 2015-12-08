@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -58,7 +58,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqSaveSnapshotDialog::pqSaveSnapshotDialog(QWidget* _parent, 
+pqSaveSnapshotDialog::pqSaveSnapshotDialog(QWidget* _parent,
   Qt::WindowFlags f):Superclass(_parent, f)
 {
   this->Internal = new pqInternal();
@@ -126,6 +126,12 @@ pqSaveSnapshotDialog::~pqSaveSnapshotDialog()
   delete this->Internal;
 }
 
+//---------------------------------------------------------------------------
+void pqSaveSnapshotDialog::setEnableSaveAllViews(bool enable)
+{
+  this->Internal->selectedViewOnly->setVisible(enable);
+}
+
 //-----------------------------------------------------------------------------
 void pqSaveSnapshotDialog::setViewSize(const QSize& view_size)
 {
@@ -148,7 +154,7 @@ bool pqSaveSnapshotDialog::saveAllViews() const
 }
 
 //-----------------------------------------------------------------------------
-void pqSaveSnapshotDialog::updateSize() 
+void pqSaveSnapshotDialog::updateSize()
 {
   if (this->saveAllViews())
     {
@@ -166,7 +172,7 @@ void pqSaveSnapshotDialog::updateSize()
     }
 
   QSize curSize = this->viewSize();
-  this->Internal->AspectRatio = 
+  this->Internal->AspectRatio =
     curSize.width()/static_cast<double>(curSize.height());
 }
 
@@ -176,7 +182,7 @@ void pqSaveSnapshotDialog::onLockAspectRatio(bool lock)
   if (lock)
     {
     QSize curSize = this->viewSize();
-    this->Internal->AspectRatio = 
+    this->Internal->AspectRatio =
       curSize.width()/static_cast<double>(curSize.height());
     }
 }

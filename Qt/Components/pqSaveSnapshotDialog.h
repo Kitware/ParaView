@@ -53,6 +53,11 @@ public:
   /// Returns the quality [0, 100] choosen by the user.
   int quality() const;
 
+  /// Specifiy if the save all views option should be visible or not.
+  /// Default behaviour is to show it. It can be useful to disable the option
+  /// for some custom applications where there is just a single view.
+  void setEnableSaveAllViews(bool enable);
+
   /// Set the default all views size. viewSize is used when used when
   /// saveAllViews is false, while all views size is used when saveAllViews is
   /// true.
