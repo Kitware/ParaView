@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -70,7 +70,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView components includes
 
 
-class pqProxyInformationWidget::pqUi 
+class pqProxyInformationWidget::pqUi
   : public QObject, public Ui::pqProxyInformationWidget
 {
 public:
@@ -103,26 +103,26 @@ pqProxyInformationWidget::~pqProxyInformationWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqProxyInformationWidget::setOutputPort(pqOutputPort* source) 
+void pqProxyInformationWidget::setOutputPort(pqOutputPort* source)
 {
   if (this->OutputPort == source)
     {
     return;
     }
-  
+
   this->VTKConnect->Disconnect();
   if (this->OutputPort)
     {
-    QObject::disconnect(this->OutputPort->getSource(), 
+    QObject::disconnect(this->OutputPort->getSource(),
         SIGNAL(dataUpdated(pqPipelineSource*)),
         this, SLOT(updateInformation()));
     }
 
   this->OutputPort = source;
-  
+
   if (this->OutputPort)
     {
-    QObject::connect(this->OutputPort->getSource(), 
+    QObject::connect(this->OutputPort->getSource(),
         SIGNAL(dataUpdated(pqPipelineSource*)),
         this, SLOT(updateInformation()));
     }
@@ -167,7 +167,7 @@ void pqProxyInformationWidget::updateInformation()
     return;
     }
 
-  vtkPVCompositeDataInformation* compositeInformation = 
+  vtkPVCompositeDataInformation* compositeInformation =
     dataInformation->GetCompositeDataInformation();
 
   if (compositeInformation->GetDataIsComposite())
@@ -201,7 +201,7 @@ void pqProxyInformationWidget::updateInformation()
             smprop = smprop->GetInformationProperty();
             source->getProxy()->UpdatePropertyInformation(smprop);
             }
-          QString filename = 
+          QString filename =
             pqSMAdaptor::getElementProperty(smprop).toString();
           QString path = vtksys::SystemTools::GetFilenamePath(
             filename.toLatin1().data()).c_str();
@@ -264,7 +264,7 @@ void pqProxyInformationWidget::fillDataInformation(
   this->Ui->numberOfRows->setText(tr("NA"));
   this->Ui->numberOfColumns->setText(tr("NA"));
   this->Ui->memory->setText(tr("NA"));
-  
+
   this->Ui->dataArrays->clear();
 
   this->Ui->xRange->setText(tr("NA"));
@@ -280,12 +280,12 @@ void pqProxyInformationWidget::fillDataInformation(
     {
     return;
     }
-  
+
   this->Ui->type->setText(tr(dataInformation->GetPrettyDataTypeString()));
-  
+
   QString numCells = QString("%1").arg(dataInformation->GetNumberOfCells());
   this->Ui->numberOfCells->setText(numCells);
-  
+
   QString numPoints = QString("%1").arg(dataInformation->GetNumberOfPoints());
   this->Ui->numberOfPoints->setText(numPoints);
 
@@ -306,7 +306,7 @@ void pqProxyInformationWidget::fillDataInformation(
     this->Ui->dataTypeProperties->setCurrentWidget(
       this->Ui->DataSet);
     }
-  
+
   QString memory = QString("%1 MB").arg(dataInformation->GetMemorySize()/1000.0,
                                      0, 'g', 2);
   this->Ui->memory->setText(memory);
@@ -322,7 +322,7 @@ void pqProxyInformationWidget::fillDataInformation(
     }
   else
     {
-    this->Ui->groupDataTime->setTitle("Time");
+    this->Ui->groupDataTime->setTitle(tr("Time"));
     }
 
   vtkPVDataSetAttributesInformation* info[6];
@@ -333,7 +333,7 @@ void pqProxyInformationWidget::fillDataInformation(
   info[4] = dataInformation->GetRowDataInformation();
   info[5] = dataInformation->GetFieldDataInformation();
 
-  QPixmap pixmaps[6] = 
+  QPixmap pixmaps[6] =
     {
     QPixmap(":/pqWidgets/Icons/pqPointData16.png"),
     QPixmap(":/pqWidgets/Icons/pqCellData16.png"),
@@ -364,9 +364,9 @@ void pqProxyInformationWidget::fillDataInformation(
       }
     else
       {
-      this->Ui->xExtent->setText("NA");
-      this->Ui->yExtent->setText("NA");
-      this->Ui->zExtent->setText("NA");
+      this->Ui->xExtent->setText(tr("NA"));
+      this->Ui->yExtent->setText(tr("NA"));
+      this->Ui->zExtent->setText(tr("NA"));
       }
     }
 
@@ -399,13 +399,14 @@ void pqProxyInformationWidget::fillDataInformation(
                              arg(range[0]).arg(range[1]);
           dataRange.append(componentRange);
           }
-        item->setData(2, Qt::DisplayRole, dataRange);
+        item->setData(2, Qt::DisplayRole,
+          dataType == "string" ? tr("NA") : dataRange);
         item->setData(2, Qt::ToolTipRole, dataRange);
         item->setFlags( item->flags() | Qt::ItemIsEditable );
         if (arrayInfo->GetIsPartial())
           {
           item->setForeground(0, QBrush(QColor("darkBlue")));
-          item->setData(0, Qt::DisplayRole, 
+          item->setData(0, Qt::DisplayRole,
             QString("%1 (partial)").arg(arrayInfo->GetName()));
           }
         else
@@ -424,7 +425,7 @@ void pqProxyInformationWidget::fillDataInformation(
   QString xrange;
   if (bounds[0] == VTK_DOUBLE_MAX && bounds[1] == -VTK_DOUBLE_MAX)
     {
-    xrange = "Not available";
+    xrange = tr("Not available");
     }
   else
     {
@@ -438,7 +439,7 @@ void pqProxyInformationWidget::fillDataInformation(
   QString yrange;
   if (bounds[2] == VTK_DOUBLE_MAX && bounds[3] == -VTK_DOUBLE_MAX)
     {
-    yrange = "Not available";
+    yrange = tr("Not available");
     }
   else
     {
@@ -452,7 +453,7 @@ void pqProxyInformationWidget::fillDataInformation(
   QString zrange;
   if (bounds[4] == VTK_DOUBLE_MAX && bounds[5] == -VTK_DOUBLE_MAX)
     {
-    zrange = "Not available";
+    zrange = tr("Not available");
     }
   else
     {
@@ -470,7 +471,7 @@ QTreeWidgetItem* pqProxyInformationWidget::fillCompositeInformation(
 {
   QTreeWidgetItem* node = 0;
 
-  QString label = info? info->GetPrettyDataTypeString() : "NA";
+  QString label = info? info->GetPrettyDataTypeString() : tr("NA");
   if (parentItem)
     {
     node = new QTreeWidgetItem(parentItem, QStringList(label));
@@ -490,10 +491,10 @@ QTreeWidgetItem* pqProxyInformationWidget::fillCompositeInformation(
   node->setData(0, Qt::UserRole, QVariant::fromValue((void*)info));
   node->setFlags( node->flags() | Qt::ItemIsEditable);
 
-  vtkPVCompositeDataInformation* compositeInformation = 
+  vtkPVCompositeDataInformation* compositeInformation =
     info->GetCompositeDataInformation();
 
-  if (!compositeInformation->GetDataIsComposite() || 
+  if (!compositeInformation->GetDataIsComposite() ||
     compositeInformation->GetDataIsMultiPiece())
     {
     return node;
@@ -503,7 +504,7 @@ QTreeWidgetItem* pqProxyInformationWidget::fillCompositeInformation(
     (strcmp(info->GetCompositeDataClassName(),"vtkNonOverlappingAMR") ==0);
   bool isOverlappingAMR =
     (strcmp(info->GetCompositeDataClassName(),"vtkOverlappingAMR") ==0);
-  bool isHB = 
+  bool isHB =
     (strcmp(info->GetCompositeDataClassName(),"vtkHierarchicalBoxDataSet") ==0);
 
   bool isAMR = isHB || isOverlappingAMR || isNonOverlappingAMR;
@@ -511,9 +512,9 @@ QTreeWidgetItem* pqProxyInformationWidget::fillCompositeInformation(
   unsigned int numChildren = compositeInformation->GetNumberOfChildren();
   for (unsigned int cc=0; cc < numChildren; cc++)
     {
-    vtkPVDataInformation* childInfo = 
+    vtkPVDataInformation* childInfo =
       compositeInformation->GetDataInformation(cc);
-    QTreeWidgetItem* childItem = 
+    QTreeWidgetItem* childItem =
       this->fillCompositeInformation(childInfo, node);
     childItem->setFlags( childItem->flags() | Qt::ItemIsEditable );
     const char* name = compositeInformation->GetName(cc);
