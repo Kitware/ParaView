@@ -30,6 +30,9 @@
 #include "pqTransferFunctionEditor.h"
 #include "ui_pqTransferFunctionEditor.h"
 
+#include <vtkDataObject.h>
+#include <vtkSMPropertyHelper.h>
+
 #include <QDoubleValidator>
 #include <QTimer>
 #include <QChar>
@@ -651,24 +654,32 @@ void pqTransferFunctionEditor::onAutoScalarRange(bool autoRange)
       }
 
     const char* array =
-        vtkSMStringVectorProperty::SafeDownCast(reprProxy->GetProperty(
-            this->Internals->ArrayNameProperty))->GetElement(4);
+      vtkSMStringVectorProperty::SafeDownCast(reprProxy->GetProperty(
+      this->Internals->ArrayNameProperty))->GetElement(4);
     int comp = pqSMAdaptor::getElementProperty(reprProxy->GetProperty(
-        this->Internals->ArrayComponentProperty)).toInt();
+      this->Internals->ArrayComponentProperty)).toInt();
 
-    if (strcmp(array, this->Internals->ConstantNameProperty) == 0 || strcmp(
-        array, "") == 0)
-      return;
-
-    double drange[2] = {0.0, 1.0};
-    if (vtkPVArrayInformation* arrayInfo =
-      vtkSMPVRepresentationProxy::GetArrayInformationForColorArray(reprProxy))
+    if (strcmp(array, this->Internals->ConstantNameProperty) == 0
+      || strcmp(array, "") == 0)
       {
-      arrayInfo->GetComponentRange(comp, drange);
-      if (drange[1] < drange[0])
+      return;
+      }
+
+    double drange[2] = { 0.0, 1.0 };
+    vtkSMPropertyHelper inputHelper(reprProxy, "Input");
+    vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy());
+    if (input)
+      {
+      vtkPVArrayInformation* arrayInfo = input->GetDataInformation(
+        inputHelper.GetOutputPort())->GetArrayInformation(array, vtkDataObject::FIELD_ASSOCIATION_POINTS);
+      if (arrayInfo)
         {
-        drange[0] = 0.0;
-        drange[1] = 1.0;
+        arrayInfo->GetComponentRange(comp, drange);
+        if (drange[1] < drange[0])
+          {
+          drange[0] = 0.0;
+          drange[1] = 1.0;
+          }
         }
       }
     this->Internals->scalarMin->setValue(drange[0]);
