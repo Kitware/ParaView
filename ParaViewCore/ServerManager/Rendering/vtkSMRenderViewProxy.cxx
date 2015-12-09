@@ -655,10 +655,14 @@ void vtkSMRenderViewProxy::ResetCamera(double bounds[6])
 //-----------------------------------------------------------------------------
 void vtkSMRenderViewProxy::MarkDirty(vtkSMProxy* modifiedProxy)
 {
-  this->ClearSelectionCache();
+  vtkSMProxy* cameraProxy = this->GetSubProxy("ActiveCamera");
+
+  // If modified proxy is the camera, we must clear the cache even if we're
+  // currently in selection mode.
+  this->ClearSelectionCache(/*force=*/modifiedProxy == cameraProxy);
 
   // skip modified properties on camera subproxy.
-  if (modifiedProxy != this->GetSubProxy("ActiveCamera"))
+  if (modifiedProxy != cameraProxy)
     {
     this->Superclass::MarkDirty(modifiedProxy);
     }
