@@ -631,6 +631,10 @@ include(vtkModuleMacros)
 include(ParaViewMacros)
 
 #----------------------------------------------------------------------------------
+# Use consistent compiler flags in ParaView and VTK.
+include(vtkDetermineCompilerFlags)
+
+#----------------------------------------------------------------------------------
 list (APPEND PARAVIEW_MODULE_ROOTS
              ThirdParty
              Utilities
