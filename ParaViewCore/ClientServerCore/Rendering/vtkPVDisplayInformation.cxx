@@ -73,6 +73,7 @@ bool vtkPVDisplayInformation::CanOpenDisplayLocally()
 //----------------------------------------------------------------------------
 bool vtkPVDisplayInformation::SupportsOpenGLLocally()
 {
+#ifdef VTKGL2
   if (vtksys::SystemTools::GetEnv("PV_DEBUG_SKIP_OPENGL_VERSION_CHECK") != NULL)
     {
     return true;
@@ -84,6 +85,12 @@ bool vtkPVDisplayInformation::SupportsOpenGLLocally()
 
   vtkNew<vtkRenderWindow> window;
   return window->SupportsOpenGL() == 1;
+#else
+  // We don't do any OpenGL check for old rendering backend since the old
+  // backend requires that the window is created for SupportsOpenGL() check to
+  // pass.
+  return true;
+#endif
 }
 
 //----------------------------------------------------------------------------
