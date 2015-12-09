@@ -617,6 +617,7 @@ class CoProcessor(object):
         import paraview.cinemaIO.explorers as explorers
         import paraview.cinemaIO.pv_explorers as pv_explorers
         import paraview.cinemaIO.pv_introspect as pv_introspect
+        import paraview.simple as simple
 
         pm = servermanager.vtkProcessModule.GetProcessModule()
         pid = pm.GetPartitionId()
@@ -629,7 +630,8 @@ class CoProcessor(object):
                              "cinema",
                              os.path.basename(vfname),
                              "info.json")
-        print fname
+
+        simple.Render(view)
         view.LockBounds = 1
         p = pv_introspect.inspect()
         l = pv_introspect.munch_tree(p)
