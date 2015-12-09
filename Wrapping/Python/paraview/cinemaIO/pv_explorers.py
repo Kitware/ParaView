@@ -65,7 +65,10 @@ class ImageExplorer(explorers.Explorer):
             idata = numpy_support.vtk_to_numpy(image) * 256
             rw = self.view.GetRenderWindow()
             width,height = rw.GetSize()
-            imageslice = np.flipud(idata.reshape(height,width))
+            try:
+                imageslice = np.flipud(idata.reshape(height,width))
+            except ValueError:
+                imageslice = None
             #import Image
             #img = Image.fromarray(imageslice)
             #img.show()

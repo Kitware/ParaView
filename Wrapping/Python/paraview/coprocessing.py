@@ -636,5 +636,5 @@ class CoProcessor(object):
         p = pv_introspect.inspect()
         l = pv_introspect.munch_tree(p)
         cs = pv_introspect.make_cinema_store(l, fname)
-        pv_introspect.explore(cs, p)
+        pv_introspect.explore(cs, p, iSave=(pid==0))
         view.LockBounds = 0

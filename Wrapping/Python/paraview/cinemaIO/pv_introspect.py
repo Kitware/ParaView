@@ -312,7 +312,7 @@ def testexplore(cs):
     e.explore()
 
 
-def explore(cs, proxies):
+def explore(cs, proxies, iSave=True):
     """
     Takes in the store, which contains only the list of parameters,
     """
@@ -401,7 +401,8 @@ def explore(cs, proxies):
 
     e = pv_explorers.ImageExplorer(cs, params,
                                    tracks,
-                                   view_proxy)
+                                   view_proxy,
+                                   iSave)
 
     for c in cols:
         c.imageExplorer = e
