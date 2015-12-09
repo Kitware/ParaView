@@ -42,6 +42,7 @@ class CoProcessor(object):
         self.__LiveVisualizationFrequency = 1;
         self.__LiveVisualizationLink = None
         self.__CinemaTracksList = []
+        self.__FilterValues = {}
         pass
 
     def SetUpdateFrequencies(self, frequencies):
@@ -328,6 +329,12 @@ class CoProcessor(object):
         controller.RegisterPipelineProxy(proxy)
         return proxy
 
+    def UpdateFilterValues(self, name, proxy, values):
+        if (isinstance(proxy, simple.servermanager.filters.Slice) or
+            isinstance(proxy, simple.servermanager.filters.Clip)  or
+            isinstance(proxy, simple.servermanager.filters.Contour)):
+            self.__FilterValues[name] = values
+
     def RegisterCinemaTrack(self, name, proxy, smproperty, valrange):
         """
         Register a point of control (filter's property) that will be varied over in a cinema export.
@@ -335,6 +342,9 @@ class CoProcessor(object):
         if not isinstance(proxy, servermanager.Proxy):
             raise RuntimeError, "Invalid 'proxy' argument passed to RegisterCinemaTrack."
         self.__CinemaTracksList.append({"name":name, "proxy":proxy, "smproperty":smproperty, "valrange":valrange})
+
+        self.UpdateFilterValues(name, proxy, values)
+
         return proxy
 
     def RegisterView(self, view, filename, freq, fittoscreen, magnification, width, height, cinema=None):
@@ -633,6 +643,6 @@ class CoProcessor(object):
         view.LockBounds = 1
         p = pv_introspect.inspect()
         l = pv_introspect.munch_tree(p)
-        cs = pv_introspect.make_cinema_store(l, fname)
+        cs = pv_introspect.make_cinema_store(l, fname, self.__FilterValues)
         pv_introspect.explore(cs, p)
         view.LockBounds = 0
