@@ -33,7 +33,6 @@
          <Property name="CameraClippingRange" panel_visibility="never"/>
          <Property name="CameraParallelScale" panel_visibility="never"/>
          <Property name="CameraParallelScaleInfo" panel_visibility="never"/>
-         <Property name="CameraParallelProjection" panel_visibility="never"/>
          <Property name="EyeAngle" panel_visibility="never"/>
          <Property name="EyeTransformMatrix" />
          <Property name="ModelTransformMatrix" />

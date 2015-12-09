@@ -288,14 +288,13 @@ vtkPVRenderView::vtkPVRenderView()
   this->CenterAxes->SetPickable(0);
   this->CenterAxes->SetScale(0.25, 0.25, 0.25);
   this->OrientationWidget = vtkPVAxesWidget::New();
-  this->InteractionMode = -1;
+  this->InteractionMode = INTERACTION_MODE_UNINTIALIZED;
   this->LastSelection = NULL;
   this->UseOffscreenRenderingForScreenshots = false;
   this->UseInteractiveRenderingForScreenshots = false;
   this->UseOffscreenRendering = (options->GetUseOffscreenRendering() != 0);
   this->EGLDeviceIndex = options->GetEGLDeviceIndex();
   this->Selector = vtkPVHardwareSelector::New();
-  this->PreviousParallelProjectionStatus = 0;
   this->NeedsOrderedCompositing = false;
   this->RenderEmptyImages = false;
   this->DistributedRenderingRequired = false;
@@ -595,6 +594,10 @@ void vtkPVRenderView::SetActiveCamera(vtkCamera* camera)
 {
   this->GetRenderer()->SetActiveCamera(camera);
   this->GetNonCompositedRenderer()->SetActiveCamera(camera);
+  if (camera)
+    {
+    camera->SetParallelProjection(this->ParallelProjection);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -641,7 +644,7 @@ void vtkPVRenderView::SetupInteractor(vtkRenderWindowInteractor* iren)
 
       // this will set the interactor style.
       int mode = this->InteractionMode;
-      this->InteractionMode = -1;
+      this->InteractionMode = INTERACTION_MODE_UNINTIALIZED;
       this->SetInteractionMode(mode);
       }
 
@@ -654,11 +657,6 @@ void vtkPVRenderView::SetInteractionMode(int mode)
 {
   if (this->InteractionMode != mode)
     {
-    if(this->InteractionMode == INTERACTION_MODE_3D)
-      {
-      this->PreviousParallelProjectionStatus = this->GetActiveCamera()->GetParallelProjection();
-      }
-
     this->InteractionMode = mode;
     this->Modified();
 
@@ -673,7 +671,7 @@ void vtkPVRenderView::SetInteractionMode(int mode)
       this->Interactor->SetInteractorStyle(
             this->InteractorStyle = this->ThreeDInteractorStyle);
       // Get back to the previous state
-      this->GetActiveCamera()->SetParallelProjection(this->PreviousParallelProjectionStatus);
+      this->GetActiveCamera()->SetParallelProjection(this->ParallelProjection);
       break;
     case INTERACTION_MODE_2D:
       this->Interactor->SetInteractorStyle(
@@ -2331,6 +2329,18 @@ void vtkPVRenderView::SetStencilCapable(int val)
   this->GetRenderWindow()->SetStencilCapable(val);
 }
 
+//*****************************************************************
+// Forwarded to vtkCamera if present on local processes.
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetParallelProjection(int mode)
+{
+  if (this->ParallelProjection != mode)
+    {
+    this->ParallelProjection = mode;
+    this->GetActiveCamera()->SetParallelProjection(mode);
+    this->Modified();
+    }
+}
 
 //*****************************************************************
 // Forwarded to vtkPVInteractorStyle if present on local processes.
