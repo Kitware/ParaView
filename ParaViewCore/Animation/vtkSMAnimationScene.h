@@ -69,13 +69,6 @@ public:
   vtkSMViewProxy* GetViewProxy(unsigned int cc);
 
   // Description:
-  // Set if caching is enabled.
-  // If Caching is true, then on every time-step, this will update the UseCache
-  // and CacheKey properties on each of the views.
-  vtkSetMacro(Caching, bool);
-  vtkGetMacro(Caching, bool);
-
-  // Description:
   // Set the time keeper. Time keeper is used to obtain the information about
   // timesteps. This is required to play animation in "Snap To Timesteps" mode.
   void SetTimeKeeper(vtkSMProxy*);
@@ -149,6 +142,14 @@ public:
     // The calldata is a vtkVector2d with the suggested time-range.
     UpdateStartEndTimesEvent = vtkCommand::UserEvent
     };
+
+  // Description:
+  // Set to true to force caching to be disabled. When false (default), caching
+  // is determined based on the value from
+  // vtkPVGeneralSettings::GetInstance()->GetCacheGeometryForAnimation().
+  vtkSetMacro(ForceDisableCaching, bool);
+  vtkGetMacro(ForceDisableCaching, bool);
+
 //BTX
 protected:
   vtkSMAnimationScene();
@@ -167,12 +168,12 @@ protected:
   void TimeKeeperTimeRangeChanged();
   void TimeKeeperTimestepsChanged();
 
-  bool Caching;
   bool LockStartTime;
   bool LockEndTime;
   bool InTick;
   double SceneTime;
   double PlaybackTimeWindow[2];
+  bool ForceDisableCaching;
   vtkSMProxy* TimeKeeper;
   vtkCompositeAnimationPlayer* AnimationPlayer;
   vtkEventForwarderCommand* Forwarder;

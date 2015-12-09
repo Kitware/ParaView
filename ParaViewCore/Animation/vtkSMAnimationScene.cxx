@@ -217,8 +217,8 @@ vtkSMAnimationScene::vtkSMAnimationScene()
   this->SceneTime = 0;
   this->PlaybackTimeWindow[0] = 1.0;
   this->PlaybackTimeWindow[1] = -1.0;
+  this->ForceDisableCaching = false;
   this->InTick = false;
-  this->Caching = false;
   this->LockEndTime = false;
   this->LockStartTime = false;
   this->OverrideStillRender = false;
@@ -450,7 +450,9 @@ void vtkSMAnimationScene::TickInternal(
   // logic in them to periodically check and synchronize the "fullness" of cache
   // among all participating processes. So we don't have to manage that here at
   // all.
-  if (this->Caching)
+  bool caching_enabled = (!this->ForceDisableCaching) &&
+    vtkPVGeneralSettings::GetInstance()->GetCacheGeometryForAnimation();
+  if (caching_enabled)
     {
     this->Internals->PassUseCache(true);
     this->Internals->PassCacheTime(currenttime);
@@ -490,7 +492,7 @@ void vtkSMAnimationScene::TickInternal(
     }
   this->InTick = false;
 
-  if (this->Caching)
+  if (caching_enabled)
     {
     this->Internals->PassUseCache(false);
     }
@@ -500,6 +502,7 @@ void vtkSMAnimationScene::TickInternal(
 void vtkSMAnimationScene::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "ForceDisableCaching: " << this->ForceDisableCaching << endl;
 }
 
 //----------------------------------------------------------------------------

@@ -129,8 +129,8 @@ bool vtkCubeAxesRepresentation::AddToView(vtkView* view)
       {
       renderer->AddActor(this->CubeAxesActor);
       this->CubeAxesActor->SetCamera(renderer->GetActiveCamera());
-      this->View = pvview;
-      return true;
+      this->RenderView = pvview;
+      return this->Superclass::AddToView(view);
       }
     }
   return false;
@@ -146,11 +146,11 @@ bool vtkCubeAxesRepresentation::RemoveFromView(vtkView* view)
       {
       renderer->RemoveActor(this->CubeAxesActor);
       this->CubeAxesActor->SetCamera(NULL);
-      this->View = NULL;
-      return true;
+      this->RenderView = NULL;
+      return this->Superclass::RemoveFromView(view);
       }
     }
-  this->View = NULL;
+  this->RenderView = NULL;
   return false;
 }
 

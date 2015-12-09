@@ -118,22 +118,6 @@ void vtkSelectionRepresentation::SetUpdateTime(double val)
 }
 
 //----------------------------------------------------------------------------
-void vtkSelectionRepresentation::SetUseCache(bool val)
-{
-  this->GeometryRepresentation->SetUseCache(val);
-  this->LabelRepresentation->SetUseCache(val);
-  this->Superclass::SetUseCache(val);
-}
-
-//----------------------------------------------------------------------------
-void vtkSelectionRepresentation::SetCacheKey(double val)
-{
-  this->GeometryRepresentation->SetCacheKey(val);
-  this->LabelRepresentation->SetCacheKey(val);
-  this->Superclass::SetCacheKey(val);
-}
-
-//----------------------------------------------------------------------------
 void vtkSelectionRepresentation::SetForceUseCache(bool val)
 {
   this->GeometryRepresentation->SetForceUseCache(val);
@@ -154,7 +138,7 @@ bool vtkSelectionRepresentation::AddToView(vtkView* view)
 {
   view->AddRepresentation(this->GeometryRepresentation);
   view->AddRepresentation(this->LabelRepresentation);
-  return true;
+  return this->Superclass::AddToView(view);
 }
 
 //----------------------------------------------------------------------------
@@ -162,7 +146,7 @@ bool vtkSelectionRepresentation::RemoveFromView(vtkView* view)
 {
   view->RemoveRepresentation(this->GeometryRepresentation);
   view->RemoveRepresentation(this->LabelRepresentation);
-  return true;
+  return this->Superclass::RemoveFromView(view);
 }
 
 //----------------------------------------------------------------------------

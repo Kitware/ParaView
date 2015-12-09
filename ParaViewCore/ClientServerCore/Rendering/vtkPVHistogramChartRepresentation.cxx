@@ -59,7 +59,6 @@ vtkPVHistogramChartRepresentation::vtkPVHistogramChartRepresentation()
   this->SetXAxisSeriesName(BIN_EXTENTS);
   this->SetSeriesVisibility(BIN_VALUES, true);
   this->SetFieldAssociation(vtkDataObject::FIELD_ASSOCIATION_ROWS);
-  this->SetUseCache(false);
   this->SetHistogramColor(0, 0, 255);
   this->AttributeType = vtkDataObject::POINT;
 }

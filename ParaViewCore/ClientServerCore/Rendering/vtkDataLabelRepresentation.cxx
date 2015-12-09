@@ -308,7 +308,7 @@ bool vtkDataLabelRepresentation::AddToView(vtkView* view)
     {
     rview->GetNonCompositedRenderer()->AddActor(this->PointLabelActor);
     rview->GetNonCompositedRenderer()->AddActor(this->CellLabelActor);
-    return true;
+    return this->Superclass::AddToView(view);
     }
   return false;
 }
@@ -321,7 +321,7 @@ bool vtkDataLabelRepresentation::RemoveFromView(vtkView* view)
     {
     rview->GetNonCompositedRenderer()->RemoveActor(this->PointLabelActor);
     rview->GetNonCompositedRenderer()->RemoveActor(this->CellLabelActor);
-    return true;
+    return this->Superclass::RemoveFromView(view);
     }
   return false;
 }

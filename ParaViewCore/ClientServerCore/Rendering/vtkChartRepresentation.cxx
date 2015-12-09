@@ -132,7 +132,7 @@ bool vtkChartRepresentation::AddToView(vtkView* view)
   this->ContextView = chartView;
   this->EnableServerSideRendering = (chartView && chartView->InTileDisplayMode());
   view->AddRepresentation(this->SelectionRepresentation);
-  return true;
+  return this->Superclass::AddToView(view);
 }
 
 //----------------------------------------------------------------------------
@@ -145,7 +145,7 @@ bool vtkChartRepresentation::RemoveFromView(vtkView* view)
     }
   this->ContextView = 0;
   view->RemoveRepresentation(this->SelectionRepresentation);
-  return true;
+  return this->Superclass::RemoveFromView(view);
 }
 
 //----------------------------------------------------------------------------

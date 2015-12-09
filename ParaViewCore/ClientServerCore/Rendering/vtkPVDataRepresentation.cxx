@@ -41,9 +41,6 @@ vtkPVDataRepresentation::vtkPVDataRepresentation()
   this->UpdateTimeValid = false;
   this->UpdateTime = 0.0;
 
-  this->UseCache = false;
-  this->CacheKey = 0.0;
-
   this->ForceUseCache = false;
   this->ForcedCacheKey = 0.0;
 
@@ -231,14 +228,69 @@ vtkAlgorithmOutput* vtkPVDataRepresentation::GetInternalOutputPort(int port,
 }
 
 //----------------------------------------------------------------------------
+bool vtkPVDataRepresentation::AddToView(vtkView* view)
+{
+  if (this->View != NULL)
+    {
+    vtkWarningMacro("Added representation has a non-null 'View'. "
+      "A representation cannot be added to two views at the same time!");
+    }
+  this->View = view;
+  return this->Superclass::AddToView(view);
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVDataRepresentation::RemoveFromView(vtkView* view)
+{
+  if (this->View == view)
+    {
+    this->View = NULL;
+    }
+  return this->Superclass::RemoveFromView(view);
+}
+
+//----------------------------------------------------------------------------
+vtkView* vtkPVDataRepresentation::GetView() const
+{
+  return this->View;
+}
+
+//----------------------------------------------------------------------------
+double vtkPVDataRepresentation::GetCacheKey()
+{
+  if (this->ForceUseCache)
+    {
+    return this->ForcedCacheKey;
+    }
+  if (vtkPVView* pvview = vtkPVView::SafeDownCast(this->View))
+    {
+    return pvview->GetCacheKey();
+    }
+  return 0.0;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVDataRepresentation::GetUseCache()
+{
+  if (this->ForceUseCache)
+    {
+    return true;
+    }
+
+  if (vtkPVView* pvview = vtkPVView::SafeDownCast(this->View))
+    {
+    return pvview->GetUseCache();
+    }
+  return false;
+}
+
+//----------------------------------------------------------------------------
 void vtkPVDataRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Visibility: " << this->Visibility << endl;
   os << indent << "UpdateTimeValid: " << this->UpdateTimeValid << endl;
   os << indent << "UpdateTime: " << this->UpdateTime << endl;
-  os << indent << "UseCache: " << this->UseCache << endl;
-  os << indent << "CacheKey: " << this->CacheKey << endl;
   os << indent << "ForceUseCache: " << this->ForceUseCache << endl;
   os << indent << "ForcedCacheKey: " << this->ForcedCacheKey << endl;
 }

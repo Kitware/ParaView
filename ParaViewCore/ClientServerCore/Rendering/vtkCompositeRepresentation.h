@@ -93,8 +93,6 @@ public:
   // Description:
   // Passed on to internal representations as well.
   virtual void SetUpdateTime(double time);
-  virtual void SetUseCache(bool val);
-  virtual void SetCacheKey(double val);
   virtual void SetForceUseCache(bool val);
   virtual void SetForcedCacheKey(double val);
 

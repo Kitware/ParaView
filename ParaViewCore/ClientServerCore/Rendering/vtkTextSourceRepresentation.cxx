@@ -110,7 +110,7 @@ bool vtkTextSourceRepresentation::AddToView(vtkView* view)
     {
     view->AddRepresentation(this->TextWidgetRepresentation);
     }
-  return true;
+  return this->Superclass::AddToView(view);
 }
 
 //----------------------------------------------------------------------------
@@ -120,7 +120,7 @@ bool vtkTextSourceRepresentation::RemoveFromView(vtkView* view)
     {
     view->RemoveRepresentation(this->TextWidgetRepresentation);
     }
-  return true;
+  return this->Superclass::RemoveFromView(view);
 }
 
 //----------------------------------------------------------------------------

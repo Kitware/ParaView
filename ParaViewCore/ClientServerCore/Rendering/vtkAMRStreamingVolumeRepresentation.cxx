@@ -388,7 +388,7 @@ bool vtkAMRStreamingVolumeRepresentation::AddToView(vtkView* view)
   if (rview)
     {
     rview->GetRenderer()->AddActor(this->Actor);
-    return true;
+    return this->Superclass::AddToView(rview);
     }
   return false;
 }
@@ -400,7 +400,7 @@ bool vtkAMRStreamingVolumeRepresentation::RemoveFromView(vtkView* view)
   if (rview)
     {
     rview->GetRenderer()->RemoveActor(this->Actor);
-    return true;
+    return this->Superclass::RemoveFromView(rview);
     }
   return false;
 }
