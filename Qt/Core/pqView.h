@@ -82,9 +82,6 @@ public:
   /// since has been destroyed due to Qt cleanup.
   QWidget* widget();
 
-  /// @deprecated Replaced by pqView::widget() as of ParaView 4.4.
-  VTK_LEGACY(QWidget* getWidget());
-
   /// Returns if this view module can support 
   /// undo/redo. Returns false by default. Subclassess must override
   /// if that's not the case.

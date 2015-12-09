@@ -523,11 +523,3 @@ void pqView::onEndRender()
   emit this->endRender();
   END_UNDO_EXCLUDE();
 }
-
-//-----------------------------------------------------------------------------
-#ifndef VTK_LEGACY_REMOVE
-QWidget* pqView::getWidget()
-{
-  return this->widget();
-}
-#endif
