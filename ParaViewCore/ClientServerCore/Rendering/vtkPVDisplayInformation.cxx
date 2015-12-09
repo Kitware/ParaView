@@ -15,9 +15,11 @@
 #include "vtkPVDisplayInformation.h"
 
 #include "vtkClientServerStream.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVOptions.h"
 #include "vtkProcessModule.h"
+#include "vtkPVOptions.h"
+#include "vtkRenderWindow.h"
 #include "vtkToolkits.h"
 
 #include "vtkRenderingOpenGLConfigure.h" // needed for VTK_USE_X
@@ -25,12 +27,14 @@
 # include <X11/Xlib.h>
 #endif
 
+#include <vtksys/SystemTools.hxx>
 vtkStandardNewMacro(vtkPVDisplayInformation);
 
 //----------------------------------------------------------------------------
 vtkPVDisplayInformation::vtkPVDisplayInformation()
 {
   this->CanOpenDisplay = 1;
+  this->SupportsOpenGL = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -42,8 +46,8 @@ vtkPVDisplayInformation::~vtkPVDisplayInformation()
 void vtkPVDisplayInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-
   os << indent << "CanOpenDisplay: " << this->CanOpenDisplay << endl;
+  os << indent << "SupportsOpenGL: " << this->SupportsOpenGL << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -67,9 +71,26 @@ bool vtkPVDisplayInformation::CanOpenDisplayLocally()
 }
 
 //----------------------------------------------------------------------------
+bool vtkPVDisplayInformation::SupportsOpenGLLocally()
+{
+  if (vtksys::SystemTools::GetEnv("PV_DEBUG_SKIP_OPENGL_VERSION_CHECK") != NULL)
+    {
+    return true;
+    }
+  if (!vtkPVDisplayInformation::CanOpenDisplayLocally())
+    {
+    return false;
+    }
+
+  vtkNew<vtkRenderWindow> window;
+  return window->SupportsOpenGL() == 1;
+}
+
+//----------------------------------------------------------------------------
 void vtkPVDisplayInformation::CopyFromObject(vtkObject*)
 {
   this->CanOpenDisplay = vtkPVDisplayInformation::CanOpenDisplayLocally()?1:0;
+  this->SupportsOpenGL = vtkPVDisplayInformation::SupportsOpenGLLocally()? 1 : 0;
 }
 
 //----------------------------------------------------------------------------
@@ -84,13 +105,19 @@ void vtkPVDisplayInformation::AddInformation(vtkPVInformation* pvi)
     {
     this->CanOpenDisplay = 0;
     }
+  if (!this->SupportsOpenGL || !di->SupportsOpenGL)
+    {
+    this->SupportsOpenGL = 0;
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVDisplayInformation::CopyToStream(vtkClientServerStream* css)
 {
   css->Reset();
-  *css << vtkClientServerStream::Reply << this->CanOpenDisplay
+  *css << vtkClientServerStream::Reply
+       << this->CanOpenDisplay
+       << this->SupportsOpenGL
        << vtkClientServerStream::End;
 }
 
@@ -98,4 +125,5 @@ void vtkPVDisplayInformation::CopyToStream(vtkClientServerStream* css)
 void vtkPVDisplayInformation::CopyFromStream(const vtkClientServerStream* css)
 {
   css->GetArgument(0, 0, &this->CanOpenDisplay);
+  css->GetArgument(0, 1, &this->SupportsOpenGL);
 }

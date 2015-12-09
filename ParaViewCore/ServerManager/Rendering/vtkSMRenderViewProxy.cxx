@@ -439,7 +439,7 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
     vtkPVDisplayInformation* info = vtkPVDisplayInformation::New();
     this->GetSession()->GatherInformation(
       vtkPVSession::RENDER_SERVER, info, 0);
-    if (info->GetCanOpenDisplay() == 0)
+    if (info->GetCanOpenDisplay() == 0 || info->GetSupportsOpenGL() == 0)
       {
       remote_rendering_available = false;
       }
