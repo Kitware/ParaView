@@ -2231,13 +2231,23 @@
           <Property name="CameraClippingRange" panel_visibility="never"/>
           <Property name="CameraParallelScale" panel_visibility="never"/>
           <Property name="CameraParallelScaleInfo" panel_visibility="never"/>
-          <Property name="CameraParallelProjection"
-                    panel_visibility="advanced"/>
           <Property name="EyeAngle" panel_visibility="never"/>
           <Property name="EyeTransformMatrix" />
           <Property name="ModelTransformMatrix" />
         </ExposedProperties>
       </SubProxy>
+      <IntVectorProperty command="SetParallelProjection"
+                         default_values="0"
+                         ignore_synchronization="1"
+                         name="CameraParallelProjection"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable/disable parallel projection mode.
+        </Documentation>
+      </IntVectorProperty>
+
       <DoubleVectorProperty command="SetBackground"
                             default_values="0.329 0.349 0.427"
                             name="Background"

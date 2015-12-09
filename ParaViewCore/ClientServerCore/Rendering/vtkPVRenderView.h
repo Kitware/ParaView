@@ -70,6 +70,7 @@ public:
 
   enum InteractionModes
     {
+    INTERACTION_MODE_UNINTIALIZED=-1,
     INTERACTION_MODE_3D=0,
     INTERACTION_MODE_2D, // not implemented yet.
     INTERACTION_MODE_SELECTION,
@@ -511,6 +512,10 @@ public:
   void SetStencilCapable(int val);
 
   //*****************************************************************
+  // Forward to vtkCamera.
+  void SetParallelProjection(int mode);
+
+  //*****************************************************************
   // Forwarded to vtkPVInteractorStyle if present on local processes.
   virtual void SetCamera2DManipulators(const int manipulators[9]);
   virtual void SetCamera3DManipulators(const int manipulators[9]);
@@ -779,7 +784,8 @@ private:
   bool DistributedRenderingRequiredLOD;
   bool NonDistributedRenderingRequiredLOD;
 
-  int PreviousParallelProjectionStatus;
+  // Cached value for parallel projection set on camera.
+  int ParallelProjection;
 
   class vtkInternals;
   vtkInternals* Internals;
