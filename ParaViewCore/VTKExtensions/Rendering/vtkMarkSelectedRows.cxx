@@ -205,8 +205,7 @@ int vtkMarkSelectedRows::RequestDataInternal(vtkTable* input,
     break;
 
   default:
-    vtkWarningMacro("FieldAssociation type not supported yet. Selected elements "
-      "may not be shown correctly.");
+    break;
     }
 
   if (!selectedIdsArray)
