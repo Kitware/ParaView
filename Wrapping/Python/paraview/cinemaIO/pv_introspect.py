@@ -29,6 +29,9 @@
 #==============================================================================
 import cinema_store
 import paraview
+import pv_explorers
+
+import numpy as np
 
 def inspect():
     """
@@ -108,6 +111,62 @@ def float_limiter(x):
         return '%.6e' % x #arbitrarily chose 6 significant digits
     else:
         return x
+
+# Keeps a link between a filter and its explorer-track. Populated in addFilterValueSublayer()
+# and queried in explore()
+explorerDir = {}
+
+def addFilterValueSublayer(name, parentLayer, cs):
+    source = paraview.simple.FindSource(name)
+
+    # plane offset generator (for Slice or Clip)
+    def generateOffsetValues():
+        bounds = source.Input.GetDataInformation().DataInformation.GetBounds()
+        minPoint = np.array([bounds[0], bounds[2], bounds[4]])
+        maxPoint = np.array([bounds[1], bounds[3], bounds[5]])
+        scaleVec = maxPoint - minPoint
+
+        # adjust offset size depending on the plane orientation
+        if hasattr(source, 'SliceType'):
+            n = source.SliceType.Normal
+        elif hasattr(source, 'ClipType'):
+            n = source.ClipType.Normal
+
+        sNormal = np.array([n[0] * scaleVec[0], n[1] * scaleVec[1], n[2] * scaleVec[2]])
+
+        steps = 5 # generate 5 slice offsets
+        offsetStep = np.linalg.norm(sNormal) / steps
+        values = np.arange(-(steps/2), steps/2) * offsetStep
+        return values
+
+    # generate values depending on the type of filter
+    if isinstance(source, paraview.simple.servermanager.filters.Clip):
+        # grab values from ui or generate defaults
+        values = generateOffsetValues()
+
+        # add sublayer and create the appropriate track
+        cs.add_sublayer(name, cinema_store.make_parameter(name, values.tolist()), parentLayer, name)
+        cs.assign_parameter_dependence("color" + name, name, values.tolist())
+        explorerDir[name] = pv_explorers.Clip(name, source)
+
+    elif isinstance(source, paraview.simple.servermanager.filters.Slice):
+        # grab values from ui or generate defaults
+        values = generateOffsetValues()
+
+        # add sublayer and create the appropriate track
+        cs.add_sublayer(name, cinema_store.make_parameter(name, values.tolist()), parentLayer, name)
+        cs.assign_parameter_dependence("color" + name, name, values.tolist())
+        explorerDir[name] = pv_explorers.Slice(name, source)
+
+    elif isinstance(source, paraview.simple.servermanager.filters.Contour):
+        # grab values from ui or generate defaults
+        vRange = source.Input.GetDataInformation().DataInformation.GetPointDataInformation().GetArrayInformation(0).GetComponentRange(0)
+        values = np.linspace(vRange[0], vRange[1], 5) # generate 5 contour values
+
+        # add sublayer and create the appropriate track
+        cs.add_sublayer(name, cinema_store.make_parameter(name, values.tolist()), parentLayer, name)
+        cs.assign_parameter_dependence("color" + name, name, values.tolist())
+        explorerDir[name] = pv_explorers.Contour(name, source)
 
 def make_cinema_store(levels, ocsfname, _phis=None, _thetas=None):
     """
@@ -192,8 +251,11 @@ def make_cinema_store(levels, ocsfname, _phis=None, _thetas=None):
             layername = "layer"+str(lcnt)
             snames = []
             for s in siblings:
-                asdict[s['name']] = s
-                snames.append(s['name'])
+                name = s['name']
+                asdict[name] = s
+                snames.append(name)
+                addFilterValueSublayer(name, layername, cs)
+
             param = cinema_store.make_parameter(layername, snames)
             if parent == '0':
                 cs.add_layer(layername, param)
@@ -254,7 +316,7 @@ def explore(cs, proxies):
     """
     Takes in the store, which contains only the list of parameters,
     """
-    import pv_explorers
+#    import pv_explorers
     import explorers
 
     print "PROXIES:"
@@ -284,9 +346,14 @@ def explore(cs, proxies):
     for x in proxies:
         name = x['name']
         for y in params:
+
+            if (y in explorerDir) and (name == y):
+                print "name in ExplorerDir: ", y, ", ", explorerDir[y]
+                tracks.append(explorerDir[y])
+
             if name in y and 'layer' in y:
                 print "N", name
-                print "X", x,
+                print "X", x
                 print "Y", y
 
                 #visibility of the layer
@@ -331,6 +398,7 @@ def explore(cs, proxies):
                 col = pv_explorers.Color("color"+name, cC, rep)
                 tracks.append(col)
                 cols.append(col)
+
     e = pv_explorers.ImageExplorer(cs, params,
                                    tracks,
                                    view_proxy)

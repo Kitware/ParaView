@@ -215,8 +215,9 @@ class Slice(explorers.Track):
         explorer.cinema_store.add_metadata({'type' : 'parametric-image-stack'})
 
     def execute(self, doc):
-        o = doc.descriptor[self.parameter]
-        self.slice.SliceOffsetValues=[o]
+        if self.parameter in doc.descriptor:
+            o = doc.descriptor[self.parameter]
+            self.slice.SliceOffsetValues=[o]
 
 class Contour(explorers.Track):
     """
@@ -234,8 +235,29 @@ class Contour(explorers.Track):
         explorer.cinema_store.add_metadata({'type': "parametric-image-stack"})
 
     def execute(self, doc):
-        o = doc.descriptor[self.parameter]
-        self.contour.SetPropertyWithName(self.control,[o])
+        if self.parameter in doc.descriptor:
+            o = doc.descriptor[self.parameter]
+            self.contour.SetPropertyWithName(self.control,[o])
+
+class Clip(explorers.Track):
+    """
+    A track that connects clip filters to a scalar valued parameter.
+    """
+
+    def __init__(self, argument, clip):
+        super(Clip, self).__init__()
+        self.argument = argument
+        self.clip = clip
+
+    def prepare(self, explorer):
+        super(Clip, self).prepare(explorer)
+        explorer.cinema_store.add_metadata({'type': 'parametric-image-stack'})
+
+    def execute(self, doc):
+        if self.argument in doc.descriptor:
+            o = doc.descriptor[self.argument]
+            self.clip.UseValueAsOffset = True
+            self.clip.Value = o
 
 class Templated(explorers.Track):
     """
