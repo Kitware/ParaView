@@ -204,12 +204,12 @@ bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(double tooltipPos[2],
                                                    std::string& tooltipText)
 {
   vtkSMSourceProxy* extractSource = this->ExtractInteractiveSelection;
-  unsigned int extractOutputPort = 
+  unsigned int extractOutputPort =
     extractSource->GetOutputPort((unsigned int)0)->GetPortIndex();
   vtkDataObject* dataObject = this->ConnectPVMoveSelectionToClient(extractSource, extractOutputPort);
- 
+
   bool compositeFound;
-  std::string compositeName; 
+  std::string compositeName;
   vtkDataSet* ds = this->FindDataSet(dataObject, compositeFound, compositeName);
   if (!ds || ds->GetNumberOfPoints() != 1)
     {
@@ -245,7 +245,7 @@ bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(double tooltipPos[2],
   // point coords
   double point[3];
   ds->GetPoint(0, point);
-  tooltipTextStream << std::endl 
+  tooltipTextStream << std::endl
     << "Coords: (" << point[0] << ", " << point[1] << ", " << point[2] << ")";
 
   // point attributes
@@ -279,13 +279,12 @@ bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(double tooltipPos[2],
 
   // tooltip position
   double pos[3] = { point[0], point[1], point[2] };
-  int* viewPos = this->PreviousView->GetRenderWindow()->GetPosition();
   vtkNew<vtkCoordinate> coordinate;
   coordinate->SetCoordinateSystemToWorld();
   coordinate->SetValue(point[0], point[1], point[2]);
   int* dispPos = coordinate->GetComputedDisplayValue(this->PreviousView->GetRenderer());
-  pos[0] = viewPos[0] + dispPos[0];
-  pos[1] = viewPos[1] - dispPos[1] + this->PreviousView->GetRenderWindow()->GetSize()[1];
+  pos[0] = dispPos[0];
+  pos[1] = dispPos[1];
 
   // output parameters
   tooltipPos[0] = pos[0];
