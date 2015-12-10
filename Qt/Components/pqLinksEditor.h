@@ -82,6 +82,7 @@ private slots:
   void currentProperty1Changed(QListWidgetItem* item);
   void currentProperty2Changed(QListWidgetItem* item);
 
+  void updateSelectedProxies();
   void updateEnabledState();
 
 private:

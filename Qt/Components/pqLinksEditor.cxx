@@ -435,7 +435,7 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
   QObject::connect(this->Ui->comboBox,
      SIGNAL(currentIndexChanged(const QString&)),
      this,
-     SLOT(updateEnabledState()), Qt::QueuedConnection);
+     SLOT(updateSelectedProxies()), Qt::QueuedConnection);
 
   pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();
 
@@ -639,6 +639,32 @@ void pqLinksEditor::currentProperty1Changed(QListWidgetItem*  item)
 void pqLinksEditor::currentProperty2Changed(QListWidgetItem*  item)
 {
   this->SelectedProperty2 = item->data(Qt::UserRole).toString();
+  this->updateEnabledState();
+}
+
+void pqLinksEditor::updateSelectedProxies()
+{
+  switch (this->linkType())
+    {
+    case (pqLinksModel::Proxy):
+      {
+      this->SelectedProxy1 = this->Proxy1Model->getProxy(this->Ui->ObjectTreeProxy1->selectionModel()->currentIndex()); 
+      this->SelectedProxy2 = this->Proxy2Model->getProxy(this->Ui->ObjectTreeProxy2->selectionModel()->currentIndex()); 
+      break;
+      }
+    case (pqLinksModel::Property):
+      {
+      this->SelectedProxy1 = this->Proxy1Model->getProxy(this->Ui->ObjectTreeProperty1->selectionModel()->currentIndex()); 
+      this->SelectedProxy2 = this->Proxy2Model->getProxy(this->Ui->ObjectTreeProperty2->selectionModel()->currentIndex()); 
+      break;
+      }
+    case (pqLinksModel::Selection):
+      {
+      this->SelectedProxy1 = this->Proxy1Model->getProxy(this->Ui->ObjectTreeSelection1->selectionModel()->currentIndex()); 
+      this->SelectedProxy2 = this->Proxy2Model->getProxy(this->Ui->ObjectTreeSelection2->selectionModel()->currentIndex()); 
+      break;
+      }
+    }
   this->updateEnabledState();
 }
 
