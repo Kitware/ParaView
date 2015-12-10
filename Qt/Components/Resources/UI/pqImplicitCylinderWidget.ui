@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>pqImplicitCylinderWidget</class>
+ <widget class="QWidget" name="pqImplicitCylinderWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>263</width>
+    <height>192</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout">
+   <item row="7" column="1">
+    <widget class="QPushButton" name="resetBounds">
+     <property name="text">
+      <string>Reset Bounds</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <spacer>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="5" column="0" colspan="2">
+    <layout class="QGridLayout">
+     <item row="0" column="2">
+      <widget class="pqLineEdit" name="centerY"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Radius</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="pqLineEdit" name="axisY"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="axisLabel">
+       <property name="text">
+        <string>Axis</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="pqLineEdit" name="axisX"/>
+     </item>
+     <item row="2" column="1">
+      <widget class="pqLineEdit" name="radius"/>
+     </item>
+     <item row="1" column="3">
+      <widget class="pqLineEdit" name="axisZ">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Center</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="pqLineEdit" name="centerX"/>
+     </item>
+     <item row="0" column="3">
+      <widget class="pqLineEdit" name="centerZ"/>
+     </item>
+    </layout>
+   </item>
+   <item row="0" column="0" colspan="2">
+    <widget class="QCheckBox" name="show3DWidget">
+     <property name="text">
+      <string>Show Cylinder</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0" colspan="2">
+    <layout class="QGridLayout">
+     <item row="0" column="0">
+      <widget class="QCheckBox" name="tubing">
+       <property name="text">
+        <string>Tubing</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QCheckBox" name="outlineTranslation">
+       <property name="text">
+        <string>Outline Translation</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QCheckBox" name="outsideBounds">
+       <property name="text">
+        <string>Outside Bounds</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QCheckBox" name="scaling">
+       <property name="text">
+        <string>Scaling</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>pqLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>show3DWidget</tabstop>
+  <tabstop>centerX</tabstop>
+  <tabstop>centerY</tabstop>
+  <tabstop>centerZ</tabstop>
+  <tabstop>axisX</tabstop>
+  <tabstop>axisY</tabstop>
+  <tabstop>axisZ</tabstop>
+  <tabstop>radius</tabstop>
+  <tabstop>tubing</tabstop>
+  <tabstop>outlineTranslation</tabstop>
+  <tabstop>outsideBounds</tabstop>
+  <tabstop>scaling</tabstop>
+  <tabstop>resetBounds</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>
