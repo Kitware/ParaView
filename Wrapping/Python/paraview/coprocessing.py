@@ -42,6 +42,7 @@ class CoProcessor(object):
         self.__LiveVisualizationFrequency = 1;
         self.__LiveVisualizationLink = None
         self.__CinemaTracksList = []
+        self.cinema_def = None
         pass
 
     def SetUpdateFrequencies(self, frequencies):
@@ -500,7 +501,7 @@ class CoProcessor(object):
         fs.add_metadata({'type':'parametric-image-stack'})
 
         def float_limiter(x):
-            #a shame, but needed to make sure python, java and (directory/file)name agree
+            #a shame, but needed to make sure python, javascript and (directory/file)name agree
             if isinstance(x, (float)):
                 #return '%6f' % x #arbitrarily chose 6 decimal places
                 return '%.6e' % x #arbitrarily chose 6 significant digits
@@ -609,9 +610,6 @@ class CoProcessor(object):
         """ called from catalyst at each timestep to add to the cinema "SPEC B" database """
         if not view.IsA("vtkSMRenderViewProxy") == True:
             return
-        #TODO: I am thinking it will go like this
-        #first time for the view - call pv_introspect to create the the store and cache that
-        #subsequently, recover from the cache and call explore to append
 
         import paraview.cinemaIO.cinema_store as CS
         import paraview.cinemaIO.explorers as explorers
@@ -619,10 +617,8 @@ class CoProcessor(object):
         import paraview.cinemaIO.pv_introspect as pv_introspect
         import paraview.simple as simple
 
-        pm = servermanager.vtkProcessModule.GetProcessModule()
-        pid = pm.GetPartitionId()
 
-        #load or create the cinema store for this view
+        #figure out where to put this store
         import os.path
         vfname = view.cpFileName
         vfname = vfname[0:vfname.rfind("_")] #strip _num.ext
@@ -631,10 +627,46 @@ class CoProcessor(object):
                              os.path.basename(vfname),
                              "info.json")
 
+
+        def float_limiter(x):
+            #a shame, but needed to make sure python, javascript and (directory/file)name agree
+            if isinstance(x, (float)):
+                return '%.6e' % x #arbitrarily chose 6 significant digits
+            else:
+                return x
+
+        #what time?
+        timestep = datadescription.GetTimeStep()
+        time = datadescription.GetTime()
+        view.ViewTime = time
+        formatted_time = float_limiter(time)
+
         simple.Render(view)
-        view.LockBounds = 1
-        p = pv_introspect.inspect()
-        l = pv_introspect.munch_tree(p)
-        cs = pv_introspect.make_cinema_store(l, fname)
-        pv_introspect.explore(cs, p, iSave=(pid==0))
+
+        #make sure depth rasters are consistent
+        view.LockBounds = 0
+
+        p = None
+        fs = None
+        if self.cinema_def == None:
+            #todo: need to make a cache for each view
+            #first time define the parameter tree
+            p = pv_introspect.inspect()
+            l = pv_introspect.munch_tree(p)
+            fs = pv_introspect.make_cinema_store(l, fname, forcetime=formatted_time)
+            self.cinema_def = [p,fs]
+        else:
+            #subsequently just add new timesteps to it
+            p = self.cinema_def[0]
+            fs = self.cinema_def[1]
+            tprop = fs.get_parameter('time')
+            tprop['values'].append(formatted_time)
+
+        #all nodes participate, but only root can writes out the files
+        pm = servermanager.vtkProcessModule.GetProcessModule()
+        pid = pm.GetPartitionId()
+
+        pv_introspect.explore(fs, p, iSave=(pid==0), currentTime={'time':formatted_time})
+        fs.save()
+
         view.LockBounds = 0

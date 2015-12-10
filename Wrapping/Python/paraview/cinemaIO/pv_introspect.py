@@ -168,7 +168,7 @@ def addFilterValueSublayer(name, parentLayer, cs):
         cs.assign_parameter_dependence("color" + name, name, values.tolist())
         explorerDir[name] = pv_explorers.Contour(name, source)
 
-def make_cinema_store(levels, ocsfname, _phis=None, _thetas=None):
+def make_cinema_store(levels, ocsfname, _phis=None, _thetas=None, forcetime=False):
     """
     Takes in the pipeline, structured as a tree, and makes a cinema store definition
     containing all the parameters we might will vary.
@@ -271,6 +271,8 @@ def make_cinema_store(levels, ocsfname, _phis=None, _thetas=None):
 
     fnp = ""
     times = paraview.simple.GetAnimationScene().TimeKeeper.TimestepValues
+    if forcetime:
+        times = [forcetime]
     if not times:
         pass
     else:
@@ -312,16 +314,12 @@ def testexplore(cs):
     e.explore()
 
 
-def explore(cs, proxies, iSave=True):
+def explore(cs, proxies, iSave=True, currentTime=None):
     """
     Takes in the store, which contains only the list of parameters,
     """
 #    import pv_explorers
     import explorers
-
-    print "PROXIES:"
-    for p in proxies:
-        print " ", p
 
     view_proxy = paraview.simple.GetActiveView()
     dist = paraview.simple.GetActiveCamera().GetDistance()
@@ -329,16 +327,20 @@ def explore(cs, proxies, iSave=True):
     #associate control points wlth parameters of the data store
     cam = pv_explorers.Camera([0,0,0], [0,1,0], dist, view_proxy)
 
-    cs.load()
+    try:
+        cs.load()
+    except AssertionError:
+        pass
     params = cs.parameter_list.keys()
-    print "PARAMS:"
-    for p in sorted(params):
-        print " ", p
 
     tracks = []
     tracks.append(cam)
 
     cols = []
+
+    ctime_float=None
+    if currentTime:
+        ctime_float = float(currentTime['time'])
 
     #hide all annotations
     view_proxy.OrientationAxesVisibility = 0
@@ -348,13 +350,13 @@ def explore(cs, proxies, iSave=True):
         for y in params:
 
             if (y in explorerDir) and (name == y):
-                print "name in ExplorerDir: ", y, ", ", explorerDir[y]
+                #print "name in ExplorerDir: ", y, ", ", explorerDir[y]
                 tracks.append(explorerDir[y])
 
             if name in y and 'layer' in y:
-                print "N", name
-                print "X", x
-                print "Y", y
+                #print "N", name
+                #print "X", x
+                #print "Y", y
 
                 #visibility of the layer
                 sp = paraview.simple.FindSource(name)
@@ -370,7 +372,9 @@ def explore(cs, proxies, iSave=True):
                 cC = pv_explorers.ColorList()
                 cC.AddDepth('depth')
                 cC.AddLuminance('luminance')
+                sp.UpdatePipeline(ctime_float)
                 cda = sp.GetCellDataInformation()
+
                 numVals = 0
                 for a in range(0, cda.GetNumberOfArrays()):
                     arr = cda.GetArray(a)
@@ -409,7 +413,7 @@ def explore(cs, proxies, iSave=True):
 
     times = paraview.simple.GetAnimationScene().TimeKeeper.TimestepValues
     if not times:
-        e.explore()
+        e.explore(currentTime)
     else:
         for t in times:
             view_proxy.ViewTime=t

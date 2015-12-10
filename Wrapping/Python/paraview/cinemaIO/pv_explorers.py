@@ -81,10 +81,13 @@ class ImageExplorer(explorers.Explorer):
         else:
             imageslice = None
             if self.CaptureLuminance:
-                rep = simple.GetRepresentation()
-                if rep != None:
-                    rep.DiffuseColor = [1,1,1]
-                    rep.ColorArrayName = None
+                try:
+                    rep = simple.GetRepresentation()
+                    if rep != None:
+                        rep.DiffuseColor = [1,1,1]
+                        rep.ColorArrayName = None
+                except ValueError:
+                    pass
                 image = self.view.CaptureWindow(1)
                 ext = image.GetExtent()
                 width = ext[1] - ext[0] + 1
