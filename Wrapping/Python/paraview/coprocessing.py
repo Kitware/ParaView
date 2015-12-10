@@ -343,7 +343,6 @@ class CoProcessor(object):
         if not isinstance(proxy, servermanager.Proxy):
             raise RuntimeError, "Invalid 'proxy' argument passed to RegisterCinemaTrack."
         self.__CinemaTracksList.append({"name":name, "proxy":proxy, "smproperty":smproperty, "valrange":valrange})
-
         self.UpdateFilterValues(name, proxy, valrange)
 
         return proxy
