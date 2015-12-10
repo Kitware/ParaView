@@ -449,7 +449,8 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
       {
       this->Ui->lineEdit->setText(model->getLinkName(idx));
 
-      if(model->getLinkType(idx) == pqLinksModel::Proxy)
+      if (model->getLinkType(idx) == pqLinksModel::Proxy ||
+          model->getLinkType(idx) == pqLinksModel::Camera)
         {
         this->Ui->comboBox->setCurrentIndex(0);
         }
