@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMChartSeriesListDomain.h"
 
+#include "vtkDataObject.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
@@ -69,25 +70,42 @@ void vtkSMChartSeriesListDomain::Update(vtkSMProperty*)
 
   for (int cc=0; dsa != NULL && cc < dsa->GetNumberOfArrays(); cc++)
     {
-    vtkPVArrayInformation* arrayInfo = dsa->GetArrayInformation(cc);
-    if (arrayInfo &&
-      (this->HidePartialArrays == false || arrayInfo->GetIsPartial() == 0))
+    this->PopulateArrayComponents(dsa->GetArrayInformation(cc), strings);
+    }
+
+  // Process point coordinates array
+  if (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+    {
+    this->PopulateArrayComponents(dataInfo->GetPointArrayInformation(), strings);
+    }
+  
+  this->SetStrings(strings);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMChartSeriesListDomain::PopulateArrayComponents(  
+  vtkPVArrayInformation* arrayInfo, std::vector<vtkStdString>& strings)
+{
+  if (arrayInfo &&
+    (this->HidePartialArrays == false || arrayInfo->GetIsPartial() == 0))
+    {
+    if (arrayInfo->GetNumberOfComponents() > 1)
       {
-      if (arrayInfo->GetNumberOfComponents() > 1)
+      for (int kk=0; kk <= arrayInfo->GetNumberOfComponents(); kk++)
         {
-        for (int kk=0; kk <= arrayInfo->GetNumberOfComponents(); kk++)
-          {
-          strings.push_back(vtkSMArrayListDomain::CreateMangledName(
-              arrayInfo, kk));
-          }
+        strings.push_back(vtkSMArrayListDomain::CreateMangledName(
+          arrayInfo, kk));
         }
-      else
+      }
+    else
+      {
+      const char* arrayName = arrayInfo->GetName();
+      if (arrayName)
         {
-        strings.push_back(arrayInfo->GetName());
+        strings.push_back(arrayName);
         }
       }
     }
-  this->SetStrings(strings);
 }
 
 //----------------------------------------------------------------------------

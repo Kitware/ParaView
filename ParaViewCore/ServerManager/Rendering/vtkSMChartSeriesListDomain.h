@@ -36,6 +36,7 @@
 #include "vtkSMStringListDomain.h"
 #include "vtkPVServerManagerRenderingModule.h" // needed for exports
 
+class vtkPVArrayInformation;
 class vtkPVDataInformation;
 
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMChartSeriesListDomain :
@@ -71,6 +72,9 @@ protected:
   vtkPVDataInformation* GetInputInformation();
 
   virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element);
+
+  virtual void PopulateArrayComponents(
+    vtkPVArrayInformation*, std::vector<vtkStdString>&);
 
   bool HidePartialArrays;
 private:
