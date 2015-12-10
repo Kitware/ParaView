@@ -39,17 +39,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDebug>
 
 // SM
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIdTypeVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMOrderedPropertyIterator.h"
+#include "vtkSMPropertyIterator.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLink.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMOrderedPropertyIterator.h"
-#include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyListDomain.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMIdTypeVectorProperty.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 
 // pqCore
@@ -669,6 +670,14 @@ void pqLinksEditor::updateEnabledState()
         {
         enabled = false;
         }
+      }
+    }
+  else if(this->linkType() == pqLinksModel::Selection)
+    {
+    if (!vtkSMSourceProxy::SafeDownCast(this->SelectedProxy1) || 
+        !vtkSMSourceProxy::SafeDownCast(this->SelectedProxy2))
+      {
+      enabled = false;
       }
     }
   this->Ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(enabled);
