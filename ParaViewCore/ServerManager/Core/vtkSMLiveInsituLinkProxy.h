@@ -66,6 +66,12 @@ public:
   // Overridden to handle server-notification messages.
   virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator);
 
+  // Description:
+  // Push updated states from the client to the server in aggregate (originally,
+  // when the simulation was paused, multiple partial updates were pushed,
+  // resulting in the connection between client and server to sever).
+  void PushUpdatedStates();
+
 protected:
   vtkSMLiveInsituLinkProxy();
   ~vtkSMLiveInsituLinkProxy();

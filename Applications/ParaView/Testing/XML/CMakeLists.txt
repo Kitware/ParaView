@@ -121,25 +121,29 @@ endif()
 # ----------------------------------------------------------------------
 if(PARAVIEW_ENABLE_CATALYST AND PARAVIEW_ENABLE_PYTHON)
   set (catalyst_live_tests
-    ${CMAKE_CURRENT_SOURCE_DIR}/CatalystLiveSetBreakpoint.xml)
+    CatalystLiveSetBreakpoint
+    CatalystLivePause)
   set (CATALYST_SIMULATION CatalystWaveletDriver.py)
-  set (INSITU_SCRIPT CatalystWaveletCoprocessing 222)
-  # Since this test is too complex to run in parallel.
-  set (CatalystLiveSetBreakpoint_FORCE_SERIAL TRUE)
+  set (INSITU_SCRIPT CatalystWaveletCoprocessing)
+  # Test-specific parameters
+  set (CatalystLiveSetBreakpoint_DURATION 222)
+  set (CatalystLivePause_DURATION 80)
 
   foreach (tname ${catalyst_live_tests})
+    # These tests are too complex to run in parallel.
+    set ("${tname}_FORCE_SERIAL" TRUE)
     add_pv_test("pv" "_DISABLE_C"
       COMMAND
       --script-ignore-output-errors --script $<TARGET_FILE:pvbatch> -sym
       ${CMAKE_CURRENT_SOURCE_DIR}/${CATALYST_SIMULATION}
-      ${INSITU_SCRIPT}
+      ${INSITU_SCRIPT} "${${tname}_DURATION}"
 
       --client ${CLIENT_EXECUTABLE}
       --enable-bt
       -dr
       --test-directory=${PARAVIEW_TEST_DIR}
       BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-      TEST_SCRIPTS ${tname}
+      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/${tname}.xml
       EXTRA_LABELS "CATALYST")
 
     add_pv_test(pvcs "_DISABLE_CS"
@@ -147,7 +151,7 @@ if(PARAVIEW_ENABLE_CATALYST AND PARAVIEW_ENABLE_PYTHON)
       --script-np 5 --script-ignore-output-errors
       --script $<TARGET_FILE:pvbatch> -sym
       ${CMAKE_CURRENT_SOURCE_DIR}/${CATALYST_SIMULATION}
-      ${INSITU_SCRIPT}
+      ${INSITU_SCRIPT} "${${tname}_DURATION}"
 
       --server $<TARGET_FILE:pvserver>
       --enable-bt
@@ -157,11 +161,10 @@ if(PARAVIEW_ENABLE_CATALYST AND PARAVIEW_ENABLE_PYTHON)
       -dr
       --test-directory=${PARAVIEW_TEST_DIR}
       BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-      TEST_SCRIPTS ${tname}
+      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/${tname}.xml
       EXTRA_LABELS "CATALYST")
   endforeach()
 endif()
-
 
 if (NOT PARAVIEW_ENABLE_XDMF3)
   # Presently, all these tests only work with Xdmf2 and when Xdmf3 is enabled,
