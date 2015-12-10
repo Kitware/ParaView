@@ -22,6 +22,51 @@
 
 vtkStandardNewMacro(vtkPointGaussianRepresentation)
 
+namespace
+{
+  std::vector<std::string> presetShaderStrings;
+
+  void InitializeShaderPresets()
+  {
+    presetShaderStrings.resize(vtkPointGaussianRepresentation::NUMBER_OF_PRESETS);
+    presetShaderStrings[vtkPointGaussianRepresentation::GAUSSIAN_BLUR] = "";
+    presetShaderStrings[vtkPointGaussianRepresentation::SPHERE] =
+      "//VTK::Color::Impl\n"
+      "float dist = dot(offsetVCVSOutput.xy,offsetVCVSOutput.xy);\n"
+      "if (dist > 1.0) {\n"
+      "  discard;\n"
+      "} else {\n"
+      "  float scale = (1.0 - dist);\n"
+      "  ambientColor *= scale;\n"
+      "  diffuseColor *= scale;\n"
+      "}\n";
+    presetShaderStrings[vtkPointGaussianRepresentation::BLACK_EDGED_CIRCLE] =
+      "//VTK::Color::Impl\n"
+      "float dist = dot(offsetVCVSOutput.xy,offsetVCVSOutput.xy);\n"
+      "if (dist > 1.0) {\n"
+      "  discard;\n"
+      "} else if (dist > 0.8) {\n"
+      "  ambientColor = vec3(0.0, 0.0, 0.0);\n"
+      "  diffuseColor = vec3(0.0, 0.0, 0.0);\n"
+      "}\n";
+    presetShaderStrings[vtkPointGaussianRepresentation::PLAIN_CIRCLE] =
+      "//VTK::Color::Impl\n"
+      "float dist = dot(offsetVCVSOutput.xy,offsetVCVSOutput.xy);\n"
+      "if (dist > 1.0) {\n"
+      "  discard;\n"
+      "};\n";
+    presetShaderStrings[vtkPointGaussianRepresentation::TRIANGLE] = "//VTK::Color::Impl\n";
+    presetShaderStrings[vtkPointGaussianRepresentation::SQUARE_OUTLINE] =
+      "//VTK::Color::Impl\n"
+      "if (abs(offsetVCVSOutput.x) > 2.2 || abs(offsetVCVSOutput.y) > 2.2) {\n"
+      "  discard;\n"
+      "}\n"
+      "if (abs(offsetVCVSOutput.x) < 1.5 && abs(offsetVCVSOutput.y) < 1.5) {\n"
+      "  discard;\n"
+      "}\n";
+  }
+}
+
 //----------------------------------------------------------------------------
 vtkPointGaussianRepresentation::vtkPointGaussianRepresentation()
 {
@@ -32,6 +77,7 @@ vtkPointGaussianRepresentation::vtkPointGaussianRepresentation()
   this->LastScaleArray = NULL;
   this->OpacityByArray = false;
   this->LastOpacityArray = NULL;
+  InitializeShaderPresets();
 }
 
 //----------------------------------------------------------------------------
@@ -241,6 +287,12 @@ void vtkPointGaussianRepresentation::SetLookupTable(vtkScalarsToColors* lut)
 void vtkPointGaussianRepresentation::SetCustomShader(const char* shaderString)
 {
   this->Mapper->SetSplatShaderCode(shaderString);
+}
+
+//----------------------------------------------------------------------------
+void vtkPointGaussianRepresentation::SelectShaderPreset(int preset)
+{
+  this->SetCustomShader(presetShaderStrings[preset].c_str());
 }
 
 //----------------------------------------------------------------------------

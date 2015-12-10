@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationComponentsModule.h" // for export macros
 #include "pqPropertyWidget.h"
 
+class vtkSMTransferFunctionProxy;
+
 /// A property widget for editing a transfer function. 
 ///
 /// To use this widget for a property add the 
@@ -51,9 +53,15 @@ public:
 
 private slots:
   void buttonClicked();
+  void minXChanged(double newMinX);
+  void maxXChanged(double newMaxX);
 
 private:
   vtkSMProperty* Property;
+  double xRange[2];
+
+  void propagateProxyPointsProperty(vtkSMTransferFunctionProxy* tfp);
+  void updateTransferFunctionRanges(vtkSMTransferFunctionProxy* tfp);
 };
 
 #endif // _pqTransferFunctionWidgetPropertyWidget_h

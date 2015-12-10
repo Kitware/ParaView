@@ -1,9 +1,28 @@
-#ifndef VTKPOINTGAUSSIANREPRESENTATION_H
-#define VTKPOINTGAUSSIANREPRESENTATION_H
+/*=========================================================================
+
+  Program:   ParaView
+  Module:    vtkPointGaussianRepresentation.h
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+// .NAME vtkPointGaussianRepresentation
+// .SECTION Description
+// Representation for showing point data as sprites, including gaussian
+// splats, spheres, or some custom shaded representation.
+
+#ifndef vtkPointGaussianRepresentation_h
+#define vtkPointGaussianRepresentation_h
 
 #include "vtkPVDataRepresentation.h"
-#include "vtkWeakPointer.h" // for weak pointer
-#include "vtkSmartPointer.h" // for smart pointer
+#include "vtkSmartPointer.h"                       // needed for smart pointer
+#include "vtkPVClientServerCoreRenderingModule.h"  // needed for exports
 
 class vtkActor;
 class vtkPointGaussianMapper;
@@ -11,7 +30,7 @@ class vtkScalarsToColors;
 class vtkPolyData;
 class vtkPiecewiseFunction;
 
-class vtkPointGaussianRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPointGaussianRepresentation : public vtkPVDataRepresentation
 {
 public:
   vtkTypeMacro(vtkPointGaussianRepresentation, vtkPVDataRepresentation)
@@ -87,6 +106,23 @@ public:
   virtual void SetSplatSize(double radius);
 
   // Description:
+  // An enum specifying some preset fragment shaders
+  enum ShaderPresets
+    {
+    GAUSSIAN_BLUR,           // This is the default
+    SPHERE,                  // Points shaded to look (something) like a sphere lit from the view direction
+    BLACK_EDGED_CIRCLE,      // Camera facing, flat circle, rimmed in black
+    PLAIN_CIRCLE,            // Same as above, but without the black edge
+    TRIANGLE,                // Camera facing, flat triangle
+    SQUARE_OUTLINE,          // Camera facing, flat square, with empty center
+    NUMBER_OF_PRESETS        // !!! THIS MUST ALWAYS BE THE LAST PRESET ENUM !!!
+    };
+
+  // Description:
+  // Allows to select one of several preset options for shading the points
+  void SelectShaderPreset(int preset);
+
+  // Description:
   // Sets the snippet of fragment shader code used to color the sprites.
   void SetCustomShader(const char* shaderString);
 
@@ -154,6 +190,10 @@ protected:
   char* LastOpacityArray;
 
   vtkSetStringMacro(LastOpacityArray);
+
+private:
+  vtkPointGaussianRepresentation(const vtkPointGaussianRepresentation&); // Not implemented
+  void operator=(const vtkPointGaussianRepresentation&); // Not implemented
 };
 
-#endif // VTKPOINTGAUSSIANREPRESENTATION_H
+#endif // vtkPointGaussianRepresentation_h
