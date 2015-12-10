@@ -9,6 +9,7 @@ from paraview import simple, servermanager
 from vtkPVVTKExtensionsCorePython import *
 import math
 
+import pdb
 # -----------------------------------------------------------------------------
 def IsInModulo(timestep, frequencyArray):
     """
@@ -643,6 +644,7 @@ class CoProcessor(object):
         view.LockBounds = 1
         p = pv_introspect.inspect()
         l = pv_introspect.munch_tree(p)
-        cs = pv_introspect.make_cinema_store(l, fname, self.__FilterValues)
+        pdb.set_trace()
+        cs = pv_introspect.make_cinema_store(l, fname, _filterValues = self.__FilterValues)
         pv_introspect.explore(cs, p)
         view.LockBounds = 0
