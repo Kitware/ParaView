@@ -43,7 +43,7 @@ class CoProcessor(object):
         self.__LiveVisualizationFrequency = 1;
         self.__LiveVisualizationLink = None
         self.__CinemaTracksList = []
-        self.__FilterValues = {}
+        self.__UserDefinedValues = {}
         pass
 
     def SetUpdateFrequencies(self, frequencies):
@@ -334,7 +334,7 @@ class CoProcessor(object):
         if (isinstance(proxy, simple.servermanager.filters.Slice) or
             isinstance(proxy, simple.servermanager.filters.Clip)  or
             isinstance(proxy, simple.servermanager.filters.Contour)):
-            self.__FilterValues[name] = values
+            self.__UserDefinedValues[name] = values
 
     def RegisterCinemaTrack(self, name, proxy, smproperty, valrange):
         """
@@ -344,6 +344,7 @@ class CoProcessor(object):
             raise RuntimeError, "Invalid 'proxy' argument passed to RegisterCinemaTrack."
         self.__CinemaTracksList.append({"name":name, "proxy":proxy, "smproperty":smproperty, "valrange":valrange})
 
+        pdb.set_trace()
         self.UpdateFilterValues(name, proxy, values)
 
         return proxy
@@ -640,11 +641,19 @@ class CoProcessor(object):
                              "cinema",
                              os.path.basename(vfname),
                              "info.json")
+
+        # add phi and theta to the userDefinedValues
+        co = view.cpCinemaOptions
+        if "phi" in co:
+            self.__UserDefinedValues["phi"] = co["phi"]
+        if "theta" in co:
+            self.__UserDefinedValues["theta"] = co["theta"]
+
         print fname
         view.LockBounds = 1
         p = pv_introspect.inspect()
         l = pv_introspect.munch_tree(p)
         pdb.set_trace()
-        cs = pv_introspect.make_cinema_store(l, fname, _filterValues = self.__FilterValues)
+        cs = pv_introspect.make_cinema_store(l, fname, _userDefinedValues = self.__UserDefinedValues)
         pv_introspect.explore(cs, p)
         view.LockBounds = 0
