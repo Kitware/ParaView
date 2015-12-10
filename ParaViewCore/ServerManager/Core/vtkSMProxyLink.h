@@ -51,6 +51,7 @@ public:
 
   // Description:
   // Get the number of proxies that are involved in this link.
+  unsigned int GetNumberOfLinkedObjects();
   unsigned int GetNumberOfLinkedProxies();
 
   // Description:
@@ -60,6 +61,7 @@ public:
   // Description:
   // Get the direction of a proxy involved in this link
   // (see vtkSMLink::UpdateDirections)
+  int GetLinkedObjectDirection(int index);
   int GetLinkedProxyDirection(int index);
   
   // Description:

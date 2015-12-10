@@ -77,6 +77,20 @@
     <string>Disregard this source/filter's time from animations</string>
    </property>
   </action>
+  <action name="actionPBLinkSelection">
+   <property name="text">
+    <string>Link with selection</string>
+   </property>
+   <property name="iconText">
+    <string>Link with selection</string>
+   </property>
+   <property name="toolTip">
+    <string>Link this source and current selected source as a selection link</string>
+   </property>
+   <property name="statusTip">
+    <string>Link this source and current selected source as a selection link</string>
+   </property>
+  </action>
   <action name="actionPBOpen">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
@@ -105,6 +119,7 @@
   <addaction name="actionPBPaste"/>
   <addaction name="actionPBCreateCustomFilter"/>
   <addaction name="actionPBChangeInput"/>
+  <addaction name="actionPBLinkSelection"/>
   <addaction name="actionPBIgnoreTime"/>
   <addaction name="actionPBDelete"/>
  </widget>

@@ -52,6 +52,7 @@ public:
 
   // Description:
   // Get the number of properties that are involved in this link.
+  unsigned int GetNumberOfLinkedObjects();
   unsigned int GetNumberOfLinkedProperties();
 
   // Description:
@@ -69,6 +70,7 @@ public:
   // Description:
   // Get the direction of a property involved in this link
   // (see vtkSMLink::UpdateDirections)
+  int GetLinkedObjectDirection(int index);
   int GetLinkedPropertyDirection(int index);
   
   // Description:

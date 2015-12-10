@@ -69,8 +69,16 @@ public:
   pqSelectionManager(QObject* parent=NULL);
   virtual ~pqSelectionManager();
 
-  /// Returns the currently selected source, if any.
+  /// Returns the first currently selected pqOutputPort, if any.
   pqOutputPort* getSelectedPort() const;
+
+  /// Return all currently selected pqOutputPort as a QSet, 
+  /// or an empty QSet if there aren't any
+  const QSet<pqOutputPort*>& getSelectedPorts() const;
+
+  /// Return true if there is at least one currently selected pqOutputPort
+  /// false otherwise
+  bool hasActiveSelection() const;
 
 signals:
   /// Fired when the selection changes. Argument is the pqOutputPort (if any)
@@ -78,9 +86,10 @@ signals:
   void selectionChanged(pqOutputPort*);
 
 public slots:
-  /// Clear all selections. Note that this does not clear
-  /// the server manager model selection
-  void clearSelection();
+  /// Clear selection on a pqOutputPort. 
+  /// Calling the method without arguments or with null
+  /// will clear all selection
+  void clearSelection(pqOutputPort* outputPort = NULL);
 
   /// Used to keep track of active render module
   void setActiveView(pqView*);
@@ -89,6 +98,14 @@ public slots:
   void select(pqOutputPort*);
 
 private slots:
+  /// Called when pqLinkModel create a link, 
+  /// to update the selection
+  void onLinkAdded(int linkType);
+
+  /// Called when pqLinkModel remove a link, 
+  /// to update the selection
+  void onLinkRemoved();
+
   /// Called when server manager item is being deleted.
   void onItemRemoved(pqServerManagerModelItem* item);
 

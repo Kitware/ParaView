@@ -1,35 +1,17 @@
 /*=========================================================================
 
-   Program: ParaView
-   Module:    pqSelectionManager.cxx
+  Program: ParaView
+  Module:    pqSelectionManager.cxx
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
-   All rights reserved.
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
-   ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-
-   See License_v1.2.txt for the full ParaView license.
-   A copy of this license can be obtained by contacting
-   Kitware Inc.
-   28 Corporate Drive
-   Clifton Park, NY 12065
-   USA
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
-CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+    This software is distributed WITHOUT ANY WARRANTY; without even
+    the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+    PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-
 #include "pqSelectionManager.h"
 
 #include <QtDebug>
@@ -43,6 +25,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 #include "pqTimeKeeper.h"
+#include "pqLinksModel.h"
 #include "vtkAlgorithm.h"
 #include "vtkCollection.h"
 #include "vtkIdTypeArray.h"
@@ -59,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkSMSelectionLink.h"
 
 //-----------------------------------------------------------------------------
 class pqSelectionManagerImplementation
@@ -68,40 +52,17 @@ public:
     {
     }
 
-  ~pqSelectionManagerImplementation() 
+  ~pqSelectionManagerImplementation()
     {
-    this->clearSelection();
     }
 
-  void clearSelection()
-    {
-    if (this->SelectedPort)
-      {
-      vtkSMSourceProxy* src = vtkSMSourceProxy::SafeDownCast(
-        this->SelectedPort->getSource()->getProxy());
-      src->CleanSelectionInputs(this->SelectedPort->getPortNumber());
-      }
-    this->SelectedPort = 0;
-    }
-
-  vtkSMProxy* getSelectionSourceProxy()
-    {
-    if (this->SelectedPort)
-      {
-      vtkSMSourceProxy* src = vtkSMSourceProxy::SafeDownCast(
-        this->SelectedPort->getSource()->getProxy());
-      return src->GetSelectionInput(this->SelectedPort->getPortNumber());
-      }
-    return 0;
-    }
-
-  QPointer<pqOutputPort> SelectedPort;
+  QSet<pqOutputPort*> SelectedPorts;
   QPointer<pqView> ActiveView;
 };
 
 //-----------------------------------------------------------------------------
 pqSelectionManager::pqSelectionManager(QObject* _parent/*=null*/) :
-  QObject(_parent)
+QObject(_parent)
 {
   this->Implementation = new pqSelectionManagerImplementation;
   pqApplicationCore* core = pqApplicationCore::instance();
@@ -109,26 +70,30 @@ pqSelectionManager::pqSelectionManager(QObject* _parent/*=null*/) :
   pqServerManagerModel* model = core->getServerManagerModel();
   // We need to clear selection when a source is removed. The source
   // that was deleted might have been selected.
-  QObject::connect(
-    model, SIGNAL(itemRemoved(pqServerManagerModelItem*)),
-    this,  SLOT(onItemRemoved(pqServerManagerModelItem*)));
+  QObject::connect(model, SIGNAL(itemRemoved(pqServerManagerModelItem*)),
+                   this, SLOT(onItemRemoved(pqServerManagerModelItem*)));
 
   // When server disconnects we must clean up the selection proxies
   // explicitly. This is needed since the internal selection proxies
   // aren't registered with the proxy manager.
-  QObject::connect(
-    model, SIGNAL(aboutToRemoveServer(pqServer*)),
-    this, SLOT(clearSelection()));
-  QObject::connect(
-    model, SIGNAL(serverRemoved(pqServer*)),
-    this, SLOT(clearSelection()));
+  QObject::connect(model, SIGNAL(aboutToRemoveServer(pqServer*)),
+                   this, SLOT(clearSelection()));
+  QObject::connect(model, SIGNAL(serverRemoved(pqServer*)),
+                   this, SLOT(clearSelection()));
 
   pqApplicationCore::instance()->registerManager("SelectionManager", this);
 
-  QObject::connect(
-    &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
-    this, SLOT(setActiveView(pqView*)));
+  QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
+                   this, SLOT(setActiveView(pqView*)));
   this->setActiveView(pqActiveObjects::instance().activeView());
+
+  // When a selection link is added or removed, we need to update the pqSelectionManager
+  // So it keed the SelectedPorts sets up to date and render any selection that
+  // may have been updated
+  QObject::connect(pqApplicationCore::instance()->getLinksModel(),
+                   SIGNAL(linkAdded(int)), this, SLOT(onLinkAdded(int)));
+  QObject::connect(pqApplicationCore::instance()->getLinksModel(),
+                   SIGNAL(linkRemoved()), this, SLOT(onLinkRemoved()));
 }
 
 //-----------------------------------------------------------------------------
@@ -149,50 +114,111 @@ void pqSelectionManager::setActiveView(pqView* view)
   this->Implementation->ActiveView = view;
   if (view)
     {
-    QObject::connect(view, SIGNAL(selected(pqOutputPort*)), 
-      this, SLOT(select(pqOutputPort*)));
+    QObject::connect(view, SIGNAL(selected(pqOutputPort*)),
+                     this, SLOT(select(pqOutputPort*)));
     }
 }
 
 //-----------------------------------------------------------------------------
 void pqSelectionManager::onItemRemoved(pqServerManagerModelItem* item)
 {
-  if (this->Implementation->SelectedPort && 
-    item == this->Implementation->SelectedPort->getSource())
+  // return if removed item is not a pqPipelineSource
+  if (qobject_cast<pqPipelineSource*>(item) == NULL)
     {
-    // clear selection if the selected source is being deleted.
-    this->clearSelection();
+    return;
+    }
+
+  // Search for the source output ports in the SelectedPorts set
+  foreach (pqOutputPort* port, this->Implementation->SelectedPorts)
+    {
+    if (port->getSource() == item)
+      {
+      // Remove it from set
+      this->Implementation->SelectedPorts.remove(port);
+      return;
+      }
     }
 }
 
 //-----------------------------------------------------------------------------
-void pqSelectionManager::clearSelection()
+void pqSelectionManager::clearSelection(pqOutputPort* outputPort)
 {
-  // Actual cleaning is done by internal method,
-  // this method additionally triggers renders and fires selection changed
-  // event.
-  pqOutputPort* opport = this->getSelectedPort();
-  this->Implementation->clearSelection();
-  if (opport)
+  if (outputPort == NULL)
     {
-    opport->renderAllViews(false);
-    this->Implementation->SelectedPort = 0;
-    }
+    // Clear all selection
+    if (this->Implementation->SelectedPorts.count() > 0)
+      {
+      vtkSMSourceProxy* src =
+        (*this->Implementation->SelectedPorts.begin())->getSourceProxy();
+      src->CleanSelectionInputs(
+        (*this->Implementation->SelectedPorts.begin())->getPortNumber());
 
-  emit this->selectionChanged(static_cast<pqOutputPort*>(0));
+      // Render all cleaned output ports
+      foreach (pqOutputPort* opport, this->Implementation->SelectedPorts)
+        {
+        if (opport)
+          {
+          opport->renderAllViews(false);
+          }
+        }
+
+      // Clear the selectedPorts set
+      this->Implementation->SelectedPorts.clear();
+
+      // inform selection have changed
+      emit this->selectionChanged(static_cast<pqOutputPort*>(0));
+      }
+    }
+  else
+    {
+    // Clear selection of one output port
+    vtkSMSourceProxy* src = outputPort->getSourceProxy();
+    src->CleanSelectionInputs(outputPort->getPortNumber());
+
+    // Remove output port from set
+    this->Implementation->SelectedPorts.remove(outputPort);
+
+    // Render cleaned output port
+    outputPort->renderAllViews(false);
+
+    // Inform selection have been changed
+    emit this->selectionChanged(outputPort);
+    }
 }
 
 //-----------------------------------------------------------------------------
 pqOutputPort* pqSelectionManager::getSelectedPort() const
 {
-  return this->Implementation->SelectedPort;
+  if (this->hasActiveSelection())
+    {
+    return *this->Implementation->SelectedPorts.begin();
+    }
+  else
+    {
+    return NULL;
+    }
+}
+
+//-----------------------------------------------------------------------------
+const QSet<pqOutputPort*>& pqSelectionManager::getSelectedPorts() const
+{
+  return this->Implementation->SelectedPorts;
+}
+
+//-----------------------------------------------------------------------------
+bool pqSelectionManager::hasActiveSelection() const
+{
+  return this->Implementation->SelectedPorts.count() != 0;
 }
 
 //-----------------------------------------------------------------------------
 void pqSelectionManager::select(pqOutputPort* selectedPort)
 {
   // The active view is reporting that it made a selection, we update our state.
-  if (this->Implementation->SelectedPort != selectedPort)
+
+  // If current selected output ports does NOT contain new selected port,
+  // we need to clear it.
+  if (!this->Implementation->SelectedPorts.contains(selectedPort))
     {
     // Clear previous selection.
     // this->clearSelection() fires selectionChanged() signal. We don't want to
@@ -201,15 +227,127 @@ void pqSelectionManager::select(pqOutputPort* selectedPort)
     this->clearSelection();
     this->blockSignals(oldVal);
     }
-  this->Implementation->SelectedPort = selectedPort;
-  if (selectedPort)
+  // If not, we need to render all selected output ports in case a link have been removed
+  // hence some selection cleared without our knowing
+  else
     {
+    foreach (pqOutputPort* port, this->Implementation->SelectedPorts)
+      {
+      port->renderAllViews(false);
+      }
+    }
+
+  // Cleanup the set, before filling it again
+  this->Implementation->SelectedPorts.clear();
+
+  if (selectedPort != NULL)
+    {
+
+    // Insert the selected port and render it
+    this->Implementation->SelectedPorts.insert(selectedPort);
     selectedPort->renderAllViews(false);
+
+    // Recover singleton
+    pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();
+    pqServerManagerModel* psmm = pqApplicationCore::instance()->getServerManagerModel();
+
+    // Recover links using selected port proxy as an input proxy in the link collection
+    vtkNew<vtkCollection> selectionLinks;
+    vtkSMSourceProxy* selectedProxy = selectedPort->getSourceProxy();
+    model->FindLinksFromProxy(selectedProxy, vtkSMLink::INPUT, selectionLinks.Get());
+
+    // insert the proxy in the checked proxy set
+    QSet<vtkSMProxy*> checkedInputProxy;
+    checkedInputProxy.insert(selectedProxy);
+
+    // For each found selection link
+    for (int i = 0; i < selectionLinks->GetNumberOfItems(); i++)
+      {
+      // check it is a selection link
+      vtkSMSelectionLink* selectionLink = vtkSMSelectionLink::SafeDownCast(
+        selectionLinks->GetItemAsObject(i));
+      if (selectionLink != NULL)
+        {
+        for (unsigned int j = 0; j < selectionLink->GetNumberOfLinkedObjects(); j++)
+          {
+          // Find output proxy in the selection link
+          if (selectionLink->GetLinkedObjectDirection(j) == vtkSMLink::OUTPUT)
+            {
+            vtkSMProxy* proxy = selectionLink->GetLinkedProxy(j);
+
+            // if the output proxy as not been checked
+            // look for links containing this proxy as an input
+            // and add the result to the link collection
+            if (!checkedInputProxy.contains(proxy))
+              {
+              model->FindLinksFromProxy(proxy, vtkSMLink::INPUT, selectionLinks.Get());
+              checkedInputProxy.insert(proxy);
+              }
+
+            // Find the source associated to the output proxy
+            pqPipelineSource* linkedSource = psmm->findItem<pqPipelineSource*>(proxy);
+
+            // Check it is valid
+            if (linkedSource != NULL &&
+              linkedSource->getNumberOfOutputPorts() > selectedPort->getPortNumber())
+              {
+              // Recover the corresponding outputport
+              pqOutputPort* linkedPort = linkedSource->getOutputPort(
+                selectedPort->getPortNumber());
+
+              // Render it
+              linkedPort->renderAllViews(false);
+
+              //Insert it
+              this->Implementation->SelectedPorts.insert(linkedPort);
+              }
+            }
+          }
+        }
+      }
 
     // update the servermanagermodel selection so that the pipeline browser
     // knows which source was selected.
     pqActiveObjects::instance().setActivePort(selectedPort);
     }
 
+  // Inform about the selection
   emit this->selectionChanged(selectedPort);
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionManager::onLinkAdded(int linkType)
+{
+  // Check it is a selection link
+  if (linkType == pqLinksModel::Selection)
+    {
+    // Reupdate current selection in case it is concerned by the link
+    this->select(this->getSelectedPort());
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionManager::onLinkRemoved()
+{
+  // When removing a link, the set of selected port became invalid
+  // We have to look for a potential selection in the set of selected port
+  foreach (pqOutputPort* port, this->Implementation->SelectedPorts)
+    {
+    vtkSMSourceProxy* proxy = port->getSourceProxy();
+    for (unsigned int i = 0; i < proxy->GetNumberOfOutputPorts(); i++)
+      {
+      // if the port contains a selection
+      if (port->getSourceProxy()->GetSelectionInput(i) != NULL)
+        {
+        // Reupdate current selection with the found selected port
+        this->select(port);
+        return;
+        }
+      // If not, render it in case it has just been cleaned
+      else
+        {
+        port->renderAllViews(false);
+        }
+      }
+    }
 }

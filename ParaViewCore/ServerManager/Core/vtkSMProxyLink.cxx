@@ -142,9 +142,17 @@ void vtkSMProxyLink::RemoveLinkedProxy(vtkSMProxy* proxy)
 }
 
 //---------------------------------------------------------------------------
-unsigned int vtkSMProxyLink::GetNumberOfLinkedProxies()
+unsigned int vtkSMProxyLink::GetNumberOfLinkedObjects()
 {
   return static_cast<unsigned int>(this->Internals->LinkedProxies.size());
+}
+
+//-----------------------------------------------------------------------------
+unsigned int vtkSMProxyLink::GetNumberOfLinkedProxies()
+{
+  vtkWarningMacro("GetNumberOfLinkedProxies() is deprecated, "
+                  "please use GetNumberOfLinkedObjects() instead");
+  return this->GetNumberOfLinkedObjects();
 }
 
 //---------------------------------------------------------------------------
@@ -166,7 +174,7 @@ vtkSMProxy* vtkSMProxyLink::GetLinkedProxy(int index)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMProxyLink::GetLinkedProxyDirection(int index)
+int vtkSMProxyLink::GetLinkedObjectDirection(int index)
 {
   vtkSMProxyLinkInternals::LinkedProxiesType::iterator iter =
     this->Internals->LinkedProxies.begin();
@@ -181,6 +189,14 @@ int vtkSMProxyLink::GetLinkedProxyDirection(int index)
     return NONE;
     }
   return iter->UpdateDirection;
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMProxyLink::GetLinkedProxyDirection(int index)
+{
+  vtkWarningMacro("GetLinkedProxyDirection(int index) is deprecated, "
+                  "please use GetLinkedObjectDirection(int index) instead");
+  return this->GetLinkedObjectDirection(index);
 }
 
 //---------------------------------------------------------------------------

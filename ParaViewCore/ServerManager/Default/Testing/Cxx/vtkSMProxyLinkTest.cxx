@@ -36,17 +36,17 @@ void vtkSMProxyLinkTest::AddLinkedProxy()
   QCOMPARE(vtkSMPropertyHelper(sphere2, "Radius").GetAsDouble(), 0.5);
 
   vtkSMProxyLink *link = vtkSMProxyLink::New();
-  QCOMPARE(link->GetNumberOfLinkedProxies(), 0U);
+  QCOMPARE(link->GetNumberOfLinkedObjects(), 0U);
 
   link->AddLinkedProxy(sphere1, vtkSMLink::INPUT);
-  QCOMPARE(link->GetNumberOfLinkedProxies(), 1U);
+  QCOMPARE(link->GetNumberOfLinkedObjects(), 1U);
   QVERIFY(link->GetLinkedProxy(0) == sphere1);
-  QVERIFY(link->GetLinkedProxyDirection(0) == vtkSMLink::INPUT);
+  QVERIFY(link->GetLinkedObjectDirection(0) == vtkSMLink::INPUT);
 
   link->AddLinkedProxy(sphere2, vtkSMLink::OUTPUT);
-  QCOMPARE(link->GetNumberOfLinkedProxies(), 2U);
+  QCOMPARE(link->GetNumberOfLinkedObjects(), 2U);
   QVERIFY(link->GetLinkedProxy(1) == sphere2);
-  QVERIFY(link->GetLinkedProxyDirection(1) == vtkSMLink::OUTPUT);
+  QVERIFY(link->GetLinkedObjectDirection(1) == vtkSMLink::OUTPUT);
 
   vtkSMPropertyHelper(sphere1, "Radius").Set(1.3);
   QCOMPARE(vtkSMPropertyHelper(sphere1, "Radius").GetAsDouble(), 1.3);

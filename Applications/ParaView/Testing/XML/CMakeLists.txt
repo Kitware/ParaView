@@ -278,6 +278,11 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/SpreadSheet2.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SPTimeseries.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SpyPlotHistoryReader.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLinkBasic.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLinkInitial.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLinkMultiple.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLinkRemove.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLinkReaction.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/StreamTracerSurface.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/StockColors.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/StreamTracerUpdates.xml
@@ -464,6 +469,11 @@ set(CheckSelectedBlocks_DISABLE_CRS TRUE)
 set(SelectionModifiersCells_DISABLE_CRS TRUE)
 set(SelectionModifiersBlocks_DISABLE_CRS TRUE)
 set(SelectionModifiersPoints_DISABLE_CRS TRUE)
+set(SelectionLinkBasic_DISABLE_CRS TRUE)
+set(SelectionLinkInitial_DISABLE_CRS TRUE)
+set(SelectionLinkMultiple_DISABLE_CRS TRUE)
+set(SelectionLinkRemove_DISABLE_CRS TRUE)
+set(SelectionLinkReaction_DISABLE_CRS TRUE)
 
 # These tests cannot be run using ctest -j since they are affected by focus
 # changed events.
@@ -557,6 +567,14 @@ IF (PARAVIEW_USE_MPI)
   # Hence disable them.
   set (FunctionalBagPlots_DISABLE_CS TRUE)
   set (FunctionalBagPlots_DISABLE_CRS TRUE)
+
+  # Selection link may highlight incorrect ID in parallel,
+  # hence disable them.
+  set(SelectionLinkBasic_DISABLE_CS TRUE)
+  set(SelectionLinkInitial_DISABLE_CS TRUE)
+  set(SelectionLinkMultiple_DISABLE_CS TRUE)
+  set(SelectionLinkRemove_DISABLE_CS TRUE)
+  set(SelectionLinkReaction_DISABLE_CS TRUE)
 ENDIF ()
 
 # Composite Surface Selection is currently broken in everything but bultin

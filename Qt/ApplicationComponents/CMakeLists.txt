@@ -152,6 +152,8 @@ set (Module_SRCS
   pqInputDataTypeDecorator.h
   pqLightsEditor.cxx
   pqLightsEditor.h
+  pqLinkSelectionReaction.cxx
+  pqLinkSelectionReaction.h
   pqListPropertyWidget.cxx
   pqListPropertyWidget.h
   pqLoadDataReaction.cxx
@@ -344,6 +346,7 @@ set (Module_MOC_HDRS
   pqImageCompressorWidget.h
   pqInputDataTypeDecorator.h
   pqLightsEditor.h
+  pqLinkSelectionReaction.h
   pqListPropertyWidget.h
   pqLoadDataReaction.h
   pqLoadPaletteReaction.h

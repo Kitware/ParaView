@@ -36,19 +36,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt
 #include <QPushButton>
+#include <QDebug>
 
 // SM
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIdTypeVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMOrderedPropertyIterator.h"
+#include "vtkSMPropertyIterator.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLink.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMOrderedPropertyIterator.h"
-#include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyListDomain.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMIdTypeVectorProperty.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 
 // pqCore
@@ -378,6 +380,13 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
   this->Ui->ObjectTreeProperty1->setModel(this->Proxy1Model);
   this->Ui->ObjectTreeProperty2->setModel(this->Proxy2Model);
 
+  this->Ui->ObjectTreeSelection1->setModel(this->Proxy1Model);
+  this->Ui->ObjectTreeSelection2->setModel(this->Proxy2Model);
+
+  // Hiding views items
+  this->Ui->ObjectTreeSelection1->setRowHidden(0, QModelIndex(), true);
+  this->Ui->ObjectTreeSelection2->setRowHidden(0, QModelIndex(), true);
+
   QObject::connect(this->Ui->ObjectTreeProxy1->selectionModel(),
      SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
      this,
@@ -388,12 +397,22 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
      this,
      SLOT(currentProxy1Changed(const QModelIndex&, const QModelIndex&)));
 
+  QObject::connect(this->Ui->ObjectTreeSelection1->selectionModel(),
+     SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
+     this,
+     SLOT(currentProxy1Changed(const QModelIndex&, const QModelIndex&)));
+
   QObject::connect(this->Ui->ObjectTreeProxy2->selectionModel(),
      SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
      this,
      SLOT(currentProxy2Changed(const QModelIndex&, const QModelIndex&)));
 
   QObject::connect(this->Ui->ObjectTreeProperty2->selectionModel(),
+     SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
+     this,
+     SLOT(currentProxy2Changed(const QModelIndex&, const QModelIndex&)));
+
+  QObject::connect(this->Ui->ObjectTreeSelection2->selectionModel(),
      SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
      this,
      SLOT(currentProxy2Changed(const QModelIndex&, const QModelIndex&)));
@@ -416,7 +435,7 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
   QObject::connect(this->Ui->comboBox,
      SIGNAL(currentIndexChanged(const QString&)),
      this,
-     SLOT(updateEnabledState()), Qt::QueuedConnection);
+     SLOT(updateSelectedProxies()), Qt::QueuedConnection);
 
   pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();
 
@@ -431,13 +450,22 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
       {
       this->Ui->lineEdit->setText(model->getLinkName(idx));
 
-      if(model->getLinkType(idx) == pqLinksModel::Property)
+      if (model->getLinkType(idx) == pqLinksModel::Proxy ||
+          model->getLinkType(idx) == pqLinksModel::Camera)
+        {
+        this->Ui->comboBox->setCurrentIndex(0);
+        }
+      else if (model->getLinkType(idx) == pqLinksModel::Property)
         {
         this->Ui->comboBox->setCurrentIndex(1);
         }
+      else if (model->getLinkType(idx) == pqLinksModel::Selection)
+        {
+        this->Ui->comboBox->setCurrentIndex(2);
+        }
       else
         {
-        this->Ui->comboBox->setCurrentIndex(0);
+        qDebug()<<"Unknow Link type:"<<model->getLinkType(idx)<<endl;
         }
 
       vtkSMProxy* inputProxy = model->getProxy1(idx);
@@ -524,8 +552,18 @@ QString pqLinksEditor::linkName()
 
 pqLinksModel::ItemType pqLinksEditor::linkType()
 {
-  return this->Ui->comboBox->currentIndex() == 0 ?
-    pqLinksModel::Proxy : pqLinksModel::Property ;
+  if (this->Ui->comboBox->currentIndex() == 0)
+    {
+    return pqLinksModel::Proxy;
+    }
+  else if (this->Ui->comboBox->currentIndex() == 1)
+    {
+    return pqLinksModel::Property;
+    }
+  else
+    {
+    return pqLinksModel::Selection;
+    }
 }
 
 vtkSMProxy* pqLinksEditor::selectedProxy1()
@@ -604,6 +642,32 @@ void pqLinksEditor::currentProperty2Changed(QListWidgetItem*  item)
   this->updateEnabledState();
 }
 
+void pqLinksEditor::updateSelectedProxies()
+{
+  switch (this->linkType())
+    {
+    case (pqLinksModel::Proxy):
+      {
+      this->SelectedProxy1 = this->Proxy1Model->getProxy(this->Ui->ObjectTreeProxy1->selectionModel()->currentIndex()); 
+      this->SelectedProxy2 = this->Proxy2Model->getProxy(this->Ui->ObjectTreeProxy2->selectionModel()->currentIndex()); 
+      break;
+      }
+    case (pqLinksModel::Property):
+      {
+      this->SelectedProxy1 = this->Proxy1Model->getProxy(this->Ui->ObjectTreeProperty1->selectionModel()->currentIndex()); 
+      this->SelectedProxy2 = this->Proxy2Model->getProxy(this->Ui->ObjectTreeProperty2->selectionModel()->currentIndex()); 
+      break;
+      }
+    case (pqLinksModel::Selection):
+      {
+      this->SelectedProxy1 = this->Proxy1Model->getProxy(this->Ui->ObjectTreeSelection1->selectionModel()->currentIndex()); 
+      this->SelectedProxy2 = this->Proxy2Model->getProxy(this->Ui->ObjectTreeSelection2->selectionModel()->currentIndex()); 
+      break;
+      }
+    }
+  this->updateEnabledState();
+}
+
 void pqLinksEditor::updateEnabledState()
 {
   bool enabled = true;
@@ -632,6 +696,14 @@ void pqLinksEditor::updateEnabledState()
         {
         enabled = false;
         }
+      }
+    }
+  else if(this->linkType() == pqLinksModel::Selection)
+    {
+    if (!vtkSMSourceProxy::SafeDownCast(this->SelectedProxy1) || 
+        !vtkSMSourceProxy::SafeDownCast(this->SelectedProxy2))
+      {
+      enabled = false;
       }
     }
   this->Ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(enabled);
