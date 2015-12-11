@@ -622,6 +622,12 @@ public:
   void StopCaptureValues();
 
   // Description:
+  // Tells views that it should draw the lighting contributions to the
+  // framebuffer.
+  void StartCaptureLuminance();
+  void StopCaptureLuminance();
+
+  // Description:
   // Access to the Z buffer.
   void CaptureZBuffer();
   vtkFloatArray * GetCapturedZBuffer();

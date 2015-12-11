@@ -84,6 +84,7 @@
 #include "vtkTrivialProducer.h"
 #ifdef VTKGL2
 #include "vtkValuePass.h"
+#include "vtkLightingMapPass.h"
 #else
 #include "vtkValuePasses.h"
 #endif
@@ -111,6 +112,7 @@ class vtkPVRenderView::vtkInternals
 public:
 #ifdef VTKGL2
   vtkNew<vtkValuePass> ValuePasses;
+  vtkNew<vtkLightingMapPass> LightingMapPass;
 #else
   vtkNew<vtkValuePasses> ValuePasses;
 #endif
@@ -2641,6 +2643,33 @@ void vtkPVRenderView::StartCaptureValues()
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::StopCaptureValues()
+{
+  this->Internals->IsInCapture = false;
+  this->SynchronizedRenderers->SetRenderPass(this->Internals->SavedRenderPass);
+  this->Internals->SavedRenderPass = NULL;
+  this->SetOrientationAxesVisibility(this->Internals->SavedOrientationState);
+  this->SetShowAnnotation(this->Internals->SavedAnnotationState);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::StartCaptureLuminance()
+{
+  if (not this->Internals->IsInCapture)
+    {
+    this->Internals->SavedRenderPass = this->SynchronizedRenderers->GetRenderPass();
+    this->Internals->SavedOrientationState = (this->OrientationWidget->GetEnabled() != 0);
+    this->Internals->SavedAnnotationState = this->ShowAnnotation;
+    this->SetOrientationAxesVisibility(false);
+    this->SetShowAnnotation(false);
+    this->Internals->IsInCapture = true;
+    }
+
+  this->SynchronizedRenderers->SetRenderPass(
+      this->Internals->LightingMapPass.GetPointer());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::StopCaptureLuminance()
 {
   this->Internals->IsInCapture = false;
   this->SynchronizedRenderers->SetRenderPass(this->Internals->SavedRenderPass);
