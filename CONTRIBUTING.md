@@ -36,6 +36,10 @@ for additional information.
         $ git add file1 file2 file3
         $ git commit
 
+    Commit messages must be thorough and informative so that
+    reviewers will have a good understanding of why the change is
+    needed before looking at the code.
+
     For more information see: [Create a Topic][]
 
 6.  Push commits in your topic branch to your fork in GitLab:

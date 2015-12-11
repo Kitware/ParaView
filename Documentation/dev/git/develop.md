@@ -117,6 +117,15 @@ A reader should have a general idea of the feature or fix to be developed given 
     * To add data follow [these instructions](https://gitlab.kitware.com/vtk/vtk/blob/master/Documentation/dev/git/data.md),
       from VTK.
 
+    Commit messages must contain a brief description as the first line
+    and a more detailed description of what the commit contains. If
+    the commit contains a new feature, the detailed message must
+    describe the new feature and why it is needed. If the commit
+    contains a bug fix, the detailed message must describe the bug
+    behavior, its underlying cause, and the approach to fix it. If the
+    bug is described in the bug tracker, the commit message must
+    contain a reference to the bug number.
+
 Share a Topic
 -------------
 
