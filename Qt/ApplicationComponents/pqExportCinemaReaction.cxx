@@ -108,10 +108,16 @@ void pqExportCinemaReaction::exportActiveView()
 
     std::string script;
     script += "import paraview\n";
-    script += "import paraview.simple\n";
-    script += "import paraview.cinemaIO.cinema_store\n";
-    script += "import paraview.cinemaIO.pv_introspect as pvi\n";
-    script += "pvi.record(csname=\"";
+    script += "ready=True\n";
+    script += "try:\n";
+    script += "    import paraview.simple\n";
+    script += "    import paraview.cinemaIO.cinema_store\n";
+    script += "    import paraview.cinemaIO.pv_introspect as pvi\n";
+    script += "except ImportError:\n";
+    script += "    paraview.print_error('Error: Cannot import cinema or a dependency')\n";
+    script += "    ready=False\n";
+    script += "if ready:\n";
+    script += "    pvi.record(csname=\"";
     script += path.c_str();
     script += "\")\n";
 
