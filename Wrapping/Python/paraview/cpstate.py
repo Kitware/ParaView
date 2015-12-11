@@ -121,7 +121,7 @@ class ContourAccessor(smtrace.RealProxyAccessor):
         return trace.raw_data()
 
 # -----------------------------------------------------------------------------
-class ClipAccessor(smtrace.RealProxyAccessor)
+class ClipAccessor(smtrace.RealProxyAccessor):
     """
     augments traces of clip filters with information to explore the
     parameter space for cinema playback (if enabled)
@@ -246,6 +246,9 @@ def cp_hook(varname, proxy):
         if ("servermanager.Slice" in proxy.__class__().__str__() and
             "Plane object" in proxy.__getattribute__("SliceType").__str__()):
             return SliceAccessor(varname, proxy)
+        if ("servermanager.Clip" in proxy.__class__().__str__() and
+            "Plane object" in proxy.__getattribute__("ClipType").__str__()):
+            return ClipAccessor(varname, proxy)
         if "servermanager.Contour" in proxy.__class__().__str__():
             return ContourAccessor(varname, proxy)
     pname = smtrace.Trace.get_registered_name(proxy, "views")
