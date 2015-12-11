@@ -30,6 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
+#include <string>
+
 #include "pqCinemaTrack.h"
 
 #include <vtkNew.h>
@@ -57,15 +59,31 @@ pqCinemaTrack::pqCinemaTrack(
   this->Track->setupUi(this);
 
   vtkSMProxy *prox = filter->getProxy();
-  //"ContourValues" because slice and isocontour happen to use same name
-  vtkSMProperty *prop = prox->GetProperty("ContourValues");
+  std::string vtkClassName = prox->GetVTKClassName();
+
+  // only the following are currently supported by cinema
+  std::pair<std::string, std::string> tags;
+  if (vtkClassName == "vtkPVMetaSliceDataSet")
+  {
+    tags.first = "ContourValues";
+    tags.second = "bounds";
+  }
+  else if (vtkClassName == "vtkPVContourFilter")
+  {
+    tags.first = "ContourValues";
+    tags.second = "scalar_range";
+  }
+  else if (vtkClassName == "vtkPVMetaClipDataSet")
+  {
+    tags.first = "Value";
+    tags.second = "range";
+  }
+
+  vtkSMProperty* prop = prox->GetProperty(tags.first.c_str());
   if (prop)
-    {
-    vtkSMDoubleRangeDomain *dom = vtkSMDoubleRangeDomain::SafeDownCast(prop->GetDomain("bounds"));
-    if (!dom)
-      {
-      dom = vtkSMDoubleRangeDomain::SafeDownCast(prop->GetDomain("scalar_range"));
-      }
+  {
+    vtkSMDoubleRangeDomain* dom = vtkSMDoubleRangeDomain::SafeDownCast(prop->GetDomain(tags.second.c_str()));
+
     if (dom)
       {
       this->Track->label->setText(filter->getSMName().toLower());

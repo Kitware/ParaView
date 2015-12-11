@@ -235,7 +235,8 @@ pqSGExportStateWizard::pqSGExportStateWizard(
     {
     if ((*it)->getProxy()->GetVTKClassName() &&
         (!strcmp((*it)->getProxy()->GetVTKClassName(), "vtkPVContourFilter") ||
-         !strcmp((*it)->getProxy()->GetVTKClassName(), "vtkPVMetaSliceDataSet")))
+         !strcmp((*it)->getProxy()->GetVTKClassName(), "vtkPVMetaSliceDataSet") ||
+         !strcmp((*it)->getProxy()->GetVTKClassName(), "vtkPVMetaClipDataSet")))
       {
       pqCinemaTrack *track = new pqCinemaTrack(this->Internals->cinemaContainer, parentFlags, *it);
       this->Internals->cinemaContainer->addWidget(track);

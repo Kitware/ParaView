@@ -546,7 +546,7 @@ class FileStore(Store):
             va = {}
             if 'view_associations' in info_json:
                 va = info_json['view_associations']
-            if va == {}:
+            if va == {} or va == None:
                 va = copy.deepcopy(a)
             self._set_view_associations(va)
 

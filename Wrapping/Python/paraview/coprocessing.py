@@ -9,6 +9,7 @@ from paraview import simple, servermanager
 from vtkPVVTKExtensionsCorePython import *
 import math
 
+import pdb
 # -----------------------------------------------------------------------------
 def IsInModulo(timestep, frequencyArray):
     """
@@ -42,7 +43,8 @@ class CoProcessor(object):
         self.__LiveVisualizationFrequency = 1;
         self.__LiveVisualizationLink = None
         self.__CinemaTracksList = []
-        self.cinema_def = None
+        self.__cinema_cache = None
+        self.__UserDefinedValues = {}
         pass
 
     def SetUpdateFrequencies(self, frequencies):
@@ -329,6 +331,12 @@ class CoProcessor(object):
         controller.RegisterPipelineProxy(proxy)
         return proxy
 
+    def UpdateFilterValues(self, name, proxy, values):
+        if (isinstance(proxy, simple.servermanager.filters.Slice) or
+            isinstance(proxy, simple.servermanager.filters.Clip)  or
+            isinstance(proxy, simple.servermanager.filters.Contour)):
+            self.__UserDefinedValues[name] = values
+
     def RegisterCinemaTrack(self, name, proxy, smproperty, valrange):
         """
         Register a point of control (filter's property) that will be varied over in a cinema export.
@@ -336,6 +344,8 @@ class CoProcessor(object):
         if not isinstance(proxy, servermanager.Proxy):
             raise RuntimeError, "Invalid 'proxy' argument passed to RegisterCinemaTrack."
         self.__CinemaTracksList.append({"name":name, "proxy":proxy, "smproperty":smproperty, "valrange":valrange})
+        self.UpdateFilterValues(name, proxy, valrange)
+
         return proxy
 
     def RegisterView(self, view, filename, freq, fittoscreen, magnification, width, height, cinema=None):
@@ -638,7 +648,6 @@ class CoProcessor(object):
                              os.path.basename(vfname),
                              "info.json")
 
-
         def float_limiter(x):
             #a shame, but needed to make sure python, javascript and (directory/file)name agree
             if isinstance(x, (float)):
@@ -652,6 +661,13 @@ class CoProcessor(object):
         view.ViewTime = time
         formatted_time = float_limiter(time)
 
+        #pass down user provided parameters
+        co = view.cpCinemaOptions
+        if "phi" in co:
+            self.__UserDefinedValues["phi"] = co["phi"]
+        if "theta" in co:
+            self.__UserDefinedValues["theta"] = co["theta"]
+
         simple.Render(view)
 
         #make sure depth rasters are consistent
@@ -659,17 +675,19 @@ class CoProcessor(object):
 
         p = None
         fs = None
-        if self.cinema_def == None:
+        if self.__cinema_cache == None:
             #todo: need to make a cache for each view
             #first time define the parameter tree
             p = pv_introspect.inspect()
             l = pv_introspect.munch_tree(p)
-            fs = pv_introspect.make_cinema_store(l, fname, forcetime=formatted_time)
-            self.cinema_def = [p,fs]
+            fs = pv_introspect.make_cinema_store(l, fname,
+                                                 forcetime=formatted_time,
+                                                 _userDefinedValues = self.__UserDefinedValues)
+            self.cinema_cache = [p,fs]
         else:
             #subsequently just add new timesteps to it
-            p = self.cinema_def[0]
-            fs = self.cinema_def[1]
+            p = self.cinema_cache[0]
+            fs = self.cinema_cache[1]
             tprop = fs.get_parameter('time')
             tprop['values'].append(formatted_time)
 

@@ -77,6 +77,7 @@ class ProducerAccessor(smtrace.RealProxyAccessor):
             (self, self.SimulationInputName))
         return trace.raw_data()
 
+# TODO: Make Slice, Contour & Clip Accessors to share an interface to reduce code duplication
 # -----------------------------------------------------------------------------
 class SliceAccessor(smtrace.RealProxyAccessor):
     """
@@ -117,6 +118,29 @@ class ContourAccessor(smtrace.RealProxyAccessor):
             trace.append_separated(["# register the filter with the coprocessor's cinema generator"])
             trace.append(["coprocessor.RegisterCinemaTrack('contour', %s, 'Isosurfaces', %s)" % (self, valrange)])
             trace.append_separator()
+        return trace.raw_data()
+
+# -----------------------------------------------------------------------------
+class ClipAccessor(smtrace.RealProxyAccessor):
+    """
+    augments traces of clip filters with information to explore the
+    parameter space for cinema playback (if enabled)
+    """
+    def __init__(self, varname, proxy):
+        smtrace.RealProxyAccessor.__init__(self, varname, proxy)
+        self.varname = varname
+
+    def trace_ctor(self, ctor, filter, ctor_args = None, skip_assignment = False):
+        original_trace = smtrace.RealProxyAccessor.trace_ctor( \
+            self, ctor, filter, ctor_args, skip_assignment)
+
+        trace = smtrace.TraceOutput(original_trace)
+        if cpstate_globals.cinema_tracks and self.varname in cpstate_globals.cinema_tracks:
+            valrange = cpstate_globals.cinema_tracks[self.varname]
+            trace.append_separated(["# register the filter with the coprocessor's cinema generator"])
+            trace.append(["coprocessor.RegisterCinemaTrack('clip', %s, 'OffsetValues', %s)" % (self, valrange)])
+            trace.append_separator()
+
         return trace.raw_data()
 
 # -----------------------------------------------------------------------------
@@ -222,6 +246,9 @@ def cp_hook(varname, proxy):
         if ("servermanager.Slice" in proxy.__class__().__str__() and
             "Plane object" in proxy.__getattribute__("SliceType").__str__()):
             return SliceAccessor(varname, proxy)
+        if ("servermanager.Clip" in proxy.__class__().__str__() and
+            "Plane object" in proxy.__getattribute__("ClipType").__str__()):
+            return ClipAccessor(varname, proxy)
         if "servermanager.Contour" in proxy.__class__().__str__():
             return ContourAccessor(varname, proxy)
     pname = smtrace.Trace.get_registered_name(proxy, "views")

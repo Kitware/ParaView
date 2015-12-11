@@ -116,7 +116,7 @@ def float_limiter(x):
 # and queried in explore()
 explorerDir = {}
 
-def addFilterValueSublayer(name, parentLayer, cs):
+def addFilterValueSublayer(name, parentLayer, cs, userDefinedValues):
     source = paraview.simple.FindSource(name)
 
     # plane offset generator (for Slice or Clip)
@@ -137,48 +137,56 @@ def addFilterValueSublayer(name, parentLayer, cs):
         steps = 5 # generate 5 slice offsets
         offsetStep = np.linalg.norm(sNormal) / steps
         values = np.arange(-(steps/2), steps/2) * offsetStep
-        return values
+        return values.tolist()
 
     # generate values depending on the type of filter
     if isinstance(source, paraview.simple.servermanager.filters.Clip):
         # grab values from ui or generate defaults
-        values = generateOffsetValues()
+        values = userDefinedValues["clip"] if ("clip" in userDefinedValues) else generateOffsetValues()
 
         # add sublayer and create the appropriate track
-        cs.add_sublayer(name, cinema_store.make_parameter(name, values.tolist()), parentLayer, name)
-        cs.assign_parameter_dependence("color" + name, name, values.tolist())
+        cs.add_sublayer(name, cinema_store.make_parameter(name, values), parentLayer, name)
+        cs.assign_parameter_dependence("color" + name, name, values)
         explorerDir[name] = pv_explorers.Clip(name, source)
 
     elif isinstance(source, paraview.simple.servermanager.filters.Slice):
         # grab values from ui or generate defaults
-        values = generateOffsetValues()
+        values = userDefinedValues["slice"] if ("slice" in userDefinedValues) else generateOffsetValues()
 
         # add sublayer and create the appropriate track
-        cs.add_sublayer(name, cinema_store.make_parameter(name, values.tolist()), parentLayer, name)
-        cs.assign_parameter_dependence("color" + name, name, values.tolist())
+        cs.add_sublayer(name, cinema_store.make_parameter(name, values), parentLayer, name)
+        cs.assign_parameter_dependence("color" + name, name, values)
         explorerDir[name] = pv_explorers.Slice(name, source)
 
     elif isinstance(source, paraview.simple.servermanager.filters.Contour):
-        # grab values from ui or generate defaults
-        vRange = source.Input.GetDataInformation().DataInformation.GetPointDataInformation().GetArrayInformation(0).GetComponentRange(0)
-        values = np.linspace(vRange[0], vRange[1], 5) # generate 5 contour values
+
+        def generateContourValues():
+            # grab values from ui or generate defaults
+            vRange = source.Input.GetDataInformation().DataInformation.GetPointDataInformation().GetArrayInformation(0).GetComponentRange(0)
+            return np.linspace(vRange[0], vRange[1], 5).tolist() # generate 5 contour values
+
+        values = userDefinedValues["contour"] if ("contour" in userDefinedValues) else generateContourValues()
 
         # add sublayer and create the appropriate track
-        cs.add_sublayer(name, cinema_store.make_parameter(name, values.tolist()), parentLayer, name)
-        cs.assign_parameter_dependence("color" + name, name, values.tolist())
+        cs.add_sublayer(name, cinema_store.make_parameter(name, values), parentLayer, name)
+        cs.assign_parameter_dependence("color" + name, name, values)
         explorerDir[name] = pv_explorers.Contour(name, source)
 
-def make_cinema_store(levels, ocsfname, _phis=None, _thetas=None, forcetime=False):
+def make_cinema_store(levels, ocsfname, forcetime=False, _userDefinedValues={}):
     """
     Takes in the pipeline, structured as a tree, and makes a cinema store definition
     containing all the parameters we might will vary.
     """
-    phis = _phis
-    if phis==None:
+
+    if "phi" in _userDefinedValues:
+        phis = _userDefinedValues["phi"]
+    else:
         phis = [0,45,90,135,180,225,270,315,360]
         #phis = [0,180,360]
-    thetas = _thetas
-    if thetas==None:
+
+    if "theta" in _userDefinedValues:
+        thetas = _userDefinedValues["theta"]
+    else:
         thetas = [0,20,40,60,80,100,120,140,160,180]
         #thetas = [0,90,180]
 
@@ -254,7 +262,7 @@ def make_cinema_store(levels, ocsfname, _phis=None, _thetas=None, forcetime=Fals
                 name = s['name']
                 asdict[name] = s
                 snames.append(name)
-                addFilterValueSublayer(name, layername, cs)
+                addFilterValueSublayer(name, layername, cs, _userDefinedValues)
 
             param = cinema_store.make_parameter(layername, snames)
             if parent == '0':
