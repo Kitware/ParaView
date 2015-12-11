@@ -104,6 +104,12 @@ public:
   vtkGetMacro(UpdateTimeValid, bool);
 
   // Description:
+  // @deprecated No longer needed. Simply remove these methods from your
+  // subclass implementation.
+  VTK_LEGACY(virtual void SetUseCache(bool));
+  VTK_LEGACY(virtual void SetCacheKey(double val));
+
+  // Description:
   // Typically a representation decides whether to use cache based on the view's
   // values for UseCache and CacheKey.
   // However in some cases we may want to
