@@ -2615,7 +2615,7 @@ void vtkPVRenderView::SetScalarRange(double min, double max)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::StartCaptureValues()
 {
-  if (not this->Internals->IsInCapture)
+  if (!this->Internals->IsInCapture)
     {
     this->Internals->SavedRenderPass = this->SynchronizedRenderers->GetRenderPass();
     this->Internals->SavedOrientationState = (this->OrientationWidget->GetEnabled() != 0);

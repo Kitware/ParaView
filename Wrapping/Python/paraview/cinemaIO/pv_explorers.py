@@ -36,7 +36,6 @@ import explorers
 import paraview.simple as simple
 import numpy as np
 import paraview
-from paraview.vtk.numpy_interface import dataset_adapter as dsa
 from paraview import numpy_support as numpy_support
 
 def rgb2grey(rgb):
@@ -99,11 +98,11 @@ class ImageExplorer(explorers.Explorer):
                 image.UnRegister(None)
             else:
                 image = self.view.CaptureWindow(1)
-                npview = dsa.WrapDataObject(image)
-                idata = npview.PointData[0]
                 ext = image.GetExtent()
                 width = ext[1] - ext[0] + 1
                 height = ext[3] - ext[2] + 1
+                imagescalars = image.GetPointData().GetScalars()
+                idata = numpy_support.vtk_to_numpy(imagescalars)
                 imageslice = np.flipud(idata.reshape(height,width,3))
                 image.UnRegister(None)
             #import Image
