@@ -647,6 +647,7 @@ void pqLinksEditor::updateSelectedProxies()
   switch (this->linkType())
     {
     case (pqLinksModel::Proxy):
+    case (pqLinksModel::Camera):
       {
       this->SelectedProxy1 = this->Proxy1Model->getProxy(this->Ui->ObjectTreeProxy1->selectionModel()->currentIndex()); 
       this->SelectedProxy2 = this->Proxy2Model->getProxy(this->Ui->ObjectTreeProxy2->selectionModel()->currentIndex()); 
@@ -663,6 +664,11 @@ void pqLinksEditor::updateSelectedProxies()
       this->SelectedProxy1 = this->Proxy1Model->getProxy(this->Ui->ObjectTreeSelection1->selectionModel()->currentIndex()); 
       this->SelectedProxy2 = this->Proxy2Model->getProxy(this->Ui->ObjectTreeSelection2->selectionModel()->currentIndex()); 
       break;
+      }
+    case (pqLinksModel::Unknown):
+      {
+      this->SelectedProxy1 = NULL;
+      this->SelectedProxy2 = NULL;
       }
     }
   this->updateEnabledState();
