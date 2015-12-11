@@ -45,8 +45,8 @@ import copy
 try:
     import OexrHelper as exr
     exrEnabled = True
+    print "Imported OpenEXR, will default to *.exr in z-buffer images."
 except ImportError:
-    print "Could not import OpenEXR, will default to *.im in z-buffer images."
     exrEnabled = False
 
 
