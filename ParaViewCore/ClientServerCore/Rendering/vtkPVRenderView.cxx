@@ -2663,9 +2663,10 @@ void vtkPVRenderView::StartCaptureLuminance()
     this->SetShowAnnotation(false);
     this->Internals->IsInCapture = true;
     }
-
+#ifdef VTKGL2
   this->SynchronizedRenderers->SetRenderPass(
       this->Internals->LightingMapPass.GetPointer());
+#endif
 }
 
 //----------------------------------------------------------------------------

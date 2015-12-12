@@ -37,9 +37,7 @@ import paraview.simple as simple
 import numpy as np
 import paraview
 from paraview import numpy_support as numpy_support
-
-def rgb2grey(rgb):
-    return np.dot(rgb[...,:3], [0.299, 0.587, 0.144])
+import vtk
 
 class ImageExplorer(explorers.Explorer):
     """
@@ -55,6 +53,19 @@ class ImageExplorer(explorers.Explorer):
         self.CaptureDepth = False
         self.CaptureLuminance = False
         self.iSave = iSave
+        self.UsingGL2 = not hasattr(vtk, 'vtkValuePasses')
+        if self.UsingGL2:
+            def rgb2grey(rgb, height, width):
+                as_grey = np.dot(rgb[...,:3], [0.0, 1.0, 0.0]) #pass through Diffuse lum term
+                res = np.flipud(as_grey.reshape(height,width).astype('uint8'))
+                return res
+            self.rgb2grey = rgb2grey
+        else:
+            def rgb2grey(rgb, height, width):
+                as_grey = np.dot(rgb[...,:3], [0.299, 0.587, 0.144])
+                res = np.flipud(as_grey.reshape(height,width).astype('uint8'))
+                return res
+            self.rgb2grey = rgb2grey
 
     def insert(self, document):
         if not self.view:
@@ -79,7 +90,7 @@ class ImageExplorer(explorers.Explorer):
             self.CaptureDepth = False
         else:
             imageslice = None
-            if self.CaptureLuminance:
+            if self.CaptureLuminance and not self.UsingGL2:
                 try:
                     rep = simple.GetRepresentation()
                     if rep != None:
@@ -93,7 +104,7 @@ class ImageExplorer(explorers.Explorer):
                 height = ext[3] - ext[2] + 1
                 imagescalars = image.GetPointData().GetScalars()
                 idata = numpy_support.vtk_to_numpy(imagescalars)
-                idata = np.flipud(rgb2grey(idata).reshape(height,width).astype('uint8'))
+                idata = self.rgb2grey(idata, height, width)
                 imageslice = np.dstack((idata,idata,idata))
                 image.UnRegister(None)
             else:
@@ -119,17 +130,25 @@ class ImageExplorer(explorers.Explorer):
     def setDrawMode(self, choice, **kwargs):
         if choice == 'color':
             self.view.StopCaptureValues()
-            self.CaptureDepth=False
+            if self.UsingGL2:
+                self.view.StopCaptureLuminance()
+            self.CaptureDepth = False
             self.CaptureLuminance = False
         if choice == 'luminance':
             self.view.StopCaptureValues()
-            self.CaptureDepth=False
+            if self.UsingGL2:
+                self.view.StartCaptureLuminance()
+            self.CaptureDepth = False
             self.CaptureLuminance = True
         if choice == 'depth':
             self.view.StopCaptureValues()
+            if self.UsingGL2:
+                self.view.StopCaptureLuminance()
             self.CaptureDepth=True
             self.CaptureLuminance = False
         if choice == 'value':
+            if self.UsingGL2:
+                self.view.StopCaptureLuminance()
             self.view.DrawCells = kwargs['field']
             self.view.ArrayNameToDraw = kwargs['name']
             self.view.ArrayComponentToDraw = kwargs['component']
@@ -143,6 +162,8 @@ class ImageExplorer(explorers.Explorer):
         #TODO: actually record state in init and restore here, for now just
         #make an assumption
         self.view.StopCaptureValues()
+        if self.UsingGL2:
+            self.view.StopCaptureLuminance()
         try:
             simple.Show()
             simple.Render()
