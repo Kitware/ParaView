@@ -37,7 +37,6 @@ import paraview.simple as simple
 import numpy as np
 import paraview
 from paraview import numpy_support as numpy_support
-import vtk
 
 class ImageExplorer(explorers.Explorer):
     """
@@ -53,7 +52,14 @@ class ImageExplorer(explorers.Explorer):
         self.CaptureDepth = False
         self.CaptureLuminance = False
         self.iSave = iSave
-        self.UsingGL2 = not hasattr(vtk, 'vtkValuePasses')
+        self.UsingGL2 = False
+        if self.view:
+            try:
+                rw=self.view.GetRenderWindow()
+                if rw.GetRenderingBackend()==2:
+                    self.UsingGL2 = True
+            except AttributeError:
+                pass
         if self.UsingGL2:
             def rgb2grey(rgb, height, width):
                 as_grey = np.dot(rgb[...,:3], [0.0, 1.0, 0.0]) #pass through Diffuse lum term
