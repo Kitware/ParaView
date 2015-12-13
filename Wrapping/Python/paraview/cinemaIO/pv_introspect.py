@@ -33,6 +33,29 @@ import pv_explorers
 
 import numpy as np
 
+def record_visibility():
+    source_proxies = paraview.servermanager.ProxyManager().GetProxiesInGroup("sources")
+    proxies = []
+    for key in source_proxies:
+        listElt = {}
+        proxy = source_proxies[key]
+        listElt['proxy'] = proxy
+        listElt['visibility'] = None
+        rep = paraview.simple.GetDisplayProperties(proxy)
+        if rep != None:
+            listElt['visibility'] = rep.Visibility
+        proxies.append(listElt)
+    return proxies
+
+def restore_visibility(proxies):
+    for listElt in proxies:
+        proxy = listElt['proxy']
+        vis = listElt['visibility']
+        if vis != None:
+            rep = paraview.simple.GetDisplayProperties(proxy)
+            if rep != None:
+                rep.Visibility = listElt['visibility']
+
 def inspect():
     """
     Produces a representation of the pipeline that is easier to work with.
@@ -187,7 +210,7 @@ def make_cinema_store(levels, ocsfname, forcetime=False, _userDefinedValues={}):
     if "theta" in _userDefinedValues:
         thetas = _userDefinedValues["theta"]
     else:
-        thetas = [0,20,40,60,80,100,120,140,160,180]
+        thetas = [0,45,90,135,180]
         #thetas = [0,90,180]
 
     def add_control_and_colors(snames, layername):
@@ -235,7 +258,16 @@ def make_cinema_store(levels, ocsfname, forcetime=False, _userDefinedValues={}):
             #remember my parameter name for my dependees
             objhomes[asdict[s]['id']] = layername+s
 
+    tvalues = []
     cs = cinema_store.FileStore(ocsfname)
+    try:
+        cs.load()
+        tprop = cs.get_parameter('time')
+        tvalues = tprop['values']
+        #start with clean slate, other than time
+        cs = cinema_store.FileStore(ocsfname)
+    except IOError:
+        pass
     lcnt = 0
     objhomes = {}
     objnames = {}
@@ -278,21 +310,25 @@ def make_cinema_store(levels, ocsfname, forcetime=False, _userDefinedValues={}):
             lcnt = lcnt + 1;
 
     fnp = ""
-    times = paraview.simple.GetAnimationScene().TimeKeeper.TimestepValues
     if forcetime:
-        times = [forcetime]
-    if not times:
-        pass
-    else:
-        prettytimes = [float_limiter(x) for x in times]
-        cs.add_parameter("time", cinema_store.make_parameter('time', prettytimes))
+        #time specified, use it, being careful to append if already a list
+        tvalues.append(forcetime)
+        tprop = cinema_store.make_parameter('time', tvalues)
+        cs.add_parameter('time', tprop)
         fnp = fnp+"{time}_"
+    else:
+        #time not specified, try and make them automaticvally
+        times = paraview.simple.GetAnimationScene().TimeKeeper.TimestepValues
+        if not times:
+            pass
+        else:
+            cs.add_parameter("time", cinema_store.make_parameter('time', prettytimes))
+            fnp = fnp+"{time}_"
     cs.add_parameter("phi", cinema_store.make_parameter('phi', phis))
     cs.add_parameter("theta", cinema_store.make_parameter('theta', thetas))
     fnp = fnp+"{phi}_{theta}/{layer0}.png"
 
     cs.filename_pattern = fnp
-    cs.save()
     return cs
 
 
@@ -335,10 +371,6 @@ def explore(cs, proxies, iSave=True, currentTime=None):
     #associate control points wlth parameters of the data store
     cam = pv_explorers.Camera([0,0,0], [0,1,0], dist, view_proxy)
 
-    try:
-        cs.load()
-    except AssertionError:
-        pass
     params = cs.parameter_list.keys()
 
     tracks = []
@@ -430,7 +462,10 @@ def explore(cs, proxies, iSave=True, currentTime=None):
 def record(csname="/tmp/test_pv/info.json"):
     paraview.simple.Render()
     view = paraview.simple.GetActiveView()
+    pxystate = record_visibility()
+
     view.LockBounds = 1
+
     p = inspect()
     l = munch_tree(p)
     cs = make_cinema_store(l, csname)
@@ -438,4 +473,8 @@ def record(csname="/tmp/test_pv/info.json"):
     #    testexplore(cs)
     #else:
     explore(cs, p)
+
     view.LockBounds = 0
+
+    restore_visibility(pxystate)
+    cs.save()

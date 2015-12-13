@@ -77,6 +77,7 @@ class ImageExplorer(explorers.Explorer):
         if not self.view:
             return
         if self.CaptureDepth:
+            simple.Render()
             image = self.view.CaptureDepthBuffer()
             idata = numpy_support.vtk_to_numpy(image) * 256
             rw = self.view.GetRenderWindow()

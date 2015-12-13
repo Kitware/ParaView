@@ -43,7 +43,6 @@ class CoProcessor(object):
         self.__LiveVisualizationFrequency = 1;
         self.__LiveVisualizationLink = None
         self.__CinemaTracksList = []
-        self.__cinema_cache = None
         self.__UserDefinedValues = {}
         pass
 
@@ -670,26 +669,17 @@ class CoProcessor(object):
 
         simple.Render(view)
 
+        #figure out what we show now
+        pxystate= pv_introspect.record_visibility()
+
         #make sure depth rasters are consistent
         view.LockBounds = 1
 
-        p = None
-        fs = None
-        if self.__cinema_cache == None:
-            #todo: need to make a cache for each view
-            #first time define the parameter tree
-            p = pv_introspect.inspect()
-            l = pv_introspect.munch_tree(p)
-            fs = pv_introspect.make_cinema_store(l, fname,
-                                                 forcetime=formatted_time,
-                                                 _userDefinedValues = self.__UserDefinedValues)
-            self.__cinema_cache = [p,fs]
-        else:
-            #subsequently just add new timesteps to it
-            p = self.__cinema_cache[0]
-            fs = self.__cinema_cache[1]
-            tprop = fs.get_parameter('time')
-            tprop['values'].append(formatted_time)
+        p = pv_introspect.inspect()
+        l = pv_introspect.munch_tree(p)
+        fs = pv_introspect.make_cinema_store(l, fname,
+                                            forcetime=formatted_time,
+                                            _userDefinedValues = self.__UserDefinedValues)
 
         #all nodes participate, but only root can writes out the files
         pm = servermanager.vtkProcessModule.GetProcessModule()
@@ -700,3 +690,6 @@ class CoProcessor(object):
             fs.save()
 
         view.LockBounds = 0
+
+        #restore what we showed
+        pv_introspect.restore_visibility(pxystate)
