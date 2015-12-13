@@ -671,7 +671,7 @@ class CoProcessor(object):
         simple.Render(view)
 
         #make sure depth rasters are consistent
-        view.LockBounds = 0
+        view.LockBounds = 1
 
         p = None
         fs = None
@@ -683,11 +683,11 @@ class CoProcessor(object):
             fs = pv_introspect.make_cinema_store(l, fname,
                                                  forcetime=formatted_time,
                                                  _userDefinedValues = self.__UserDefinedValues)
-            self.cinema_cache = [p,fs]
+            self.__cinema_cache = [p,fs]
         else:
             #subsequently just add new timesteps to it
-            p = self.cinema_cache[0]
-            fs = self.cinema_cache[1]
+            p = self.__cinema_cache[0]
+            fs = self.__cinema_cache[1]
             tprop = fs.get_parameter('time')
             tprop['values'].append(formatted_time)
 
@@ -696,6 +696,7 @@ class CoProcessor(object):
         pid = pm.GetPartitionId()
 
         pv_introspect.explore(fs, p, iSave=(pid==0), currentTime={'time':formatted_time})
-        fs.save()
+        if pid == 0:
+            fs.save()
 
         view.LockBounds = 0

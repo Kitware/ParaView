@@ -90,7 +90,6 @@ void pqExportCinemaReaction::exportActiveView()
 #ifdef PARAVIEW_ENABLE_PYTHON
   pqView* view = pqActiveObjects::instance().activeView();
   if (!view) { return ;}
-  vtkSMViewProxy* viewProxy = view->getViewProxy();
 
   pqFileDialog folder_dialog(NULL, pqCoreUtilities::mainWidget(),
       tr("Export Cinema:"), QString(), "");

@@ -2654,7 +2654,7 @@ void vtkPVRenderView::StopCaptureValues()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::StartCaptureLuminance()
 {
-  if (not this->Internals->IsInCapture)
+  if (!this->Internals->IsInCapture)
     {
     this->Internals->SavedRenderPass = this->SynchronizedRenderers->GetRenderPass();
     this->Internals->SavedOrientationState = (this->OrientationWidget->GetEnabled() != 0);
