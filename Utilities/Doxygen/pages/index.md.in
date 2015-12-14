@@ -12,6 +12,7 @@ Navigation
 
 Page | Description
 -----|----------------------------------------
+[Environment Variables](@ref EnvironmentVariables) | Environment variables that affect application behavior.
 [Major API Changes](@ref MajorAPIChanges) | Descriptions for major API changes.
 [Proxy Hints](@ref ProxyHints) | ServerManager XML hints for Proxies.
 [Property Hints](@ref PropertyHints) | ServerManager XML hints for Properties.

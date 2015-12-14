@@ -37,11 +37,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "vtkNew.h"
 #include "vtkPVDisplayInformation.h"
 #include "vtkPVGeneralSettings.h"
+#include "vtkPVOpenGLInformation.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
-
 #include <QMessageBox>
 
 //-----------------------------------------------------------------------------
@@ -66,10 +67,42 @@ void pqDefaultViewBehavior::onServerCreation(pqServer* server)
   if (!di->GetCanOpenDisplay())
     {
     QMessageBox::warning(pqCoreUtilities::mainWidget(),
-      tr("Server DISPLAY not accessible"),
+      tr("Server DISPLAY not accessible!"),
       tr("Display is not accessible on the server side.\n"
         "Remote rendering will be disabled."),
       QMessageBox::Ok);
+    }
+  else if (!di->GetSupportsOpenGL())
+    {
+    vtkNew<vtkPVOpenGLInformation> glinfo;
+    server->session()->GatherInformation(
+      vtkSMSession::RENDER_SERVER, glinfo.GetPointer(), 0);
+    QString glinfostring = QString(tr("\n\nOpenGL Vendor: %1\nOpenGL Version: %2\nOpenGL Renderer: %3")).arg(
+      glinfo->GetVendor().c_str(),
+      glinfo->GetVersion().c_str(),
+      glinfo->GetRenderer().c_str());
+    if (server->isRemote())
+      {
+      QString msg = tr("OpenGL drivers on the server side don't support\n"
+          "required OpenGL features for basic rendering.\n"
+          "Remote rendering will be disabled.");
+      msg += glinfostring;
+      QMessageBox::warning(pqCoreUtilities::mainWidget(),
+        tr("Server OpenGL support inadequate!"), msg,
+        QMessageBox::Ok);
+      }
+    else
+      {
+      QString msg = tr("Your OpenGL drivers don't support\n"
+          "required OpenGL features for basic rendering.\n"
+          "Application cannot continue and will abort for debugging purposes.");
+      msg += glinfostring;
+      QMessageBox::warning(pqCoreUtilities::mainWidget(),
+        tr("OpenGL support inadequate!"),
+        msg,
+        QMessageBox::Ok);
+      abort();
+      }
     }
   di->Delete();
 
