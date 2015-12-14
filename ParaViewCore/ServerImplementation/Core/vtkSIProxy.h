@@ -97,6 +97,10 @@ public:
   // Default implementation does pretty much nothing.
   virtual void UpdatePipelineInformation() { }
 
+  // Description:
+  // Called by vtkSMProxy::RecreateVTKObjects() to re-create the VTK objects.
+  virtual void RecreateVTKObjects();
+
 protected:
   vtkSIProxy();
   ~vtkSIProxy();
@@ -120,14 +124,23 @@ protected:
   // Returns true if object are (or have been) created successfully.
   // \c message is used to obtain information about what proxy helper this is if
   // the objects need to be created.
-  virtual bool CreateVTKObjects(vtkSMMessage* message);
+  virtual bool CreateVTKObjects();
+
+  // Description:
+  // Called to delete VTK objects.
   void DeleteVTKObjects();
 
-  // Description;
-  // Called in CreateVTKObjects() after the vtk-object has been created and
-  // subproxy-information has been processed, but before the XML is parsed to
-  // generate properties and initialize their values.
+  // Description:
+  // Called after CreateVTKObjects(). The main difference for subclasses when
+  // overriding CreateVTKObjects() or OnCreateVTKObjects() is that
+  // CreateVTKObjects() is called before ReadXMLAttributes() is called, while
+  // OnCreateVTKObjects() is called after ReadXMLAttributes().
   virtual void OnCreateVTKObjects();
+
+  // Description:
+  // Called by vtkSIProxy::Push() to ensure that the vtkSIProxy has been
+  // initialized.
+  bool InitializeAndCreateVTKObjects(vtkSMMessage* message);
 
   // Description:
   // Parses the XML to create property/subproxy helpers.
@@ -152,6 +165,7 @@ protected:
   char* XMLSubProxyName;
   char* PostPush;
   char* PostCreation;
+  int NumberOfInputPorts;
 
   vtkSmartPointer<vtkObjectBase> VTKObject;
   bool ObjectsCreated;

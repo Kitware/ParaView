@@ -24,8 +24,6 @@
 #include "vtkPVServerImplementationRenderingModule.h" //needed for exports
 #include "vtkSISourceProxy.h"
 
-class vtkImageData;
-
 class VTKPVSERVERIMPLEMENTATIONRENDERING_EXPORT vtkSIImageTextureProxy : public vtkSISourceProxy
 {
 public:
@@ -38,8 +36,8 @@ protected:
   ~vtkSIImageTextureProxy();
 
   // Description:
-  // Creates the VTKObjects. Overridden to add post-filters to the pipeline.
-  virtual bool CreateVTKObjects(vtkSMMessage* message);
+  // Overridden to hookup the image source with the Texture, if available.
+  bool CreateVTKObjects() VTK_OVERRIDE;
 
 private:
   vtkSIImageTextureProxy(const vtkSIImageTextureProxy&) VTK_DELETE_FUNCTION;

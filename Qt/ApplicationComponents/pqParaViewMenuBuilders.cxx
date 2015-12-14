@@ -71,10 +71,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqManageCustomFiltersReaction.h"
 #include "pqManageLinksReaction.h"
 #include "pqManagePluginsReaction.h"
-#include "pqPVApplicationCore.h"
 #include "pqProxyGroupMenuManager.h"
+#include "pqPVApplicationCore.h"
 #include "pqPythonShellReaction.h"
 #include "pqRecentFilesMenu.h"
+#include "pqReloadFilesReaction.h"
 #include "pqRepresentationToolbar.h"
 #include "pqSaveAnimationGeometryReaction.h"
 #include "pqSaveAnimationReaction.h"
@@ -159,6 +160,7 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu)
   new pqCopyReaction(ui.actionPaste, true);
   new pqApplicationSettingsReaction(ui.actionEditSettings);
   new pqDataQueryReaction(ui.actionQuery);
+  new pqReloadFilesReaction(ui.actionReloadFiles);
 }
 
 //-----------------------------------------------------------------------------
@@ -291,6 +293,7 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QWidget& widget)
   new pqHideAllReaction(ui.actionPBHideAll);
   new pqCopyReaction(ui.actionPBCopy);
   new pqCopyReaction(ui.actionPBPaste, true);
+  new pqReloadFilesReaction(ui.actionPBReloadFiles);
 }
 
 //-----------------------------------------------------------------------------

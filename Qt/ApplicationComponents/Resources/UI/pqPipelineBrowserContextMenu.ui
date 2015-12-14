@@ -126,15 +126,27 @@
     <string>&amp;Create Custom Filter...</string>
    </property>
   </action>
+  <action name="actionPBReloadFiles">
+   <property name="text">
+     <string>Reload Files</string>
+   </property>
+   <property name="iconText">
+    <string>Reload Files</string>
+   </property>
+   <property name="toolTip">
+    <string>Reload data files in case they were changed externally.</string>
+   </property>
+  </action>
   <addaction name="actionPBOpen"/>
+  <addaction name="actionPBHideAll"/>
   <addaction name="actionPBCopy"/>
   <addaction name="actionPBPaste"/>
-  <addaction name="actionPBCreateCustomFilter"/>
   <addaction name="actionPBChangeInput"/>
-  <addaction name="actionPBLinkSelection"/>
+  <addaction name="actionPBReloadFiles"/>
   <addaction name="actionPBIgnoreTime"/>
-  <addaction name="actionPBHideAll"/>
   <addaction name="actionPBDelete"/>
+  <addaction name="actionPBCreateCustomFilter"/>
+  <addaction name="actionPBLinkSelection"/>
  </widget>
  <resources>
   <include location="../../../Components/Resources/pqComponents.qrc"/>

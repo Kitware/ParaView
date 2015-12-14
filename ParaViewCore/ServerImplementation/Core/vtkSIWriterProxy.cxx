@@ -25,6 +25,8 @@
 #include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
 
+#include <cassert>
+
 vtkStandardNewMacro(vtkSIWriterProxy);
 //----------------------------------------------------------------------------
 vtkSIWriterProxy::vtkSIWriterProxy()
@@ -56,17 +58,9 @@ bool vtkSIWriterProxy::ReadXMLAttributes(vtkPVXMLElement* element)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSIWriterProxy::CreateVTKObjects(vtkSMMessage* message)
+void vtkSIWriterProxy::OnCreateVTKObjects()
 {
-  if (this->ObjectsCreated)
-    {
-    return true;
-    }
-
-  if (!this->Superclass::CreateVTKObjects(message))
-    {
-    return false;
-    }
+  this->Superclass::OnCreateVTKObjects();
 
   vtkObjectBase* object = this->GetVTKObject();
   vtkSIProxy* writerProxy = this->GetSubSIProxy("Writer");
@@ -150,8 +144,6 @@ bool vtkSIWriterProxy::CreateVTKObjects(vtkSMMessage* message)
   this->Interpreter->ProcessStream(stream);
   vtkProcessModule::GetProcessModule()->ReportInterpreterErrorsOn();
   stream.Reset();
-
-  return true;
 }
 
 //----------------------------------------------------------------------------

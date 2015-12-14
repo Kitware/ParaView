@@ -208,6 +208,12 @@ public:
   virtual void UpdateVTKObjects();
 
   // Description:
+  // Recreate the VTK object for this proxy. This is a convenient mechanism
+  // to create a new VTK object with the same state as an existing one in its
+  // stead.
+  virtual void RecreateVTKObjects();
+
+  // Description:
   // Update the value of one property (pushed to the server) if it is
   // modified.  If the object has not been created, it will be created
   // first. If force is true, the property is pushed even if it not

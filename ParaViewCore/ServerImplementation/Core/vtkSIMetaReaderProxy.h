@@ -39,9 +39,7 @@ protected:
   vtkSIMetaReaderProxy();
   ~vtkSIMetaReaderProxy();
 
-  // Description:
-  // Creates the VTKObjects. Overridden to add post-filters to the pipeline.
-  virtual bool CreateVTKObjects(vtkSMMessage* message);
+  void OnCreateVTKObjects() VTK_OVERRIDE;
 
   // Description:
   // Read xml-attributes.

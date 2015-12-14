@@ -59,13 +59,17 @@ public:
   virtual void SetDisablePipelineExecution(bool value)
   { this->DisablePipelineExecution = value; }
 
+  // Description:
+  // Overridden to update the output ports.
+  void RecreateVTKObjects() VTK_OVERRIDE;
+
 protected:
   vtkSISourceProxy();
   ~vtkSISourceProxy();
 
   // Description:
-  // Creates the VTKObjects. Overridden to add post-filters to the pipeline.
-  virtual bool CreateVTKObjects(vtkSMMessage* message);
+  // Overridden to setup the output ports and pipelines for the output ports.
+  bool CreateVTKObjects() VTK_OVERRIDE;
 
   // Description:
   // Read xml-attributes.
@@ -76,17 +80,6 @@ protected:
   // CreateOutputPorts is only called when an output-port is requested, i.e.
   // GetOutputPort() is called.
   virtual bool CreateOutputPorts();
-
-  // Description:
-  // Called to initialize a single output port. This assigns each output port an
-  // interpreter id and then initializes the translator/extract pieces/post
-  // filters.
-  virtual bool InitializeOutputPort(vtkAlgorithm* alo, int port);
-
-  // Description:
-  // Insert a filter to create the Post Filter
-  // so that filters can request data conversions
-  void InsertPostFilterIfNecessary(vtkAlgorithm* algo, int port);
 
   // Description:
   // Callbacks to add start/end events to the timer log.

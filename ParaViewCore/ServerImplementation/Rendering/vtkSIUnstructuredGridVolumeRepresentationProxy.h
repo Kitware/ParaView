@@ -36,8 +36,8 @@ protected:
   ~vtkSIUnstructuredGridVolumeRepresentationProxy();
 
   // Description:
-  // Register the mappers.
-  virtual void OnCreateVTKObjects();
+  // Register the mappers
+  bool CreateVTKObjects() VTK_OVERRIDE;
 
 
 private:

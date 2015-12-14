@@ -145,8 +145,31 @@ possible values are:
       <Hints>
         <ShowProxyDocumentationInPanel type="description"/>
       </Hints>
+    </SourceProxy>
+
+
+ReloadFiles
+-----------
+Indicate the property on a reader to use to refresh (or reload) the reader to
+make it re-read the data files.
+
+This hint can be used for readers that support "smart refresh" to re-read files
+when they are changed. Otherwise, ParaView will use the default mechanism which
+simply recreated the reader thus forgoing any previous data cached by the
+reader. The attribute **property** indicates the name of the property on the
+reader proxy to invoke to make the reader refresh.
+
+    <SourceProxy>
+    ...
+      <Hints>
+        <ReloadFiles property="Refresh" />
+      </Hints>
+    </SourceProxy>
 
 View Annotations
 ----------------
-Views support the following annotations.
- * "ParaView::DetachedFromLayout" : If Set to True, this Annotation will prevent the Layout to grab the view, enabling CustomApplication developpers to assign or position the view themselves. Use `pqObjectBuilder::createView(viewType, server, true)` to set the annotation.
+Views support the following annotations:
+1. **ParaView::DetachedFromLayout**: If set to "True", this annotation will prevent the
+layout from grabbing the view, enabling custom application developers to assign or
+position the view themselves. Use `pqObjectBuilder::createView(viewType, server, true)`
+to create a new view with this annotation added.
