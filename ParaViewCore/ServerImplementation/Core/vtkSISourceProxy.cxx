@@ -43,7 +43,6 @@ class vtkSISourceProxy::vtkInternals
 {
 public:
   std::vector<vtkSmartPointer<vtkAlgorithmOutput> > OutputPorts;
-  std::vector<vtkSmartPointer<vtkAlgorithm> > ExtractPieces;
   std::vector<vtkSmartPointer<vtkPVPostFilter> > PostFilters;
 };
 
@@ -137,7 +136,6 @@ bool vtkSISourceProxy::CreateOutputPorts()
 
   int ports = algo->GetNumberOfOutputPorts();
   this->Internals->OutputPorts.resize(ports);
-  this->Internals->ExtractPieces.resize(ports);
   this->Internals->PostFilters.resize(ports);
 
   for (int cc=0; cc < ports; cc++)
