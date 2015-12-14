@@ -21,6 +21,7 @@
 #include "vtkDataArray.h"
 #include "vtkEventForwarderCommand.h"
 #include "vtkExtractSelectedFrustum.h"
+#include "vtkFloatArray.h"
 #include "vtkIdTypeArray.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
@@ -1327,6 +1328,16 @@ vtkImageData* vtkSMRenderViewProxy::CaptureWindowInternal(int magnification)
   vtkImageData* capture = vtkImageData::New();
   capture->ShallowCopy(w2i->GetOutput());
   this->GetRenderWindow()->Frame();
+  return capture;
+}
+
+//----------------------------------------------------------------------------
+vtkFloatArray* vtkSMRenderViewProxy::CaptureDepthBuffer()
+{
+  this->InvokeCommand("CaptureZBuffer");
+  vtkPVRenderView* view =
+    vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
+  vtkFloatArray *capture = view->GetCapturedZBuffer();
   return capture;
 }
 

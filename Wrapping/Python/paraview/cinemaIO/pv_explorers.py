@@ -1,11 +1,42 @@
+#==============================================================================
+# Copyright (c) 2015,  Kitware Inc., Los Alamos National Laboratory
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
+#
+# 1. Redistributions of source code must retain the above copyright notice, this
+# list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice, this
+# list of conditions and the following disclaimer in the documentation and/or other
+# materials provided with the distribution.
+#
+# 3. Neither the name of the copyright holder nor the names of its contributors may
+# be used to endorse or promote products derived from this software without specific
+# prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+# IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+# INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+# NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+# OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#==============================================================================
 """
     Module consisting of explorers and tracks that connect arbitrary paraview
     pipelines to cinema stores.
 """
 
 import explorers
-
 import paraview.simple as simple
+import numpy as np
+import paraview
+from paraview import numpy_support as numpy_support
 
 class ImageExplorer(explorers.Explorer):
     """
@@ -18,22 +49,133 @@ class ImageExplorer(explorers.Explorer):
                 iSave=True):
         super(ImageExplorer, self).__init__(cinema_store, parameters, tracks)
         self.view = view
-        self.iSave=iSave
+        self.CaptureDepth = False
+        self.CaptureLuminance = False
+        self.iSave = iSave
+        self.UsingGL2 = False
+        if self.view:
+            try:
+                rw=self.view.GetRenderWindow()
+                if rw.GetRenderingBackend()==2:
+                    self.UsingGL2 = True
+            except AttributeError:
+                pass
+        if self.UsingGL2:
+            def rgb2grey(rgb, height, width):
+                as_grey = np.dot(rgb[...,:3], [0.0, 1.0, 0.0]) #pass through Diffuse lum term
+                res = np.flipud(as_grey.reshape(height,width).astype('uint8'))
+                return res
+            self.rgb2grey = rgb2grey
+        else:
+            def rgb2grey(rgb, height, width):
+                as_grey = np.dot(rgb[...,:3], [0.299, 0.587, 0.144])
+                res = np.flipud(as_grey.reshape(height,width).astype('uint8'))
+                return res
+            self.rgb2grey = rgb2grey
 
     def insert(self, document):
-        # FIXME: for now we'll write a temporary image and read that in.
-        # we need to provide nicer API for this.
-        extension = self.cinema_store.get_image_type()
-        simple.WriteImage("temporary"+extension, view=self.view)
-        with open("temporary"+extension, "rb") as file:
-            document.data = file.read()
-
-        #alternatively if you are just writing out files and don't need them in memory
-        ##fn = self.cinema_store.get_filename(document)
-        ##simple.WriteImage(fn)
-
+        if not self.view:
+            return
+        if self.CaptureDepth:
+            simple.Render()
+            image = self.view.CaptureDepthBuffer()
+            idata = numpy_support.vtk_to_numpy(image) * 256
+            rw = self.view.GetRenderWindow()
+            width,height = rw.GetSize()
+            try:
+                imageslice = np.flipud(idata.reshape(height,width))
+            except ValueError:
+                imageslice = None
+            #import Image
+            #img = Image.fromarray(imageslice)
+            #img.show()
+            #try:
+            #    input("Press enter to continue ")
+            #except NameError:
+            #    pass
+            document.data = imageslice
+            self.CaptureDepth = False
+        else:
+            imageslice = None
+            if self.CaptureLuminance and not self.UsingGL2:
+                try:
+                    rep = simple.GetRepresentation()
+                    if rep != None:
+                        rep.DiffuseColor = [1,1,1]
+                        rep.ColorArrayName = None
+                except ValueError:
+                    pass
+                image = self.view.CaptureWindow(1)
+                ext = image.GetExtent()
+                width = ext[1] - ext[0] + 1
+                height = ext[3] - ext[2] + 1
+                imagescalars = image.GetPointData().GetScalars()
+                idata = numpy_support.vtk_to_numpy(imagescalars)
+                idata = self.rgb2grey(idata, height, width)
+                imageslice = np.dstack((idata,idata,idata))
+                image.UnRegister(None)
+            else:
+                image = self.view.CaptureWindow(1)
+                ext = image.GetExtent()
+                width = ext[1] - ext[0] + 1
+                height = ext[3] - ext[2] + 1
+                imagescalars = image.GetPointData().GetScalars()
+                idata = numpy_support.vtk_to_numpy(imagescalars)
+                imageslice = np.flipud(idata.reshape(height,width,3))
+                image.UnRegister(None)
+            #import Image
+            #img = Image.fromarray(imageslice)
+            #img.show()
+            #try:
+            #    input("Press enter to continue ")
+            #except NameError:
+            #    pass
+            document.data = imageslice
         if self.iSave:
             super(ImageExplorer, self).insert(document)
+
+    def setDrawMode(self, choice, **kwargs):
+        if choice == 'color':
+            self.view.StopCaptureValues()
+            if self.UsingGL2:
+                self.view.StopCaptureLuminance()
+            self.CaptureDepth = False
+            self.CaptureLuminance = False
+        if choice == 'luminance':
+            self.view.StopCaptureValues()
+            if self.UsingGL2:
+                self.view.StartCaptureLuminance()
+            self.CaptureDepth = False
+            self.CaptureLuminance = True
+        if choice == 'depth':
+            self.view.StopCaptureValues()
+            if self.UsingGL2:
+                self.view.StopCaptureLuminance()
+            self.CaptureDepth=True
+            self.CaptureLuminance = False
+        if choice == 'value':
+            if self.UsingGL2:
+                self.view.StopCaptureLuminance()
+            self.view.DrawCells = kwargs['field']
+            self.view.ArrayNameToDraw = kwargs['name']
+            self.view.ArrayComponentToDraw = kwargs['component']
+            self.view.ScalarRange = kwargs['range']
+            self.view.StartCaptureValues()
+            self.CaptureDepth = False
+            self.CaptureLuminance = False
+
+    def finish(self):
+        super(ImageExplorer, self).finish()
+        #TODO: actually record state in init and restore here, for now just
+        #make an assumption
+        self.view.StopCaptureValues()
+        if self.UsingGL2:
+            self.view.StopCaptureLuminance()
+        try:
+            simple.Show()
+            simple.Render()
+        except RuntimeError:
+            pass
 
 class Camera(explorers.Track):
     """
@@ -106,8 +248,9 @@ class Slice(explorers.Track):
         explorer.cinema_store.add_metadata({'type' : 'parametric-image-stack'})
 
     def execute(self, doc):
-        o = doc.descriptor[self.parameter]
-        self.slice.SliceOffsetValues=[o]
+        if self.parameter in doc.descriptor:
+            o = doc.descriptor[self.parameter]
+            self.slice.SliceOffsetValues=[o]
 
 class Contour(explorers.Track):
     """
@@ -125,8 +268,29 @@ class Contour(explorers.Track):
         explorer.cinema_store.add_metadata({'type': "parametric-image-stack"})
 
     def execute(self, doc):
-        o = doc.descriptor[self.parameter]
-        self.contour.SetPropertyWithName(self.control,[o])
+        if self.parameter in doc.descriptor:
+            o = doc.descriptor[self.parameter]
+            self.contour.SetPropertyWithName(self.control,[o])
+
+class Clip(explorers.Track):
+    """
+    A track that connects clip filters to a scalar valued parameter.
+    """
+
+    def __init__(self, argument, clip):
+        super(Clip, self).__init__()
+        self.argument = argument
+        self.clip = clip
+
+    def prepare(self, explorer):
+        super(Clip, self).prepare(explorer)
+        explorer.cinema_store.add_metadata({'type': 'parametric-image-stack'})
+
+    def execute(self, doc):
+        if self.argument in doc.descriptor:
+            o = doc.descriptor[self.argument]
+            self.clip.UseValueAsOffset = True
+            self.clip.Value = o
 
 class Templated(explorers.Track):
     """
@@ -147,8 +311,8 @@ class Templated(explorers.Track):
 
 class ColorList():
     """
-    A helper that creates a dictionary of color controls for ParaView. The Color engine takes in
-    a Color name from the Explorer and looks up into a ColorList to determine exactly what
+    A helper that creates a dictionary of color controls for ParaView. The Color track takes in
+    a color name from the Explorer and looks up into a ColorList to determine exactly what
     needs to be set to apply the color.
     """
     def __init__(self):
@@ -160,6 +324,19 @@ class ColorList():
     def AddLUT(self, name, lut):
         self._dict[name] = {'type':'lut','content':lut}
 
+    def AddDepth(self, name):
+        self._dict[name] = {'type':'depth'}
+
+    def AddLuminance(self, name):
+        self._dict[name] = {'type':'luminance'}
+
+    def AddValueRender(self, name, field, arrayname, component, range):
+        self._dict[name] = {'type':'value',
+                            'field':field,
+                            'arrayname':arrayname,
+                            'component':component,
+                            'range':range}
+
     def getColor(self, name):
         return self._dict[name]
 
@@ -167,19 +344,62 @@ class Color(explorers.Track):
     """
     A track that connects a parameter to a choice of surface rendered color maps.
     """
-
     def __init__(self, parameter, colorlist, rep):
         super(Color, self).__init__()
         self.parameter = parameter
         self.colorlist = colorlist
         self.rep = rep
+        self.imageExplorer = None
 
     def execute(self, doc):
+        if not self.parameter in doc.descriptor:
+            return
+        if self.rep == None:
+            #TODO: probably a bad sign
+            return
         o = doc.descriptor[self.parameter]
         spec = self.colorlist.getColor(o)
+        found = False
         if spec['type'] == 'rgb':
+            found = True
             self.rep.DiffuseColor = spec['content']
             self.rep.ColorArrayName = None
+            if self.imageExplorer:
+                self.imageExplorer.setDrawMode('color')
         if spec['type'] == 'lut':
+            found = True
             self.rep.LookupTable = spec['content']
             self.rep.ColorArrayName = o
+            if self.imageExplorer:
+                self.imageExplorer.setDrawMode('color')
+        if spec['type'] == 'depth':
+            found = True
+            if self.imageExplorer:
+                self.imageExplorer.setDrawMode('depth')
+        if spec['type'] == 'luminance':
+            found = True
+            if self.imageExplorer:
+                self.imageExplorer.setDrawMode('luminance')
+        if spec['type'] == 'value':
+            found = True
+            if self.imageExplorer:
+                self.imageExplorer.setDrawMode("value",
+                                               field=spec['field'],
+                                               name=spec['arrayname'],
+                                               component=spec['component'],
+                                               range=spec['range'])
+
+
+class SourceProxyInLayer(explorers.LayerControl):
+    """
+    A track that turns on and off an source proxy in a layer
+    """
+    def showme(self):
+        self.representation.Visibility = 1
+
+    def hideme(self):
+        self.representation.Visibility = 0
+
+    def __init__(self, parameter, representation):
+        super(SourceProxyInLayer, self).__init__(parameter, self.showme, self.hideme)
+        self.representation = representation

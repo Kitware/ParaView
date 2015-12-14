@@ -34,7 +34,7 @@ class vtkAlgorithmOutput;
 class vtkCamera;
 class vtkCuller;
 class vtkExtentTranslator;
-class vtkPVGridAxes3DActor;
+class vtkFloatArray;
 class vtkInformationDoubleKey;
 class vtkInformationDoubleVectorKey;
 class vtkInformationIntegerKey;
@@ -48,6 +48,7 @@ class vtkPVAxesWidget;
 class vtkPVCenterAxesActor;
 class vtkPVDataDeliveryManager;
 class vtkPVDataRepresentation;
+class vtkPVGridAxes3DActor;
 class vtkPVHardwareSelector;
 class vtkPVInteractorStyle;
 class vtkPVSynchronizedRenderer;
@@ -59,6 +60,7 @@ class vtkRenderer;
 class vtkTextRepresentation;
 class vtkTexture;
 class vtkTimerLog;
+class vtkWindowToImageFilter;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVRenderView : public vtkPVView
 {
@@ -384,6 +386,9 @@ public:
   static vtkDataObject* GetCurrentStreamedPiece(
     vtkInformation* info, vtkPVDataRepresentation* repr);
 
+  void SetLockBounds(bool nv);
+  vtkGetMacro(LockBounds, bool);
+  
   // Description:
   // Requests the view to deliver the pieces produced by the \c repr to all
   // processes after a gather to the root node to merge the datasets generated
@@ -609,6 +614,29 @@ public:
   void AddPropToRenderer(vtkProp* prop);
   void RemovePropFromRenderer(vtkProp* prop);
 
+  // Description:
+  // Tells view that it should draw a particular array component
+  // to the screen such that the pixels can be read back and
+  // decoded to obtain the values.
+  void SetDrawCells(bool choice);
+  void SetArrayNameToDraw(const char *name);
+  void SetArrayNumberToDraw(int fieldAttributeType);
+  void SetArrayComponentToDraw(int comp);
+  void SetScalarRange(double min, double max);
+  void StartCaptureValues();
+  void StopCaptureValues();
+
+  // Description:
+  // Tells views that it should draw the lighting contributions to the
+  // framebuffer.
+  void StartCaptureLuminance();
+  void StopCaptureLuminance();
+
+  // Description:
+  // Access to the Z buffer.
+  void CaptureZBuffer();
+  vtkFloatArray * GetCapturedZBuffer();
+
 //BTX
 protected:
   vtkPVRenderView();
@@ -765,6 +793,8 @@ protected:
   // Keeps track of the time when the priority-queue for streaming was
   // generated.
   vtkTimeStamp PriorityQueueBuildTimeStamp;
+
+  bool LockBounds;
 private:
   vtkPVRenderView(const vtkPVRenderView&); // Not implemented
   void operator=(const vtkPVRenderView&); // Not implemented

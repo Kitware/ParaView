@@ -9,6 +9,7 @@ from paraview import simple, servermanager
 from vtkPVVTKExtensionsCorePython import *
 import math
 
+import pdb
 # -----------------------------------------------------------------------------
 def IsInModulo(timestep, frequencyArray):
     """
@@ -42,6 +43,7 @@ class CoProcessor(object):
         self.__LiveVisualizationFrequency = 1;
         self.__LiveVisualizationLink = None
         self.__CinemaTracksList = []
+        self.__UserDefinedValues = {}
         pass
 
     def SetUpdateFrequencies(self, frequencies):
@@ -151,7 +153,11 @@ class CoProcessor(object):
                     self.RescaleDataRange(view, datadescription.GetTime())
                 cinemaOptions = view.cpCinemaOptions
                 if cinemaOptions and 'camera' in cinemaOptions:
-                    dirname = self.UpdateCinema(view, datadescription)
+                    dirname = None
+                    if 'composite' in cinemaOptions:
+                        dirname = self.UpdateCinemaComposite(view, datadescription)
+                    else:
+                        dirname = self.UpdateCinema(view, datadescription)
                     if dirname:
                         cinema_dirs.append(dirname)
                 else:
@@ -324,6 +330,12 @@ class CoProcessor(object):
         controller.RegisterPipelineProxy(proxy)
         return proxy
 
+    def UpdateFilterValues(self, name, proxy, values):
+        if (isinstance(proxy, simple.servermanager.filters.Slice) or
+            isinstance(proxy, simple.servermanager.filters.Clip)  or
+            isinstance(proxy, simple.servermanager.filters.Contour)):
+            self.__UserDefinedValues[name] = values
+
     def RegisterCinemaTrack(self, name, proxy, smproperty, valrange):
         """
         Register a point of control (filter's property) that will be varied over in a cinema export.
@@ -331,6 +343,8 @@ class CoProcessor(object):
         if not isinstance(proxy, servermanager.Proxy):
             raise RuntimeError, "Invalid 'proxy' argument passed to RegisterCinemaTrack."
         self.__CinemaTracksList.append({"name":name, "proxy":proxy, "smproperty":smproperty, "valrange":valrange})
+        self.UpdateFilterValues(name, proxy, valrange)
+
         return proxy
 
     def RegisterView(self, view, filename, freq, fittoscreen, magnification, width, height, cinema=None):
@@ -438,7 +452,17 @@ class CoProcessor(object):
                    lut.RGBPoints.SetData(newrgbpoints)
 
     def UpdateCinema(self, view, datadescription):
+        """ called from catalyst at each timestep to add to the cinema "SPEC A" database """
         if not view.IsA("vtkSMRenderViewProxy") == True:
+            return
+
+        try:
+            import PIL
+            import paraview.cinemaIO.cinema_store as CS
+            import paraview.cinemaIO.explorers as explorers
+            import paraview.cinemaIO.pv_explorers as pv_explorers
+        except ImportError:
+            print "Can not include cinema or a dependency"
             return
 
         def get_nearest(eye, at, up, phis, thetas):
@@ -471,9 +495,6 @@ class CoProcessor(object):
                     best_up = updiff
             return best_phi, best_theta
 
-        import paraview.cinemaIO.cinema_store as CS
-        import paraview.cinemaIO.explorers as explorers
-        import paraview.cinemaIO.pv_explorers as pv_explorers
 
         pm = servermanager.vtkProcessModule.GetProcessModule()
         pid = pm.GetPartitionId()
@@ -495,7 +516,7 @@ class CoProcessor(object):
         fs.add_metadata({'type':'parametric-image-stack'})
 
         def float_limiter(x):
-            #a shame, but needed to make sure python, java and (directory/file)name agree
+            #a shame, but needed to make sure python, javascript and (directory/file)name agree
             if isinstance(x, (float)):
                 #return '%6f' % x #arbitrarily chose 6 decimal places
                 return '%.6e' % x #arbitrarily chose 6 significant digits
@@ -599,3 +620,76 @@ class CoProcessor(object):
             proxy.SetPropertyWithName(property, value)
 
         return os.path.basename(vfname)
+
+    def UpdateCinemaComposite(self, view, datadescription):
+        """ called from catalyst at each timestep to add to the cinema "SPEC B" database """
+        if not view.IsA("vtkSMRenderViewProxy") == True:
+            return
+
+        try:
+            import PIL
+            import paraview.cinemaIO.cinema_store as CS
+            import paraview.cinemaIO.explorers as explorers
+            import paraview.cinemaIO.pv_explorers as pv_explorers
+            import paraview.cinemaIO.pv_introspect as pv_introspect
+            import paraview.simple as simple
+        except ImportError:
+            paraview.print_error("Error: Cannot import numpy")
+            return
+
+
+        #figure out where to put this store
+        import os.path
+        vfname = view.cpFileName
+        vfname = vfname[0:vfname.rfind("_")] #strip _num.ext
+        fname = os.path.join(os.path.dirname(vfname),
+                             "cinema",
+                             os.path.basename(vfname),
+                             "info.json")
+
+        def float_limiter(x):
+            #a shame, but needed to make sure python, javascript and (directory/file)name agree
+            if isinstance(x, (float)):
+                return '%.6e' % x #arbitrarily chose 6 significant digits
+            else:
+                return x
+
+        #what time?
+        timestep = datadescription.GetTimeStep()
+        time = datadescription.GetTime()
+        view.ViewTime = time
+        formatted_time = float_limiter(time)
+
+        #pass down user provided parameters
+        co = view.cpCinemaOptions
+        if "phi" in co:
+            self.__UserDefinedValues["phi"] = co["phi"]
+        if "theta" in co:
+            self.__UserDefinedValues["theta"] = co["theta"]
+
+        simple.Render(view)
+
+        #figure out what we show now
+        pxystate= pv_introspect.record_visibility()
+
+        #make sure depth rasters are consistent
+        view.LockBounds = 1
+
+        p = pv_introspect.inspect()
+        l = pv_introspect.munch_tree(p)
+        fs = pv_introspect.make_cinema_store(l, fname,
+                                            forcetime=formatted_time,
+                                            _userDefinedValues = self.__UserDefinedValues)
+
+        #all nodes participate, but only root can writes out the files
+        pm = servermanager.vtkProcessModule.GetProcessModule()
+        pid = pm.GetPartitionId()
+
+        pv_introspect.explore(fs, p, iSave=(pid==0), currentTime={'time':formatted_time})
+        if pid == 0:
+            fs.save()
+
+        view.LockBounds = 0
+
+        #restore what we showed
+        pv_introspect.restore_visibility(pxystate)

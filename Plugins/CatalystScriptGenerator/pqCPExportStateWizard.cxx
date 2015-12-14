@@ -163,7 +163,12 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
       QString camType = viewInfo->getCameraType();
       if (rvp && (camType != "None"))
         {
-        cinemaCam = QString("{\"camera\":\"");
+        cinemaCam = QString("{");
+        if (this->Internals->cinemaComposite->isChecked())
+          {
+          cinemaCam += "\"composite\":True, ";
+          }
+        cinemaCam += "\"camera\":\"";
         cinemaCam += camType;
         cinemaCam += "\"";
         if (camType != "Static")
