@@ -40,28 +40,7 @@ public:
   virtual int ProcessViewRequest(vtkInformationRequestKey *request_type,
                                  vtkInformation *inInfo,
                                  vtkInformation *outInfo);
-  // Description:
-  // Set the input data arrays that this algorithm will process. Overridden to
-  // pass the array selection to the mapper.
-  virtual void SetInputArrayToProcess(int idx, int port, int connection,
-    int fieldAssociation, const char *name);
-  virtual void SetInputArrayToProcess(int idx, int port, int connection,
-    int fieldAssociation, int fieldAttributeType)
-    {
-    this->Superclass::SetInputArrayToProcess(
-      idx, port, connection, fieldAssociation, fieldAttributeType);
-    }
-  virtual void SetInputArrayToProcess(int idx, vtkInformation *info)
-    {
-    this->Superclass::SetInputArrayToProcess(idx, info);
-    }
-  virtual void SetInputArrayToProcess(int idx, int port, int connection,
-                              const char* fieldAssociation,
-                              const char* attributeTypeorName)
-    {
-    this->Superclass::SetInputArrayToProcess(idx, port, connection,
-      fieldAssociation, attributeTypeorName);
-    }
+
   // Description:
   // Use to set the color map for the data in this representation
   void SetLookupTable(vtkScalarsToColors* lut);
@@ -180,6 +159,8 @@ protected:
   vtkSmartPointer< vtkActor > Actor;
   vtkSmartPointer< vtkPointGaussianMapper > Mapper;
   vtkSmartPointer< vtkPolyData > ProcessedData;
+
+  void UpdateColoringParameters();
 
   bool ScaleByArray;
   char* LastScaleArray;

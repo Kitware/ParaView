@@ -240,40 +240,45 @@ int vtkPointGaussianRepresentation::ProcessViewRequest(
       vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
 
       this->Mapper->SetInputConnection(producerPort);
+      this->UpdateColoringParameters();
     }
   return 1;
 }
 
 //----------------------------------------------------------------------------
-void vtkPointGaussianRepresentation::SetInputArrayToProcess(
-  int idx, int port, int connection, int fieldAssociation, const char *name)
+void vtkPointGaussianRepresentation::UpdateColoringParameters()
 {
-  this->Superclass::SetInputArrayToProcess(
-    idx, port, connection, fieldAssociation, name);
-
-  if (name && name[0])
+  vtkInformation *info = this->GetInputArrayInformation(0);
+  if (info &&
+      info->Has(vtkDataObject::FIELD_ASSOCIATION()) &&
+      info->Has(vtkDataObject::FIELD_NAME()))
     {
-    this->Mapper->SetScalarVisibility(1);
-    this->Mapper->SelectColorArray(name);
-    this->Mapper->SetUseLookupTableScalarRange(1);
-    }
-  else
-    {
-    this->Mapper->SetScalarVisibility(0);
-    this->Mapper->SelectColorArray(static_cast<const char*>(NULL));
-    }
+    const char* colorArrayName = info->Get(vtkDataObject::FIELD_NAME());
+    int fieldAssociation = info->Get(vtkDataObject::FIELD_ASSOCIATION());
+    if (colorArrayName && colorArrayName[0])
+      {
+      this->Mapper->SetScalarVisibility(1);
+      this->Mapper->SelectColorArray(colorArrayName);
+      this->Mapper->SetUseLookupTableScalarRange(1);
+      }
+    else
+      {
+      this->Mapper->SetScalarVisibility(0);
+      this->Mapper->SelectColorArray(static_cast<const char*>(NULL));
+      }
 
-  switch (fieldAssociation)
-    {
-  case vtkDataObject::FIELD_ASSOCIATION_CELLS:
-    vtkWarningMacro(<<"Using cell data in PointGaussian representation");
-    this->Mapper->SetScalarMode(VTK_SCALAR_MODE_USE_CELL_FIELD_DATA);
-    break;
+    switch (fieldAssociation)
+      {
+    case vtkDataObject::FIELD_ASSOCIATION_CELLS:
+      this->Mapper->SetScalarVisibility(0);
+      this->Mapper->SelectColorArray(static_cast<const char*>(NULL));
+      break;
 
-  case vtkDataObject::FIELD_ASSOCIATION_POINTS:
-  default:
-    this->Mapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
-    break;
+    case vtkDataObject::FIELD_ASSOCIATION_POINTS:
+    default:
+      this->Mapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
+      break;
+      }
     }
 }
 
