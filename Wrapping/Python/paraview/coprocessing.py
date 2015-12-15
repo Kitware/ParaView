@@ -9,7 +9,6 @@ from paraview import simple, servermanager
 from vtkPVVTKExtensionsCorePython import *
 import math
 
-import pdb
 # -----------------------------------------------------------------------------
 def IsInModulo(timestep, frequencyArray):
     """
@@ -457,12 +456,12 @@ class CoProcessor(object):
             return
 
         try:
-            import PIL
             import paraview.cinemaIO.cinema_store as CS
             import paraview.cinemaIO.explorers as explorers
             import paraview.cinemaIO.pv_explorers as pv_explorers
-        except ImportError:
-            print "Can not include cinema or a dependency"
+        except ImportError as e:
+            paraview.print_error("Cannot import cinema")
+            paraview.print_error(e)
             return
 
         def get_nearest(eye, at, up, phis, thetas):
@@ -627,14 +626,14 @@ class CoProcessor(object):
             return
 
         try:
-            import PIL
             import paraview.cinemaIO.cinema_store as CS
             import paraview.cinemaIO.explorers as explorers
             import paraview.cinemaIO.pv_explorers as pv_explorers
             import paraview.cinemaIO.pv_introspect as pv_introspect
             import paraview.simple as simple
-        except ImportError:
-            paraview.print_error("Error: Cannot import numpy")
+        except ImportError as e:
+            paraview.print_error("Cannot import cinema")
+            paraview.print_error(e)
             return
 
 

@@ -37,18 +37,9 @@ import os.path
 import re
 import itertools
 import weakref
-import PIL.Image
-import PIL.ImImagePlugin
 import numpy as np
 import copy
-
-try:
-    import OexrHelper as exr
-    exrEnabled = True
-    print "Imported OpenEXR, will default to *.exr in z-buffer images."
-except ImportError:
-    exrEnabled = False
-
+import raster_wrangler
 
 class Document(object):
     """
@@ -608,7 +599,7 @@ class FileStore(Store):
         #determine file type for this document
         doctype = self.determine_type(desc)
         if doctype == "Z":
-            if exrEnabled:
+            if raster_wrangler.exrEnabled:
                 ext = ".exr"
             else:
                 ext = ".im"
@@ -627,24 +618,10 @@ class FileStore(Store):
 
         if not document.data == None:
             doctype = self.determine_type(document.descriptor)
-            if doctype == 'RGB' or doctype == 'VALUE':
-                imageslice = document.data
-                pimg = PIL.Image.fromarray(imageslice)
-                pimg.save(fname)
-            elif doctype == 'LUMINANCE':
-                imageslice = document.data
-                pimg = PIL.Image.fromarray(imageslice)
-                pimg.save(fname)
+            if doctype == 'RGB' or doctype == 'VALUE' or doctype == 'LUMINANCE':
+                raster_wrangler.rgbwriter(document.data, fname)
             elif doctype == 'Z':
-                imageslice = document.data
-                if exrEnabled:
-                    exr.save_depth(imageslice, fname)
-                else:
-                    pimg = PIL.Image.fromarray(imageslice)
-                    #TODO: avoid letting ImImagePlugin.py insert the Name: filename in line two
-                    #      why? because ImImagePlugin.py has a 100 character limit when it reads back
-                    pimg.save(fname)
-                pimg.save(fname) #beside PIL.im, is there a standard for depth images?
+                raster_wrangler.zwriter(document.data, fname)
             else:
                 with open(fname, mode='w') as file:
                     file.write(document.data)
@@ -659,7 +636,7 @@ class FileStore(Store):
                 im = PIL.Image.open(doc_file)
                 data = np.array(im, np.uint8).reshape(im.size[1], im.size[0], 3)
             elif doctype == 'Z':
-                if exrEnabled:
+                if raster_wrangler.exrEnabled:
                     data = exr.load_depth(doc_file)
                 else:
                     try:

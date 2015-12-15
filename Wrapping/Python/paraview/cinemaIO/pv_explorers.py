@@ -63,13 +63,13 @@ class ImageExplorer(explorers.Explorer):
         if self.UsingGL2:
             def rgb2grey(rgb, height, width):
                 as_grey = np.dot(rgb[...,:3], [0.0, 1.0, 0.0]) #pass through Diffuse lum term
-                res = np.flipud(as_grey.reshape(height,width).astype('uint8'))
+                res = as_grey.reshape(height,width).astype('uint8')
                 return res
             self.rgb2grey = rgb2grey
         else:
             def rgb2grey(rgb, height, width):
                 as_grey = np.dot(rgb[...,:3], [0.299, 0.587, 0.144])
-                res = np.flipud(as_grey.reshape(height,width).astype('uint8'))
+                res = as_grey.reshape(height,width).astype('uint8')
                 return res
             self.rgb2grey = rgb2grey
 
@@ -83,7 +83,7 @@ class ImageExplorer(explorers.Explorer):
             rw = self.view.GetRenderWindow()
             width,height = rw.GetSize()
             try:
-                imageslice = np.flipud(idata.reshape(height,width))
+                imageslice = idata.reshape(height,width)
             except ValueError:
                 imageslice = None
             #import Image
@@ -121,7 +121,7 @@ class ImageExplorer(explorers.Explorer):
                 height = ext[3] - ext[2] + 1
                 imagescalars = image.GetPointData().GetScalars()
                 idata = numpy_support.vtk_to_numpy(imagescalars)
-                imageslice = np.flipud(idata.reshape(height,width,3))
+                imageslice = idata.reshape(height,width,3)
                 image.UnRegister(None)
             #import Image
             #img = Image.fromarray(imageslice)

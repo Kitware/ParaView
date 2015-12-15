@@ -266,7 +266,7 @@ def make_cinema_store(levels, ocsfname, forcetime=False, _userDefinedValues={}):
         tvalues = tprop['values']
         #start with clean slate, other than time
         cs = cinema_store.FileStore(ocsfname)
-    except IOError:
+    except IOError, KeyError:
         pass
     lcnt = 0
     objhomes = {}
