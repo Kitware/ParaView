@@ -99,6 +99,47 @@ void vtkCameraInterpolator2::InterpolateCamera(double u, vtkCamera* camera)
     {
     this->Evaluate(u, this->PositionSpline, tuple);
     camera->SetPosition(tuple);
+    if (this->PositionSpline->GetPoints()->GetNumberOfPoints() > 1)
+      {
+      // This is assuming that the camera is passed in having the first
+      // timestep's view up.
+      vtkVector3<double> firstPos, secondPos;
+      this->PositionSpline->GetPoints()->GetPoint(0, firstPos.GetData());
+      this->PositionSpline->GetPoints()->GetPoint(1, secondPos.GetData());
+      vtkVector3<double> delta;
+      for (int i = 0; i < 3; ++i)
+        {
+        delta[i] = secondPos[i] - firstPos[i];
+        }
+      vtkVector3<double> initialViewUp;
+      camera->GetViewUp(initialViewUp.GetData());
+      delta.Normalize();
+      initialViewUp.Normalize();
+      // If the initial motion is within 45 degrees of the view up,
+      // assume the view up should be the tangent of the direction of
+      // motion.  (Roughly, this is a pretty shoddy derivative
+      // calculation but it should prevent the view up from lining up
+      // with the view plane normal in many cases such as an orbit about
+      // the x-axis)
+      if (std::abs(delta.Dot(initialViewUp)) > sqrt(0.5))
+        {
+        vtkVector3<double> p1, p2;
+        double t1 = u, t2 = u + 0.05;
+        if (t2 > 1)
+          {
+          t1 = u - 0.05;
+          t2 = u;
+          }
+        this->Evaluate(t1, this->PositionSpline, p1.GetData());
+        this->Evaluate(t2, this->PositionSpline, p2.GetData());
+        for (int i = 0; i < 3; ++i)
+          {
+          delta[i] = p2[i] - p1[i];
+          }
+        delta.Normalize();
+        camera->SetViewUp(delta.GetData());
+        }
+      }
     }
 }
 
