@@ -37,14 +37,13 @@ class CoProcessor(object):
         self.__PipelineCreated = False
         self.__ProducersMap = {}
         self.__WritersList = []
-        self.__ExporterList = []
         self.__ViewsList = []
         self.__EnableLiveVisualization = False
         self.__LiveVisualizationFrequency = 1;
         self.__LiveVisualizationLink = None
         self.__CinemaTracksList = []
         self.__UserDefinedValues = {}
-        pass
+        self.__InitialFrequencies = {}
 
     def SetUpdateFrequencies(self, frequencies):
         """Set the frequencies at which the pipeline needs to be updated.
@@ -56,8 +55,7 @@ class CoProcessor(object):
         if type(frequencies) != dict:
            raise RuntimeError,\
                  "Incorrect argument type: %s, must be a dict" % type(frequencies)
-        self.__Frequencies = frequencies
-
+        self.__InitialFrequencies = frequencies
 
     def EnableLiveVisualization(self, enable, frequency = 1):
         """Call this method to enable live-visualization. When enabled,
@@ -66,11 +64,6 @@ class CoProcessor(object):
         communication happens (default is every second)."""
         self.__EnableLiveVisualization = enable
         self.__LiveVisualizationFrequency = frequency
-        if (enable):
-            for currentFrequencies in self.__Frequencies.itervalues():
-                if not frequency in currentFrequencies:
-                    currentFrequencies.append(frequency)
-                    currentFrequencies.sort()
 
     def CreatePipeline(self, datadescription):
         """This methods must be overridden by subclasses to create the
@@ -88,15 +81,59 @@ class CoProcessor(object):
            this method to provide addtional customizations."""
 
         timestep = datadescription.GetTimeStep()
-        num_inputs = datadescription.GetNumberOfInputDescriptions()
-        for cc in range(num_inputs):
-            input_name = datadescription.GetInputDescriptionName(cc)
 
-            freqs = self.__Frequencies.get(input_name, [])
-            if freqs:
-                if IsInModulo(timestep, freqs) :
+        # if this is a time step to do live then all of the inputs
+        # must be made available. note that we want the pipeline built
+        # before we do the actual first live connection.
+        if self.__EnableLiveVisualization and timestep % self.__LiveVisualizationFrequency == 0 \
+           and self.__LiveVisualizationLink:
+            if self.__LiveVisualizationLink.Initialize(servermanager.ActiveConnection.Session.GetSessionProxyManager()):
+                num_inputs = datadescription.GetNumberOfInputDescriptions()
+                for cc in range(num_inputs):
+                    input_name = datadescription.GetInputDescriptionName(cc)
                     datadescription.GetInputDescription(cc).AllFieldsOn()
                     datadescription.GetInputDescription(cc).GenerateMeshOn()
+                return
+
+        # if we haven't processed the pipeline yet in DoCoProcessing() we
+        # must use the initial frequencies to figure out if there's
+        # work to do this time/timestep. If Live is enabled we mark
+        # all inputs as needed (this is only done if the Live connection
+        # hasn't been set up yet). If we don't have live enabled
+        # we know that the output frequencies aren't changed and can
+        # just use the initial frequencies.
+        if self.__InitialFrequencies or not self.__EnableLiveVisualization:
+            num_inputs = datadescription.GetNumberOfInputDescriptions()
+            for cc in range(num_inputs):
+                input_name = datadescription.GetInputDescriptionName(cc)
+
+                freqs = self.__InitialFrequencies.get(input_name, [])
+                if self.__EnableLiveVisualization or ( self and IsInModulo(timestep, freqs) ):
+                        datadescription.GetInputDescription(cc).AllFieldsOn()
+                        datadescription.GetInputDescription(cc).GenerateMeshOn()
+        else:
+            # the catalyst pipeline may have been changed by a live connection
+            # so we need to regenerate the frequencies
+            import cpstate
+            frequencies = {}
+            for writer in self.__WritersList:
+                frequency = writer.parameters.GetProperty(
+                    "WriteFrequency").GetElement(0)
+                if (timestep % frequency) == 0 or \
+                   datadescription.GetForceOutput() == True:
+                    writerinputs = cpstate.locate_simulation_inputs(writer)
+                    for writerinput in writerinputs:
+                        datadescription.GetInputDescriptionByName(writerinput).AllFieldsOn()
+                        datadescription.GetInputDescriptionByName(writerinput).GenerateMeshOn()
+
+            for view in self.__ViewsList:
+                if (view.cpFrequency and timestep % view.cpFrequency == 0) or \
+                   datadescription.GetForceOutput() == True:
+                    viewinputs = cpstate.locate_simulation_inputs(writer)
+                    for viewinput in viewinputs:
+                        datadescription.GetInputDescriptionByName(viewinput).AllFieldsOn()
+                        datadescription.GetInputDescriptionByName(viewinput).GenerateMeshOn()
+
 
     def UpdateProducers(self, datadescription):
         """This method will update the producers in the pipeline. If the
@@ -106,12 +143,16 @@ class CoProcessor(object):
         if not self.__PipelineCreated:
            self.CreatePipeline(datadescription)
            self.__PipelineCreated = True
+           if self.__EnableLiveVisualization:
+               # we don't want to use __InitialFrequencies any more with live viz
+               self.__InitialFrequencies = None
         else:
             simtime = datadescription.GetTime()
             for name, producer in self.__ProducersMap.iteritems():
                 producer.GetClientSideObject().SetOutput(
                     datadescription.GetInputDescriptionByName(name).GetGrid(),
                     simtime)
+
 
     def WriteData(self, datadescription):
         """This method will update all writes present in the pipeline, as
@@ -121,14 +162,11 @@ class CoProcessor(object):
         for writer in self.__WritersList:
             frequency = writer.parameters.GetProperty(
                 "WriteFrequency").GetElement(0)
-            fileName = writer.parameters.GetProperty("FileName").GetElement(0)
             if (timestep % frequency) == 0 or \
                     datadescription.GetForceOutput() == True:
+                fileName = writer.parameters.GetProperty("FileName").GetElement(0)
                 writer.FileName = fileName.replace("%t", str(timestep))
                 writer.UpdatePipeline(datadescription.GetTime())
-
-        for exporter in self.__ExporterList:
-            exporter.UpdatePipeline(datadescription.GetTime())
 
     def WriteImages(self, datadescription, rescale_lookuptable=False):
         """This method will update all views, if present and write output
@@ -190,26 +228,28 @@ class CoProcessor(object):
            for live-visualization. Call this method only if you want to support
            live-visualization with your co-processing module."""
 
-        if (not self.__EnableLiveVisualization or
-            (datadescription.GetTimeStep() %
-             self.__LiveVisualizationFrequency) != 0):
+        if not self.__EnableLiveVisualization:
             return
 
-        # make sure the live insitu is initialized
-        if not self.__LiveVisualizationLink:
-           # Create the vtkLiveInsituLink i.e.  the "link" to the visualization processes.
-           self.__LiveVisualizationLink = servermanager.vtkLiveInsituLink()
+        if not self.__LiveVisualizationLink and self.__EnableLiveVisualization:
+            # Create the vtkLiveInsituLink i.e.  the "link" to the visualization processes.
+            self.__LiveVisualizationLink = servermanager.vtkLiveInsituLink()
 
-           # Tell vtkLiveInsituLink what host/port must it connect to
-           # for the visualization process.
-           self.__LiveVisualizationLink.SetHostname(hostname)
-           self.__LiveVisualizationLink.SetInsituPort(int(port))
+            # Tell vtkLiveInsituLink what host/port must it connect to
+            # for the visualization process.
+            self.__LiveVisualizationLink.SetHostname(hostname)
+            self.__LiveVisualizationLink.SetInsituPort(int(port))
 
-           # Initialize the "link"
-           self.__LiveVisualizationLink.InsituInitialize(servermanager.ActiveConnection.Session.GetSessionProxyManager())
+            # Initialize the "link"
+            self.__LiveVisualizationLink.Initialize(servermanager.ActiveConnection.Session.GetSessionProxyManager())
+
+
+        timeStep = datadescription.GetTimeStep()
+        if self.__EnableLiveVisualization and timeStep % self.__LiveVisualizationFrequency == 0:
+            if not self.__LiveVisualizationLink.Initialize(servermanager.ActiveConnection.Session.GetSessionProxyManager()):
+                return
 
         time = datadescription.GetTime()
-        timeStep = datadescription.GetTimeStep()
 
         # stay in the loop while the simulation is paused
         while True:
@@ -248,6 +288,11 @@ class CoProcessor(object):
         grid = datadescription.GetInputDescriptionByName(inputname).GetGrid()
 
         producer = simple.PVTrivialProducer(guiName=inputname)
+        producer.add_attribute("cpSimulationInput", inputname)
+        # mark this as an input proxy so we can use cpstate.locate_simulation_inputs()
+        # to find it
+        producer.SMProxy.cpSimulationInput = inputname
+
         # we purposefully don't set the time for the PVTrivialProducer here.
         # when we update the pipeline we will do it then.
         producer.GetClientSideObject().SetOutput(grid, datadescription.GetTime())
@@ -262,25 +307,6 @@ class CoProcessor(object):
         self.__ProducersMap[inputname] = producer
         producer.UpdatePipeline(datadescription.GetTime())
         return producer
-
-    def RegisterExporter(self, exporter):
-        """
-        Registers a python object that will be responsible to export any
-        kind of data. That exporter needs to provide the following set of
-        methods:
-            UpdatePipeline(time)
-            Finalize()
-
-        It will be the responsability of the exporter to skip timestep inside
-        the UpdatePipeline(time) method when the given time does not match the
-        targetted frequency.
-
-        The coprocessing engine will automatically call UpdatePipeline(time)
-        for each timestep on each registered exporter.
-        Once the simulation is done, the Finalize() method will then be called
-        to all exporter.
-        """
-        self.__ExporterList.append(exporter)
 
     def RegisterWriter(self, writer, filename, freq):
         """Registers a writer proxy. This method is generally used in
@@ -384,9 +410,6 @@ class CoProcessor(object):
         for view in self.__ViewsList:
             if hasattr(view, 'Finalize'):
                 view.Finalize()
-        for exporter in self.__ExporterList:
-            if hasattr(view, 'Finalize'):
-                exporter.Finalize()
 
     def RescaleDataRange(self, view, time):
         """DataRange can change across time, sometime we want to rescale the

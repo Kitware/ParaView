@@ -148,7 +148,7 @@ namespace
       message.SetExtension(ProxyState::xml_name, "Catalyst_Communication");
 
       // Add custom user_data
-      ProxyState_UserData* user_data = 
+      ProxyState_UserData* user_data =
         message.AddExtension(ProxyState::user_data);
       user_data->set_key("LiveAction");
       Variant* variant = user_data->add_variant();
@@ -357,32 +357,30 @@ vtkLiveInsituLink::~vtkLiveInsituLink()
 }
 
 //----------------------------------------------------------------------------
-void vtkLiveInsituLink::Initialize(vtkSMSessionProxyManager* pxm)
+bool vtkLiveInsituLink::Initialize(vtkSMSessionProxyManager* pxm)
 {
-  if (this->Controller)
+  if (this->Controller || this->ExtractsDeliveryHelper != NULL)
     {
     // already initialized. all's well.
-    return;
-    }
-
-  if (this->ExtractsDeliveryHelper != NULL)
-    {
-    // already initialized (this->Controller is non-existant on satellites)
-    return;
+    // (this->Controller is non-existant on satellites)
+    return true;
     }
 
   this->InsituProxyManager = pxm;
 
+  bool retVal = true;
   switch (this->ProcessType)
     {
   case LIVE:
+    // LIVE always has a true return value
     this->InitializeLive();
     break;
 
   case INSITU:
-    this->InitializeInsitu();
+    retVal = this->InitializeInsitu();
     break;
     }
+  return retVal;
 }
 
 //----------------------------------------------------------------------------
@@ -453,7 +451,7 @@ void vtkLiveInsituLink::InitializeLive()
 }
 
 //----------------------------------------------------------------------------
-void vtkLiveInsituLink::InitializeInsitu()
+bool vtkLiveInsituLink::InitializeInsitu()
 {
   // vtkLiveInsituLink::Initialize() should not call this method unless
   // Controller==NULL.
@@ -471,6 +469,7 @@ void vtkLiveInsituLink::InitializeInsitu()
     abort();
     }
 
+  bool retVal = false;
   if (myId == 0)
     {
     vtkNetworkAccessManager* nam = pm->GetNetworkAccessManager();
@@ -480,7 +479,7 @@ void vtkLiveInsituLink::InitializeInsitu()
       << "timeout=0&handshake=paraview.insitu." << PARAVIEW_VERSION;
     this->SetURL(url.str().c_str());
     // Suppress any error messages while attempting to connect to ParaView
-    // visualization engine. 
+    // visualization engine.
     int display_errors = vtkObject::GetGlobalWarningDisplay();
     vtkObject::GlobalWarningDisplayOff();
     vtkMultiProcessController* controller = nam->NewConnection(this->URL);
@@ -497,6 +496,7 @@ void vtkLiveInsituLink::InitializeInsitu()
       // handle that case.
       this->InsituConnect(controller);
       controller->Delete();
+      retVal = true;
       }
     // nothing to do, no server to connect to.
     }
@@ -507,8 +507,10 @@ void vtkLiveInsituLink::InitializeInsitu()
     if (connection_established)
       {
       this->InsituConnect(NULL);
+      retVal = true;
       }
     }
+  return retVal;
 }
 
 //----------------------------------------------------------------------------
@@ -562,6 +564,7 @@ void vtkLiveInsituLink::DropLiveInsituConnection()
   this->Controller = 0;
   this->ExtractsDeliveryHelper = 0;
   this->SimulationPaused = 0;
+  vtkDebugMacro("Catalyst and ParaView should now be disconnected");
 }
 
 //----------------------------------------------------------------------------
@@ -581,6 +584,8 @@ void vtkLiveInsituLink::InsituConnect(vtkMultiProcessController* controller)
     vtkMultiProcessController::GetGlobalController();
   int numProcs = parallelController->GetNumberOfProcesses();
   int myId = parallelController->GetLocalProcessId();
+
+  vtkDebugMacro("Catalyst and ParaView should now be connected");
 
   if (myId == 0)
     {
@@ -714,14 +719,6 @@ void vtkLiveInsituLink::InsituConnect(vtkMultiProcessController* controller)
 }
 
 //----------------------------------------------------------------------------
-void vtkLiveInsituLink::InsituInitialize(vtkSMSessionProxyManager* pxm)
-{
-  assert(this->ProcessType == INSITU);
-
-  this->Initialize(pxm);
-}
-
-//----------------------------------------------------------------------------
 void vtkLiveInsituLink::InsituUpdate(double time, vtkIdType timeStep)
 {
   assert(this->ProcessType == INSITU);
@@ -740,7 +737,9 @@ void vtkLiveInsituLink::InsituUpdate(double time, vtkIdType timeStep)
     // ParaView LIVE was not ready the last time we attempted to connect
     // to it, or ParaView LIVE disconnected. We make a fresh attempt to
     // connect to it.
-    this->InsituInitialize(this->InsituProxyManager);
+    assert(this->ProcessType == INSITU);
+
+    this->Initialize(this->InsituProxyManager);
     }
 
   if (!this->ExtractsDeliveryHelper.GetPointer())
