@@ -129,8 +129,9 @@ void pqParaViewMenuBuilders::buildFileMenu(QMenu& menu)
 
   new pqExportReaction(ui.actionExport);
 #ifdef PARAVIEW_ENABLE_PYTHON
-  new pqExportCinemaReaction(menu.addAction("Export Cinema...")
-                             << pqSetName("actionExportCinema"));
+  new pqExportCinemaReaction(ui.actionExportCinema);
+#else
+  ui.actionExportCinema->setVisible(false);
 #endif
   new pqSaveDataReaction(ui.actionFileSaveData);
 
