@@ -268,6 +268,10 @@ def make_cinema_store(levels, ocsfname, forcetime=False, _userDefinedValues={}):
         cs = cinema_store.FileStore(ocsfname)
     except IOError, KeyError:
         pass
+
+    cs.add_metadata({'type':'composite-image-stack'})
+    cs.add_metadata({'store_type':'FS'})
+    cs.add_metadata({'version':'0.0'})
     lcnt = 0
     objhomes = {}
     objnames = {}
