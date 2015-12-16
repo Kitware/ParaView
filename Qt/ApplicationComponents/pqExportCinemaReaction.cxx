@@ -99,11 +99,20 @@ void pqExportCinemaReaction::exportActiveView()
       folder_dialog.getSelectedFiles().size() > 0)
     {
     QString filename = folder_dialog.getSelectedFiles().first();
+    //deal with MSWindows
+    //there dialog returns the last component with just one slash
+    int lastSlash = filename.lastIndexOf("\\");
+    if (lastSlash!=-1)
+      {
+      if (filename[lastSlash-1] != QString("\\")[0])
+        {
+        filename.insert(lastSlash, "\\");
+        }
+      }
     //std::cerr << "Selected path: " << qPrintable(filename) << std::endl;
 
     std::string path;
     path += qPrintable(filename);
-    path += "/info.json";
 
     std::string script;
     script += "import paraview\n";

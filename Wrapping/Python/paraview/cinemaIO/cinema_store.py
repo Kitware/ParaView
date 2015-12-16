@@ -519,8 +519,11 @@ class FileStore(Store):
     def __init__(self, dbfilename=None):
         super(FileStore, self).__init__()
         self.__filename_pattern = None
-        self.__dbfilename = dbfilename if dbfilename \
+        tmpfname = dbfilename if dbfilename \
                 else os.path.join(os.getcwd(), "info.json")
+        if not tmpfname.endswith("info.json"):
+            tmpfname = os.path.join(tmpfname, "info.json")
+        self.__dbfilename = tmpfname
         self.cached_searches = {}
         self.cached_files = {}
 
