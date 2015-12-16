@@ -120,6 +120,7 @@ public:
   /// string list.
   QStringList getPythonAttributes(const QString& pythonObjectName)
     {
+    vtkPythonScopeGilEnsurer gilEnsurer;
     if (this->Interpreter == NULL ||
       this->Interpreter->GetInteractiveConsoleLocalsPyObject() == NULL)
       {
@@ -193,7 +194,6 @@ public:
         }
       Py_DECREF(object);
       }
-
     return results;
     }
 };

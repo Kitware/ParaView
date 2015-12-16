@@ -53,20 +53,23 @@ public:
     // Make sure the python interpreter is initialized
     vtkPythonInterpreter::Initialize(1);
 
-    const char* code = "__vtkPythonViewLocals={'__builtins__':__builtins__}\n";
-    PyRun_SimpleString(const_cast<char *>(code));
-
-    PyObject* main_module = PyImport_AddModule((char*)"__main__");
-    PyObject* global_dict = PyModule_GetDict(main_module);
-    this->CustomLocals = PyDict_GetItemString(global_dict, "__vtkPythonViewLocals");
-    if (!this->CustomLocals)
       {
+      vtkPythonScopeGilEnsurer gilEnsurer;
+      const char* code = "__vtkPythonViewLocals={'__builtins__':__builtins__}\n";
+      PyRun_SimpleString(const_cast<char *>(code));
+
+      PyObject* main_module = PyImport_AddModule((char*)"__main__");
+      PyObject* global_dict = PyModule_GetDict(main_module);
+      this->CustomLocals = PyDict_GetItemString(global_dict, "__vtkPythonViewLocals");
+      if (!this->CustomLocals)
+        {
         vtkGenericWarningMacro("Failed to locate the __vtkPythonViewLocals object.");
         return NULL;
-      }
-    Py_INCREF(this->CustomLocals);
+        }
+      Py_INCREF(this->CustomLocals);
 
-    PyRun_SimpleString(const_cast<char*>("del __vtkPythonViewLocals"));
+      PyRun_SimpleString(const_cast<char*>("del __vtkPythonViewLocals"));
+      }
 
     return this->CustomLocals;
     }
@@ -478,8 +481,10 @@ int vtkPythonView::RunSimpleStringWithCustomLocals(const char* code)
   buffer.erase(std::remove(buffer.begin(), buffer.end(), '\r'), buffer.end());
 
   PyObject* context = this->Internals->GetCustomLocalsPyObject();
+  
+  vtkPythonScopeGilEnsurer gilEnsurer;
   vtkSmartPyObject result(PyRun_String(const_cast<char*>(buffer.c_str()),
-                                       Py_file_input, context, context));
+                                         Py_file_input, context, context));
 
   if (result)
     {
