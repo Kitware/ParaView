@@ -293,5 +293,6 @@
     <file>Icons/pvIcon64.png</file>
     <file>Icons/pvIcon96.png</file>
     <file>Icons/pvIcon512.png</file>
+    <file>Icons/pdf.png</file>
   </qresource>
 </RCC>

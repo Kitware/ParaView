@@ -120,6 +120,8 @@ set (Module_SRCS
   pqDefaultViewBehavior.h
   pqDeleteReaction.cxx
   pqDeleteReaction.h
+  pqDesktopServicesReaction.cxx
+  pqDesktopServicesReaction.h
   pqDoubleRangeSliderPropertyWidget.cxx
   pqDoubleRangeSliderPropertyWidget.h
   pqEditCameraReaction.cxx
@@ -332,6 +334,7 @@ set (Module_MOC_HDRS
   pqDefaultMainWindow.h
   pqDefaultViewBehavior.h
   pqDeleteReaction.h
+  pqDesktopServicesReaction.h
   pqDoubleRangeSliderPropertyWidget.h
   pqEditCameraReaction.h
   pqEditColorMapReaction.h

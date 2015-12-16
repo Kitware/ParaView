@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCreateCustomFilterReaction.h"
 #include "pqDataQueryReaction.h"
 #include "pqDeleteReaction.h"
+#include "pqDesktopServicesReaction.h"
 #include "pqExportCinemaReaction.h"
 #include "pqExportReaction.h"
 #include "pqFiltersMenuReaction.h"
@@ -321,11 +322,31 @@ void pqParaViewMenuBuilders::buildMacrosMenu
 //-----------------------------------------------------------------------------
 void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
 {
+#if defined (_WIN32)
+  QString filePath = QCoreApplication::applicationDirPath() + "/../doc/ParaViewGuide-CE.pdf";
+#elif defined(__APPLE__)
+  QString filePath = QCoreApplication::applicationDirPath() + "/../../../doc/ParaViewGuide-CE.pdf";
+#else
+  QString filePath = QCoreApplication::applicationDirPath() + "/../../doc/ParaViewGuide-CE.pdf";
+#endif
+
+  new pqDesktopServicesReaction(
+    QUrl::fromLocalFile(filePath),
+    (menu.addAction(QIcon(":/pqWidgets/Icons/pdf.png"), "ParaView Guide") << pqSetName("actionGuide")));
   QAction * help = menu.addAction("Help") <<
     pqSetName("actionHelp");
   help->setShortcut(QKeySequence::HelpContents);
   new pqHelpReaction(help);
 
+  menu.addSeparator();
+  new pqDesktopServicesReaction(
+    QUrl("http://www.paraview.org/tutorials/"),
+    (menu.addAction("Online Tutorials") << pqSetName("actionTutorials")));
+  new pqDesktopServicesReaction(
+    QUrl("http://www.kitware.com/blog/home/browse/topic/13"),
+    (menu.addAction("Online Blogs") << pqSetName("actionBlogs")));
+
+  menu.addSeparator();
   new pqAboutDialogReaction(
     menu.addAction("About...")
     << pqSetName("actionAbout"));
