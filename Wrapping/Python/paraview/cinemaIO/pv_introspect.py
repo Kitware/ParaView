@@ -403,7 +403,8 @@ def explore(cs, proxies, iSave=True, currentTime=None):
                 rep = paraview.simple.GetRepresentation(sp, view_proxy)
 
                 #hide all annotations
-                rep.SetScalarBarVisibility(view_proxy, False)
+                if rep.LookupTable:
+                    rep.SetScalarBarVisibility(view_proxy, False)
                 tc1 = pv_explorers.SourceProxyInLayer("ON", rep)
                 lt = explorers.Layer(y, [tc1])
                 tracks.append(lt)
