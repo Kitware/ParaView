@@ -14,7 +14,7 @@
           <Group name="filters" />
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
-          <DataType value="vtkDataSet" />
+          <DataType value="vtkImageData" />
         </DataTypeDomain>
         <InputArrayDomain attribute_type="point"
                           name="input_array"
@@ -140,7 +140,7 @@
           <Group name="filters" />
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
-          <DataType value="vtkDataSet" />
+          <DataType value="vtkImageData" />
         </DataTypeDomain>
         <InputArrayDomain attribute_type="point"
                           name="input_array"
@@ -219,7 +219,7 @@
           <Group name="filters" />
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
-          <DataType value="vtkDataSet" />
+          <DataType value="vtkImageData" />
         </DataTypeDomain>
         <Documentation>This property specifies the input to the Slice
         filter.</Documentation>
@@ -237,21 +237,6 @@
         <Documentation>This property sets the parameters of the slice
         function.</Documentation>
       </ProxyProperty>
-      <DoubleVectorProperty animateable="1"
-                            command="SetValue"
-                            label="Slice Offset Value"
-                            name="ContourValue"
-                            panel_visibility="advanced">
-        <BoundsDomain mode="magnitude"
-                      name="bounds">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </BoundsDomain>
-        <Documentation>The values in this property specify an
-        offset value for the slice.</Documentation>
-      </DoubleVectorProperty>
       <Hints>
         <Visibility replace_input="2" />
         <ShowInMenu category="Accelerated Algorithms" />
