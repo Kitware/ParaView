@@ -11,4 +11,5 @@ ELSE ()
 ENDIF ()
 
 ADD_PARAVIEW_PLUGIN(AcceleratedAlgorithms "1.0"
-  SERVER_MANAGER_XML AcceleratedAlgorithms.xml)
+  SERVER_MANAGER_XML AcceleratedAlgorithms.xml
+  REQUIRED_ON_SERVER)
