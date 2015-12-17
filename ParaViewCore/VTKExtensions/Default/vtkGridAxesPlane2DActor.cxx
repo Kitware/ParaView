@@ -214,6 +214,9 @@ void vtkGridAxesPlane2DActor::Update(vtkViewport* viewport)
     }
   this->PolyData->SetPoints(this->PolyDataPoints.GetPointer());
   this->PolyData->SetLines(this->PolyDataLines.GetPointer());
+  this->PolyDataPoints->Modified();
+  this->PolyDataLines->Modified();
+  this->PolyData->Modified();
   this->LineSegments.clear();
 
   this->Actor->SetUserMatrix(this->GetMatrix());
