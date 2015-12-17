@@ -112,8 +112,9 @@ void pqExportCinemaReaction::exportActiveView()
     script += "    import paraview.simple\n";
     script += "    import paraview.cinemaIO.cinema_store\n";
     script += "    import paraview.cinemaIO.pv_introspect as pvi\n";
-    script += "except ImportError:\n";
-    script += "    paraview.print_error('Error: Cannot import cinema or a dependency')\n";
+    script += "except ImportError as e:\n";
+    script += "    paraview.print_error('Cannot import cinema')\n";
+    script += "    paraview.print_error(e)\n";
     script += "    ready=False\n";
     script += "if ready:\n";
     script += "    pvi.record(csname=\"";
