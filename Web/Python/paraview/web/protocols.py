@@ -257,6 +257,20 @@ class ParaViewWebViewPort(ParaViewWebProtocol):
         view.CameraPosition = position
         self.getApplication().InvalidateCache(view.SMProxy)
 
+    @exportRpc("viewport.camera.get")
+    def getCamera(self, view_id):
+        view = self.getView(view_id)
+        return {
+            focal: view.CameraFocalPoint,
+            up: view.CameraViewUp,
+            position: view.CameraPosition
+        }
+
+    @exportRpc("viewport.size.update")
+    def updateSize(self, view_id, width, height):
+        view = self.getView(view_id)
+        view.ViewSize = [ width, height ]
+
 # =============================================================================
 #
 # Provide Image delivery mechanism
@@ -2368,7 +2382,17 @@ class ParaViewWebFileListing(ParaViewWebProtocol):
             relativeDir = relativeDir[len(self.rootName)+1:]
             path += relativeDir.replace('\\','/').split('/')
 
-        currentPath = os.path.join(baseDirectory, relativeDir)
+        currentPath = os.path.normpath(os.path.join(baseDirectory, relativeDir))
+        normBase = os.path.normpath(baseDirectory)
+
+        if not currentPath.startswith(normBase):
+            print "### CAUTION =========================================="
+            print " Attempt to get to another root path ###"
+            print "  => Requested:", relativeDir
+            print "  => BaseDir:", normBase
+            print "  => Computed path:", currentPath
+            print "### CAUTION =========================================="
+            currentPath = normBase
 
         self.directory_proxy.List(currentPath)
 
