@@ -344,6 +344,8 @@ info "Loading source tree from $commit..."
 rm -f "$GIT_INDEX_FILE"
 git read-tree -m -i "$commit"
 git rm -rf -q --cached ".ExternalData"
+git submodule sync
+git submodule update --init
 read_submodules_into_index
 tree="$( git write-tree )"
 
