@@ -48,14 +48,6 @@ paraview_add_test_python(
   TestClipCylinder.py
 )
 
-# This test makes use of "Point Gaussian" representation, only available with OpenGL2
-if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
-  paraview_add_test_python(
-    NO_DATA NO_RT
-    PointGaussianProperties.py
-  )
-endif()
-
 paraview_add_test_pvbatch(
   NO_DATA NO_RT
   CinemaTest.py

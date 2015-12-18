@@ -21,6 +21,7 @@ paraview_test_load_data(""
 set(PY_TESTS
   Animation.py
   AnimationCache.py,NO_VALID
+  AxesGridTestGridLines.py
   ProxyPropertyLinks.py
   PythonPVSimpleCone.py
   PythonPVSimpleExII.py
@@ -54,6 +55,11 @@ if (BUILD_SHARED_LIBS
   list(APPEND PY_TESTS
     Plugins.py,NO_VALID)
 endif ()
+
+# This test makes use of "Point Gaussian" representation, only available with OpenGL2
+if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
+    list(APPEND PY_TESTS PointGaussianProperties.py)
+endif()
 
 set(SMSTATE_FILE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(${vtk-module}_ARGS

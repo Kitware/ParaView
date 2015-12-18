@@ -3,6 +3,7 @@ import os, sys
 from paraview import simple
 from vtkPVServerManagerRenderingPython import *
 from vtk import *
+from paraview import smtesting
 
 
 NUM_POINTS = 5
@@ -94,16 +95,5 @@ renderView.CameraParallelProjection = 0
 
 simple.Render(renderView)
 
-# Now compare to baseline image
-try:
-  baselineIndex = sys.argv.index('-B')+1
-  baselinePath = sys.argv[baselineIndex]
-except:
-  print "Could not get baseline directory. Test failed."
-
-import os
-baseline_file = os.path.join(baselinePath, "PointGaussianProperties.png")
-import vtk.test.Testing
-vtk.test.Testing.VTK_TEMP_DIR = vtk.util.misc.vtkGetTempDir()
-vtk.test.Testing.compareImage(renderView.GetRenderWindow(), baseline_file, threshold=25)
-vtk.test.Testing.interact()
+if not smtesting.DoRegressionTesting(renderView.SMProxy):
+    raise smtesting.TestError('Image comparison failed.')
