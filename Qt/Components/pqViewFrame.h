@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -47,6 +47,8 @@ class QLabel;
 class QMenu;
 class QToolBar;
 class QToolButton;
+class pqServerManagerModelItem;
+class pqView;
 
 /// pqViewFrame is used to represent a frame for any ParaView view shown in the
 /// pqMultiViewWidget. A frame has title-bar that can be used to show arbitrary
@@ -69,7 +71,7 @@ public:
   /// QLayout::addWidget, this call takes the ownership of the widget and the
   /// widget will be deleted with pqViewFrame is deleted or another widget is set
   /// using setCentralWidget().
-  void setCentralWidget(QWidget* widget);
+  void setCentralWidget(QWidget* widget, pqView* view = 0);
   QWidget* centralWidget() const;
 
   /// Get/Set the border BorderColor. The border is only drawn when the
@@ -152,6 +154,8 @@ public slots:
     this->DecorationsVisible = val;
     this->updateComponentVisibilities();
     }
+
+  void onViewNameChanged(pqServerManagerModelItem*);
 
   /// event filter to handle drag/drop events.
   virtual bool eventFilter(QObject*, QEvent*);

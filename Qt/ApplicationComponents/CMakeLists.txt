@@ -214,6 +214,8 @@ set (Module_SRCS
   pqQtMessageHandlerBehavior.h
   pqReaction.cxx
   pqReaction.h
+  pqRenameProxyReaction.cxx
+  pqRenameProxyReaction.h
   pqRenderViewSelectionReaction.cxx
   pqRenderViewSelectionReaction.h
   pqRepresentationToolbar.cxx
@@ -380,6 +382,7 @@ set (Module_MOC_HDRS
   pqPythonShellReaction.h
   pqQtMessageHandlerBehavior.h
   pqReaction.h
+  pqRenameProxyReaction.h
   pqRenderViewSelectionReaction.h
   pqRepresentationToolbar.h
   pqRescaleCustomScalarRangeReaction.h
