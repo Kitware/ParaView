@@ -71,6 +71,10 @@
     { "name":"vtkUtilitiesKWSys",
       "path":"VTK/Utilities/KWSys"
     },
+    {
+      "name":"vtkkwiml",
+      "path":"VTK/Utilities/KWIML"
+    },
     { "name":"vtkPVServerManagerCore",
       "path":"ParaViewCore/ServerManager/Core",
       "cswrap":true,
