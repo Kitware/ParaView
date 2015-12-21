@@ -25,8 +25,10 @@
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"
 #include "vtkStructuredData.h" // for VTK_*_PLANE
+#include "vtkNew.h" // for vtkNew.
 
 class vtkImageData;
+class vtkPExtentTranslator;
 class vtkPVCacheKeeper;
 class vtkPVImageSliceMapper;
 class vtkPVLODActor;
@@ -168,12 +170,15 @@ protected:
   int SliceMode;
   unsigned int Slice;
 
-  int WholeExtent[6];
   vtkPVCacheKeeper* CacheKeeper;
-
   vtkPVImageSliceMapper* SliceMapper;
   vtkPVLODActor* Actor;
   vtkImageData* SliceData;
+
+  // meta-data about the input image to pass on to render view for hints
+  // when redistributing data.
+  vtkNew<vtkPExtentTranslator> PExtentTranslator;
+  int WholeExtent[6];
 private:
   vtkImageSliceRepresentation(const vtkImageSliceRepresentation&); // Not implemented
   void operator=(const vtkImageSliceRepresentation&); // Not implemented

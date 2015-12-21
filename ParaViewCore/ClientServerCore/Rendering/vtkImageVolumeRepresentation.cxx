@@ -61,6 +61,11 @@ vtkImageVolumeRepresentation::vtkImageVolumeRepresentation()
 
   vtkMath::UninitializeBounds(this->DataBounds);
   this->DataSize = 0;
+
+  this->Origin[0] = this->Origin[1] = this->Origin[2] = 0;
+  this->Spacing[0] = this->Spacing[1] = this->Spacing[2] = 0;
+  this->WholeExtent[0] = this->WholeExtent[2] = this->WholeExtent[4] = 0;
+  this->WholeExtent[1] = this->WholeExtent[3] = this->WholeExtent[5] = -1;
 }
 
 //----------------------------------------------------------------------------
@@ -107,8 +112,10 @@ int vtkImageVolumeRepresentation::ProcessViewRequest(
 
     vtkPVRenderView::SetGeometryBounds(inInfo, this->DataBounds);
 
-    vtkImageVolumeRepresentation::PassOrderedCompositingInformation(
-      this, inInfo);
+    // Pass partitioning information to the render view.
+    vtkPVRenderView::SetOrderedCompositingInformation(
+      inInfo, this, this->PExtentTranslator.GetPointer(),
+      this->WholeExtent, this->Origin, this->Spacing);
 
     vtkPVRenderView::SetRequiresDistributedRendering(inInfo, this, true);
     }
@@ -130,35 +137,17 @@ int vtkImageVolumeRepresentation::ProcessViewRequest(
 }
 
 //----------------------------------------------------------------------------
+#ifndef VTK_LEGACY_REMOVE
 void vtkImageVolumeRepresentation::PassOrderedCompositingInformation(
-  vtkPVDataRepresentation* self, vtkInformation* inInfo)
+  vtkPVDataRepresentation* vtkNotUsed(self), vtkInformation* vtkNotUsed(inInfo))
 {
-  // The KdTree generation code that uses the image cuts needs to be updated
-  // bigtime. But due to time shortage, I'm leaving the old code as is. We
-  // will get back to it later.
-  (void)inInfo;
-  if (self->GetNumberOfInputConnections(0) == 1)
-    {
-    vtkAlgorithmOutput* connection = self->GetInputConnection(0, 0);
-    vtkAlgorithm* inputAlgo = connection->GetProducer();
-    vtkStreamingDemandDrivenPipeline* sddp =
-      vtkStreamingDemandDrivenPipeline::SafeDownCast(inputAlgo->GetExecutive());
-
-    int extent[6] = {1, -1, 1, -1, 1, -1};
-    sddp->GetWholeExtent(sddp->GetOutputInformation(connection->GetIndex()),
-      extent);
-    double origin[3], spacing[3];
-    vtkImageData* image = vtkImageData::SafeDownCast(
-      inputAlgo->GetOutputDataObject(connection->GetIndex()));
-    image->GetOrigin(origin);
-    image->GetSpacing(spacing);
-
-    vtkNew<vtkPExtentTranslator> translator;
-    translator->GatherExtents(image);
-    vtkPVRenderView::SetOrderedCompositingInformation(
-      inInfo, self, translator.GetPointer(), extent, origin, spacing);
-    }
+  vtkGenericWarningMacro(
+    "vtkImageVolumeRepresentation::PassOrderedCompositingInformation was deprecated in "
+    "ParaView 5.0 and will be removed in a future version. Change your representation "
+    "to cache information about image and then pass to "
+    "vtkPVRenderView::SetOrderedCompositingInformation() directly.");
 }
+#endif
 
 //----------------------------------------------------------------------------
 int vtkImageVolumeRepresentation::RequestData(vtkInformation* request,
@@ -166,6 +155,10 @@ int vtkImageVolumeRepresentation::RequestData(vtkInformation* request,
 {
   vtkMath::UninitializeBounds(this->DataBounds);
   this->DataSize = 0;
+  this->Origin[0] = this->Origin[1] = this->Origin[2] = 0;
+  this->Spacing[0] = this->Spacing[1] = this->Spacing[2] = 0;
+  this->WholeExtent[0] = this->WholeExtent[2] = this->WholeExtent[4] = 0;
+  this->WholeExtent[1] = this->WholeExtent[3] = this->WholeExtent[5] = -1;
 
   // Pass caching information to the cache keeper.
   this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
@@ -184,12 +177,21 @@ int vtkImageVolumeRepresentation::RequestData(vtkInformation* request,
     this->VolumeMapper->SetInputConnection(
       this->CacheKeeper->GetOutputPort());
 
-    this->OutlineSource->SetBounds(vtkImageData::SafeDownCast(
-        this->CacheKeeper->GetOutputDataObject(0))->GetBounds());
+    vtkImageData* output = vtkImageData::SafeDownCast(this->CacheKeeper->GetOutputDataObject(0));
+    this->OutlineSource->SetBounds(output->GetBounds());
     this->OutlineSource->GetBounds(this->DataBounds);
     this->OutlineSource->Update();
 
-    this->DataSize = this->CacheKeeper->GetOutputDataObject(0)->GetActualMemorySize();
+    this->DataSize = output->GetActualMemorySize();
+
+    // Collect information about volume that is needed for data redistribution
+    // later.
+    this->PExtentTranslator->GatherExtents(output);
+    this->PExtentTranslator->Print(cout);
+    output->GetOrigin(this->Origin);
+    output->GetSpacing(this->Spacing);
+    vtkStreamingDemandDrivenPipeline::GetWholeExtent(
+      inputVector[0]->GetInformationObject(0), this->WholeExtent);
     }
   else
     {

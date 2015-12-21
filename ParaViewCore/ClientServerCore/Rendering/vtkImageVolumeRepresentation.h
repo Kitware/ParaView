@@ -26,11 +26,14 @@
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"
+#include "vtkNew.h" // needed for vtkNew.
 
 class vtkColorTransferFunction;
+class vtkExtentTranslator;
 class vtkFixedPointVolumeRayCastMapper;
 class vtkImageData;
 class vtkOutlineSource;
+class vtkPExtentTranslator;
 class vtkPiecewiseFunction;
 class vtkPolyDataMapper;
 class vtkPVCacheKeeper;
@@ -97,8 +100,9 @@ public:
   // Description:
   // Helper method to pass input image extent information to the view to use in
   // determining the cuts for ordered compositing.
-  static void PassOrderedCompositingInformation(
-    vtkPVDataRepresentation* self, vtkInformation* inInfo);
+  VTK_LEGACY(
+    static void PassOrderedCompositingInformation(
+      vtkPVDataRepresentation* self, vtkInformation* inInfo));
 
 //BTX
 protected:
@@ -145,6 +149,12 @@ protected:
   unsigned long DataSize;
   double DataBounds[6];
 
+  // meta-data about the input image to pass on to render view for hints
+  // when redistributing data.
+  vtkNew<vtkPExtentTranslator> PExtentTranslator;
+  double Origin[3];
+  double Spacing[3];
+  int WholeExtent[6];
 private:
   vtkImageVolumeRepresentation(const vtkImageVolumeRepresentation&); // Not implemented
   void operator=(const vtkImageVolumeRepresentation&); // Not implemented
