@@ -226,7 +226,7 @@ int vtkPVImageSliceMapper::SetupScalars(vtkImageData* input)
 
 //----------------------------------------------------------------------------
 void vtkPVImageSliceMapper::RenderInternal(vtkRenderer *renderer,
-                                           vtkActor *vtkNotUsed(actor))
+                                           vtkActor *actor)
 {
   vtkImageData* input = vtkImageData::SafeDownCast(this->GetInput());
   if (this->UpdateTime < input->GetMTime() || this->UpdateTime < this->MTime)
@@ -406,6 +406,7 @@ void vtkPVImageSliceMapper::RenderInternal(vtkRenderer *renderer,
       polyPoints->SetPoint(i, outputbounds[indices[i*3]],
         outputbounds[indices[3*i+1]], outputbounds[indices[3*i+2]]);
       }
+      polyPoints->Modified();
     }
 
   if (!this->Texture->GetInput())
@@ -413,6 +414,13 @@ void vtkPVImageSliceMapper::RenderInternal(vtkRenderer *renderer,
     return;
     }
 
+  // copy information to the delegate
+  this->PolyDataActor->vtkProp3D::ShallowCopy(actor);
+  vtkInformation *info = actor->GetPropertyKeys();
+  this->PolyDataActor->SetPropertyKeys(info);
+  this->PolyDataActor->SetProperty(actor->GetProperty());
+
+  // Render
   this->Texture->Render(renderer);
   this->PolyDataActor->GetMapper()->Render(renderer, this->PolyDataActor);
   this->Texture->PostRender(renderer);
@@ -493,6 +501,7 @@ void vtkPVImageSliceMapper::ReleaseGraphicsResources (vtkWindow *win)
 {
 #ifdef VTKGL2
   this->Texture->ReleaseGraphicsResources(win);
+  this->PolyDataActor->ReleaseGraphicsResources(win);
 #else
   this->Painter->ReleaseGraphicsResources(win);
 #endif
