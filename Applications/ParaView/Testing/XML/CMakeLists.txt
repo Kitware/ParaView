@@ -92,6 +92,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/MemoryInspectorPanel.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/NonlinearSubdivisionDisplay.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/QuartilePlot.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/RemoteRendering.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RenderNan.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ResetToVisibleRange.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SaveLargeScreenshot.xml
@@ -547,6 +548,10 @@ set (DisconnectAndSaveAnimation_DISABLE_C TRUE)
 set (DisconnectAndSaveAnimation_DISABLE_CRS TRUE)
 set (DisconnectAndSaveAnimation_BREAK TRUE)
 
+# Cannot support CRS since we do volume rendering of image data
+# in this test.
+set (RemoteRendering_DISABLE_CRS TRUE)
+set (RemoteRendering_THRESHOLD 50)
 
 # Histogram filter produces different results when running in parallel, so
 # disable it.
