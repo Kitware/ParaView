@@ -23,6 +23,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPExtentTranslator.h"
 #include "vtkProperty.h"
 #include "vtkPVCacheKeeper.h"
 #include "vtkPVImageSliceMapper.h"
@@ -31,6 +32,8 @@
 #include "vtkRenderer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStructuredExtent.h"
+
+#include <algorithm>
 
 vtkStandardNewMacro(vtkImageSliceRepresentation);
 //----------------------------------------------------------------------------
@@ -144,11 +147,15 @@ int vtkImageSliceRepresentation::ProcessViewRequest(
     if (this->Actor->HasTranslucentPolygonalGeometry())
       {
       outInfo->Set(vtkPVRenderView::NEED_ORDERED_COMPOSITING(), 1);
+      if (img)
+        {
+        // Pass on the partitioning information to the view. This logic is similar
+        // to what we do in vtkImageVolumeRepresentation.
+        vtkPVRenderView::SetOrderedCompositingInformation(
+          inInfo, this, this->PExtentTranslator.GetPointer(),
+          this->WholeExtent, img->GetOrigin(), img->GetSpacing());
+        }
       }
-
-    // Pass on the partitioning information to the view. This logic is similar
-    // to what we do in vtkImageVolumeRepresentation.
-    vtkImageVolumeRepresentation::PassOrderedCompositingInformation(this, inInfo);
     }
   else if (request_type == vtkPVView::REQUEST_RENDER())
     {
@@ -201,17 +208,23 @@ void vtkImageSliceRepresentation::UpdateSliceData(
 {
   if (this->GetUsingCacheForUpdate())
     {
+    // FIXME: When using cache we're really using obsolete WholeExtent. We
+    // really need to cache WholeExtent information as well. See BUG 15899.
     return;
     }
 
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   vtkImageData* input = vtkImageData::GetData(inputVector[0], 0);
 
+
   int inWholeExtent[6], outExt[6];
   memset(outExt, 0, sizeof(int)*6);
 
   inInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), inWholeExtent);
   int dataDescription = vtkStructuredData::SetExtent(inWholeExtent, outExt);
+
+  std::copy(inWholeExtent, inWholeExtent+6, this->WholeExtent);
+  this->PExtentTranslator->GatherExtents(input);
 
   if (vtkStructuredData::GetDataDimension(dataDescription) != 3)
     {
@@ -265,7 +278,6 @@ void vtkImageSliceRepresentation::UpdateSliceData(
   // vtkExtractVOI is not passing correct origin. Until that's fixed, I
   // will just use the input origin/spacing to compute the bounds.
   this->SliceData->SetOrigin(input->GetOrigin());
-
 }
 
 //----------------------------------------------------------------------------

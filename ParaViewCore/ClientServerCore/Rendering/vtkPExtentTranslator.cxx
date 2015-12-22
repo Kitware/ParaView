@@ -130,4 +130,17 @@ void vtkPExtentTranslator::GatherExtents(vtkDataSet* dataset)
 void vtkPExtentTranslator::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "Ranks: " << (this->Internals->AllProcessExtents.size()/6) << endl;
+  os << indent << "Extents: " << endl;
+  for (size_t cc=0; cc < this->Internals->AllProcessExtents.size(); cc+=6)
+    {
+    int *extents = &this->Internals->AllProcessExtents[cc];
+    cout << indent.GetNextIndent() << "["
+                                   << extents[0] << ", "
+                                   << extents[1] << ", "
+                                   << extents[2] << ", "
+                                   << extents[3] << ", "
+                                   << extents[4] << ", "
+                                   << extents[5] << "]" << endl;
+    }
 }
