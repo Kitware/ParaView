@@ -47,6 +47,16 @@ public:
   // Get Representation Proxy.
   vtkGetObjectMacro(RepresentationProxy, vtkSMProxy);
 
+  // Description:
+  // Called to link properties from a Widget to \c controlledProxy i.e. a
+  // proxy whose properties are being manipulated using this Widget.
+  // Currently, we only support linking with one controlled proxy at a time. One
+  // must call UnlinkProperties() before one can call this method on another
+  // controlledProxy. The \c controlledPropertyGroup is used to determine the
+  // mapping between this widget properties and controlledProxy properties.
+  bool LinkProperties(vtkSMProxy* controlledProxy, vtkSMPropertyGroup* controlledPropertyGroup);
+  bool UnlinkProperties(vtkSMProxy* controlledProxy);
+
 //BTX
 protected:
   vtkSMNewWidgetRepresentationProxy();
@@ -69,6 +79,9 @@ protected:
   // Called every time the user interacts with the widget.
   virtual void ExecuteEvent(unsigned long event);
 
+  // Description:
+  // Called everytime a controlled property's unchecked values change.
+  void ProcessLinkedPropertyEvent(vtkSMProperty* controlledProperty, unsigned long event);
 private:
 
   vtkSMNewWidgetRepresentationProxy(const vtkSMNewWidgetRepresentationProxy&); // Not implemented
