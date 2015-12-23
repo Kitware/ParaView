@@ -93,20 +93,13 @@ public:
   void SetSimulationPaused (int paused);
 
   // Description:
-  // Initializes the link.
-  void Initialize() { this->Initialize(NULL); }
-  void Initialize(vtkSMSessionProxyManager*);
+  // Initializes the link. For in situ this returns true it there is a
+  // connection and false otherwise. For live it always returns true.
+  bool Initialize() { return this->Initialize(NULL); }
+  bool Initialize(vtkSMSessionProxyManager*);
 
   // **************************************************************************
   //      *** API to be used from the insitu library ***
-
-  // Description:
-  // Must be called at the beginning with the proxy manager. vtkLiveInsituLink
-  // makes an attempt to connect to ParaView,  however that attempt may fail if
-  // ParaView is not yet ready to accept connections. In that case,
-  // vtkLiveInsituLink will make an attempt to connect on every subsequent
-  // InsituUpdate() call.
-  void InsituInitialize(vtkSMSessionProxyManager* pxm);
 
   // Description:
   // Every time Insitu is ready to communicate with ParaView visualization
@@ -198,8 +191,9 @@ protected:
   void InitializeLive();
 
   // Description:
-  // Called by Initialize() to initialize on a Insitu process.
-  void InitializeInsitu();
+  // Called by Initialize() to initialize on a Insitu process. Returns
+  // true if a connection is made.
+  bool InitializeInsitu();
 
   // Description:
   // Callback on Visualization process when a simulation connects to it.
