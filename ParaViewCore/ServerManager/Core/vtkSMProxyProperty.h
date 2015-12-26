@@ -114,6 +114,7 @@ public:
   // Description:
   // Removes all unchecked proxies.
   virtual void RemoveAllUncheckedProxies();
+  virtual void ClearUncheckedElements() { this->RemoveAllUncheckedProxies(); }
 
   // Description:
   // Returns the number of proxies.

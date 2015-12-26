@@ -235,6 +235,11 @@ void pqPropertyLinks::reset()
     if (connection && connection->proxy())
       {
       connection->copyValuesFromServerManagerToQt(false);
+      // Ensures that on "reset" we clear out unchecked values for the property.
+      if (vtkSMProperty* prop = connection->propertySM())
+        {
+        prop->ClearUncheckedElements();
+        }
       }
     }
 }
