@@ -81,6 +81,7 @@ set(Module_SRCS
   vtkViewLayout.cxx
   vtkVolumeRepresentationPreprocessor.cxx
   vtkZlibImageCompressor.cxx
+  vtkCinemaExporter.cxx
 )
 
 # Disabled unless using the OpenGL backend.

@@ -2729,7 +2729,21 @@
       </StringVectorProperty>
       <!-- End of POVExporter -->
     </RenderViewExporterProxy>
-
+    <RenderViewExporterProxy class="vtkCinemaExporter"
+                             file_extension="json"
+                             name="CinemaExporter">
+      <Documentation long_help="Export view to a Cinema Database"
+                     short_help="Cinema Database">CinemaExporter is a render window
+                     exporter which writes out the renderered scene into a
+                     Cinema database.</Documentation>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Documentation>Name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <!-- End of Cinema Exporter -->
+    </RenderViewExporterProxy>
     <!-- GL2PS exporter, shared options between render and context views: -->
     <GL2PSExporterProxy class="not-used"
                         viewtype="none"
