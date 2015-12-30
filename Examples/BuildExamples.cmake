@@ -61,6 +61,7 @@ add_custom_command(
                        -DCMAKE_LIBRARY_OUTPUT_DIRECTORY:PATH=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
                        -DCMAKE_RUNTIME_OUTPUT_DIRECTORY:PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
                        -DBUILD_TESTING:BOOL=${BUILD_TESTING}
+                       -DPARAVIEW_TEST_OUTPUT_DIR:PATH=${PARAVIEW_TEST_OUTPUT_DIR}
                        -DENABLE_CATALYST:BOOL=${ENABLE_CATALYST}
                        ${extra_params}
                        --no-warn-unused-cli
