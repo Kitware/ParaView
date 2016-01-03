@@ -70,6 +70,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTextureSelectorPropertyWidget.h"
 #include "pqTransferFunctionWidgetPropertyWidget.h"
 #include "pqViewTypePropertyWidget.h"
+#include "pqYoungsMaterialPropertyWidget.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMProperty.h"
 
@@ -256,6 +257,10 @@ pqStandardPropertyWidgetInterface::createWidgetForPropertyGroup(
   else if (panelWidget == "InteractivePolyLine")
     {
     return new pqSplinePropertyWidget(proxy, group, pqSplinePropertyWidget::POLYLINE);
+    }
+  else if (panelWidget == "YoungsMaterial")
+    {
+    return new pqYoungsMaterialPropertyWidget(proxy, group);
     }
   // *** NOTE: When adding new types, please update the header documentation ***
 

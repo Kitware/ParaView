@@ -14224,17 +14224,11 @@ source.</Documentation>
           <NoDefault />
         </Hints>
       </StringVectorProperty>
-      <Hints>
-        <!--
-          YoungsMaterialInterface uses a custom panel that creates custom
-          widgets for these two properties so we hide them from the
-          auto-generated part of the panel.
-        -->
-        <Property name="OrderingArrays"
-                  show="0" />
-        <Property name="NormalArrays"
-                  show="0" />
-      </Hints>
+      <PropertyGroup panel_widget="YoungsMaterial">
+        <Property name="VolumeFractionArrays" function="VolumeFractionArrays" />
+        <Property name="OrderingArrays" function="OrderingArrays" />
+        <Property name="NormalArrays" function="NormalArrays" />
+      </PropertyGroup>
       <!-- End of YoungsMaterialInterface -->
     </SourceProxy>
     <!-- ==================================================================== -->

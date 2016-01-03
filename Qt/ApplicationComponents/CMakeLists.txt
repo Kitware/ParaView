@@ -300,6 +300,8 @@ set (Module_SRCS
   pqViewStreamingBehavior.h
   pqViewTypePropertyWidget.cxx
   pqViewTypePropertyWidget.h
+  pqYoungsMaterialPropertyWidget.cxx
+  pqYoungsMaterialPropertyWidget.h
 )
 
 set (Module_MOC_HDRS
@@ -437,6 +439,7 @@ set (Module_MOC_HDRS
   pqViewMenuManager.h
   pqViewStreamingBehavior.h
   pqViewTypePropertyWidget.h
+  pqYoungsMaterialPropertyWidget.h
 )
 
 if (PARAVIEW_ENABLE_PYTHON)
@@ -485,6 +488,7 @@ set (Module_UI_FILES
   Resources/UI/pqTimeInspectorWidget.ui
   Resources/UI/pqTransferFunctionWidgetPropertyWidgetDialog.ui
   Resources/UI/pqVCRToolbar.ui
+  Resources/UI/pqYoungsMaterialPropertyWidget.ui
 )
 
 set (Module_RESOURCE_FILES

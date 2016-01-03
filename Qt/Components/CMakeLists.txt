@@ -322,8 +322,6 @@ set (Module_SRCS
   pqWidgetRangeDomain.h
   pqWriterDialog.cxx
   pqWriterDialog.h
-  pqYoungsMaterialInterfacePanel.cxx
-  pqYoungsMaterialInterfacePanel.h
 )
 
 set (Module_MOC_HDRS
@@ -463,7 +461,6 @@ set (Module_MOC_HDRS
   pqViewManager.h
   pqWidgetRangeDomain.h
   pqWriterDialog.h
-  pqYoungsMaterialInterfacePanel.h
 )
 
 set (Module_UI_FILES
