@@ -68,7 +68,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSILDomain.h"
 
 // ParaView includes
-#include "pq3DWidget.h"
 #include "pqApplicationCore.h"
 #include "pqCollapsedGroup.h"
 #include "pqComboBoxDomain.h"
@@ -278,28 +277,8 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
     }
   else if (pt == pqSMAdaptor::PROXYSELECTION)
     {
-    //pqProxySelectionWidget* w = qobject_cast<pqProxySelectionWidget*>(object);
-    //if(w)
-    //  {
-    //  property_manager->registerLink(
-    //    w, "proxy", SIGNAL(proxyChanged(pqSMProxy)),
-    //    proxy, SMProperty);
-
-    //  QWidget* parent = w->parentWidget();
-    //  pqObjectPanel* object_panel = qobject_cast<pqObjectPanel*>(parent);
-    //  if(object_panel)
-    //    {
-    //    w->setView(object_panel->view());
-    //    QObject::connect(parent, SIGNAL(viewChanged(pqView*)),
-    //                     w, SLOT(setView(pqView*)));
-    //    QObject::connect(parent, SIGNAL(onaccept()), w, SLOT(accept()));
-    //    QObject::connect(parent, SIGNAL(onreset()), w, SLOT(reset()));
-    //    QObject::connect(parent, SIGNAL(onselect()), w, SLOT(select()));
-    //    QObject::connect(parent, SIGNAL(ondeselect()), w, SLOT(deselect()));
-    //    QObject::connect(w, SIGNAL(modified()), parent, SLOT(setModified()));
-    //    }
-
-    //  }
+    // no longer supported.
+    qWarning("Case no longer supported.");
     }
   else if(pt == pqSMAdaptor::SINGLE_ELEMENT || pt == pqSMAdaptor::FILE_LIST)
     {
@@ -727,54 +706,7 @@ static void processHints(QGridLayout* panelLayout,
       }
     }
 
-  pqObjectPanel* panel =
-    qobject_cast<pqObjectPanel*>(panelLayout->parentWidget());
-
-  // See if any properties are grouped into 3D widgets.
-  QList<pq3DWidget*> widgets = pq3DWidget::createWidgets(smProxy, smProxy);  // TODO seems a bit odd to pass both the same
-  if (widgets.size() == 0)
-    {
-    return;
-    }
-  int rowCount = 0;
-  foreach (pq3DWidget* widget, widgets)
-    {
-    pqCollapsedGroup* group = 
-      new pqCollapsedGroup(panel);
-    group->setLayout(new QVBoxLayout(group));
-    group->setTitle(widget->getHints()->GetAttribute("label"));
-    widget->setParent(group);
-    QObject::connect(panel, SIGNAL(viewChanged(pqView*)),
-      widget,SLOT(setView(pqView*)));
-    widget->setView(panel->view());
-    widget->resetBounds();
-    widget->reset();
-    
-    QObject::connect(panel, SIGNAL(onselect()), widget, SLOT(select()));
-    QObject::connect(panel, SIGNAL(ondeselect()), widget, SLOT(deselect()));
-    QObject::connect(panel, SIGNAL(onaccept()), widget, SLOT(accept()));
-    QObject::connect(panel, SIGNAL(onreset()), widget, SLOT(reset()));
-    QObject::connect(widget, SIGNAL(modified()),
-                     panel, SLOT(setModified()));
-
-    group->layout()->addWidget(widget);
-    panelLayout->addWidget(group, rowCount++, 0, 1, 2);
-
-    vtkSmartPointer<vtkCollection> elements = 
-      vtkSmartPointer<vtkCollection>::New();
-    vtkPVXMLElement* widgetHints = widget->getHints();
-    widgetHints->GetElementsByName("Property", elements);
-    for (int cc=0; cc < elements->GetNumberOfItems(); ++cc)
-      {
-      vtkPVXMLElement* child = vtkPVXMLElement::SafeDownCast(
-        elements->GetItemAsObject(cc));
-      if (!child)
-        {
-        continue;
-        }
-      propertiesToHide.push_back(child->GetAttribute("name"));
-      }
-    }
+  Q_UNUSED(panelLayout);
 }
 
 //-----------------------------------------------------------------------------
