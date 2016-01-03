@@ -756,7 +756,7 @@ void pqProxyWidget::hideEvent(QHideEvent *hevent)
   if (hevent == NULL || !hevent->spontaneous())
     {
     foreach (const pqProxyWidgetItem* item, this->Internals->Items)
-      {
+  {
       item->deselect();
       }
     }
@@ -855,12 +855,12 @@ void pqProxyWidget::createWidgets(const QStringList &properties)
     }
   else
     {
-    //qCritical() << smproxy->GetXMLName() << " is using a custom object panel "
-    //  "(pqObjectPanel subclass). pqObjectPanel and subclasses are deprecated since "
-    //  "ParaView 4.0 and will no longer work in subsequent releases."
-    //  "Please update the code to use custom property widgets "
-    //  "(pqPropertyWidget subclasses) instead."
-    //  "Contact the mailing list if you need assistance.";
+    qWarning() << smproxy->GetXMLName() << "is using a custom object panel "
+      "(pqObjectPanel subclass). pqObjectPanel and subclasses are deprecated since "
+      "ParaView 4.0 and will no longer work in subsequent releases 5.1 onwards. "
+      "Please update the code to use custom property widgets "
+      "(pqPropertyWidget subclasses) instead. "
+      "Contact the mailing list if you need assistance.";
     }
 
   foreach (const pqProxyWidgetItem* item, this->Internals->Items)
