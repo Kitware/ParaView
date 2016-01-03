@@ -1,15 +1,15 @@
 /*=========================================================================
 
-   Program: ParaView
-   Module:    pqPolyLineWidget.h
+   Program:   ParaQ
+   Module:    pqPointSourceWidget.h
 
-   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
-   ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2.
+   ParaQ is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaQ license version 1.2. 
 
-   See License_v1.2.txt for the full ParaView license.
+   See License_v1.2.txt for the full ParaQ license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -28,23 +28,28 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-========================================================================*/
-#ifndef pqPolyLineWidget_h
-#define pqPolyLineWidget_h
+=========================================================================*/
 
-#include "pq3DWidget.h"
-#include <QColor>
+#ifndef _pqPointSourceWidget_h
+#define _pqPointSourceWidget_h
 
-class pqServer;
+#include "pqSMProxy.h"
 
-/// GUI for PolyLineWidgetRepresentation. This is a 3D widget that edits a spline.
-class PQCOMPONENTS_EXPORT pqPolyLineWidget : public pq3DWidget
+#include "pqHandleWidget.h" 
+#include "pqDeprecatedModule.h"
+
+class pqPropertyManager;
+
+/// Provides a complete Qt UI for working with a vtkPointSource filter
+class PQDEPRECATED_EXPORT pqPointSourceWidget : public pqHandleWidget 
 {
+  typedef pqHandleWidget Superclass;
+  
   Q_OBJECT
-  typedef pq3DWidget Superclass;
+  
 public:
-  pqPolyLineWidget(vtkSMProxy* refProxy, vtkSMProxy* proxy, QWidget* parent);
-  virtual ~pqPolyLineWidget();
+  pqPointSourceWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p = 0);
+  ~pqPointSourceWidget();
 
   /// Resets the bounds of the 3D widget to the reference proxy bounds.
   /// This typically calls PlaceWidget on the underlying 3D Widget 
@@ -52,29 +57,21 @@ public:
   /// This should be explicitly called after the panel is created
   /// and the widget is initialized i.e. the reference proxy, controlled proxy
   /// and hints have been set.
-  virtual void resetBounds(double /*bounds*/[6]) {}
+  virtual void resetBounds(double bounds[6]);
   virtual void resetBounds()
-    { return this->Superclass::resetBounds(); }
-
-  void setLineColor(const QColor& color);
-
-protected slots:
-  void addPoint();
-  void removePoints();
-
-  /// Snap currently selected point to surface.
-  virtual void pick(double x, double y, double z);
+    { this->Superclass::resetBounds(); }
 
 protected:
-  /// Internal method to create the widget.
-  void createWidget(pqServer*);
+  /// Subclasses can override this method to map properties to
+  /// GUI. Default implementation updates the internal datastructures
+  /// so that default implementations can be provided for 
+  /// accept/reset.
+  virtual void setControlledProperty(const char* function,
+    vtkSMProperty * controlled_property);
 
 private:
-  pqPolyLineWidget(const pqPolyLineWidget&); // Not implemented.
-  void operator=(const pqPolyLineWidget&); // Not implemented.
-
-  class pqInternals;
-  pqInternals* Internals;
+  class pqImplementation;
+  pqImplementation* const Implementation;
 };
 
 #endif

@@ -1,14 +1,14 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqStandardColorLinkAdaptor.cxx
+   Module:    pqDistanceWidget.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
    under the terms of the ParaView license version 1.2. 
-
+   
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -29,18 +29,31 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqStandardColorLinkAdaptor.h"
+#ifndef pqDistanceWidget_h
+#define pqDistanceWidget_h
 
-#include "pqStandardColorButton.h"
+#include "pqLineWidget.h"
+#include "pqDeprecatedModule.h"
 
-//-----------------------------------------------------------------------------
-pqStandardColorLinkAdaptor::pqStandardColorLinkAdaptor(
-  pqStandardColorButton* button, vtkSMProxy* proxy, const char* propname)
-:Superclass(button)
+class QLabel;
+
+// Currently, we are simply showing the Line widget since the vtkDistanceWidget
+// has issues when running in client-server.
+class PQDEPRECATED_EXPORT pqDistanceWidget : public pqLineWidget
 {
-}
+  Q_OBJECT
+  typedef pqLineWidget Superclass;
+public:
+  pqDistanceWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p = 0);
+  virtual ~pqDistanceWidget();
 
-//-----------------------------------------------------------------------------
-pqStandardColorLinkAdaptor::~pqStandardColorLinkAdaptor()
-{
-}
+protected slots:
+  void updateDistance();
+
+private:
+  pqDistanceWidget(const pqDistanceWidget&); // Not implemented.
+  void operator=(const pqDistanceWidget&); // Not implemented.
+  QLabel* Label;
+};
+
+#endif

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqLineWidget.h
+   Module:    pqHandleWidget.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,26 +30,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqLineWidget_h
-#define _pqLineWidget_h
+#ifndef _pqHandleWidget_h
+#define _pqHandleWidget_h
 
+#include "pqProxy.h"
 #include "pq3DWidget.h"
-#include "pqComponentsModule.h"
-#include <QColor>
+#include "pqDeprecatedModule.h"
 
-class pqServer;
-
-/// Provides a complete Qt UI for working with a 3D line widget
-class PQCOMPONENTS_EXPORT pqLineWidget : public pq3DWidget
+/// Provides a complete Qt UI for working with a 3D handle widget
+class PQDEPRECATED_EXPORT pqHandleWidget : public pq3DWidget
 {
-  typedef pq3DWidget Superclass;
-  
   Q_OBJECT
   
 public:
-  pqLineWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p = 0, 
-    const char* xmlname="LineWidgetRepresentation");
-  ~pqLineWidget();
+  typedef pq3DWidget Superclass;
+
+  pqHandleWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* p);
+  ~pqHandleWidget();
 
   /// Resets the bounds of the 3D widget to the reference proxy bounds.
   /// This typically calls PlaceWidget on the underlying 3D Widget 
@@ -61,28 +58,18 @@ public:
     { this->Superclass::resetBounds(); }
   virtual void resetBounds(double bounds[6]);
 
-  void setControlledProperties(vtkSMProperty* point1, vtkSMProperty* point2);
-  void setLineColor(const QColor& color);
-
-public slots:
-  void onXAxis();
-  void onYAxis();
-  void onZAxis();
+private slots:
+  /// Called when the user changes widget visibility
+  void onWidgetVisibilityChanged(bool visible);
 
 protected:
-  virtual void setControlledProperty(const char* function,
-    vtkSMProperty * controlled_property);
+  /// Internal method to create the widget.
+  void createWidget(pqServer*);
 
   /// Called on pick.
   virtual void pick(double, double, double);
 
-private slots:
-  void onWidgetVisibilityChanged(bool visible);
-
 private:
-  void createWidget(pqServer* server, const QString& xmlname);
-  void getReferenceBoundingBox(double center[3], double size[3]);
-
   class pqImplementation;
   pqImplementation* const Implementation;
 };

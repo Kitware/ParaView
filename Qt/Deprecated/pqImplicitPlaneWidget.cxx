@@ -544,4 +544,3 @@ void pqImplicitPlaneWidget::get3DWidgetState(double* origin, double* normal)
     normal[2] = normalHelper.GetAsDouble(2);
     }
 }
-

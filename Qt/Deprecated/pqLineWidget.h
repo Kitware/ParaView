@@ -1,15 +1,15 @@
 /*=========================================================================
 
-   Program: ParaView
-   Module:    pqSphereWidget.h
+   Program:   ParaQ
+   Module:    pqLineWidget.h
 
-   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
-   ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.1. 
+   ParaQ is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaQ license version 1.2. 
 
-   See License_v1.1.txt for the full ParaView license.
+   See License_v1.2.txt for the full ParaQ license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -28,20 +28,28 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-========================================================================*/
-#ifndef pqSphereWidget_h
-#define pqSphereWidget_h
+=========================================================================*/
+
+#ifndef _pqLineWidget_h
+#define _pqLineWidget_h
 
 #include "pq3DWidget.h"
+#include "pqDeprecatedModule.h"
+#include <QColor>
 
 class pqServer;
-class PQCOMPONENTS_EXPORT pqSphereWidget : public pq3DWidget
+
+/// Provides a complete Qt UI for working with a 3D line widget
+class PQDEPRECATED_EXPORT pqLineWidget : public pq3DWidget
 {
-  Q_OBJECT
   typedef pq3DWidget Superclass;
+  
+  Q_OBJECT
+  
 public:
-  pqSphereWidget(vtkSMProxy* refProxy, vtkSMProxy* proxy, QWidget* p = 0);
-  virtual ~pqSphereWidget();
+  pqLineWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p = 0, 
+    const char* xmlname="LineWidgetRepresentation");
+  ~pqLineWidget();
 
   /// Resets the bounds of the 3D widget to the reference proxy bounds.
   /// This typically calls PlaceWidget on the underlying 3D Widget 
@@ -53,31 +61,30 @@ public:
     { this->Superclass::resetBounds(); }
   virtual void resetBounds(double bounds[6]);
 
-  /// accept the changes. Overridden to hide handles.
-  virtual void accept();
+  void setControlledProperties(vtkSMProperty* point1, vtkSMProperty* point2);
+  void setLineColor(const QColor& color);
 
-  /// reset the changes. Overridden to hide handles.
-  virtual void reset();
-
-  /// When set, the widget can also be used to setup a direction vector.
-  void enableDirection(bool);
+public slots:
+  void onXAxis();
+  void onYAxis();
+  void onZAxis();
 
 protected:
-  /// Internal method to create the widget.
-  void createWidget(pqServer*);
+  virtual void setControlledProperty(const char* function,
+    vtkSMProperty * controlled_property);
+
+  /// Called on pick.
+  virtual void pick(double, double, double);
 
 private slots:
-  /// Called when the user changes widget visibility
   void onWidgetVisibilityChanged(bool visible);
 
 private:
-  pqSphereWidget(const pqSphereWidget&); // Not implemented.
-  void operator=(const pqSphereWidget&); // Not implemented.
+  void createWidget(pqServer* server, const QString& xmlname);
+  void getReferenceBoundingBox(double center[3], double size[3]);
 
   class pqImplementation;
-  pqImplementation* Implementation;
+  pqImplementation* const Implementation;
 };
 
 #endif
-
-

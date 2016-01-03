@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqLineSourceWidget.cxx
+   Module:    pqPointSourceWidget.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,52 +30,54 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "pqApplicationCore.h"
-#include "pqLineSourceWidget.h"
+#include "pqHandleWidget.h"
+#include "pqNamedWidgets.h"
+#include "pqPointSourceWidget.h"
 #include "pqPropertyLinks.h"
-#include "pqSMSignalAdaptors.h"
 
-#include "ui_pqLineSourceControls.h"
+#include "ui_pqPointSourceControls.h"
 
+#include <vtkSMDoubleVectorProperty.h>
+#include <vtkSMIntVectorProperty.h>
 #include <vtkSMProxyProperty.h>
-#include <vtkSMSourceProxy.h>
 #include <vtkSMNewWidgetRepresentationProxy.h>
 
-/////////////////////////////////////////////////////////////////////////
-// pqLineSourceWidget::pqImplementation
+#include <QDoubleValidator>
+#include <QHBoxLayout>
+#include <QIntValidator>
+#include <QLabel>
+#include <QLineEdit>
+#include <QVBoxLayout>
 
-class pqLineSourceWidget::pqImplementation
+/////////////////////////////////////////////////////////////////////////
+// pqPointSourceWidget::pqImplementation
+
+class pqPointSourceWidget::pqImplementation
 {
 public:
   pqImplementation()
   {
-    this->Links.setUseUncheckedProperties(false);
-    this->Links.setAutoUpdateVTKObjects(true);
+  this->Links.setUseUncheckedProperties(false);
+  this->Links.setAutoUpdateVTKObjects(true);
   }
-  
-  ~pqImplementation()
-  {
-    this->Links.removeAllPropertyLinks();
-  }
-
-  /// Contains the Qt widgets
   QWidget ControlsContainer;
-  /// Stores the Qt widgets
-  Ui::pqLineSourceControls UI;
-  
-  /// Maps Qt widgets to the 3D widget
+  Ui::pqPointSourceControls Controls;
+
   pqPropertyLinks Links;
 };
 
 /////////////////////////////////////////////////////////////////////////
-// pqLineSourceWidget
+// pqPointSourceWidget
 
-pqLineSourceWidget::pqLineSourceWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p) :
-  Superclass(o, pxy, p, "LineSourceWidgetRepresentation"),
+pqPointSourceWidget::pqPointSourceWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p) :
+  Superclass(o, pxy, p),
   Implementation(new pqImplementation())
 {
-  this->Implementation->UI.setupUi(
+  this->Implementation->Controls.setupUi(
     &this->Implementation->ControlsContainer);
+    
+  this->Implementation->Controls.Radius->
+    setValidator(new QDoubleValidator(this->Implementation->Controls.Radius));
 
   this->layout()->addWidget(&this->Implementation->ControlsContainer);
   QLabel* label =new QLabel("<b>Note: Move mouse and use 'P' key to change point position</b>", this);
@@ -87,31 +89,46 @@ pqLineSourceWidget::pqLineSourceWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* 
 }
 
 //-----------------------------------------------------------------------------
-pqLineSourceWidget::~pqLineSourceWidget()
+pqPointSourceWidget::~pqPointSourceWidget()
 {
   delete this->Implementation;
 }
 
 //-----------------------------------------------------------------------------
-void pqLineSourceWidget::setControlledProperties(vtkSMProperty* point1, 
-  vtkSMProperty* point2, vtkSMProperty* resolution)
+void pqPointSourceWidget::resetBounds(double input_bounds[6])
 {
-  this->Superclass::setControlledProperties(point1, point2);
-  this->setControlledProperty("Resolution", resolution);
+  this->Superclass::resetBounds(input_bounds);
+
+  vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
+  double min_diameter = input_bounds[1]-input_bounds[0];
+  min_diameter = qMin(min_diameter, input_bounds[3]-input_bounds[2]);
+  min_diameter = qMin(min_diameter, input_bounds[5]-input_bounds[4]);
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    widget->GetProperty("Radius"));
+  if (dvp)
+    {
+    dvp->SetElement(0, min_diameter * 0.1);
+    }
+  widget->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
-void pqLineSourceWidget::setControlledProperty(const char* function,
+void pqPointSourceWidget::setControlledProperty(const char* function,
   vtkSMProperty* _property)
 {
-  if (strcmp(function, "Resolution") == 0)
+  if (strcmp(function, "NumberOfPoints") == 0)
     {
     this->Implementation->Links.addPropertyLink(
-      this->Implementation->UI.resolution, "value", 
+      this->Implementation->Controls.NumberOfPoints, "value", 
       SIGNAL(valueChanged(int)),
-      this->getWidgetProxy(), 
-      this->getWidgetProxy()->GetProperty("Resolution"));
+      this->getWidgetProxy(), this->getWidgetProxy()->GetProperty("NumberOfPoints"));
+    }
+  else if (strcmp(function, "Radius") == 0)
+    {
+    this->Implementation->Links.addPropertyLink(
+      this->Implementation->Controls.Radius, "text", 
+      SIGNAL(textChanged(QString)),
+      this->getWidgetProxy(), this->getWidgetProxy()->GetProperty("Radius"));
     }
   this->Superclass::setControlledProperty(function, _property);
 }
-

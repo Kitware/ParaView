@@ -39,7 +39,7 @@ class pqServer;
 class vtkSMProxy;
 
 /// GUI for ContourWidgetRepresentation. This is a 3D widget that edits a Contour.
-class PQCOMPONENTS_EXPORT pqContourWidget : public pq3DWidget
+class PQDEPRECATED_EXPORT pqContourWidget : public pq3DWidget
 {
   Q_OBJECT
   typedef pq3DWidget Superclass;
@@ -121,5 +121,3 @@ private:
 };
 
 #endif
-
-

@@ -194,4 +194,3 @@ void pqSphereWidget::reset()
 {
   this->Superclass::reset();
 }
-

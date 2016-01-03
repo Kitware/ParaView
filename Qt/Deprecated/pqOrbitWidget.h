@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqSphereWidget.h"
 
-class PQCOMPONENTS_EXPORT pqOrbitWidget : public pqSphereWidget
+class PQDEPRECATED_EXPORT pqOrbitWidget : public pqSphereWidget
 {
   Q_OBJECT
   typedef pqSphereWidget Superclass;
@@ -48,5 +48,3 @@ private:
 };
 
 #endif
-
-

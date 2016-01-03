@@ -185,5 +185,3 @@ void pqHandleWidget::resetBounds(double input_bounds[6])
     widget->UpdateVTKObjects();
     }
 }
-
-

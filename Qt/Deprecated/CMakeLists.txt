@@ -29,30 +29,73 @@
 #
 #==========================================================================
 set (Module_SRCS
-  pqStandardColorButton.cxx
-  pqStandardColorButton.h
-  pqStandardColorLinkAdaptor.cxx
-  pqStandardColorLinkAdaptor.h
-  pqTransferFunctionChartViewWidget.cxx
-  pqTransferFunctionChartViewWidget.h
-)
+  pq3DWidget.cxx
+  pq3DWidget.h
+  pq3DWidgetPropertyWidget.cxx
+  pq3DWidgetPropertyWidget.h
+  pqBoxWidget.cxx
+  pqBoxWidget.h
+  pqContourWidget.cxx
+  pqContourWidget.h
+  pqDistanceWidget.cxx
+  pqDistanceWidget.h
+  pqHandleWidget.cxx
+  pqHandleWidget.h
+  pqImplicitPlaneWidget.cxx
+  pqImplicitPlaneWidget.h
+  pqLineSourceWidget.cxx
+  pqLineSourceWidget.h
+  pqLineWidget.cxx
+  pqLineWidget.h
+  pqOrbitWidget.cxx
+  pqOrbitWidget.h
+  pqPointSourceWidget.cxx
+  pqPointSourceWidget.h
+  pqPolyLineWidget.cxx
+  pqPolyLineWidget.h
+  pqSphereWidget.cxx
+  pqSphereWidget.h
+  pqSplineWidget.cxx
+  pqSplineWidget.h
+  )
 
 set (Module_MOC_HDRS
-  pqStandardColorButton.h
-  pqStandardColorLinkAdaptor.h
-  pqTransferFunctionChartViewWidget.h
+  pq3DWidget.h
+  pq3DWidgetPropertyWidget.h
+  pqBoxWidget.h
+  pqContourWidget.h
+  pqDistanceWidget.h
+  pqHandleWidget.h
+  pqImplicitPlaneWidget.h
+  pqLineSourceWidget.h
+  pqLineWidget.h
+  pqOrbitWidget.h
+  pqPointSourceWidget.h
+  pqPolyLineWidget.h
+  pqSphereWidget.h
+  pqSplineWidget.h
 )
 
 set (Module_UI_FILES
+  pqBoxWidget.ui
+  pqContourWidget.ui
+  pqHandleWidget.ui
+  pqImplicitPlaneWidget.ui
+  pqLineSourceControls.ui
+  pqLineWidget.ui
+  pqPointSourceControls.ui
+  pqPolyLineWidget.ui
+  pqSphereWidget.ui
+  pqSplineWidget.ui
 )
 
 #-----------------------------------------------------------------------------------
 if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
   qt5_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
-  #  qt5_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
+  qt5_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
 else ()
   qt4_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
-  #qt4_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
+  qt4_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
 endif ()
 set(${vtk-module}_NO_HeaderTest 1)
 vtk_module_library(${vtk-module}

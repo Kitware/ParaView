@@ -1,15 +1,15 @@
 /*=========================================================================
 
-   Program:   ParaQ
-   Module:    pqHandleWidget.h
+   Program: ParaView
+   Module:    pqPolyLineWidget.h
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
-   ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.2. 
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.2.
 
-   See License_v1.2.txt for the full ParaQ license.
+   See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -28,25 +28,23 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
+========================================================================*/
+#ifndef pqPolyLineWidget_h
+#define pqPolyLineWidget_h
 
-#ifndef _pqHandleWidget_h
-#define _pqHandleWidget_h
-
-#include "pqProxy.h"
 #include "pq3DWidget.h"
-#include "pqComponentsModule.h"
+#include <QColor>
 
-/// Provides a complete Qt UI for working with a 3D handle widget
-class PQCOMPONENTS_EXPORT pqHandleWidget : public pq3DWidget
+class pqServer;
+
+/// GUI for PolyLineWidgetRepresentation. This is a 3D widget that edits a spline.
+class PQDEPRECATED_EXPORT pqPolyLineWidget : public pq3DWidget
 {
   Q_OBJECT
-  
-public:
   typedef pq3DWidget Superclass;
-
-  pqHandleWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* p);
-  ~pqHandleWidget();
+public:
+  pqPolyLineWidget(vtkSMProxy* refProxy, vtkSMProxy* proxy, QWidget* parent);
+  virtual ~pqPolyLineWidget();
 
   /// Resets the bounds of the 3D widget to the reference proxy bounds.
   /// This typically calls PlaceWidget on the underlying 3D Widget 
@@ -54,24 +52,29 @@ public:
   /// This should be explicitly called after the panel is created
   /// and the widget is initialized i.e. the reference proxy, controlled proxy
   /// and hints have been set.
+  virtual void resetBounds(double /*bounds*/[6]) {}
   virtual void resetBounds()
-    { this->Superclass::resetBounds(); }
-  virtual void resetBounds(double bounds[6]);
+    { return this->Superclass::resetBounds(); }
 
-private slots:
-  /// Called when the user changes widget visibility
-  void onWidgetVisibilityChanged(bool visible);
+  void setLineColor(const QColor& color);
+
+protected slots:
+  void addPoint();
+  void removePoints();
+
+  /// Snap currently selected point to surface.
+  virtual void pick(double x, double y, double z);
 
 protected:
   /// Internal method to create the widget.
   void createWidget(pqServer*);
 
-  /// Called on pick.
-  virtual void pick(double, double, double);
-
 private:
-  class pqImplementation;
-  pqImplementation* const Implementation;
+  pqPolyLineWidget(const pqPolyLineWidget&); // Not implemented.
+  void operator=(const pqPolyLineWidget&); // Not implemented.
+
+  class pqInternals;
+  pqInternals* Internals;
 };
 
 #endif

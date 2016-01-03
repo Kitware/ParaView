@@ -1,15 +1,15 @@
 /*=========================================================================
 
-   Program:   ParaQ
-   Module:    pqPointSourceWidget.h
+   Program: ParaView
+   Module:    pqSphereWidget.h
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
-   ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.2. 
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
 
-   See License_v1.2.txt for the full ParaQ license.
+   See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -28,28 +28,20 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
+========================================================================*/
+#ifndef pqSphereWidget_h
+#define pqSphereWidget_h
 
-#ifndef _pqPointSourceWidget_h
-#define _pqPointSourceWidget_h
+#include "pq3DWidget.h"
 
-#include "pqSMProxy.h"
-
-#include "pqHandleWidget.h" 
-#include "pqComponentsModule.h"
-
-class pqPropertyManager;
-
-/// Provides a complete Qt UI for working with a vtkPointSource filter
-class PQCOMPONENTS_EXPORT pqPointSourceWidget : public pqHandleWidget 
+class pqServer;
+class PQDEPRECATED_EXPORT pqSphereWidget : public pq3DWidget
 {
-  typedef pqHandleWidget Superclass;
-  
   Q_OBJECT
-  
+  typedef pq3DWidget Superclass;
 public:
-  pqPointSourceWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p = 0);
-  ~pqPointSourceWidget();
+  pqSphereWidget(vtkSMProxy* refProxy, vtkSMProxy* proxy, QWidget* p = 0);
+  virtual ~pqSphereWidget();
 
   /// Resets the bounds of the 3D widget to the reference proxy bounds.
   /// This typically calls PlaceWidget on the underlying 3D Widget 
@@ -57,21 +49,33 @@ public:
   /// This should be explicitly called after the panel is created
   /// and the widget is initialized i.e. the reference proxy, controlled proxy
   /// and hints have been set.
-  virtual void resetBounds(double bounds[6]);
   virtual void resetBounds()
     { this->Superclass::resetBounds(); }
+  virtual void resetBounds(double bounds[6]);
+
+  /// accept the changes. Overridden to hide handles.
+  virtual void accept();
+
+  /// reset the changes. Overridden to hide handles.
+  virtual void reset();
+
+  /// When set, the widget can also be used to setup a direction vector.
+  void enableDirection(bool);
 
 protected:
-  /// Subclasses can override this method to map properties to
-  /// GUI. Default implementation updates the internal datastructures
-  /// so that default implementations can be provided for 
-  /// accept/reset.
-  virtual void setControlledProperty(const char* function,
-    vtkSMProperty * controlled_property);
+  /// Internal method to create the widget.
+  void createWidget(pqServer*);
+
+private slots:
+  /// Called when the user changes widget visibility
+  void onWidgetVisibilityChanged(bool visible);
 
 private:
+  pqSphereWidget(const pqSphereWidget&); // Not implemented.
+  void operator=(const pqSphereWidget&); // Not implemented.
+
   class pqImplementation;
-  pqImplementation* const Implementation;
+  pqImplementation* Implementation;
 };
 
 #endif

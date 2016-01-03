@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqImplicitPlaneWidget_h
 #define _pqImplicitPlaneWidget_h
 
-#include "pqComponentsModule.h"
+#include "pqDeprecatedModule.h"
 
 #include "pqProxy.h"
 
@@ -43,7 +43,7 @@ class pqServer;
 class vtkSMDoubleVectorProperty;
 
 /// Provides a complete Qt UI for working with a 3D plane widget
-class PQCOMPONENTS_EXPORT pqImplicitPlaneWidget : public pq3DWidget
+class PQDEPRECATED_EXPORT pqImplicitPlaneWidget : public pq3DWidget
 {
   typedef pq3DWidget Superclass;
 

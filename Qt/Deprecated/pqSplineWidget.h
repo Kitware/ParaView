@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqStandardColorLinkAdaptor.h
+   Module:    pqSplineWidget.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,31 +29,52 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef pqStandardColorLinkAdaptor_h
-#define pqStandardColorLinkAdaptor_h
+#ifndef pqSplineWidget_h
+#define pqSplineWidget_h
 
-#include <QObject>
-#include "pqDeprecatedModule.h"
+#include "pq3DWidget.h"
+#include <QColor>
 
-class vtkEventQtSlotConnect;
-class pqStandardColorButton;
-class vtkSMProxy;
+class pqServer;
 
-/// DEPRECATED: Refer to pqColorChooserButtonWithPalettes and
-/// pqColorPaletteLinkHelper.
-class PQDEPRECATED_EXPORT pqStandardColorLinkAdaptor : public QObject
+/// GUI for SplineWidgetRepresentation. This is a 3D widget that edits a spline.
+class PQDEPRECATED_EXPORT pqSplineWidget : public pq3DWidget
 {
   Q_OBJECT
-  typedef QObject Superclass;
+  typedef pq3DWidget Superclass;
 public:
-  pqStandardColorLinkAdaptor(
-    pqStandardColorButton*, vtkSMProxy* proxy, const char* propname);
-  ~pqStandardColorLinkAdaptor();
+  pqSplineWidget(vtkSMProxy* refProxy, vtkSMProxy* proxy, QWidget* parent);
+  virtual ~pqSplineWidget();
 
-  /// Break a global-property link.
-  static void breakLink(vtkSMProxy*, const char*) {}
+  /// Resets the bounds of the 3D widget to the reference proxy bounds.
+  /// This typically calls PlaceWidget on the underlying 3D Widget 
+  /// with reference proxy bounds.
+  /// This should be explicitly called after the panel is created
+  /// and the widget is initialized i.e. the reference proxy, controlled proxy
+  /// and hints have been set.
+  virtual void resetBounds(double /*bounds*/[6]) {}
+  virtual void resetBounds()
+    { return this->Superclass::resetBounds(); }
+
+  void setLineColor(const QColor& color);
+
+protected slots:
+  void addPoint();
+  void removePoints();
+
+  /// Snap currently selected point to surface.
+  virtual void pick(double x, double y, double z);
+
+protected:
+  /// Internal method to create the widget.
+  void createWidget(pqServer*);
+
 private:
-  Q_DISABLE_COPY(pqStandardColorLinkAdaptor);
+  pqSplineWidget(const pqSplineWidget&); // Not implemented.
+  void operator=(const pqSplineWidget&); // Not implemented.
+
+  class pqInternals;
+  pqInternals* Internals;
 };
 
 #endif

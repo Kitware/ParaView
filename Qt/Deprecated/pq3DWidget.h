@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pq3DWidget_h
 #define pq3DWidget_h
 
-#include "pqComponentsModule.h"
+#include "pqDeprecatedModule.h"
 #include "pqProxyPanel.h"
 
 class pq3DWidgetInternal;
@@ -48,7 +48,7 @@ class vtkSMProperty;
 /// pq3DWidget is the abstract superclass for all 3D widgets.
 /// This class represents a 3D Widget proxy as well as the GUI for the
 /// widget.
-class PQCOMPONENTS_EXPORT pq3DWidget : public pqProxyPanel
+class PQDEPRECATED_EXPORT pq3DWidget : public pqProxyPanel
 {
   Q_OBJECT
   typedef pqProxyPanel Superclass;
@@ -232,4 +232,3 @@ private:
 };
 
 #endif
-
