@@ -1,46 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>pqImplicitCylinderWidget</class>
- <widget class="QWidget" name="pqImplicitCylinderWidget">
+ <class>CylinderPropertyWidget</class>
+ <widget class="QWidget" name="CylinderPropertyWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>263</width>
-    <height>192</height>
+    <width>300</width>
+    <height>190</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout">
-   <item row="7" column="1">
-    <widget class="QPushButton" name="resetBounds">
-     <property name="text">
-      <string>Reset Bounds</string>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="0">
-    <spacer>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
+  <layout class="QGridLayout" name="layout1">
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <property name="spacing">
+    <number>2</number>
+   </property>
    <item row="5" column="0" colspan="2">
-    <layout class="QGridLayout">
+    <layout class="QGridLayout" name="gridLayout2">
+     <property name="spacing">
+      <number>2</number>
+     </property>
      <item row="0" column="2">
       <widget class="pqLineEdit" name="centerY"/>
      </item>
      <item row="2" column="0">
-      <widget class="QLabel" name="label_2">
+      <widget class="QLabel" name="radiusLabel">
        <property name="text">
         <string>Radius</string>
        </property>
@@ -70,7 +59,7 @@
       </widget>
      </item>
      <item row="0" column="0">
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="centerLabel">
        <property name="text">
         <string>Center</string>
        </property>
@@ -89,12 +78,21 @@
      <property name="text">
       <string>Show Cylinder</string>
      </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item row="6" column="0" colspan="2">
-    <layout class="QGridLayout">
+    <layout class="QGridLayout" name="gridLayout1">
+     <property name="spacing">
+      <number>2</number>
+     </property>
      <item row="0" column="0">
       <widget class="QCheckBox" name="tubing">
+       <property name="toolTip">
+        <string>Enable/disable tubing of the wire outline of the cylinder intersecton (against the bounding box). The tube thickens the line by wrapping with a vtkTubeFilter.</string>
+       </property>
        <property name="text">
         <string>Tubing</string>
        </property>
@@ -102,6 +100,9 @@
      </item>
      <item row="0" column="1">
       <widget class="QCheckBox" name="outlineTranslation">
+       <property name="toolTip">
+        <string>Enable/disable the ability to translate the bounding box by moving it with the mouse</string>
+       </property>
        <property name="text">
         <string>Outline Translation</string>
        </property>
@@ -109,6 +110,9 @@
      </item>
      <item row="1" column="0">
       <widget class="QCheckBox" name="outsideBounds">
+       <property name="toolTip">
+        <string>Enable/disable the ability to move the widget outside of the bounds specified.</string>
+       </property>
        <property name="text">
         <string>Outside Bounds</string>
        </property>
@@ -116,12 +120,22 @@
      </item>
      <item row="1" column="1">
       <widget class="QCheckBox" name="scaling">
+       <property name="toolTip">
+        <string>Enable/disable the ability to scale the widget with the mouse.</string>
+       </property>
        <property name="text">
         <string>Scaling</string>
        </property>
       </widget>
      </item>
     </layout>
+   </item>
+   <item row="7" column="0" colspan="2">
+    <widget class="QPushButton" name="resetBounds">
+     <property name="text">
+      <string>Reset Bounds</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

@@ -112,6 +112,8 @@ set (Module_SRCS
   pqCreateCustomFilterReaction.h
   pqCubeAxesPropertyWidget.cxx
   pqCubeAxesPropertyWidget.h
+  pqCylinderPropertyWidget.cxx
+  pqCylinderPropertyWidget.h
   pqDataQueryReaction.cxx
   pqDataQueryReaction.h
   pqDataTimeStepBehavior.cxx
@@ -346,6 +348,7 @@ set (Module_MOC_HDRS
   pqCrashRecoveryBehavior.h
   pqCreateCustomFilterReaction.h
   pqCubeAxesPropertyWidget.h
+  pqCylinderPropertyWidget.h
   pqDataQueryReaction.h
   pqDataTimeStepBehavior.h
   pqDefaultMainWindow.h
@@ -468,6 +471,7 @@ set (Module_UI_FILES
   Resources/UI/pqColorMapEditor.ui
   Resources/UI/pqColorOpacityEditorWidget.ui
   Resources/UI/pqColorToolbar.ui
+  Resources/UI/pqCylinderPropertyWidget.ui
   Resources/UI/pqDefaultMainWindow.ui
   Resources/UI/pqDoubleRangeSliderPropertyWidget.ui
   Resources/UI/pqEditMenuBuilder.ui

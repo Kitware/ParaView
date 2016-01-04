@@ -693,8 +693,8 @@
         </ProxyList>
       </Hints>
     </Proxy>
-    <Proxy class="vtkPVCylinder"
-           name="Cylinder">
+    <Proxy class="vtkPVCylinder" name="Cylinder">
+      <InputProperty is_internal="1" name="Input" />
       <DoubleVectorProperty command="SetCenter"
                             default_values="none"
                             name="Center"
@@ -714,21 +714,16 @@
         <DoubleRangeDomain min="0"
                            name="range" />
       </DoubleVectorProperty>
+      <PropertyGroup label="Cylinder Parameters" panel_widget="InteractiveCylinder">
+        <Property function="Center" name="Center" />
+        <Property function="Axis" name="Axis" />
+        <Property function="Radius" name="Radius" />
+        <Property function="Input" name="Input" />
+      </PropertyGroup>
       <Hints>
-        <!-- Hints are metadata associated with the proxy.
-             As far as the ServerManager is concerned, Hints have no
-             significance. GUI is free to interpret the hints as
-             it chooses. Hints provide a mechanism to add some GUI
-             pertinant information to the server manager XML.
-        -->
-        <PropertyGroup type="Cylinder">
-          <Property function="Center"
-                    name="Center" />
-          <Property function="Axis"
-                    name="Axis" />
-          <Property function="Radius"
-                    name="Radius" />
-        </PropertyGroup>
+        <ProxyList>
+          <Link name="Input" with_property="Input" />
+        </ProxyList>
       </Hints>
     </Proxy>
   </ProxyGroup>

@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqColorPaletteSelectorWidget.h"
 #include "pqColorSelectorPropertyWidget.h"
 #include "pqCommandButtonPropertyWidget.h"
+#include "pqCylinderPropertyWidget.h"
 #include "pqCTHArraySelectionDecorator.h"
 #include "pqCubeAxesPropertyWidget.h"
 #include "pqDisplayRepresentationWidget.h"
@@ -261,6 +262,10 @@ pqStandardPropertyWidgetInterface::createWidgetForPropertyGroup(
   else if (panelWidget == "YoungsMaterial")
     {
     return new pqYoungsMaterialPropertyWidget(proxy, group);
+    }
+  else if (panelWidget == "InteractiveCylinder")
+    {
+    return new pqCylinderPropertyWidget(proxy, group);
     }
   // *** NOTE: When adding new types, please update the header documentation ***
 

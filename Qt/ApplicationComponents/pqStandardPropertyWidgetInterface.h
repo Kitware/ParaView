@@ -93,6 +93,7 @@ public:
   /// \li \c InteractiveSpline: pqSplinePropertyWidget
   /// \li \c InteractiveSphere: pqSpherePropertyWidget
   /// \li \c InteractivePolyLine: pqSplinePropertyWidget (with mode==POLYLINE)
+  /// \li \c InteractiveCylinder: pqCylinderPropertyWidget
   /// \li \c YoungsMaterial: pqYoungsMaterialPropertyWidget
   virtual pqPropertyWidget* createWidgetForPropertyGroup(
     vtkSMProxy *proxy, vtkSMPropertyGroup *group);
