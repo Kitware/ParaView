@@ -223,10 +223,6 @@ void vtkSMParaViewPipelineController::RegisterProxiesForProxyListDomains(
     for (unsigned int cc=0, max=pld->GetNumberOfProxies(); cc < max; cc++)
       {
       vtkSMProxy* plproxy = pld->GetProxy(cc);
-
-      // Handle proxy-list hints.
-      this->ProcessProxyListProxyHints(proxy, plproxy);
-
       this->PostInitializeProxy(plproxy);
       pxm->RegisterProxy(groupname.c_str(), iter->GetKey(), plproxy);
       }
@@ -305,76 +301,6 @@ bool vtkSMParaViewPipelineController::SetupGlobalPropertiesLinks(vtkSMProxy* pro
       }
     }
   return true;
-}
-
-namespace vtkSMParaViewPipelineControllerNS
-{
-  //---------------------------------------------------------------------------
-  class vtkSMLinkObserver : public vtkCommand
-  {
-public:
-  vtkWeakPointer<vtkSMProperty> Output;
-  typedef vtkCommand Superclass;
-  virtual const char* GetClassNameInternal() const
-    { return "vtkSMLinkObserver"; }
-  static vtkSMLinkObserver* New()
-    {
-    return new vtkSMLinkObserver();
-    }
-  virtual void Execute(vtkObject* caller, unsigned long event, void* calldata)
-    {
-    (void)event;
-    (void)calldata;
-    vtkSMProperty* input = vtkSMProperty::SafeDownCast(caller);
-    if (input && this->Output)
-      {
-      // this will copy both checked and unchecked property values.
-      this->Output->Copy(input);
-      }
-    }
-
-  static void LinkProperty(vtkSMProperty* input,
-    vtkSMProperty* output)
-    {
-    if (input && output)
-      {
-      vtkSMLinkObserver* observer = vtkSMLinkObserver::New();
-      observer->Output = output;
-      input->AddObserver(vtkCommand::PropertyModifiedEvent, observer);
-      input->AddObserver(vtkCommand::UncheckedPropertyModifiedEvent, observer);
-      observer->FastDelete();
-      output->Copy(input);
-      }
-    }
-  };
-
-}
-
-//----------------------------------------------------------------------------
-void vtkSMParaViewPipelineController::ProcessProxyListProxyHints(
-  vtkSMProxy* parent, vtkSMProxy* plproxy)
-{
-  vtkPVXMLElement* proxyListElement = plproxy->GetHints()?
-    plproxy->GetHints()->FindNestedElementByName("ProxyList") : NULL;
-  if (!proxyListElement)
-    {
-    return;
-    }
-  for (unsigned int cc=0, max = proxyListElement->GetNumberOfNestedElements();
-    cc < max; ++cc)
-    {
-    vtkPVXMLElement* child = proxyListElement->GetNestedElement(cc);
-    if (child && child->GetName() && strcmp(child->GetName(), "Link") == 0)
-      {
-      const char* name = child->GetAttribute("name");
-      const char* linked_with = child->GetAttribute("with_property");
-      if (name && linked_with)
-        {
-        vtkSMParaViewPipelineControllerNS::vtkSMLinkObserver::LinkProperty(
-          parent->GetProperty(linked_with), plproxy->GetProperty(name));
-        }
-      }
-    }
 }
 
 //----------------------------------------------------------------------------
