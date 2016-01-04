@@ -17,19 +17,19 @@
 
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
   <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="PointSource" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/1pq3DWidgetPropertyWidget0/pqHandleWidget/pqPointSourceControls/NumberOfPoints" command="set_int" arguments="10" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/1pq3DWidgetPropertyWidget0/pqHandleWidget/pqPointSourceControls/NumberOfPoints" command="set_int" arguments="100" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/1pq3DWidgetPropertyWidget0/pqHandleWidget/pqPointSourceControls/NumberOfPoints" command="set_int" arguments="1000" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/1pq3DWidgetPropertyWidget0/pqHandleWidget/pqPointSourceControls/Radius" command="key" arguments="46" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/1pq3DWidgetPropertyWidget0/pqHandleWidget/pqPointSourceControls/Radius" command="set_string" arguments="0.5" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/NumberOfPoints/LineEdit0" command="set_string" arguments="10" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/NumberOfPoints/LineEdit0" command="set_string" arguments="100" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/NumberOfPoints/LineEdit0" command="set_string" arguments="1000" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Radius/LineEdit0" command="key" arguments="46" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Radius/LineEdit0" command="set_string" arguments="0.5" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
   <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="PointSource" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/1pq3DWidgetPropertyWidget0/pqHandleWidget/pqPointSourceControls/NumberOfPoints" command="set_int" arguments="10" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/1pq3DWidgetPropertyWidget0/pqHandleWidget/pqPointSourceControls/NumberOfPoints" command="set_int" arguments="100" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/1pq3DWidgetPropertyWidget0/pqHandleWidget/pqPointSourceControls/NumberOfPoints" command="set_int" arguments="1000" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/1pq3DWidgetPropertyWidget0/pqHandleWidget/pqPointSourceControls/Radius" command="key" arguments="46" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/1pq3DWidgetPropertyWidget0/pqHandleWidget/pqPointSourceControls/Radius" command="set_string" arguments="0.5" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/NumberOfPoints/LineEdit0" command="set_string" arguments="10" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/NumberOfPoints/LineEdit0" command="set_string" arguments="100" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/NumberOfPoints/LineEdit0" command="set_string" arguments="1000" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Radius/LineEdit0" command="key" arguments="46" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Radius/LineEdit0" command="set_string" arguments="0.5" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/Calculator" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ResultArrayName/ResultArrayName" command="key" arguments="16777248" />

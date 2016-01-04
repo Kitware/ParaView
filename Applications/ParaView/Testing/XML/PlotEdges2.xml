@@ -24,10 +24,10 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/Cut" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveY" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CutFunction/1pqProxySelectionWidget0/pqImplicitPlaneWidget/useYNormal" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CutFunction/ProxySelectionWidget/frame/ChosenProxyWidget/InteractivePlane/useYNormal" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <!-- hide the slice plane widget -->
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CutFunction/1pqProxySelectionWidget0/pqImplicitPlaneWidget/show3DWidget" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CutFunction/ProxySelectionWidget/frame/ChosenProxyWidget/InteractivePlane/show3DWidget" command="set_boolean" arguments="false" />
 
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="PlotOnSortedLines" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
