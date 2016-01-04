@@ -732,6 +732,22 @@
         <DoubleRangeDomain min="0"
                            name="range" />
       </DoubleVectorProperty>
+      <Hints>
+        <!-- Hints are metadata associated with the proxy.
+             As far as the ServerManager is concerned, Hints have no
+             significance. GUI is free to interpret the hints as
+             it chooses. Hints provide a mechanism to add some GUI
+             pertinant information to the server manager XML.
+        -->
+        <PropertyGroup type="Cylinder">
+          <Property function="Center"
+                    name="Center" />
+          <Property function="Axis"
+                    name="Axis" />
+          <Property function="Radius"
+                    name="Radius" />
+        </PropertyGroup>
+      </Hints>
     </Proxy>
   </ProxyGroup>
   <ProxyGroup name="transforms">

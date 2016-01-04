@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -65,6 +65,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqBoxWidget.h"
 #include "pqCoreUtilities.h"
 #include "pqDistanceWidget.h"
+#include "pqImplicitCylinderWidget.h"
 #include "pqImplicitPlaneWidget.h"
 #include "pqInterfaceTracker.h"
 #include "pqLineSourceWidget.h"
@@ -137,6 +138,10 @@ public:
       {
       widget = new pqSplineWidget(referenceProxy, controlledProxy, 0);
       }
+    else if (name == "Cylinder")
+      {
+      widget = new pqImplicitCylinderWidget(referenceProxy, controlledProxy, 0);
+      }
     return widget;
     }
 };
@@ -156,7 +161,7 @@ public:
   this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
   this->IsMaster = pqApplicationCore::instance()->getActiveServer()->isMaster();
   }
-    
+
   vtkSmartPointer<vtkSMProxy> ReferenceProxy;
   vtkSmartPointer<vtkSMNewWidgetRepresentationProxy> WidgetProxy;
   vtkSmartPointer<vtkCommand> ControlledPropertiesObserver;
@@ -189,7 +194,7 @@ pq3DWidget::pq3DWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* _p) :
   this->Internal->ReferenceProxy = refProxy;
 
   this->Internal->ControlledPropertiesObserver.TakeReference(
-    vtkMakeMemberFunctionCommand(*this, 
+    vtkMakeMemberFunctionCommand(*this,
       &pq3DWidget::onControlledPropertyChanged));
   this->Internal->IgnorePropertyChange = false;
 
@@ -280,7 +285,7 @@ void pq3DWidget::pickingSupported(const QKeySequence& key)
 
 //-----------------------------------------------------------------------------
 void pq3DWidget::setView(pqView* pqview)
-{ 
+{
   pqRenderViewBase* rview = this->renderView();
   if (pqview == rview)
     {
@@ -310,8 +315,8 @@ void pq3DWidget::setView(pqView* pqview)
   if (rview && widget)
     {
     // To add/remove the 3D widget display from the view module.
-    // we don't use the property. This is so since the 3D widget add/remove 
-    // should not get saved in state or undo-redo. 
+    // we don't use the property. This is so since the 3D widget add/remove
+    // should not get saved in state or undo-redo.
     vtkSMPropertyHelper(
       rview->getProxy(), "HiddenRepresentations").Remove(widget);
     rview->getProxy()->UpdateVTKObjects();
@@ -331,8 +336,8 @@ void pq3DWidget::setView(pqView* pqview)
   if (rview && widget)
     {
     // To add/remove the 3D widget display from the view module.
-    // we don't use the property. This is so since the 3D widget add/remove 
-    // should not get saved in state or undo-redo. 
+    // we don't use the property. This is so since the 3D widget add/remove
+    // should not get saved in state or undo-redo.
     this->updateWidgetVisibility();
     vtkSMPropertyHelper(
       rview->getProxy(), "HiddenRepresentations").Add(widget);
@@ -407,8 +412,8 @@ void pq3DWidget::setWidgetProxy(vtkSMNewWidgetRepresentationProxy* pxy)
   if (rview && widget)
     {
     // To add/remove the 3D widget display from the view module.
-    // we don't use the property. This is so since the 3D widget add/remove 
-    // should not get saved in state or undo-redo. 
+    // we don't use the property. This is so since the 3D widget add/remove
+    // should not get saved in state or undo-redo.
     vtkSMPropertyHelper(viewProxy,"HiddenRepresentations").Remove(widget);
     viewProxy->UpdateVTKObjects();
     rview->render();
@@ -431,8 +436,8 @@ void pq3DWidget::setWidgetProxy(vtkSMNewWidgetRepresentationProxy* pxy)
   if (rview && pxy)
     {
     // To add/remove the 3D widget display from the view module.
-    // we don't use the property. This is so since the 3D widget add/remove 
-    // should not get saved in state or undo-redo. 
+    // we don't use the property. This is so since the 3D widget add/remove
+    // should not get saved in state or undo-redo.
     vtkSMPropertyHelper(viewProxy,"HiddenRepresentations").Add(widget);
     viewProxy->UpdateVTKObjects();
     rview->render();
@@ -509,7 +514,7 @@ void pq3DWidget::setHints(vtkPVXMLElement* hints)
 bool pq3DWidget::pickOnMeshPoint() const
 {
   return this->Internal->PickOnMeshPoint;
-} 
+}
 
 //-----------------------------------------------------------------------------
 void pq3DWidget::setControlledProperty(const char* function,
@@ -524,13 +529,13 @@ void pq3DWidget::setControlledProperty(const char* function,
 }
 
 //-----------------------------------------------------------------------------
-void pq3DWidget::setControlledProperty(vtkSMProperty* widget_property, 
+void pq3DWidget::setControlledProperty(vtkSMProperty* widget_property,
   vtkSMProperty* controlled_property)
 {
   this->Internal->PropertyMap.insert(
     widget_property,
     controlled_property);
-    
+
   controlled_property->AddObserver(vtkCommand::ModifiedEvent,
     this->Internal->ControlledPropertiesObserver);
 }
@@ -539,10 +544,10 @@ void pq3DWidget::setControlledProperty(vtkSMProperty* widget_property,
 void pq3DWidget::accept()
 {
   this->Internal->IgnorePropertyChange = true;
-  QMap<vtkSmartPointer<vtkSMProperty>, 
+  QMap<vtkSmartPointer<vtkSMProperty>,
     vtkSmartPointer<vtkSMProperty> >::const_iterator iter;
   for (iter = this->Internal->PropertyMap.constBegin() ;
-    iter != this->Internal->PropertyMap.constEnd(); 
+    iter != this->Internal->PropertyMap.constEnd();
     ++iter)
     {
     iter.value()->Copy(iter.key());
@@ -557,14 +562,14 @@ void pq3DWidget::accept()
 //-----------------------------------------------------------------------------
 void pq3DWidget::reset()
 {
-  // We don't want to fire any widget modified events while resetting the 
+  // We don't want to fire any widget modified events while resetting the
   // 3D widget, hence we block all signals. Otherwise, on reset, we fire a
   // widget modified event, which makes the accept button enabled again.
   this->blockSignals(true);
-  QMap<vtkSmartPointer<vtkSMProperty>, 
+  QMap<vtkSmartPointer<vtkSMProperty>,
     vtkSmartPointer<vtkSMProperty> >::const_iterator iter;
   for (iter = this->Internal->PropertyMap.constBegin() ;
-    iter != this->Internal->PropertyMap.constEnd(); 
+    iter != this->Internal->PropertyMap.constEnd();
     ++iter)
     {
     iter.key()->Copy(iter.value());
@@ -656,7 +661,7 @@ int pq3DWidget::getReferenceInputBounds(double bounds[6]) const
     {
     return 0;
     }
-  
+
   vtkSMSourceProxy* input = NULL;
   vtkSMInputProperty* ivp = vtkSMInputProperty::SafeDownCast(
     refProxy->GetProperty("Input"));
@@ -689,9 +694,9 @@ void pq3DWidget::updateWidgetVisibility()
 {
   const bool widget_visible = this->Internal->Selected
     && this->Internal->WidgetVisible;
-    
+
   const bool widget_enabled = widget_visible;
-  
+
   this->updateWidgetState(widget_visible, widget_enabled);
 }
 

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -64,7 +64,7 @@ pqBoxWidget::pqBoxWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* _parent
 {
   this->Implementation = new pqImplementation();
   this->Implementation->setupUi(this);
-  this->Implementation->show3DWidget->setChecked(this->widgetVisible());  
+  this->Implementation->show3DWidget->setChecked(this->widgetVisible());
 
   // Setup validators for all line edits.
   QDoubleValidator* validator = new QDoubleValidator(this);
@@ -90,6 +90,15 @@ pqBoxWidget::pqBoxWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* _parent
 
   QObject::connect(this->Implementation->show3DWidget,
     SIGNAL(toggled(bool)), this, SLOT(setWidgetVisible(bool)));
+
+  QObject::connect(this->Implementation->enableTranslation,
+    SIGNAL(toggled(bool)), this, SLOT(onEnableTranslation(bool)));
+  QObject::connect(this->Implementation->enableScaling,
+    SIGNAL(toggled(bool)), this, SLOT(onEnableScaling(bool)));
+  QObject::connect(this->Implementation->enableRotation,
+    SIGNAL(toggled(bool)), this, SLOT(onEnableRotation(bool)));
+  QObject::connect(this->Implementation->enableMoveFaces,
+    SIGNAL(toggled(bool)), this, SLOT(onEnableMoveFaces(bool)));
 
   QObject::connect(this, SIGNAL(widgetVisibilityChanged(bool)),
     this, SLOT(onWidgetVisibilityChanged(bool)));
@@ -122,6 +131,14 @@ pqBoxWidget::~pqBoxWidget()
     widget, widget->GetProperty(smproperty), index);\
 }
 
+#define PVBOXWIDGET_LINK2(ui, signal, smproperty)\
+{\
+  this->Implementation->Links.addPropertyLink(\
+    this->Implementation->ui, "checked",\
+    SIGNAL(toggled(bool)),\
+    widget, widget->GetProperty(smproperty));\
+}
+
 //-----------------------------------------------------------------------------
 void pqBoxWidget::createWidget(pqServer* server)
 {
@@ -129,9 +146,9 @@ void pqBoxWidget::createWidget(pqServer* server)
     pqApplicationCore::instance()->get3DWidgetFactory()->
     get3DWidget("BoxWidgetRepresentation", server, this->getReferenceProxy());
   this->setWidgetProxy(widget);
-
   widget->UpdateVTKObjects();
   widget->UpdatePropertyInformation();
+
 
   PVBOXWIDGET_LINK(positionX, "Position", 0);
   PVBOXWIDGET_LINK(positionY, "Position", 1);
@@ -144,6 +161,11 @@ void pqBoxWidget::createWidget(pqServer* server)
   PVBOXWIDGET_LINK(scaleX, "Scale", 0);
   PVBOXWIDGET_LINK(scaleY, "Scale", 1);
   PVBOXWIDGET_LINK(scaleZ, "Scale", 2);
+
+  PVBOXWIDGET_LINK2(enableTranslation, onEnableTranslation, "TranslationEnabled");
+  PVBOXWIDGET_LINK2(enableScaling, onEnableScaling, "ScalingEnabled");
+  PVBOXWIDGET_LINK2(enableRotation, onEnableRotation, "RotationEnabled");
+  PVBOXWIDGET_LINK2(enableMoveFaces, onEnableMoveFaces, "MoveFacesEnabled");
 }
 
 //-----------------------------------------------------------------------------
@@ -195,11 +217,11 @@ void pqBoxWidget::reset()
 void pqBoxWidget::showHandles()
 {
   /*
-  vtkSMProxy* proxy = this->getWidgetProxy();
-  if (proxy)
+  vtkSMProxy* widget = this->getWidgetProxy();
+  if (widget)
     {
-    pqSMAdaptor::setElementProperty(proxy->GetProperty("HandleVisibility"), 1);
-    proxy->UpdateVTKObjects();
+    pqSMAdaptor::setElementProperty(widget->GetProperty("HandleVisibility"), 1);
+    widget->UpdateVTKObjects();
     }
     */
 }
@@ -208,11 +230,55 @@ void pqBoxWidget::showHandles()
 void pqBoxWidget::hideHandles()
 {
   /*
-  vtkSMProxy* proxy = this->getWidgetProxy();
-  if (proxy)
+  vtkSMProxy* widget = this->getWidgetProxy();
+  if (widget)
     {
-    pqSMAdaptor::setElementProperty(proxy->GetProperty("HandleVisibility"), 1);
-    proxy->UpdateVTKObjects();
+    pqSMAdaptor::setElementProperty(widget->GetProperty("HandleVisibility"), 1);
+    widget->UpdateVTKObjects();
     }
   */
+}
+
+//-----------------------------------------------------------------------------
+void pqBoxWidget::onEnableTranslation(bool b)
+{
+  vtkSMProxy* widget = this->getWidgetProxy();
+  if (widget)
+    {
+    pqSMAdaptor::setElementProperty(widget->GetProperty("TranslationEnabled"), b ? 1 : 0);
+    widget->UpdateVTKObjects();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqBoxWidget::onEnableScaling(bool b)
+{
+  vtkSMProxy* widget = this->getWidgetProxy();
+  if (widget)
+    {
+    pqSMAdaptor::setElementProperty(widget->GetProperty("ScalingEnabled"), b ? 1 : 0);
+    widget->UpdateVTKObjects();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqBoxWidget::onEnableRotation(bool b)
+{
+  vtkSMProxy* widget = this->getWidgetProxy();
+  if (widget)
+    {
+    pqSMAdaptor::setElementProperty(widget->GetProperty("RotationEnabled"), b ? 1 : 0);
+    widget->UpdateVTKObjects();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqBoxWidget::onEnableMoveFaces(bool b)
+{
+  vtkSMProxy* widget = this->getWidgetProxy();
+  if (widget)
+    {
+    pqSMAdaptor::setElementProperty(widget->GetProperty("MoveFacesEnabled"), b ? 1 : 0);
+    widget->UpdateVTKObjects();
+    }
 }

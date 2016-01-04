@@ -141,6 +141,8 @@ set (Module_SRCS
   pqHighlightItemDelegate.h
   pqImageTip.cxx
   pqImageTip.h
+  pqImplicitCylinderWidget.cxx
+  pqImplicitCylinderWidget.h
   pqImplicitPlaneWidget.cxx
   pqImplicitPlaneWidget.h
   pqIndexSelectionWidget.cxx
@@ -406,6 +408,7 @@ set (Module_MOC_HDRS
   pqHandleWidget.h
   pqHighlightItemDelegate.h
   pqImageTip.h
+  pqImplicitCylinderWidget.h
   pqImplicitPlaneWidget.h
   pqIndexSelectionWidget.h
   pqIntMaskPropertyWidget.h
@@ -535,6 +538,7 @@ set (Module_UI_FILES
   Resources/UI/pqFindDataSelectionDisplayFrame.ui
   Resources/UI/pqFixStateFilenamesDialog.ui
   Resources/UI/pqHandleWidget.ui
+  Resources/UI/pqImplicitCylinderWidget.ui
   Resources/UI/pqImplicitPlaneWidget.ui
   Resources/UI/pqItemViewSearchWidget.ui
   Resources/UI/pqKeyFrameEditor.ui

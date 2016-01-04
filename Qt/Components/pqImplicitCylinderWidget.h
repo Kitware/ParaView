@@ -1,9 +1,9 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqBoxWidget.h
+   Module:    pqImplicitCylinderWidget.h
 
-   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
@@ -28,65 +28,66 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-========================================================================*/
-#ifndef pqBoxWidget_h
-#define pqBoxWidget_h
+=========================================================================*/
+
+#ifndef _pqImplicitCylinderWidget_h
+#define _pqImplicitCylinderWidget_h
 
 #include "pq3DWidget.h"
 
 class pqServer;
 
-/// Provides UI for Box Widget.
-class PQCOMPONENTS_EXPORT pqBoxWidget : public pq3DWidget
+/// Provides a complete Qt UI for working with a 3D cylinder widget
+class PQCOMPONENTS_EXPORT pqImplicitCylinderWidget : public pq3DWidget
 {
   Q_OBJECT
   typedef pq3DWidget Superclass;
-public:
-  pqBoxWidget(vtkSMProxy* refProxy, vtkSMProxy* proxy, QWidget* p = 0);
-  virtual ~pqBoxWidget();
 
+public:
+  pqImplicitCylinderWidget(vtkSMProxy* refProxy, vtkSMProxy* proxy, QWidget* p = 0);
+  ~pqImplicitCylinderWidget();
+
+public slots:
   /// Resets the bounds of the 3D widget to the reference proxy bounds.
-  /// This typically calls PlaceWidget on the underlying 3D Widget
-  /// with reference proxy bounds.
-  /// This should be explicitly called after the panel is created
-  /// and the widget is initialized i.e. the reference proxy, controlled proxy
-  /// and hints have been set.
-  virtual void resetBounds(double bounds[6]);
   virtual void resetBounds()
     { this->Superclass::resetBounds(); }
+  virtual void resetBounds(double bounds[6]);
 
-  /// accept the changes. Overridden to hide handles.
-  virtual void accept();
+  /// accept the changes
+  void accept();
 
-  /// reset the changes. Overridden to hide handles.
-  virtual void reset();
+  /// reset the changes
+  void reset();
 
   /// Overridden to update widget placement based on data bounds.
   virtual void select();
 
 protected:
+  /// Makes the 3D widget cylinder visible (respects the overall visibility flag)
+  virtual void showCylinder();
+
+  /// Hides the 3D widget cylinder
+  virtual void hideCylinder();
+
   /// Internal method to create the widget.
   void createWidget(pqServer*);
 
 private slots:
-  /// Called when the user changes widget visibility
+  /// Called to show/hide the 3D widget
+  void onShow3DWidget(bool);
   void onWidgetVisibilityChanged(bool visible);
 
-  void onEnableTranslation(bool);
-  void onEnableScaling(bool);
-  void onEnableRotation(bool);
-  void onEnableMoveFaces(bool);
+  void onTubing(bool);
+  void onOutlineTranslation(bool);
+  void onOutsideBounds(bool);
+  void onScaling(bool);
 
-  void showHandles();
-  void hideHandles();
 private:
-  pqBoxWidget(const pqBoxWidget&); // Not implemented.
-  void operator=(const pqBoxWidget&); // Not implemented.
+  void setNormalProperty(vtkSMProperty*);
+  void setOriginProperty(vtkSMProperty*);
 
   class pqImplementation;
-  pqImplementation* Implementation;
+  pqImplementation* const Implementation;
 };
 
 #endif
-
-
