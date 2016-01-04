@@ -53,8 +53,19 @@ protected slots:
   void fiveMinuteTimeoutWarning();
   void finalTimeoutWarning();
 
+  void showWarnings();
 private:
-  Q_DISABLE_COPY(pqDefaultViewBehavior)
+  Q_DISABLE_COPY(pqDefaultViewBehavior);
+
+  enum WarningModes
+    {
+    NONE,
+    SERVER_DISPLAY_INACCESSIBLE,
+    SERVER_OPENGL_INADEQUATE,
+    CLIENT_OPENGL_INADEQUATE
+    };
+  WarningModes WarningMode;
+  QString ExtraWarningMessage;
 };
 
 #endif
