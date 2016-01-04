@@ -4173,12 +4173,7 @@
         <EnumerationDomain name="enum">
           <Entry text="Smart"
                  value="0" />
-          <Entry text="Ray Cast and Texture Mapping"
-                 value="1" />
-          <Entry text="Ray Cast Only"
                  value="2" />
-          <Entry text="Texture Mapping Only"
-                 value="3" />
           <Entry text="GPU Based"
                  value="4" />
         </EnumerationDomain>
@@ -8195,12 +8190,8 @@
         <EnumerationDomain name="enum">
           <Entry text="Smart"
                  value="0" />
-          <Entry text="Ray Cast and Texture Mapping"
-                 value="1" />
           <Entry text="Ray Cast Only"
                  value="2" />
-          <Entry text="Texture Mapping Only"
-                 value="3" />
           <Entry text="GPU Based"
                  value="4" />
         </EnumerationDomain>
