@@ -271,9 +271,9 @@ void vtkPVOptions::Initialize()
     "Do not use registry when running ParaView (for testing).");
 
   this->AddBooleanArgument("--disable-xdisplay-test", 0, &this->DisableXDisplayTests,
-    "When specified, all X-display tests are skipped. Use this option if "
+    "When specified, all X-display tests and OpenGL version checks are skipped. Use this option if "
     "you are getting remote-rendering disabled errors and you are positive that "
-    "the X environment is setup properly (experimental).",
+    "the X environment is setup properly and your OpenGL support is adequate (experimental).",
     vtkPVOptions::PVSERVER|vtkPVOptions::PVRENDER_SERVER|vtkPVOptions::PVBATCH);
 
 #if defined(PARAVIEW_USE_MPI)

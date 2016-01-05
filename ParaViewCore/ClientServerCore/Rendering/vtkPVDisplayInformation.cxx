@@ -82,9 +82,16 @@ bool vtkPVDisplayInformation::SupportsOpenGLLocally()
     {
     return false;
     }
-
-  vtkNew<vtkRenderWindow> window;
-  return window->SupportsOpenGL() == 1;
+  // We're going to skip OpenGL version checks too  if DisableXDisplayTests
+  // command line option is set.
+  vtkPVOptions* options = vtkProcessModule::GetProcessModule()?
+    vtkProcessModule::GetProcessModule()->GetOptions() : NULL;
+  if (options && options->GetDisableXDisplayTests() == 0)
+    {
+    vtkNew<vtkRenderWindow> window;
+    return window->SupportsOpenGL() == 1;
+    }
+  return true;
 #else
   // We don't do any OpenGL check for old rendering backend since the old
   // backend requires that the window is created for SupportsOpenGL() check to
