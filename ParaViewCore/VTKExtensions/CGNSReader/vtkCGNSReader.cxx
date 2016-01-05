@@ -2301,7 +2301,7 @@ int vtkCGNSReader::RequestData(vtkInformation *vtkNotUsed(request),
 
     std::vector<double>::iterator timeIte = std::find_if(
           this->Internal.GetTimes().begin(), this->Internal.GetTimes().end(),
-          vtkstd::bind2nd(WithinTolerance(), requestedTimeValue));
+          std::bind2nd(WithinTolerance(), requestedTimeValue));
     //
     if (timeIte == this->Internal.GetTimes().end())
       {
