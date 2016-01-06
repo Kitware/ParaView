@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMessageBox>
 #include <QPushButton>
 #include <QStringList>
+#include <QTextStream>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 
@@ -51,6 +52,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPluginManager.h"
 #include "pqServer.h"
 #include "pqSettings.h"
+#include "vtkNew.h"
+#include "vtkPVPythonInformation.h"
+#include "vtkSMSession.h"
 
 // enum for different columns
 enum PluginTreeCol
@@ -136,11 +140,51 @@ void pqPluginDialog::loadLocalPlugin()
 //----------------------------------------------------------------------------
 void pqPluginDialog::loadPlugin(pqServer* server, bool remote)
 {
-  pqFileDialog fd(remote ? server : NULL, this, "Load Plugin", QString(),
-    "Plugins (*.so;*.dylib;*.dll;*.sl)\n"
-    "Client Resource Files (*.bqrc)\n"
-    "Server Manager XML (*.xml)\n"
-    "All Files (*)");
+  std::map<QString, QStringList> exts;
+  exts[tr("Qt binary resource files")] << "*.bqrc";
+  exts[tr("XML plugins")] << "*.xml";
+
+#if defined(_WIN32) && !defined(__CYGWIN__)
+  exts[tr("Binary plugins")] << "*.dll";
+#elif defined(__APPLE__)
+  exts[tr("Binary plugins")] << "*.dylib";
+#else
+  exts[tr("Binary plugins")] << "*.so";
+#endif
+
+  vtkNew<vtkPVPythonInformation> pinfo;
+  if (remote && server != nullptr)
+  {
+    server->session()->GatherInformation(vtkPVSession::DATA_SERVER_ROOT, pinfo, 0);
+  }
+  else
+  {
+    pinfo->CopyFromObject(nullptr);
+  }
+
+  if (pinfo->GetPythonSupport())
+  {
+    exts["Python plugins"] << "*.py";
+  }
+
+  QStringList supportsExts;
+  for (const auto apair : exts)
+  {
+    supportsExts.append(apair.second);
+  }
+  supportsExts.sort(Qt::CaseInsensitive);
+
+  QString filterString;
+  QTextStream stream(&filterString, QIODevice::WriteOnly);
+
+  stream << tr("Supported plugins") << " (" << supportsExts.join(" ") << ");;";
+  for (const auto apair : exts)
+  {
+    stream << apair.first << " (" << apair.second.join(" ") << ");;";
+  }
+  stream << "All files (*)";
+
+  pqFileDialog fd(remote ? server : NULL, this, "Load Plugin", QString(), filterString);
   if (fd.exec() == QDialog::Accepted)
   {
     QString plugin = fd.getSelectedFiles()[0];

@@ -380,7 +380,10 @@ list(APPEND _vtk_modules vtkDomainsChemistryOpenGL2)
 list (APPEND _vtk_modules vtkIOSegY)
 list(APPEND _vtk_mpi_modules vtkRenderingParallelLIC)
 if(PARAVIEW_ENABLE_PYTHON)
-  list (APPEND _vtk_modules vtkPVCinemaReader)
+  list (APPEND _vtk_modules
+    vtkPVCinemaReader
+    vtkPVPythonAlgorithm
+    )
 endif()
 
 if (PARAVIEW_ENABLE_XDMF2)

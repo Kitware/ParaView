@@ -679,6 +679,28 @@ if(PARAVIEW_ENABLE_PYTHON)
     set(ImportCinema_DISABLE_CRS TRUE)
     set(ImportCinemaSpecA_DISABLE_CS TRUE)
     set(ImportCinemaSpecA_DISABLE_CRS TRUE)
+
+
+    # PythonAlgorithm plugin tests.
+    configure_file(
+      "${CMAKE_CURRENT_SOURCE_DIR}/PythonAlgorithmPlugin.xml.in"
+      "${CMAKE_CURRENT_BINARY_DIR}/PythonAlgorithmPlugin.xml" @ONLY)
+    configure_file(
+      "${CMAKE_CURRENT_SOURCE_DIR}/PythonAlgorithmReadersAndWriters.xml.in"
+      "${CMAKE_CURRENT_BINARY_DIR}/PythonAlgorithmReadersAndWriters.xml" @ONLY)
+
+    set(pyalgo_plugin_tests
+      PythonAlgorithmPlugin
+      PythonAlgorithmReadersAndWriters)
+    foreach(tname IN LISTS pyalgo_plugin_tests)
+      list(APPEND TESTS_WITH_BASELINES
+        ${CMAKE_CURRENT_BINARY_DIR}/${tname}.xml)
+
+      # we need to extend testing infrastructure to better support
+      # loading plugins in client-server. At that point, we can test these as well.
+      set(${tname}_DISABLE_CS TRUE)
+      set(${tname}_DISABLE_CRS TRUE)
+    endforeach()
   endif()
 endif()
 

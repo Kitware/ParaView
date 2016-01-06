@@ -364,7 +364,7 @@ bool vtkSIProxy::CreateVTKObjects()
   assert(this->ObjectsCreated == false);
   if (this->VTKClassName && this->VTKClassName[0])
   {
-    vtkObjectBase* obj = this->Interpreter->NewInstance(this->VTKClassName);
+    vtkObjectBase* obj = this->NewVTKObject(this->VTKClassName);
     if (!obj)
     {
       vtkErrorMacro("Failed to create '"
@@ -419,6 +419,12 @@ bool vtkSIProxy::CreateVTKObjects()
   }
 
   return true;
+}
+
+//----------------------------------------------------------------------------
+vtkObjectBase* vtkSIProxy::NewVTKObject(const char* className)
+{
+  return this->Interpreter->NewInstance(className);
 }
 
 //----------------------------------------------------------------------------

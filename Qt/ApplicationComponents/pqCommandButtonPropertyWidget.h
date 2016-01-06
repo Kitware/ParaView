@@ -42,6 +42,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 * To use this widget for a property add the 'panel_widget="command_button"'
 * to the property's XML.
+*
+* If the property has a "command" set, then the property will be modified and
+* updated immediately when the button is pushed. If the property has no command
+* set, then clicking the button will call `vtkSMProxy::RecreateVTKObjects()`.
 */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqCommandButtonPropertyWidget : public pqPropertyWidget
 {

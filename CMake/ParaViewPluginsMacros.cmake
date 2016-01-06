@@ -286,7 +286,7 @@ function(_write_static_plugins_init_file header source)
   set(plugins_init_function "${plugins_init_function}static bool paraview_static_plugins_load(const char* name);\n\n")
   set(plugins_init_function "${plugins_init_function}static bool paraview_static_plugins_search(const char* name);\n\n")
   set(plugins_init_function "${plugins_init_function}void paraview_static_plugins_init()\n{\n")
-  set(plugins_init_function "${plugins_init_function}  vtkPVPluginLoader::SetStaticPluginLoadFunction(paraview_static_plugins_load);\n")
+  set(plugins_init_function "${plugins_init_function}  vtkPVPluginLoader::RegisterLoadPluginCallback(paraview_static_plugins_load);\n")
   set(plugins_init_function "${plugins_init_function}  vtkPVPluginTracker::SetStaticPluginSearchFunction(paraview_static_plugins_search);\n")
   set(plugins_init_function "${plugins_init_function}}\n\n")
 
