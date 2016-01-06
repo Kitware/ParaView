@@ -8,6 +8,7 @@
 #endif
 
 #include <stdlib.h>
+#include <cstring>
 
 // Example of a C++ adaptor for a simulation code
 // where the simulation code has a fixed topology
