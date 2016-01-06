@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkObjectFactory.h"
 #include "vtkCinemaExporter.h"
+#include "vtkStdString.h"
 #include "vtkPVConfig.h" // needed for PARAVIEW_ENABLE_PYTHON
 #ifdef PARAVIEW_ENABLE_PYTHON
 #include "vtkPythonInterpreter.h"
@@ -25,16 +26,16 @@ vtkStandardNewMacro(vtkCinemaExporter);
 vtkCinemaExporter::vtkCinemaExporter()
 : vtkExporter()
 , FileName(NULL)
+, ViewSelection(NULL)
+, TrackSelection(NULL)
 {
-  // Sometimes the call to RunSimpleString() does not execute the script correctly
-  // right after calling Initialize(). To avoid this, Initialize() is called before
-  // the first call to this->WriteData()
-  this->checkInterpreterInitialization();
 }
 
 vtkCinemaExporter::~vtkCinemaExporter()
 {
   delete[] this->FileName;
+  delete[] this->ViewSelection;
+  delete[] this->TrackSelection;
 }
 
 void vtkCinemaExporter::WriteData()
@@ -51,7 +52,8 @@ void vtkCinemaExporter::WriteData()
     }
 
 #ifdef PARAVIEW_ENABLE_PYTHON
-  int const r = vtkPythonInterpreter::RunSimpleString(this->GetPythonScript());
+  int const r = vtkPythonInterpreter::RunSimpleString(this->GetPythonScript().c_str());
+
   if (r != 0)
     {
     vtkErrorMacro(<< "An error occurred while running the Cinema export script!");
@@ -77,12 +79,14 @@ bool vtkCinemaExporter::checkInterpreterInitialization()
 
   return true;
 #else
+  vtkErrorMacro(<< "Export Failed! Python support is required to export a Cinema store.");
   return false;
 #endif
 }
-char const* vtkCinemaExporter::GetPythonScript()
+
+const vtkStdString vtkCinemaExporter::GetPythonScript()
 {
-  std::string script;
+  vtkStdString script;
   script += "import paraview\n";
   script += "ready=True\n";
   script += "try:\n";
@@ -94,25 +98,29 @@ char const* vtkCinemaExporter::GetPythonScript()
   script += "    paraview.print_error(e)\n";
   script += "    ready=False\n";
   script += "if ready:\n";
-  script += "    pvi.record(csname=\"";
-  script += this->FileName;
-  script += "\")\n";
+  script += "    pvi.export_scene(baseDirName=\"";
+  script += this->FileName ? this->FileName : "";
+  script += "\", viewSelection={";
+  script += this->ViewSelection ? this->ViewSelection : "";
+  script += "}, trackSelection={";
+  script += this->TrackSelection ? this->TrackSelection : "";
+  script += "})\n";
 
-  return script.c_str();
+  return script;
 }
 
 void vtkCinemaExporter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  if (this->FileName)
-    {
-    os << indent << "FileName: " << this->FileName << "\n";
-    }
-  else
-    {
-    os << indent << "FileName: (null)\n";
-    }
+  char const * fn = this->FileName ? this->FileName : "(null)";
+  os << indent << "FileName: " << fn << '\n';
 
-  os << indent << "PythonScript: " << this->GetPythonScript() << "\n";
+  char const * vs = this->ViewSelection ? this->ViewSelection : "(null)";
+  os << indent << "ViewSelection: " << vs << '\n';
+
+  char const * ts = this->TrackSelection ? this->TrackSelection : "(null)";
+  os << indent << "TrackSelection: " << ts << '\n';
+
+  os << indent << "PythonScript: " << this->GetPythonScript().c_str() << "\n";
 }

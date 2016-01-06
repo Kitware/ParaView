@@ -86,6 +86,7 @@ public:
   /// \li \c FontEditor : pqFontPropertyWidget
   /// \li \c LightsEditor : pqLightsPropertyGroup
   /// \li \c SeriesEditor : pqSeriesEditorPropertyWidget
+  /// \li \c cinema_export_selector : pqCinemaConfiguration 
   virtual pqPropertyWidget* createWidgetForPropertyGroup(
     vtkSMProxy *proxy, vtkSMPropertyGroup *group);
 

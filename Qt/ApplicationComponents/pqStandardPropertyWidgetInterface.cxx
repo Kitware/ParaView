@@ -66,7 +66,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqViewTypePropertyWidget.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMProperty.h"
-
+#include "vtkPVConfig.h"
+#ifdef PARAVIEW_ENABLE_PYTHON
+#include "pqCinemaConfiguration.h"
+#endif
 #include <QtDebug>
 
 //-----------------------------------------------------------------------------
@@ -221,6 +224,14 @@ pqStandardPropertyWidgetInterface::createWidgetForPropertyGroup(
   else if (QString(group->GetPanelWidget()) == "TextLocationEditor")
     {
     return new pqTextLocationWidget(proxy, group);
+    }
+  else if (QString(group->GetPanelWidget()) == "cinema_export_selector")
+    {
+#ifdef PARAVIEW_ENABLE_PYTHON
+    return new pqCinemaConfiguration(proxy, group);
+#else
+    return NULL;
+#endif
     }
   // *** NOTE: When adding new types, please update the header documentation ***
 
