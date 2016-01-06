@@ -21,6 +21,9 @@ set(_vtk_mpi_modules
 
   vtkIOMPIParallel
   # vtkMPIMultiBlockPLOT3DReader.
+
+  # Needed for vtkPUnstructuredGridGhostCellsGenerator
+  vtkFiltersParallelGeometry
   )
 
 # Add CosmoTools VTK extensions if enabled.
