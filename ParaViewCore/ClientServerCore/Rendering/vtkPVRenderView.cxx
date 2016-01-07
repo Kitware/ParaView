@@ -347,6 +347,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->NonDistributedRenderingRequired = false;
   this->DistributedRenderingRequiredLOD = false;
   this->NonDistributedRenderingRequiredLOD = false;
+  this->ParallelProjection = 0;
   this->Culler = vtkSmartPointer<vtkPVRendererCuller>::New();
 
   this->SynchronizedRenderers = vtkPVSynchronizedRenderer::New();
