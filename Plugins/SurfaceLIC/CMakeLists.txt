@@ -32,6 +32,7 @@ SET(SURFACELIC_PLUGIN_TESTING
   ON CACHE BOOL
   "Explicitly disable SurfaceLIC plugin ctests"
   )
+mark_as_advanced(SURFACELIC_PLUGIN_TESTING)
 
 if (BUILD_TESTING AND SURFACELIC_PLUGIN_TESTING AND PARAVIEW_ENABLE_PYTHON)
   add_subdirectory(Testing/Python)

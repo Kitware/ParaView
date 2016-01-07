@@ -3,6 +3,7 @@ OPTION(GMVReader_SKIP_DATARANGE_CALCULATIONS_IN_REQUEST_INFORMATION_CALLS
    A feature inherited from AVSucdReader, but it seems this information is
    never queried by ParaView."
   OFF)
+MARK_AS_ADVANCED(GMVReader_SKIP_DATARANGE_CALCULATIONS_IN_REQUEST_INFORMATION_CALLS)
 IF(GMVReader_SKIP_DATARANGE_CALCULATIONS_IN_REQUEST_INFORMATION_CALLS)
   SET_SOURCE_FILES_PROPERTIES(
     vtkGMVReader.cxx
@@ -26,6 +27,7 @@ ENDIF()
 # Where are gmvread.c, gmvread.h and gmvrayread.h stored?
 # -----------------------------------------------------------------------------
 SET(GMVReader_GMVREAD_LIB_DIR "GMVREAD-NOTFOUND" CACHE PATH "The directory containing gmvread.c, gmvread.h and gmvrayread.h")
+MARK_AS_ADVANCED(GMVReader_GMVREAD_LIB_DIR)
 FIND_PATH(GMVReader_GMVREAD_LIB_DIR
   NAMES gmvread.c gmvread.h gmvrayread.h
   PATHS ${vtkIOVisItBridge_INCLUDE_DIRS} ${ParaView_SOURCE_DIR}/Utilities/VisItBridge/databases

@@ -264,6 +264,7 @@ cmake_dependent_option(PARAVIEW_ENABLE_COMMANDLINE_TOOLS
 option(PARAVIEW_ENABLE_PYTHON "Enable/Disable Python scripting support" OFF)
 cmake_dependent_option(PARAVIEW_USE_UNIFIED_BINDINGS "If enabled, Python bindings will back the ClientServer wrapping implementation" OFF
   PARAVIEW_ENABLE_PYTHON OFF)
+mark_as_advanced(PARAVIEW_USE_UNIFIED_BINDINGS)
 cmake_dependent_option(PARAVIEW_ENABLE_MATPLOTLIB "Enable/Disable Python scripting support" ON
   "PARAVIEW_ENABLE_PYTHON" OFF)
 mark_as_advanced(PARAVIEW_ENABLE_MATPLOTLIB)
@@ -679,8 +680,13 @@ mark_as_advanced(
   VTK_USE_TK
   VTK_WRAP_JAVA
   VTK_WRAP_TCL)
-
-
+mark_as_advanced(
+  VTK_ANDROID_BUILD
+  VTK_IOS_BUILD
+  VTK_USE_CXX11_FEATURES
+  VTK_USE_LARGE_DATA
+  VTK_USE_SYSTEM_GLEW
+  VTK_PYTHON_VERSION)
 #------------------------------------------------------------------------------
 # Based on state of VTK modules, set up some variables that paraview needs to
 # compile optional code.
