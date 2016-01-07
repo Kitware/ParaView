@@ -42,7 +42,8 @@ def CreateCoProcessor():
       if datadescription.GetTimeStep() != 0:
         restartparticles = XMLPartitionedPolydataReader(FileName='particles_50.pvtp')
         particlePath1.RestartSource = restartparticles
-        particlePath1.RestartStep = datadescription.GetTimeStep()
+        particlePath1.FirstTimeStep = datadescription.GetTimeStep()
+        particlePath1.RestartedSimulation = 1
 
       # create a new 'Parallel PolyData Writer'
       parallelPolyDataWriter1 = servermanager.writers.XMLPPolyDataWriter(Input=particlePath1)

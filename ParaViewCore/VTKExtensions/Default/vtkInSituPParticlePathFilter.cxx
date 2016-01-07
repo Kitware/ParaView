@@ -36,8 +36,8 @@ vtkInSituPParticlePathFilter::vtkInSituPParticlePathFilter()
 {
   this->SetNumberOfInputPorts(3);
   this->UseArrays = false;
-  this->RestartStep = 0;
-  this->SkippedFirstInjection = false;
+  this->RestartedSimulation = false;
+  this->FirstTimeStep = 0;
 }
 
 vtkInSituPParticlePathFilter::~vtkInSituPParticlePathFilter()
@@ -47,6 +47,7 @@ vtkInSituPParticlePathFilter::~vtkInSituPParticlePathFilter()
 //----------------------------------------------------------------------------
 void vtkInSituPParticlePathFilter::SetClearCache(bool clearCache)
 {
+  cout << "vtkInSituPParticlePathFilter::SetClearCache " << clearCache << endl;
   this->It.SetClearCache(clearCache);
 }
 
@@ -98,7 +99,8 @@ int vtkInSituPParticlePathFilter::RequestUpdateExtent(
 void vtkInSituPParticlePathFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   Superclass::PrintSelf(os,indent);
-  os << indent << "RestartStep: " << this->RestartStep << endl;
+  os << indent << "RestartedSimulation: " << this->RestartedSimulation << endl;
+  os << indent << "FirstTimeStep: " << this->FirstTimeStep << endl;
 }
 
 //---------------------------------------------------------------------------
@@ -132,6 +134,7 @@ void vtkInSituPParticlePathFilter::AssignSeedsToProcessors(
     return Superclass::AssignSeedsToProcessors(t, source, sourceID, ptId,
                                                localSeedPoints, localAssignedCount);
     }
+
   ParticleVector candidates;
   //
   // take points from the source object and create a particle list
@@ -170,15 +173,14 @@ void vtkInSituPParticlePathFilter::AssignSeedsToProcessors(
         {
         this->UniqueIdCounter = info.UniqueParticleId+1;
         }
-      info.TimeStepAge          = this->RestartStep-info.InjectedStepId;
+      info.TimeStepAge          = this->FirstTimeStep-info.InjectedStepId;
       }
     else
       {
       info.SourceID             = sourceID;
       info.InjectedPointId      = i+ptId;
       // this->GetReinjectionCounter() really gets the reinjection time step
-      // ignoring the restart step.
-      info.InjectedStepId       = this->GetReinjectionCounter()+this->RestartStep;
+      info.InjectedStepId       = this->GetReinjectionCounter()+this->FirstTimeStep;
       info.UniqueParticleId     =-1;
       info.age                  = 0.0;
       info.TimeStepAge          = 0;
@@ -239,11 +241,11 @@ void vtkInSituPParticlePathFilter::AssignSeedsToProcessors(
 
 //---------------------------------------------------------------------------
 std::vector<vtkDataSet*> vtkInSituPParticlePathFilter::GetSeedSources(
-  vtkInformationVector* inputVector, int vtkNotUsed(timeStep))
+  vtkInformationVector* inputVector, int timeStep)
 {
   int numSources = inputVector->GetNumberOfInformationObjects();
   std::vector<vtkDataSet*> seedSources;
-  if(this->SkippedFirstInjection == true || this->RestartStep == 0)
+  if(this->RestartedSimulation == false || timeStep != 0)
     {
     for (int idx=0; idx<numSources; ++idx)
       {
@@ -254,9 +256,6 @@ std::vector<vtkDataSet*> vtkInSituPParticlePathFilter::GetSeedSources(
         }
       }
     }
-  else
-    {
-    this->SkippedFirstInjection = true;
-    }
+
   return seedSources;
 }

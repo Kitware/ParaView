@@ -173,13 +173,21 @@
         <Documentation>Clear the particle cache from previous time steps.
         </Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetRestartStep"
+      <IntVectorProperty command="SetFirstTimeStep"
                          default_values="0"
-                         name="RestartStep"
+                         name="FirstTimeStep"
                          number_of_elements="1"
                          panel_visibility="never">
-        <Documentation>For restarted simulations set the first time step. Default is 0.
+        <Documentation>Set the first time step. Default is 0.
         </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRestartedSimulation"
+                         default_values="0"
+                         name="RestartedSimulation"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>Specify whether or not this is a restarted simulation.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetDisableResetCache"
                          default_values="0"
