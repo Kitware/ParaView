@@ -191,9 +191,12 @@ bool vtkSIStringVectorProperty::Push(const vtkVectorOfStrings &values)
   vtkObjectBase* object = this->GetVTKObject();
   if (this->CleanCommand)
     {
-    stream << vtkClientServerStream::Invoke
-      << object << this->CleanCommand
-      << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke << object << this->CleanCommand;
+    if (this->InitialString)
+      {
+      stream << this->InitialString;
+      }
+    stream << vtkClientServerStream::End;
     }
 
   if (!this->Repeatable)
@@ -204,7 +207,7 @@ bool vtkSIStringVectorProperty::Push(const vtkVectorOfStrings &values)
       {
       stream << InitialString;
       }
-      
+
     vtkVectorOfStrings::const_iterator iter;
     int i=0;
     for (iter = values.begin(); iter != values.end(); ++iter, ++i)
@@ -232,15 +235,20 @@ bool vtkSIStringVectorProperty::Push(const vtkVectorOfStrings &values)
     int numCommands = static_cast<int>(values.size()) / this->NumberOfElementsPerCommand;
     if (this->SetNumberCommand)
       {
-      stream << vtkClientServerStream::Invoke
-        << object
-        << this->SetNumberCommand
-        << numCommands
-        << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke << object << this->SetNumberCommand;
+      if (this->InitialString)
+        {
+        stream << this->InitialString;
+        }
+      stream << numCommands << vtkClientServerStream::End;
       }
     for (int i=0; i<numCommands; i++)
       {
       stream << vtkClientServerStream::Invoke << object << this->Command;
+      if (this->InitialString)
+        {
+        stream << this->InitialString;
+        }
       if (this->UseIndex)
         {
         stream << i;

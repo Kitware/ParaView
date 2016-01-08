@@ -405,24 +405,30 @@ bool vtkSIVectorPropertyTemplate<T, force_idtype>::Push(T* values, int number_of
 
   if (this->CleanCommand)
     {
-    stream << vtkClientServerStream::Invoke
-      << object << this->CleanCommand
-      << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke << object << this->CleanCommand;
+    if (this->InitialString)
+      {
+      stream << this->InitialString;
+      }
+    stream << vtkClientServerStream::End;
     }
 
   if (this->SetNumberCommand)
     {
     stream << vtkClientServerStream::Invoke
          << object
-         << this->SetNumberCommand
-         << number_of_elements / this->NumberOfElementsPerCommand
-         << vtkClientServerStream::End;
+         << this->SetNumberCommand;
+    if (this->InitialString)
+      {
+      stream << this->InitialString;
+      }
+    stream << number_of_elements / this->NumberOfElementsPerCommand
+           << vtkClientServerStream::End;
     }
 
   if (!this->Repeatable && number_of_elements > 0)
     {
     stream << vtkClientServerStream::Invoke << object << this->Command;
-
     if (this->InitialString)
       {
       stream << this->InitialString;
@@ -446,6 +452,10 @@ bool vtkSIVectorPropertyTemplate<T, force_idtype>::Push(T* values, int number_of
     for(int i=0; i<numCommands; i++)
       {
       stream << vtkClientServerStream::Invoke << object << this->Command;
+      if (this->InitialString)
+        {
+        stream << this->InitialString;
+        }
       if (this->UseIndex)
         {
         stream << i;
