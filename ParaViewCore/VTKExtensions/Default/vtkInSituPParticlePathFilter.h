@@ -48,10 +48,18 @@ public:
   void RemoveAllRestarts();
 
   // Description:
-  // Set/Get the initial time step for a restarted simulation.
-  // The default is 0 meaning that there is no restart.
-  vtkSetMacro(RestartStep, int);
-  vtkGetMacro(RestartStep, int);
+  // Set/Get if the simulation has been restarted. If it is a restarted
+  // simulation we may not necessarily want to inject/reinject particles
+  // on the first time step. The default is False.
+  vtkSetMacro(RestartedSimulation, bool);
+  vtkGetMacro(RestartedSimulation, bool);
+
+  // Description:
+  // Specify the first time step that particle paths are computed.
+  // This is useful for restarted simulations or when the simulation's
+  // first time step isn't 0. The default is 0.
+  vtkSetMacro(FirstTimeStep, int);
+  vtkGetMacro(FirstTimeStep, int);
 
 protected:
   vtkInSituPParticlePathFilter();
@@ -104,13 +112,17 @@ private:
   bool UseArrays;
 
   // Description:
-  // The initial time step for a restarted simulation.
-  // The default is 0 meaning that there is no restart.
-  int RestartStep;
+  // Specify whether or not the particle paths are computed for a
+  // restarted simulation. The default is False indicating this
+  // is not a restarted simulation.
+  bool RestartedSimulation;
 
   // Description:
-  // Internal variable to keep track of if this is a restarted simulation
-  // where we skip the first injection of the seeds.
-  bool SkippedFirstInjection;
+  // Specify the first simulation time step that particles are computed.
+  // This is useful for restarted simulations as well as simulations or
+  // particle path tracking that don't start at time step 0. This is
+  // used in computing the time step age and injected step id in
+  // the output.
+  int FirstTimeStep;
 };
 #endif
