@@ -31,9 +31,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqInteractivePropertyWidget.h"
 
+#include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
+#include "pqLiveInsituVisualizationManager.h"
 #include "pqPropertyLinks.h"
 #include "pqRenderViewBase.h"
+#include "pqServer.h"
+#include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
 #include "vtkCommand.h"
 #include "vtkNew.h"
@@ -79,7 +83,14 @@ pqInteractivePropertyWidget::pqInteractivePropertyWidget(
 
   pqInternals& internals = (*this->Internals);
 
-  vtkSMSessionProxyManager* pxm = smproxy->GetSessionProxyManager();
+  pqServer* server = pqApplicationCore::instance()->getServerManagerModel()->findServer(
+    smproxy->GetSession());
+
+  // Check is server is a Catalyst session. If so, we need to create the widget
+  // proxies on the "display-session".
+  server = pqLiveInsituVisualizationManager::displaySession(server);
+
+  vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkSmartPointer<vtkSMProxy> aProxy;
   aProxy.TakeReference(pxm->NewProxy(widget_smgroup, widget_smname));
   vtkSMNewWidgetRepresentationProxy* wdgProxy = vtkSMNewWidgetRepresentationProxy::SafeDownCast(aProxy);
