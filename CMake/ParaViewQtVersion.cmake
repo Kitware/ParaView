@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------
 
 set(PARAVIEW_QT_VERSION "4" CACHE STRING "Expected Qt version")
-mark_as_advanced(PARAVIEW_QT_VERSION)
+mark_as_advanced(VTK_QT_VERSION)
 set_property(CACHE PARAVIEW_QT_VERSION PROPERTY STRINGS 4 5)
 if(NOT (PARAVIEW_QT_VERSION VERSION_EQUAL "4" OR
   PARAVIEW_QT_VERSION VERSION_EQUAL "5"))
