@@ -316,6 +316,8 @@ set (Module_SRCS
   pqViewFrame.h
   pqViewManager.cxx
   pqViewManager.h
+  pqWelcomeDialog.cxx
+  pqWelcomeDialog.h
   pqWidgetRangeDomain.cxx
   pqWidgetRangeDomain.h
   pqAbstractItemSelectionModel.cxx
@@ -455,6 +457,7 @@ set (Module_MOC_HDRS
   pqViewContextMenuManager.h
   pqViewFrame.h
   pqViewManager.h
+  pqWelcomeDialog.h
   pqWidgetRangeDomain.h
   pqAbstractItemSelectionModel.h
 )
@@ -516,6 +519,8 @@ set (Module_UI_FILES
   Resources/UI/pqSpreadSheetViewDecorator.ui
   Resources/UI/pqTimerLogDisplay.ui
   Resources/UI/pqViewFrame.ui
+  Resources/UI/pqWelcomeDialog.ui
+  Resources/UI/pqWriterDialog.ui
 )
 
 if(PARAVIEW_ENABLE_PYTHON)

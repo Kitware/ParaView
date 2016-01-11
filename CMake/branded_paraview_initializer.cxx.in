@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOptions.h"
 #include "pqPVApplicationCore.h"
 #include "pqSettings.h"
+#include "pqWelcomeDialog.h"
 #include "vtkInitializationHelper.h"
 #include "vtkPVPluginTracker.h"
 
@@ -175,6 +176,11 @@ pq@BPC_NAME@Initializer::Status pq@BPC_NAME@Initializer::Initialize(int argc, ch
     {
     this->Splash->finish(this->MainWindow);
     }
+
+  pqWelcomeDialog dialog(this->MainWindow);
+  dialog.setModal(false);
+  dialog.exec();
+
   return RunApplication;
 }
 // ***************** DO NOT EDIT ***********************************
