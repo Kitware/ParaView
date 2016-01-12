@@ -290,6 +290,10 @@ private:
   pqServerManagerModel(const pqServerManagerModel&); // Not implemented.
   void operator=(const pqServerManagerModel&); // Not implemented.
 
+  /// Process the QSettings-only settings, setting the values in the
+  /// various settings proxies.
+  void updateSettingsFromQSettings(pqServer* server);
+
   class pqInternal;
   pqInternal* Internal;
 };
