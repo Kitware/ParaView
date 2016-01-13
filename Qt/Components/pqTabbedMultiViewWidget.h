@@ -54,6 +54,7 @@ class PQCOMPONENTS_EXPORT pqTabbedMultiViewWidget : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
+  Q_PROPERTY(bool readOnly READ readOnly WRITE setReadOnly)
 public:
   pqTabbedMultiViewWidget(QWidget* parent=0);
   virtual ~pqTabbedMultiViewWidget();
@@ -74,6 +75,11 @@ public:
 
   /// Capture an image and saves it out to a file.
   virtual bool writeImage(const QString& filename, int width, int height, int quality=-1);
+
+  /// When set to true (off by default), the widget will not allow
+  /// adding/removing tabs trough user interactions.
+  void setReadOnly(bool val);
+  bool readOnly() const;
 
 signals:
   /// fired when lockViewSize() is called.
@@ -161,8 +167,15 @@ protected:
     /// Returns the icon to use for the popout button given the popped_out state.
     static QStyle::StandardPixmap popoutLabelPixmap(bool popped_out);
 
+    /// When true the widget disable changes to the tabs i.e adding/removing tabs
+    /// by user interaction.
+    void setReadOnly(bool val);
+    bool readOnly() const
+      { return this->ReadOnly;}
+
   private:
     Q_DISABLE_COPY(pqTabWidget);
+    bool ReadOnly;
     friend class pqTabbedMultiViewWidget;
   };
 
