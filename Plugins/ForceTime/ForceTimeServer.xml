@@ -3,7 +3,9 @@
     <SourceProxy name="ForceTime"
                 class="vtkForceTime"
                 label="Force Time">
-                
+      <Documentation>
+        Filter used to explicitly request a specific time from the pipeline.
+      </Documentation>
       <InputProperty
          name="Input"
          command="SetInputConnection">
@@ -42,11 +44,16 @@
           This property specifies the time to request.
           If the IgnorePipelineTime property is set, then this value will override any time request in the VTK pipeline.
         </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="IgnorePipelineTime"
+                                   value="1" />
+        </Hints>
       </DoubleVectorProperty>
       <Hints>
         <ShowInMenu category="Temporal" />
       </Hints>
-
     </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
