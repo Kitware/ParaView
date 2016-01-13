@@ -569,17 +569,37 @@ def GetViewProperties(view=None):
 # ServerManager methods
 #==============================================================================
 
+def RenameProxy(proxy, group, newName):
+    """Renames the given proxy."""
+    pxm = servermanager.ProxyManager()
+    oldName = pxm.GetProxyName(group, proxy)
+    if oldName and newName != oldName:
+      pxm.RegisterProxy(group, newName, proxy)
+      pxm.UnRegisterProxy(group, oldName, proxy)
+
 def RenameSource(newName, proxy=None):
     """Renames the given source.  If the given proxy is not registered
     in the sources group this method will have no effect.  If no source is
     provided, the active source is used."""
     if not proxy:
-        proxy = active_objects.source
-    pxm = servermanager.ProxyManager()
-    oldName = pxm.GetProxyName("sources", proxy)
-    if oldName and newName != oldName:
-      pxm.RegisterProxy("sources", newName, proxy)
-      pxm.UnRegisterProxy("sources", oldName, proxy)
+        proxy = GetActiveSource()
+    RenameProxy(proxy, "sources", newName)
+
+def RenameView(newName, proxy=None):
+    """Renames the given view.  If the given proxy is not registered
+    in the views group this method will have no effect.  If no view is
+    provided, the active view is used."""
+    if not proxy:
+        proxy = GetActiveView()
+    RenameProxy(proxy, "views", newName)
+
+def RenameLayout(newName, proxy=None):
+    """Renames the given layout.  If the given proxy is not registered
+    in the layout group this method will have no effect.  If no layout is
+    provided, the active layout is used."""
+    if not proxy:
+        proxy = GetLayout()
+    RenameProxy(proxy, "layouts", newName)
 
 # -----------------------------------------------------------------------------
 

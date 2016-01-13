@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqMultiViewWidget;
 class pqProxy;
 class pqServer;
+class pqServerManagerModelItem;
 class pqView;
 class vtkImageData;
 class vtkSMViewLayoutProxy;
@@ -121,6 +122,11 @@ protected slots:
   /// processes.
   virtual void aboutToCreateView(pqServer*);
 
+  /// called when context menu need to be created on the tab title.
+  void contextMenuRequested(const QPoint&);
+
+  void onLayoutNameChanged(pqServerManagerModelItem*);
+
 protected:
   virtual bool eventFilter(QObject *obj, QEvent *event);
 
@@ -130,34 +136,34 @@ protected:
   /// Internal class used as the TabWidget.
   class pqTabWidget : public QTabWidget
   {
-  typedef QTabWidget Superclass;
-public:
-  pqTabWidget(QWidget* parentWdg=NULL);
-  virtual ~pqTabWidget();
+    typedef QTabWidget Superclass;
+  public:
+    pqTabWidget(QWidget* parentWdg = NULL);
+    virtual ~pqTabWidget();
 
-  /// Set a button to use on the tab bar.
-  virtual void setTabButton(int index, QTabBar::ButtonPosition position, QWidget* wdg);
-  
-  /// Given the QWidget pointer that points to the buttons (popout or close)
-  /// in the tabbar, this returns the index of that that the button corresponds
-  /// to. 
-  virtual int tabButtonIndex(QWidget* wdg, QTabBar::ButtonPosition position) const;
+    /// Set a button to use on the tab bar.
+    virtual void setTabButton(int index, QTabBar::ButtonPosition position, QWidget* wdg);
 
+    /// Given the QWidget pointer that points to the buttons (popout or close)
+    /// in the tabbar, this returns the index of that that the button corresponds
+    /// to.
+    virtual int tabButtonIndex(QWidget* wdg, QTabBar::ButtonPosition position) const;
 
-  /// Add a pqTabbedMultiViewWidget instance as a new tab. This will setup the
-  /// appropriate tab-bar for this new tab (with 2 buttons for popout and
-  /// close).
-  virtual int addAsTab(pqMultiViewWidget* wdg, pqTabbedMultiViewWidget* self);
+    /// Add a pqTabbedMultiViewWidget instance as a new tab. This will setup the
+    /// appropriate tab-bar for this new tab (with 2 buttons for popout and
+    /// close).
+    virtual int addAsTab(pqMultiViewWidget* wdg, pqTabbedMultiViewWidget* self);
 
-  /// Returns the label/tooltip to use for the popout button given the
-  /// popped_out state.
-  static const char* popoutLabelText(bool popped_out);
+    /// Returns the label/tooltip to use for the popout button given the
+    /// popped_out state.
+    static const char* popoutLabelText(bool popped_out);
 
-  /// Returns the icon to use for the popout button given the popped_out state.
-  static QStyle::StandardPixmap popoutLabelPixmap(bool popped_out);
+    /// Returns the icon to use for the popout button given the popped_out state.
+    static QStyle::StandardPixmap popoutLabelPixmap(bool popped_out);
 
-private:
-  Q_DISABLE_COPY(pqTabWidget);
+  private:
+    Q_DISABLE_COPY(pqTabWidget);
+    friend class pqTabbedMultiViewWidget;
   };
 
 private:
