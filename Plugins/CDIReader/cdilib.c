@@ -47,7 +47,7 @@
 #define _XOPEN_SOURCE 600
 #endif
 
-#ifdef __linux__ 
+#if defined(__linux__) || defined(__APPLE__) 
   #include <unistd.h>
   #include <stdbool.h>
   #include <sys/types.h>
@@ -56,7 +56,7 @@
   #ifndef _SX
     #include <aio.h>
   #endif
-#elif _WIN32
+#elif defined(_WIN32)
   #define inline __inline
   #define __func__ __FUNCTION__
   #include <io.h>
