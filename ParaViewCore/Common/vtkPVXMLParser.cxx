@@ -13,6 +13,8 @@
 
 =========================================================================*/
 #include "vtkPVXMLParser.h"
+
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include <sstream>
@@ -166,4 +168,18 @@ void vtkPVXMLParser::ReportXmlParseError()
     {
     this->Superclass::ReportXmlParseError();
     }
+}
+
+//-----------------------------------------------------------------------------
+vtkSmartPointer<vtkPVXMLElement> vtkPVXMLParser::ParseXML(
+  const char* xmlcontents, bool suppress_errors)
+{
+  vtkSmartPointer<vtkPVXMLElement> root;
+  vtkNew<vtkPVXMLParser> parser;
+  parser->SetSuppressErrorMessages(suppress_errors? 1 : 0);
+  if (parser->Parse(xmlcontents))
+    {
+    root = parser->GetRootElement();
+    }
+  return root;
 }
