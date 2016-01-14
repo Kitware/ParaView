@@ -161,7 +161,9 @@ pq@BPC_NAME@Initializer::Status pq@BPC_NAME@Initializer::Initialize(int argc, ch
     this->PVApp->loadConfiguration(QString(":/@BPC_NAME@/Configuration/") + file);
     }
 #endif
+#if @BPC_HAS_TITLE@
   this->MainWindow->setWindowTitle("@BPC_TITLE@");
+#endif
 
   // We used to call processEvents() here. We removed it, since that results in
   // timers (esp. pqCommandLineOptionsBehavior::playTests(), or
