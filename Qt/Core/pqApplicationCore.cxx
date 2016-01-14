@@ -427,7 +427,26 @@ void pqApplicationCore::loadState(
       }
     }
   END_UNDO_EXCLUDE();
+  this->loadStateIncremental(rootElement, server);
+}
 
+//-----------------------------------------------------------------------------
+void pqApplicationCore::loadStateIncremental(const QString& filename, pqServer* server)
+{
+  if (!server || filename.isEmpty())
+    {
+    return ;
+    }
+  vtkPVXMLParser* parser = vtkPVXMLParser::New();
+  parser->SetFileName(filename.toLatin1().data());
+  parser->Parse();
+  this->loadStateIncremental(parser->GetRootElement(), server);
+  parser->Delete();
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::loadStateIncremental(vtkPVXMLElement* rootElement, pqServer* server)
+{
   emit this->aboutToLoadState(rootElement);
 
   // TODO: this->LoadingState cannot be relied upon.

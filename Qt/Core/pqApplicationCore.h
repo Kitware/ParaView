@@ -207,6 +207,11 @@ public:
   void loadState(vtkPVXMLElement* root, pqServer* server);
   void loadState(const char* filename, pqServer* server);
 
+  /// Same as loadState() except that it doesn't clear the current visualization
+  /// state.
+  void loadStateIncremental(vtkPVXMLElement* root, pqServer* server);
+  void loadStateIncremental(const QString& filename, pqServer* server);
+
   /// Check to see if its in the process of loading a state
   /// Reliance on this flag is chimerical since we cannot set this ivar when
   /// state file is  being loaded from python shell.
