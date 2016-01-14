@@ -434,8 +434,6 @@
           <Property function="Normal"
                     name="Normal" />
         </PropertyGroup>
-        <PropertyGroup label="Slice Widget"
-                       type="Handle"></PropertyGroup>
       </Hints>
     </SourceProxy>
     <SourceProxy class="vtkAMRResampleFilter"
@@ -1807,8 +1805,7 @@ found and the point will be rejected.</Documentation>
                             default_values="0 0 0"
                             label="Low Point"
                             name="LowPoint"
-                            number_of_elements="3"
-                            panel_visibility="never">
+                            number_of_elements="3" >
         <BoundsDomain default_mode="min"
                       mode="normal"
                       name="range">
@@ -1825,8 +1822,7 @@ found and the point will be rejected.</Documentation>
                             default_values="0 0 1"
                             label="High Point"
                             name="HighPoint"
-                            number_of_elements="3"
-                            panel_visibility="never">
+                            number_of_elements="3" >
         <BoundsDomain default_mode="max"
                       mode="normal"
                       name="range">
@@ -1838,14 +1834,13 @@ found and the point will be rejected.</Documentation>
         <Documentation>This property defines the other end of the direction
         vector (large scalar values).</Documentation>
       </DoubleVectorProperty>
+      <PropertyGroup panel_widget="InteractiveLine">
+        <Property function="Point1WorldPosition" name="LowPoint" />
+        <Property function="Point2WorldPosition" name="HighPoint" />
+        <Property function="Input" name="Input" />
+      </PropertyGroup>
+
       <Hints>
-        <PropertyGroup label="Elevation"
-                       type="Line">
-          <Property function="Point1WorldPosition"
-                    name="LowPoint" />
-          <Property function="Point2WorldPosition"
-                    name="HighPoint" />
-        </PropertyGroup>
       </Hints>
       <!-- End ElevationFilter -->
     </SourceProxy>
@@ -7930,8 +7925,7 @@ source.</Documentation>
       <DoubleVectorProperty command="SetLocation"
                             default_values="0.0 0.0 0.0"
                             name="Location"
-                            number_of_elements="3"
-                            panel_visibility="never">
+                            number_of_elements="3">
         <Documentation>Select the location of interest in 3D space.</Documentation>
         <BoundsDomain default_mode="mid"
                       mode="normal"
@@ -7942,12 +7936,12 @@ source.</Documentation>
           </RequiredProperties>
         </BoundsDomain>
       </DoubleVectorProperty>
-
+      <PropertyGroup label="Location Paramaters" panel_widget="InteractiveHandle">
+        <Property function="WorldPosition" name="Location" />
+        <Property function="Input" name="Input" />
+      </PropertyGroup>
       <Hints>
         <Visibility replace_input="2" />
-        <PropertyGroup type="Handle">
-          <Property function="WorldPosition" name="Location" />
-        </PropertyGroup>
       </Hints>
 
       <!-- End ProbePoint -->
@@ -14230,17 +14224,11 @@ source.</Documentation>
           <NoDefault />
         </Hints>
       </StringVectorProperty>
-      <Hints>
-        <!--
-          YoungsMaterialInterface uses a custom panel that creates custom
-          widgets for these two properties so we hide them from the
-          auto-generated part of the panel.
-        -->
-        <Property name="OrderingArrays"
-                  show="0" />
-        <Property name="NormalArrays"
-                  show="0" />
-      </Hints>
+      <PropertyGroup panel_widget="YoungsMaterial">
+        <Property name="VolumeFractionArrays" function="VolumeFractionArrays" />
+        <Property name="OrderingArrays" function="OrderingArrays" />
+        <Property name="NormalArrays" function="NormalArrays" />
+      </PropertyGroup>
       <!-- End of YoungsMaterialInterface -->
     </SourceProxy>
     <!-- ==================================================================== -->

@@ -242,11 +242,6 @@ protected:
   virtual bool UnRegisterDependencies(vtkSMProxy* proxy);
 
   // Description:
-  // Proxies in proxy-list domains can have hints that are used to setup
-  // property-links to ensure that those proxies get appropriate domains.
-  virtual void ProcessProxyListProxyHints(vtkSMProxy* parent, vtkSMProxy* proxyFromDomain);
-
-  // Description:
   // Returns the initialization timestamp for the proxy, if available. Useful
   // for subclasses to determine which properties were modified since
   // initialization.

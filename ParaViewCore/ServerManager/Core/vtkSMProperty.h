@@ -404,6 +404,10 @@ public:
   // runtime based on input dataset or file being processed.
   bool HasDomainsWithRequiredProperties();
 
+  // Description:
+  // Use this method to clear unchecked values set of this property.
+  virtual void ClearUncheckedElements() {}
+
 //BTX
 protected:
   vtkSMProperty();

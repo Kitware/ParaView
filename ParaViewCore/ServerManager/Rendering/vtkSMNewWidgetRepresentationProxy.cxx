@@ -24,30 +24,40 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSession.h"
+#include "vtkSMUncheckedPropertyHelper.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSMWidgetRepresentationProxy.h"
 #include "vtkWeakPointer.h"
 #include "vtkWidgetRepresentation.h"
 
 #include <list>
+#include <cassert>
 
 vtkStandardNewMacro(vtkSMNewWidgetRepresentationProxy);
 
 class vtkSMNewWidgetRepresentationObserver : public vtkCommand
 {
 public:
-  static vtkSMNewWidgetRepresentationObserver *New() 
+  static vtkSMNewWidgetRepresentationObserver *New()
     { return new vtkSMNewWidgetRepresentationObserver; }
-  virtual void Execute(vtkObject*, unsigned long event, void*)
+  virtual void Execute(vtkObject* caller, unsigned long event, void*)
     {
       if (this->Proxy)
         {
-        this->Proxy->ExecuteEvent(event);
+        if (vtkAbstractWidget::SafeDownCast(caller))
+          {
+          this->Proxy->ExecuteEvent(event);
+          }
+        else if (vtkSMProperty* prop = vtkSMProperty::SafeDownCast(caller))
+          {
+          this->Proxy->ProcessLinkedPropertyEvent(prop, event);
+          }
         }
     }
   vtkSMNewWidgetRepresentationObserver():Proxy(0) {}
@@ -59,6 +69,10 @@ struct vtkSMNewWidgetRepresentationInternals
   typedef std::list<vtkSmartPointer<vtkSMLink> > LinksType;
   LinksType Links;
   vtkWeakPointer<vtkSMRenderViewProxy> ViewProxy;
+
+  // Data about "controlled proxies".
+  vtkWeakPointer<vtkSMProxy> ControlledProxy;
+  vtkWeakPointer<vtkSMPropertyGroup> ControlledPropertyGroup;
 };
 
 //----------------------------------------------------------------------------
@@ -246,6 +260,91 @@ void vtkSMNewWidgetRepresentationProxy::ExecuteEvent(unsigned long event)
     if (vtkRenderWindowInteractor* iren = this->Widget->GetInteractor())
       {
       iren->InvokeEvent(event);
+      }
+    }
+}
+
+
+//----------------------------------------------------------------------------
+bool vtkSMNewWidgetRepresentationProxy::LinkProperties(
+  vtkSMProxy* controlledProxy, vtkSMPropertyGroup* controlledPropertyGroup)
+{
+  if (this->Internal->ControlledProxy != NULL)
+    {
+    vtkErrorMacro("Cannot `LinkProperties` with muliple proxies.");
+    return false;
+    }
+
+  this->Internal->ControlledProxy = controlledProxy;
+  this->Internal->ControlledPropertyGroup = controlledPropertyGroup;
+  for (unsigned int cc=0, max=controlledPropertyGroup->GetNumberOfProperties(); cc < max; ++cc)
+    {
+    vtkSMProperty* prop = controlledPropertyGroup->GetProperty(cc);
+    const char* function = controlledPropertyGroup->GetFunction(prop);
+    if (vtkSMProperty* widgetProperty = this->GetProperty(function))
+      {
+      prop->AddObserver(
+        vtkCommand::UncheckedPropertyModifiedEvent, this->Observer);
+      widgetProperty->AddObserver(
+        vtkCommand::ModifiedEvent, this->Observer);
+
+      vtkSMUncheckedPropertyHelper helper(prop);
+      vtkSMPropertyHelper(widgetProperty).Copy(helper);
+      }
+    }
+  this->UpdateVTKObjects();
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMNewWidgetRepresentationProxy::UnlinkProperties(vtkSMProxy* controlledProxy)
+{
+  if (this->Internal->ControlledProxy != controlledProxy)
+    {
+    vtkErrorMacro("Cannot 'UnlinkProperties' from a non-linked proxy.");
+    return false;
+    }
+
+  vtkSMPropertyGroup* controlledPropertyGroup = this->Internal->ControlledPropertyGroup;
+  for (unsigned int cc=0, max=controlledPropertyGroup->GetNumberOfProperties(); cc < max; ++cc)
+    {
+    vtkSMProperty* prop = controlledPropertyGroup->GetProperty(cc);
+    prop->RemoveObserver(this->Observer);
+    }
+  return true;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMNewWidgetRepresentationProxy::ProcessLinkedPropertyEvent(
+  vtkSMProperty* caller, unsigned long event)
+{
+  assert(this->Internal->ControlledPropertyGroup);
+  vtkSMPropertyGroup* controlledPropertyGroup = this->Internal->ControlledPropertyGroup;
+  if (event == vtkCommand::UncheckedPropertyModifiedEvent)
+    {
+    // Whenever a controlled property's unchecked value changes, we copy that
+    // value
+    vtkSMProperty* controlledProperty = caller;
+    const char* function = controlledPropertyGroup->GetFunction(controlledProperty);
+    if (vtkSMProperty* widgetProperty = this->GetProperty(function))
+      {
+      // Copy unchecked values from controlledProperty to the checked values of
+      // this widget's property.
+      vtkSMUncheckedPropertyHelper chelper(controlledProperty);
+      vtkSMPropertyHelper(widgetProperty).Copy(chelper);
+      this->UpdateVTKObjects();
+      }
+    }
+  else if (event == vtkCommand::ModifiedEvent)
+    {
+    // Whenever a property on the widget is modified, we change the unchecked
+    // property on the linked controlled proxy.
+    vtkSMProperty* widgetProperty = caller;
+    const char* function = this->GetPropertyName(widgetProperty);
+    if (vtkSMProperty* controlledProperty = controlledPropertyGroup->GetProperty(function))
+      {
+      vtkSMPropertyHelper whelper(widgetProperty);
+      vtkSMUncheckedPropertyHelper(controlledProperty).Copy(whelper);
       }
     }
 }

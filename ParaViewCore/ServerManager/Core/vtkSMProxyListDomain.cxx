@@ -14,7 +14,9 @@
 =========================================================================*/
 #include "vtkSMProxyListDomain.h"
 
+#include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVXMLElement.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMPropertyHelper.h"
@@ -27,21 +29,180 @@
 #include <string>
 #include <vector>
 
+namespace vtkSMProxyListDomainNS
+{
+  //---------------------------------------------------------------------------
+  class vtkSMLinkObserver : public vtkCommand
+  {
+public:
+  vtkWeakPointer<vtkSMProperty> Output;
+  typedef vtkCommand Superclass;
+  virtual const char* GetClassNameInternal() const
+    { return "vtkSMLinkObserver"; }
+  static vtkSMLinkObserver* New()
+    {
+    return new vtkSMLinkObserver();
+    }
+  virtual void Execute(vtkObject* caller, unsigned long event, void* calldata)
+    {
+    (void)event;
+    (void)calldata;
+    vtkSMProperty* input = vtkSMProperty::SafeDownCast(caller);
+    if (input && this->Output)
+      {
+      // this will copy both checked and unchecked property values.
+      this->Output->Copy(input);
+      }
+    }
+  };
+}
+
 //-----------------------------------------------------------------------------
+class vtkSMProxyInfo
+{
+public:
+  vtkSmartPointer<vtkSMProxy> Proxy;
+  std::vector<unsigned long> ObserverIds;
+
+  // Proxies in proxy-list domains can have hints that are used to setup
+  // property-links to ensure that those proxies get appropriate domains.
+  void ProcessProxyListProxyHints(vtkSMProxy* parent)
+    {
+    vtkSMProxy* plproxy = this->Proxy;
+    vtkPVXMLElement* proxyListElement = plproxy->GetHints()?
+      plproxy->GetHints()->FindNestedElementByName("ProxyList") : NULL;
+    if (!proxyListElement)
+      {
+      return;
+      }
+    for (unsigned int cc=0, max = proxyListElement->GetNumberOfNestedElements(); cc < max; ++cc)
+      {
+      vtkPVXMLElement* child = proxyListElement->GetNestedElement(cc);
+      if (child && child->GetName() && strcmp(child->GetName(), "Link") == 0)
+        {
+        const char* name = child->GetAttribute("name");
+        const char* linked_with = child->GetAttribute("with_property");
+        if (name && linked_with)
+          {
+          vtkSMProperty* input = parent->GetProperty(linked_with);
+          vtkSMProperty* output = plproxy->GetProperty(name);
+          if (input && output)
+            {
+            vtkSMProxyListDomainNS::vtkSMLinkObserver* observer =
+              vtkSMProxyListDomainNS::vtkSMLinkObserver::New();
+            observer->Output = output;
+            this->ObserverIds.push_back(
+              input->AddObserver(vtkCommand::PropertyModifiedEvent, observer));
+            this->ObserverIds.push_back(
+              input->AddObserver(vtkCommand::UncheckedPropertyModifiedEvent, observer));
+            observer->FastDelete();
+            output->Copy(input);
+            }
+          }
+        }
+      }
+    }
+  void RemoveObservers()
+    {
+    for (size_t cc=0; cc < this->ObserverIds.size(); cc++)
+      {
+      this->Proxy->RemoveObserver(this->ObserverIds[cc]);
+      }
+    this->ObserverIds.clear();
+    }
+};
+
 class vtkSMProxyListDomainInternals
 {
 public:
-  typedef std::vector<vtkSmartPointer<vtkSMProxy> > VectorOfProxies;
-  VectorOfProxies ProxyList;
+  typedef std::vector<vtkSMProxyInfo> VectorOfProxies;
+  const VectorOfProxies& GetProxies() const { return this->ProxyList; }
 
+  // Add a proxy to the internal Proxies list. This will also process any "ProxyList"
+  // hints specified on the \c proxy and setup property links with the parent-proxy of
+  // self.
+  void AddProxy(vtkSMProxy* proxy, vtkSMProxyListDomain* self)
+    {
+    vtkSMProxyInfo info;
+    info.Proxy = proxy;
+
+    vtkSMProxy* parent = self->GetProperty()? self->GetProperty()->GetParent() : NULL;
+    if (parent)
+      {
+      // Handle proxy-list hints.
+      info.ProcessProxyListProxyHints(parent);
+      }
+    this->ProxyList.push_back(info);
+    }
+
+  // Removes a proxy from the Proxies list. Will also cleanup any "links" setup
+  // during AddProxy().
+  bool RemoveProxy(vtkSMProxy* proxy)
+    {
+    VectorOfProxies::iterator iter;
+    for (iter = this->ProxyList.begin(); iter != this->ProxyList.end(); iter++)
+      {
+      if (iter->Proxy == proxy)
+        {
+        iter->RemoveObservers();
+        this->ProxyList.erase(iter);
+        return true;
+        }
+      }
+    return false;
+    }
+
+  // Removes a proxy from the Proxies list. Will also cleanup any "links" setup
+  // during AddProxy().
+  bool RemoveProxy(unsigned int index)
+    {
+    if (index >= this->ProxyList.size())
+      {
+      return false;
+      }
+
+    VectorOfProxies::iterator iter;
+    unsigned int cc=0;
+    for (iter = this->ProxyList.begin(); iter != this->ProxyList.end(); ++iter, ++cc)
+      {
+      if (cc == index)
+        {
+        iter->RemoveObservers();
+        this->ProxyList.erase(iter);
+        return true;
+        }
+      }
+    return false;
+    }
+
+  // Removes all proxies from the Proxies list. Will also cleanup any "links" setup
+  // during AddProxy() calls.
+  void ClearProxies()
+    {
+    VectorOfProxies::iterator iter;
+    for (iter = this->ProxyList.begin(); iter != this->ProxyList.end(); ++iter)
+      {
+      iter->RemoveObservers();
+      }
+    this->ProxyList.clear();
+    }
+
+  ~vtkSMProxyListDomainInternals()
+    {
+    this->ClearProxies();
+    }
+
+public:
   struct ProxyInfo
     {
     std::string GroupName;
     std::string ProxyName;
     };
-
   typedef std::vector<ProxyInfo> VectorOfProxyInfo;
   VectorOfProxyInfo ProxyTypeList;
+
+private:
+  VectorOfProxies ProxyList;
 };
 
 //-----------------------------------------------------------------------------
@@ -64,7 +225,8 @@ void vtkSMProxyListDomain::CreateProxies(vtkSMSessionProxyManager* pxm)
 {
   assert(pxm);
 
-  this->Internals->ProxyList.clear();
+  this->Internals->ClearProxies();
+
   for (vtkSMProxyListDomainInternals::VectorOfProxyInfo::iterator iter =
     this->Internals->ProxyTypeList.begin();
     iter != this->Internals->ProxyTypeList.end(); ++iter)
@@ -73,7 +235,7 @@ void vtkSMProxyListDomain::CreateProxies(vtkSMSessionProxyManager* pxm)
       iter->GroupName.c_str(), iter->ProxyName.c_str());
     if (proxy)
       {
-      this->Internals->ProxyList.push_back(proxy);
+      this->Internals->AddProxy(proxy, this);
       proxy->FastDelete();
       }
     }
@@ -147,7 +309,7 @@ int vtkSMProxyListDomain::SetDefaultValues(vtkSMProperty* prop, bool use_uncheck
 }
 
 //-----------------------------------------------------------------------------
-int vtkSMProxyListDomain::ReadXMLAttributes(vtkSMProperty* prop, 
+int vtkSMProxyListDomain::ReadXMLAttributes(vtkSMProperty* prop,
   vtkPVXMLElement* element)
 {
   if (!this->Superclass::ReadXMLAttributes(prop, element))
@@ -185,23 +347,25 @@ int vtkSMProxyListDomain::ReadXMLAttributes(vtkSMProperty* prop,
 //-----------------------------------------------------------------------------
 void vtkSMProxyListDomain::AddProxy(vtkSMProxy* proxy)
 {
-  this->Internals->ProxyList.push_back(proxy);
+  this->Internals->AddProxy(proxy, this);
+  this->DomainModified();
 }
 
 //-----------------------------------------------------------------------------
 unsigned int vtkSMProxyListDomain::GetNumberOfProxies()
 {
-  return static_cast<unsigned int>(this->Internals->ProxyList.size());
+  return static_cast<unsigned int>(this->Internals->GetProxies().size());
 }
 
 //-----------------------------------------------------------------------------
 bool vtkSMProxyListDomain::HasProxy(vtkSMProxy* proxy)
 {
-  vtkSMProxyListDomainInternals::VectorOfProxies::iterator iter;
-  for (iter = this->Internals->ProxyList.begin();
-    iter != this->Internals->ProxyList.end(); iter++)
+  const vtkSMProxyListDomainInternals::VectorOfProxies& proxies =
+    this->Internals->GetProxies();
+  vtkSMProxyListDomainInternals::VectorOfProxies::const_iterator iter;
+  for (iter = proxies.begin(); iter != proxies.end(); iter++)
     {
-    if (iter->GetPointer() == proxy)
+    if (iter->Proxy == proxy)
       {
       return true;
       }
@@ -213,28 +377,29 @@ bool vtkSMProxyListDomain::HasProxy(vtkSMProxy* proxy)
 //-----------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxyListDomain::GetProxy(unsigned int index)
 {
-  if (index >= this->Internals->ProxyList.size())
+  const vtkSMProxyListDomainInternals::VectorOfProxies& proxies =
+    this->Internals->GetProxies();
+  if (index >= proxies.size())
     {
-    vtkErrorMacro("Index " << index << " greater than max "
-      << this->Internals->ProxyList.size());
+    vtkErrorMacro("Index " << index << " greater than max " << proxies.size());
     return 0;
     }
-  return this->Internals->ProxyList[index].GetPointer();
+  return this->Internals->GetProxies()[index].Proxy;
 }
 
 //-----------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxyListDomain::FindProxy(const char* xmlgroup, const char* xmlname)
 {
-  vtkSMProxyListDomainInternals::VectorOfProxies::iterator iter;
-  for (iter = this->Internals->ProxyList.begin();
-    xmlgroup != NULL && xmlname != NULL && iter != this->Internals->ProxyList.end(); iter++)
+  vtkSMProxyListDomainInternals::VectorOfProxies::const_iterator iter;
+  const vtkSMProxyListDomainInternals::VectorOfProxies& proxies =
+    this->Internals->GetProxies();
+  for (iter = proxies.begin(); xmlgroup != NULL && xmlname != NULL && iter != proxies.end(); iter++)
     {
-    if (iter->GetPointer() &&
-      iter->GetPointer()->GetXMLGroup() && iter->GetPointer()->GetXMLName() &&
-      strcmp(iter->GetPointer()->GetXMLGroup(), xmlgroup) == 0 &&
-      strcmp(iter->GetPointer()->GetXMLName(), xmlname) == 0)
+    if (iter->Proxy && iter->Proxy->GetXMLGroup() && iter->Proxy->GetXMLName() &&
+      strcmp(iter->Proxy->GetXMLGroup(), xmlgroup) == 0 &&
+      strcmp(iter->Proxy->GetXMLName(), xmlname) == 0)
       {
-      return iter->GetPointer();
+      return iter->Proxy;
       }
     }
   return NULL;
@@ -243,15 +408,10 @@ vtkSMProxy* vtkSMProxyListDomain::FindProxy(const char* xmlgroup, const char* xm
 //-----------------------------------------------------------------------------
 int vtkSMProxyListDomain::RemoveProxy(vtkSMProxy* proxy)
 {
-  vtkSMProxyListDomainInternals::VectorOfProxies::iterator iter;
-  for (iter = this->Internals->ProxyList.begin();
-    iter != this->Internals->ProxyList.end(); iter++)
+  if (this->Internals->RemoveProxy(proxy))
     {
-    if (iter->GetPointer() == proxy)
-      {
-      this->Internals->ProxyList.erase(iter);
-      return 1;
-      }
+    this->DomainModified();
+    return 1;
     }
   return 0;
 }
@@ -259,21 +419,10 @@ int vtkSMProxyListDomain::RemoveProxy(vtkSMProxy* proxy)
 //-----------------------------------------------------------------------------
 int vtkSMProxyListDomain::RemoveProxy(unsigned int index)
 {
-  if (index >= this->Internals->ProxyList.size())
+  if (this->Internals->RemoveProxy(index))
     {
-    return 0;
-    }
-
-  vtkSMProxyListDomainInternals::VectorOfProxies::iterator iter;
-  unsigned int cc=0; 
-  for (iter = this->Internals->ProxyList.begin();
-    iter != this->Internals->ProxyList.end(); ++iter, ++cc)
-    {
-    if (cc == index)
-      {
-      this->Internals->ProxyList.erase(iter);
-      return 1;
-      }
+    this->DomainModified();
+    return 1;
     }
   return 0;
 }
@@ -283,15 +432,15 @@ void vtkSMProxyListDomain::ChildSaveState(vtkPVXMLElement* element)
 {
   this->Superclass::ChildSaveState(element);
 
-  vtkSMProxyListDomainInternals::VectorOfProxies::iterator iter;
-  for (iter = this->Internals->ProxyList.begin();
-    iter != this->Internals->ProxyList.end(); ++iter)
+  vtkSMProxyListDomainInternals::VectorOfProxies::const_iterator iter;
+  const vtkSMProxyListDomainInternals::VectorOfProxies& proxies =
+    this->Internals->GetProxies();
+  for (iter = proxies.begin(); iter != proxies.end(); ++iter)
     {
-    vtkSMProxy* proxy = iter->GetPointer();
+    vtkSMProxy* proxy = iter->Proxy.GetPointer();
     vtkPVXMLElement* proxyElem = vtkPVXMLElement::New();
     proxyElem->SetName("Proxy");
-    proxyElem->AddAttribute("value",
-      static_cast<int>(proxy->GetGlobalID()));
+    proxyElem->AddAttribute("value", static_cast<int>(proxy->GetGlobalID()));
     element->AddNestedElement(proxyElem);
     proxyElem->Delete();
     }
@@ -301,7 +450,7 @@ void vtkSMProxyListDomain::ChildSaveState(vtkPVXMLElement* element)
 int vtkSMProxyListDomain::LoadState(vtkPVXMLElement* element,
   vtkSMProxyLocator* loader)
 {
-  this->Internals->ProxyList.clear();
+  this->Internals->ClearProxies();
   if (!this->Superclass::LoadState(element, loader))
     {
     return 0;
@@ -318,23 +467,24 @@ int vtkSMProxyListDomain::LoadState(vtkPVXMLElement* element,
         vtkSMProxy* proxy = loader->LocateProxy(id);
         if (proxy)
           {
-          this->AddProxy(proxy);
+          this->Internals->AddProxy(proxy, this);
           }
         }
       }
     }
+  this->DomainModified();
   return 1;
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMProxyListDomain::SetProxies(vtkSMProxy** proxies, unsigned int count)
 {
-  vtkSMProxyListDomainInternals::VectorOfProxies newValues(proxies, proxies+count);
-  if (this->Internals->ProxyList != newValues)
+  this->Internals->ClearProxies();
+  for (unsigned int cc=0; cc < count; ++cc)
     {
-    this->Internals->ProxyList = newValues;
-    this->DomainModified();
+    this->Internals->AddProxy(proxies[cc], this);
     }
+  this->DomainModified();
 }
 
 //-----------------------------------------------------------------------------

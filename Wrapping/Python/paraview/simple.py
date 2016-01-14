@@ -1401,7 +1401,7 @@ def Show3DWidgets(proxy=None):
     proxy = proxy if proxy else GetActiveSource()
     if not proxy:
         raise ValueError, "No 'proxy' was provided and no active source was found."
-    proxy.InvokeEvent('UserEvent', "ShowWidget")
+    _Invoke3DWidgetUserEvent(proxy, "ShowWidget")
 
 def Hide3DWidgets(proxy=None):
     """If possible in the current environment, this method will
@@ -1409,7 +1409,20 @@ def Hide3DWidgets(proxy=None):
     proxy = proxy if proxy else GetActiveSource()
     if not proxy:
         raise ValueError, "No 'proxy' was provided and no active source was found."
-    proxy.InvokeEvent('UserEvent', "HideWidget")
+    _Invoke3DWidgetUserEvent(proxy, "HideWidget")
+
+def _Invoke3DWidgetUserEvent(proxy, event):
+    """Internal method used by Show3DWidgets/Hide3DWidgets"""
+    if proxy:
+        proxy.InvokeEvent('UserEvent', event)
+        # Since in 5.0 and earlier, Show3DWidgets/Hide3DWidgets was called with the
+        # proxy being the filter proxy (eg. Clip) and not the proxy that has the
+        # widget i.e. (Clip.ClipType), we explicitly handle it by iterating of
+        # proxy list properties and then invoking the event on their value proxies
+        # too.
+        for smproperty in proxy:
+            if smproperty.FindDomain("vtkSMProxyListDomain"):
+                _Invoke3DWidgetUserEvent(smproperty.GetData(), event)
 
 def ExportView(filename, view=None, **params):
     """Export a view to the specified output file."""

@@ -4,6 +4,117 @@ Major API Changes             {#MajorAPIChanges}
 This page documents major API/design changes between different versions since we
 started tracking these (starting after version 4.2).
 
+Changes in 5.1
+--------------
+
+###Refactored 3DWidget panels###
+
+3DWidget panels were subclasses of `pqObjectPanel`, the Properties panel
+hierarchy that has been deprecated since 4.0. This version finally drops support
+for these old 3D widget panels. The new implementation simply uses the
+`pqPropertyWidget` infrastructure. A 3D widget panel is nothing more than a custom
+`pqPropertyWidget` subclass for a property-group (`vtkSMPropertyGroup`) which
+creates an interactive widget to be shown in the active view to help the users
+change the values for properties in the property-group using this interactive
+widget, in addition to standard Qt-based UI elements.
+
+If you have a filter or proxy indicating that the Properties panel use one of
+the standard 3D widgets for controlling certain properties on that proxy, you
+specified that using `<Hints>` in the Proxy's XML definition.
+
+For example, the **(implicit_functions, Plane)** proxy requested that
+`pqImplicitPlaneWidget` be used using the following XML hints.
+
+    <Proxy class="vtkPVPlane" name="Plane">
+      <InputProperty is_internal="1" name="Input" />
+      <DoubleVectorProperty command="SetOrigin"
+                            default_values="0.0 0.0 0.0"
+                            name="Origin"
+                            number_of_elements="3">
+      ...
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetNormal"
+                            default_values="1.0 0.0 0.0"
+                            name="Normal"
+                            number_of_elements="3">
+      ...
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetOffset"
+                            default_values="0.0"
+                            name="Offset"
+                            number_of_elements="1">
+      </DoubleVectorProperty>
+      <Hints>
+        <PropertyGroup type="Plane">
+          <Property function="Origin" name="Origin" />
+          <Property function="Normal" name="Normal" />
+        </PropertyGroup>
+        <ProxyList>
+          <Link name="Input" with_property="Input" />
+        </ProxyList>
+      </Hints>
+    </Proxy>
+
+Since 3D widget panels are now simply custom `pqPropertyWidget` subclasses for a
+property-group, this code changes are follows:
+
+    <Proxy class="vtkPVPlane" name="Plane">
+      <InputProperty is_internal="1" name="Input" />
+      <DoubleVectorProperty command="SetOrigin"
+                            default_values="0.0 0.0 0.0"
+                            name="Origin"
+                            number_of_elements="3">
+      ...
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetNormal"
+                            default_values="1.0 0.0 0.0"
+                            name="Normal"
+                            number_of_elements="3">
+      ...
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetOffset"
+                            default_values="0.0"
+                            name="Offset"
+                            number_of_elements="1">
+      </DoubleVectorProperty>
+      <PropertyGroup label="Plane Parameters" panel_widget="InteractivePlane">
+        <Property function="Origin" name="Origin" />
+        <Property function="Normal" name="Normal" />
+        <Property function="Input"  name="Input" />
+      </PropertyGroup>
+      <Hints>
+        <ProxyList>
+          <Link name="Input" with_property="Input" />
+        </ProxyList>
+      </Hints>
+    </Proxy>
+
+Things to note:
+
+- The `<PropertyGroup>` tag is no longer specified under `<Hints>`.
+- The `panel_widget` attribute is used to indicate which custom widget to create
+for this property group.
+
+The functions for properties in the group supported by each type 3D widget (or
+interactive widget as we now will call them) can be found by looking at the
+documentation of each of the custom widget listed below. For the most past,
+these have remained unchanged for previous function names.
+
+Available custom property-widgets, the interactive widget they use and the
+obsolete 3DWidget they correspond to are given in the table below.
+
+New Widget | `panel_widget` | Interactive Widget used | Obsolete 3DWidget name
+-----------|-------------------------|-------------------------------------
+pqBoxPropertyWidget |`InteractiveBox` | BoxWidgetRepresentation | `pqBoxWidget`
+pqHandlePropertyWidget | `InteractiveHandle` | HandleWidgetRepresentation | `pqHandleWidget`, `pqPointSourceWidget`
+pqImplicitPlanePropertyWidget | `InteractivePlane` | ImplicitPlaneWidgetRepresentation |  `pqImplicitPlaneWidget`
+pqLinePropertyWidget | `InteractiveLine` | LineSourceWidgetRepresentation | `pqLineWidget`, `pqDistanceWidget`, `pqLineSourceWidget`
+pqSpherePropertyWidget | `InteractiveSphere` | SphereWidgetRepresentation | `pqSphereWidget`, `pqOrbitWidget`
+pqSplinePropertyWidget | `InteractiveSpline` or `InteractivePolyLine` | SplineWidgetRepresentation or PolyLineWidgetRepresentation | `pqSplineWidget`, `pqPolyLineWidget`
+
+
 Changes in 5.0
 --------------
 

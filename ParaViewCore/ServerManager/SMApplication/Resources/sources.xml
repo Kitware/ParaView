@@ -721,8 +721,7 @@
                             command="SetPoint1"
                             default_values="-0.5 0.0 0.0"
                             name="Point1"
-                            number_of_elements="3"
-                            panel_visibility="never">
+                            number_of_elements="3">
         <DoubleRangeDomain name="range" />
         <Documentation>This property controls the coordinates of the first
         endpoint of the line.</Documentation>
@@ -731,8 +730,7 @@
                             command="SetPoint2"
                             default_values="0.5 0.0 0.0"
                             name="Point2"
-                            number_of_elements="3"
-                            panel_visibility="never">
+                            number_of_elements="3">
         <DoubleRangeDomain name="range" />
         <Documentation>This property controls the coordinates of the second
         endpoint of the line.</Documentation>
@@ -740,24 +738,16 @@
       <IntVectorProperty command="SetResolution"
                          default_values="6"
                          name="Resolution"
-                         number_of_elements="1"
-                         panel_visibility="never">
+                         number_of_elements="1">
         <IntRangeDomain min="1"
                         name="range" />
         <Documentation>This property specifies the number of pieces into which
         to divide the line.</Documentation>
       </IntVectorProperty>
-      <Hints>
-        <PropertyGroup label="Line"
-                       type="LineSource">
-          <Property function="Point1WorldPosition"
-                    name="Point1" />
-          <Property function="Point2WorldPosition"
-                    name="Point2" />
-          <Property function="Resolution"
-                    name="Resolution" />
-        </PropertyGroup>
-      </Hints>
+      <PropertyGroup label="Line Parameters" panel_widget="InteractiveLine">
+          <Property function="Point1WorldPosition" name="Point1" />
+          <Property function="Point2WorldPosition" name="Point2" />
+      </PropertyGroup>
       <!-- End Line -->
     </SourceProxy>
     <!-- ==================================================================== -->
@@ -773,29 +763,22 @@
                      key shortcut.</Documentation>
       <DoubleVectorProperty default_values="-0.5 0.0 0.0"
                             name="Point1"
-                            number_of_elements="3"
-                            panel_visibility="never">
+                            number_of_elements="3">
         <DoubleRangeDomain name="range" />
         <Documentation>This property controls the coordinates of the first
         endpoint of the line.</Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty default_values="0.5 0.0 0.0"
                             name="Point2"
-                            number_of_elements="3"
-                            panel_visibility="never">
+                            number_of_elements="3" >
         <DoubleRangeDomain name="range" />
         <Documentation>This property controls the coordinates of the second
         endpoint of the line.</Documentation>
       </DoubleVectorProperty>
-      <Hints>
-        <PropertyGroup label="Distance"
-                       type="Distance">
-          <Property function="Point1WorldPosition"
-                    name="Point1" />
-          <Property function="Point2WorldPosition"
-                    name="Point2" />
-        </PropertyGroup>
-      </Hints>
+      <PropertyGroup label="Distance" panel_widget="InteractiveLine">
+        <Property function="Point1WorldPosition" name="Point1" />
+        <Property function="Point2WorldPosition" name="Point2" />
+      </PropertyGroup>
       <!-- End Line -->
     </SourceProxy>
     <!-- ==================================================================== -->
@@ -1069,8 +1052,7 @@
                             command="SetCenter"
                             default_values="0.0 0.0 0.0"
                             name="Center"
-                            number_of_elements="3"
-                            panel_visibility="never">
+                            number_of_elements="3">
         <DoubleRangeDomain name="range" />
         <Documentation>This property specifies the 3D coordinates of the center
         of the point cloud.</Documentation>
@@ -1079,8 +1061,7 @@
                          command="SetNumberOfPoints"
                          default_values="1"
                          name="NumberOfPoints"
-                         number_of_elements="1"
-                         panel_visibility="never">
+                         number_of_elements="1" >
         <IntRangeDomain min="1"
                         name="range" />
         <Documentation>This property specifies the number of points in the
@@ -1090,23 +1071,15 @@
                             command="SetRadius"
                             default_values="0.0"
                             name="Radius"
-                            number_of_elements="1"
-                            panel_visibility="never">
+                            number_of_elements="1">
         <DoubleRangeDomain min="0"
                            name="range" />
         <Documentation>This property specifies the radius of the point cloud,
         measured from the value of the Center property.</Documentation>
       </DoubleVectorProperty>
-      <Hints>
-        <PropertyGroup type="PointSource">
-          <Property function="WorldPosition"
-                    name="Center" />
-          <Property function="Radius"
-                    name="Radius" />
-          <Property function="NumberOfPoints"
-                    name="NumberOfPoints" />
-        </PropertyGroup>
-      </Hints>
+      <PropertyGroup label="Point Parameters" panel_widget="InteractiveHandle">
+        <Property function="WorldPosition" name="Center" />
+      </PropertyGroup>
       <!-- End PointSource -->
     </SourceProxy>
     <!-- ==================================================================== -->
@@ -1125,24 +1098,18 @@
                             number_of_elements_per_command="3"
                             repeat_command="1"
                             set_number_command="SetNumberOfPoints"
-                            use_index="1"
-                            panel_visibility="never">
+                            use_index="1">
       </DoubleVectorProperty>
       <IntVectorProperty command="SetClosed"
                          default_values="0"
                          name="Closed"
-                         number_of_elements="1"
-                         panel_visibility="never">
+                         number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      <Hints>
-        <PropertyGroup type="PolyLineSource">
-          <Property function="HandlePositions"
-                    name="Points" />
-          <Property function="Closed"
-                    name="Closed" />
-        </PropertyGroup>
-      </Hints>
+      <PropertyGroup label="Poly-line Parameters" panel_widget="InteractivePolyLine">
+        <Property function="HandlePositions" name="Points" />
+        <Property function="Closed" name="Closed" />
+      </PropertyGroup>
     </SourceProxy>
     <!-- ==================================================================== -->
     <SourceProxy class="vtkSphereSource"

@@ -81,9 +81,6 @@ private slots:
   /// called when the user clicks on an item in the left pane.
   void changeCurrentPage();
 
-  /// update the visibility and points in the spline widget.
-  void updateSplineWidget();
-
 private:
   pqCameraKeyFrameWidget(const pqCameraKeyFrameWidget&); // Not implemented.
   void operator=(const pqCameraKeyFrameWidget&); // Not implemented.
@@ -93,5 +90,3 @@ private:
 };
 
 #endif
-
-

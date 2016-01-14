@@ -90,21 +90,14 @@ IF (BUILD_TESTING)
   # this test is redundant with the CatalystFullWorkflow test
   # in the coprocessing library but that may not be built so we
   # add it here as well. this test though is a subset of that test.
-  IF ( BUILD_SHARED_LIBS )
-    add_client_tests("pv"
-      LOAD_PLUGIN "CatalystScriptGeneratorPlugin"
-      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Testing/CatalystGUI.xml )
-    SET_TESTS_PROPERTIES(pv.CatalystGUI PROPERTIES RUN_SERIAL ON LABELS "PARAVIEW;CATALYST")
-    add_client_tests("pv"
-      LOAD_PLUGIN "CatalystScriptGeneratorPlugin"
-      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Testing/CatalystCinemaGUI.xml )
-    SET_TESTS_PROPERTIES(pv.CatalystCinemaGUI PROPERTIES RUN_SERIAL ON LABELS "PARAVIEW;CATALYST")
-  ELSE ()
-    add_client_tests("pv"
-      LOAD_PLUGIN "CatalystScriptGeneratorPlugin"
-      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Testing/CatalystGUI-static.xml )
-    SET_TESTS_PROPERTIES(pv.CatalystGUI-static PROPERTIES RUN_SERIAL ON LABELS "PARAVIEW;CATALYST")
-  ENDIF ()
+  add_client_tests("pv"
+    LOAD_PLUGIN "CatalystScriptGeneratorPlugin"
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Testing/CatalystGUI.xml )
+  SET_TESTS_PROPERTIES(pv.CatalystGUI PROPERTIES RUN_SERIAL ON LABELS "PARAVIEW;CATALYST")
+  add_client_tests("pv"
+    LOAD_PLUGIN "CatalystScriptGeneratorPlugin"
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Testing/CatalystCinemaGUI.xml )
+  SET_TESTS_PROPERTIES(pv.CatalystCinemaGUI PROPERTIES RUN_SERIAL ON LABELS "PARAVIEW;CATALYST")
 ENDIF ()
 
 if(PARAVIEW_USE_MPI)

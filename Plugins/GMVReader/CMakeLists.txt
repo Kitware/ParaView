@@ -69,37 +69,10 @@ if(PARAVIEW_USE_MPI)
   include(vtkMPI)
 endif()
 
-# ---------------------------------------------------------------------------
-# Combined plugin
-# -----------------------------------------------------------------------------
-IF (PARAVIEW_BUILD_QT_GUI)
-  # Extend the auto-generated panel
-  IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    QT5_WRAP_CPP (MOC_SRCS pqGMVReaderPanel.h)
-  ELSE ()
-    QT4_WRAP_CPP (MOC_SRCS pqGMVReaderPanel.h)
-  ENDIF ()
-  ADD_PARAVIEW_OBJECT_PANEL(IFACES IFACE_SRCS
-    CLASS_NAME pqGMVReaderPanel
-    XML_NAME GMVSeriesReader
-    XML_GROUP sources
-    )
-
-  ADD_PARAVIEW_PLUGIN(GMVReader "1.0"
-    REQUIRED_ON_SERVER
-    REQUIRED_ON_CLIENT
-    SERVER_MANAGER_XML GMVReaderSM.xml
-    SERVER_MANAGER_SOURCES vtkGMVReader.cxx
-    GUI_INTERFACES ${IFACES}
-    GUI_SOURCES ${MOC_SRCS} ${UI_SRCS} ${IFACE_SRCS} pqGMVReaderPanel.cxx
-    )
-ELSE ()
-  ADD_PARAVIEW_PLUGIN(GMVReader "1.0"
-    REQUIRED_ON_SERVER
-    REQUIRED_ON_CLIENT
-    SERVER_MANAGER_XML GMVReaderSM.xml
-    SERVER_MANAGER_SOURCES vtkGMVReader.cxx)
-ENDIF ()
+ADD_PARAVIEW_PLUGIN(GMVReader "1.0"
+  REQUIRED_ON_SERVER
+  SERVER_MANAGER_XML GMVReaderSM.xml
+  SERVER_MANAGER_SOURCES vtkGMVReader.cxx)
 
 # Add testing if necessary
 IF (BUILD_TESTING)
