@@ -102,7 +102,10 @@ int pqTabbedMultiViewWidget::pqTabWidget::addAsTab(pqMultiViewWidget* wdg, pqTab
   pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
   pqProxy* item = smmodel->findItem<pqProxy*>(proxy);
-  item->rename(QString("Layout #%1").arg(tab_count));
+  if (item->getSMName().startsWith("ViewLayout"))
+    {
+    item->rename(QString("Layout #%1").arg(tab_count));
+    }
   int tab_index = this->insertTab(tab_count-1, wdg, item->getSMName());
 
   this->connect(item, SIGNAL(nameChanged(pqServerManagerModelItem*)),
