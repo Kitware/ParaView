@@ -31,6 +31,11 @@ public:
   vtkTypeMacro(vtkThickenLayeredCells, vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Enable/disable thickening.
+  vtkSetMacro(EnableThickening, bool);
+  vtkGetMacro(EnableThickening, bool);
+
 //BTX
 protected:
   vtkThickenLayeredCells();
@@ -40,6 +45,7 @@ protected:
     vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
 
+  bool EnableThickening;
 private:
   vtkThickenLayeredCells(const vtkThickenLayeredCells&); // Not implemented.
   void operator=(const vtkThickenLayeredCells&); // Not implemented.
