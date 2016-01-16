@@ -106,7 +106,7 @@ Available custom property-widgets, the interactive widget they use and the
 obsolete 3DWidget they correspond to are given in the table below.
 
 New Widget | `panel_widget` | Interactive Widget used | Obsolete 3DWidget name
------------|-------------------------|-------------------------------------
+-----------|----------------|-------------------------|-------------------------------------
 pqBoxPropertyWidget |`InteractiveBox` | BoxWidgetRepresentation | `pqBoxWidget`
 pqHandlePropertyWidget | `InteractiveHandle` | HandleWidgetRepresentation | `pqHandleWidget`, `pqPointSourceWidget`
 pqImplicitPlanePropertyWidget | `InteractivePlane` | ImplicitPlaneWidgetRepresentation |  `pqImplicitPlaneWidget`
