@@ -105,14 +105,14 @@ these have remained unchanged for previous function names.
 Available custom property-widgets, the interactive widget they use and the
 obsolete 3DWidget they correspond to are given in the table below.
 
-New Widget | `panel_widget` | Interactive Widget used | Obsolete 3DWidget name
------------|----------------|-------------------------|-------------------------------------
-pqBoxPropertyWidget |`InteractiveBox` | BoxWidgetRepresentation | `pqBoxWidget`
-pqHandlePropertyWidget | `InteractiveHandle` | HandleWidgetRepresentation | `pqHandleWidget`, `pqPointSourceWidget`
-pqImplicitPlanePropertyWidget | `InteractivePlane` | ImplicitPlaneWidgetRepresentation |  `pqImplicitPlaneWidget`
-pqLinePropertyWidget | `InteractiveLine` | LineSourceWidgetRepresentation | `pqLineWidget`, `pqDistanceWidget`, `pqLineSourceWidget`
-pqSpherePropertyWidget | `InteractiveSphere` | SphereWidgetRepresentation | `pqSphereWidget`, `pqOrbitWidget`
-pqSplinePropertyWidget | `InteractiveSpline` or `InteractivePolyLine` | SplineWidgetRepresentation or PolyLineWidgetRepresentation | `pqSplineWidget`, `pqPolyLineWidget`
+New Widget | panel_widget | Interactive Widget used | Obsolete 3DWidget name
+-----------|--------------|-------------------------|-------------------------------------
+pqBoxPropertyWidget |InteractiveBox | BoxWidgetRepresentation | pqBoxWidget
+pqHandlePropertyWidget | InteractiveHandle | HandleWidgetRepresentation | pqHandleWidget, pqPointSourceWidget
+pqImplicitPlanePropertyWidget | InteractivePlane | ImplicitPlaneWidgetRepresentation |  pqImplicitPlaneWidget
+pqLinePropertyWidget | InteractiveLine | LineSourceWidgetRepresentation | pqLineWidget, pqDistanceWidget, pqLineSourceWidget
+pqSpherePropertyWidget | InteractiveSphere | SphereWidgetRepresentation | pqSphereWidget, pqOrbitWidget
+pqSplinePropertyWidget | InteractiveSpline or InteractivePolyLine | SplineWidgetRepresentation or PolyLineWidgetRepresentation | pqSplineWidget, pqPolyLineWidget
 
 
 Changes in 5.0
