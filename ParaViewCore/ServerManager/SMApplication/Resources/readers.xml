@@ -2675,7 +2675,10 @@
                             panel_visibility="default">
         <FileListDomain name="files" />
         <Documentation>This property specifies the .q (solution) file name for
-        the PLOT3D reader.</Documentation>
+          the PLOT3D reader.</Documentation>
+        <Hints>
+          <FileChooser extensions="q" file_description="Solution files" />
+        </Hints>
       </StringVectorProperty>
       <StringVectorProperty animateable="0"
                             command="SetFunctionFileName"
@@ -7371,6 +7374,9 @@
         There can be more than one. If more that one file is specified, the
         reader will switch to file-series mode in which it will pretend that it
         can support time and provide one file per time step.</Documentation>
+        <Hints>
+          <FileChooser extensions="q" file_description="Solution files" />
+        </Hints>
       </StringVectorProperty>
       <SubProxy>
         <Proxy name="Reader"
