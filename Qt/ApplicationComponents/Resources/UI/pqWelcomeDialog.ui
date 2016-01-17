@@ -6,12 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>707</width>
-    <height>604</height>
+    <width>560</width>
+    <height>654</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
+  </property>
+  <property name="autoFillBackground">
+   <bool>false</bool>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -20,7 +26,7 @@
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap resource="../pqComponents.qrc">:/pqWidgets/Icons/PVSplashScreen.png</pixmap>
+      <pixmap resource="../../../Components/Resources/pqComponents.qrc">:/pqWidgets/Icons/PVSplashScreen.png</pixmap>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -211,7 +217,7 @@
     <widget class="QWidget" name="widget" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QCheckBox" name="checkBox">
+       <widget class="QCheckBox" name="DoNotShowAgainButton">
         <property name="text">
          <string>Don't show this window again</string>
         </property>
@@ -232,7 +238,9 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../../Components/Resources/pqComponents.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>
