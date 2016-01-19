@@ -51,6 +51,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPlastiqueStyle>
 #endif
 
+#include <vtksys/SystemTools.hxx>
+
 #include <stdlib.h>
 #include <clocale>
 
@@ -101,8 +103,13 @@ int main(int argc, char* argv[])
 #endif
 #endif
 
+  // We force LC_NUMERIC to C - it is important as Qt sets locale to the user's
+  // environment locale value and this might break some basic features like
+  // the calls to atof() that are locale dependent.
+  vtksys::SystemTools::PutEnv("LC_NUMERIC=C");
+
   QApplication qtapp(argc, argv);
-  setlocale(LC_NUMERIC,"C");
+
   pq@BPC_NAME@Initializer pvInitializer;
   pq@BPC_NAME@Initializer::Status status = pvInitializer.Initialize(argc, argv);
   switch (status)
