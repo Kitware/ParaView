@@ -33,30 +33,94 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqParaViewBehaviors_h
 
 #include <QObject>
+#include <QFlags>
 #include "pqApplicationComponentsModule.h"
 
 class QMainWindow;
 
 /// @defgroup Behaviors ParaView Behaviors
-/// Behaviors are classes that manage certain behaviors in the application. 
+/// Behaviors are classes that manage certain behaviors in the application.
 /// Developers should simply instantiate behaviors if the expect that
 /// behavior in their client.
-
-
+/// Once can customize which behaviors to instantiate by passing the \c behaviors
+/// argument to the constructor. e.g.
+///
+/// \code
+///   new pqParaViewBehaviors(
+///     pqParaViewBehaviors::AllBehaviors^pqParaViewBehaviors::DefaultViewBehavior, this, this);
+/// \endcode
+///
 /// @ingroup Behaviors
 /// pqParaViewBehaviors creates all the behaviors used by ParaView. If your
 /// client is merely a branded version of ParaView, then you may want to simply
 /// use this behavior.
+
+#define PQ_BEHAVIOR_DEFINE_METHODS(_name) \
+  static void setEnable##_name(bool val) { pqParaViewBehaviors::_name = val; } \
+  static bool enable##_name() { return pqParaViewBehaviors::_name; }
+
+#define PQ_BEHAVIOR_DECLARE_FLAG(_name) static bool _name;
+
 class PQAPPLICATIONCOMPONENTS_EXPORT pqParaViewBehaviors : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
 public:
-  pqParaViewBehaviors(QMainWindow* window, QObject* parent=0);
+  PQ_BEHAVIOR_DEFINE_METHODS(QtMessageHandlerBehavior);
+  PQ_BEHAVIOR_DEFINE_METHODS(DataTimeStepBehavior);
+  PQ_BEHAVIOR_DEFINE_METHODS(SpreadSheetVisibilityBehavior);
+  PQ_BEHAVIOR_DEFINE_METHODS(PipelineContextMenuBehavior);
+  PQ_BEHAVIOR_DEFINE_METHODS(ObjectPickingBehavior);
+  PQ_BEHAVIOR_DEFINE_METHODS(DefaultViewBehavior);
+  PQ_BEHAVIOR_DEFINE_METHODS(UndoRedoBehavior);
+  PQ_BEHAVIOR_DEFINE_METHODS(AlwaysConnectedBehavior);
+  PQ_BEHAVIOR_DEFINE_METHODS(CrashRecoveryBehavior);
+  PQ_BEHAVIOR_DEFINE_METHODS(AutoLoadPluginXMLBehavior);
+  PQ_BEHAVIOR_DEFINE_METHODS(PluginDockWidgetsBehavior);
+  PQ_BEHAVIOR_DEFINE_METHODS(VerifyRequiredPluginBehavior);
+  PQ_BEHAVIOR_DEFINE_METHODS(PluginActionGroupBehavior);
+  PQ_BEHAVIOR_DEFINE_METHODS(FixPathsInStateFilesBehavior);
+  PQ_BEHAVIOR_DEFINE_METHODS(CommandLineOptionsBehavior);
+  PQ_BEHAVIOR_DEFINE_METHODS(PersistentMainWindowStateBehavior);
+  PQ_BEHAVIOR_DEFINE_METHODS(CollaborationBehavior);
+  PQ_BEHAVIOR_DEFINE_METHODS(StandardArrayColorMapsBehavior);
+  PQ_BEHAVIOR_DEFINE_METHODS(ViewStreamingBehavior);
+  PQ_BEHAVIOR_DEFINE_METHODS(PluginSettingsBehavior);
+  PQ_BEHAVIOR_DEFINE_METHODS(ApplyBehavior);
+  PQ_BEHAVIOR_DEFINE_METHODS(QuickLaunchShortcuts);
+
+  pqParaViewBehaviors(QMainWindow* window, QObject* parent=NULL);
+  virtual ~pqParaViewBehaviors();
 
 private:
-  Q_DISABLE_COPY(pqParaViewBehaviors)
+  Q_DISABLE_COPY(pqParaViewBehaviors);
+
+  PQ_BEHAVIOR_DECLARE_FLAG(QtMessageHandlerBehavior);
+  PQ_BEHAVIOR_DECLARE_FLAG(DataTimeStepBehavior);
+  PQ_BEHAVIOR_DECLARE_FLAG(SpreadSheetVisibilityBehavior);
+  PQ_BEHAVIOR_DECLARE_FLAG(PipelineContextMenuBehavior);
+  PQ_BEHAVIOR_DECLARE_FLAG(ObjectPickingBehavior);
+  PQ_BEHAVIOR_DECLARE_FLAG(DefaultViewBehavior);
+  PQ_BEHAVIOR_DECLARE_FLAG(UndoRedoBehavior);
+  PQ_BEHAVIOR_DECLARE_FLAG(AlwaysConnectedBehavior);
+  PQ_BEHAVIOR_DECLARE_FLAG(CrashRecoveryBehavior);
+  PQ_BEHAVIOR_DECLARE_FLAG(AutoLoadPluginXMLBehavior);
+  PQ_BEHAVIOR_DECLARE_FLAG(PluginDockWidgetsBehavior);
+  PQ_BEHAVIOR_DECLARE_FLAG(VerifyRequiredPluginBehavior);
+  PQ_BEHAVIOR_DECLARE_FLAG(PluginActionGroupBehavior);
+  PQ_BEHAVIOR_DECLARE_FLAG(FixPathsInStateFilesBehavior);
+  PQ_BEHAVIOR_DECLARE_FLAG(CommandLineOptionsBehavior);
+  PQ_BEHAVIOR_DECLARE_FLAG(PersistentMainWindowStateBehavior);
+  PQ_BEHAVIOR_DECLARE_FLAG(CollaborationBehavior);
+  PQ_BEHAVIOR_DECLARE_FLAG(StandardArrayColorMapsBehavior);
+  PQ_BEHAVIOR_DECLARE_FLAG(ViewStreamingBehavior);
+  PQ_BEHAVIOR_DECLARE_FLAG(PluginSettingsBehavior);
+  PQ_BEHAVIOR_DECLARE_FLAG(ApplyBehavior);
+  PQ_BEHAVIOR_DECLARE_FLAG(QuickLaunchShortcuts);
 };
+
+#undef PQ_BEHAVIOR_DECLARE_FLAG
+#undef PQ_BEHAVIOR_DEFINE_METHODS
 
 #endif
 

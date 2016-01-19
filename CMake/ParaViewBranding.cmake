@@ -10,7 +10,7 @@
 #   # client-name is used.
 #   APPLICATION_NAME "ParaView"
 # 
-#   # This is the title bar text. If none is provided the name will be used.
+#   # This is the title bar text (optional).
 #   TITLE "Kitware ParaView"
 #   
 #   # This is the organization name.
@@ -107,6 +107,11 @@ FUNCTION(build_paraview_client BPC_NAME)
   ENDIF ()
 
   # If no title is provided, make one up using the name.
+  if(DEFINED BPC_TITLE)
+    set (BPC_HAS_TITLE 1)
+  else()
+    set (BPC_HAS_TITLE 0)
+  endif()
   pv_set_if_not_set(BPC_TITLE "${BPC_NAME}")
   pv_set_if_not_set(BPC_APPLICATION_NAME "${BPC_NAME}")
   pv_set_if_not_set(BPC_ORGANIZATION "Humanity")

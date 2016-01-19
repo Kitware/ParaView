@@ -64,7 +64,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ******************** pqTabWidget **********************
 //-----------------------------------------------------------------------------
 pqTabbedMultiViewWidget::pqTabWidget::pqTabWidget(QWidget* parentObject):
-  Superclass(parentObject)
+  Superclass(parentObject),
+  ReadOnly(false)
 {
 }
 
@@ -128,6 +129,7 @@ int pqTabbedMultiViewWidget::pqTabWidget::addAsTab(pqMultiViewWidget* wdg, pqTab
     this->style()->standardPixmap(QStyle::SP_TitleBarCloseButton));
   this->setTabButton(tab_index, QTabBar::RightSide, label);
   label->installEventFilter(self);
+  label->setVisible(!this->ReadOnly);
   return tab_index;
 }
 
@@ -147,6 +149,22 @@ QStyle::StandardPixmap pqTabbedMultiViewWidget::pqTabWidget::popoutLabelPixmap(b
 }
 
 //-----------------------------------------------------------------------------
+void pqTabbedMultiViewWidget::pqTabWidget::setReadOnly(bool val)
+{
+  if (this->ReadOnly == val)
+    {
+    return;
+    }
+
+  this->ReadOnly = val;
+  QList<QLabel*> labels = this->findChildren<QLabel*>("close");
+  foreach (QLabel* label, labels)
+    {
+    label->setVisible(!val);
+    }
+}
+
+//-----------------------------------------------------------------------------
 // ****************     pqTabbedMultiViewWidget   **********************
 //-----------------------------------------------------------------------------
 class pqTabbedMultiViewWidget::pqInternals
@@ -155,6 +173,7 @@ public:
   QPointer<pqTabWidget> TabWidget;
   QMultiMap<pqServer*, QPointer<pqMultiViewWidget> > TabWidgets;
   QPointer<QWidget> FullScreenWindow;
+  QPointer<QWidget> NewTabWidget;
 
   /// returns a frame that can be used to assign the view proxy. May return NULL
   /// if no suitable frame is found.
@@ -171,6 +190,24 @@ public:
       return this->TabWidgets.value(view->getServer());
       }
     return NULL;
+    }
+
+  void addNewTabWidget()
+    {
+    if (!this->NewTabWidget)
+      {
+      this->NewTabWidget = new QWidget(this->TabWidget);
+      this->TabWidget->addTab(this->NewTabWidget, "+");
+      }
+    }
+  void removeNewTabWidget()
+    {
+    if (this->NewTabWidget)
+      {
+      this->TabWidget->removeTab(
+        this->TabWidget->indexOf(this->NewTabWidget));
+      delete this->NewTabWidget;
+      }
     }
 };
 
@@ -205,7 +242,7 @@ pqTabbedMultiViewWidget::pqTabbedMultiViewWidget(QWidget* parentObject)
   QObject::connect(smmodel, SIGNAL(preServerRemoved(pqServer*)),
     this, SLOT(serverRemoved(pqServer*)));
 
-  this->Internals->TabWidget->addTab(new QWidget(this), "+");
+  this->Internals->addNewTabWidget();
   QObject::connect(this->Internals->TabWidget, SIGNAL(currentChanged(int)),
     this, SLOT(currentTabChanged(int)));
 
@@ -224,6 +261,29 @@ pqTabbedMultiViewWidget::pqTabbedMultiViewWidget(QWidget* parentObject)
 pqTabbedMultiViewWidget::~pqTabbedMultiViewWidget()
 {
   delete this->Internals;
+}
+
+//-----------------------------------------------------------------------------
+void pqTabbedMultiViewWidget::setReadOnly(bool val)
+{
+  if (val != this->readOnly())
+    {
+    this->Internals->TabWidget->setReadOnly(val);
+    if (val)
+      {
+      this->Internals->removeNewTabWidget();
+      }
+    else
+      {
+      this->Internals->addNewTabWidget();
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+bool pqTabbedMultiViewWidget::readOnly() const
+{
+  return this->Internals->TabWidget->readOnly();
 }
 
 //-----------------------------------------------------------------------------
@@ -382,18 +442,17 @@ void pqTabbedMultiViewWidget::serverRemoved(pqServer* server)
 }
 
 //-----------------------------------------------------------------------------
-void pqTabbedMultiViewWidget::currentTabChanged(int index)
+void pqTabbedMultiViewWidget::currentTabChanged(int/* index*/)
 {
-  if (index < (this->Internals->TabWidget->count()-1))
+  QWidget* currentWidget = this->Internals->TabWidget->currentWidget();
+  if (pqMultiViewWidget* frame = qobject_cast<pqMultiViewWidget*>(currentWidget))
     {
-    // make the first frame active.
-    pqMultiViewWidget* frame = qobject_cast<pqMultiViewWidget*>(
-      this->Internals->TabWidget->currentWidget());
     frame->makeFrameActive();
     }
-  else if (index == (this->Internals->TabWidget->count()-1) && index != 0)
+  else if (currentWidget == this->Internals->NewTabWidget &&
+    this->Internals->TabWidget->count() > 1)
     {
-    // index !=0 check keeps this widget from creating new tabs as the tabs are
+    // count() > 1 check keeps this widget from creating new tabs as the tabs are
     // being removed.
     this->createTab();
     }

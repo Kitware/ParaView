@@ -92,6 +92,7 @@ namespace
 vtkStandardNewMacro(vtkThickenLayeredCells);
 //----------------------------------------------------------------------------
 vtkThickenLayeredCells::vtkThickenLayeredCells()
+  : EnableThickening(true)
 {
 }
 
@@ -108,6 +109,10 @@ int vtkThickenLayeredCells::RequestData(vtkInformation* vtkNotUsed(request),
   vtkUnstructuredGrid* input = vtkUnstructuredGrid::GetData(inputVector[0], 0);
   vtkUnstructuredGrid* output = vtkUnstructuredGrid::GetData(outputVector);
   output->ShallowCopy(input);
+  if (!this->EnableThickening)
+    {
+    return 1;
+    }
 
   vtkPoints* ipoints = input->GetPoints();
 
