@@ -75,35 +75,35 @@ icetquirk = False
 start_frame = 0
 default_log_threshold = dict()
 
+def componentString(component):
+    ret = ""
+    if component & 0x10:
+        ret = ret + " CLIENT "
+    if component & 0x4:
+        ret = ret + " RENDER "
+    if component & 0x1:
+        ret = ret + " DATA "
+    return ret
+
 class OneLog :
     def __init__(self):
         self.runmode = 'batch'
         self.servertype = 'unified'
-        self.component = 0x10
+        self.component = ""
         self.rank = 0
         self.lines = []
-
-    def componentString(self):
-        ret = ""
-        if self.component & 0x10:
-            ret = ret + " CLIENT "
-        if self.component & 0x4:
-            ret = ret + " RENDER "
-        if self.component & 0x1:
-            ret = ret + " DATA "
-        return ret
 
     def print_log(self, showlines=False):
         print "#RunMode:", self.runmode,
         print "ServerType:", self.servertype,
-        print "Component:", self.componentString(),
+        print "Component:", self.component,
         print "processor#:", self.rank
         if showlines:
             for i in self.lines:
                 print i
 
     def toString(self, showlines=False):
-        result = "#RunMode: " + self.runmode + " ServerType: " + self.servertype + " Component: " + self.componentString() + " processor#: " + str(self.rank) + "\n"
+        result = "#RunMode: " + self.runmode + " ServerType: " + self.servertype + " Component: " + self.component + " processor#: " + str(self.rank) + "\n"
         if showlines:
             for i in self.lines:
                 result += i + "\n"
@@ -220,7 +220,7 @@ def get_logs() :
             alog = OneLog()
             alog.runmode = runmode
             alog.servertype = servertype
-            alog.component = component
+            alog.component = componentString(component)
             alog.rank = i
 
             if is_symmetric_mode:
