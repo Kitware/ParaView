@@ -218,6 +218,9 @@ option(PARAVIEW_USE_VISITBRIDGE "Build ParaView with VisIt readers." OFF)
 # Xdmf3 is not ON by default since it depends on Boost.
 option(PARAVIEW_ENABLE_XDMF3 "Enable Xdmf3 support (requires Boost)." OFF)
 
+# Enable CGNS support
+option(PARAVIEW_ENABLE_CGNS "Enable the CGNS file reader" OFF)
+
 if (UNIX)
   option(PARAVIEW_ENABLE_FFMPEG "Enable FFMPEG Support." OFF)
 endif()
@@ -277,12 +280,6 @@ if (UNIX)
     "Build ParaView with CosmoTools VTK Extensions" OFF
     "PARAVIEW_USE_MPI" OFF)
   mark_as_advanced(PARAVIEW_ENABLE_COSMOTOOLS)
-
-  cmake_dependent_option(PARAVIEW_ENABLE_CGNS
-  "Enable the CGNS file reader" OFF
-  "PARAVIEW_USE_MPI" OFF)
-  mark_as_advanced(PARAVIEW_ENABLE_CGNS)
-
 endif()
 
 # Is this a 32 bit or 64bit build. Display this in about dialog.
