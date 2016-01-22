@@ -9,8 +9,16 @@ find_package(CGNS REQUIRED)
 if (NOT CGNS_FOUND)
   message(FATAL_ERROR "Unable to locate CGNS library.")
 endif()
-
 include_directories(${CGNS_INCLUDE_DIR})
+
+if(CGNS_LINK_TO_HDF5 AND NOT VTK_USE_SYSTEM_HDF5)
+  message(WARNING
+    "CGNS is linking against HDF5, but VTK_USE_SYSTEM_HDF5 is OFF. "
+    "Since VTK mangles HDF5, it is possible that you will get linking errors "
+    "from CGNS libraries about missing HDF5 symbols. It is advisable that "
+    "you should enable VTK_USE_SYSTEM_HDF5 and make VTK use the same "
+    "(or compatible) HDF5 that was used to build cgns libraries.")
+endif()
 
 # -----------------------------------------------------------------------------
 # Disable some warnings
