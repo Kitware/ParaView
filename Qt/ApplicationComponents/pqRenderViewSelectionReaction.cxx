@@ -262,6 +262,12 @@ void pqRenderViewSelectionReaction::beginSelection()
       "points and display a tooltip with points information.\n\n"
       "Use the 'Esc' key or the same toolbar button to exit this mode.",
       QMessageBox::Ok | QMessageBox::Save);
+    // switch the interaction mode to selection mode even though we're no making
+    // selections. This ensures that the render view realizes it's being used
+    // for selection and will not release cached selection render buffers as the
+    // selection interaction progresses (BUG #0015882).
+    vtkSMPropertyHelper(rmp, "InteractionMode").Set(
+      vtkPVRenderView::INTERACTION_MODE_SELECTION);
     break;
 
   case ZOOM_TO_BOX:
