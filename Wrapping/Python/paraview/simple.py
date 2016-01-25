@@ -1537,7 +1537,7 @@ def _initializeSession(connection):
     controller = servermanager.ParaViewPipelineController()
     controller.InitializeSession(connection.Session)
 
-def _create_func(key, module):
+def _create_func(key, module, skipRegisteration=False):
     "Internal function."
 
     def CreateObject(*input, **params):
@@ -1589,12 +1589,13 @@ def _create_func(key, module):
         # post initialize
         controller.PostInitializeProxy(px)
 
-        # Register the proxy with the proxy manager (assuming we are only using
-        # these functions for pipeline proxies or animation proxies.
-        if isinstance(px, servermanager.SourceProxy):
-            controller.RegisterPipelineProxy(px, registrationName)
-        elif px.GetXMLGroup() == "animation":
-           controller.RegisterAnimationProxy(px)
+        if not skipRegisteration:
+            # Register the proxy with the proxy manager (assuming we are only using
+            # these functions for pipeline proxies or animation proxies.
+            if isinstance(px, servermanager.SourceProxy):
+                controller.RegisterPipelineProxy(px, registrationName)
+            elif px.GetXMLGroup() == "animation":
+               controller.RegisterAnimationProxy(px)
         return px
 
     return CreateObject
@@ -1633,13 +1634,15 @@ def _add_functions(g):
     activeModule = servermanager.ActiveConnection.Modules
     for m in [activeModule.filters, activeModule.sources,
               activeModule.writers, activeModule.animation]:
+        # Skip registering proxies in certain modules (currently only writers)
+        skipRegisteration = m is activeModule.writers
         dt = m.__dict__
         for key in dt.keys():
             cl = dt[key]
             if not isinstance(cl, str):
                 if not key in g and _func_name_valid(key):
                     #print "add %s function" % key
-                    g[key] = _create_func(key, m)
+                    g[key] = _create_func(key, m, skipRegisteration)
                     exec "g[key].__doc__ = _create_doc(m.%s.__doc__, g[key].__doc__)" % key
 
 # -----------------------------------------------------------------------------
