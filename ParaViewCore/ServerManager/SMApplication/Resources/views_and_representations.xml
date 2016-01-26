@@ -4171,11 +4171,9 @@
                          name="VolumeRenderingMode"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
-          <Entry text="Smart"
-                 value="0" />
-                 value="2" />
-          <Entry text="GPU Based"
-                 value="4" />
+          <Entry text="Smart" value="0" />
+          <Entry text="Ray Cast Only" value="2" />
+          <Entry text="GPU Based" value="4" />
         </EnumerationDomain>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetScalarOpacityUnitDistance"
