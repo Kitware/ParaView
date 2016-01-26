@@ -105,7 +105,10 @@ vtkSmartPointer<vtkMultiProcessController> vtkProcessModule::GlobalController;
 //----------------------------------------------------------------------------
 bool vtkProcessModule::Initialize(ProcessTypes type, int &argc, char** &argv)
 {
-  setlocale(LC_NUMERIC,"C");
+  // We force LC_NUMERIC to C - it is important as Qt sets locale to the user's
+  // environment locale value and this might break some basic features like
+  // the calls to atof() that are locale dependent.
+  vtksys::SystemTools::PutEnv("LC_NUMERIC=C");
 
   vtkProcessModule::ProcessType = type;
 
