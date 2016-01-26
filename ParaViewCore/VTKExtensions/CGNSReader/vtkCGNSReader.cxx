@@ -16,33 +16,34 @@
 
 #include "vtkCGNSReader.h"
 
-#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCellArray.h"
 #include "vtkCellData.h"
+#include "vtkCharArray.h"
 #include "vtkDataArraySelection.h"
+#include "vtkDoubleArray.h"
+#include "vtkErrorCode.h"
+#include "vtkFloatArray.h"
 #include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
+#include "vtkInformationStringKey.h"
 #include "vtkInformationVector.h"
-#include "vtkTypeInt32Array.h"
-#include "vtkTypeInt64Array.h"
+#include "vtkIntArray.h"
+#include "vtkLongArray.h"
 #include "vtkMultiBlockDataSet.h"
+#include "vtkMultiProcessController.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
+#include "vtkPolyhedron.h"
+#include "vtkPVInformationKeys.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStructuredGrid.h"
+#include "vtkTypeInt32Array.h"
+#include "vtkTypeInt64Array.h"
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkVertex.h"
-#include "vtkPolyhedron.h"
-#include "vtkErrorCode.h"
-#include "vtkCharArray.h"
-#include "vtkDoubleArray.h"
-#include "vtkFloatArray.h"
-#include "vtkIntArray.h"
-#include "vtkLongArray.h"
-#include "vtkInformationStringKey.h"
-#include "vtkPVInformationKeys.h"
-#include "vtkNew.h"
 
 #include <algorithm>
 #include <functional>
@@ -54,9 +55,6 @@
 
 #include <vtksys/SystemTools.hxx>
 
-#ifdef PARAVIEW_USE_MPI
-#include "vtkMultiProcessController.h"
-#endif
 
 #include "cgio_helpers.h"
 
@@ -120,12 +118,10 @@ vtkCGNSReader::vtkCGNSReader()
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
 
-#ifdef PARAVIEW_USE_MPI
   this->ProcRank = 0;
   this->ProcSize = 1;
   this->Controller = NULL;
   this->SetController(vtkMultiProcessController::GetGlobalController());
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -140,13 +136,9 @@ vtkCGNSReader::~vtkCGNSReader()
   this->BaseSelection->RemoveObserver(this->SelectionObserver);
   this->BaseSelection->Delete();
   this->SelectionObserver->Delete();
-
-#ifdef PARAVIEW_USE_MPI
   this->SetController(NULL);
-#endif
 }
 
-#ifdef PARAVIEW_USE_MPI
 //----------------------------------------------------------------------------
 void vtkCGNSReader::SetController(vtkMultiProcessController* c)
 {
@@ -177,7 +169,6 @@ void vtkCGNSReader::SetController(vtkMultiProcessController* c)
     this->ProcSize = 1;
     }
 }
-#endif
 
 //------------------------------------------------------------------------------
 bool vtkCGNSReader::IsVarEnabled(CGNS_ENUMT(GridLocation_t) varcentering,
@@ -2168,7 +2159,6 @@ int vtkCGNSReader::RequestData(vtkInformation *vtkNotUsed(request),
   int nSelectedBases = 0;
   unsigned int blockIndex = 0 ;
 
-#ifdef PARAVIEW_USE_MPI
   int processNumber;
   int numProcessors;
   int startRange, endRange;
@@ -2252,22 +2242,11 @@ int vtkCGNSReader::RequestData(vtkInformation *vtkNotUsed(request),
     this->LoadBndPatch = 0;
     this->CreateEachSolutionAsBlock = 0;
     }
-#endif
 
   if (!this->Internal.Parse(this->FileName))
     {
     return 0;
     }
-
-#ifndef PARAVIEW_USE_MPI
-  // get the info object
-  vtkInformation *outInfo = outputVector->GetInformationObject(0);
-
-  // get the output
-  vtkMultiBlockDataSet *output =
-      vtkMultiBlockDataSet::SafeDownCast(
-        outInfo->Get(vtkMultiBlockDataSet::DATA_OBJECT()));
-#endif
 
   vtkMultiBlockDataSet* rootNode = output;
 
@@ -2443,15 +2422,10 @@ int vtkCGNSReader::RequestData(vtkInformation *vtkNotUsed(request),
         }
       }
 
-#ifdef PARAVIEW_USE_MPI
     int zonemin = baseToZoneRange[numBase][0];
     int zonemax = baseToZoneRange[numBase][1];
     for (int zone = zonemin; zone < zonemax; ++zone)
       {
-#else
-    for (int zone = 0; zone < nzones; ++zone)
-      {
-#endif
       CGNSRead::char_33 zoneName;
       cgsize_t zsize[9];
       CGNS_ENUMT(ZoneType_t) zt = CGNS_ENUMV(ZoneTypeNull);
@@ -2589,7 +2563,6 @@ int vtkCGNSReader::RequestInformation(vtkInformation * request,
                                         vtkInformationVector *outputVector)
 {
 
-#ifdef PARAVIEW_USE_MPI
   // Setting CAN_HANDLE_PIECE_REQUEST to 1 indicates to the
   // upstream consumer that I can provide the same number of pieces
   // as there are number of processors
@@ -2601,7 +2574,6 @@ int vtkCGNSReader::RequestInformation(vtkInformation * request,
 
   if (this->ProcRank == 0)
     {
-#endif
     if (!this->FileName)
       {
       vtkErrorMacro(<< "File name not set\n");
@@ -2625,14 +2597,12 @@ int vtkCGNSReader::RequestInformation(vtkInformation * request,
       vtkErrorMacro(<< "Failed to parse cgns file: " << this->FileName);
       return false;
       }
-#ifdef PARAVIEW_USE_MPI
     } // End_ProcRank_0
 
   if (this->ProcSize > 1)
     {
     this->Broadcast(this->Controller);
     }
-#endif
 
   this->NumberOfBases = this->Internal.GetNumberOfBaseNodes();
 
@@ -2973,7 +2943,6 @@ void vtkCGNSReader::SelectionModifiedCallback(vtkObject*, unsigned long,
   static_cast<vtkCGNSReader*>(clientdata)->Modified();
 }
 
-#ifdef PARAVIEW_USE_MPI
 //------------------------------------------------------------------------------
 void vtkCGNSReader::Broadcast(vtkMultiProcessController* ctrl)
 {
@@ -2983,4 +2952,3 @@ void vtkCGNSReader::Broadcast(vtkMultiProcessController* ctrl)
     this->Internal.Broadcast(ctrl, rank);
     }
 }
-#endif
