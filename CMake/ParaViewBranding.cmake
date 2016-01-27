@@ -342,6 +342,10 @@ FUNCTION(build_paraview_client BPC_NAME)
     ENDIF ()
     SET_TARGET_PROPERTIES(${BPC_NAME} PROPERTIES
       MACOSX_BUNDLE_BUNDLE_NAME "${BPC_APPLICATION_NAME}")
+    if (NOT PARAVIEW_DO_UNIX_STYLE_INSTALLS)
+      set_target_properties("${BPC_NAME}" PROPERTIES
+        INSTALL_RPATH "@executable_path/../Libraries;@executable_path/../Plugins")
+    endif ()
   ENDIF ()
 
   IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")

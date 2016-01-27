@@ -329,9 +329,7 @@ if (APPLE AND PARAVIEW_DO_UNIX_STYLE_INSTALLS)
     # same place as ParaView's binaries.
     set(CMAKE_INSTALL_NAME_DIR "${PARAVIEW_CUSTOM_INSTALL_NAME_DIR}/${VTK_INSTALL_LIBRARY_DIR}")
   else ()
-    # Set CMAKE_INSTALL_NAME_DIR to point to the libraries directory relative
-    # to the executable.
-    set(CMAKE_INSTALL_NAME_DIR "@executable_path/../${VTK_INSTALL_LIBRARY_DIR}")
+    set(CMAKE_INSTALL_NAME_DIR "@rpath/")
   endif ()
 
   # ensure that we don't build forwarding executables on apple.
