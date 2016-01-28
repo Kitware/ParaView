@@ -47,7 +47,6 @@ vtkInSituPParticlePathFilter::~vtkInSituPParticlePathFilter()
 //----------------------------------------------------------------------------
 void vtkInSituPParticlePathFilter::SetClearCache(bool clearCache)
 {
-  cout << "vtkInSituPParticlePathFilter::SetClearCache " << clearCache << endl;
   this->It.SetClearCache(clearCache);
 }
 
