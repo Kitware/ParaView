@@ -194,15 +194,13 @@ void vtkPVClientServerSynchronizedRenderers::PushImageToScreen()
   // vtkSynchronizedRenderers::PushImageToScreen() should clear the screen by
   // default -- I can argue not.
   int layer = this->Renderer->GetLayer();
+  int prev = this->Renderer->GetPreserveColorBuffer();
   if (layer == 0)
     {
-    this->Renderer->SetLayer(1);
+    this->Renderer->SetPreserveColorBuffer(1);
     }
   this->Superclass::PushImageToScreen();
-  if (layer == 0)
-    {
-    this->Renderer->SetLayer(0);
-    }
+  this->Renderer->SetPreserveColorBuffer(prev);
 }
 
 //----------------------------------------------------------------------------
