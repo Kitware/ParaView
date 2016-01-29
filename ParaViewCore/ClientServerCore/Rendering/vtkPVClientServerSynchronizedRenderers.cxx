@@ -73,6 +73,26 @@ void vtkPVClientServerSynchronizedRenderers::MasterEndRender()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVClientServerSynchronizedRenderers::SlaveStartRender()
+{
+  this->Superclass::SlaveStartRender();
+
+#ifdef VTKGL2
+  // In client-server mode, we want all the server ranks to simply render using
+  // a black background. That makes it easier to blend the image we obtain from
+  // the server rank on top of the background rendered locally on the client.
+  // vtkPVSynchronizedRenderer only creates
+  // vtkPVClientServerSynchronizedRenderers in client-server mode that support
+  // image delivery to client (i.e. not in tile-display, or cave mode).
+  // Hence, we know it won't affect server ranks that do display the rendered
+  // result. (Fixes BUG #0015961).
+  this->Renderer->SetBackground(0, 0, 0);
+  this->Renderer->SetGradientBackground(false);
+  this->Renderer->SetTexturedBackground(false);
+#endif
+}
+
+//----------------------------------------------------------------------------
 void vtkPVClientServerSynchronizedRenderers::SlaveEndRender()
 {
   assert(this->ParallelController->IsA("vtkSocketController") ||
