@@ -14570,5 +14570,66 @@ source.</Documentation>
       </DoubleVectorProperty>
       <!-- End AngularPeriodicFilter -->
     </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkResampleToImage"
+                 label="Resample To Image"
+                 name="ResampleToImage">
+      <Documentation long_help="Sample attributes using a 3D image as probing mesh."
+                     short_help="Sample attributes using a 3D image."/>
+
+      <InputProperty command="SetInputConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the dataset whose data will
+        be probed</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetUseInputBounds"
+                         default_values="1"
+                         name="UseInputBounds"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <Documentation>
+        Use input bounds or custom ones?
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetSamplingDimensions"
+                         default_values="100 100 100"
+                         name="SamplingDimensions"
+                         number_of_elements="3"
+                         panel_visibility="default">
+                         <IntRangeDomain name="range" min="2 2 2" max="10000 10000 10000"/>
+        <Documentation>
+        How many linear samples we want along each axis
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetSamplingBounds"
+                         default_values="0 1 0 1 0 1"
+                         name="SamplingBounds"
+                         number_of_elements="6"
+                         panel_visibility="default">
+        <BoundsDomain name="bounds">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>
+        Custom probing bounds
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="UseInputBounds"
+                                   value="0" />
+        </Hints>
+      </DoubleVectorProperty>
+      <!-- End vtkResampleToImage -->
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
