@@ -64,6 +64,7 @@ protected slots:
 
 private:
   Q_DISABLE_COPY(pqBoxPropertyWidget);
+  pqPropertyLinks WidgetLinks;
 };
 
 #endif

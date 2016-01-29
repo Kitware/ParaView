@@ -102,6 +102,19 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
     qCritical("Missing required property for 'Scale'.");
     }
 
+  // Let's link some of the UI elements that only affect the interactive widget
+  // properties without affecting properties on the main proxy.
+  vtkSMProxy* wdgProxy = this->widgetProxy();
+  this->WidgetLinks.addPropertyLink(ui.enableTranslation, "checked", SIGNAL(toggled(bool)),
+    wdgProxy, wdgProxy->GetProperty("TranslationEnabled"));
+  this->WidgetLinks.addPropertyLink(ui.enableScaling, "checked", SIGNAL(toggled(bool)),
+    wdgProxy, wdgProxy->GetProperty("ScalingEnabled"));
+  this->WidgetLinks.addPropertyLink(ui.enableRotation, "checked", SIGNAL(toggled(bool)),
+    wdgProxy, wdgProxy->GetProperty("RotationEnabled"));
+  this->WidgetLinks.addPropertyLink(ui.enableMoveFaces, "checked", SIGNAL(toggled(bool)),
+    wdgProxy, wdgProxy->GetProperty("MoveFacesEnabled"));
+  this->connect(&this->WidgetLinks, SIGNAL(qtWidgetChanged()), SLOT(render()));
+
   // link show3DWidget checkbox
   this->connect(ui.show3DWidget, SIGNAL(toggled(bool)), SLOT(setWidgetVisible(bool)));
   ui.show3DWidget->connect(this, SIGNAL(widgetVisibilityToggled(bool)), SLOT(setChecked(bool)));
