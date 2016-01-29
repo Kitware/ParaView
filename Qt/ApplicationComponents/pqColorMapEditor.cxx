@@ -287,6 +287,7 @@ void pqColorMapEditor::editScalarBar()
       this, SLOT(renderViews()));
     dialog.setWindowTitle("Edit Color Legend Parameters");
     dialog.setObjectName("ColorLegendEditor");
+    dialog.setEnableSearchBar(true);
     dialog.exec();
     }
   else
