@@ -51,6 +51,7 @@ vtk_module(vtkPVVTKExtensionsRendering
     vtkRenderingVolumeAMR
   PRIVATE_DEPENDS
     vtkzlib
+    vtklz4
   COMPILE_DEPENDS
     vtkUtilitiesEncodeString
 

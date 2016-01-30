@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPVClientServerSynchronizedRenderers.h"
 
+#include "vtkLZ4Compressor.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkOpenGLRenderer.h"
@@ -180,6 +181,10 @@ void vtkPVClientServerSynchronizedRenderers::ConfigureCompressor(const char *str
     else if (className=="vtkZlibImageCompressor")
       {
       comp=vtkZlibImageCompressor::New();
+      }
+    else if (className == "vtkLZ4Compressor")
+      {
+      comp = vtkLZ4Compressor::New();
       }
     else if (className=="NULL" || className.empty())
       {
