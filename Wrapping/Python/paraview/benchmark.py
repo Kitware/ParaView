@@ -509,6 +509,8 @@ def parse_logs(show_parse = False, tabular = False) :
     if len(logs) == 0:
         get_logs()
 
+    timersummary = []
+
     for i in logs:
         # per filter records
         filters = dict()
@@ -594,6 +596,9 @@ def parse_logs(show_parse = False, tabular = False) :
                 print record['duration'], ",",
                 print record['local_duration']
             print
+
+        timersummary.append(filters)
+    return timersummary
 
 def __render(ss, v, title, nframes):
     print '============================================================'
