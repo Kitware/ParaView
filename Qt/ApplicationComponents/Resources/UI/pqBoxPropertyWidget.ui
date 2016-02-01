@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>245</width>
-    <height>140</height>
+    <height>244</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -89,6 +89,38 @@
     </layout>
    </item>
    <item>
+    <layout class="QGridLayout">
+     <item row="3" column="0">
+      <widget class="QCheckBox" name="enableRotation">
+       <property name="text">
+        <string>Rotation</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QCheckBox" name="enableTranslation">
+       <property name="text">
+        <string>Translation</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QCheckBox" name="enableScaling">
+       <property name="text">
+        <string>Scaling</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QCheckBox" name="enableMoveFaces">
+       <property name="text">
+        <string>Face Movement</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
     <widget class="QPushButton" name="resetBounds">
      <property name="text">
       <string>Reset Bounds</string>
@@ -115,6 +147,10 @@
   <tabstop>scaleX</tabstop>
   <tabstop>scaleY</tabstop>
   <tabstop>scaleZ</tabstop>
+  <tabstop>enableTranslation</tabstop>
+  <tabstop>enableScaling</tabstop>
+  <tabstop>enableRotation</tabstop>
+  <tabstop>enableMoveFaces</tabstop>
   <tabstop>resetBounds</tabstop>
  </tabstops>
  <resources/>
