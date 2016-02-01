@@ -317,6 +317,10 @@ function(build_help_project name)
     ${ARGN}
     )
 
+  if (NOT PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION)
+    return()
+  endif()
+
   if (NOT DEFINED arg_DESTINATION_DIRECTORY)
     message(FATAL_ERROR "No DESTINATION_DIRECTORY specified in build_help_project()")
   endif()
