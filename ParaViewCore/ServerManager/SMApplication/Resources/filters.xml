@@ -10556,39 +10556,6 @@ source.</Documentation>
       <!-- End OrderedCompositeDistributor -->
     </SourceProxy>
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkPVUpdateSuppressor"
-                 executive="vtkUpdateSuppressorPipeline"
-                 name="UpdateSuppressor2">
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <Documentation>Set the input to the Update Suppressor
-        filter.</Documentation>
-      </InputProperty>
-      <Property command="ForceUpdate"
-                name="ForceUpdate" />
-      <IntVectorProperty command="SetEnabled"
-                         default_values="1"
-                         name="Enabled"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Toggle whether the update suppressor is
-        enabled.</Documentation>
-      </IntVectorProperty>
-      <DoubleVectorProperty command="SetUpdateTime"
-                            default_values="none"
-                            immediate_update="1"
-                            is_internal="1"
-                            name="UpdateTime"
-                            number_of_elements="1">
-        <DoubleRangeDomain name="range" />
-      </DoubleVectorProperty>
-      <!-- End UpdateSuppressor2 -->
-    </SourceProxy>
-    <!-- ==================================================================== -->
     <SourceProxy class="vtkPVCacheKeeper"
                  executive="vtkPVCacheKeeperPipeline"
                  name="CacheKeeper">

@@ -522,12 +522,19 @@ void vtkPVImageSliceMapper::Render(vtkRenderer* ren, vtkActor* act)
     return;
     }
 
+  vtkInformation *inInfo = this->GetInputInformation();
+
   int nPieces = this->NumberOfSubPieces* this->NumberOfPieces;
   for (int cc=0; cc < this->NumberOfSubPieces; cc++)
     {
     int currentPiece = this->NumberOfSubPieces * this->Piece + cc;
-    vtkStreamingDemandDrivenPipeline::SetUpdateExtent(this->GetInputInformation(),
-      currentPiece, nPieces, this->GhostLevel);
+    inInfo->Set(
+      vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER(), currentPiece);
+    inInfo->Set(
+      vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES(), nPieces);
+    inInfo->Set(
+      vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(),
+      this->GhostLevel);
     this->RenderPiece(ren, act);
     }
 
@@ -557,11 +564,17 @@ void vtkPVImageSliceMapper::Update(int port)
     // the memory limit, break the current piece into sub-pieces.
     if (input)
       {
-      this->GetInputAlgorithm()->UpdateInformation();
+      vtkInformation* inInfo = this->GetInputInformation();
       currentPiece = this->NumberOfSubPieces * this->Piece;
-      vtkStreamingDemandDrivenPipeline::SetUpdateExtent(
-        this->GetInputInformation(),
-        currentPiece, this->NumberOfSubPieces*nPieces, this->GhostLevel);
+      this->GetInputAlgorithm()->UpdateInformation();
+      inInfo->Set(
+        vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER(), currentPiece);
+      inInfo->Set(
+        vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES(),
+        this->NumberOfSubPieces * nPieces);
+      inInfo->Set(
+        vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(),
+        this->GhostLevel);
       }
 
     this->Superclass::Update(port);

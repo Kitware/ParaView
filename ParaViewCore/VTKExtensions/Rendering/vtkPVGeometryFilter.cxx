@@ -1356,13 +1356,7 @@ void vtkPVGeometryFilter::StructuredGridExecute(vtkStructuredGrid* input,
 
   vtkNew<vtkStructuredGridOutlineFilter> outline;
   outline->SetInputConnection(producer->GetOutputPort());
-  vtkStreamingDemandDrivenPipeline::SetUpdateNumberOfPieces(
-    outline->GetOutputInformation(0), updateNumPieces);
-  vtkStreamingDemandDrivenPipeline::SetUpdatePiece(
-    outline->GetOutputInformation(0), updatePiece);
-  vtkStreamingDemandDrivenPipeline::SetUpdateGhostLevel(
-    outline->GetOutputInformation(0), updateGhosts);
-  outline->Update();
+  outline->UpdatePiece(updatePiece, updateNumPieces, updateGhosts);
   output->CopyStructure(outline->GetOutput());
 }
 

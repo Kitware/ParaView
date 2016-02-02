@@ -423,22 +423,13 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
   source->SetFieldType(this->FieldType);
   source->SetContainingCells(this->ContainingCells);
   source->SetInverse(this->Inverse);
-  source->UpdateInformation();
-
-  vtkStreamingDemandDrivenPipeline* sddp = vtkStreamingDemandDrivenPipeline::SafeDownCast(
-    source->GetExecutive());
-  if (sddp)
-    {
-    sddp->SetUpdateExtent(0, piece, npieces, 0);
-    }
-
 
   switch (this->Mode)
     {
   case FRUSTUM:
     source->SetContentType(vtkSelectionNode::FRUSTUM);
     source->SetFrustum(this->Frustum);
-    source->Update();
+    source->UpdatePiece(piece, npieces, 0);
     output->ShallowCopy(source->GetOutput());
     break;
 
@@ -452,7 +443,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
         {
         source->AddID(-1, *iter);
         }
-      source->Update();
+      source->UpdatePiece(piece, npieces, 0);
       output->ShallowCopy(source->GetOutput());
       }
     break;
@@ -472,7 +463,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
           {
           if (iter != this->Internal->PedigreeIDs.begin())
             {
-            source->Update();
+            source->UpdatePiece(piece, npieces, 0);
             vtkSelectionNode* clone = vtkSelectionNode::New();
             clone->ShallowCopy(source->GetOutput()->GetNode(0));
             clone->SetContentType(vtkSelectionNode::PEDIGREEIDS);
@@ -487,7 +478,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
         }
       if (this->Internal->PedigreeIDs.size() > 0)
         {
-        source->Update();
+        source->UpdatePiece(piece, npieces, 0);
         vtkSelectionNode* clone = vtkSelectionNode::New();
         clone->ShallowCopy(source->GetOutput()->GetNode(0));
         clone->SetContentType(vtkSelectionNode::PEDIGREEIDS);
@@ -507,7 +498,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
           {
           if (siter != this->Internal->PedigreeStringIDs.begin())
             {
-            source->Update();
+            source->UpdatePiece(piece, npieces, 0);
             vtkSelectionNode* clone = vtkSelectionNode::New();
             clone->ShallowCopy(source->GetOutput()->GetNode(0));
             clone->SetContentType(vtkSelectionNode::PEDIGREEIDS);
@@ -522,7 +513,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
         }
       if (this->Internal->PedigreeStringIDs.size() > 0)
         {
-        source->Update();
+        source->UpdatePiece(piece, npieces, 0);
         vtkSelectionNode* clone = vtkSelectionNode::New();
         clone->ShallowCopy(source->GetOutput()->GetNode(0));
         clone->SetContentType(vtkSelectionNode::PEDIGREEIDS);
@@ -544,7 +535,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
           {
           if (iter != this->Internal->CompositeIDs.begin())
             {
-            source->Update();
+            source->UpdatePiece(piece, npieces, 0);
             vtkSelectionNode* clone = vtkSelectionNode::New();
             clone->ShallowCopy(source->GetOutput()->GetNode(0));
             output->AddNode(clone);
@@ -559,7 +550,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
         }
       if (this->Internal->CompositeIDs.size() > 0)
         {
-        source->Update();
+        source->UpdatePiece(piece, npieces, 0);
         vtkSelectionNode* clone = vtkSelectionNode::New();
         clone->ShallowCopy(source->GetOutput()->GetNode(0));
         output->AddNode(clone);
@@ -580,7 +571,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
           {
           if (iter != this->Internal->HierarchicalIDs.begin())
             {
-            source->Update();
+            source->UpdatePiece(piece, npieces, 0);
             vtkSelectionNode* clone = vtkSelectionNode::New();
             clone->ShallowCopy(source->GetOutput()->GetNode(0));
             output->AddNode(clone);
@@ -595,7 +586,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
         }
       if (this->Internal->HierarchicalIDs.size() > 0)
         {
-        source->Update();
+        source->UpdatePiece(piece, npieces, 0);
         vtkSelectionNode* clone = vtkSelectionNode::New();
         clone->ShallowCopy(source->GetOutput()->GetNode(0));
         output->AddNode(clone);
@@ -618,7 +609,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
         iter++;
         source->AddThreshold(min, max);
         }
-      source->Update();
+      source->UpdatePiece(piece, npieces, 0);
       output->ShallowCopy(source->GetOutput());
       }
     break;
@@ -638,7 +629,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
         iter++;
         source->AddLocation(x, y ,z);
         }
-      source->Update();
+      source->UpdatePiece(piece, npieces, 0);
       output->ShallowCopy(source->GetOutput());
       }
     break;
@@ -652,7 +643,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
         {
         source->AddBlock(*iter);
         }
-      source->Update();
+      source->UpdatePiece(piece, npieces, 0);
       output->ShallowCopy(source->GetOutput());
       }
     break;
@@ -661,7 +652,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
       {
       source->SetContentType(vtkSelectionNode::QUERY);
       source->SetQueryString(this->QueryString);
-      source->Update();
+      source->UpdatePiece(piece, npieces, 0);
       output->ShallowCopy(source->GetOutput());
       }
 
@@ -676,7 +667,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
         {
         source->AddID(iter->Piece, iter->ID);
         }
-      source->Update();
+      source->UpdatePiece(piece, npieces, 0);
       output->ShallowCopy(source->GetOutput());
       }
     break;

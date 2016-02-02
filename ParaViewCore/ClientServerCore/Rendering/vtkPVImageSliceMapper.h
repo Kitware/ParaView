@@ -99,6 +99,10 @@ public:
   virtual void Update(int port);
   virtual void Update()
     { this->Superclass::Update(); }
+  virtual int Update(int port, vtkInformationVector* requests)
+    { return this->Superclass::Update(port, requests); }
+  virtual int Update(vtkInformation* requests)
+    { return this->Superclass::Update(requests); }
 
   // Description:
   // If you want only a part of the data, specify by setting the piece.

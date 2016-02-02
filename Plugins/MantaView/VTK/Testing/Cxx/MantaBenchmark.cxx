@@ -275,8 +275,7 @@ void MyProcess::Execute()
 #endif
 
   //Compute local geometric bounds
-  source->SetUpdateExtent(me, numProcs, 0);
-  source->Update();
+  source->UpdatePiece(me, numProcs, 0);
   source->GetOutput()->GetBounds(bds);
   /*
   cerr << "LBDS(" << me << ") "  
