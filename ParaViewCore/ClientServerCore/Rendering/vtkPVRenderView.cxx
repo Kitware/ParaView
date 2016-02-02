@@ -963,12 +963,6 @@ void vtkPVRenderView::SetLockBounds(bool nv)
     }
   this->LockBounds = nv;
   this->Modified();
-  if (!this->GeometryBounds.IsValid())
-    {
-    return;
-    }
-  double bounds[6];
-  this->GeometryBounds.GetBounds(bounds);
 }
 
 //----------------------------------------------------------------------------
