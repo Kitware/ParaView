@@ -92,7 +92,7 @@ timestep.
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
         </DataTypeDomain>
-        <InputArrayDomain attribute_type="none"
+        <InputArrayDomain attribute_type="field"
                           name="input_array"
                           number_of_components="1" />
         <Documentation>Set the input of the filter.</Documentation>

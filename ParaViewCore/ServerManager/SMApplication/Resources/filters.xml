@@ -8283,8 +8283,7 @@ source.</Documentation>
                         name="input_type">
           <DataType value="vtkDataSet" />
         </DataTypeDomain>
-        <InputArrayDomain attribute_type="any"
-                          name="input_array"
+        <InputArrayDomain name="input_array"
                           number_of_components="3" />
         <Documentation>This property specifies the input to the Stream Tracer
         filter.</Documentation>

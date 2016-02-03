@@ -21,8 +21,7 @@
                         name="input_type">
           <DataType value="vtkUnstructuredGridBase" />
         </DataTypeDomain>
-        <InputArrayDomain attribute_type="any"
-                          name="input_array_any">
+        <InputArrayDomain name="input_array_any">
         </InputArrayDomain>
         <Documentation>Set the input to the representation.</Documentation>
       </InputProperty>
