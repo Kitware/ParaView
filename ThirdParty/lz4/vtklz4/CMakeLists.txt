@@ -18,8 +18,9 @@ IF( ${SIZEOF_VOID_P} STREQUAL  "8" )
     MESSAGE( STATUS "64 bit architecture detected size of void * is " ${SIZEOF_VOID_P})
 ENDIF()
 
-IF("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU" OR
-   "${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
+# XXX(kitware): avoid quoted variable policy warning from CMake.
+IF(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR
+   CMAKE_C_COMPILER_ID STREQUAL "Clang")
   SET(GNU_COMPATIBLE_COMPILER 1)
 ENDIF()
 

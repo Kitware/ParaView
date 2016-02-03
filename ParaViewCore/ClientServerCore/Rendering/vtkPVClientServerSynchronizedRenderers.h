@@ -67,6 +67,7 @@ protected:
   void Decompress(vtkUnsignedCharArray* input, vtkUnsignedCharArray* outputBuffer);
 
   virtual void MasterEndRender();
+  virtual void SlaveStartRender();
   virtual void SlaveEndRender();
 
   vtkImageCompressor* Compressor;

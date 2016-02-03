@@ -40,6 +40,7 @@ set(Module_SRCS
   vtkImageCompressor.cxx
   vtkKdTreeGenerator.cxx
   vtkKdTreeManager.cxx
+  vtkLZ4Compressor.cxx
   vtkMarkSelectedRows.cxx
   vtkMultiSliceContextItem.cxx
   vtkOrderedCompositeDistributor.cxx
