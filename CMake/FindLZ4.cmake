@@ -1,5 +1,5 @@
 
-find_library(LZ4_LIBRARIES NAME lz4)
+find_library(LZ4_LIBRARIES NAMES lz4)
 find_path(LZ4_INCLUDE_DIRS NAMES lz4.h)
 
 include(FindPackageHandleStandardArgs)
