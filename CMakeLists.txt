@@ -471,10 +471,8 @@ if (PARAVIEW_ENABLE_QT_SUPPORT)
     set (Qt5_FIND_COMPONENTS
       Help
       Network
-      Test
       UiTools
-      Widgets
-      Xml)
+      Widgets)
     if(PARAVIEW_USE_QTWEBKIT)
       list(APPEND Qt5_FIND_COMPONENTS WebKitWidgets)
     endif()
