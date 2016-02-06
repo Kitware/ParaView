@@ -35,6 +35,7 @@
 *
 *****************************************************************************/
 
+#include <cmath>
 #include <VolumeAttributes.h>
 #include <DataNode.h>
 #include <ColorControlPoint.h>
@@ -1825,7 +1826,6 @@ VolumeAttributes::SetDefaultColorControlPoints()
 //    Made the method const.
 //
 // ****************************************************************************
-#include <math.h>
 void
 VolumeAttributes::GetGaussianOpacities(unsigned char *alphas) const
 {
