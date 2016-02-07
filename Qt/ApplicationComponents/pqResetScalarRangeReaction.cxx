@@ -38,32 +38,50 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDebug>
 
 //-----------------------------------------------------------------------------
-pqResetScalarRangeReaction::pqResetScalarRangeReaction(QAction* parentObject)
+pqResetScalarRangeReaction::pqResetScalarRangeReaction(
+  QAction* parentObject, bool track_active_objects)
   : Superclass(parentObject)
 {
-  QObject::connect(&pqActiveObjects::instance(),
-    SIGNAL(representationChanged(pqDataRepresentation*)),
-    this, SLOT(updateEnableState()), Qt::QueuedConnection);
+  if (track_active_objects)
+    {
+    QObject::connect(&pqActiveObjects::instance(),
+      SIGNAL(representationChanged(pqDataRepresentation*)),
+      this, SLOT(setRepresentation(pqDataRepresentation*)));
+    this->setRepresentation(pqActiveObjects::instance().activeRepresentation());
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqResetScalarRangeReaction::setRepresentation(pqDataRepresentation* repr)
+{
+  this->Representation = qobject_cast<pqPipelineRepresentation*>(repr);
   this->updateEnableState();
 }
 
 //-----------------------------------------------------------------------------
 void pqResetScalarRangeReaction::updateEnableState()
 {
-  pqPipelineRepresentation* repr = qobject_cast<pqPipelineRepresentation*>(
-    pqActiveObjects::instance().activeRepresentation());
-  this->parentAction()->setEnabled(repr != NULL);
+  this->parentAction()->setEnabled(this->Representation != NULL);
 }
 
 //-----------------------------------------------------------------------------
-void pqResetScalarRangeReaction::resetScalarRange()
+void pqResetScalarRangeReaction::onTriggered()
 {
-  pqPipelineRepresentation* repr = qobject_cast<pqPipelineRepresentation*>(
-    pqActiveObjects::instance().activeRepresentation());
-  if (!repr)
+  pqResetScalarRangeReaction::resetScalarRange(this->Representation);
+}
+
+//-----------------------------------------------------------------------------
+void pqResetScalarRangeReaction::resetScalarRange(pqPipelineRepresentation* repr)
+{
+  if (repr == NULL)
     {
-    qCritical() << "No active representation.";
-    return;
+    repr = qobject_cast<pqPipelineRepresentation*>(
+      pqActiveObjects::instance().activeRepresentation());
+    if (!repr)
+      {
+      qCritical() << "No representation provided.";
+      return;
+      }
     }
 
   BEGIN_UNDO_SET("Reset Range");

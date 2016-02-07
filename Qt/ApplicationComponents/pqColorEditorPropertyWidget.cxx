@@ -75,18 +75,22 @@ pqColorEditorPropertyWidget::pqColorEditorPropertyWidget(vtkSMProxy *smProxy,
                    this, SLOT(updateEnableState()));
   QObject::connect(scalarBarAction, SIGNAL(toggled(bool)),
                    Ui.ShowScalarBar, SLOT(setChecked(bool)));
-  new pqScalarBarVisibilityReaction(scalarBarAction);
+  pqScalarBarVisibilityReaction* sbvr = new pqScalarBarVisibilityReaction(
+    scalarBarAction, /*track_active_objects*/false);
+  sbvr->setRepresentation(representation);
 
 
   // edit color map button
   QAction *editColorMapAction = new QAction(this);
   QObject::connect(Ui.EditColorMap, SIGNAL(clicked()), editColorMapAction, SLOT(trigger()));
-  new pqEditColorMapReaction(editColorMapAction);
+  pqEditColorMapReaction* ecmr = new pqEditColorMapReaction(editColorMapAction, false);
+  ecmr->setRepresentation(representation);
 
   // reset range button
   QAction *resetRangeAction = new QAction(this);
   QObject::connect(Ui.Rescale, SIGNAL(clicked()), resetRangeAction, SLOT(trigger()));
-  new pqResetScalarRangeReaction(resetRangeAction);
+  pqResetScalarRangeReaction* rsrr = new pqResetScalarRangeReaction(resetRangeAction);
+  rsrr->setRepresentation(representation);
 
   this->updateEnableState();
 }

@@ -47,32 +47,50 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDockWidget>
 
 //-----------------------------------------------------------------------------
-pqEditColorMapReaction::pqEditColorMapReaction(QAction* parentObject)
+pqEditColorMapReaction::pqEditColorMapReaction(
+  QAction* parentObject, bool track_active_objects)
   : Superclass(parentObject)
 {
-  QObject::connect(&pqActiveObjects::instance(),
-    SIGNAL(representationChanged(pqDataRepresentation*)),
-    this, SLOT(updateEnableState()), Qt::QueuedConnection);
+  if (track_active_objects)
+    {
+    QObject::connect(&pqActiveObjects::instance(),
+      SIGNAL(representationChanged(pqDataRepresentation*)),
+      this, SLOT(setRepresentation(pqDataRepresentation*)));
+    this->setRepresentation(pqActiveObjects::instance().activeRepresentation());
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqEditColorMapReaction::setRepresentation(pqDataRepresentation* repr)
+{
+  this->Representation = qobject_cast<pqPipelineRepresentation*>(repr);
   this->updateEnableState();
 }
 
 //-----------------------------------------------------------------------------
 void pqEditColorMapReaction::updateEnableState()
 {
-  pqPipelineRepresentation* repr = qobject_cast<pqPipelineRepresentation*>(
-    pqActiveObjects::instance().activeRepresentation());
-  this->parentAction()->setEnabled(repr != NULL);
+  this->parentAction()->setEnabled(this->Representation != NULL);
 }
 
 //-----------------------------------------------------------------------------
-void pqEditColorMapReaction::editColorMap()
+void pqEditColorMapReaction::onTriggered()
 {
-  pqPipelineRepresentation* repr = qobject_cast<pqPipelineRepresentation*>(
-    pqActiveObjects::instance().activeRepresentation());
-  if (!repr)
+  pqEditColorMapReaction::editColorMap(this->Representation);
+}
+
+//-----------------------------------------------------------------------------
+void pqEditColorMapReaction::editColorMap(pqPipelineRepresentation* repr)
+{
+  if (repr == NULL)
     {
-    qCritical() << "No active representation.";
-    return;
+    repr = qobject_cast<pqPipelineRepresentation*>(
+      pqActiveObjects::instance().activeRepresentation());
+    if (!repr)
+      {
+      qCritical() << "No representation provided.";
+      return;
+      }
     }
 
   if (!vtkSMPVRepresentationProxy::GetUsingScalarColoring(repr->getProxy()))
