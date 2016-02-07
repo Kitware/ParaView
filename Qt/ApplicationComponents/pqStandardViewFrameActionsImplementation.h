@@ -150,7 +150,7 @@ protected:
 
   /// check the XML hints to see if a button with the given name
   /// should be added to the view frame
-  bool isButtonVisible(const std::string & buttonName, pqView* view);
+  virtual bool isButtonVisible(const std::string & buttonName, pqView* view);
 
   struct ViewType
     {
