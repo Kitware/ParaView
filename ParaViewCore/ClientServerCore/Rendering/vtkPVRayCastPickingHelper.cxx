@@ -92,11 +92,7 @@ void vtkPVRayCastPickingHelper::ComputeIntersection()
   vtkNew<vtkPVExtractSelection> extractSelectionFilter;
   extractSelectionFilter->SetInputConnection(0,this->Input->GetOutputPort(0));
   extractSelectionFilter->SetInputConnection(1,this->Selection->GetOutputPort(0));
-  vtkStreamingDemandDrivenPipeline* executive =
-      vtkStreamingDemandDrivenPipeline::SafeDownCast(
-        extractSelectionFilter->GetExecutive());
-  executive->SetUpdateExtent(0, pid, numberOfProcesses, 0);
-  extractSelectionFilter->Update();
+  extractSelectionFilter->UpdatePiece(pid, numberOfProcesses, 0);
   vtkDataSet* ds = vtkDataSet::SafeDownCast(extractSelectionFilter->GetOutput());
   vtkCompositeDataSet* cds =
       vtkCompositeDataSet::SafeDownCast(extractSelectionFilter->GetOutput());

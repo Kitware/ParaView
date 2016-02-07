@@ -37,6 +37,7 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkDataArray.h"
 #include "vtkDoubleArray.h"
 #include "vtkColorTransferFunction.h"
+#include "vtkInformation.h"
 #include <cfloat>
 #include <iostream>
 #include <string>
@@ -244,11 +245,11 @@ vtkStreamingDemandDrivenPipeline *GetParallelExec(
 
   vtkInformation *info  = exec->GetOutputInformation(0);
 
-  exec->SetUpdateNumberOfPieces(info,worldSize);
-  exec->SetUpdatePiece(info,worldRank);
   exec->UpdateInformation();
-  exec->SetUpdateExtent(info,worldRank,worldSize,0);
-  exec->SetUpdateTimeStep(0,t);
+  typedef vtkStreamingDemandDrivenPipeline vtkSDDP;
+  info->Set(vtkSDDP::UPDATE_PIECE_NUMBER(), worldRank);
+  info->Set(vtkSDDP::UPDATE_NUMBER_OF_PIECES(), worldSize);
+  info->Set(vtkSDDP::UPDATE_TIME_STEP(), t);
   exec->PropagateUpdateExtent(0);
 
   return exec;

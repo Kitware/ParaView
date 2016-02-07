@@ -253,7 +253,6 @@ void vtkSISourceProxy::UpdatePipeline(int port, double time, bool doTime)
       algo->GetExecutive());
 
   sddp->UpdateInformation();
-  sddp->UpdateDataObject();
 
   int real_port = output_port->GetIndex();
 
@@ -261,14 +260,16 @@ void vtkSISourceProxy::UpdatePipeline(int port, double time, bool doTime)
   // ghost-cells if available (11811), but not asking for ghost-cells earlier than the
   // representation results in multiple executes (12546). Hence, we request
   // ghost-cells in UpdatePipeline().
+  vtkInformation* outInfo = sddp->GetOutputInformation(real_port);
   bool req_ghost_cells = vtkGeometryRepresentationDoRequestGhostCells(
-    sddp->GetOutputInformation(real_port));
+    outInfo);
 
-  sddp->SetUpdateExtent(real_port, processid, numprocs, /*ghost level*/
-    req_ghost_cells?1 : 0);
+  outInfo->Set(sddp->UPDATE_PIECE_NUMBER(), processid);
+  outInfo->Set(sddp->UPDATE_NUMBER_OF_PIECES(), numprocs);
+  outInfo->Set(sddp->UPDATE_NUMBER_OF_GHOST_LEVELS(), req_ghost_cells?1 : 0);
   if (doTime)
     {
-    sddp->SetUpdateTimeStep(real_port, time);
+    outInfo->Set(sddp->UPDATE_TIME_STEP(), time);
     }
   sddp->Update(real_port);
 }

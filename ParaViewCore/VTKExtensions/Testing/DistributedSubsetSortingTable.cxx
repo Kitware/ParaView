@@ -94,13 +94,9 @@ void MyProcess::Execute()
   sortFilter->SetInputConnection(dsToTableFilter->GetOutputPort());
   sortFilter->SetColumnNameToSort("RTData");
   sortFilter->SetSelectedComponent(0);
-
-  vtkStreamingDemandDrivenPipeline* exec= vtkStreamingDemandDrivenPipeline::SafeDownCast(sortFilter->GetExecutive());
-  exec->SetUpdateExtent(0, me, nbProc, 0);
-
   sortFilter->SetBlock(0);
   sortFilter->SetBlockSize(1024);
-  sortFilter->Update();
+  sortFilter->UpdatePiece(me, nbProc, 0);
 
 //  cout << "Full range ["
 //       << wavelet->GetOutput()->GetScalarRange()[0]

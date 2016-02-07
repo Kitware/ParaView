@@ -257,18 +257,6 @@ void vtkCompositeRepresentation::MarkModified()
 }
 
 //----------------------------------------------------------------------------
-void vtkCompositeRepresentation::Update(int port)
-{
-  // FIXME:STREAMING -- do we call Update() on the active repr here?
-  //vtkPVDataRepresentation* curActive = this->GetActiveRepresentation();
-  //if (curActive)
-  //  {
-  //  curActive->Update();
-  //  }
-  this->Superclass::Update(port);
-}
-
-//----------------------------------------------------------------------------
 void vtkCompositeRepresentation::SetUpdateTime(double time)
 {
   vtkInternals::RepresentationMap::iterator iter;
