@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxiesWidget.h"
 
 #include "pqExpanderButton.h"
+#include "pqPropertiesPanel.h"
 #include "pqProxyWidget.h"
 #include "pqView.h"
 #include "vtkSMProxy.h"
@@ -135,7 +136,7 @@ void pqProxiesWidget::updateLayout()
   delete this->layout();
   QVBoxLayout* vbox = new QVBoxLayout(this);
   vbox->setMargin(0);
-  vbox->setSpacing(0);
+  vbox->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
 
   // Don't add expander buttons if there's only 1 component and that components
   // name is empty.
