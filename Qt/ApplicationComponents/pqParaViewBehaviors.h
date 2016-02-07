@@ -66,6 +66,8 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqParaViewBehaviors : public QObject
   Q_OBJECT
   typedef QObject Superclass;
 public:
+  PQ_BEHAVIOR_DEFINE_METHODS(StandardPropertyWidgets);
+  PQ_BEHAVIOR_DEFINE_METHODS(StandardViewFrameActions);
   PQ_BEHAVIOR_DEFINE_METHODS(QtMessageHandlerBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(DataTimeStepBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(SpreadSheetVisibilityBehavior);
@@ -95,6 +97,8 @@ public:
 private:
   Q_DISABLE_COPY(pqParaViewBehaviors);
 
+  PQ_BEHAVIOR_DECLARE_FLAG(StandardPropertyWidgets);
+  PQ_BEHAVIOR_DECLARE_FLAG(StandardViewFrameActions);
   PQ_BEHAVIOR_DECLARE_FLAG(QtMessageHandlerBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(DataTimeStepBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(SpreadSheetVisibilityBehavior);

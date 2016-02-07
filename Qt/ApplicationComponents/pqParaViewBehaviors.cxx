@@ -66,6 +66,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMainWindow>
 
 #define PQ_BEHAVIOR_DEFINE_FLAG(_name) bool pqParaViewBehaviors:: _name = true;
+PQ_BEHAVIOR_DEFINE_FLAG(StandardPropertyWidgets);
+PQ_BEHAVIOR_DEFINE_FLAG(StandardViewFrameActions);
 PQ_BEHAVIOR_DEFINE_FLAG(QtMessageHandlerBehavior);
 PQ_BEHAVIOR_DEFINE_FLAG(DataTimeStepBehavior);
 PQ_BEHAVIOR_DEFINE_FLAG(SpreadSheetVisibilityBehavior);
@@ -100,11 +102,17 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   // Register ParaView interfaces.
   pqInterfaceTracker* pgm = pqApplicationCore::instance()->interfaceTracker();
 
-  // Register standard types of property widgets.
-  pgm->addInterface(new pqStandardPropertyWidgetInterface(pgm));
+  if (PQ_IS_BEHAVIOR_ENABLED(StandardPropertyWidgets))
+    {
+    // Register standard types of property widgets.
+    pgm->addInterface(new pqStandardPropertyWidgetInterface(pgm));
+    }
 
-  // Register standard types of view-frame actions.
-  pgm->addInterface(new pqStandardViewFrameActionsImplementation(pgm));
+  if (PQ_IS_BEHAVIOR_ENABLED(StandardViewFrameActions))
+    {
+    // Register standard types of view-frame actions.
+    pgm->addInterface(new pqStandardViewFrameActionsImplementation(pgm));
+    }
 
   // Load plugins distributed with application.
   pqApplicationCore::instance()->loadDistributedPlugins();
