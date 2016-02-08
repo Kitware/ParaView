@@ -30,9 +30,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "pqStandardPropertyWidgetInterface.h"
-
 #include "pqArrayStatusPropertyWidget.h"
 #include "pqBackgroundEditorWidget.h"
+#include "pqBoxPropertyWidget.h"
 #include "pqCalculatorWidget.h"
 #include "pqCameraManipulatorWidget.h"
 #include "pqColorAnnotationsPropertyWidget.h"
@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqColorPaletteSelectorWidget.h"
 #include "pqColorSelectorPropertyWidget.h"
 #include "pqCommandButtonPropertyWidget.h"
+#include "pqCylinderPropertyWidget.h"
 #include "pqCTHArraySelectionDecorator.h"
 #include "pqCubeAxesPropertyWidget.h"
 #include "pqDisplayRepresentationWidget.h"
@@ -50,26 +51,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFontPropertyWidget.h"
 #include "pqGenericPropertyWidgetDecorator.h"
 #include "pqGlyphScaleFactorPropertyWidget.h"
+#include "pqHandlePropertyWidget.h"
 #include "pqImageCompressorWidget.h"
+#include "pqImplicitPlanePropertyWidget.h"
 #include "pqIndexSelectionWidget.h"
 #include "pqInputDataTypeDecorator.h"
 #include "pqIntMaskPropertyWidget.h"
 #include "pqLightsEditor.h"
+#include "pqLinePropertyWidget.h"
 #include "pqListPropertyWidget.h"
 #include "pqPropertyGroupButton.h"
 #include "pqProxyEditorPropertyWidget.h"
 #include "pqSeriesEditorPropertyWidget.h"
 #include "pqShowWidgetDecorator.h"
+#include "pqSpherePropertyWidget.h"
+#include "pqSplinePropertyWidget.h"
 #include "pqTextLocationWidget.h"
 #include "pqTextureSelectorPropertyWidget.h"
 #include "pqTransferFunctionWidgetPropertyWidget.h"
 #include "pqViewTypePropertyWidget.h"
+#include "pqYoungsMaterialPropertyWidget.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMProperty.h"
 #include "vtkPVConfig.h"
 #ifdef PARAVIEW_ENABLE_PYTHON
 #include "pqCinemaConfiguration.h"
 #endif
+
 #include <QtDebug>
 
 //-----------------------------------------------------------------------------
@@ -182,50 +190,87 @@ pqStandardPropertyWidgetInterface::createWidgetForPropertyGroup(
   vtkSMProxy *proxy,
   vtkSMPropertyGroup *group)
 {
+  QString panelWidget(group->GetPanelWidget());
   // *** NOTE: When adding new types, please update the header documentation ***
-  if(QString(group->GetPanelWidget()) == "ColorEditor")
+  if (panelWidget == "ColorEditor")
     {
     return new pqColorEditorPropertyWidget(proxy);
     }
-  else if(QString(group->GetPanelWidget()) == "CubeAxes")
+  else if(panelWidget == "CubeAxes")
     {
     return new pqCubeAxesPropertyWidget(proxy);
     }
-  else if(QString(group->GetPanelWidget()) == "BackgroundEditor")
+  else if(panelWidget == "BackgroundEditor")
     {
     return new pqBackgroundEditorWidget(proxy, group);
     }
-  else if(QString(group->GetPanelWidget()) == "LightsEditor")
+  else if(panelWidget == "LightsEditor")
     {
     pqPropertyGroupButton * pgb = new pqPropertyGroupButton(proxy, group);
     pgb->SetEditor (new pqLightsEditor(pgb));
     return pgb;
     }
-  else if (QString(group->GetPanelWidget()) == "ArrayStatus")
+  else if (panelWidget == "ArrayStatus")
     {
     return new pqArrayStatusPropertyWidget(proxy, group);
     }
-  else if (QString(group->GetPanelWidget()) == "ColorOpacityEditor")
+  else if (panelWidget == "ColorOpacityEditor")
     {
     return new pqColorOpacityEditorWidget(proxy, group);
     }
-  else if (QString(group->GetPanelWidget()) == "AnnotationsEditor")
+  else if (panelWidget == "AnnotationsEditor")
     {
     return new pqColorAnnotationsPropertyWidget(proxy, group);
     }
-  else if (QString(group->GetPanelWidget()) == "FontEditor")
+  else if (panelWidget == "FontEditor")
     {
     return new pqFontPropertyWidget(proxy, group);
     }
-  else if (QString(group->GetPanelWidget()) == "SeriesEditor")
+  else if (panelWidget == "SeriesEditor")
     {
     return new pqSeriesEditorPropertyWidget(proxy, group);
     }
-  else if (QString(group->GetPanelWidget()) == "TextLocationEditor")
+  else if (panelWidget == "TextLocationEditor")
     {
     return new pqTextLocationWidget(proxy, group);
     }
-  else if (QString(group->GetPanelWidget()) == "cinema_export_selector")
+  else if (panelWidget == "InteractivePlane")
+    {
+    return new pqImplicitPlanePropertyWidget(proxy, group);
+    }
+  else if (panelWidget == "InteractiveBox")
+    {
+    return new pqBoxPropertyWidget(proxy, group);
+    }
+  else if (panelWidget == "InteractiveHandle")
+    {
+    return new pqHandlePropertyWidget(proxy, group);
+    }
+  else if (panelWidget == "InteractiveLine")
+    {
+    return new pqLinePropertyWidget(proxy, group);
+    }
+  else if (panelWidget == "InteractiveSpline")
+    {
+    return new pqSplinePropertyWidget(proxy, group);
+    }
+  else if (panelWidget == "InteractiveSphere")
+    {
+    return new pqSpherePropertyWidget(proxy, group);
+    }
+  else if (panelWidget == "InteractivePolyLine")
+    {
+    return new pqSplinePropertyWidget(proxy, group, pqSplinePropertyWidget::POLYLINE);
+    }
+  else if (panelWidget == "YoungsMaterial")
+    {
+    return new pqYoungsMaterialPropertyWidget(proxy, group);
+    }
+  else if (panelWidget == "InteractiveCylinder")
+    {
+    return new pqCylinderPropertyWidget(proxy, group);
+    }
+  else if (panelWidget == "cinema_export_selector")
     {
 #ifdef PARAVIEW_ENABLE_PYTHON
     return new pqCinemaConfiguration(proxy, group);

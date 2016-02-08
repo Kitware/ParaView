@@ -28,6 +28,7 @@ if (Module_vtkRenderingCore)
     vtkFiltersParallel
     vtkFiltersParallelMPI
     vtkIOExport
+    vtkIOExportOpenGL
     vtkIOImage
     vtkIOXML
     vtkInteractionStyle
@@ -35,7 +36,8 @@ if (Module_vtkRenderingCore)
     vtkRenderingAnnotation
     vtkRenderingCore
     vtkRenderingParallel
-    vtkicet)
+    vtkicet
+    vtklz4)
 endif ()
 
 vtk_module(vtkPVVTKExtensionsRendering

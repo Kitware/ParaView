@@ -12,6 +12,7 @@ paraview_test_load_data(""
   quadraticTetra01.vtu
   sonic.pht
   TestRepresentationTypePlugin.xml
+  PythonProgrammableFilterParameters.xml
   )
 
 ###############################################################################
@@ -28,6 +29,7 @@ set(PY_TESTS
   PythonPVSimpleSphere.py
   PythonSMTraceTest1.py
   PythonSMTraceTest2.py,NO_VALID
+  PythonTestBenchmark.py,NO_VALID
   PythonAnimationTrack.py
   GhostCellsInMergeBlocks.py
   CellIntegrator.py,NO_VALID
@@ -41,6 +43,7 @@ set(PY_TESTS
   ValidateSources.py,NO_VALID
   ColorAttributeTypeBackwardsCompatibility.py,NO_VALID
   RepresentationTypeHint.py,NO_VALID
+  PythonProgrammableFilterParameters.py,NO_VALID
   )
 
 include(FindPythonModules)

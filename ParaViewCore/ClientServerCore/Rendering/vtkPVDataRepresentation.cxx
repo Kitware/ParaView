@@ -140,8 +140,8 @@ int vtkPVDataRepresentation::RequestUpdateTime(
       {
       if (this->UpdateTimeValid)
         {
-        vtkStreamingDemandDrivenPipeline::SetUpdateTimeStep(
-          inputVector[cc]->GetInformationObject(kk),
+        inputVector[cc]->GetInformationObject(kk)->Set(
+          vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP(),
           this->UpdateTime);
         }
       }
@@ -164,17 +164,18 @@ int vtkPVDataRepresentation::RequestUpdateExtent(vtkInformation* request,
     {
     for (int kk=0; kk < inputVector[cc]->GetNumberOfInformationObjects(); kk++)
       {
-      vtkStreamingDemandDrivenPipeline::SetUpdateExtent(
-            inputVector[cc]->GetInformationObject(kk),
-            controller->GetLocalProcessId(),
-            controller->GetNumberOfProcesses(), /*ghost-levels*/ 0);
-      inputVector[cc]->GetInformationObject(kk)->Set(
-            vtkStreamingDemandDrivenPipeline::EXACT_EXTENT(), 1);
+      vtkInformation* info = inputVector[cc]->GetInformationObject(kk);
+      info->Set(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER(),
+        controller->GetLocalProcessId());
+      info->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES(),
+        controller->GetNumberOfProcesses());
+      info->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(),
+        0);
+      info->Set(vtkStreamingDemandDrivenPipeline::EXACT_EXTENT(), 1);
       if (this->UpdateTimeValid)
         {
-        vtkStreamingDemandDrivenPipeline::SetUpdateTimeStep(
-              inputVector[cc]->GetInformationObject(kk),
-              this->UpdateTime);
+        info->Set(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP(),
+          this->UpdateTime);
         }
       }
     }

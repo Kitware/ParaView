@@ -34,17 +34,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqProxyWidget.h"
 #include "pqServer.h"
-#include "pqSplineWidget.h"
 #include "vtkCamera.h"
+#include "vtkPVSession.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
+#include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
-#include "vtkSMProperty.h"
-#include "vtkPVSession.h"
+#include "vtkSmartPointer.h"
 
 #include <QPointer>
 #include <QVBoxLayout>
@@ -56,10 +56,10 @@ class pqCameraKeyFrameWidget::pqInternal : public Ui::CameraKeyFrameWidget
 {
 public:
   vtkSmartPointer<vtkSMProxy> PSplineProxy;
-  QPointer<pqSplineWidget> PSplineWidget;
+  QPointer<pqProxyWidget> PSplineWidget;
 
   vtkSmartPointer<vtkSMProxy> FSplineProxy;
-  QPointer<pqSplineWidget> FSplineWidget;
+  QPointer<pqProxyWidget> FSplineWidget;
   double Data[3];
   pqInternal()
     {
@@ -200,16 +200,12 @@ pqCameraKeyFrameWidget::pqCameraKeyFrameWidget(QWidget* parentObject)
     vtkPVSession::CLIENT);
   this->Internal->PSplineProxy->UpdateVTKObjects();
 
-  this->Internal->PSplineWidget = new pqSplineWidget(
-    this->Internal->PSplineProxy, this->Internal->PSplineProxy, this);
-  this->Internal->PSplineWidget->setHints(
-    this->Internal->PSplineProxy->GetHints()->FindNestedElementByName(
-      "PropertyGroup"));
+  this->Internal->PSplineWidget = new pqProxyWidget(this->Internal->PSplineProxy, this);
 
   QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
     this->Internal->PSplineWidget, SLOT(setView(pqView*)));
   this->Internal->PSplineWidget->setView(pqActiveObjects::instance().activeView());
-  this->Internal->PSplineWidget->deselect();
+  this->Internal->PSplineWidget->filterWidgets();
 
   (new QVBoxLayout(this->Internal->positionContainer))->addWidget(
     this->Internal->PSplineWidget);
@@ -220,16 +216,11 @@ pqCameraKeyFrameWidget::pqCameraKeyFrameWidget(QWidget* parentObject)
   this->Internal->PSplineProxy->SetLocation(vtkPVSession::CLIENT);
   this->Internal->FSplineProxy->UpdateVTKObjects();
 
-  this->Internal->FSplineWidget = new pqSplineWidget(
-    this->Internal->FSplineProxy, this->Internal->FSplineProxy, this);
-  this->Internal->FSplineWidget->setHints(
-    this->Internal->FSplineProxy->GetHints()->FindNestedElementByName(
-      "PropertyGroup"));
-
+  this->Internal->FSplineWidget = new pqProxyWidget(this->Internal->FSplineProxy, this);
   QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
     this->Internal->FSplineWidget, SLOT(setView(pqView*)));
   this->Internal->FSplineWidget->setView(pqActiveObjects::instance().activeView());
-  this->Internal->FSplineWidget->deselect();
+  this->Internal->FSplineWidget->filterWidgets();
 
   (new QVBoxLayout(this->Internal->focusContainer))->addWidget(
     this->Internal->FSplineWidget);
@@ -301,8 +292,8 @@ void pqCameraKeyFrameWidget::initializeUsingCamera(vtkCamera* camera)
 /// Write the user chosen values for this key frame to the proxy.
 void pqCameraKeyFrameWidget::saveToKeyFrame(vtkSMProxy* keyFrame)
 {
-  this->Internal->PSplineWidget->accept();
-  this->Internal->FSplineWidget->accept();
+  this->Internal->PSplineWidget->apply();
+  this->Internal->FSplineWidget->apply();
 
   vtkSMPropertyHelper(keyFrame,"Position").Set(
     this->Internal->position(), 3);
@@ -355,30 +346,6 @@ void pqCameraKeyFrameWidget::changeCurrentPage()
     {
     this->Internal->stackedWidget->setCurrentIndex(3);
     }
-  this->updateSplineWidget();
-}
-
-//-----------------------------------------------------------------------------
-void pqCameraKeyFrameWidget::updateSplineWidget()
-{
-  if (this->usePathBasedMode())
-    {
-    switch (this->Internal->stackedWidget->currentIndex())
-      {
-    case 1:
-      this->Internal->PSplineWidget->select();
-      this->Internal->FSplineWidget->deselect();
-      return;
-
-    case 2:
-      this->Internal->FSplineWidget->select();
-      this->Internal->PSplineWidget->deselect();
-      return;
-      }
-    }
-
-  this->Internal->FSplineWidget->deselect();
-  this->Internal->PSplineWidget->deselect();
 }
 
 //-----------------------------------------------------------------------------

@@ -21,6 +21,9 @@ set(_vtk_mpi_modules
 
   vtkIOMPIParallel
   # vtkMPIMultiBlockPLOT3DReader.
+
+  # Needed for vtkPUnstructuredGridGhostCellsGenerator
+  vtkFiltersParallelGeometry
   )
 
 # Add CosmoTools VTK extensions if enabled.
@@ -32,10 +35,11 @@ if (UNIX AND PARAVIEW_ENABLE_COSMOTOOLS)
     )
 endif()
 
-if( PARAVIEW_ENABLE_CGNS )
-  list(APPEND _vtk_mpi_modules  vtkPVVTKExtensionsCGNSReader)
+if (NOT WIN32)
+  list(APPEND _vtk_mpi_modules
+    vtkFiltersParallelDIY2
+    )
 endif()
-
 
 set(_vtk_modules
   # VTK modules which ParaView has a explicity compile
@@ -361,6 +365,10 @@ endif()
 
 if (PARAVIEW_USE_VISITBRIDGE)
   list (APPEND _vtk_modules vtkIOVisItBridge)
+endif()
+
+if(PARAVIEW_ENABLE_CGNS)
+  list(APPEND _vtk_modules vtkPVVTKExtensionsCGNSReader)
 endif()
 
 if (PARAVIEW_ENABLE_MATPLOTLIB)

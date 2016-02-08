@@ -38,8 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QRegExp>
 
 static const int NO_COMPRESSION=0;
-static const int SQUIRT_COMPRESSION=1;
-static const int ZLIB_COMPRESSION=2;
+static const int LZ4_COMPRESSION=1;
+static const int SQUIRT_COMPRESSION=2;
+static const int ZLIB_COMPRESSION=3;
 //-----------------------------------------------------------------------------
 
 class pqImageCompressorWidget::pqInternals
@@ -115,8 +116,20 @@ void pqImageCompressorWidget::setCompressorConfig(const QString& value)
                      "\\s+"
                      "([01])"   // strip alpha (0 or 1).
                      "$");
+  QRegExp lz4RegExp("^vtkLZ4Compressor"
+                       "\\s+"   // space
+                       "0"      // 0
+                       "\\s+"   // space
+                       "([0-9]+)" // num-of-bits.
+                       "$");
 
-  if (squirtRegExp.exactMatch(value))
+  if (lz4RegExp.exactMatch(value))
+    {
+    int numBits = lz4RegExp.cap(1).toInt();
+    ui.compressionType->setCurrentIndex(LZ4_COMPRESSION);
+    ui.squirtColorSpace->setValue(numBits);
+    }
+  else if (squirtRegExp.exactMatch(value))
     {
     int numBits = squirtRegExp.cap(1).toInt();
     ui.compressionType->setCurrentIndex(SQUIRT_COMPRESSION);
@@ -144,10 +157,13 @@ QString pqImageCompressorWidget::compressorConfig() const
   Ui::ImageCompressorWidget& ui = this->Internals->Ui;
   switch (ui.compressionType->currentIndex())
     {
-  case 1: // squirt
+  case LZ4_COMPRESSION:
+    return QString("vtkLZ4Compressor 0 %1").arg(ui.squirtColorSpace->value());
+
+  case SQUIRT_COMPRESSION: // squirt
     return QString("vtkSquirtCompressor 0 %1").arg(ui.squirtColorSpace->value());
 
-  case 2: // zlib
+  case ZLIB_COMPRESSION: // zlib
     return QString("vtkZlibImageCompressor 0 %1 %2 %3")
       .arg(ui.zlibLevel->value())
       .arg(ui.zlibColorSpace->value())
@@ -161,8 +177,8 @@ QString pqImageCompressorWidget::compressorConfig() const
 void pqImageCompressorWidget::currentIndexChanged(int index)
 {
   Ui::ImageCompressorWidget& ui = this->Internals->Ui;
-  ui.squirtLabel->setVisible(index == SQUIRT_COMPRESSION);
-  ui.squirtColorSpace->setVisible(index == SQUIRT_COMPRESSION);
+  ui.squirtLabel->setVisible(index == SQUIRT_COMPRESSION || index == LZ4_COMPRESSION);
+  ui.squirtColorSpace->setVisible(index == SQUIRT_COMPRESSION || index == LZ4_COMPRESSION);
 
   ui.zlibLabel1->setVisible(index == ZLIB_COMPRESSION);
   ui.zlibLabel2->setVisible(index == ZLIB_COMPRESSION);
@@ -193,11 +209,11 @@ void pqImageCompressorWidget::setConfigurationDefault(int index)
     break;
 
   case ETHERNET_1_GIG:
-    this->setCompressorConfig("vtkZlibImageCompressor 0 1 0 0");
+    this->setCompressorConfig("vtkLZ4Compressor 0 5");
     break;
 
   case ETHERNET_10_GIG:
-    this->setCompressorConfig("vtkSquirtCompressor 0 3");
+    this->setCompressorConfig("vtkLZ4Compressor 0 3");
     break;
 
   case SHARED_MEMORY:

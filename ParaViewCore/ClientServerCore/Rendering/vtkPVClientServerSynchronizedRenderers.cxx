@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPVClientServerSynchronizedRenderers.h"
 
+#include "vtkLZ4Compressor.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkOpenGLRenderer.h"
@@ -70,6 +71,26 @@ void vtkPVClientServerSynchronizedRenderers::MasterEndRender()
       }
     rawImage.MarkValid();
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVClientServerSynchronizedRenderers::SlaveStartRender()
+{
+  this->Superclass::SlaveStartRender();
+
+#ifdef VTKGL2
+  // In client-server mode, we want all the server ranks to simply render using
+  // a black background. That makes it easier to blend the image we obtain from
+  // the server rank on top of the background rendered locally on the client.
+  // vtkPVSynchronizedRenderer only creates
+  // vtkPVClientServerSynchronizedRenderers in client-server mode that support
+  // image delivery to client (i.e. not in tile-display, or cave mode).
+  // Hence, we know it won't affect server ranks that do display the rendered
+  // result. (Fixes BUG #0015961).
+  this->Renderer->SetBackground(0, 0, 0);
+  this->Renderer->SetGradientBackground(false);
+  this->Renderer->SetTexturedBackground(false);
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -161,6 +182,10 @@ void vtkPVClientServerSynchronizedRenderers::ConfigureCompressor(const char *str
       {
       comp=vtkZlibImageCompressor::New();
       }
+    else if (className == "vtkLZ4Compressor")
+      {
+      comp = vtkLZ4Compressor::New();
+      }
     else if (className=="NULL" || className.empty())
       {
       this->SetCompressor(0);
@@ -194,15 +219,13 @@ void vtkPVClientServerSynchronizedRenderers::PushImageToScreen()
   // vtkSynchronizedRenderers::PushImageToScreen() should clear the screen by
   // default -- I can argue not.
   int layer = this->Renderer->GetLayer();
+  int prev = this->Renderer->GetPreserveColorBuffer();
   if (layer == 0)
     {
-    this->Renderer->SetLayer(1);
+    this->Renderer->SetPreserveColorBuffer(1);
     }
   this->Superclass::PushImageToScreen();
-  if (layer == 0)
-    {
-    this->Renderer->SetLayer(0);
-    }
+  this->Renderer->SetPreserveColorBuffer(prev);
 }
 
 //----------------------------------------------------------------------------

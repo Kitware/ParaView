@@ -21,18 +21,7 @@ if (BUILD_TESTING)
   include(CTest)
 endif()
 
-# Theoretically, CheckFortran should not be needed, but
-# enable_language(OPTIONAL) fails with Ninja generator.
-include(CheckFortran)
-if(CMAKE_Fortran_COMPILER)
-  enable_language(Fortran OPTIONAL)
-endif()
-
 add_subdirectory(CxxOverlappingAMRExample)
-if(CMAKE_Fortran_COMPILER_WORKS)
-  add_subdirectory(Fortran90FullExample)
-  add_subdirectory(FortranPoissonSolver)
-endif()
 add_subdirectory(CxxNonOverlappingAMRExample)
 add_subdirectory(CFullExample2)
 add_subdirectory(CxxFullExample)
@@ -44,3 +33,18 @@ add_subdirectory(CxxPVSMPipelineExample)
 add_subdirectory(CxxMappedDataArrayExample)
 add_subdirectory(MPISubCommunicatorExample)
 add_subdirectory(PythonDolfinExample)
+add_subdirectory(CxxParticlePathExample)
+
+set(BUILD_FORTRAN_EXAMPLES OFF CACHE BOOL "Build Fortran Catalyst Examples")
+if(BUILD_FORTRAN_EXAMPLES)
+  # Theoretically, CheckFortran should not be needed, but
+  # enable_language(OPTIONAL) fails with Ninja generator.
+  include(CheckFortran)
+  if(CMAKE_Fortran_COMPILER)
+    enable_language(Fortran OPTIONAL)
+  endif()
+  if(CMAKE_Fortran_COMPILER_WORKS)
+    add_subdirectory(Fortran90FullExample)
+    add_subdirectory(FortranPoissonSolver)
+  endif()
+endif()

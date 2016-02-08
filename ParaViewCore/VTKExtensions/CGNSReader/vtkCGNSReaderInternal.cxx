@@ -796,7 +796,6 @@ void vtkCGNSMetaData::PrintSelf(std::ostream& os)
     }
 }
 
-#ifdef PARAVIEW_USE_MPI
 //------------------------------------------------------------------------------
 static void BroadcastCGNSString(vtkMultiProcessController* ctrl,
                                 CGNSRead::char_33 & str)
@@ -1027,6 +1026,5 @@ void vtkCGNSMetaData::Broadcast(vtkMultiProcessController* controller,
   CGNSRead::BroadcastString(controller, this->LastReadFilename, rank);
   BroadcastDoubleVector(controller, this->GlobalTime, rank);
 }
-#endif
 
 }

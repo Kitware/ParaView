@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -40,11 +40,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerObserver.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
+
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMTrace.h"
 #include "vtkSMViewLayoutProxy.h"
 
 #include <QEvent>
+#include <QInputDialog>
 #include <QLabel>
+#include <QMenu>
+#include <QMouseEvent>
 #include <QMultiMap>
 #include <QPointer>
 #include <QShortcut>
@@ -55,10 +61,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 //-----------------------------------------------------------------------------
-// **************** pqTabbedMultiViewWidget::pqTabWidget **********************
+// ******************** pqTabWidget **********************
 //-----------------------------------------------------------------------------
 pqTabbedMultiViewWidget::pqTabWidget::pqTabWidget(QWidget* parentObject):
-  Superclass(parentObject)
+  Superclass(parentObject),
+  ReadOnly(false)
 {
 }
 
@@ -92,14 +99,25 @@ void pqTabbedMultiViewWidget::pqTabWidget::setTabButton(
 int pqTabbedMultiViewWidget::pqTabWidget::addAsTab(pqMultiViewWidget* wdg, pqTabbedMultiViewWidget* self)
 {
   int tab_count = this->count();
-  int tab_index = this->insertTab(tab_count-1, wdg, QString("Layout #%1").arg(tab_count));
+  vtkSMViewLayoutProxy* proxy = wdg->layoutManager();
+  pqServerManagerModel* smmodel =
+    pqApplicationCore::instance()->getServerManagerModel();
+  pqProxy* item = smmodel->findItem<pqProxy*>(proxy);
+  if (item->getSMName().startsWith("ViewLayout"))
+    {
+    item->rename(QString("Layout #%1").arg(tab_count));
+    }
+  int tab_index = this->insertTab(tab_count-1, wdg, item->getSMName());
+
+  this->connect(item, SIGNAL(nameChanged(pqServerManagerModelItem*)),
+    self, SLOT(onLayoutNameChanged(pqServerManagerModelItem*)));
 
   QLabel* label = new QLabel(this);
   label->setObjectName("popout");
   label->setToolTip(pqTabWidget::popoutLabelText(false));
   label->setStatusTip(pqTabWidget::popoutLabelText(false));
   label->setPixmap(this->style()->standardPixmap(
-      pqTabWidget::popoutLabelPixmap(false)));
+    pqTabWidget::popoutLabelPixmap(false)));
   this->setTabButton(tab_index, QTabBar::LeftSide, label);
   label->installEventFilter(self);
 
@@ -111,6 +129,7 @@ int pqTabbedMultiViewWidget::pqTabWidget::addAsTab(pqMultiViewWidget* wdg, pqTab
     this->style()->standardPixmap(QStyle::SP_TitleBarCloseButton));
   this->setTabButton(tab_index, QTabBar::RightSide, label);
   label->installEventFilter(self);
+  label->setVisible(!this->ReadOnly);
   return tab_index;
 }
 
@@ -130,14 +149,31 @@ QStyle::StandardPixmap pqTabbedMultiViewWidget::pqTabWidget::popoutLabelPixmap(b
 }
 
 //-----------------------------------------------------------------------------
+void pqTabbedMultiViewWidget::pqTabWidget::setReadOnly(bool val)
+{
+  if (this->ReadOnly == val)
+    {
+    return;
+    }
+
+  this->ReadOnly = val;
+  QList<QLabel*> labels = this->findChildren<QLabel*>("close");
+  foreach (QLabel* label, labels)
+    {
+    label->setVisible(!val);
+    }
+}
+
+//-----------------------------------------------------------------------------
 // ****************     pqTabbedMultiViewWidget   **********************
 //-----------------------------------------------------------------------------
 class pqTabbedMultiViewWidget::pqInternals
 {
 public:
-  QPointer<pqTabbedMultiViewWidget::pqTabWidget> TabWidget;
+  QPointer<pqTabWidget> TabWidget;
   QMultiMap<pqServer*, QPointer<pqMultiViewWidget> > TabWidgets;
   QPointer<QWidget> FullScreenWindow;
+  QPointer<QWidget> NewTabWidget;
 
   /// returns a frame that can be used to assign the view proxy. May return NULL
   /// if no suitable frame is found.
@@ -155,6 +191,24 @@ public:
       }
     return NULL;
     }
+
+  void addNewTabWidget()
+    {
+    if (!this->NewTabWidget)
+      {
+      this->NewTabWidget = new QWidget(this->TabWidget);
+      this->TabWidget->addTab(this->NewTabWidget, "+");
+      }
+    }
+  void removeNewTabWidget()
+    {
+    if (this->NewTabWidget)
+      {
+      this->TabWidget->removeTab(
+        this->TabWidget->indexOf(this->NewTabWidget));
+      delete this->NewTabWidget;
+      }
+    }
 };
 
 //-----------------------------------------------------------------------------
@@ -164,6 +218,10 @@ pqTabbedMultiViewWidget::pqTabbedMultiViewWidget(QWidget* parentObject)
 {
   this->Internals->TabWidget = new pqTabWidget(this);
   this->Internals->TabWidget->setObjectName("CoreWidget");
+
+  this->Internals->TabWidget->tabBar()->setContextMenuPolicy(Qt::CustomContextMenu);
+  connect(this->Internals->TabWidget->tabBar(), SIGNAL(customContextMenuRequested(const QPoint&)),
+    this, SLOT(contextMenuRequested(const QPoint&)));
 
   QVBoxLayout* vbox = new QVBoxLayout();
   this->setLayout(vbox);
@@ -184,7 +242,7 @@ pqTabbedMultiViewWidget::pqTabbedMultiViewWidget(QWidget* parentObject)
   QObject::connect(smmodel, SIGNAL(preServerRemoved(pqServer*)),
     this, SLOT(serverRemoved(pqServer*)));
 
-  this->Internals->TabWidget->addTab(new QWidget(this), "+");
+  this->Internals->addNewTabWidget();
   QObject::connect(this->Internals->TabWidget, SIGNAL(currentChanged(int)),
     this, SLOT(currentTabChanged(int)));
 
@@ -203,6 +261,29 @@ pqTabbedMultiViewWidget::pqTabbedMultiViewWidget(QWidget* parentObject)
 pqTabbedMultiViewWidget::~pqTabbedMultiViewWidget()
 {
   delete this->Internals;
+}
+
+//-----------------------------------------------------------------------------
+void pqTabbedMultiViewWidget::setReadOnly(bool val)
+{
+  if (val != this->readOnly())
+    {
+    this->Internals->TabWidget->setReadOnly(val);
+    if (val)
+      {
+      this->Internals->removeNewTabWidget();
+      }
+    else
+      {
+      this->Internals->addNewTabWidget();
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+bool pqTabbedMultiViewWidget::readOnly() const
+{
+  return this->Internals->TabWidget->readOnly();
 }
 
 //-----------------------------------------------------------------------------
@@ -361,18 +442,17 @@ void pqTabbedMultiViewWidget::serverRemoved(pqServer* server)
 }
 
 //-----------------------------------------------------------------------------
-void pqTabbedMultiViewWidget::currentTabChanged(int index)
+void pqTabbedMultiViewWidget::currentTabChanged(int/* index*/)
 {
-  if (index < (this->Internals->TabWidget->count()-1))
+  QWidget* currentWidget = this->Internals->TabWidget->currentWidget();
+  if (pqMultiViewWidget* frame = qobject_cast<pqMultiViewWidget*>(currentWidget))
     {
-    // make the first frame active.
-    pqMultiViewWidget* frame = qobject_cast<pqMultiViewWidget*>(
-      this->Internals->TabWidget->currentWidget());
     frame->makeFrameActive();
     }
-  else if (index == (this->Internals->TabWidget->count()-1) && index != 0)
+  else if (currentWidget == this->Internals->NewTabWidget &&
+    this->Internals->TabWidget->count() > 1)
     {
-    // index !=0 check keeps this widget from creating new tabs as the tabs are
+    // count() > 1 check keeps this widget from creating new tabs as the tabs are
     // being removed.
     this->createTab();
     }
@@ -398,6 +478,11 @@ void pqTabbedMultiViewWidget::closeTab(int index)
     builder->destroy(smmodel->findItem<pqProxy*>(vlayout));
     END_UNDO_SET();
     }
+
+   if (this->Internals->TabWidget->count() == 1)
+     {
+     this->createTab();
+     }
 }
 
 //-----------------------------------------------------------------------------
@@ -451,38 +536,38 @@ bool pqTabbedMultiViewWidget::eventFilter(QObject *obj, QEvent *evt)
   if (evt->type() == QEvent::MouseButtonRelease &&
     qobject_cast<QLabel*>(obj))
     {
-    int index = this->Internals->TabWidget->tabButtonIndex(
-      qobject_cast<QWidget*>(obj), QTabBar::RightSide);
-    if (index != -1)
+    QMouseEvent* mouseEvent = dynamic_cast<QMouseEvent*>(evt);
+    if (mouseEvent->button() == Qt::LeftButton)
       {
-      BEGIN_UNDO_SET("Close Tab");
-      this->closeTab(index);
-      if (this->Internals->TabWidget->count() == 1)
+      int index = this->Internals->TabWidget->tabButtonIndex(
+        qobject_cast<QWidget*>(obj), QTabBar::RightSide);
+      if (index != -1)
         {
-        this->createTab();
+        BEGIN_UNDO_SET("Close Tab");
+        this->closeTab(index);
+        END_UNDO_SET();
+        return true;
         }
-      END_UNDO_SET();
-      return true;
-      }
 
-    // user clicked on the popout label. We pop the frame out (or back in).
-    index = this->Internals->TabWidget->tabButtonIndex(
-      qobject_cast<QWidget*>(obj), QTabBar::LeftSide);
-    if (index != -1)
-      {
-      // Pop out tab in a separate window.
-      pqMultiViewWidget* tabPage = qobject_cast<pqMultiViewWidget*>(
-        this->Internals->TabWidget->widget(index));
-      if (tabPage)
+      // user clicked on the popout label. We pop the frame out (or back in).
+      index = this->Internals->TabWidget->tabButtonIndex(
+        qobject_cast<QWidget*>(obj), QTabBar::LeftSide);
+      if (index != -1)
         {
-        QLabel* label = qobject_cast<QLabel*>(obj);
-        bool popped_out = tabPage->togglePopout();
-        label->setPixmap(this->style()->standardPixmap(
+        // Pop out tab in a separate window.
+        pqMultiViewWidget* tabPage = qobject_cast<pqMultiViewWidget*>(
+          this->Internals->TabWidget->widget(index));
+        if (tabPage)
+          {
+          QLabel* label = qobject_cast<QLabel*>(obj);
+          bool popped_out = tabPage->togglePopout();
+          label->setPixmap(this->style()->standardPixmap(
             pqTabWidget::popoutLabelPixmap(popped_out)));
-        label->setToolTip(pqTabWidget::popoutLabelText(popped_out));
-        label->setStatusTip(pqTabWidget::popoutLabelText(popped_out));
+          label->setToolTip(pqTabWidget::popoutLabelText(popped_out));
+          label->setStatusTip(pqTabWidget::popoutLabelText(popped_out));
+          }
+        return true;
         }
-      return true;
       }
     }
 
@@ -625,6 +710,70 @@ void pqTabbedMultiViewWidget::onStateLoaded()
     if (!proxies.contains(view->getViewProxy()))
       {
       this->assignToFrame(view, false);
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqTabbedMultiViewWidget::contextMenuRequested(const QPoint& point)
+{
+  this->setFocus(Qt::OtherFocusReason);
+
+  int tabIndex = this->Internals->TabWidget->tabBar()->tabAt(point);
+  pqMultiViewWidget* widget = qobject_cast<pqMultiViewWidget*>(
+    this->Internals->TabWidget->widget(tabIndex));
+  vtkSMProxy* vlayout = widget? widget->layoutManager() : NULL;
+  if (!vlayout)
+    {
+    return;
+    }
+  pqServerManagerModel* smmodel =
+    pqApplicationCore::instance()->getServerManagerModel();
+  pqProxy* proxy = smmodel->findItem<pqProxy*>(vlayout);
+
+  QMenu* menu = new QMenu(this);
+  QAction* renameAction = menu->addAction("Rename");
+  QAction* closeAction = menu->addAction(tr("Close layout"));
+  QAction* action =
+    menu->exec(this->Internals->TabWidget->tabBar()->mapToGlobal(point));
+  if (action == closeAction)
+    {
+    BEGIN_UNDO_SET("Close Tab");
+      this->closeTab(tabIndex);
+    END_UNDO_SET();
+    }
+  else if (action == renameAction)
+    {
+    bool ok;
+    QString oldName = proxy->getSMName();
+    QString newName = QInputDialog::getText(this,
+      tr("Rename Layout..."), tr("New name:"), QLineEdit::Normal,
+      oldName, &ok);
+    if (ok && !newName.isEmpty() && newName != oldName)
+      {
+      SM_SCOPED_TRACE(CallFunction)
+        .arg("RenameLayout")
+        .arg(newName.toLatin1().data())
+        .arg((vtkObject*)proxy->getProxy());
+
+      proxy->rename(newName);
+      }
+    }
+  delete menu;
+}
+
+//-----------------------------------------------------------------------------
+void pqTabbedMultiViewWidget::onLayoutNameChanged(pqServerManagerModelItem* item)
+{
+  pqProxy* proxy = dynamic_cast<pqProxy*>(item);
+  for (int i = 0; i < this->Internals->TabWidget->count(); i++)
+    {
+    pqMultiViewWidget* wdg =
+      dynamic_cast<pqMultiViewWidget*>(this->Internals->TabWidget->widget(i));
+    if (wdg && wdg->layoutManager() == proxy->getProxy())
+      {
+      this->Internals->TabWidget->setTabText(i, proxy->getSMName());
+      return;
       }
     }
 }

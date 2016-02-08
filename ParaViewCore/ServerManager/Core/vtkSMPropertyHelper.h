@@ -222,6 +222,12 @@ public:
   void SetUseUnchecked(bool val) { this->UseUnchecked = val; }
   bool GetUseUnchecked() { return this->UseUnchecked; }
 
+  // Description:
+  // Copy property values from another vtkSMPropertyHelper. This only
+  // works for compatible properties and currently only supported for numeric
+  // vtkSMVectorProperty subclasses.
+  bool Copy(vtkSMPropertyHelper& source);
+
 protected:
   void setUseUnchecked(bool useUnchecked) { this->UseUnchecked = useUnchecked; }
 
@@ -237,7 +243,8 @@ private:
   template<typename T> void SetProperty(unsigned int index, T value);
   template<typename T> void SetPropertyArray(const T *values, unsigned int count);
   void SetPropertyArrayIdType(const vtkIdType *values, unsigned int count);
- 
+  template<typename T> bool CopyInternal(vtkSMPropertyHelper& source);
+
   enum PType {
     INT,
     DOUBLE,

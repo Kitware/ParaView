@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>BoxPropertyWidget</class>
+ <widget class="QWidget" name="BoxPropertyWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>245</width>
+    <height>244</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout">
+   <property name="spacing">
+    <number>2</number>
+   </property>
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QCheckBox" name="show3DWidget">
+     <property name="text">
+      <string>Show Box</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout">
+     <property name="margin">
+      <number>0</number>
+     </property>
+     <property name="spacing">
+      <number>2</number>
+     </property>
+     <item row="1" column="0">
+      <widget class="QLabel" name="labelRotate">
+       <property name="text">
+        <string>Rotate</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="pqLineEdit" name="rotateX"/>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="labelTranslate">
+       <property name="text">
+        <string>Translate</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="pqLineEdit" name="rotateZ"/>
+     </item>
+     <item row="0" column="3">
+      <widget class="pqLineEdit" name="translateZ"/>
+     </item>
+     <item row="0" column="2">
+      <widget class="pqLineEdit" name="translateY"/>
+     </item>
+     <item row="1" column="2">
+      <widget class="pqLineEdit" name="rotateY"/>
+     </item>
+     <item row="0" column="1">
+      <widget class="pqLineEdit" name="translateX"/>
+     </item>
+     <item row="2" column="2">
+      <widget class="pqLineEdit" name="scaleY"/>
+     </item>
+     <item row="2" column="1">
+      <widget class="pqLineEdit" name="scaleX"/>
+     </item>
+     <item row="2" column="3">
+      <widget class="pqLineEdit" name="scaleZ"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="labelScale">
+       <property name="text">
+        <string>Scale</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QGridLayout">
+     <item row="3" column="0">
+      <widget class="QCheckBox" name="enableRotation">
+       <property name="text">
+        <string>Rotation</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QCheckBox" name="enableTranslation">
+       <property name="text">
+        <string>Translation</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QCheckBox" name="enableScaling">
+       <property name="text">
+        <string>Scaling</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QCheckBox" name="enableMoveFaces">
+       <property name="text">
+        <string>Face Movement</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QPushButton" name="resetBounds">
+     <property name="text">
+      <string>Reset Bounds</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>pqLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>show3DWidget</tabstop>
+  <tabstop>translateX</tabstop>
+  <tabstop>translateY</tabstop>
+  <tabstop>translateZ</tabstop>
+  <tabstop>rotateX</tabstop>
+  <tabstop>rotateY</tabstop>
+  <tabstop>rotateZ</tabstop>
+  <tabstop>scaleX</tabstop>
+  <tabstop>scaleY</tabstop>
+  <tabstop>scaleZ</tabstop>
+  <tabstop>enableTranslation</tabstop>
+  <tabstop>enableScaling</tabstop>
+  <tabstop>enableRotation</tabstop>
+  <tabstop>enableMoveFaces</tabstop>
+  <tabstop>resetBounds</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

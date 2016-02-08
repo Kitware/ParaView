@@ -214,6 +214,11 @@ public:
     return this->DeepCopy( (vtkAbstractArray*) da);
   }
 
+  void SetVoidArray (void *p, vtkIdType id, int i, int j)
+  {
+    this->BuildFallback ();
+    return this->Fallback->SetVoidArray (p, id, i, j);
+  }
   void SetVoidArray (void *p, vtkIdType id, int i)
   {
     this->BuildFallback ();

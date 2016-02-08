@@ -166,18 +166,22 @@ void vtkSMRepresentationProxy::UpdatePipelineInternal(
   double time, bool doTime)
 {
   vtkClientServerStream stream;
+
   if (doTime)
     {
     stream << vtkClientServerStream::Invoke
            << VTKOBJECT(this)
-           << "SetUpdateTime" << time
+           << "UpdateTimeStep"
+           << time
            << vtkClientServerStream::End;
     }
-
-  stream << vtkClientServerStream::Invoke
-         << VTKOBJECT(this)
-         << "Update"
-         << vtkClientServerStream::End;
+  else
+    {
+    stream << vtkClientServerStream::Invoke
+           << VTKOBJECT(this)
+           << "Update"
+           << vtkClientServerStream::End;
+    }
 
   this->GetSession()->PrepareProgress();
   this->ExecuteStream(stream);

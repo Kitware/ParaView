@@ -46,6 +46,7 @@ correctness of outputs. A description of the examples are:
                                VTK data arrays to save on memory use by Catalyst.
 * MPISubCommunicatorExample -- An example where only a subset of the MPI
                                processes are used for the simulation and Catalyst.
+* CxxParticlePathExample -- An example for computing particle paths in situ.
 
 Other objects of interest:
 * LICENSE.md -- The license of this software.

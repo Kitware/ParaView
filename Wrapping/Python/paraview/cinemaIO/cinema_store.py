@@ -499,10 +499,9 @@ class Store(object):
                 if not strval in ok_descs:
                     ok_descs.add(strval)
                     ordered_descs.append(ok_desc)
+                    yield ok_desc
 
         self.cached_searches[argstr] = ordered_descs
-        for descriptor in ordered_descs:
-            yield descriptor
 
 class FileStore(Store):
     """Implementation of a store based on named files and directories."""

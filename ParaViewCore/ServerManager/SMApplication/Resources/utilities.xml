@@ -397,20 +397,10 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      <Hints>
-        <!-- Hints are metadata associated with the proxy.
-             As far as the ServerManager is concerned, Hints have no
-             significance. GUI is free to interpret the hints as
-             it chooses. Hints provide a mechanism to add some GUI
-             pertinant information to the server manager XML.
-        -->
-        <PropertyGroup type="Spline">
-          <Property function="HandlePositions"
-                    name="Points" />
-          <Property function="Closed"
-                    name="Closed" />
-        </PropertyGroup>
-      </Hints>
+      <PropertyGroup label="Spline Parameters" panel_widget="InteractiveSpline">
+        <Property function="HandlePositions" name="Points" />
+        <Property function="Closed" name="Closed" />
+      </PropertyGroup>
       <!-- end of Spline -->
     </Proxy>
   </ProxyGroup>
@@ -592,6 +582,13 @@
                             name="Offset"
                             number_of_elements="1">
       </DoubleVectorProperty>
+
+      <PropertyGroup label="Plane Parameters" panel_widget="InteractivePlane">
+        <Property function="Origin" name="Origin" />
+        <Property function="Normal" name="Normal" />
+        <Property function="Input" name="Input" />
+      </PropertyGroup>
+
       <Hints>
         <!-- Hints are metadata associated with the proxy.
              As far as the ServerManager is concerned, Hints have no
@@ -599,12 +596,7 @@
              it chooses. Hints provide a mechanism to add some GUI
              pertinant information to the server manager XML.
         -->
-        <PropertyGroup type="Plane">
-          <Property function="Origin"
-                    name="Origin" />
-          <Property function="Normal"
-                    name="Normal" />
-        </PropertyGroup>
+
         <ProxyList>
           <!--
             ProxyList hints are used when this proxy
@@ -634,8 +626,8 @@
         </ProxyGroupDomain>
       </ProxyProperty>
     </Proxy>
-    <Proxy class="vtkPVBox"
-           name="Box">
+    <Proxy class="vtkPVBox" name="Box">
+      <InputProperty is_internal="1" name="Input" />
       <DoubleVectorProperty command="SetBounds"
                             default_values="0 1 0 1 0 1"
                             name="Bounds"
@@ -661,28 +653,22 @@
                             number_of_elements="3">
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
+      <PropertyGroup label="Box Parameters" panel_widget="InteractiveBox">
+        <Property function="Position" name="Position" />
+        <Property function="Rotation" name="Rotation" />
+        <Property function="Scale" name="Scale" />
+        <Property function="PlaceWidget" name="Bounds" />
+        <Property function="Input" name="Input" />
+      </PropertyGroup>
       <Hints>
-        <!-- Hints are metadata associated with the proxy.
-             As far as the ServerManager is concerned, Hints have no
-             significance. GUI is free to interpret the hints as
-             it chooses. Hints provide a mechanism to add some GUI
-             pertinant information to the server manager XML.
-        -->
-        <PropertyGroup type="Box">
-          <Property function="Position"
-                    name="Position" />
-          <Property function="Rotation"
-                    name="Rotation" />
-          <Property function="Scale"
-                    name="Scale" />
-          <Property function="PlaceWidget"
-                    name="Bounds" />
-        </PropertyGroup>
+        <ProxyList>
+          <Link name="Input" with_property="Input" />
+        </ProxyList>
       </Hints>
       <!-- End of Box -->
     </Proxy>
-    <Proxy class="vtkSphere"
-           name="Sphere">
+    <Proxy class="vtkSphere" name="Sphere">
+      <InputProperty is_internal="1" name="Input" />
       <DoubleVectorProperty command="SetCenter"
                             default_values="none"
                             name="Center"
@@ -696,23 +682,19 @@
         <DoubleRangeDomain min="0"
                            name="range" />
       </DoubleVectorProperty>
+      <PropertyGroup label="Sphere Parameters" panel_widget="InteractiveSphere">
+        <Property function="Center" name="Center" />
+        <Property function="Radius" name="Radius" />
+        <Property function="Input" name="Input" />
+      </PropertyGroup>
       <Hints>
-        <!-- Hints are metadata associated with the proxy.
-             As far as the ServerManager is concerned, Hints have no
-             significance. GUI is free to interpret the hints as
-             it chooses. Hints provide a mechanism to add some GUI
-             pertinant information to the server manager XML.
-        -->
-        <PropertyGroup type="Sphere">
-          <Property function="Center"
-                    name="Center" />
-          <Property function="Radius"
-                    name="Radius" />
-        </PropertyGroup>
+        <ProxyList>
+          <Link name="Input" with_property="Input" />
+        </ProxyList>
       </Hints>
     </Proxy>
-    <Proxy class="vtkPVCylinder"
-           name="Cylinder">
+    <Proxy class="vtkPVCylinder" name="Cylinder">
+      <InputProperty is_internal="1" name="Input" />
       <DoubleVectorProperty command="SetCenter"
                             default_values="none"
                             name="Center"
@@ -732,6 +714,17 @@
         <DoubleRangeDomain min="0"
                            name="range" />
       </DoubleVectorProperty>
+      <PropertyGroup label="Cylinder Parameters" panel_widget="InteractiveCylinder">
+        <Property function="Center" name="Center" />
+        <Property function="Axis" name="Axis" />
+        <Property function="Radius" name="Radius" />
+        <Property function="Input" name="Input" />
+      </PropertyGroup>
+      <Hints>
+        <ProxyList>
+          <Link name="Input" with_property="Input" />
+        </ProxyList>
+      </Hints>
     </Proxy>
   </ProxyGroup>
   <ProxyGroup name="transforms">
@@ -1817,18 +1810,14 @@
                      name="DummyInput">
         <!-- Used when this source is added to a proxy list domain. -->
       </InputProperty>
+     <PropertyGroup label="Line Parameters" panel_widget="InteractiveLine">
+          <Property function="Point1WorldPosition" name="Point1" />
+          <Property function="Point2WorldPosition" name="Point2" />
+          <Property function="Input" name="DummyInput" />
+      </PropertyGroup>
       <Hints>
-        <PropertyGroup type="LineSource">
-          <Property function="Point1WorldPosition"
-                    name="Point1" />
-          <Property function="Point2WorldPosition"
-                    name="Point2" />
-          <Property function="Resolution"
-                    name="Resolution" />
-        </PropertyGroup>
         <ProxyList>
-          <Link name="DummyInput"
-                with_property="Input" />
+          <Link name="DummyInput" with_property="Input" />
         </ProxyList>
       </Hints>
       <!-- End LineSource -->
@@ -1871,22 +1860,17 @@
         <IntRangeDomain min="1"
                         name="range" />
       </IntVectorProperty>
-      <InputProperty is_internal="1"
-                     name="DummyInput">
+      <InputProperty is_internal="1" name="DummyInput">
         <!-- Used when this source is added to a proxy list domain. -->
       </InputProperty>
+      <PropertyGroup label="Line Parameters" panel_widget="InteractiveLine">
+          <Property function="Point1WorldPosition" name="Point1" />
+          <Property function="Point2WorldPosition" name="Point2" />
+          <Property function="Input" name="DummyInput" />
+      </PropertyGroup>
       <Hints>
-        <PropertyGroup type="LineSource">
-          <Property function="Point1WorldPosition"
-                    name="Point1" />
-          <Property function="Point2WorldPosition"
-                    name="Point2" />
-          <Property function="Resolution"
-                    name="Resolution" />
-        </PropertyGroup>
         <ProxyList>
-          <Link name="DummyInput"
-                with_property="Input" />
+          <Link name="DummyInput" with_property="Input" />
         </ProxyList>
       </Hints>
       <!-- End HighResLineSource -->
@@ -1934,18 +1918,13 @@
                      name="DummyInput">
         <!-- Used when this source is added to a proxy list domain. -->
       </InputProperty>
+      <PropertyGroup label="Point Parameters" panel_widget="InteractiveHandle">
+        <Property function="WorldPosition" name="Center" />
+        <Property function="Input" name="DummyInput" />
+      </PropertyGroup>
       <Hints>
-        <PropertyGroup type="PointSource">
-          <Property function="WorldPosition"
-                    name="Center" />
-          <Property function="Radius"
-                    name="Radius" />
-          <Property function="NumberOfPoints"
-                    name="NumberOfPoints" />
-        </PropertyGroup>
         <ProxyList>
-          <Link name="DummyInput"
-                with_property="Input" />
+          <Link name="DummyInput" with_property="Input" />
         </ProxyList>
       </Hints>
       <!-- End PointSource -->
@@ -1987,18 +1966,14 @@
                      name="DummyInput">
         <!-- Used when this source is added to a proxy list domain. -->
       </InputProperty>
+      <PropertyGroup label="Point Parameters" panel_widget="InteractiveHandle">
+        <Property function="WorldPosition" name="Center" />
+        <Property function="Input" name="DummyInput" />
+      </PropertyGroup>
+
       <Hints>
-        <PropertyGroup type="PointSource">
-          <Property function="WorldPosition"
-                    name="Center" />
-          <Property function="Radius"
-                    name="Radius" />
-          <Property function="NumberOfPoints"
-                    name="NumberOfPoints" />
-        </PropertyGroup>
         <ProxyList>
-          <Link name="DummyInput"
-                with_property="Input" />
+          <Link name="DummyInput" with_property="Input" />
         </ProxyList>
       </Hints>
       <!-- End PointSource -->
@@ -2092,20 +2067,17 @@
                             information_only="1"
                             name="ScaleInfo"
                             number_of_elements="3" />
+      <InputProperty is_internal="1" name="DummyInput" />
+      <PropertyGroup panel_widget="InteractiveBox">
+        <Property function="Position" name="Position" />
+        <Property function="Rotation" name="Rotation" />
+        <Property function="Scale" name="Scale" />
+        <Property function="Input" name="DummyInput" />
+      </PropertyGroup>
       <Hints>
-        <PropertyGroup type="Box">
-          <Property function="Position"
-                    name="Position" />
-          <Property function="Rotation"
-                    name="Rotation" />
-          <Property function="Scale"
-                    name="Scale" />
-        </PropertyGroup>
-        <!--
          <ProxyList>
            <Link name="DummyInput" with_property="Input" />
          </ProxyList>
-         -->
       </Hints>
     </Proxy>
   </ProxyGroup>

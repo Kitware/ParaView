@@ -324,11 +324,12 @@ def make_cinema_store(levels, ocsfname, forcetime=False, _userDefinedValues={}):
         cs.add_parameter('time', tprop)
         fnp = fnp+"{time}_"
     else:
-        #time not specified, try and make them automaticvally
+        #time not specified, try and make them automatically
         times = paraview.simple.GetAnimationScene().TimeKeeper.TimestepValues
         if not times:
             pass
         else:
+            prettytimes = [float_limiter(t) for t in times]
             cs.add_parameter("time", cinema_store.make_parameter('time', prettytimes))
             fnp = fnp+"{time}_"
     cs.add_parameter("phi", cinema_store.make_parameter('phi', phis))

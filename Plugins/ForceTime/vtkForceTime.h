@@ -16,13 +16,13 @@
 #ifndef vtkForceTime_h_
 #define vtkForceTime_h_
 
-#include "vtkDataObjectAlgorithm.h"
+#include "vtkPassInputTypeAlgorithm.h"
 
-class VTK_EXPORT vtkForceTime : public vtkDataObjectAlgorithm
+class VTK_EXPORT vtkForceTime : public vtkPassInputTypeAlgorithm
 {
 public :
   static vtkForceTime *New();
-  vtkTypeMacro(vtkForceTime, vtkDataObjectAlgorithm);
+  vtkTypeMacro(vtkForceTime, vtkPassInputTypeAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

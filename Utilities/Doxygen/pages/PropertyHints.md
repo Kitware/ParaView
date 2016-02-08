@@ -130,3 +130,26 @@ tabular/tree widget.
         <WidgetHeight number_of_rows="20" />
       </Hints>
     </IntVectorProperty>
+
+FileChooser
+------------
+Specify supported extensions to list for `pqFileChooserWidget` dialog.
+
+For properties using FileListDomain to show a file chooser widget on the
+Properties panel, sometimes we want to provide a list of extensions expected. In
+that case, one can use this hint. Note, this is not intended for specifying
+extensions that a reader supports. For that one uses the `<ReaderFactory>` hint
+descriped in [ProxyHints](@ref ProxyHints).
+
+    <StringVectorProperty animateable="0"
+                          command="SetQFileName"
+                          name="QFileName"
+                          number_of_elements="1"
+                          panel_visibility="default">
+      <FileListDomain name="files" />
+      <Documentation>This property specifies the .q (solution) file name for
+        the PLOT3D reader.</Documentation>
+      <Hints>
+        <FileChooser extensions="q" file_description="Solution files" />
+      </Hints>
+    </StringVectorProperty>

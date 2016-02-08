@@ -37,12 +37,15 @@ vtkStandardNewMacro(vtkPythonProgrammableFilter);
 //----------------------------------------------------------------------------
 
 typedef std::map<std::string, std::string> ParametersT;
+typedef std::map<std::string, std::vector<std::string> > RepeatableParametersT;
 
 class vtkPythonProgrammableFilterImplementation
 {
 public:
   // Stores name-value parameters that will be passed to running scripts
   ParametersT Parameters;
+
+  RepeatableParametersT RepeatableParameters;
 };
 
 //----------------------------------------------------------------------------
@@ -243,7 +246,38 @@ void vtkPythonProgrammableFilter::SetParameter(
 void vtkPythonProgrammableFilter::ClearParameters()
 {
   this->Implementation->Parameters.clear();
+  this->Implementation->RepeatableParameters.clear();
   this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPythonProgrammableFilter::AddParameter(const char* name, const char* value)
+{
+  if (!name || !name[0])
+    {
+    vtkErrorMacro(<< "cannot set parameter with empty name");
+    return;
+    }
+  std::ostringstream buf;
+  buf << "r'" << (value? value : "") << "'";
+  this->Implementation->RepeatableParameters[name].push_back(buf.str());
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPythonProgrammableFilter::ClearParameter(const char* name)
+{
+  if (!name || !name[0])
+    {
+    vtkErrorMacro(<< "cannot clear parameter with empty name");
+    return;
+    }
+  RepeatableParametersT::iterator iter = this->Implementation->RepeatableParameters.find(name);
+  if (iter != this->Implementation->RepeatableParameters.end())
+    {
+    this->Implementation->RepeatableParameters.erase(iter);
+    this->Modified();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -310,6 +344,21 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
       ++parameter)
     {
     fscript += "  " + parameter->first + " = " + parameter->second + "\n";
+    }
+
+  for (RepeatableParametersT::const_iterator rparameter =
+    this->Implementation->RepeatableParameters.begin();
+    rparameter != this->Implementation->RepeatableParameters.end();
+    ++rparameter)
+    {
+    fscript += "  " + rparameter->first + " = [\\\n";
+
+    for (std::vector<std::string>::const_iterator parameter = rparameter->second.begin();
+      parameter != rparameter->second.end(); ++parameter)
+      {
+      fscript += "    " + (*parameter) + ",\n";
+      }
+    fscript += "]\n";
     }
 
   // Indent user script

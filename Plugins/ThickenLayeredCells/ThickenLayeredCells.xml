@@ -44,6 +44,16 @@
         </ArrayListDomain>
         <Documentation>Select the 'layer' array.</Documentation>
       </StringVectorProperty>
+      <IntVectorProperty name="EnableThickening"
+        command="SetEnableThickening"
+        number_of_elements="1"
+        default_values="1">
+        <Documentation>
+          Enable/disable thickening. When disabled, the filter simply acts as a
+          pass-through.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
     </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

@@ -48,7 +48,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSessionProxyManager.h"
 
 // ParaView Server Manager includes
-#include "pq3DWidget.h"
 #include "pqApplicationCore.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineModel.h"

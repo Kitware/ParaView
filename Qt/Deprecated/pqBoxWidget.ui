@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>pqBoxWidget</class>
+ <widget class="QWidget" name="pqBoxWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>289</width>
+    <height>192</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout">
+   <item row="7" column="0">
+    <spacer>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="5" column="0" colspan="2">
+    <layout class="QGridLayout">
+     <property name="spacing">
+      <number>6</number>
+     </property>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Translate</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="pqLineEdit" name="positionX"/>
+     </item>
+     <item row="0" column="2">
+      <widget class="pqLineEdit" name="positionY"/>
+     </item>
+     <item row="0" column="3">
+      <widget class="pqLineEdit" name="positionZ"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Rotate</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="pqLineEdit" name="rotationX"/>
+     </item>
+     <item row="1" column="2">
+      <widget class="pqLineEdit" name="rotationY"/>
+     </item>
+     <item row="1" column="3">
+      <widget class="pqLineEdit" name="rotationZ"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Scale</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="pqLineEdit" name="scaleX"/>
+     </item>
+     <item row="2" column="2">
+      <widget class="pqLineEdit" name="scaleY"/>
+     </item>
+     <item row="2" column="3">
+      <widget class="pqLineEdit" name="scaleZ"/>
+     </item>
+    </layout>
+   </item>
+   <item row="0" column="0" colspan="2">
+    <widget class="QCheckBox" name="show3DWidget">
+     <property name="text">
+      <string>Show Box</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="QPushButton" name="resetBounds">
+     <property name="text">
+      <string>Reset Bounds</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0" colspan="2">
+    <layout class="QGridLayout">
+     <item row="0" column="0">
+      <widget class="QCheckBox" name="enableTranslation">
+       <property name="text">
+        <string>Translation</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QCheckBox" name="enableRotation">
+       <property name="text">
+        <string>Rotation</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QCheckBox" name="enableMoveFaces">
+       <property name="text">
+        <string>Face Movement</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QCheckBox" name="enableScaling">
+       <property name="text">
+        <string>Scaling</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>pqLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>show3DWidget</tabstop>
+  <tabstop>positionX</tabstop>
+  <tabstop>positionY</tabstop>
+  <tabstop>positionZ</tabstop>
+  <tabstop>rotationX</tabstop>
+  <tabstop>rotationY</tabstop>
+  <tabstop>rotationZ</tabstop>
+  <tabstop>scaleX</tabstop>
+  <tabstop>scaleY</tabstop>
+  <tabstop>scaleZ</tabstop>
+  <tabstop>enableTranslation</tabstop>
+  <tabstop>enableScaling</tabstop>
+  <tabstop>enableRotation</tabstop>
+  <tabstop>enableMoveFaces</tabstop>
+  <tabstop>resetBounds</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

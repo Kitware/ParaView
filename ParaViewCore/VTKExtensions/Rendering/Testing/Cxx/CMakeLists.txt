@@ -9,21 +9,26 @@ find_file(smooth_flash
           NO_DEFAULT_PATH)
 mark_as_advanced(smooth_flash)
 
+paraview_test_load_data(""
+  NE2_ps_bath.png)
+
+paraview_add_test_cxx(${vtk-module}CxxTests tests
+  NO_VALID NO_OUTPUT
 # This was basically ignored in the previous version.
-#paraview_add_test_cxx(${vtk-module}CxxTests tests
 #  TestResampledAMRImageSourceWithPointData.cxx
-#  )
+  TestImageCompressors.cxx
+  )
 
-if (EXISTS "${smooth_flash}")
-  get_filename_component(smooth_flash_dir "${smooth_flash}" PATH)
-  set(${vtk-module}_DATA_DIR "${smooth_flash_dir}")
-  # This was basically ignored in the previous version.
-  #paraview_add_test_cxx(${vtk-module}CxxTests smooth_flash_tests
-  #  TestResampledAMRImageSource.cxx
-  #  )
-  list(APPEND tests
-    ${smooth_flash_tests})
-endif()
+#if (EXISTS "${smooth_flash}")
+#  get_filename_component(smooth_flash_dir "${smooth_flash}" PATH)
+#  set(${vtk-module}_DATA_DIR "${smooth_flash_dir}")
+#  # This was basically ignored in the previous version.
+#  #paraview_add_test_cxx(${vtk-module}CxxTests smooth_flash_tests
+#  #  TestResampledAMRImageSource.cxx
+#  #  )
+#  list(APPEND tests
+#    ${smooth_flash_tests})
+#endif()
 
 # This was basically ignored in the previous version.
-#vtk_test_cxx_executable(${vtk-module}CxxTests tests)
+vtk_test_cxx_executable(${vtk-module}CxxTests tests)

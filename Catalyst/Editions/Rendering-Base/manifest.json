@@ -69,6 +69,10 @@
         "type": "BOOL",
         "value": "ON"
       },
+      { "name": "Module_vtkIOExportOpenGL",
+        "type": "BOOL",
+        "value": "ON"
+      },
       { "name": "Module_vtkRenderingAnnotation",
         "type": "BOOL",
         "value": "ON"
@@ -114,6 +118,7 @@
         { "class": "vtkImageCompressor" },
         { "class": "vtkKdTreeGenerator" },
         { "class": "vtkKdTreeManager" },
+        { "class": "vtkLZ4Compressor" },
         { "class": "vtkMarkSelectedRows" },
         { "class": "vtkMPICompositeManager" },
         { "class": "vtkMultiSliceContextItem" },
@@ -195,6 +200,14 @@
       ],
       "replace": [
         { "path": "VTK/IO/Export/CMakeLists.txt" }
+      ],
+      "cswrap": true,
+      "pythonwrap": true
+    },
+    { "name": "vtkIOExportOpenGL",
+      "path": "VTK/IO/ExportOpenGL",
+      "exclude": [
+        { "path": "Testing" }
       ],
       "cswrap": true,
       "pythonwrap": true
@@ -911,6 +924,9 @@
     },
     { "name": "vtkgl2ps",
       "path": "VTK/ThirdParty/gl2ps"
+    },
+    { "name": "vtklz4",
+      "path": "ThirdParty/lz4"
     }
   ],
   "proxies":[

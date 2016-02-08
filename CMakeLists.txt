@@ -96,9 +96,9 @@ include(CMakeDependentOption)
 set (PARAVIEW_VERSION_MAJOR 5)
 set (PARAVIEW_VERSION_MINOR 0)
 set (PARAVIEW_VERSION_PATCH 0)
-set (PARAVIEW_VERSION_PATCH_EXTRA "RC3")
+set (PARAVIEW_VERSION_PATCH_EXTRA)
 set (PARAVIEW_VERSION "5.0")
-set (PARAVIEW_VERSION_FULL "5.0.0-RC3")
+set (PARAVIEW_VERSION_FULL "5.0.0")
 
 determine_version(${ParaView_SOURCE_DIR} ${GIT_EXECUTABLE} "PARAVIEW")
 
@@ -218,6 +218,9 @@ option(PARAVIEW_USE_VISITBRIDGE "Build ParaView with VisIt readers." OFF)
 # Xdmf3 is not ON by default since it depends on Boost.
 option(PARAVIEW_ENABLE_XDMF3 "Enable Xdmf3 support (requires Boost)." OFF)
 
+# Enable CGNS support
+option(PARAVIEW_ENABLE_CGNS "Enable the CGNS file reader" OFF)
+
 if (UNIX)
   option(PARAVIEW_ENABLE_FFMPEG "Enable FFMPEG Support." OFF)
 endif()
@@ -264,6 +267,7 @@ cmake_dependent_option(PARAVIEW_ENABLE_COMMANDLINE_TOOLS
 option(PARAVIEW_ENABLE_PYTHON "Enable/Disable Python scripting support" OFF)
 cmake_dependent_option(PARAVIEW_USE_UNIFIED_BINDINGS "If enabled, Python bindings will back the ClientServer wrapping implementation" OFF
   PARAVIEW_ENABLE_PYTHON OFF)
+mark_as_advanced(PARAVIEW_USE_UNIFIED_BINDINGS)
 cmake_dependent_option(PARAVIEW_ENABLE_MATPLOTLIB "Enable/Disable Python scripting support" ON
   "PARAVIEW_ENABLE_PYTHON" OFF)
 mark_as_advanced(PARAVIEW_ENABLE_MATPLOTLIB)
@@ -276,12 +280,6 @@ if (UNIX)
     "Build ParaView with CosmoTools VTK Extensions" OFF
     "PARAVIEW_USE_MPI" OFF)
   mark_as_advanced(PARAVIEW_ENABLE_COSMOTOOLS)
-
-  cmake_dependent_option(PARAVIEW_ENABLE_CGNS
-  "Enable the CGNS file reader" OFF
-  "PARAVIEW_USE_MPI" OFF)
-  mark_as_advanced(PARAVIEW_ENABLE_CGNS)
-
 endif()
 
 # Is this a 32 bit or 64bit build. Display this in about dialog.
@@ -331,9 +329,7 @@ if (APPLE AND PARAVIEW_DO_UNIX_STYLE_INSTALLS)
     # same place as ParaView's binaries.
     set(CMAKE_INSTALL_NAME_DIR "${PARAVIEW_CUSTOM_INSTALL_NAME_DIR}/${VTK_INSTALL_LIBRARY_DIR}")
   else ()
-    # Set CMAKE_INSTALL_NAME_DIR to point to the libraries directory relative
-    # to the executable.
-    set(CMAKE_INSTALL_NAME_DIR "@executable_path/../${VTK_INSTALL_LIBRARY_DIR}")
+    set(CMAKE_INSTALL_NAME_DIR "@rpath/")
   endif ()
 
   # ensure that we don't build forwarding executables on apple.
@@ -679,8 +675,13 @@ mark_as_advanced(
   VTK_USE_TK
   VTK_WRAP_JAVA
   VTK_WRAP_TCL)
-
-
+mark_as_advanced(
+  VTK_ANDROID_BUILD
+  VTK_IOS_BUILD
+  VTK_USE_CXX11_FEATURES
+  VTK_USE_LARGE_DATA
+  VTK_USE_SYSTEM_GLEW
+  VTK_PYTHON_VERSION)
 #------------------------------------------------------------------------------
 # Based on state of VTK modules, set up some variables that paraview needs to
 # compile optional code.

@@ -90,6 +90,7 @@ pqLiveInsituVisualizationManager::pqLiveInsituVisualizationManager(
     pqServerResource("catalyst:"));
   catalyst->setProperty("LiveInsituVisualizationManager",
     QVariant::fromValue(static_cast<QObject*>(this)));
+  catalyst->setProperty("DisplaySession", QVariant::fromValue<QObject*>(server));
   adaptor->SetInsituProxyManager(catalyst->proxyManager());
   catalyst->setMonitorServerNotifications(true);
   adaptor->InvokeCommand("Initialize");
@@ -115,6 +116,14 @@ pqServer* pqLiveInsituVisualizationManager::insituSession() const
 pqServer* pqLiveInsituVisualizationManager::displaySession() const
 {
   return this->Internals->DisplaySession;
+}
+
+//-----------------------------------------------------------------------------
+pqServer* pqLiveInsituVisualizationManager::displaySession(pqServer* server)
+{
+  pqServer* displayServer = server? qobject_cast<pqServer*>(
+    server->property("DisplaySession").value<QObject*>()) : NULL;
+  return displayServer? displayServer : server;
 }
 
 //-----------------------------------------------------------------------------

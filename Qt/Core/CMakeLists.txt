@@ -89,8 +89,6 @@ set(Module_SRCS
   pqFlatTreeViewEventPlayer.h
   pqFlatTreeViewEventTranslator.cxx
   pqFlatTreeViewEventTranslator.h
-  pqFormBuilder.cxx
-  pqFormBuilder.h
   pqGraphLayoutStrategyInterface.cxx
   pqGraphLayoutStrategyInterface.h
   pqImageUtil.cxx
@@ -250,7 +248,6 @@ set (Module_MOC_HDRS
   pqFileDialogRecentDirsModel.h
   pqFlatTreeViewEventPlayer.h
   pqFlatTreeViewEventTranslator.h
-  pqFormBuilder.h
   pqInterfaceTracker.h
   pqLinksModel.h
   pqLinkViewWidget.h
@@ -330,14 +327,9 @@ endif()
 if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
   # Setting this variable ensures that any module depending on pqWidgets
   # automatically inherits the Qt include dirs.
-  set (${vtk-module}_INCLUDE_DIRS
-    ${Qt5Widgets_INCLUDE_DIRS}
-    ${Qt5UiTools_INCLUDE_DIRS}
-    ${Qt5Xml_INCLUDE_DIRS})
+  set (${vtk-module}_INCLUDE_DIRS ${Qt5Widgets_INCLUDE_DIRS})
 else ()
   # import Qt4 build settings
-  set (QT_USE_QTUITOOLS 1)
-  set (QT_USE_QTXML 1) # uitools depends on xml
   find_package (Qt4 REQUIRED QUIET)
   include (${QT_USE_FILE})
   # Setting this variable ensures that any module depending on pqWidgets

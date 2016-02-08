@@ -75,6 +75,11 @@ public:
   void SetParameter(const char *name, double value1, double value2, double value3);
 
   // Description:
+  // To support repeatable-parameters.
+  void AddParameter(const char* name, const char* value);
+  void ClearParameter(const char* name);
+
+  // Description:
   // Clear all name-value parameters
   void ClearParameters();
 

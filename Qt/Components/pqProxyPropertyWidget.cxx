@@ -76,48 +76,32 @@ pqProxyPropertyWidget::pqProxyPropertyWidget(vtkSMProperty *smProperty,
     PV_DEBUG_PANELS() << "pqSelectionInputWidget for a ProxyProperty with a "
                   << "SelectionInput hint";
     }
-  else
+  else if (vtkSMProxyListDomain *pld =
+    vtkSMProxyListDomain::SafeDownCast(smProperty->FindDomain("vtkSMProxyListDomain")))
     {
-    // find the domain
-    vtkSMProxyListDomain *domain = vtkSMProxyListDomain::SafeDownCast(
-      smProperty->FindDomain("vtkSMProxyListDomain"));
+    PV_DEBUG_PANELS() << "pqProxySelectionWidget for a "
+      << "ProxyListDomain (" << pld->GetXMLName() << ")";
+    pqProxySelectionWidget* widget = new pqProxySelectionWidget(smProperty, smProxy, this);
+    widget->setView(this->view());
+    this->connect(widget, SIGNAL(changeAvailable()), SIGNAL(changeAvailable()));
+    this->connect(widget, SIGNAL(changeFinished()), SIGNAL(changeFinished()));
+    this->connect(widget, SIGNAL(restartRequired()), SIGNAL(restartRequired()));
+    widget->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
 
-    if (domain)
-      {
-      pqProxySelectionWidget *widget = new pqProxySelectionWidget(smProxy,
-        smProxy->GetPropertyName(smProperty),
-        smProperty->GetXMLLabel(),
-        this);
-      widget->setView(this->view());
-      this->addPropertyLink(widget,
-        "proxy",
-        SIGNAL(proxyChanged(pqSMProxy)),
-        smProperty);
-      this->connect(widget, SIGNAL(modified()), this, SIGNAL(changeAvailable()));
-      this->connect(widget, SIGNAL(modified()), this, SIGNAL(changeFinished()));
-      this->connect(this, SIGNAL(viewChanged(pqView*)), widget,
-        SLOT(setView(pqView*)));
+    vbox->addWidget(widget);
 
-      vbox->addWidget(widget);
+    // store the proxy selection widget so that we can call
+    // its accept() method when our apply() is called
+    this->ProxySelectionWidget = widget;
 
-      // store the proxy selection widget so that we can call
-      // its accept() method when our apply() is called
-      this->ProxySelectionWidget = widget;
-
-      // don't show label for the proxy selection widget
-      this->setShowLabel(false);
-
-
-      // If selected_proxy_panel_visibility="advanced" hint is specified, we
-      // only show the widgets for the selected proxy in advanced mode.
-      vtkPVXMLElement* hints = smProperty->GetHints()?
-        smProperty->GetHints()->FindNestedElementByName("ProxyPropertyWidget") : NULL;
-      this->HideWidgetsInDefaultView = (hints &&
-        strcmp(hints->GetAttributeOrDefault("selected_proxy_panel_visibility", ""), "advanced") == 0);
-
-      PV_DEBUG_PANELS() << "pqProxySelectionWidget for a "
-                    << "ProxyListDomain (" << domain->GetXMLName() << ")";
-      }
+    // don't show label for the proxy selection widget
+    this->setShowLabel(false);
+    // If selected_proxy_panel_visibility="advanced" hint is specified, we
+    // only show the widgets for the selected proxy in advanced mode.
+    vtkPVXMLElement* hints = smProperty->GetHints()?
+      smProperty->GetHints()->FindNestedElementByName("ProxyPropertyWidget") : NULL;
+    this->HideWidgetsInDefaultView = (hints &&
+      strcmp(hints->GetAttributeOrDefault("selected_proxy_panel_visibility", ""), "advanced") == 0);
     }
 
   this->setLayout(vbox);
@@ -135,7 +119,7 @@ void pqProxyPropertyWidget::apply()
   // apply properties for the proxy selection widget
   if(this->ProxySelectionWidget)
     {
-    this->ProxySelectionWidget->accept();
+    this->ProxySelectionWidget->apply();
     }
 
   if (this->SelectionInputWidget)
@@ -177,6 +161,6 @@ void pqProxyPropertyWidget::updateWidget(bool showing_advanced_properties)
 {
   if (this->ProxySelectionWidget && this->HideWidgetsInDefaultView)
     {
-    this->ProxySelectionWidget->setSelectedProxyWidgetVisibility(showing_advanced_properties);
+    this->ProxySelectionWidget->updateWidget(showing_advanced_properties);
     }
 }

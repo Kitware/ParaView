@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>LinePropertyWidget</class>
+ <widget class="QWidget" name="LinePropertyWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>379</width>
+    <height>189</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <property name="spacing">
+    <number>2</number>
+   </property>
+   <item row="3" column="0">
+    <widget class="QLabel" name="labelPoint1">
+     <property name="text">
+      <string>Point 1</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="pqLineEdit" name="point1X"/>
+   </item>
+   <item row="3" column="2">
+    <widget class="pqLineEdit" name="point1Y"/>
+   </item>
+   <item row="3" column="3">
+    <widget class="pqLineEdit" name="point1Z"/>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="labelPoint2">
+     <property name="text">
+      <string>Point 2</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="pqLineEdit" name="point2X"/>
+   </item>
+   <item row="4" column="2">
+    <widget class="pqLineEdit" name="point2Y"/>
+   </item>
+   <item row="4" column="3">
+    <widget class="pqLineEdit" name="point2Z"/>
+   </item>
+   <item row="5" column="0" colspan="4">
+    <widget class="QComboBox" name="pickPoint">
+     <property name="toolTip">
+      <string>Allow to choose wich point to pick, for easier replacing</string>
+     </property>
+     <item>
+      <property name="text">
+       <string>Pick Both Points</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Pick Point 1</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Pick Point 2</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="6" column="0" colspan="4">
+    <widget class="QLabel" name="pickLabel">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Note: Use 'P' to a point on mesh or 'Ctrl+P' to snap to the closest mesh point</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0" colspan="4">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>2</number>
+     </property>
+     <item>
+      <widget class="QPushButton" name="xAxis">
+       <property name="text">
+        <string>X Axis</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="yAxis">
+       <property name="text">
+        <string>Y Axis</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="zAxis">
+       <property name="text">
+        <string>Z Axis</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="8" column="0" colspan="4">
+    <widget class="QPushButton" name="centerOnBounds">
+     <property name="text">
+      <string>Center on Bounds</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="3">
+    <widget class="QCheckBox" name="show3DWidget">
+     <property name="text">
+      <string>Show Line</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="4">
+    <widget class="QLabel" name="labelLength">
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Length: &lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;na&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>pqLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

@@ -28,29 +28,6 @@
       </SubProxy>
     </NewWidgetRepresentationProxy>
     <!-- ================================================================== -->
-    <NewWidgetRepresentationProxy base_proxygroup="representations"
-                                  base_proxyname="HandleWidgetRepresentation"
-                                  class="vtk3DWidgetRepresentation"
-                                  name="PointSourceWidgetRepresentation">
-      <!--
-        This is same as handle widget except that it provides
-        dummy properties for the radius/number of points in a point
-        source.
-      -->
-      <DoubleVectorProperty default_values="1.0"
-                            name="Radius"
-                            number_of_elements="1">
-        <DoubleRangeDomain min="0"
-                           name="range" />
-      </DoubleVectorProperty>
-      <IntVectorProperty default_values="1"
-                         name="NumberOfPoints"
-                         number_of_elements="1">
-        <IntRangeDomain min="1"
-                        name="range" />
-      </IntVectorProperty>
-    </NewWidgetRepresentationProxy>
-    <!-- ================================================================== -->
     <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
                                   name="LineWidgetRepresentation">
       <IntVectorProperty command="SetEnabled"
@@ -70,7 +47,6 @@
           <Property name="Point1WorldPosition" />
           <Property name="Point2WorldPositionInfo" />
           <Property name="Point2WorldPosition" />
-          <Property name="PlaceWidget" />
           <Property name="LineColor" />
         </ExposedProperties>
       </SubProxy>
@@ -103,7 +79,7 @@
     <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
                                   name="ImplicitPlaneWidgetRepresentation">
       <IntVectorProperty command="SetEnabled"
-                         default_values="0"
+                         default_values="1"
                          name="Enabled"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
@@ -199,6 +175,12 @@
         <Proxy name="Widget"
                proxygroup="3d_widgets"
                proxyname="BoxWidget2"></Proxy>
+        <ExposedProperties>
+          <Property name="TranslationEnabled" />
+          <Property name="ScalingEnabled" />
+          <Property name="RotationEnabled" />
+          <Property name="MoveFacesEnabled" />
+        </ExposedProperties>
       </SubProxy>
       <!-- End of BoxWidgetRepresentation -->
     </NewWidgetRepresentationProxy>
@@ -236,6 +218,46 @@
         <Proxy name="Widget"
                proxygroup="3d_widgets"
                proxyname="SphereWidget2"></Proxy>
+      </SubProxy>
+      <!-- End of SphereWidgetRepresentation -->
+    </NewWidgetRepresentationProxy>
+    <!-- ================================================================== -->
+    <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
+                                  name="ImplicitCylinderWidgetRepresentation">
+      <Documentation>Representation proxy for the the sphere widget. This
+      includes the widget/representation proxies for the sphere 3D
+      widget.</Documentation>
+      <IntVectorProperty command="SetEnabled"
+                         default_values="0"
+                         name="Enabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/Disable widget interaction.</Documentation>
+      </IntVectorProperty>
+      <SubProxy>
+        <Proxy name="Prop"
+               proxygroup="3d_widget_representations"
+               proxyname="ImplicitCylinderRepresentation"></Proxy>
+        <ExposedProperties>
+          <Property name="Visibility" />
+          <Property name="PlaceWidget" />
+          <Property name="Center" />
+          <Property name="CenterInfo" />
+          <Property name="Axis" />
+          <Property name="AxisInfo" />
+          <Property name="Radius" />
+          <Property name="RadiusInfo" />
+          <Property name="DrawCylinder" />
+          <Property name="Tubing" />
+          <Property name="OutlineTranslation" />
+          <Property name="OutsideBounds" />
+          <Property name="ScaleEnabled" />
+        </ExposedProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Widget"
+               proxygroup="3d_widgets"
+               proxyname="ImplicitCylinderWidget"></Proxy>
       </SubProxy>
       <!-- End of SphereWidgetRepresentation -->
     </NewWidgetRepresentationProxy>
@@ -979,6 +1001,134 @@
       <!-- End of BoxRepresentation -->
     </BoxRepresentationProxy>
     <!-- ================================================================== -->
+    <Proxy class="vtkImplicitCylinderRepresentation"
+           name="ImplicitCylinderRepresentation">
+      <Documentation>Proxy for vtkImplicitCylinderWidget. Don't confuse this with
+      the vtkSMRepresentation proxy for the cylinder widget (which is the
+      ImplicitCylinderWidget).</Documentation>
+      <IntVectorProperty animateable="1"
+                         command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="PlaceWidget"
+                            default_values="none"
+                            name="PlaceWidget"
+                            number_of_elements="6">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPlaceFactor"
+                            default_values="1.0"
+                            name="PlaceFactor"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0.01"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetCenter"
+                            default_values="0.0 0.0 0.0"
+                            information_property="CenterInfo"
+                            name="Center"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>The center of the cylinder. The center is located along the
+        cylinder axis.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetCenter"
+                            information_only="1"
+                            name="CenterInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetAxis"
+                            default_values="0.0 0.0 1.0"
+                            information_property="AxisInfo"
+                            name="Axis"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>The axis of rotation for the cylinder. If the axis is not
+        specified as a unit vector, it will be normalized.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetAxis"
+                            information_only="1"
+                            name="AxisInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetRadius"
+                            default_values="0.5"
+                            information_property="RadiusInfo"
+                            name="Radius"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0.0"
+                           name="range" />
+        <Documentation>The radius of the cylinder. Note that if the radius is
+        too big the cylinder will be outside of the bounding box.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetRadius"
+                            information_only="1"
+                            name="RadiusInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetDrawCylinder"
+                         default_values="1"
+                         name="DrawCylinder"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/disable the drawing of the cylinder. In some cases
+        the cylinder interferes with the object that it is operating on (e.g.,
+        the cylinder interferes with the cut surface it produces resulting in
+        z-buffer artifacts.) By default it is on.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetResolution"
+                         default_values="128"
+                         name="Resolution"
+                         number_of_elements="1">
+        <IntRangeDomain min="8"
+                        max="2048"
+                        name="range" />
+        <Documentation>This is the number of polygonal facets used to approximate
+        the curved cylindrical surface (for rendering purposes). An vtkCylinder
+        is used under the hood to provide an exact surface representation.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTubing"
+                         default_values="1"
+                         name="Tubing"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/disable tubing of the wire outline of the cylinder
+        intersecton (against the bounding box). The tube thickens the
+        line by wrapping with a vtkTubeFilter..</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetOutlineTranslation"
+                         default_values="1"
+                         name="OutlineTranslation"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/disable the ability to translate the bounding box by
+        moving it with the mouse.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetOutsideBounds"
+                         default_values="1"
+                         name="OutsideBounds"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/disable the ability to move the widget outside of
+        the bounds specified in the initial PlaceWidget() invocation.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetScaleEnabled"
+                            default_values="1"
+                            name="ScaleEnabled"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/disable the ability to scale the widget with the
+        mouse.</Documentation>
+      </IntVectorProperty>
+      <!-- End of SphereRepresentation -->
+    </Proxy>
+    <!-- ================================================================== -->
     <Proxy class="vtkDistanceRepresentation2D"
            name="DistanceRepresentation2D"
            post_creation="InstantiateHandleRepresentation">
@@ -1037,7 +1187,7 @@
       </IntVectorProperty>
       <IntVectorProperty animateable="1"
                          command="SetDrawPlane"
-                         default_values="1"
+                         default_values="0"
                          name="DrawPlane"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
@@ -1118,40 +1268,6 @@
                             information_only="1"
                             name="Point2WorldPositionInfo">
         <SimpleDoubleInformationHelper />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty argument_is_array="1"
-                            command="SetPoint1DisplayPosition"
-                            default_values="0 0 0"
-                            information_property="Point1DisplayPositionInfo"
-                            name="Point1DisplayPosition"
-                            number_of_elements="3">
-        <DoubleRangeDomain name="range" />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="GetPoint1DisplayPosition"
-                            information_only="1"
-                            name="Point1DisplayPositionInfo">
-        <SimpleDoubleInformationHelper />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty argument_is_array="1"
-                            command="SetPoint2DisplayPosition"
-                            default_values="0 0 0"
-                            information_property="Point2DisplayPositionInfo"
-                            name="Point2DisplayPosition"
-                            number_of_elements="3">
-        <DoubleRangeDomain name="range" />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="GetPoint2DisplayPosition"
-                            information_only="1"
-                            name="Point2DisplayPositionInfo">
-        <SimpleDoubleInformationHelper />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty argument_is_array="1"
-                            command="PlaceWidget"
-                            default_values="0 1 0 1 0 1"
-                            is_internal="1"
-                            name="PlaceWidget"
-                            number_of_elements="6">
-        <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetLineColor"
                             default_values="1.0 1.0 1.0"
@@ -1486,12 +1602,50 @@
            class="vtkBoxWidget2"
            name="BoxWidget2">
       <Documentation>Proxy for vtkBoxWidget2.</Documentation>
+      <IntVectorProperty command="SetTranslationEnabled"
+                         default_values="1"
+                         name="TranslationEnabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set whether to allow this 3D widget to be interactively
+        translated.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetScalingEnabled"
+                         default_values="1"
+                         name="ScalingEnabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set whether to allow this 3D widget to be interactively
+        sclaed.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRotationEnabled"
+                         default_values="1"
+                         name="RotationEnabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set whether to allow this 3D widget to be interactively
+        rotated.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetMoveFacesEnabled"
+                         default_values="1"
+                         name="MoveFacesEnabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set whether to allow interactive face movement to be
+          performed on this 3D widget.</Documentation>
+      </IntVectorProperty>
     </Proxy>
     <Proxy base_proxygroup="3d_widgets"
            base_proxyname="WidgetBase"
            class="vtkSphereWidget2"
            name="SphereWidget2">
       <Documentation>Proxy for vtkSphereWidget2.</Documentation>
+    </Proxy>
+    <Proxy base_proxygroup="3d_widgets"
+           base_proxyname="WidgetBase"
+           class="vtkImplicitCylinderWidget"
+           name="ImplicitCylinderWidget">
+      <Documentation>Proxy for vtkImplicitCylinderWidget.</Documentation>
     </Proxy>
     <Proxy class="vtkPVAxesWidget"
            name="AxesWidget"

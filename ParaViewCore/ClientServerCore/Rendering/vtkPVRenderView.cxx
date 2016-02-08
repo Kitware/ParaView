@@ -347,6 +347,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->NonDistributedRenderingRequired = false;
   this->DistributedRenderingRequiredLOD = false;
   this->NonDistributedRenderingRequiredLOD = false;
+  this->ParallelProjection = 0;
   this->Culler = vtkSmartPointer<vtkPVRendererCuller>::New();
 
   this->SynchronizedRenderers = vtkPVSynchronizedRenderer::New();
@@ -962,12 +963,6 @@ void vtkPVRenderView::SetLockBounds(bool nv)
     }
   this->LockBounds = nv;
   this->Modified();
-  if (!this->GeometryBounds.IsValid())
-    {
-    return;
-    }
-  double bounds[6];
-  this->GeometryBounds.GetBounds(bounds);
 }
 
 //----------------------------------------------------------------------------

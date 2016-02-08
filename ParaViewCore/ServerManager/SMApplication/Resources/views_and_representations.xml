@@ -1698,7 +1698,7 @@
         </Hints>
       </IntVectorProperty>
       <StringVectorProperty command="ConfigureCompressor"
-                            default_values="vtkSquirtCompressor 0 3"
+                            default_values="vtkLZ4Compressor 0 3"
                             name="CompressorConfig"
                             panel_visibility="never"
                             number_of_elements="1">
@@ -4171,16 +4171,9 @@
                          name="VolumeRenderingMode"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
-          <Entry text="Smart"
-                 value="0" />
-          <Entry text="Ray Cast and Texture Mapping"
-                 value="1" />
-          <Entry text="Ray Cast Only"
-                 value="2" />
-          <Entry text="Texture Mapping Only"
-                 value="3" />
-          <Entry text="GPU Based"
-                 value="4" />
+          <Entry text="Smart" value="0" />
+          <Entry text="Ray Cast Only" value="2" />
+          <Entry text="GPU Based" value="4" />
         </EnumerationDomain>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetScalarOpacityUnitDistance"
@@ -8195,12 +8188,8 @@
         <EnumerationDomain name="enum">
           <Entry text="Smart"
                  value="0" />
-          <Entry text="Ray Cast and Texture Mapping"
-                 value="1" />
           <Entry text="Ray Cast Only"
                  value="2" />
-          <Entry text="Texture Mapping Only"
-                 value="3" />
           <Entry text="GPU Based"
                  value="4" />
         </EnumerationDomain>

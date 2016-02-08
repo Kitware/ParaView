@@ -40,6 +40,7 @@ set(Module_SRCS
   vtkImageCompressor.cxx
   vtkKdTreeGenerator.cxx
   vtkKdTreeManager.cxx
+  vtkLZ4Compressor.cxx
   vtkMarkSelectedRows.cxx
   vtkMultiSliceContextItem.cxx
   vtkOrderedCompositeDistributor.cxx
@@ -50,6 +51,7 @@ set(Module_SRCS
   vtkPVDefaultPass.cxx
   vtkPVDiscretizableColorTransferFunction.cxx
   vtkPVGeometryFilter.cxx
+  vtkPVGL2PSExporter.cxx
   vtkPVInteractorStyle.cxx
   vtkPVJoystickFly.cxx
   vtkPVJoystickFlyIn.cxx
@@ -87,7 +89,6 @@ set(Module_SRCS
 # Disabled unless using the OpenGL backend.
 if ("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
   list(APPEND Module_SRCS
-    vtkPVGL2PSExporter.cxx
     vtkTexturePainter.cxx
     )
 endif()
