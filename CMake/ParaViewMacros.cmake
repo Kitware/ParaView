@@ -427,6 +427,10 @@ function(pv_add_executable name)
   if (PV_EXE_JOB_LINK_POOL)
     set_property(TARGET "${name}" PROPERTY JOB_POOL_LINK ${PV_EXE_JOB_LINK_POOL})
   endif ()
+  if (APPLE AND NOT PARAVIEW_DO_UNIX_STYLE_INSTALLS)
+    set_target_properties("${name}" PROPERTIES
+      INSTALL_RPATH "@executable_path/../Libraries;@executable_path/../Plugins")
+  endif ()
   pv_executable_install(${name} "${VTK_EXE_SUFFIX}")
 endfunction()
 
