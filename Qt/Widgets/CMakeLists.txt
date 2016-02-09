@@ -248,9 +248,7 @@ if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
     ${Qt5Widgets_INCLUDE_DIRS}
     ${Qt5Network_INCLUDE_DIRS}
     ${Qt5Help_INCLUDE_DIRS}
-    ${Qt5PrintSupport_INCLUDE_DIRS}
-    ${Qt5Test_INCLUDE_DIRS}
-    ${Qt5WebKitWidgets_INCLUDE_DIRS})
+    ${Qt5PrintSupport_INCLUDE_DIRS})
 else ()
   set (QT_USE_QTNETWORK 1)
   set (QT_USE_QTHELP 1)
