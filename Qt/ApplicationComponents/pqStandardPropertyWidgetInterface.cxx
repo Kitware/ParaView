@@ -30,7 +30,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "pqStandardPropertyWidgetInterface.h"
-
 #include "pqArrayStatusPropertyWidget.h"
 #include "pqBackgroundEditorWidget.h"
 #include "pqBoxPropertyWidget.h"
@@ -74,6 +73,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqYoungsMaterialPropertyWidget.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMProperty.h"
+#include "vtkPVConfig.h"
+#ifdef PARAVIEW_ENABLE_PYTHON
+#include "pqCinemaConfiguration.h"
+#endif
 
 #include <QtDebug>
 
@@ -266,6 +269,14 @@ pqStandardPropertyWidgetInterface::createWidgetForPropertyGroup(
   else if (panelWidget == "InteractiveCylinder")
     {
     return new pqCylinderPropertyWidget(proxy, group);
+    }
+  else if (panelWidget == "cinema_export_selector")
+    {
+#ifdef PARAVIEW_ENABLE_PYTHON
+    return new pqCinemaConfiguration(proxy, group);
+#else
+    return NULL;
+#endif
     }
   // *** NOTE: When adding new types, please update the header documentation ***
 

@@ -95,6 +95,7 @@ public:
   /// \li \c InteractivePolyLine: pqSplinePropertyWidget (with mode==POLYLINE)
   /// \li \c InteractiveCylinder: pqCylinderPropertyWidget
   /// \li \c YoungsMaterial: pqYoungsMaterialPropertyWidget
+  /// \li \c cinema_export_selector : pqCinemaConfiguration
   virtual pqPropertyWidget* createWidgetForPropertyGroup(
     vtkSMProxy *proxy, vtkSMPropertyGroup *group);
 

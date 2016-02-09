@@ -2706,14 +2706,31 @@
                              name="CinemaExporter">
       <Documentation long_help="Export view to a Cinema Database"
                      short_help="Cinema Database">CinemaExporter is a render window
-                     exporter which writes out the renderered scene into a
+                     exporter which writes out the renderered scene as a
                      Cinema database.</Documentation>
-      <StringVectorProperty command="SetFileName"
-                            name="FileName"
-                            panel_visibility="never"
+      <StringVectorProperty name="FileName"
+                            command="SetFileName"
                             number_of_elements="1">
         <Documentation>Name of the file to be written.</Documentation>
       </StringVectorProperty>
+
+      <StringVectorProperty name="ViewSelection"
+                            command="SetViewSelection"
+                            number_of_elements="1">
+        <Documentation>Script string defining the view selection.</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="TrackSelection"
+                            command="SetTrackSelection"
+                            number_of_elements="1">
+        <Documentation>Script string defining the track selection.</Documentation>
+      </StringVectorProperty>
+
+      <PropertyGroup label="Cinema Configuration"
+                     panel_widget="cinema_export_selector">
+        <Property name="ViewSelection"/>
+        <Property name="TrackSelection" />
+      </PropertyGroup>
       <!-- End of Cinema Exporter -->
     </RenderViewExporterProxy>
     <!-- GL2PS exporter, shared options between render and context views: -->
