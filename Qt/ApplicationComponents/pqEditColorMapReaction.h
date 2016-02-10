@@ -34,6 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqReaction.h"
 
+#include <QPointer>
+
+class pqPipelineRepresentation;
+class pqDataRepresentation;
+
 /// @ingroup Reactions
 /// Reaction to edit the active representation's color map or solid color.
 class PQAPPLICATIONCOMPONENTS_EXPORT pqEditColorMapReaction : public pqReaction
@@ -41,27 +46,28 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqEditColorMapReaction : public pqReaction
   Q_OBJECT
   typedef pqReaction Superclass;
 public:
-  pqEditColorMapReaction(QAction* parent);
+  /// if \c track_active_objects is false, then the reaction will not track
+  /// pqActiveObjects automatically.
+  pqEditColorMapReaction(QAction* parent, bool track_active_objects=true);
 
   /// Edit active representation's color map (or solid color).
-  static void editColorMap();
+  static void editColorMap(pqPipelineRepresentation* repr=NULL);
 
 public slots:
   /// Updates the enabled state. Applications need not explicitly call
   /// this.
   void updateEnableState();
 
+public slots:
+  /// Set the active representation.
+  void setRepresentation(pqDataRepresentation*);
+
 protected:
   /// Called when the action is triggered.
-  virtual void onTriggered()
-    { 
-    pqEditColorMapReaction::editColorMap();
-    }
-
+  virtual void onTriggered();
 private:
-  Q_DISABLE_COPY(pqEditColorMapReaction)
+  Q_DISABLE_COPY(pqEditColorMapReaction);
+  QPointer<pqPipelineRepresentation> Representation;
 };
 
 #endif
-
-

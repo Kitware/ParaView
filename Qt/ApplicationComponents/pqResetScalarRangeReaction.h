@@ -33,6 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqResetScalarRangeReaction_h
 
 #include "pqReaction.h"
+#include <QPointer>
+
+class pqPipelineRepresentation;
+class pqDataRepresentation;
 
 /// @ingroup Reactions
 /// Reaction to reset the active lookup table's range to match the active
@@ -42,26 +46,27 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqResetScalarRangeReaction : public pqReact
   Q_OBJECT
   typedef pqReaction Superclass;
 public:
-  pqResetScalarRangeReaction(QAction* parent);
+  /// if \c track_active_objects is false, then the reaction will not track
+  /// pqActiveObjects automatically.
+  pqResetScalarRangeReaction(QAction* parent, bool track_active_objects=true);
 
-  static void resetScalarRange();
+  static void resetScalarRange(pqPipelineRepresentation* repr=NULL);
 
 public slots:
   /// Updates the enabled state. Applications need not explicitly call
   /// this.
   void updateEnableState();
 
+  /// Set the data representation explicitly when track_active_objects is false.
+  void setRepresentation(pqDataRepresentation* repr);
+
 protected:
   /// Called when the action is triggered.
-  virtual void onTriggered()
-    { 
-    pqResetScalarRangeReaction::resetScalarRange();
-    }
+  virtual void onTriggered();
 
 private:
-  Q_DISABLE_COPY(pqResetScalarRangeReaction)
+  Q_DISABLE_COPY(pqResetScalarRangeReaction);
+  QPointer<pqPipelineRepresentation> Representation;
 };
 
 #endif
-
-
