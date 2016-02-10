@@ -132,6 +132,8 @@ set (Module_SRCS
   pqEditCameraReaction.h
   pqEditColorMapReaction.cxx
   pqEditColorMapReaction.h
+  pqEditScalarBarReaction.cxx
+  pqEditScalarBarReaction.h
   pqEnableWidgetDecorator.cxx
   pqEnableWidgetDecorator.h
   pqExportReaction.cxx
@@ -360,6 +362,7 @@ set (Module_MOC_HDRS
   pqDoubleRangeSliderPropertyWidget.h
   pqEditCameraReaction.h
   pqEditColorMapReaction.h
+  pqEditScalarBarReaction.h
   pqEnableWidgetDecorator.h
   pqExportReaction.h
   pqFileNamePropertyWidget.h

@@ -35,16 +35,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
 #include "pqEditColorMapReaction.h"
+#include "pqEditScalarBarReaction.h"
 #include "pqPropertiesPanel.h"
 #include "pqResetScalarRangeReaction.h"
 #include "pqScalarBarVisibilityReaction.h"
 #include "pqServerManagerModel.h"
+#include "vtkSMPropertyHelper.h"
 
 class pqColorEditorPropertyWidget::pqInternals
 {
 public:
   Ui::ColorEditorPropertyWidget Ui;
   QPointer<QAction> ScalarBarVisibilityAction;
+  QPointer<QAction> EditScalarBarAction;
 };
 
 //-----------------------------------------------------------------------------
@@ -70,15 +73,21 @@ pqColorEditorPropertyWidget::pqColorEditorPropertyWidget(vtkSMProxy *smProxy,
   // show scalar bar button
   QAction *scalarBarAction = new QAction(this);
   this->Internals->ScalarBarVisibilityAction = scalarBarAction;
-  QObject::connect(Ui.ShowScalarBar, SIGNAL(clicked(bool)), scalarBarAction, SLOT(trigger()));
-  QObject::connect(scalarBarAction, SIGNAL(changed()),
-                   this, SLOT(updateEnableState()));
-  QObject::connect(scalarBarAction, SIGNAL(toggled(bool)),
-                   Ui.ShowScalarBar, SLOT(setChecked(bool)));
+  scalarBarAction->connect(Ui.ShowScalarBar, SIGNAL(clicked()), SLOT(trigger()));
+  Ui.ShowScalarBar->connect(
+    scalarBarAction, SIGNAL(toggled(bool)), SLOT(setChecked(bool)));
   pqScalarBarVisibilityReaction* sbvr = new pqScalarBarVisibilityReaction(
     scalarBarAction, /*track_active_objects*/false);
   sbvr->setRepresentation(representation);
+  this->connect(scalarBarAction, SIGNAL(changed()), SLOT(updateEnableState()));
 
+  // edit scalar bar.
+  QAction* editScalarBarAction = new QAction(this);
+  this->Internals->EditScalarBarAction = editScalarBarAction;
+  editScalarBarAction->connect(Ui.EditScalarBar, SIGNAL(clicked()), SLOT(trigger()));
+  pqEditScalarBarReaction* esbr = new pqEditScalarBarReaction(editScalarBarAction, false);
+  esbr->setRepresentation(representation);
+  this->connect(editScalarBarAction, SIGNAL(changed()), SLOT(updateEnableState()));
 
   // edit color map button
   QAction *editColorMapAction = new QAction(this);
@@ -89,7 +98,19 @@ pqColorEditorPropertyWidget::pqColorEditorPropertyWidget(vtkSMProxy *smProxy,
   // reset range button
   QAction *resetRangeAction = new QAction(this);
   QObject::connect(Ui.Rescale, SIGNAL(clicked()), resetRangeAction, SLOT(trigger()));
-  pqResetScalarRangeReaction* rsrr = new pqResetScalarRangeReaction(resetRangeAction);
+  pqResetScalarRangeReaction* rsrr = new pqResetScalarRangeReaction(resetRangeAction, false);
+  rsrr->setRepresentation(representation);
+
+  // reset custom range button
+  QAction* resetCustomRangeAction = new QAction(this);
+  resetCustomRangeAction->connect(Ui.RescaleCustom, SIGNAL(clicked()), SLOT(trigger()));
+  rsrr = new pqResetScalarRangeReaction(resetCustomRangeAction, false, pqResetScalarRangeReaction::CUSTOM);
+  rsrr->setRepresentation(representation);
+
+  // reset custom range button
+  QAction* resetTemporalRangeAction = new QAction(this);
+  resetTemporalRangeAction->connect(Ui.RescaleTemporal, SIGNAL(clicked()), SLOT(trigger()));
+  rsrr = new pqResetScalarRangeReaction(resetTemporalRangeAction, false, pqResetScalarRangeReaction::TEMPORAL);
   rsrr->setRepresentation(representation);
 
   this->updateEnableState();
@@ -105,6 +126,24 @@ pqColorEditorPropertyWidget::~pqColorEditorPropertyWidget()
 //-----------------------------------------------------------------------------
 void pqColorEditorPropertyWidget::updateEnableState()
 {
-  this->Internals->Ui.ShowScalarBar->setEnabled(
-    this->Internals->ScalarBarVisibilityAction->isEnabled());
+  Ui::ColorEditorPropertyWidget &ui = this->Internals->Ui;
+  const QAction* sbva = this->Internals->ScalarBarVisibilityAction;
+  ui.ShowScalarBar->setEnabled(sbva->isEnabled());
+  ui.Rescale->setEnabled(sbva->isEnabled());
+  ui.RescaleCustom->setEnabled(sbva->isEnabled());
+  ui.RescaleTemporal->setEnabled(sbva->isEnabled());
+
+  const QAction* esba = this->Internals->EditScalarBarAction;
+  ui.EditScalarBar->setEnabled(esba->isEnabled());
+}
+
+//-----------------------------------------------------------------------------
+void pqColorEditorPropertyWidget::editScalarBar()
+{
+  vtkSMProxy* lut = vtkSMPropertyHelper(this->proxy(), "LookupTable", true).GetAsProxy();
+  if (lut == NULL)
+    {
+    qDebug("No lookuptable found!");
+    return;
+    }
 }

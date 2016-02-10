@@ -54,9 +54,6 @@
      </item>
      <item>
       <widget class="QToolButton" name="EditScalarBar">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
        <property name="toolTip">
         <string>Edit color legend properties</string>
        </property>
@@ -272,22 +269,6 @@
   <include location="../../../Components/Resources/pqComponents.qrc"/>
  </resources>
  <connections>
-  <connection>
-   <sender>ShowScalarBar</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>EditScalarBar</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>280</x>
-     <y>22</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>304</x>
-     <y>22</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>AutoUpdate</sender>
    <signal>toggled(bool)</signal>

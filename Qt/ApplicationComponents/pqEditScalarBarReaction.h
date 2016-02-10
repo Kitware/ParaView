@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqResetScalarRangeReaction.h
+   Module:  pqEditScalarBarReaction.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,66 +29,52 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef pqResetScalarRangeReaction_h
-#define pqResetScalarRangeReaction_h
+#ifndef pqEditScalarBarReaction_h
+#define pqEditScalarBarReaction_h
 
 #include "pqReaction.h"
 #include <QPointer>
 
-class pqPipelineRepresentation;
 class pqDataRepresentation;
+class pqScalarBarVisibilityReaction;
 
 /// @ingroup Reactions
-/// Reaction to reset the active lookup table's range to match the active
-/// representation. You can disable tracking of the active representation,
-/// instead explicitly provide one using setRepresentation() by pass
-/// track_active_objects as false to the constructor.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqResetScalarRangeReaction : public pqReaction
+/// Reaction to allow editing of scalar bar properties using a
+/// pqProxyWidgetDialog.
+///
+/// Reaction allows editing of scalar bar properties using a
+/// pqProxyWidgetDialog. Internally, it uses pqScalarBarVisibilityReaction to
+/// track the visibility state for the scalar to enable/disable the parent
+/// action.
+class PQAPPLICATIONCOMPONENTS_EXPORT pqEditScalarBarReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
 public:
-  enum Modes
-    {
-    DATA,
-    CUSTOM,
-    TEMPORAL
-    };
-
-  /// if \c track_active_objects is false, then the reaction will not track
-  /// pqActiveObjects automatically.
-  pqResetScalarRangeReaction(QAction* parent, bool track_active_objects=true , Modes mode=DATA);
-
-
-  /// @deprecated Use resetScalarRangeToData().
-  static void resetScalarRange(pqPipelineRepresentation* repr=NULL)
-    { pqResetScalarRangeReaction::resetScalarRangeToData(repr); }
-
-  /// Reset to current data range.
-  static bool resetScalarRangeToData(pqPipelineRepresentation* repr=NULL);
-
-  /// Reset range to a custom range.
-  static bool resetScalarRangeToCustom(pqPipelineRepresentation* repr=NULL);
-
-  /// Reset range to data range over time.
-  static bool resetScalarRangeToDataOverTime(pqPipelineRepresentation* repr=NULL);
+  pqEditScalarBarReaction(QAction* parent=0, bool track_active_objects=true);
+  virtual ~pqEditScalarBarReaction();
 
 public slots:
+  /// Set the active representation. This should only be used when
+  /// \c track_active_objects is false. If used when \c track_active_objects is
+  /// true, the representation will get replaced whenever the active
+  /// representation changes.
+  void setRepresentation(pqDataRepresentation*);
+
+  /// Show the editor dialog for editing scalar bar properties.
+  bool editScalarBar();
+
+protected slots:
   /// Updates the enabled state. Applications need not explicitly call
   /// this.
-  void updateEnableState();
+  virtual void updateEnableState();
 
-  /// Set the data representation explicitly when track_active_objects is false.
-  void setRepresentation(pqDataRepresentation* repr);
-
-protected:
   /// Called when the action is triggered.
   virtual void onTriggered();
 
 private:
-  Q_DISABLE_COPY(pqResetScalarRangeReaction);
-  QPointer<pqPipelineRepresentation> Representation;
-  Modes Mode;
+  Q_DISABLE_COPY(pqEditScalarBarReaction);
+  QPointer<pqScalarBarVisibilityReaction> SBVReaction;
 };
 
 #endif

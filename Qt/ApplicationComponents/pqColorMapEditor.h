@@ -62,9 +62,6 @@ protected slots:
   /// render's view when transfer function is modified.
   void renderViews();
 
-  /// Pops up the scalar bar edit widget.
-  void editScalarBar();
-
   /// Save the current transfer function(s) as default.
   void saveAsDefault();
 
@@ -79,9 +76,11 @@ protected slots:
   void setAutoUpdate(bool);
 
   void updateIfNeeded();
+
 protected:
   void setDataRepresentation(pqDataRepresentation* repr);
   void setColorTransferFunction(vtkSMProxy* ctf);
+
 protected slots:
   /// update the enabled state for show/edit scalar bar buttons.
   void updateScalarBarButtons();

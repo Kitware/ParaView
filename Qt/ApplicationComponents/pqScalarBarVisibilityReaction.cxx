@@ -78,6 +78,12 @@ void pqScalarBarVisibilityReaction::updateEnableState()
 }
 
 //-----------------------------------------------------------------------------
+pqDataRepresentation* pqScalarBarVisibilityReaction::representation() const
+{
+  return this->CachedRepresentation;
+}
+
+//-----------------------------------------------------------------------------
 void pqScalarBarVisibilityReaction::setRepresentation(pqDataRepresentation* repr)
 {
   if (this->CachedRepresentation)
@@ -115,11 +121,8 @@ void pqScalarBarVisibilityReaction::setRepresentation(pqDataRepresentation* repr
     Q_ASSERT(view);
 
     // get whether the scalar bar is currently shown.
-    vtkSMProxy* ctfProxy = repr->getLookupTableProxy();
-    vtkSMProxy* sb = vtkSMTransferFunctionProxy::FindScalarBarRepresentation(
-      ctfProxy, view->getProxy());
-    is_shown = sb?
-      (vtkSMPropertyHelper(sb, "Visibility").GetAsInt()!=0) : false;
+    vtkSMProxy* sb = this->scalarBarProxy();
+    is_shown = sb?  (vtkSMPropertyHelper(sb, "Visibility").GetAsInt()!=0) : false;
     }
 
   QAction* parent_action = this->parentAction();
@@ -127,6 +130,20 @@ void pqScalarBarVisibilityReaction::setRepresentation(pqDataRepresentation* repr
   parent_action->setEnabled(can_show_sb);
   parent_action->setChecked(is_shown);
   this->BlockSignals = false;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxy* pqScalarBarVisibilityReaction::scalarBarProxy() const
+{
+  pqDataRepresentation* repr = this->CachedRepresentation;
+  vtkSMProxy* reprProxy = repr? repr->getProxy() : NULL;
+  pqView *view = repr? repr->getView() : NULL;
+  if (vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy))
+    {
+    return vtkSMTransferFunctionProxy::FindScalarBarRepresentation(
+      repr->getLookupTableProxy(), view->getProxy());
+    }
+  return NULL;
 }
 
 //-----------------------------------------------------------------------------
