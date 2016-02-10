@@ -261,9 +261,9 @@ class ParaViewWebViewPort(ParaViewWebProtocol):
     def getCamera(self, view_id):
         view = self.getView(view_id)
         return {
-            focal: view.CameraFocalPoint,
-            up: view.CameraViewUp,
-            position: view.CameraPosition
+            focal: list(view.CameraFocalPoint),
+            up: list(view.CameraViewUp),
+            position: list(view.CameraPosition)
         }
 
     @exportRpc("viewport.size.update")
