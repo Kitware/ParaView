@@ -6,6 +6,9 @@ very specific web application.
 import os, sys, logging, types, inspect, traceback, logging, re, json
 from time import time
 
+# import Twisted reactor for later callback
+from twisted.internet import reactor
+
 # import RPC annotation
 from autobahn.wamp import register as exportRpc
 
@@ -48,6 +51,7 @@ class ParaViewWebProtocol(vtk_protocols.vtkWebProtocol):
 
     def __init__(self):
         self.Application = None
+        self.coreServer = None
         self.multiRoot = False
         self.baseDirectory = ''
         self.baseDirectoryMap = {}
@@ -143,6 +147,10 @@ class ParaViewWebProtocol(vtk_protocols.vtkWebProtocol):
         v = view or self.getView(-1)
         lutMgr = vtkSMTransferFunctionManager()
         lutMgr.UpdateScalarBars(v.SMProxy, mode)
+
+    def publish(self, topic, event):
+        if self.coreServer:
+            self.coreServer.publish(topic, event)
 
 # =============================================================================
 #
@@ -439,6 +447,13 @@ class ParaViewWebTimeHandler(ParaViewWebProtocol):
         self.scene = simple.GetAnimationScene()
         simple.GetTimeTrack()
         self.scene.PlayMode = "Snap To TimeSteps"
+        self.playing = False
+        self.playTime = 0.1 # Time in second
+
+    def nextPlay(self):
+        self.updateTime('next')
+        if self.playing:
+            reactor.callLater(self.playTime, self.nextPlay)
 
     # RpcName: updateTime => pv.vcr.action
     @exportRpc("pv.vcr.action")
@@ -460,7 +475,53 @@ class ParaViewWebTimeHandler(ParaViewWebProtocol):
         if action == "last":
             animationScene.GoToLast()
 
+        timestep = list(animationScene.TimeKeeper.TimestepValues).index(animationScene.TimeKeeper.Time)
+        self.publish("pv.time.change", { 'time': float(view.ViewTime), 'timeStep': timestep } )
+
         return view.ViewTime
+
+    @exportRpc("pv.time.index.set")
+    def setTimeStep(self, timeIdx):
+        anim = simple.GetAnimationScene()
+        anim.TimeKeeper.Time = anim.TimeKeeper.TimestepValues[timeIdx]
+        return anim.TimeKeeper.Time
+
+    @exportRpc("pv.time.index.get")
+    def getTimeStep(self):
+        anim = simple.GetAnimationScene()
+        return list(anim.TimeKeeper.TimestepValues).index(anim.TimeKeeper.Time)
+
+    @exportRpc("pv.time.value.set")
+    def setTimeValue(self, t):
+        anim = simple.GetAnimationScene()
+
+        try:
+            step = list(anim.TimeKeeper.TimestepValues).index(t)
+            anim.TimeKeeper.Time = anim.TimeKeeper.TimestepValues[step]
+        except:
+            print 'Try to update time with', t, 'but value not found in the list'
+
+        return anim.TimeKeeper.Time
+
+    @exportRpc("pv.time.value.get")
+    def getTimeValue(self):
+        anim = simple.GetAnimationScene()
+        return anim.TimeKeeper.Time
+
+    @exportRpc("pv.time.values")
+    def getTimeValues(self):
+        return list(simple.GetAnimationScene().TimeKeeper.TimestepValues)
+
+    @exportRpc("pv.time.play")
+    def play(self, deltaT=0.1):
+        if not self.playing:
+            self.playTime = deltaT
+            self.playing = True
+            self.nextPlay()
+
+    @exportRpc("pv.time.stop")
+    def stop(self):
+        self.playing = False
 
 # =============================================================================
 #
