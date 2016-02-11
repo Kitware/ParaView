@@ -226,19 +226,37 @@ QString pqExportViewSelection::getSelectionAsPythonScript(QString const & script
       cinemaCam += "}";
       }
 
-    // apply specified format
-    rendering_info += scriptFormat.
-      arg(proxyManager->GetProxyName("views", viewProxy)).
-      arg(viewInfo->getImageFileName()).arg(viewInfo->getWriteFrequency()).
-      arg(static_cast<int>(viewInfo->fitToScreen())).
-      arg(viewInfo->getMagnification()).
-      arg(viewSize.width()).
-      arg(viewSize.height()).
-      arg(cinemaCam);
+    QMap<QString, QString> parameters;
+    parameters["%1"] = proxyManager->GetProxyName("views", viewProxy);
+    parameters["%2"] = viewInfo->getImageFileName();
+    parameters["%3"] = QString::number(viewInfo->getWriteFrequency());
+    parameters["%4"] = QString::number(static_cast<int>(viewInfo->fitToScreen()));
+    parameters["%5"] = QString::number(viewInfo->getMagnification());
+    parameters["%6"] = QString::number(viewSize.width());
+    parameters["%7"] = QString::number(viewSize.height());
+    parameters["%8"] = cinemaCam;
+
+    QString info = scriptFormat;
+    this->patchFormatString(parameters, info);
+
+    rendering_info += info;
 
     if (index < allViews.count() - 1)
       rendering_info += ", ";
     }
 
   return rendering_info;
+}
+
+void pqExportViewSelection::patchFormatString(QMap<QString, QString> const & parameters, QString & infoFormat)
+{
+  QMapIterator<QString, QString> paramIt(parameters);
+  while(paramIt.hasNext())
+    {
+      paramIt.next();
+      if (infoFormat.contains(paramIt.key()))
+        {
+        infoFormat = infoFormat.arg(paramIt.value());
+        }
+    }
 }
