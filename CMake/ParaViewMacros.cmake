@@ -246,36 +246,37 @@ function (generate_htmls_from_xmls output_files xmls gui_xmls output_dir)
 
   if (NOT EXISTS ${QT_XMLPATTERNS_EXECUTABLE})
     message(WARNING "Valid QT_XMLPATTERNS_EXECUTABLE not specified.")
-  endif()
+  else()
 
-  add_custom_command(
-    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${first_xml}.xml"
+    add_custom_command(
+      OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${first_xml}.xml"
 
-    # process each html file to separate it out into files for each proxy.
-    COMMAND ${CMAKE_COMMAND}
-            -Dxmlpatterns:FILEPATH=${QT_XMLPATTERNS_EXECUTABLE}
-            -Dxml_to_xml_xsl:FILEPATH=${ParaView_CMAKE_DIR}/smxml_to_xml.xsl
-            -Dgenerate_category_rw_xsl:FILEPATH=${ParaView_CMAKE_DIR}/generate_category_rw.xsl
-            -Dxml_to_html_xsl:FILEPATH=${ParaView_CMAKE_DIR}/xml_to_html.xsl
-            -Dxml_to_wiki_xsl:FILEPATH=${ParaView_CMAKE_DIR}/xml_to_wiki.xsl.in
-            -Dinput_xmls:STRING=${xmls_string}
-            -Dinput_gui_xmls:STRING=${gui_xmls_string}
-            -Doutput_dir:PATH=${output_dir}
-            -Doutput_file:FILEPATH=${CMAKE_CURRENT_BINARY_DIR}/${first_xml}.xml
-            -P ${ParaView_CMAKE_DIR}/generate_proxydocumentation.cmake
+      # process each html file to separate it out into files for each proxy.
+      COMMAND ${CMAKE_COMMAND}
+              -Dxmlpatterns:FILEPATH=${QT_XMLPATTERNS_EXECUTABLE}
+              -Dxml_to_xml_xsl:FILEPATH=${ParaView_CMAKE_DIR}/smxml_to_xml.xsl
+              -Dgenerate_category_rw_xsl:FILEPATH=${ParaView_CMAKE_DIR}/generate_category_rw.xsl
+              -Dxml_to_html_xsl:FILEPATH=${ParaView_CMAKE_DIR}/xml_to_html.xsl
+              -Dxml_to_wiki_xsl:FILEPATH=${ParaView_CMAKE_DIR}/xml_to_wiki.xsl.in
+              -Dinput_xmls:STRING=${xmls_string}
+              -Dinput_gui_xmls:STRING=${gui_xmls_string}
+              -Doutput_dir:PATH=${output_dir}
+              -Doutput_file:FILEPATH=${CMAKE_CURRENT_BINARY_DIR}/${first_xml}.xml
+              -P ${ParaView_CMAKE_DIR}/generate_proxydocumentation.cmake
 
-    DEPENDS ${xmls}
-            ${ParaView_CMAKE_DIR}/smxml_to_xml.xsl
-            ${ParaView_CMAKE_DIR}/xml_to_html.xsl
-            ${ParaView_CMAKE_DIR}/generate_proxydocumentation.cmake
+      DEPENDS ${xmls}
+              ${ParaView_CMAKE_DIR}/smxml_to_xml.xsl
+              ${ParaView_CMAKE_DIR}/xml_to_html.xsl
+              ${ParaView_CMAKE_DIR}/generate_proxydocumentation.cmake
 
-    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+      WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 
-    COMMENT "Generating Documentation HTMLs from xmls")
+      COMMENT "Generating Documentation HTMLs from xmls")
 
     set (dependencies ${dependencies}
-          "${CMAKE_CURRENT_BINARY_DIR}/${first_xml}.xml")
-  set (${output_files} ${dependencies} PARENT_SCOPE)
+         "${CMAKE_CURRENT_BINARY_DIR}/${first_xml}.xml")
+    set (${output_files} ${dependencies} PARENT_SCOPE)
+  endif()
 endfunction()
 
 #------------------------------------------------------------------------------
@@ -316,6 +317,10 @@ function(build_help_project name)
     ""
     ${ARGN}
     )
+
+  if (NOT PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION)
+    return()
+  endif()
 
   if (NOT DEFINED arg_DESTINATION_DIRECTORY)
     message(FATAL_ERROR "No DESTINATION_DIRECTORY specified in build_help_project()")

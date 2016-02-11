@@ -51,11 +51,13 @@ foreach (module IN LISTS VTK_MODULES_ENABLED)
   endif()
 endforeach()
 
-#------------------------------------------------------------------------------
-# Build Online-Help (aka Embedded Help) for the ParaView application.
-# This is done after the above piece of code that sets the application_gui_xmls
-# variable. Documentation/CMakeLists.txt depends on it.
-add_subdirectory(Documentation)
+if (PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION)
+  #------------------------------------------------------------------------------
+  # Build Online-Help (aka Embedded Help) for the ParaView application.
+  # This is done after the above piece of code that sets the application_gui_xmls
+  # variable. Documentation/CMakeLists.txt depends on it.
+  add_subdirectory(Documentation)
+endif()
 
 #------------------------------------------------------------------------------
 # FIXME: This is necessary because the vtkPVStaticPluginsInit library cannot be
@@ -103,9 +105,11 @@ if( PARAVIEW_QT_VERSION VERSION_GREATER "4" )
     LINK_PRIVATE ${QT_LIBRARIES})
 endif()
 
-# Link against the documentation module.
-target_link_libraries(paraview
-  LINK_PRIVATE vtkParaViewDocumentation)
+if (PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION)
+  # Link against the documentation module.
+  target_link_libraries(paraview
+    LINK_PRIVATE vtkParaViewDocumentation)
+endif()
 
 # link enabled plugins if not building in shared library mode and
 # add dependecies to linked python modules These are non-empty only when

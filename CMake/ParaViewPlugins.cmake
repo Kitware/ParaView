@@ -951,16 +951,18 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
         FILEPATTERNS "*.html;*.css;*.png;*.jpg"
         DEPENDS "${proxy_documentation_files}" )
 
-      # we don't compile the help project as a Qt resource. Instead it's
-      # packaged as a SM resource. This makes it possible for
-      # server-only plugins to provide documentation to the client without
-      generate_header("${CMAKE_CURRENT_BINARY_DIR}/${NAME}_doc.h"
-        SUFFIX "_doc"
-        VARIABLE function_names
-        BINARY
-        FILES "${CMAKE_CURRENT_BINARY_DIR}/doc/${NAME}.qch")
-      list(APPEND binary_resources ${CMAKE_CURRENT_BINARY_DIR}/${NAME}_doc.h)
-      set (EXTRA_INCLUDES "${EXTRA_INCLUDES}#include \"${CMAKE_CURRENT_BINARY_DIR}/${NAME}_doc.h\"")
+      if (PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION)
+        # we don't compile the help project as a Qt resource. Instead it's
+        # packaged as a SM resource. This makes it possible for
+        # server-only plugins to provide documentation to the client without
+        generate_header("${CMAKE_CURRENT_BINARY_DIR}/${NAME}_doc.h"
+          SUFFIX "_doc"
+          VARIABLE function_names
+          BINARY
+          FILES "${CMAKE_CURRENT_BINARY_DIR}/doc/${NAME}.qch")
+        list(APPEND binary_resources ${CMAKE_CURRENT_BINARY_DIR}/${NAME}_doc.h)
+        set (EXTRA_INCLUDES "${EXTRA_INCLUDES}#include \"${CMAKE_CURRENT_BINARY_DIR}/${NAME}_doc.h\"")
+      endif()
       foreach (func_name ${function_names})
         set (BINARY_RESOURCES_INIT
           "${BINARY_RESOURCES_INIT}  PushBack(resources, ${func_name});\n")
