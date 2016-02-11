@@ -80,10 +80,10 @@ void pqExportReaction::updateEnableState()
 }
 
 //-----------------------------------------------------------------------------
-void pqExportReaction::exportActiveView()
+QString pqExportReaction::exportActiveView()
 {
   pqView* view = pqActiveObjects::instance().activeView();
-  if (!view) { return ;}
+  if (!view) { return QString(); }
   vtkSMViewProxy* viewProxy = view->getViewProxy();
 
   vtkNew<vtkSMViewExportHelper> helper;
@@ -91,7 +91,7 @@ void pqExportReaction::exportActiveView()
   if (filters.isEmpty())
     {
     qCritical("Cannot export current view.");
-    return;
+    return QString();
     }
 
   pqFileDialog file_dialog(NULL, pqCoreUtilities::mainWidget(),
@@ -107,7 +107,7 @@ void pqExportReaction::exportActiveView()
     if (!proxy)
       {
       qCritical("Couldn't handle export filename");
-      return;
+      return QString();
       }
 
     QPointer<pqProxyWidget> proxyWidget = new pqProxyWidget(proxy);
@@ -142,8 +142,10 @@ void pqExportReaction::exportActiveView()
         .arg("exporter", proxy)
         .arg("filename", filename.toLatin1().data());
       proxy->Write();
+      return filename;
       }
     }
+  return QString();
 }
 
 // ----------------------------------------------------------------------------

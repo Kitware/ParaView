@@ -48,8 +48,9 @@ public:
   /// Constructor. Parent cannot be NULL.
   pqExportReaction(QAction* parent);
 
-  /// Exports the current view.
-  void exportActiveView();
+  /// Exports the current view. Returns the exported filename of successful
+  /// export, otherwise returns an empty QString.
+  QString exportActiveView();
 
 public slots:
   /// Updates the enabled state. Applications need not explicitly call
