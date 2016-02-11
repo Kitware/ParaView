@@ -96,6 +96,13 @@ private slots:
 
 private:
 
+  /// Checks if a given string marker exists in infoFormat and replaces it with the
+  /// appropriate value in parameters.
+  /// @note This helper for getSelectionAsPythonScript(...) is needed given that QString::arg's
+  /// result is undefined when called on a string with no unreplaced "%i" markers. See
+  /// , http://doc.qt.io/qt-4.8/qstring.html#arg
+  void patchFormatString(QMap<QString, QString> const & parameters, QString & infoFormat);
+
   /// @note This is templated to handle pqRenderViewBase* and pqContextView*
   /// given that only these two pqView sub-types are supported by cinema. When
   /// cinema gives support to all the pqView types the template will be removed.
