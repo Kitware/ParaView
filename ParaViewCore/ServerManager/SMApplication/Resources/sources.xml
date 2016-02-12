@@ -1435,8 +1435,8 @@
                             number_of_elements="3"
                             panel_visibility="default">
         <DoubleRangeDomain name="range" />
-        <Documentation>This property specifies the 3D coordinates of the center
-        of the dataset.</Documentation>
+        <Documentation>This property specifies the 3D coordinates of the center of
+        the periodic function (x, y and z in the equation).</Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetMaximum"
                             default_values="255.0"
