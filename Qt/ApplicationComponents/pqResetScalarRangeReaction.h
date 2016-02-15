@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -40,17 +40,38 @@ class pqDataRepresentation;
 
 /// @ingroup Reactions
 /// Reaction to reset the active lookup table's range to match the active
-/// representation.
+/// representation. You can disable tracking of the active representation,
+/// instead explicitly provide one using setRepresentation() by pass
+/// track_active_objects as false to the constructor.
 class PQAPPLICATIONCOMPONENTS_EXPORT pqResetScalarRangeReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
 public:
+  enum Modes
+    {
+    DATA,
+    CUSTOM,
+    TEMPORAL
+    };
+
   /// if \c track_active_objects is false, then the reaction will not track
   /// pqActiveObjects automatically.
-  pqResetScalarRangeReaction(QAction* parent, bool track_active_objects=true);
+  pqResetScalarRangeReaction(QAction* parent, bool track_active_objects=true , Modes mode=DATA);
 
-  static void resetScalarRange(pqPipelineRepresentation* repr=NULL);
+
+  /// @deprecated Use resetScalarRangeToData().
+  static void resetScalarRange(pqPipelineRepresentation* repr=NULL)
+    { pqResetScalarRangeReaction::resetScalarRangeToData(repr); }
+
+  /// Reset to current data range.
+  static bool resetScalarRangeToData(pqPipelineRepresentation* repr=NULL);
+
+  /// Reset range to a custom range.
+  static bool resetScalarRangeToCustom(pqPipelineRepresentation* repr=NULL);
+
+  /// Reset range to data range over time.
+  static bool resetScalarRangeToDataOverTime(pqPipelineRepresentation* repr=NULL);
 
 public slots:
   /// Updates the enabled state. Applications need not explicitly call
@@ -67,6 +88,7 @@ protected:
 private:
   Q_DISABLE_COPY(pqResetScalarRangeReaction);
   QPointer<pqPipelineRepresentation> Representation;
+  Modes Mode;
 };
 
 #endif

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqExportReaction.h
+   Module:  pqEditScalarBarReaction.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,46 +29,52 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef pqExportReaction_h
-#define pqExportReaction_h
+#ifndef pqEditScalarBarReaction_h
+#define pqEditScalarBarReaction_h
 
 #include "pqReaction.h"
+#include <QPointer>
 
-
-class pqProxyWidget;
+class pqDataRepresentation;
+class pqScalarBarVisibilityReaction;
 
 /// @ingroup Reactions
-/// Reaction for exporting a view. Uses pqViewExporterManager for actual
-/// exporting.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqExportReaction : public pqReaction
+/// Reaction to allow editing of scalar bar properties using a
+/// pqProxyWidgetDialog.
+///
+/// Reaction allows editing of scalar bar properties using a
+/// pqProxyWidgetDialog. Internally, it uses pqScalarBarVisibilityReaction to
+/// track the visibility state for the scalar to enable/disable the parent
+/// action.
+class PQAPPLICATIONCOMPONENTS_EXPORT pqEditScalarBarReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
 public:
-  /// Constructor. Parent cannot be NULL.
-  pqExportReaction(QAction* parent);
-
-  /// Exports the current view. Returns the exported filename of successful
-  /// export, otherwise returns an empty QString.
-  QString exportActiveView();
+  pqEditScalarBarReaction(QAction* parent=0, bool track_active_objects=true);
+  virtual ~pqEditScalarBarReaction();
 
 public slots:
+  /// Set the active representation. This should only be used when
+  /// \c track_active_objects is false. If used when \c track_active_objects is
+  /// true, the representation will get replaced whenever the active
+  /// representation changes.
+  void setRepresentation(pqDataRepresentation*);
+
+  /// Show the editor dialog for editing scalar bar properties.
+  bool editScalarBar();
+
+protected slots:
   /// Updates the enabled state. Applications need not explicitly call
   /// this.
-  void updateEnableState();
+  virtual void updateEnableState();
 
-protected:
   /// Called when the action is triggered.
-  virtual void onTriggered()
-    { this->exportActiveView(); }
+  virtual void onTriggered();
 
 private:
-  /// Creates a dialog widget containing the predefined proxyWidget.
-  QDialog* createConfigurationDialog(pqProxyWidget* proxyWidget);
-
-  Q_DISABLE_COPY(pqExportReaction)
+  Q_DISABLE_COPY(pqEditScalarBarReaction);
+  QPointer<pqScalarBarVisibilityReaction> SBVReaction;
 };
 
 #endif
-
-

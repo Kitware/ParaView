@@ -6,18 +6,51 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>291</width>
+    <width>367</width>
     <height>82</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="1">
+  <layout class="QGridLayout" name="gridLayout" columnstretch="1,0,0,0,0,0">
+   <item row="1" column="2">
+    <widget class="QPushButton" name="RescaleCustom">
+     <property name="toolTip">
+      <string>Rescale to custom range</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../../../Components/Resources/pqComponents.qrc">
+       <normaloff>:/pqWidgets/Icons/pqResetRangeCustom24.png</normaloff>:/pqWidgets/Icons/pqResetRangeCustom24.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="6">
+    <widget class="pqDisplayColorWidget" name="DisplayColorWidget" native="true"/>
+   </item>
+   <item row="2" column="4">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::MinimumExpanding</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="1" column="0">
     <widget class="QPushButton" name="EditColorMap">
      <property name="toolTip">
-      <string>Edit Color Map</string>
+      <string>Edit color map</string>
      </property>
      <property name="statusTip">
       <string>Edit Color Map</string>
@@ -34,16 +67,36 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
+   <item row="1" column="1">
+    <widget class="QPushButton" name="Rescale">
+     <property name="toolTip">
+      <string>Rescale to data range</string>
+     </property>
+     <property name="statusTip">
+      <string>Rescale to Data Range</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../../../Components/Resources/pqComponents.qrc">
+       <normaloff>:/pqWidgets/Icons/pqResetRange24.png</normaloff>:/pqWidgets/Icons/pqResetRange24.png</iconset>
+     </property>
+     <property name="flat">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="4">
     <widget class="QPushButton" name="ShowScalarBar">
      <property name="toolTip">
-      <string>Toggle Color Legend Visibility</string>
+      <string>Show/hide color legend</string>
      </property>
      <property name="statusTip">
       <string>Toggle Color Legend Visibility</string>
      </property>
      <property name="text">
-      <string>Show</string>
+      <string/>
      </property>
      <property name="icon">
       <iconset resource="../../../Components/Resources/pqComponents.qrc">
@@ -57,44 +110,33 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="0" colspan="3">
-    <widget class="pqDisplayColorWidget" name="DisplayColorWidget" native="true"/>
-   </item>
-   <item row="1" column="2">
-    <widget class="QPushButton" name="Rescale">
+   <item row="1" column="5">
+    <widget class="QPushButton" name="EditScalarBar">
      <property name="toolTip">
-      <string>Rescale to Data Range</string>
-     </property>
-     <property name="statusTip">
-      <string>Rescale to Data Range</string>
+      <string>Edit color legend properties</string>
      </property>
      <property name="text">
-      <string>Rescale</string>
+      <string/>
      </property>
      <property name="icon">
       <iconset resource="../../../Components/Resources/pqComponents.qrc">
-       <normaloff>:/pqWidgets/Icons/pqResetRange24.png</normaloff>:/pqWidgets/Icons/pqResetRange24.png</iconset>
-     </property>
-     <property name="flat">
-      <bool>false</bool>
+       <normaloff>:/pqWidgets/Icons/pqEditScalarBar16.png</normaloff>:/pqWidgets/Icons/pqEditScalarBar16.png</iconset>
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
+   <item row="1" column="3">
+    <widget class="QPushButton" name="RescaleTemporal">
+     <property name="toolTip">
+      <string>Rescale to data range over all timesteps</string>
      </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::MinimumExpanding</enum>
+     <property name="text">
+      <string/>
      </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
+     <property name="icon">
+      <iconset resource="../../../Components/Resources/pqComponents.qrc">
+       <normaloff>:/pqWidgets/Icons/pqResetRangeTemporal24.png</normaloff>:/pqWidgets/Icons/pqResetRangeTemporal24.png</iconset>
      </property>
-    </spacer>
+    </widget>
    </item>
   </layout>
  </widget>

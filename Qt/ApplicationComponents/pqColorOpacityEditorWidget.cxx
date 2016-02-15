@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertiesPanel.h"
 #include "pqPropertyWidgetDecorator.h"
 #include "pqRescaleRange.h"
+#include "pqResetScalarRangeReaction.h"
 #include "pqSettings.h"
 #include "pqTransferFunctionWidget.h"
 #include "pqUndoStack.h"
@@ -621,46 +622,22 @@ void pqColorOpacityEditorWidget::updateButtonEnableState()
 //-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::resetRangeToData()
 {
-  pqDataRepresentation* repr =
-    pqActiveObjects::instance().activeRepresentation();
-  if (!repr)
+  // passing in NULL ensure pqResetScalarRangeReaction simply uses active representation.
+  if (pqResetScalarRangeReaction::resetScalarRangeToData(NULL))
     {
-    qDebug("No active representation.");
-    return;
+    this->Internals->render();
+    emit this->changeFinished();
     }
-  BEGIN_UNDO_SET("Reset transfer function ranges using data range");
-  vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(repr->getProxy());
-  this->Internals->render();
-  emit this->changeFinished();
-  END_UNDO_SET();
 }
 
 //-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::resetRangeToDataOverTime()
 {
-  pqDataRepresentation* repr =
-    pqActiveObjects::instance().activeRepresentation();
-  if (!repr)
+  // passing in NULL ensure pqResetScalarRangeReaction simply uses active representation.
+  if (pqResetScalarRangeReaction::resetScalarRangeToDataOverTime(NULL))
     {
-    qDebug("No active representation.");
-    return;
-    }
-
-  if (QMessageBox::warning(this,
-      "Potentially slow operation",
-      "This can potentially take a long time to complete. \n"
-      "Are you sure you want to continue?",
-      QMessageBox::Yes |QMessageBox::No, QMessageBox::No) == QMessageBox::Yes)
-    {
-    BEGIN_UNDO_SET("Reset transfer function ranges using temporal data range");
-    vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRangeOverTime(repr->getProxy());
-
-    // disable auto-rescale of transfer function since the user has set on
-    // explicitly (BUG #14371).
-    this->setLockScalarRange(true);
     this->Internals->render();
     emit this->changeFinished();
-    END_UNDO_SET();
     }
 }
 
