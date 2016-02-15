@@ -698,7 +698,6 @@ class CoProcessor(object):
         view.LockBounds = 1
 
         p = pv_introspect.inspect()
-        l = pv_introspect.munch_tree(p)
         fs = pv_introspect.make_cinema_store(l, fname,
                                             forcetime=formatted_time,
                                             _userDefinedValues = self.__UserDefinedValues)
