@@ -117,6 +117,7 @@ SET( VR_SOURCE_FILES
   vtkVRQueue.cxx
   vtkVRTrackStyle.cxx
   vtkVRSpaceNavigatorGrabWorldStyle.cxx
+  vtkVRVirtualHandStyle.cxx
   ${MOC_SRCS})
 
 ADD_PARAVIEW_AUTO_START(IFACES IFACE_SRCS CLASS_NAME pqVRStarter
