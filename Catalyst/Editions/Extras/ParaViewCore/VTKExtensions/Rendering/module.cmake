@@ -35,7 +35,8 @@ if (Module_vtkRenderingCore)
     vtkRenderingAnnotation
     vtkRenderingCore
     vtkRenderingParallel
-    vtkicet)
+    vtkicet
+    vtklz4)
 endif ()
 
 vtk_module(vtkPVVTKExtensionsRendering
