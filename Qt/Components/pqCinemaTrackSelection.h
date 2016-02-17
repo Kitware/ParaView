@@ -41,8 +41,13 @@ namespace Ui
   class CinemaTrackSelection;
 }
 
+class QModelIndex;
+
+class vtkSMSourceProxy;
 class pqPipelineFilter;
 class pqCinemaTrack;
+class pqPipelineModel;
+class pqPipelineAnnotationFilterModel;
 
 /// @brief Widget to select among supported Cinema Tracks (filters).
 ///
@@ -76,10 +81,22 @@ public:
 
 private slots:
 
+  /// Selection change handler.
+  void onPipelineItemChanged(QModelIndex const & current, QModelIndex const & previous);
+
   void onPreviousClicked();
   void onNextClicked();
 
 private:
+
+  /// Creates a PipelineModel which gets populated using the current
+  /// ServerManagerModel and passes it to the View object.
+  void initializePipelineBrowser();
+
+  /// Clear value-array widget and re-populate using the provided proxy.
+  void populateArrayPicker(vtkSMSourceProxy* proxy);
+
+  /////////////////////////////////////////////////////////////////////////////
 
   Ui::CinemaTrackSelection* Ui;
 };

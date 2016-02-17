@@ -60,20 +60,39 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 pqPipelineBrowserWidget::pqPipelineBrowserWidget(QWidget* parentObject)
   : Superclass(parentObject)
+  , PipelineModel(new pqPipelineModel(this))
+  , FilteredPipelineModel(new pqPipelineAnnotationFilterModel(this))
 {
-  this->PipelineModel = new pqPipelineModel(this);
-  this->FilteredPipelineModel = new pqPipelineAnnotationFilterModel(this);
-  this->FilteredPipelineModel->setSourceModel(this->PipelineModel);
+  this->configureModel();
 
   // Initialize pqFlatTreeView.
-  this->setModel(this->FilteredPipelineModel);
+  Superclass::setModel(this->FilteredPipelineModel);
   this->getHeader()->hide();
   this->getHeader()->moveSection(1, 0);
   this->installEventFilter(this);
   this->setSelectionMode(pqFlatTreeView::ExtendedSelection);
 
+  // Connect internal handlers
+  QObject::connect(this, SIGNAL(clicked(const QModelIndex &)),
+    this, SLOT(handleIndexClicked(const QModelIndex &)));
+  QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
+    this, SLOT(setActiveView(pqView*)));
+
+  new pqPipelineModelSelectionAdaptor(this->getSelectionModel());
+}
+
+//-----------------------------------------------------------------------------
+pqPipelineBrowserWidget::~pqPipelineBrowserWidget()
+{
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineBrowserWidget::configureModel()
+{
+  this->FilteredPipelineModel->setSourceModel(this->PipelineModel);
+
   // Connect the model to the ServerManager model.
-  pqServerManagerModel *smModel = 
+  pqServerManagerModel *smModel =
     pqApplicationCore::instance()->getServerManagerModel();
   QObject::connect(smModel, SIGNAL(serverAdded(pqServer*)),
     this->PipelineModel, SLOT(addServer(pqServer*)));
@@ -92,31 +111,16 @@ pqPipelineBrowserWidget::pqPipelineBrowserWidget(QWidget* parentObject)
     this->PipelineModel,
     SLOT(removeConnection(pqPipelineSource*, pqPipelineSource*, int)));
 
-  QObject::connect(this, SIGNAL(clicked(const QModelIndex &)),
-    this, SLOT(handleIndexClicked(const QModelIndex &)));
-
   // Use the tree view's font as the base for the model's modified
   // font.
   QFont modifiedFont = this->font();
   modifiedFont.setBold(true);
   this->PipelineModel->setModifiedFont(modifiedFont);
 
-  QObject::connect(
-    &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
-    this, SLOT(setActiveView(pqView*)));
-
-  new pqPipelineModelSelectionAdaptor(this->getSelectionModel());
-
-
   // Make sure the tree items get expanded when new descendents
   // are added.
   QObject::connect(this->PipelineModel, SIGNAL(firstChildAdded(const QModelIndex &)),
       this, SLOT(expandWithModelIndexTranslation(const QModelIndex &)));
-}
-
-//-----------------------------------------------------------------------------
-pqPipelineBrowserWidget::~pqPipelineBrowserWidget()
-{
 }
 
 //-----------------------------------------------------------------------------
@@ -357,4 +361,17 @@ const pqPipelineModel* pqPipelineBrowserWidget::getPipelineModel(const QModelInd
 void pqPipelineBrowserWidget::expandWithModelIndexTranslation(const QModelIndex &index)
 {
   this->expand(this->FilteredPipelineModel->mapFromSource(index));
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineBrowserWidget::setModel(pqPipelineModel* model)
+{
+  if (!model)
+    return;
+
+  delete this->PipelineModel;
+  this->PipelineModel = model;
+  this->PipelineModel->setParent(this);
+
+  this->configureModel();
 }

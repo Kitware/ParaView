@@ -29,12 +29,23 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "vtkSMProxy.h"
+#include <QDebug>
+
+#include "vtkSMSourceProxy.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVArrayInformation.h"
 
 #include "pqCinemaTrackSelection.h"
 #include "ui_pqCinemaTrackSelection.h"
 #include "pqPipelineFilter.h"
 #include "pqCinemaTrack.h"
+#include "pqApplicationCore.h"
+#include "pqServerManagerModel.h"
+#include "pqOutputPort.h"
+#include "pqPipelineModel.h"
+#include "pqRenderView.h"
+#include "pqTreeWidget.h"
 
 
 // ----------------------------------------------------------------------------
@@ -43,14 +54,92 @@ pqCinemaTrackSelection::pqCinemaTrackSelection(QWidget* parent_)
 , Ui(new Ui::CinemaTrackSelection())
 {
   this->Ui->setupUi(this);
+  this->initializePipelineBrowser();
 
   connect(this->Ui->pbPrevious, SIGNAL(clicked()), this, SLOT(onPreviousClicked()));
   connect(this->Ui->pbNext, SIGNAL(clicked()), this, SLOT(onNextClicked()));
 }
 
+// ----------------------------------------------------------------------------
 pqCinemaTrackSelection::~pqCinemaTrackSelection()
 {
   delete Ui;
+}
+
+// ----------------------------------------------------------------------------
+void pqCinemaTrackSelection::initializePipelineBrowser()
+{
+  pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
+  pqPipelineModel* model = new pqPipelineModel(*smModel, NULL);
+
+  // pqPipelineBrowser takes ownership of the model
+  pqPipelineBrowserWidget* plBrowser = this->Ui->wPipelineBrowser;
+  plBrowser->setModel(model);
+  plBrowser->expandAll();
+
+  QItemSelectionModel* selModel = plBrowser->getSelectionModel();
+  connect(selModel, SIGNAL(currentChanged(QModelIndex const &, QModelIndex const &)),
+    this, SLOT(onPipelineItemChanged(QModelIndex const &, QModelIndex const &)));
+
+  // TODO change the view depending on the wViewSelection FIXME
+  QList<pqRenderViewBase*> views = smModel->findItems<pqRenderViewBase*>();
+  plBrowser->setActiveView(views[0]);
+}
+
+// ----------------------------------------------------------------------------
+void pqCinemaTrackSelection::onPipelineItemChanged(QModelIndex const & current,
+  QModelIndex const & previous)
+{
+  // transform the FilterModel QMIndex to its PipelineModel equivalent
+  pqPipelineModel const* model = this->Ui->wPipelineBrowser->getPipelineModel(current);
+  QModelIndex const plModelIndex = this->Ui->wPipelineBrowser->pipelineModelIndex(current);
+  // query an item from the PipelineModel and get its vtkSMSourceProxy
+  pqServerManagerModelItem const* smModelItem = model->getItemFor(plModelIndex);
+  pqPipelineSource const* source = qobject_cast<pqPipelineSource const*>(smModelItem);
+  pqOutputPort const* port = source ? source->getOutputPort(0) :
+    qobject_cast<pqOutputPort const*>(smModelItem);
+
+  if (!port)
+    {
+    qDebug() << "Failed to query outputPort from index(" << current.row() << ", "
+      << current.column() << ")";
+    return;
+    }
+
+  vtkSMSourceProxy* proxy = port->getSourceProxy();
+  //proxy->PrintSelf(std::cout, vtkIndent());
+  this->populateArrayPicker(proxy);
+}
+
+// ----------------------------------------------------------------------------
+void pqCinemaTrackSelection::populateArrayPicker(vtkSMSourceProxy* proxy)
+{
+  // clear and re-populate value-arrays
+  pqTreeWidget* arrayPicker = this->Ui->wArrayPicker;
+  arrayPicker->clear();
+
+  vtkPVDataInformation* dataInfo = proxy->GetDataInformation();
+  if (!dataInfo)
+    {
+    return;
+    }
+  
+  vtkPVDataSetAttributesInformation const* attribInfo = dataInfo->GetPointDataInformation();
+  if (!attribInfo)
+    {
+    return;
+    }
+
+  for (int i = 0 ; i < attribInfo->GetNumberOfArrays() ; i++)
+    {
+      vtkPVArrayInformation* arrInfo = attribInfo->GetArrayInformation(i);
+      if (!arrInfo)
+        {
+        continue;
+        }
+
+      qDebug() << "->>> Array " << i << ": " << QString(arrInfo->GetName());
+    }
 }
 
 // ----------------------------------------------------------------------------
