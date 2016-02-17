@@ -57,7 +57,7 @@ if(NOT VTK_INSTALL_NO_DEVELOPMENT)
     ${LZ4_DIR}/lz4hc.h
     ${LZ4_DIR}/lz4frame.h
     ${LZ4_DIR}/vtklz4_mangle.h
-    ${CMAKE_CURRENT_BUILD_DIR}/vtklz4Exports.h
+    ${CMAKE_CURRENT_BINARY_DIR}/vtklz4Exports.h
     DESTINATION ${VTK_INSTALL_INCLUDE_DIR}/vtklz4
     COMPONENT Developmetn)
 endif()
