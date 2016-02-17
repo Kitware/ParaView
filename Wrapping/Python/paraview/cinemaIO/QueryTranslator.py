@@ -35,7 +35,7 @@ class QueryTranslator(object):
         return
 
     @abc.abstractmethod
-    def translateQuery(self, query, colorDefinitions = {}):
+    def translateQuery(self, query):
         ''' Receives a query and returns a set of LayerSpecs consisting of all
         the layers to render. Abstract, implement in a derived class.'''
         return
@@ -66,7 +66,7 @@ class QueryTranslator_SpecA(QueryTranslator):
     def supportsLayering(self):
         return False
 
-    def translateQuery(self, query, colorDefinitions = {}):
+    def translateQuery(self, query):
         ''' Receives a query and returns a set of LayerSpecs consisting of all the
         different layers to composite. '''
         # resolve the base layer (time and camera). this also cleans up the query

@@ -99,7 +99,7 @@ def restore_visibility(proxies):
                                             listElt['scalar_bar_visibility'])
 
 
-def inspect():
+def inspect(skip_invisible=True):
     """
     Produces a representation of the pipeline that is easier to work with.
     Thanks Scott Wittenburg and the pv mailing list for this gem
@@ -115,12 +115,13 @@ def inspect():
 
         #skip the invisible
         rep = paraview.simple.GetDisplayProperties(proxy)
-        if rep == None:
-            #for example, writers in catalyst pipeline
-            #todo: is it possible for these to have decendents that are visible?
-            continue
+        if skip_invisible:
+            if rep == None:
+                #for example, writers in catalyst pipeline
+                #todo: is it possible for these to have decendents that are visible?
+                continue
 
-        listElt['visibility'] = rep.Visibility
+        listElt['visibility'] = 0 if (rep == None) else rep.Visibility
 
         parentId = '0'
         try:
@@ -132,20 +133,42 @@ def inspect():
         proxies.append(listElt)
         proxybyId[key[1]] = listElt
 
-    #reparent upward over invisible parents
-    for l in proxies:
-        pid = l['parent']
-        while pid != '0' and proxybyId[pid]['visibility'] == 0:
-            pid = proxybyId[pid]['parent']
-        l['parent'] = pid
+    if skip_invisible:
+        #reparent upward over invisible parents
+        for l in proxies:
+            pid = l['parent']
+            while pid != '0' and proxybyId[pid]['visibility'] == 0:
+                pid = proxybyId[pid]['parent']
+            l['parent'] = pid
 
-    #remove invisible proxies themselves
-    pxies = []
-    for l in proxies:
-        if l['visibility'] != 0:
-            pxies.append(l)
+        #remove invisible proxies themselves
+        pxies = []
+        for l in proxies:
+            if l['visibility'] != 0:
+                pxies.append(l)
+    else:
+        pxies = proxies
 
     return pxies
+
+def get_pipeline():
+    proxies = inspect(skip_invisible=False)
+    for proxy in proxies:
+        source = paraview.simple.FindSource(proxy['name'])
+        numberOfProducers = source.GetNumberOfProducers()
+        if proxy['parent'] is '0' and numberOfProducers > 0:
+            # this proxy is the result of a merge
+            parents = []
+            for i in xrange(numberOfProducers):
+                parents.append(source.GetProducerProxy(i).GetGlobalIDAsString())
+            proxy['parents'] = parents
+        else:
+            proxy['parents'] = [proxy['parent']]
+        del proxy['parent']
+    for proxy in proxies:
+        proxy['children'] = [p['id'] for p in proxies
+                             if proxy['id'] in p['parents']]
+    return proxies
 
 def float_limiter(x):
     #a shame, but needed to make sure python, java and (directory/file)name agree
@@ -288,6 +311,8 @@ def make_cinema_store(proxies, ocsfname, forcetime=False, _userDefinedValues={})
     cs.add_metadata({'type':'composite-image-stack'})
     cs.add_metadata({'store_type':'FS'})
     cs.add_metadata({'version':'0.0'})
+    pipeline = get_pipeline()
+    cs.add_metadata({'pipeline':pipeline})
 
     vis = [proxy['name'] for proxy in proxies]
     cs.add_layer("vis",cinema_store.make_parameter('vis', vis))

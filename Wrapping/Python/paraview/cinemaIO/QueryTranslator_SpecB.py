@@ -17,8 +17,7 @@ class QueryTranslator_SpecB(QueryTranslator):
         for name in query.keys():
 
             if (name in self.store().parameter_list and
-                not self.store().isdepender(name) and
-                not self.store().islayer(name)):
+                not self.store().isdepender(name)):
 
                 values = query[name]
                 v = list(iter(values))[0] #no options in query, so only 1 result not many
@@ -30,9 +29,8 @@ class QueryTranslator_SpecB(QueryTranslator):
         return baseLayer, otherLayers
 
     def __generateQueriedLayers(self, query, baseLayer, otherQueriedNames):
-        ''' Generates a set of LayerSpecs depending on the queried parameters and sets
-        its name 'parameter/value'. It currently supports two different cases:
-
+        ''' Generates a set of LayerSpecs depending on the queried parameters. It currently
+        supports two different cases:
         1. When the queried parameter name is a layer with values (e.g. Clip1, Slice1, etc...;
         layers with numerical values). In this case it finds the corresponding field and creates
         LayersSpecs for it.
@@ -43,49 +41,31 @@ class QueryTranslator_SpecB(QueryTranslator):
         '''
         createdLayers = []
         for argName in otherQueriedNames:
+            parameter_ = self.store().parameter_list[argName]
             # Case 1.
-            if (self.store().islayer(argName)):
-                dependerNames = self.store().getdependers(argName)
-                for dName in dependerNames:
-                    if self.store().isfield(dName):
+            if (parameter_["role"] == "control"):
 
-                        #for each queried value (e.g. Clip1 : [0, -0.1]) add a set of fbo components of the field
-                        for value in query[argName]:
-                            layer = self.__createLayer(query, baseLayer, {argName : value}, dName)
-                            layer.setLayerName(argName + "/" + str(value))
-                            createdLayers.append(layer)
+                dName = self.store().getRelatedField(argName)
+                if dName == None:
+                    continue
 
-            # Case 2.
-            elif (self.store().isfield(argName)):
+                #for each queried value (e.g. Clip1 : [0, -0.1]) add a set of fbo components of the field
+                for value in query[argName]:
+                    layer = self.__createLayer(query, baseLayer, {argName : value}, dName)
+                    layer.setLayerName(argName + "/" + str(value))
+                    createdLayers.append(layer)
 
-                otherBaseQueries = self.__generateAdditionalBaseQueries(argName)
+            # Case 2.   (field arguments need to be added alone only if there is no parameter related to it)
+            elif (parameter_["role"] == "field") and  \
+                 not self.store().hasRelatedParameter(argName):
+
                 #for each queried value (e.g. Calculator1 : [coord_x, ..] add a set of fbo components.
                 for value in query[argName]:
-                    layer = self.__createLayer(query, baseLayer, otherBaseQueries, argName)
+                    layer = self.__createLayer(query, baseLayer, {argName: value}, argName)
                     layer.setLayerName(argName + "/" + str(value))
                     createdLayers.append(layer)
 
         return createdLayers
-
-    def __generateAdditionalBaseQueries(self, argName):
-        ''' Generates additional base queries required to display what a user specified.
-        It generates them by exploring the dependees (associations) recursively.'''
-        dependeesNames = self.store().getdependees(argName)
-        foundBaseQueries = {}
-
-        def recursivelyAddDependencies(dependerName, currentDependees, result):
-            for dName in currentDependees:
-                requiredValue = self.store().getDependeeValue(dependerName, dName)
-                result[dName] = requiredValue
-                #print "->>> recAddDep | current level: ", dependerName, " -> ", dName
-
-                nextDependees = self.store().getdependees(dName)
-                if len(nextDependees) > 0:  # TODO watch for the maximum recursion level
-                    recursivelyAddDependencies(dName, nextDependees, result)
-
-        recursivelyAddDependencies(argName, dependeesNames, foundBaseQueries)
-
-        return foundBaseQueries
 
     def __createLayer(self, query, baseLayer, otherBaseQueries, fieldName):
         ''' Creates a new layer by copying a 'baseLayer' and then including additional
@@ -122,12 +102,12 @@ class QueryTranslator_SpecB(QueryTranslator):
 
         return newLayer
 
-    def translateQuery(self, query):
+    def translateQuery(self, query, colorDefinitions = {}):
         ''' Receives a query and returns a set of LayerSpecs consisting of all the
         different layers to composite. '''
-        # resolve the base layer (time and camera). this also cleans up the query
+        # Resolve the base layer (time and camera). This also cleans up the query.
         baseLayer, otherQueriedNames = self._QueryTranslator__createBaseLayerFromQuery(query)
-        # create the layers  # TODO cache layers to not have to re-create them every time
+        # Create the layers (TODO cache layers and other db info to avoid re-creating them every time).
         allLayers = self.__generateQueriedLayers(query, baseLayer, otherQueriedNames)
         self._QueryTranslator__loadLayers(allLayers)
 

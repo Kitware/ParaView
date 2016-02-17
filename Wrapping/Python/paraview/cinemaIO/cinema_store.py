@@ -353,7 +353,7 @@ class Store(object):
         """ return a list of all the parameters that depend on the given one """
         result = []
         for depender, dependees in self.parameter_associations.iteritems():
-            if name in dependees:
+            if name in dependees["vis"]:
                 result.append(depender)
         return result
 
@@ -442,7 +442,7 @@ class Store(object):
         self.add_parameter(name, properties)
 
     def islayer(self, name):
-        return self.parameter_list[name]['role'] == 'layer'
+        return (self.parameter_list[name]['role'] == 'layer') if (name in self.parameter_list and 'role' in self.parameter_list[name]) else False
 
     def add_sublayer(self, name, properties, parent_layer, parents_value):
         """
@@ -463,7 +463,7 @@ class Store(object):
         self.assign_parameter_dependence(name, parent_layer, parents_values)
 
     def isfield(self, name):
-        return (self.parameter_list[name]['role'] == 'field') if (name in self.parameter_list) else False
+        return (self.parameter_list[name]['role'] == 'field') if (name in self.parameter_list and 'role' in self.parameter_list[name]) else False
 
     def add_control(self, name, properties):
         """
@@ -707,7 +707,7 @@ class FileStore(Store):
         if not os.path.exists(dirname):
             os.makedirs(dirname)
 
-        if not document.data == None:
+        if not document.data is None:
             doctype = self.determine_type(document.descriptor)
             if doctype == 'RGB' or doctype == 'VALUE' or doctype == 'LUMINANCE':
                 self.raster_wrangler.rgbwriter(document.data, fname)
@@ -865,7 +865,7 @@ class SingleFileStore(Store):
 
         index = self.get_sliceindex(document)
 
-        if not document.data == None:
+        if not document.data is None:
             dirname = os.path.dirname(self.__dbfilename)
             if not os.path.exists(dirname):
                 os.makedirs(dirname)
