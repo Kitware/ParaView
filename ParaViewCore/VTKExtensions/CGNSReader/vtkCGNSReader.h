@@ -35,18 +35,13 @@
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vtkPVVTKExtensionsCGNSReaderModule.h" // for export macro
-#include "vtkPVConfig.h"     // For PARAVIEW_USE_MPI
-
 #include "vtkCGNSReaderInternal.h" // For parsing information request
 
 class vtkDataSet;
 class vtkDataArraySelection;
 class vtkCallbackCommand;
 
-#ifdef PARAVIEW_USE_MPI
 class vtkMultiProcessController;
-#endif
-
 class VTKPVVTKEXTENSIONSCGNSREADER_EXPORT vtkCGNSReader : public vtkMultiBlockDataSetAlgorithm
 {
 public:
@@ -102,7 +97,6 @@ public:
   vtkGetMacro(CreateEachSolutionAsBlock,int);
   vtkBooleanMacro(CreateEachSolutionAsBlock,int);
 
-#ifdef PARAVIEW_USE_MPI
   // Description:
   // Set/get the communication object used to relay a list of files
   // from the rank 0 process to all others. This is the only interprocess
@@ -114,8 +108,6 @@ public:
   // Sends metadata (that read from the input file, not settings modified
   // through this API) from the rank 0 node to all other processes in a job.
   void Broadcast( vtkMultiProcessController* ctrl );
-#endif
-
 
 protected:
   vtkCGNSReader();
@@ -150,11 +142,9 @@ protected:
   int GetUnstructuredZone(int  base, int zone,
                           int cell_dim, int phys_dim, cgsize_t *zsize,
                           vtkMultiBlockDataSet *mbase);
-#ifdef PARAVIEW_USE_MPI
   vtkMultiProcessController* Controller;
   vtkIdType ProcRank;
   vtkIdType ProcSize;
-#endif
 
 #ifndef __WRAP__
   bool IsVarEnabled(CGNS_ENUMT(GridLocation_t) varcentering,

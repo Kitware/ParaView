@@ -27,8 +27,6 @@
 #ifndef vtkCGNSReaderInternal_h
 #define vtkCGNSReaderInternal_h
 
-#include "vtkPVConfig.h"     // For PARAVIEW_USE_MPI
-
 #include <cgnslib.h> // DataType, and other definition
 #include <cgns_io.h> // Low level IO for fast parsing
 
@@ -41,9 +39,7 @@
 #include "vtkPoints.h"
 #include "vtkIdTypeArray.h"
 
-#ifdef PARAVIEW_USE_MPI
 #include "vtkMultiProcessController.h"
-#endif
 
 namespace CGNSRead
 {
@@ -265,9 +261,7 @@ public:
   // print object debugging purpose
   void PrintSelf(std::ostream& os);
 
-#ifdef PARAVIEW_USE_MPI
   void Broadcast ( vtkMultiProcessController* controller, int rank );
-#endif
 
   // Description
   // Constructor/Destructor
