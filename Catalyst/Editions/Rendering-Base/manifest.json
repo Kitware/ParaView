@@ -127,6 +127,7 @@
         { "class": "vtkPVAxesWidget" },
         { "class": "vtkPVCenterAxesActor" },
         { "class": "vtkPVDefaultPass" },
+        { "class": "vtkPVDiscretizableColorTransferFunction" },
         { "class": "vtkPVGeometryFilter" },
         { "class": "vtkPVGL2PSExporter" },
         { "class": "vtkPVInteractorStyle" },

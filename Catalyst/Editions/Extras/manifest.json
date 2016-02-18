@@ -59,12 +59,10 @@
         { "class":"vtkExtractCells" },
         { "class":"vtkExtractSelectedBlock" },
         { "class":"vtkExtractSelectedIds" },
-        { "class":"vtkExtractSelectedFrustum" },
         { "class":"vtkExtractSelectedLocations" },
         { "class":"vtkExtractSelectedThresholds" },
         { "class":"vtkExtractSelectedRows" },
         { "class":"vtkExtractSelection" },
-        { "class":"vtkExtractSelectionBase" },
         { "class":"vtkProbeSelectedLocations" }
       ],
       "cswrap":true,
@@ -105,6 +103,8 @@
     { "name":"vtkFiltersGeneral",
       "path":"VTK/Filters/General",
       "include":[
+        { "class":"vtkExtractSelectedFrustum" },
+        { "class":"vtkExtractSelectionBase" },
         { "class":"vtkImageDataToPointSet" },
         { "class":"vtkRectilinearGridToPointSet" },
         { "class":"vtkTransformFilter" },
