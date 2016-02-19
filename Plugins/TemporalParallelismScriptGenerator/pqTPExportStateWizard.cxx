@@ -83,7 +83,7 @@ void pqTPExportStateWizard::customize()
   this->Internals->liveViz->hide();
   this->Internals->rescaleDataRange->hide();
   this->Internals->outputCinema->hide();
-  this->Internals->cinemaContainer->hide();
+  this->Internals->wCinemaTrackSelection->hide();
 }
 
 //-----------------------------------------------------------------------------
@@ -149,23 +149,8 @@ bool pqTPExportStateWizard::getCommandString(QString& command)
     }
   else // we are creating an image so we need to get the proper information from there
     {
-    vtkSMSessionProxyManager* proxyManager =
-        vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
-    for(int i=0;i<this->Internals->viewsContainer->count();i++)
-      {
-      pqImageOutputInfo* viewInfo = dynamic_cast<pqImageOutputInfo*>(
-        this->Internals->viewsContainer->widget(i));
-      pqView* view = viewInfo->getView();
-      QSize viewSize = view->getSize();
-      vtkSMViewProxy* viewProxy = view->getViewProxy();
-      QString info = QString(" '%1' : ['%2', '%3', '%4', '%5'],").
-        arg(proxyManager->GetProxyName("views", viewProxy)).
-        arg(viewInfo->getImageFileName()).arg(viewInfo->getMagnification()).
-        arg(viewSize.width()).arg(viewSize.height());
-      rendering_info+= info;
-      }
-    // remove the last comma -- assume that there's at least one view
-    rendering_info.chop(1);
+    QString itemFormat = " '%1' : ['%2', '%5', '%6', '%7']";
+    rendering_info = this->Internals->wViewSelection->getSelectionAsPythonScript(itemFormat, false);
     }
 
   QString filters ="ParaView Python State Files (*.py);;All files (*)";
