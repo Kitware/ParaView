@@ -71,6 +71,14 @@ pqBoolPropertyWidgetDecorator::pqBoolPropertyWidgetDecorator(
       this->Index = index;
       this->Function = function;
 
+      if (!this->Property)
+        {
+        qDebug() << "Property '" << (name ? name : "(null)")
+                 << "' specified in pqBoolPropertyWidgetDecorator not found in proxy '"
+                 << proxy->GetXMLName() << "'.";
+        break;
+        }
+
       this->ObserverId = this->Property->AddObserver(
         vtkCommand::UncheckedPropertyModifiedEvent,
         this, &pqBoolPropertyWidgetDecorator::updateBoolPropertyState);
