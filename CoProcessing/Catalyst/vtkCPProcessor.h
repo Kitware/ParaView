@@ -82,7 +82,9 @@ public:
   /// MPI_COMM_WORLD isn't the proper one. Catalyst is initialized
   /// to use MPI_COMM_WORLD by default.
   virtual int Initialize();
+#ifndef __WRAP__
   virtual int Initialize(vtkMPICommunicatorOpaqueComm& comm);
+#endif
 
   /// Configuration Step:
   /// The coprocessor first determines if any coprocessing needs to be done
