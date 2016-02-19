@@ -83,6 +83,7 @@ bool pqEditScalarBarReaction::editScalarBar()
     dialog.setWindowTitle("Edit Color Legend Parameters");
     dialog.setObjectName("ColorLegendEditor");
     dialog.setEnableSearchBar(true);
+    dialog.setSettingsKey("ColorLegendEditor");
 
     repr->connect(&dialog, SIGNAL(accepted()), SLOT(renderViewEventually()));
     return dialog.exec() == QDialog::Accepted;
