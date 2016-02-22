@@ -1715,7 +1715,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         return { 'success': True, 'id': reader.GetGlobalIDAsString() }
 
     @exportRpc("pv.proxy.manager.get")
-    def get(self, proxyId):
+    def get(self, proxyId, ui=True):
         """
         Returns the proxy state for the given proxyId as a JSON object.
         """
@@ -1723,8 +1723,11 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         proxyId = str(proxyId)
         self.fillPropertyList(proxyId, proxyProperties)
         proxyProperties = self.reorderProperties(proxyId, proxyProperties)
-        uiProperties = self.getUiProperties(proxyId, proxyProperties)
-        proxyJson = { 'id': proxyId, 'properties': proxyProperties, 'ui': uiProperties }
+        proxyJson = { 'id': proxyId, 'properties': proxyProperties }
+
+        # Perform costly request only when needed
+        if ui:
+            proxyJson['ui'] = self.getUiProperties(proxyId, proxyProperties)
 
         if 'specialHints' in self.propertyDetailsMap:
             proxyJson['hints'] = self.propertyDetailsMap['specialHints']
