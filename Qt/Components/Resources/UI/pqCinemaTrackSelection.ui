@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>601</width>
-    <height>368</height>
+    <height>440</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -65,7 +65,7 @@
             </attribute>
             <layout class="QVBoxLayout" name="verticalLayout">
              <item>
-              <widget class="pqTreeWidget" name="wArrayPicker" native="true">
+              <widget class="pqTreeView" name="viewArrayPicker" native="true">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                  <horstretch>0</horstretch>
@@ -156,9 +156,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>pqTreeWidget</class>
+   <class>pqTreeView</class>
    <extends>QWidget</extends>
-   <header>pqTreeWidget.h</header>
+   <header>pqTreeView.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

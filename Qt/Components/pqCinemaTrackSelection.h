@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqCinemaTrackSelection_h
 #define pqCinemaTrackSelection_h
 
+#include <map>
+
 #include "pqComponentsModule.h"
 #include <QWidget>
 
@@ -43,11 +45,13 @@ namespace Ui
 
 class QModelIndex;
 
-class vtkSMSourceProxy;
+//class vtkSMSourceProxy;
 class pqPipelineFilter;
 class pqCinemaTrack;
 class pqPipelineModel;
 class pqPipelineAnnotationFilterModel;
+class pqPipelineSource;
+class pqArraySelectionModel;
 
 /// @brief Widget to select among supported Cinema Tracks (filters).
 ///
@@ -60,6 +64,9 @@ class PQCOMPONENTS_EXPORT pqCinemaTrackSelection : public QWidget
 
 public:
 
+  typedef std::pair<pqArraySelectionModel*, pqCinemaTrack*> ItemValues;
+  typedef std::map<QString, ItemValues> ItemValuesMap;
+  
   pqCinemaTrackSelection(QWidget* parent_ = NULL);
   ~pqCinemaTrackSelection();
 
@@ -93,12 +100,15 @@ private:
   /// ServerManagerModel and passes it to the View object.
   void initializePipelineBrowser();
 
-  /// Clear value-array widget and re-populate using the provided proxy.
-  void populateArrayPicker(vtkSMSourceProxy* proxy);
+  void initializePipelineItemValues(QList<pqPipelineSource*> const & items);
+
+  pqPipelineSource* getPipelineSource(QModelIndex const & index) const;
 
   /////////////////////////////////////////////////////////////////////////////
 
   Ui::CinemaTrackSelection* Ui;
+
+  ItemValuesMap PipelineItemValues;
 };
 
 #endif
