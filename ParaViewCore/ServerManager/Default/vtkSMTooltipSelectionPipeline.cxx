@@ -363,7 +363,14 @@ vtkDataSet* vtkSMTooltipSelectionPipeline::FindDataSet(vtkDataObject* dataObject
       if (ds)
         {
         compositeFound = true;
-        compositeName = it->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME());
+        std::stringstream ssname;
+        ssname << it->GetCurrentFlatIndex() - 1;
+        const char* name = it->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME());
+        if (name)
+          {
+          ssname << ": " << name;
+          }
+        compositeName = ssname.str();
         break;
         }
       it->GoToNextItem();
