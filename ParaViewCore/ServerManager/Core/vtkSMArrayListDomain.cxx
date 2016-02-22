@@ -212,7 +212,7 @@ void vtkSMArrayListDomainInternals::BuildArrayList(
       {
       continue;
       }
-    assert(acceptable_as != vtkSMInputArrayDomain::ANY);
+    assert(acceptable_as != vtkSMInputArrayDomain::ANY && acceptable_as != vtkSMInputArrayDomain::ANY_EXCEPT_FIELD);
 
     // iterate over all arrays and add them to the list, if acceptable.
     for (int idx=0, maxIdx=attrInfo->GetNumberOfArrays(); idx < maxIdx; ++idx)
