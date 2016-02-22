@@ -1545,6 +1545,12 @@ int vtkCGNSReader::GetUnstructuredZone(int base, int zone,
     return 1;
     }
 
+  // Set up ugrid - we need to refer to it if we're building an NFACE_n or NGON_n grid
+  // Create an unstructured grid to contain the points.
+  vtkUnstructuredGrid *ugrid = vtkUnstructuredGrid::New();
+  ugrid->SetPoints(points);
+
+  bool buildGrid(true);
   // Iterate over core sections.
   for (std::vector<int>::iterator iter = coreSec.begin();
        iter != coreSec.end(); ++iter)
@@ -1563,7 +1569,7 @@ int vtkCGNSReader::GetUnstructuredZone(int base, int zone,
     double cgioSectionId;
     cgioSectionId = elemIdList[sec];
 
-    if (elemType != CGNS_ENUMV(MIXED))
+    if (elemType != CGNS_ENUMV(MIXED) && elemType != CGNS_ENUMV(NFACE_n) && elemType != CGNS_ENUMV(NGON_n)) // MDvR: test for NFACE_n, NGON_n too
       {
       // All cells are of the same type.
       int numPointsPerCell = 0;
@@ -1700,10 +1706,198 @@ int vtkCGNSReader::GetUnstructuredZone(int base, int zone,
         CGNSRead::CGNS2VTKorder(elementSize, &cellsTypes[start-1], localElements);
         }
       }
+    else if ( elemType == CGNS_ENUMV(NFACE_n))
+      {
+      buildGrid = false;      
+    
+      // the faces are in NGON_n format, and are in another section - or multiple sections!
+      std::vector<vtkIdType> faceElements;
+      vtkIdType numFaces(0);
+      cgsize_t fDataSize(0);
+      for(size_t osec = 0, n = 0; osec < sectionInfoList.size(); ++osec)
+        {
+        // the documentation specifies that the faces of NFACE_n are always in NGON_n
+        // format, so look for another section that has that element type.        
+        if (osec == sec) continue; // skip self
+        if (sectionInfoList[osec].elemType == NGON_n)
+          {            
+          fDataSize = sectionInfoList[osec].eDataSize;
+          // resize to fit the next batch of element connectivity values
+          faceElements.resize(faceElements.size() + fDataSize);
+      
+          numFaces = 1 +  sectionInfoList[osec].range[1] -  sectionInfoList[osec].range[0];
+          
+          cgsize_t memDim[2];
+          
+          srcStart[0]  = 1 ;
+          srcEnd[0] = fDataSize;
+          srcStride[0] = 1;
+          
+          memStart[0]  = 1;
+          memStart[1]  = 1;
+          memEnd[0]    = fDataSize;
+          memEnd[1]    = 1;
+          memStride[0] = 1;
+          memStride[1] = 1;
+          memDim[0]    = fDataSize;
+          memDim[1]    = 1;
+        
+          if(0 != CGNSRead::get_section_connectivity(this->cgioNum, elemIdList[osec], 1,
+                              srcStart, srcEnd, srcStride,
+                              memStart, memEnd, memStride,
+                              memDim, &faceElements[n]))
+             {
+             vtkErrorMacro(<< "FAILED to read NGON_n cells\n");
+             return 1;
+             }
+
+          n += fDataSize; // points to next index      
+          }
+        }
+      
+      vtkNew<vtkIdTypeArray> cellArray;
+      cgsize_t eDataSize(0);
+      eDataSize = sectionInfoList[sec].eDataSize;
+        
+      cellArray->SetNumberOfValues(eDataSize);
+      vtkIdType* cellElements = cellArray->GetPointer(0);
+      cgsize_t memDim[2];
+      
+      srcStart[0]  = 1 ;
+      srcEnd[0] = eDataSize;
+      srcStride[0] = 1;
+      
+      memStart[0]  = 1;
+      memStart[1]  = 1;
+      memEnd[0]    = eDataSize;
+      memEnd[1]    = 1;
+      memStride[0] = 1;
+      memStride[1] = 1;
+      memDim[0]    = eDataSize;
+      memDim[1]    = 1;
+      
+      if (0 != CGNSRead::get_section_connectivity(this->cgioNum, cgioSectionId, 1,
+                                         srcStart, srcEnd, srcStride,
+                                         memStart, memEnd, memStride,
+                                         memDim, cellElements))
+        {
+        vtkErrorMacro(<< "FAILED to read NFACE_n cells\n");
+        return 1;
+        }
+      
+      // ok, now we have the face-to-node connectivity array and the cell-to-face connectivity array.
+      // VTK, however, has no concept of faces, and uses cell-to-node connectivity, so the intermediate faces
+      // need to be taken out of the description.
+      
+      std::vector<vtkIdType> faceNodeLookupTable(numFaces);
+      
+      vtkIdType p(0);
+      for(vtkIdType nf = 0; nf < numFaces; ++nf)
+        {      
+        faceNodeLookupTable[nf] = p;
+        p += 1 + faceElements[p];
+        }
+      
+      p = 0;
+      for(vtkIdType nc = 0; nc < numCoreCells; ++nc)
+        {
+        int numCellFaces = cellElements[p];
+        
+        vtkNew<vtkIdList> faces;
+        faces->InsertNextId(numCellFaces);
+      
+        for(vtkIdType nf = 0; nf < numCellFaces; ++nf)
+          {
+          vtkIdType faceId = cellElements[p + nf + 1]; 
+          bool mustReverse = faceId > 0;
+          faceId = abs(faceId); 
+
+          // the following is needed because when the NGON_n face data preceeds the 
+          // NFACE_n cell data, the indices are continuous, so a "global-to-local" mapping must be done.
+          faceId -= sectionInfoList[sec].range[1]; 
+          faceId -= 1; // CGNS uses FORTRAN ID style, starting at 1
+          
+          vtkIdType q = faceNodeLookupTable[faceId]; 
+          vtkIdType numNodes = faceElements[q];
+          faces->InsertNextId(numNodes);
+          if (mustReverse)
+            {
+            for(vtkIdType nn = numNodes - 1; nn >= 0; --nn)
+              {
+              vtkIdType nodeID = faceElements[q + nn + 1] - 1; // AGAIN subtract 1 from node ID
+              faces->InsertNextId(nodeID);  
+              }
+            }
+          else
+            {
+            for (vtkIdType nn = 0; nn < numNodes; ++nn)
+              {
+              vtkIdType nodeID = faceElements[q + nn + 1] - 1; // AGAIN subtract 1 from node ID
+              faces->InsertNextId(nodeID);  
+              }
+            }
+          }
+        ugrid->InsertNextCell(VTK_POLYHEDRON, faces.GetPointer());
+        p += 1 + numCellFaces; //p now points to the index of the next cell
+        }      
+      }
+    else if (elemType == CGNS_ENUMV(NGON_n))
+      {
+      buildGrid = false;
+      vtkNew<vtkIdTypeArray> ngonFaceArray;
+      cgsize_t eDataSize = 0;
+      eDataSize = sectionInfoList[sec].eDataSize;
+        
+      ngonFaceArray->SetNumberOfValues(eDataSize);
+      vtkIdType* localElements = ngonFaceArray->GetPointer(0);
+      cgsize_t memDim[2];
+      
+      srcStart[0]  = 1 ;
+      srcEnd[0] = eDataSize;
+      srcStride[0] = 1;
+      
+      memStart[0]  = 1;
+      memStart[1]  = 1;
+      memEnd[0]    = eDataSize;
+      memEnd[1]    = 1;
+      memStride[0] = 1;
+      memStride[1] = 1;
+      memDim[0]    = eDataSize;
+      memDim[1]    = 1;
+      
+      if (0 != CGNSRead::get_section_connectivity(this->cgioNum, cgioSectionId, 1,
+                                         srcStart, srcEnd, srcStride,
+                                         memStart, memEnd, memStride,
+                                         memDim, localElements))
+        {
+        vtkErrorMacro(<< "FAILED to read NGON_n cells\n");
+        return 1;
+        }
+      
+      vtkIdType numFaces = 1+ sectionInfoList[sec].range[1] - sectionInfoList[sec].range[0];
+      int p(0);
+      for(vtkIdType nf = 0; nf < numFaces ; ++nf)
+        {
+        vtkIdType numNodes = localElements[p];
+        vtkNew<vtkIdList> nodes;
+        //nodes->InsertNextId(numNodes);
+        for (vtkIdType nn = 0; nn < numNodes; ++nn)
+          {
+          vtkIdType nodeId = localElements[p+nn+1];
+          nodeId -= 1; // FORTRAN to C-style indexing
+          nodes->InsertNextId(nodeId);
+          }
+        ugrid->InsertNextCell(VTK_POLYGON, nodes.GetPointer());
+        p += 1 + numNodes;
+        }
+      }
+
     cgio_release_id(this->cgioNum, cgioSectionId);
     }
+  
+  if (buildGrid)
+    cells->SetCells(numCoreCells , cellLocations.GetPointer());
 
-  cells->SetCells(numCoreCells , cellLocations.GetPointer());
   //
   bool requiredPatch = (this->LoadBndPatch != 0);
   // SetUp zone Blocks
@@ -1718,12 +1912,8 @@ int vtkCGNSReader::GetUnstructuredZone(int base, int zone,
     }
   mzone->GetMetaData((unsigned int) 0)->Set(vtkCompositeDataSet::NAME(), "Internal");
 
-  // Set up ugrid
-  // Create an unstructured grid to contain the points.
-  vtkUnstructuredGrid *ugrid = vtkUnstructuredGrid::New();
-  ugrid->SetPoints(points);
-
-  ugrid->SetCells(cellsTypes, cells.GetPointer());
+  if(buildGrid)
+    ugrid->SetCells(cellsTypes, cells.GetPointer());
 
   delete [] cellsTypes;
 

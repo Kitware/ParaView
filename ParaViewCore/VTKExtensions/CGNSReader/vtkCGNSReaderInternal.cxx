@@ -157,6 +157,7 @@ int get_section_connectivity(const int cgioNum, const double cgioSectionId,
       char message[81];
       cgio_error_message(message);
       std::cerr << "cgio_read_data :" << message;
+      return 1;
       }
     }
   else
