@@ -69,6 +69,10 @@
         "type": "BOOL",
         "value": "ON"
       },
+      { "name": "Module_vtkIOExportOpenGL",
+        "type": "BOOL",
+        "value": "ON"
+      },
       { "name": "Module_vtkRenderingAnnotation",
         "type": "BOOL",
         "value": "ON"
@@ -123,6 +127,7 @@
         { "class": "vtkPVAxesWidget" },
         { "class": "vtkPVCenterAxesActor" },
         { "class": "vtkPVDefaultPass" },
+        { "class": "vtkPVDiscretizableColorTransferFunction" },
         { "class": "vtkPVGeometryFilter" },
         { "class": "vtkPVGL2PSExporter" },
         { "class": "vtkPVInteractorStyle" },
@@ -196,6 +201,14 @@
       ],
       "replace": [
         { "path": "VTK/IO/Export/CMakeLists.txt" }
+      ],
+      "cswrap": true,
+      "pythonwrap": true
+    },
+    { "name": "vtkIOExportOpenGL",
+      "path": "VTK/IO/ExportOpenGL",
+      "exclude": [
+        { "path": "Testing" }
       ],
       "cswrap": true,
       "pythonwrap": true

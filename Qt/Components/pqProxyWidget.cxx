@@ -31,8 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqProxyWidget.h"
 
-#include "pq3DWidget.h"
-#include "pq3DWidgetPropertyWidget.h"
 #include "pqApplicationCore.h"
 #include "pqApplicationCore.h"
 #include "pqCommandPropertyWidget.h"
@@ -758,7 +756,7 @@ void pqProxyWidget::hideEvent(QHideEvent *hevent)
   if (hevent == NULL || !hevent->spontaneous())
     {
     foreach (const pqProxyWidgetItem* item, this->Internals->Items)
-      {
+  {
       item->deselect();
       }
     }
@@ -857,12 +855,12 @@ void pqProxyWidget::createWidgets(const QStringList &properties)
     }
   else
     {
-    //qCritical() << smproxy->GetXMLName() << " is using a custom object panel "
-    //  "(pqObjectPanel subclass). pqObjectPanel and subclasses are deprecated since "
-    //  "ParaView 4.0 and will no longer work in subsequent releases."
-    //  "Please update the code to use custom property widgets "
-    //  "(pqPropertyWidget subclasses) instead."
-    //  "Contact the mailing list if you need assistance.";
+    qWarning() << smproxy->GetXMLName() << "is using a custom object panel "
+      "(pqObjectPanel subclass). pqObjectPanel and subclasses are deprecated since "
+      "ParaView 4.0 and will no longer work in subsequent releases 5.1 onwards. "
+      "Please update the code to use custom property widgets "
+      "(pqPropertyWidget subclasses) instead. "
+      "Contact the mailing list if you need assistance.";
     }
 
   foreach (const pqProxyWidgetItem* item, this->Internals->Items)
@@ -1115,19 +1113,10 @@ void pqProxyWidget::create3DWidgets()
 {
   vtkSMProxy *smProxy = this->proxy();
   vtkPVXMLElement *hints = smProxy->GetHints();
-  if (!hints)
+  if (hints && (hints->FindNestedElementByName("PropertyGroup") != NULL))
     {
-    return;
-    }
-
-  QList<pq3DWidget*> widgets3d = pq3DWidget::createWidgets(smProxy, smProxy);
-  foreach (pq3DWidget *widget3d, widgets3d)
-    { 
-    pq3DWidgetPropertyWidget* wdg = new pq3DWidgetPropertyWidget(widget3d, this);
-    pqProxyWidgetItem *item = pqProxyWidgetItem::newItem(wdg, QString(), this);
-    widget3d->resetBounds();
-    widget3d->reset();
-    this->Internals->appendToItems(item, this);
+    qCritical("Obsolete 3DWidget request encountered in the proxy hints. "
+      "Please refer to the 'Major API Changes' guide in ParaView developer documentation.");
     }
 }
 

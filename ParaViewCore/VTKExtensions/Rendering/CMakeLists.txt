@@ -51,6 +51,7 @@ set(Module_SRCS
   vtkPVDefaultPass.cxx
   vtkPVDiscretizableColorTransferFunction.cxx
   vtkPVGeometryFilter.cxx
+  vtkPVGL2PSExporter.cxx
   vtkPVInteractorStyle.cxx
   vtkPVJoystickFly.cxx
   vtkPVJoystickFlyIn.cxx
@@ -82,12 +83,12 @@ set(Module_SRCS
   vtkViewLayout.cxx
   vtkVolumeRepresentationPreprocessor.cxx
   vtkZlibImageCompressor.cxx
+  vtkCinemaExporter.cxx
 )
 
 # Disabled unless using the OpenGL backend.
 if ("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
   list(APPEND Module_SRCS
-    vtkPVGL2PSExporter.cxx
     vtkTexturePainter.cxx
     )
 endif()

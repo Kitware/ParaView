@@ -483,9 +483,6 @@ int vtkSQVPICReader::RequestData(
 
   // Even if the pipeline asks for a smaller subextent, give it the
   // full subextent with ghosts
-  vtkStreamingDemandDrivenPipeline* pipeline =
-      vtkStreamingDemandDrivenPipeline::SafeDownCast(this->GetExecutive());
-  pipeline->SetUpdateExtent(outInfo, this->SubExtent);
 
   // Set the subextent for this processor
   output->SetExtent(this->SubExtent);

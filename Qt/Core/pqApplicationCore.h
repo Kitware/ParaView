@@ -61,6 +61,7 @@ class QHelpEngine;
 class QStringList;
 class vtkPVXMLElement;
 class vtkSMProxyLocator;
+class vtkSMStateLoader;
 
 /// This class is the crux of the ParaView application. It creates
 /// and manages various managers which are necessary for the ParaView-based
@@ -204,8 +205,13 @@ public:
 
   /// Loads the ServerManager state. Emits the signal
   /// stateLoaded() on loading state successfully.
-  void loadState(vtkPVXMLElement* root, pqServer* server);
-  void loadState(const char* filename, pqServer* server);
+  void loadState(vtkPVXMLElement* root, pqServer* server, vtkSMStateLoader* loader=NULL);
+  void loadState(const char* filename, pqServer* server, vtkSMStateLoader* loader=NULL);
+
+  /// Same as loadState() except that it doesn't clear the current visualization
+  /// state.
+  void loadStateIncremental(vtkPVXMLElement* root, pqServer* server, vtkSMStateLoader* loader=NULL);
+  void loadStateIncremental(const QString& filename, pqServer* server, vtkSMStateLoader* loader=NULL);
 
   /// Check to see if its in the process of loading a state
   /// Reliance on this flag is chimerical since we cannot set this ivar when

@@ -232,6 +232,15 @@ def get_state(propertiesToTraceOnCreate=1, # sm.vtkSMTrace.RECORD_MODIFIED_PROPE
                 for rep in view_scalarbars:
                     smtrace.Trace.get_accessor(rep)
             trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
+
+    # restore the active source since the order in which the pipeline is created
+    # in the state file can end up changing the active source to be different
+    # than what it was when the state is being saved.
+    trace.append_separated([\
+            "# ----------------------------------------------------------------",
+            "# finally, restore active source",
+            "SetActiveSource(%s)" % smtrace.Trace.get_accessor(simple.GetActiveSource()),
+            "# ----------------------------------------------------------------"])
     del trace_config
     smtrace.stop_trace()
     #print trace

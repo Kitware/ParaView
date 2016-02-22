@@ -70,6 +70,11 @@ public:
 
   vtkSMLiveInsituLinkProxy* getProxy() const;
 
+  /// Convenience method to return the displaySession for a catalystSession. If
+  /// the argument is not a catalystSession, it will simply return the same
+  /// session without any errors.
+  static pqServer* displaySession(pqServer* catalystSession);
+
 signals:
   void insituConnected();
   void insituDisconnected();

@@ -68,14 +68,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDialog.h"
 
 #include <QComboBox>
+#include <QDebug>
 #include <QLabel>
+#include <QPushButton>
+#include <QRegExp>
+#include <QStyle>
 #include <QTextEdit>
 #include <QTreeWidget>
 #include <QVBoxLayout>
-#include <QPushButton>
-#include <QStyle>
-
-#include <QDebug>
 
 #ifdef PARAVIEW_ENABLE_PYTHON
 #include "pqPythonSyntaxHighlighter.h"
@@ -94,12 +94,14 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
     return;
     }
 
+  vtkPVXMLElement* hints = svp->GetHints();
+
   bool multiline_text = false;
   bool python = false;
   QString placeholderText;
-  if (svp->GetHints())
+  if (hints)
     {
-    vtkPVXMLElement* widgetHint = svp->GetHints()->FindNestedElementByName("Widget");
+    vtkPVXMLElement* widgetHint = hints->FindNestedElementByName("Widget");
     if (widgetHint && widgetHint->GetAttribute("type") &&
       strcmp(widgetHint->GetAttribute("type"), "multi_line") == 0)
       {
@@ -110,7 +112,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
       {
       python = true;
       }
-    if (vtkPVXMLElement* phtElement = svp->GetHints()->FindNestedElementByName("PlaceholderText"))
+    if (vtkPVXMLElement* phtElement = hints->FindNestedElementByName("PlaceholderText"))
       {
       placeholderText = phtElement->GetCharacterData();
       placeholderText = placeholderText.trimmed();
@@ -196,11 +198,29 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
 
     // If there's a hint on the smproperty indicating that this smproperty expects a
     // directory name, then, we will use the directory mode.
-    if (smProperty->IsA("vtkSMStringVectorProperty") &&
-        smProperty->GetHints() &&
-        smProperty->GetHints()->FindNestedElementByName("UseDirectoryName"))
+
+    if (hints && hints->FindNestedElementByName("UseDirectoryName"))
       {
       chooser->setUseDirectoryMode(true);
+      }
+
+    if (vtkPVXMLElement* fileChooserHints = hints? hints->FindNestedElementByName("FileChooser") : NULL)
+      {
+      // We could also support multiple FileChooser hints. For now, we will only
+      // support 1.
+      const char* extensions = fileChooserHints->GetAttribute("extensions");
+      const char* file_description = fileChooserHints->GetAttribute("file_description");
+      if (!extensions || !file_description)
+        {
+        PV_DEBUG_PANELS() << "Incomplete 'FileChooser' hints specified. Skipping them.";
+        }
+      else
+        {
+        PV_DEBUG_PANELS() << "'FileChooser' hints specified. Will use them to limit entries listed "
+          << "in file chooser widget.";
+        QStringList lextensions = QString(extensions).split(QRegExp("\\s+"), QString::SkipEmptyParts);
+        chooser->setExtension(QString("%1 (*.%2)").arg(file_description).arg(lextensions.join(" *.")));
+        }
       }
 
     pqServerManagerModel *smm =

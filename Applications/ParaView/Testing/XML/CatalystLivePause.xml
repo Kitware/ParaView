@@ -42,7 +42,7 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ComputeNormals/CheckBox" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,73,12,/1:0/0:0/1:0" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,73,12,/1:0/0:0/1:0" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CutFunction/1pqProxySelectionWidget0/pqImplicitPlaneWidget/normalY" command="set_string" arguments="1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CutFunction/ProxySelectionWidget/frame/ChosenProxyWidget/InteractivePlane/normalY" command="set_string" arguments="1" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mousePress" arguments="1,1,0,5,48" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseMove" arguments="1,0,0,5,124" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,5,124" />

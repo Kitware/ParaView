@@ -79,7 +79,7 @@ class ImageExplorer(explorers.Explorer):
         if self.CaptureDepth:
             simple.Render()
             image = self.view.CaptureDepthBuffer()
-            idata = numpy_support.vtk_to_numpy(image) * 256
+            idata = numpy_support.vtk_to_numpy(image)
             rw = self.view.GetRenderWindow()
             width,height = rw.GetSize()
             try:

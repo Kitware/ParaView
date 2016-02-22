@@ -212,7 +212,7 @@ void vtkPVTemporalDataInformation::CopyFromObject(vtkObject* object)
       // skip the timestep already seen.
       continue;
       }
-    sddp->SetUpdateTimeStep(port->GetIndex(), *iter);
+    pipelineInfo->Set(sddp->UPDATE_TIME_STEP(), *iter);
     sddp->Update(port->GetIndex());
 
     dobj = port->GetProducer()->GetOutputDataObject(port->GetIndex());

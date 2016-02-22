@@ -38,16 +38,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 #include <QScopedPointer>
 
+
 class pqView;
 namespace Ui { class ImageOutputInfo; }
 
 class PQCOMPONENTS_EXPORT pqImageOutputInfo : public QWidget
 {
   Q_OBJECT
-  typedef QWidget Superclass;
+
 public:
-  pqImageOutputInfo(
-    QWidget *parentObject, Qt::WindowFlags parentFlags, pqView* view, QString& viewName);
+  pqImageOutputInfo(QWidget* parent_ = NULL);
+  pqImageOutputInfo(QWidget* parentObject, Qt::WindowFlags parentFlags,
+    pqView* view, QString& viewName);
+
   ~pqImageOutputInfo();
 
   void setupScreenshotInfo();
@@ -62,12 +65,13 @@ public:
   bool fitToScreen();
   int getMagnification();
 
-  void showCinema();
-  void hideCinema();
-
+  /// Remove or add options depending on whether cinema is visible
+  /// and specA should be supported.
+  void setCinemaVisible(bool status, bool specASupport = true);
   const QString getCameraType();
   double getPhi();
   double getTheta();
+  void setView(pqView* const view);
 
 public slots:
   void updateImageFileName();
@@ -75,10 +79,14 @@ public slots:
   void updateCinemaType(const QString&);
 
 private:
-  Q_DISABLE_COPY(pqImageOutputInfo)
-  QScopedPointer<Ui::ImageOutputInfo> Info;
-  pqView* View;
+
+  void initialize(Qt::WindowFlags parentFlags, pqView* view,
+    QString const & viewName);
 
   void updateSpherical();
+
+  Q_DISABLE_COPY(pqImageOutputInfo)
+  QScopedPointer<Ui::ImageOutputInfo> Ui;
+  pqView* View;
 };
 #endif

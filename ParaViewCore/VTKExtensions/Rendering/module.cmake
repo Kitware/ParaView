@@ -47,6 +47,7 @@ vtk_module(vtkPVVTKExtensionsRendering
     vtkRendering${VTK_RENDERING_BACKEND}
     vtkRenderingParallel
     vtkIOExport
+    vtkIOExport${VTK_RENDERING_BACKEND}
     ${__dependencies}
     vtkRenderingVolumeAMR
   PRIVATE_DEPENDS

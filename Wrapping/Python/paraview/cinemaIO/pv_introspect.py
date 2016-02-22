@@ -165,7 +165,8 @@ def addFilterValueSublayer(name, parentLayer, cs, userDefinedValues):
     # generate values depending on the type of filter
     if isinstance(source, paraview.simple.servermanager.filters.Clip):
         # grab values from ui or generate defaults
-        values = userDefinedValues["clip"] if ("clip" in userDefinedValues) else generateOffsetValues()
+        values = userDefinedValues[name] if (name in userDefinedValues) else generateOffsetValues()
+        if len(values) == 0: values = generateOffsetValues()
 
         # add sublayer and create the appropriate track
         cs.add_sublayer(name, cinema_store.make_parameter(name, values), parentLayer, name)
@@ -174,7 +175,8 @@ def addFilterValueSublayer(name, parentLayer, cs, userDefinedValues):
 
     elif isinstance(source, paraview.simple.servermanager.filters.Slice):
         # grab values from ui or generate defaults
-        values = userDefinedValues["slice"] if ("slice" in userDefinedValues) else generateOffsetValues()
+        values = userDefinedValues[name] if (name in userDefinedValues) else generateOffsetValues()
+        if len(values) == 0: values = generateOffsetValues()
 
         # add sublayer and create the appropriate track
         cs.add_sublayer(name, cinema_store.make_parameter(name, values), parentLayer, name)
@@ -188,7 +190,8 @@ def addFilterValueSublayer(name, parentLayer, cs, userDefinedValues):
             vRange = source.Input.GetDataInformation().DataInformation.GetPointDataInformation().GetArrayInformation(0).GetComponentRange(0)
             return np.linspace(vRange[0], vRange[1], 5).tolist() # generate 5 contour values
 
-        values = userDefinedValues["contour"] if ("contour" in userDefinedValues) else generateContourValues()
+        values = userDefinedValues[name] if (name in userDefinedValues) else generateContourValues()
+        if len(values) == 0: values = generateContourValues()
 
         # add sublayer and create the appropriate track
         cs.add_sublayer(name, cinema_store.make_parameter(name, values), parentLayer, name)
@@ -321,11 +324,12 @@ def make_cinema_store(levels, ocsfname, forcetime=False, _userDefinedValues={}):
         cs.add_parameter('time', tprop)
         fnp = fnp+"{time}_"
     else:
-        #time not specified, try and make them automaticvally
+        #time not specified, try and make them automatically
         times = paraview.simple.GetAnimationScene().TimeKeeper.TimestepValues
         if not times:
             pass
         else:
+            prettytimes = [float_limiter(t) for t in times]
             cs.add_parameter("time", cinema_store.make_parameter('time', prettytimes))
             fnp = fnp+"{time}_"
     cs.add_parameter("phi", cinema_store.make_parameter('phi', phis))
@@ -483,3 +487,90 @@ def record(csname="/tmp/test_pv/info.json"):
 
     restore_visibility(pxystate)
     cs.save()
+
+def export_scene(baseDirName, viewSelection, trackSelection):
+    '''This explores a set of user-defined views and tracks. export_scene is
+    called from vtkCinemaExport.  The expected order of parameters is as follows:
+
+    - viewSelection (following the format defined in Wrapping/Python/paraview/cpstate.py):
+
+    Directory  of the form {'ViewName' : [parameters], ...}, with parameters defined in the
+    order:  Image filename, freq, fittoscreen, magnification, width, height, cinema).
+
+    - trackSelection:
+
+    Directory of the form {'TrackName' : [v1, v2, v3], ...}
+
+    Note:  baseDirName is used as the parent directory of the database generated for
+    each view in viewSelection. 'Image filename' is used as the database directory name.
+    '''
+
+    import paraview.simple as pvs
+
+    # save initial state
+    initialView = pvs.GetActiveView()
+    pvstate = record_visibility()
+
+    atLeastOneViewExported = False
+    for viewName, viewParams in viewSelection.iteritems():
+
+        # check if this view was selected to export as spec b
+        cinemaParams = viewParams[6]
+        if len(cinemaParams) == 0:
+            print "Skipping view: Not selected to export as cinema spherical."
+            continue
+
+        # get the view and save the initial status
+        view = pvs.FindView(viewName)
+        pvs.SetActiveView(view)
+        view.ViewSize = [viewParams[4], viewParams[5]]
+        pvs.Render() # fully renders the scene (if not, some faces might be culled)
+        view.LockBounds = 1
+
+        #writeFreq = viewParams[1] # TODO where to get the timestamp in this case?
+        #if (writeFreq and timestamp % writeFreq == 0):
+
+        #magnification = viewParams[3] # Not used in cinema (TODO hide in UI)
+
+        fitToScreen = viewParams[2]
+        if fitToScreen != 0:
+            if view.IsA("vtkSMRenderViewProxy") == True:
+                view.ResetCamera()
+            elif view.IsA("vtkSMContextViewProxy") == True:
+                view.ResetDisplay()
+            else:
+                print ' do not know what to do with a ', view.GetClassName()
+
+        userDefValues = {}
+        if "theta" in cinemaParams:
+            userDefValues["theta"] = cinemaParams["theta"]
+
+        if "phi" in cinemaParams:
+            userDefValues["phi"] = cinemaParams["phi"]
+
+        userDefValues.update(trackSelection)
+
+        # generate file path
+        import os.path
+        viewFileName = viewParams[0]
+        viewDirName = viewFileName[0:viewFileName.rfind("_")] #strip _num.ext
+        filePath = os.path.join(baseDirName, viewDirName, "info.json")
+
+        p = inspect()
+        l = munch_tree(p)
+        cs = make_cinema_store(l, filePath, forcetime = False,
+          _userDefinedValues = userDefValues)
+
+        explore(cs, p)
+
+        view.LockBounds = 0
+        cs.save()
+        atLeastOneViewExported = True
+
+    if not atLeastOneViewExported:
+        print "No view was selected to export as cinema spherical."
+        return
+
+    # restore initial state
+    pvs.SetActiveView(initialView)
+    restore_visibility(pvstate)

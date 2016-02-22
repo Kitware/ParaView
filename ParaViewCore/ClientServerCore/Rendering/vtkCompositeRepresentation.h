@@ -82,11 +82,6 @@ public:
   virtual vtkDataObject* GetRenderedDataObject(int port);
 
   // Description:
-  // Bring this algorithm's outputs up-to-date.
-  virtual void Update() { this->Superclass::Update(); }
-  virtual void Update(int port);
-
-  // Description:
   // Returns the list of available representation types as a string array.
   vtkStringArray* GetRepresentationTypes();
 

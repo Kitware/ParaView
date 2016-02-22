@@ -28,29 +28,6 @@
       </SubProxy>
     </NewWidgetRepresentationProxy>
     <!-- ================================================================== -->
-    <NewWidgetRepresentationProxy base_proxygroup="representations"
-                                  base_proxyname="HandleWidgetRepresentation"
-                                  class="vtk3DWidgetRepresentation"
-                                  name="PointSourceWidgetRepresentation">
-      <!--
-        This is same as handle widget except that it provides
-        dummy properties for the radius/number of points in a point
-        source.
-      -->
-      <DoubleVectorProperty default_values="1.0"
-                            name="Radius"
-                            number_of_elements="1">
-        <DoubleRangeDomain min="0"
-                           name="range" />
-      </DoubleVectorProperty>
-      <IntVectorProperty default_values="1"
-                         name="NumberOfPoints"
-                         number_of_elements="1">
-        <IntRangeDomain min="1"
-                        name="range" />
-      </IntVectorProperty>
-    </NewWidgetRepresentationProxy>
-    <!-- ================================================================== -->
     <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
                                   name="LineWidgetRepresentation">
       <IntVectorProperty command="SetEnabled"
@@ -70,7 +47,6 @@
           <Property name="Point1WorldPosition" />
           <Property name="Point2WorldPositionInfo" />
           <Property name="Point2WorldPosition" />
-          <Property name="PlaceWidget" />
           <Property name="LineColor" />
         </ExposedProperties>
       </SubProxy>
@@ -103,7 +79,7 @@
     <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
                                   name="ImplicitPlaneWidgetRepresentation">
       <IntVectorProperty command="SetEnabled"
-                         default_values="0"
+                         default_values="1"
                          name="Enabled"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
@@ -1211,7 +1187,7 @@
       </IntVectorProperty>
       <IntVectorProperty animateable="1"
                          command="SetDrawPlane"
-                         default_values="1"
+                         default_values="0"
                          name="DrawPlane"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
@@ -1292,40 +1268,6 @@
                             information_only="1"
                             name="Point2WorldPositionInfo">
         <SimpleDoubleInformationHelper />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty argument_is_array="1"
-                            command="SetPoint1DisplayPosition"
-                            default_values="0 0 0"
-                            information_property="Point1DisplayPositionInfo"
-                            name="Point1DisplayPosition"
-                            number_of_elements="3">
-        <DoubleRangeDomain name="range" />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="GetPoint1DisplayPosition"
-                            information_only="1"
-                            name="Point1DisplayPositionInfo">
-        <SimpleDoubleInformationHelper />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty argument_is_array="1"
-                            command="SetPoint2DisplayPosition"
-                            default_values="0 0 0"
-                            information_property="Point2DisplayPositionInfo"
-                            name="Point2DisplayPosition"
-                            number_of_elements="3">
-        <DoubleRangeDomain name="range" />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="GetPoint2DisplayPosition"
-                            information_only="1"
-                            name="Point2DisplayPositionInfo">
-        <SimpleDoubleInformationHelper />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty argument_is_array="1"
-                            command="PlaceWidget"
-                            default_values="0 1 0 1 0 1"
-                            is_internal="1"
-                            name="PlaceWidget"
-                            number_of_elements="6">
-        <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetLineColor"
                             default_values="1.0 1.0 1.0"

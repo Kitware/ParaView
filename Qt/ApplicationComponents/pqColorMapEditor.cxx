@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
+#include "pqEditScalarBarReaction.h"
 #include "pqProxyWidgetDialog.h"
 #include "pqProxyWidget.h"
 #include "pqScalarBarVisibilityReaction.h"
@@ -67,6 +68,8 @@ public:
   QPointer<pqProxyWidget> ProxyWidget;
   QPointer<pqDataRepresentation> ActiveRepresentation;
   QPointer<QAction> ScalarBarVisibilityAction;
+  QPointer<QAction> EditScalarBarAction;
+
   unsigned long ObserverId;
 
   pqInternals(pqColorMapEditor* self) : ObserverId(0)
@@ -95,8 +98,6 @@ pqColorMapEditor::pqColorMapEditor(QWidget* parentObject)
                    this, SLOT(updatePanel()));
   QObject::connect(this->Internals->Ui.SearchBox, SIGNAL(textChanged(QString)),
                    this, SLOT(updatePanel()));
-  QObject::connect(this->Internals->Ui.EditScalarBar, SIGNAL(clicked()),
-                   this, SLOT(editScalarBar()));
   QObject::connect(this->Internals->Ui.RestoreDefaults, SIGNAL(clicked()),
                    this, SLOT(restoreDefaults()));
   QObject::connect(this->Internals->Ui.SaveAsDefaults, SIGNAL(clicked()),
@@ -111,13 +112,23 @@ pqColorMapEditor::pqColorMapEditor(QWidget* parentObject)
   // Let pqScalarBarVisibilityReaction do the heavy lifting for managing the
   // show-scalar bar button.
   QAction* showSBAction = new QAction(this);
-  this->Internals->ScalarBarVisibilityAction = showSBAction;
   this->Internals->Ui.ShowScalarBar->connect(
     showSBAction, SIGNAL(toggled(bool)), SLOT(setChecked(bool)));
   showSBAction->connect(
-    this->Internals->Ui.ShowScalarBar, SIGNAL(clicked(bool)), SLOT(trigger()));
-  this->connect(showSBAction, SIGNAL(changed()), SLOT(updateScalarBarButtons()));
+    this->Internals->Ui.ShowScalarBar, SIGNAL(clicked()), SLOT(trigger()));
   new pqScalarBarVisibilityReaction(showSBAction);
+  this->Internals->ScalarBarVisibilityAction = showSBAction;
+
+  QAction* editSBAction = new QAction(this);
+  editSBAction->connect(
+    this->Internals->Ui.EditScalarBar, SIGNAL(clicked()), SLOT(trigger()));
+  new pqEditScalarBarReaction(editSBAction);
+  this->Internals->EditScalarBarAction = editSBAction;
+
+  // update the enable state for the buttons based on the actions.
+  this->connect(showSBAction, SIGNAL(changed()), SLOT(updateScalarBarButtons()));
+  this->connect(editSBAction, SIGNAL(changed()), SLOT(updateScalarBarButtons()));
+  this->updateScalarBarButtons();
 
   pqActiveObjects *activeObjects = &pqActiveObjects::instance();
   this->connect(activeObjects, SIGNAL(representationChanged(pqDataRepresentation*)),
@@ -262,37 +273,13 @@ void pqColorMapEditor::setColorTransferFunction(vtkSMProxy* ctf)
   QObject::connect(widget, SIGNAL(changeFinished()), this, SLOT(updateIfNeeded()));
 }
 
-//-----------------------------------------------------------------------------
+ //-----------------------------------------------------------------------------
 void pqColorMapEditor::updateScalarBarButtons()
 {
-  Ui::ColorMapEditor& ui = this->Internals->Ui;
-  bool can_show_sb = this->Internals->ScalarBarVisibilityAction->isEnabled();
-  ui.ShowScalarBar->setEnabled(can_show_sb);
-  ui.EditScalarBar->setEnabled(can_show_sb &&
-    this->Internals->ScalarBarVisibilityAction->isChecked());
-}
-
-//-----------------------------------------------------------------------------
-void pqColorMapEditor::editScalarBar()
-{
-  Q_ASSERT(this->Internals->ProxyWidget && this->Internals->ActiveRepresentation);
-
-  vtkSMProxy* lutProxy = this->Internals->ProxyWidget->proxy();
-  vtkSMProxy* viewProxy = this->Internals->ActiveRepresentation->getView()->getProxy();
-  vtkSMProxy* sbProxy = vtkSMTransferFunctionProxy::FindScalarBarRepresentation(lutProxy, viewProxy);
-  if (sbProxy)
-    {
-    pqProxyWidgetDialog dialog(sbProxy);
-    QObject::connect(&dialog, SIGNAL(accepted()),
-      this, SLOT(renderViews()));
-    dialog.setWindowTitle("Edit Color Legend Parameters");
-    dialog.setObjectName("ColorLegendEditor");
-    dialog.exec();
-    }
-  else
-    {
-    qCritical("Failed to locate scalar bar proxy. Ignoring.");
-    }
+  pqInternals &internals = *this->Internals;
+  Ui::ColorMapEditor& ui = internals.Ui;
+  ui.ShowScalarBar->setEnabled(internals.ScalarBarVisibilityAction->isEnabled());
+  ui.EditScalarBar->setEnabled(internals.EditScalarBarAction->isEnabled());
 }
 
 //-----------------------------------------------------------------------------

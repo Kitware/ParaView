@@ -258,6 +258,14 @@ cmake_dependent_option(PARAVIEW_USE_QTWEBKIT
   "PARAVIEW_ENABLE_QT_SUPPORT" OFF)
 mark_as_advanced(PARAVIEW_USE_QTWEBKIT)
 
+# This option controls the behavior of the build_help_project function.  If it is
+# on then the .qch file will be generated, if not then the function does nothing.
+cmake_dependent_option(PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION 
+       "Build the ParaView help menu documentation for ParaView and its plugins" ON
+       "PARAVIEW_BUILD_QT_GUI" ON)
+mark_as_advanced(PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION)
+
+
 # If PARAVIEW_BUILD_QT_GUI is OFF, provide an option to the user to turn other command line
 # executables ON/OFF.
 cmake_dependent_option(PARAVIEW_ENABLE_COMMANDLINE_TOOLS
@@ -329,9 +337,7 @@ if (APPLE AND PARAVIEW_DO_UNIX_STYLE_INSTALLS)
     # same place as ParaView's binaries.
     set(CMAKE_INSTALL_NAME_DIR "${PARAVIEW_CUSTOM_INSTALL_NAME_DIR}/${VTK_INSTALL_LIBRARY_DIR}")
   else ()
-    # Set CMAKE_INSTALL_NAME_DIR to point to the libraries directory relative
-    # to the executable.
-    set(CMAKE_INSTALL_NAME_DIR "@executable_path/../${VTK_INSTALL_LIBRARY_DIR}")
+    set(CMAKE_INSTALL_NAME_DIR "@rpath/")
   endif ()
 
   # ensure that we don't build forwarding executables on apple.
@@ -471,10 +477,8 @@ if (PARAVIEW_ENABLE_QT_SUPPORT)
     set (Qt5_FIND_COMPONENTS
       Help
       Network
-      Test
       UiTools
-      Widgets
-      Xml)
+      Widgets)
     if(PARAVIEW_USE_QTWEBKIT)
       list(APPEND Qt5_FIND_COMPONENTS WebKitWidgets)
     endif()

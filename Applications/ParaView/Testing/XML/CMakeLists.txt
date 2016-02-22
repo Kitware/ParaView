@@ -234,6 +234,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/FieldDataBlocks.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Flow.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Flow2.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ForceTime.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Fractal2D.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/FunctionalBagPlots.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/GlyphUseCellCenters.xml
@@ -407,6 +408,7 @@ if(PARAVIEW_ENABLE_PYTHON)
   if (numpy_found)
     list(APPEND TESTS_WITH_BASELINES
       ${CMAKE_CURRENT_SOURCE_DIR}/ExodusModeShapes.xml
+      ${CMAKE_CURRENT_SOURCE_DIR}/ForceTimeDiamond.xml
       ${CMAKE_CURRENT_SOURCE_DIR}/StructuredGridCellBlanking.xml
       ${CMAKE_CURRENT_SOURCE_DIR}/TestFindDataMax.xml)
     list(APPEND TESTS_WITH_INLINE_COMPARES

@@ -32,74 +32,59 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqProxySelectionWidget_h
 #define pqProxySelectionWidget_h
 
-#include <QWidget>
-#include <QVariant>
 #include "pqComponentsModule.h"
+#include "pqPropertyWidget.h"
 #include "pqSMProxy.h"
+#include <QScopedPointer>
 
 class vtkSMProxy;
 class vtkSMProperty;
 class pqView;
 
-/// a widget that contains a combo box and child widget
-/// for represents a ProxyProperty with a ProxyListDomain
-/// the combo box selects the proxy, and the child widget
-/// contains properties of the proxy
-class PQCOMPONENTS_EXPORT pqProxySelectionWidget : public QWidget
+/// pqPropertyWidget that can be used for any proxy with a vtkSMProxyListDomain.
+/// pqProxyPropertyWidget automatically creates this widget when it encounters a
+/// property with vtkSMProxyListDomain.
+class PQCOMPONENTS_EXPORT pqProxySelectionWidget : public pqPropertyWidget
 {
   Q_OBJECT
-  Q_PROPERTY(pqSMProxy proxy READ proxy WRITE setProxy)
+  typedef pqPropertyWidget Superclass;
+  Q_PROPERTY(pqSMProxy chosenProxy READ chosenProxy WRITE setChosenProxy)
+
 public:
-  /// constructor requires the proxy, property
-  pqProxySelectionWidget(vtkSMProxy* proxy, const QString& property,
-                    const QString& label = QString(), 
-                    QWidget* parent = NULL);
+  /// constructor requires the proxy, property. Note that this will abort if the
+  /// property does not have a ProxyListDomain.
+  pqProxySelectionWidget(vtkSMProperty *property, vtkSMProxy *proxy, QWidget *parent = 0);
   ~pqProxySelectionWidget();
 
   /// get the selected proxy
-  pqSMProxy proxy() const;
+  vtkSMProxy* chosenProxy() const;
+  void setChosenProxy(vtkSMProxy* proxy);
 
-  /// Set whether the pqProxyPanel (or pqProxyPanel for legacy panels) for the
-  /// selected Proxy should be shown or not.
-  void setSelectedProxyWidgetVisibility(bool visible);
+  /// Overridden to forward the call to the internal pqProxyWidget maintained
+  /// for the chosen proxy.
+  virtual void apply();
+  virtual void reset();
+  virtual void select();
+  virtual void deselect();
+  virtual void updateWidget(bool showing_advanced_properties);
+  virtual void setPanelVisibility(const char* vis);
+  virtual void setView(pqView*);
 
 signals:
-  /// signal the proxy changed (QVariant wrapped pqSMProxy)
-  void proxyChanged(pqSMProxy);
+  /// Signal fired by setChosenProxy() when the proxy changes.
+  void chosenProxyChanged();
 
-  void modified();
-
-public slots:
-  /// set the proxy
-  virtual void setProxy(pqSMProxy);
-
-  /// Activates the widget
-  /// slot is forwarded to the sub panel
-  virtual void select();
-
-  /// Deactivates the widget
-  /// slot is forwarded to the sub panel
-  virtual void deselect();
-
-  /// Accepts pending changes.
-  /// slot is forwarded to the sub panel
-  virtual void accept();
-
-  /// Resets pending changes
-  /// slot is forwarded to the sub panel
-  virtual void reset();
-
-  /// Set the render module that this widget works with
-  /// slot is forwarded to the sub panel
-  virtual void setView(pqView* rm);
-
-protected slots:
-  void handleProxyChanged();
+private slots:
+  /// Called when the current index in the combo-box is changed from the UI.
+  /// This calls setChosenProxy() with the argument as the proxy corresponding
+  /// to the \c idx from the domain.
+  void currentIndexChanged(int);
 
 private:
-  void initialize3DWidget();
   class pqInternal;
-  pqInternal* Internal;
+  const QScopedPointer<pqInternal> Internal;
+
+  Q_DISABLE_COPY(pqProxySelectionWidget);
 };
 
 #endif

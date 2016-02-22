@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SpherePropertyWidget</class>
+ <widget class="QWidget" name="SpherePropertyWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>402</width>
+    <height>148</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <property name="spacing">
+    <number>2</number>
+   </property>
+   <item row="0" column="0" colspan="2">
+    <widget class="QCheckBox" name="show3DWidget">
+     <property name="text">
+      <string>Show Sphere</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="centerLabel">
+     <property name="text">
+      <string>Center</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="pqLineEdit" name="centerX"/>
+   </item>
+   <item row="1" column="2">
+    <widget class="pqLineEdit" name="centerY"/>
+   </item>
+   <item row="1" column="3">
+    <widget class="pqLineEdit" name="centerZ"/>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="normalLabel">
+     <property name="text">
+      <string>Normal</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="pqLineEdit" name="normalX"/>
+   </item>
+   <item row="2" column="2">
+    <widget class="pqLineEdit" name="normalY"/>
+   </item>
+   <item row="2" column="3">
+    <widget class="pqLineEdit" name="normalZ"/>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="radiusLabel">
+     <property name="text">
+      <string>Radius</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="pqLineEdit" name="radius"/>
+   </item>
+   <item row="4" column="0" colspan="4">
+    <widget class="QLabel" name="pickLabel">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Note: Use 'P' to a 'Center' on mesh or 'Ctrl+P' to snap to the closest mesh point</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0" colspan="4">
+    <widget class="QPushButton" name="centerOnBounds">
+     <property name="text">
+      <string>Center on Bounds</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>pqLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

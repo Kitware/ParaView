@@ -30,8 +30,7 @@ def initialize():
         import paraview.servermanager as pvsm
         # we need ParaView 4.2 since ParaView 4.1 doesn't properly wrap
         # vtkPVPythonCatalystPython
-        if pvsm.vtkSMProxyManager.GetVersionMajor() != 4 or \
-           pvsm.vtkSMProxyManager.GetVersionMinor() < 2:
+        if pvsm.vtkSMProxyManager.GetVersionMajor() < 4 or (pvsm.vtkSMProxyManager.GetVersionMajor() == 4 and pvsm.vtkSMProxyManager.GetVersionMinor() < 2):
             print 'Must use ParaView v4.2 or greater'
             sys.exit(0)
 

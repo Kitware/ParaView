@@ -65,8 +65,9 @@ public:
   /// Only widgets that have 3D widgets need to
   /// override these methods to select/deselect the 3D widgets.
   /// Default implementation does nothing.
-  virtual void select() {}
-  virtual void deselect() {}
+  virtual void select() {this->Selected = true;}
+  virtual void deselect() {this->Selected = false;}
+  bool isSelected() const { return this->Selected; }
 
   // This method is called on pqPropertyWidget instances that pqProxyWidget
   // deems that should be shown in current configuration. Subclasses can
@@ -113,8 +114,7 @@ public:
 
   /// unhide superclass method. Note this is not virtual in QObject so don't add
   /// any other logic here.
-  bool setProperty (const char *name, const QVariant &value)
-    { return this->Superclass::setProperty(name, value); }
+  using Superclass::setProperty;
 
   /// Returns the tooltip to use for the property. May return an empty string.
   static QString getTooltip(vtkSMProperty* property);
@@ -203,6 +203,7 @@ private:
   pqPropertyLinks Links;
   bool ShowLabel;
   bool ChangeAvailableAsChangeFinished;
+  bool Selected;
 
   const QScopedPointer<pqTimer> Timer;
 

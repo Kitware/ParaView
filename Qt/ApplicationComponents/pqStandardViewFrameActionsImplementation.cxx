@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqEditCameraReaction.h"
 #include "pqInterfaceTracker.h"
 #include "pqObjectBuilder.h"
+#include "pqRenameProxyReaction.h"
 #include "pqRenderView.h"
 #include "pqRenderViewSelectionReaction.h"
 #include "pqServer.h"
@@ -272,6 +273,9 @@ void pqStandardViewFrameActionsImplementation::addGenericActions(
 
   /// Add convert-to menu.
   frame->contextMenu()->addSeparator();
+  QAction* renameAction = frame->contextMenu()->addAction("Rename");
+  new pqRenameProxyReaction(renameAction, view);
+
   QMenu* convertMenu = frame->contextMenu()->addMenu("Convert To ...");
   QObject::connect(convertMenu, SIGNAL(aboutToShow()),
     this, SLOT(aboutToShowConvertMenu()));
@@ -308,7 +312,7 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
   Q_ASSERT(frame);
 
   this->addSeparator(frame, renderView);
-  
+
   if (this->isButtonVisible("ToggleInteractionMode", renderView))
     {
     QAction* toggleInteractionModeAction = frame->addTitleBarAction(

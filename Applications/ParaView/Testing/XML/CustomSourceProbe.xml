@@ -12,7 +12,7 @@
   <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeZ" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveZ" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveX" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CutFunction/1pqProxySelectionWidget0/pqImplicitPlaneWidget/show3DWidget" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CutFunction/ProxySelectionWidget/frame/ChosenProxyWidget/InteractivePlane/show3DWidget" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,117,44," />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,117,44," />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,95,12,/0:0/0:0" />

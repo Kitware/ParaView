@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>583</width>
-    <height>724</height>
+    <width>628</width>
+    <height>908</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -168,19 +168,180 @@
    <property name="subTitle">
     <string>Select state configuration options.</string>
    </property>
-   <layout class="QGridLayout" name="gridLayout_4">
-    <item row="12" column="1">
-     <widget class="QPushButton" name="nextView">
-      <property name="enabled">
-       <bool>false</bool>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QFormLayout" name="formLayout_2">
+      <property name="fieldGrowthPolicy">
+       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
       </property>
-      <property name="text">
-       <string>Next View</string>
+      <property name="labelAlignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
       </property>
-     </widget>
+      <property name="formAlignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Live Visualization</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QCheckBox" name="liveViz">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Output rendering components i.e. views</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QCheckBox" name="outputRendering">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Output to Cinema</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QCheckBox" name="outputCinema">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="chbComposite">
+          <property name="layoutDirection">
+           <enum>Qt::RightToLeft</enum>
+          </property>
+          <property name="text">
+           <string>Generate Composite</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="laRescaleDataRange">
+        <property name="text">
+         <string>Rescale to Data Range</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QCheckBox" name="rescaleDataRange">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="toolTip">
+         <string>Check to rescale the data range every outputted time step.</string>
+        </property>
+        <property name="whatsThis">
+         <string>Check to rescale the data range every outputted time step.</string>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Time compartment size</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QSpinBox" name="timeCompartmentSize">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>100</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>The number of processes working together on a specific time step.</string>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::RightToLeft</enum>
+        </property>
+        <property name="suffix">
+         <string/>
+        </property>
+        <property name="prefix">
+         <string/>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>1000</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
-    <item row="9" column="0" colspan="2">
-     <widget class="QStackedWidget" name="viewsContainer">
+    <item>
+     <widget class="pqExportViewSelection" name="wViewSelection" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
         <horstretch>0</horstretch>
@@ -189,164 +350,28 @@
       </property>
       <property name="minimumSize">
        <size>
-        <width>300</width>
-        <height>220</height>
+        <width>0</width>
+        <height>200</height>
        </size>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::Box</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Sunken</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="15" column="0" colspan="2">
-     <widget class="QStackedWidget" name="cinemaContainer">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>300</width>
-        <height>150</height>
-       </size>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::Box</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Sunken</enum>
-      </property>
-      <property name="currentIndex">
-       <number>-1</number>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="0">
-     <widget class="QCheckBox" name="liveViz">
-      <property name="text">
-       <string>Live Visualization</string>
-      </property>
-     </widget>
-    </item>
-    <item row="16" column="1">
-     <widget class="QPushButton" name="nextTrack">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="text">
-       <string>Next Track</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="1">
-     <widget class="QLabel" name="label_2">
-      <property name="text">
-       <string>Time compartment size</string>
-      </property>
-     </widget>
-    </item>
-    <item row="8" column="0">
-     <widget class="QCheckBox" name="rescaleDataRange">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="toolTip">
-       <string>Check to rescale the data range every outputted time step.</string>
-      </property>
-      <property name="whatsThis">
-       <string>Check to rescale the data range every outputted time step.</string>
       </property>
       <property name="layoutDirection">
        <enum>Qt::LeftToRight</enum>
       </property>
-      <property name="text">
-       <string>Rescale to Data Range</string>
-      </property>
      </widget>
     </item>
-    <item row="1" column="0">
-     <widget class="QSpinBox" name="timeCompartmentSize">
-      <property name="toolTip">
-       <string>The number of processes working together on a specific time step.</string>
+    <item>
+     <widget class="pqCinemaTrackSelection" name="wCinemaTrackSelection" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
       </property>
-      <property name="layoutDirection">
-       <enum>Qt::RightToLeft</enum>
-      </property>
-      <property name="suffix">
-       <string/>
-      </property>
-      <property name="prefix">
-       <string/>
-      </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>1000</number>
-      </property>
-     </widget>
-    </item>
-    <item row="7" column="0" colspan="2">
-     <widget class="QCheckBox" name="outputRendering">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="text">
-       <string>Output rendering components i.e. views</string>
-      </property>
-      <property name="checked">
-       <bool>false</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="12" column="0">
-     <widget class="QPushButton" name="previousView">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="text">
-       <string>Previous View</string>
-      </property>
-     </widget>
-    </item>
-    <item row="16" column="0">
-     <widget class="QPushButton" name="previousTrack">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="text">
-       <string>Previous Track</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="1">
-     <widget class="QRadioButton" name="cinemaComposite">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="toolTip">
-       <string>enables dynamic layers and colormaps for cinema view(s)</string>
-      </property>
-      <property name="text">
-       <string>Cinema Composite</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QCheckBox" name="outputCinema">
-      <property name="toolTip">
-       <string>Export views as cinema databases for deferred visualization</string>
-      </property>
-      <property name="text">
-       <string>Output to Cinema</string>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>200</height>
+       </size>
       </property>
      </widget>
     </item>
@@ -366,120 +391,19 @@
    <header>QWizardPage</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>pqExportViewSelection</class>
+   <extends>QWidget</extends>
+   <header>pqExportViewSelection.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqCinemaTrackSelection</class>
+   <extends>QWidget</extends>
+   <header>pqCinemaTrackSelection.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <resources/>
- <connections>
-  <connection>
-   <sender>outputRendering</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>previousView</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>156</x>
-     <y>86</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>138</x>
-     <y>339</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>outputRendering</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>nextView</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>156</x>
-     <y>86</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>272</x>
-     <y>339</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>outputRendering</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>viewsContainer</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>156</x>
-     <y>86</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>243</x>
-     <y>217</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>outputCinema</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>previousTrack</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>282</x>
-     <y>403</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>278</x>
-     <y>607</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>outputCinema</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>nextTrack</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>282</x>
-     <y>403</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>448</x>
-     <y>607</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>outputCinema</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>cinemaContainer</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>282</x>
-     <y>403</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>363</x>
-     <y>517</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>outputCinema</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>cinemaComposite</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>286</x>
-     <y>147</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>459</x>
-     <y>148</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

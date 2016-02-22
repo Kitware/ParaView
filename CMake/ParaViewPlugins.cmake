@@ -661,34 +661,17 @@ Display Panel Decorators are no longer applicaple.")
 ENDMACRO()
 
 
-# Creates implementation for a pq3DWidgetInterface to add new 3D widgets to
-# ParaView.
-# ADD_3DWIDGET(OUTIFACES OUTSRCS
-#   CLASS_NAME <pq3DWidget subclass being added>
-#   WIDGET_TYPE <string identifying the 3DWidget typically used in the <Hints/>
-#               for the proxy when specifying the PropertyGroup.
-#   )
+#--------------------------------------------------------------------------------------
+# DEPRECATED: 3DWidgets are simply custom property panels (pqPropertyWidget
+# subclasses). Thus, use add_paraview_property_group_widget() to resgiter a new
+# 3D widget panel after having updated the code accordingly.
+# Creates implementation for a pq3DWidgetInterface to add new 3D widgets to ParaView.
 MACRO(ADD_3DWIDGET OUTIFACES OUTSRCS)
-  PV_PLUGIN_PARSE_ARGUMENTS(ARG "CLASS_NAME;WIDGET_TYPE" "" ${ARGN})
-
-  SET(${OUTIFACES} ${ARG_CLASS_NAME})
-  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pq3DWidgetImplementation.h.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h @ONLY)
-  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pq3DWidgetImplementation.cxx.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx @ONLY)
-
-  SET(ACTION_MOC_SRCS)
-  IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    QT5_WRAP_CPP(ACTION_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h)
-  ELSE ()
-    QT4_WRAP_CPP(ACTION_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h)
-  ENDIF ()
-
-  SET(${OUTSRCS}
-      ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx
-      ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h
-      ${ACTION_MOC_SRCS}
-      )
+  message(FATAL_ERROR
+"'ADD_3DWIDGET' macro is no longer supported.
+ParaView's Properties panel has been refactored in 3.98. Legacy 3DWidget support
+was dropped in 5.1. Please refer to 'Major API Changes' in ParaView developer
+documentation for details.")
 ENDMACRO()
 
 
@@ -968,16 +951,18 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
         FILEPATTERNS "*.html;*.css;*.png;*.jpg"
         DEPENDS "${proxy_documentation_files}" )
 
-      # we don't compile the help project as a Qt resource. Instead it's
-      # packaged as a SM resource. This makes it possible for
-      # server-only plugins to provide documentation to the client without
-      generate_header("${CMAKE_CURRENT_BINARY_DIR}/${NAME}_doc.h"
-        SUFFIX "_doc"
-        VARIABLE function_names
-        BINARY
-        FILES "${CMAKE_CURRENT_BINARY_DIR}/doc/${NAME}.qch")
-      list(APPEND binary_resources ${CMAKE_CURRENT_BINARY_DIR}/${NAME}_doc.h)
-      set (EXTRA_INCLUDES "${EXTRA_INCLUDES}#include \"${CMAKE_CURRENT_BINARY_DIR}/${NAME}_doc.h\"")
+      if (PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION)
+        # we don't compile the help project as a Qt resource. Instead it's
+        # packaged as a SM resource. This makes it possible for
+        # server-only plugins to provide documentation to the client without
+        generate_header("${CMAKE_CURRENT_BINARY_DIR}/${NAME}_doc.h"
+          SUFFIX "_doc"
+          VARIABLE function_names
+          BINARY
+          FILES "${CMAKE_CURRENT_BINARY_DIR}/doc/${NAME}.qch")
+        list(APPEND binary_resources ${CMAKE_CURRENT_BINARY_DIR}/${NAME}_doc.h)
+        set (EXTRA_INCLUDES "${EXTRA_INCLUDES}#include \"${CMAKE_CURRENT_BINARY_DIR}/${NAME}_doc.h\"")
+      endif()
       foreach (func_name ${function_names})
         set (BINARY_RESOURCES_INIT
           "${BINARY_RESOURCES_INIT}  PushBack(resources, ${func_name});\n")

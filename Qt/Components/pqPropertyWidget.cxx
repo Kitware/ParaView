@@ -48,6 +48,7 @@ pqPropertyWidget::pqPropertyWidget(vtkSMProxy *smProxy, QWidget *parentObject)
     Proxy(smProxy),
     Property(0),
     ChangeAvailableAsChangeFinished(true),
+    Selected(false),
     Timer(new pqTimer())
 {
   this->ShowLabel = true;

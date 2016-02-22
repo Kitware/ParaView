@@ -569,17 +569,37 @@ def GetViewProperties(view=None):
 # ServerManager methods
 #==============================================================================
 
+def RenameProxy(proxy, group, newName):
+    """Renames the given proxy."""
+    pxm = servermanager.ProxyManager()
+    oldName = pxm.GetProxyName(group, proxy)
+    if oldName and newName != oldName:
+      pxm.RegisterProxy(group, newName, proxy)
+      pxm.UnRegisterProxy(group, oldName, proxy)
+
 def RenameSource(newName, proxy=None):
     """Renames the given source.  If the given proxy is not registered
     in the sources group this method will have no effect.  If no source is
     provided, the active source is used."""
     if not proxy:
-        proxy = active_objects.source
-    pxm = servermanager.ProxyManager()
-    oldName = pxm.GetProxyName("sources", proxy)
-    if oldName and newName != oldName:
-      pxm.RegisterProxy("sources", newName, proxy)
-      pxm.UnRegisterProxy("sources", oldName, proxy)
+        proxy = GetActiveSource()
+    RenameProxy(proxy, "sources", newName)
+
+def RenameView(newName, proxy=None):
+    """Renames the given view.  If the given proxy is not registered
+    in the views group this method will have no effect.  If no view is
+    provided, the active view is used."""
+    if not proxy:
+        proxy = GetActiveView()
+    RenameProxy(proxy, "views", newName)
+
+def RenameLayout(newName, proxy=None):
+    """Renames the given layout.  If the given proxy is not registered
+    in the layout group this method will have no effect.  If no layout is
+    provided, the active layout is used."""
+    if not proxy:
+        proxy = GetLayout()
+    RenameProxy(proxy, "layouts", newName)
 
 # -----------------------------------------------------------------------------
 
@@ -1381,7 +1401,7 @@ def Show3DWidgets(proxy=None):
     proxy = proxy if proxy else GetActiveSource()
     if not proxy:
         raise ValueError, "No 'proxy' was provided and no active source was found."
-    proxy.InvokeEvent('UserEvent', "ShowWidget")
+    _Invoke3DWidgetUserEvent(proxy, "ShowWidget")
 
 def Hide3DWidgets(proxy=None):
     """If possible in the current environment, this method will
@@ -1389,7 +1409,20 @@ def Hide3DWidgets(proxy=None):
     proxy = proxy if proxy else GetActiveSource()
     if not proxy:
         raise ValueError, "No 'proxy' was provided and no active source was found."
-    proxy.InvokeEvent('UserEvent', "HideWidget")
+    _Invoke3DWidgetUserEvent(proxy, "HideWidget")
+
+def _Invoke3DWidgetUserEvent(proxy, event):
+    """Internal method used by Show3DWidgets/Hide3DWidgets"""
+    if proxy:
+        proxy.InvokeEvent('UserEvent', event)
+        # Since in 5.0 and earlier, Show3DWidgets/Hide3DWidgets was called with the
+        # proxy being the filter proxy (eg. Clip) and not the proxy that has the
+        # widget i.e. (Clip.ClipType), we explicitly handle it by iterating of
+        # proxy list properties and then invoking the event on their value proxies
+        # too.
+        for smproperty in proxy:
+            if smproperty.FindDomain("vtkSMProxyListDomain"):
+                _Invoke3DWidgetUserEvent(smproperty.GetData(), event)
 
 def ExportView(filename, view=None, **params):
     """Export a view to the specified output file."""
@@ -1504,7 +1537,7 @@ def _initializeSession(connection):
     controller = servermanager.ParaViewPipelineController()
     controller.InitializeSession(connection.Session)
 
-def _create_func(key, module):
+def _create_func(key, module, skipRegisteration=False):
     "Internal function."
 
     def CreateObject(*input, **params):
@@ -1556,12 +1589,13 @@ def _create_func(key, module):
         # post initialize
         controller.PostInitializeProxy(px)
 
-        # Register the proxy with the proxy manager (assuming we are only using
-        # these functions for pipeline proxies or animation proxies.
-        if isinstance(px, servermanager.SourceProxy):
-            controller.RegisterPipelineProxy(px, registrationName)
-        elif px.GetXMLGroup() == "animation":
-           controller.RegisterAnimationProxy(px)
+        if not skipRegisteration:
+            # Register the proxy with the proxy manager (assuming we are only using
+            # these functions for pipeline proxies or animation proxies.
+            if isinstance(px, servermanager.SourceProxy):
+                controller.RegisterPipelineProxy(px, registrationName)
+            elif px.GetXMLGroup() == "animation":
+               controller.RegisterAnimationProxy(px)
         return px
 
     return CreateObject
@@ -1600,13 +1634,15 @@ def _add_functions(g):
     activeModule = servermanager.ActiveConnection.Modules
     for m in [activeModule.filters, activeModule.sources,
               activeModule.writers, activeModule.animation]:
+        # Skip registering proxies in certain modules (currently only writers)
+        skipRegisteration = m is activeModule.writers
         dt = m.__dict__
         for key in dt.keys():
             cl = dt[key]
             if not isinstance(cl, str):
                 if not key in g and _func_name_valid(key):
                     #print "add %s function" % key
-                    g[key] = _create_func(key, m)
+                    g[key] = _create_func(key, m, skipRegisteration)
                     exec "g[key].__doc__ = _create_doc(m.%s.__doc__, g[key].__doc__)" % key
 
 # -----------------------------------------------------------------------------

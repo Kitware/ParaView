@@ -584,15 +584,9 @@ void vtkXMLCollectionReader::ReadAFile(int index,
 
     // Give the update request from this output to its internal
     // reader.
-    vtkStreamingDemandDrivenPipeline::SafeDownCast(
-      r->GetExecutive())->SetUpdateExtent(0, 
-                                          updatePiece,
-                                          updateNumPieces, 
-                                          updateGhostLevels);
-      
     // Read the data.
-    r->Update();
-    
+    r->UpdatePiece(updatePiece, updateNumPieces, updateGhostLevels);
+
     // The internal reader is finished.  Remove the observer in case
     // we delete the reader later.
     r->RemoveObserver(this->InternalProgressObserver);

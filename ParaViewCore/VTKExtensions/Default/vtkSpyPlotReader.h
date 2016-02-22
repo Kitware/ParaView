@@ -327,6 +327,15 @@ protected:
                      vtkInformationVector *outputInfo,
                      vtkCompositeDataSet *hb);
 
+  // Description:
+  // Overwritten to avoid hiding.
+  virtual int UpdateTimeStep(double time,
+    int piece=-1, int numPieces=1, int ghostLevels=0, int* extents=0)
+  {
+    return this->Superclass::UpdateTimeStep(time, piece, numPieces, ghostLevels, extents);
+  }
+
+
   // The file format stores a vector field as separated scalar component
   // fields. This method rebuilds the vector field from those scalar
   // component fields.

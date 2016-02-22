@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkNew.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMProperty.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMViewLayoutProxy.h"
 #include "vtkSMViewProxy.h"
 #include "vtkWeakPointer.h"
@@ -146,7 +147,7 @@ namespace
     if (pqview != NULL)
       {
       QWidget* viewWidget = pqview->widget();
-      frame->setCentralWidget(viewWidget);
+      frame->setCentralWidget(viewWidget, pqview);
       }
     }
 
@@ -623,6 +624,10 @@ void pqMultiViewWidget::reload()
       this->Internals->PopoutFrame.resize(this->size());
       }
     this->Internals->PopoutFrame.show();
+
+    QString layoutName =
+      vlayout->GetSessionProxyManager()->GetProxyName("layouts", vlayout);
+    this->Internals->PopoutFrame.setWindowTitle(layoutName);
     }
   else
     {

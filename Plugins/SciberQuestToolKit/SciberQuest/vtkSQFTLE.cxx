@@ -38,7 +38,6 @@
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
-#include "vtkTensor.h"
 #include "vtkPVXMLElement.h"
 #include "XMLUtils.h"
 #include "vtkSQLog.h"

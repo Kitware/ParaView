@@ -500,7 +500,9 @@ void vtkXMLPVDWriter::CreateWriters()
         }
       else
         {
-        w->SetWriteSummaryFile((this->Piece == 0)? 1:0);
+        // We tell all piece writers to write summary file. The vtkXMLPDataWriter correctly
+        // decides to write out the file only on rank 0.
+        w->SetWriteSummaryFile(1);
         }
       }
     }

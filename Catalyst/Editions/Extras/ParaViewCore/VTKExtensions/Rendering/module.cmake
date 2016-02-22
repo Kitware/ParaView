@@ -28,6 +28,7 @@ if (Module_vtkRenderingCore)
     vtkFiltersParallel
     vtkFiltersParallelMPI
     vtkIOExport
+    vtkIOExportOpenGL
     vtkIOImage
     vtkIOXML
     vtkInteractionStyle

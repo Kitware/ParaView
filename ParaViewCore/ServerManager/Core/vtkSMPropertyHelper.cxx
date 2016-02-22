@@ -1220,3 +1220,35 @@ const char* vtkSMPropertyHelper::GetInputArrayNameToProcess()
 
   return svp->GetNumberOfElements() == 2? svp->GetElement(1) : svp->GetElement(4);
 }
+
+//----------------------------------------------------------------------------
+template<typename T>
+bool vtkSMPropertyHelper::CopyInternal(vtkSMPropertyHelper& source)
+{
+  std::vector<T> values = source.GetPropertyArray<T>();
+  this->SetPropertyArray<T>(
+    values.size() > 0? &values[0] : NULL, static_cast<unsigned int>(values.size()));
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMPropertyHelper::Copy(vtkSMPropertyHelper& source)
+{
+  if (this->Type != source.Type)
+    {
+    vtkSMPropertyHelperWarningMacro("Property types much match for 'Copy' to work.");
+    return false;
+    }
+  switch (this->Type)
+    {
+  case INT:
+    return this->CopyInternal<int>(source);
+  case DOUBLE:
+    return this->CopyInternal<double>(source);
+  case IDTYPE:
+    return this->CopyInternal<vtkIdType>(source);
+  default:
+    vtkSMPropertyHelperWarningMacro("Copy currently only supported for int/double/idtype properties.");
+    return false;
+    }
+}

@@ -126,7 +126,6 @@ protected slots:
   /// A slot called when an interactive selection is toggled
   void interactiveSelectionToggled(bool checked);
 
-
 protected:
   /// called to setup empty frame.
   virtual void setupEmptyFrame(QWidget* frame);
@@ -135,10 +134,10 @@ protected:
   virtual void addGenericActions(pqViewFrame* frame, pqView* view);
 
   /// called to add view type independent actions first.
-  virtual QActionGroup* addSelectionModifierActions(pqViewFrame* frame, pqView* view); 
+  virtual QActionGroup* addSelectionModifierActions(pqViewFrame* frame, pqView* view);
 
   /// called to add a separator in the action bar
-  virtual void addSeparator(pqViewFrame* frame, pqView* view); 
+  virtual void addSeparator(pqViewFrame* frame, pqView* view);
 
   /// called to add context view actions.
   virtual void addContextViewActions(pqViewFrame* frame, pqContextView* chart_view);
@@ -151,7 +150,7 @@ protected:
 
   /// check the XML hints to see if a button with the given name
   /// should be added to the view frame
-  bool isButtonVisible(const std::string & buttonName, pqView* view);
+  virtual bool isButtonVisible(const std::string & buttonName, pqView* view);
 
   struct ViewType
     {

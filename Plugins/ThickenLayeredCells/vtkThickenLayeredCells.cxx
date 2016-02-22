@@ -22,7 +22,6 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkVector.h"
 #include "vtkVectorOperators.h"
-
 #include <cassert>
 #include <set>
 #include <map>
@@ -59,55 +58,7 @@ namespace
 
   typedef std::map<vtkEdge, vtkEdgeInfo> vtkEdgeMap;
 
-  class vtkNodeInfo
-    {
-    vtkVector2i Layers;
-  public:
-    vtkNodeInfo() : Layers(-1, -1) {}
-    void AddLayer(int layer)
-      {
-      if (this->Layers[0] == -1)
-        {
-        this->Layers[0] = layer;
-        }
-      else if (this->Layers[1] == -1)
-        {
-        int layer0 = this->Layers[0];
-        this->Layers[0] = std::min(layer0, layer);
-        this->Layers[1] = std::max(layer0, layer);
-        }
-      else
-        {
-        vtkGenericWarningMacro("An egde is shared between more than 2 layers!!!! Ignoring.");
-        }
-      }
-    inline bool OffsetForLayer(int layer, int fixed_layer) const
-      {
-      assert(layer != -1);
-      if (this->Layers[1] == layer)
-        {
-        return true;
-        }
-      if (this->Layers[1] == -1 && this->Layers[0] == layer)
-        {
-        return layer != fixed_layer;
-        }
-      return false;
-      }
-    };
-
-  class vtkNodeMap : public std::map<vtkIdType, vtkNodeInfo>
-    {
-  public:
-    void AddEdge(const vtkEdge& edge, int layer)
-      {
-      (*this)[edge.first].AddLayer(layer);
-      (*this)[edge.second].AddLayer(layer);
-      }
-    };
-
-  int vtkDisplacePoints(vtkEdgeMap& edges, vtkNodeMap& nodes,
-    vtkPoints* ipoints, vtkPoints* opoints, int outermost_layer)
+  int vtkDisplacePoints(vtkEdgeMap& edges, vtkPoints* ipoints, vtkPoints* opoints)
   {
   // sort edges by layer, since we displace points in that order.
   // We use descending order since layer 1 is the inner most layer and layer 6  is the outermost
@@ -131,26 +82,8 @@ namespace
     opoints->GetPoint(seiter->Edge.first, pt1.GetData());
     opoints->GetPoint(seiter->Edge.second, pt2.GetData());
 
-    int offset_count = 0;
-    if (nodes[seiter->Edge.first].OffsetForLayer(seiter->Layer, outermost_layer))
-      {
-      opoints->SetPoint(seiter->Edge.first, (pt2 - vec * avgThickness).GetData());
-      offset_count++;
-      }
-    else
-      {
-      opoints->SetPoint(seiter->Edge.first, pt1.GetData());
-      }
-    if (nodes[seiter->Edge.second].OffsetForLayer(seiter->Layer, outermost_layer))
-      {
-      opoints->SetPoint(seiter->Edge.second, (pt1 + vec * avgThickness).GetData());
-      offset_count++;
-      }
-    else
-      {
-      opoints->SetPoint(seiter->Edge.second, pt2.GetData());
-      }
-    assert(offset_count == 1);
+    // offset the second point.
+    opoints->SetPoint(seiter->Edge.second, (pt1 + vec * avgThickness).GetData());
     }
   return 1;
   }
@@ -159,6 +92,7 @@ namespace
 vtkStandardNewMacro(vtkThickenLayeredCells);
 //----------------------------------------------------------------------------
 vtkThickenLayeredCells::vtkThickenLayeredCells()
+  : EnableThickening(true)
 {
 }
 
@@ -175,6 +109,10 @@ int vtkThickenLayeredCells::RequestData(vtkInformation* vtkNotUsed(request),
   vtkUnstructuredGrid* input = vtkUnstructuredGrid::GetData(inputVector[0], 0);
   vtkUnstructuredGrid* output = vtkUnstructuredGrid::GetData(outputVector);
   output->ShallowCopy(input);
+  if (!this->EnableThickening)
+    {
+    return 1;
+    }
 
   vtkPoints* ipoints = input->GetPoints();
 
@@ -200,19 +138,15 @@ int vtkThickenLayeredCells::RequestData(vtkInformation* vtkNotUsed(request),
     return 0;
     }
 
-  double layerRange[2];
-  layer->GetRange(layerRange, 0);
-
   // Compute average thickness for all the edges.
   vtkEdgeMap edges;
-  vtkNodeMap nodes;
 
   bool warned_once = false;
 
-  // Iterate over cells to locate edges and but those edges in the `edges` map. The edges
+  // Iterate over cells to locate edges and put those edges in the `edges` map. The edges
   // keep track of the two nodes that form the edge as well as which layer the edge belongs to.
-  // At the same time, we build a nodes datastructure which tells us the information about the
-  // at-most-two layers that the node is shared with.
+  // The 2 points in an edge in the edgemap are ordered so that the 1st point "outer" point
+  // and the 2nd one is inner point.
   vtkCellIterator *iter = input->NewCellIterator();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextCell())
     {
@@ -228,18 +162,25 @@ int vtkThickenLayeredCells::RequestData(vtkInformation* vtkNotUsed(request),
       }
     input->GetCellPoints(iter->GetCellId(), ptIds.GetPointer());
     assert(ptIds->GetNumberOfIds() == 6);
+
+    // We make an assumption that the first 3 points in the cell are the lower
+    // points of the wedge while the last 3 are the upper points. "lower"
+    // meaning closer to the outer shell.
     for (int cc=0; cc < 3; cc++)
       {
-      vtkIdType p1 = std::min(ptIds->GetId(cc), ptIds->GetId(cc+3));
-      vtkIdType p2 = std::max(ptIds->GetId(cc), ptIds->GetId(cc+3));
+      vtkIdType p1 = ptIds->GetId(cc);
+      vtkIdType p2 = ptIds->GetId(cc+3);
 
       vtkEdgeInfo& info = edges[vtkEdge(p1, p2)];
-      info.Edge.first = p1;
-      info.Edge.second = p2;
+      vtkVector3d pt1, pt2;
+      ipoints->GetPoint(p1, pt1.GetData());
+      ipoints->GetPoint(p2, pt2.GetData());
+
       if (info.Count == 0)
         {
+        info.Edge.first = p1;
+        info.Edge.second = p2;
         info.Layer = layer->GetComponent(iter->GetCellId(), 0);
-        nodes.AddEdge(info.Edge, info.Layer);
         }
       else
         {
@@ -250,7 +191,7 @@ int vtkThickenLayeredCells::RequestData(vtkInformation* vtkNotUsed(request),
       }
     }
   iter->Delete();
-  return vtkDisplacePoints(edges, nodes, ipoints, opoints.GetPointer(), layerRange[1]);
+  return vtkDisplacePoints(edges, ipoints, opoints.GetPointer());
 }
 
 //----------------------------------------------------------------------------

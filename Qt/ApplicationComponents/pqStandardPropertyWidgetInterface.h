@@ -86,6 +86,16 @@ public:
   /// \li \c FontEditor : pqFontPropertyWidget
   /// \li \c LightsEditor : pqLightsPropertyGroup
   /// \li \c SeriesEditor : pqSeriesEditorPropertyWidget
+  /// \li \c InteractivePlane : pqImplicitPlanePropertyWidget
+  /// \li \c InteractiveBox: pqBoxPropertyWidget
+  /// \li \c InteractiveHandle: pqHandlePropertyWidget
+  /// \li \c InteractiveLine: pqLinePropertyWidget
+  /// \li \c InteractiveSpline: pqSplinePropertyWidget
+  /// \li \c InteractiveSphere: pqSpherePropertyWidget
+  /// \li \c InteractivePolyLine: pqSplinePropertyWidget (with mode==POLYLINE)
+  /// \li \c InteractiveCylinder: pqCylinderPropertyWidget
+  /// \li \c YoungsMaterial: pqYoungsMaterialPropertyWidget
+  /// \li \c cinema_export_selector : pqCinemaConfiguration
   virtual pqPropertyWidget* createWidgetForPropertyGroup(
     vtkSMProxy *proxy, vtkSMPropertyGroup *group);
 

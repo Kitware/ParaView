@@ -61,7 +61,9 @@ extern "C" {
 #include <QUrl>
 #include <QMimeData>
 
+#ifdef PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION
 #include "ParaViewDocumentationInitializer.h"
+#endif
 
 
 #ifdef PARAVIEW_ENABLE_PYTHON
@@ -92,8 +94,10 @@ ParaViewMainWindow::ParaViewMainWindow()
   vtkPVInitializePythonModules();
 #endif
 
+#ifdef PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION
   // init the ParaView embedded documentation.
   PARAVIEW_DOCUMENTATION_INIT();
+#endif
 
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
