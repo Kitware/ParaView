@@ -31,17 +31,18 @@ static const char* const vtkSMInputArrayDomainAttributeTypes[] = {
   "point",
   "cell",
   "field",
-  "any",
+  "any-except-field",
   "vertex",
   "edge",
   "row",
+  "any",
   NULL
 };
 
 //---------------------------------------------------------------------------
 vtkSMInputArrayDomain::vtkSMInputArrayDomain()
 {
-  this->AttributeType = vtkSMInputArrayDomain::ANY;
+  this->AttributeType = vtkSMInputArrayDomain::ANY_EXCEPT_FIELD;
   this->NumberOfComponents = 0;
 }
 
@@ -140,6 +141,29 @@ bool vtkSMInputArrayDomain::IsAttributeTypeAcceptable(
       attribute_type == EDGE||
       attribute_type == VERTEX||
       attribute_type == ROW;
+    }
+
+  if (required_type == ANY_EXCEPT_FIELD)
+    {
+    // Try out all attribute types except field data sequentially.
+    int attribute_types_to_try[] =
+      {
+      vtkDataObject::POINT,
+      vtkDataObject::CELL,
+      vtkDataObject::VERTEX,
+      vtkDataObject::EDGE,
+      vtkDataObject::ROW,
+      -1
+      };
+    for (int cc=0; attribute_types_to_try[cc] != -1; ++cc)
+      {
+      if (vtkSMInputArrayDomain::IsAttributeTypeAcceptable(
+          attribute_types_to_try[cc], attribute_type, acceptable_as_type))
+        {
+        return true;
+        }
+      }
+    return false;
     }
 
   switch (attribute_type)

@@ -4938,8 +4938,7 @@
       dataset.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
-        <InputArrayDomain attribute_type="any"
-                          name="input_array_any"></InputArrayDomain>
+        <InputArrayDomain name="input_array_any"></InputArrayDomain>
       </InputProperty>
       <IntVectorProperty command="SetVisibility"
                          default_values="1"
@@ -5200,8 +5199,7 @@
       <Documentation>Proxy to show a selection as geometry.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
-        <InputArrayDomain attribute_type="any"
-                          name="input_array_any"></InputArrayDomain>
+        <InputArrayDomain name="input_array_any"></InputArrayDomain>
       </InputProperty>
       <IntVectorProperty command="SetVisibility"
                          default_values="1"

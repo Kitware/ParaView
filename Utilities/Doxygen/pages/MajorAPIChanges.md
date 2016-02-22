@@ -114,6 +114,17 @@ pqLinePropertyWidget | InteractiveLine | LineSourceWidgetRepresentation | pqLine
 pqSpherePropertyWidget | InteractiveSphere | SphereWidgetRepresentation | pqSphereWidget, pqOrbitWidget
 pqSplinePropertyWidget | InteractiveSpline or InteractivePolyLine | SplineWidgetRepresentation or PolyLineWidgetRepresentation | pqSplineWidget, pqPolyLineWidget
 
+Changes in 5.0.1
+----------------
+
+###Changes to vtkSMInputArrayDomain###
+
+vtkSMInputArrayDomain has changed the meaning of **"any"** attribute type. It
+now includes field data arrays. To exclude field data arrays from the field
+selection, change this to  **"any-except-field"**. This is also the default for
+vtkSMInputArrayDomain, hence simply removing the `attribute_type` field is also
+an acceptable solution and is the recommended approach so that the XML can work
+without changes in earlier versions of ParaView as well.
 
 Changes in 5.0
 --------------
