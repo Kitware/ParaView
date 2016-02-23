@@ -530,6 +530,9 @@
           Set the compression method used when transferring rendered images from
           the server to the client.
         </Documentation>
+        <Hints>
+          <SupportsLZ4/>
+        </Hints>
       </StringVectorProperty>
 
       <IntVectorProperty name="OutlineThreshold"
