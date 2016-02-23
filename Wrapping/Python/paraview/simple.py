@@ -39,6 +39,9 @@ import paraview
 import servermanager
 import lookuptable
 
+# Bring OutputPort in our namespace.
+from servermanager import OutputPort
+
 
 def GetParaViewVersion():
     """Returns the version of the ParaView build"""
