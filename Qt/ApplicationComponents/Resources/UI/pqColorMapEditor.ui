@@ -205,9 +205,6 @@
             <iconset resource="../../../Components/Resources/pqComponents.qrc">
              <normaloff>:/pqWidgets/Icons/pqUpdate16.png</normaloff>:/pqWidgets/Icons/pqUpdate16.png</iconset>
            </property>
-           <property name="shortcut">
-            <string>Alt+A</string>
-           </property>
            <property name="default">
             <bool>true</bool>
            </property>
@@ -224,9 +221,6 @@
            <property name="icon">
             <iconset resource="../../../Components/Resources/pqComponents.qrc">
              <normaloff>:/pqWidgets/Icons/pqUpdate16.png</normaloff>:/pqWidgets/Icons/pqUpdate16.png</iconset>
-           </property>
-           <property name="shortcut">
-            <string>Alt+A</string>
            </property>
            <property name="checkable">
             <bool>true</bool>
