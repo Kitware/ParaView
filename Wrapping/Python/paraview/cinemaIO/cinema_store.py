@@ -115,6 +115,8 @@ class Store(object):
         self.__parameter_associations = {}
         self.__view_associations = {}
         self.__type_specs = {}
+        self.cached_searches = {}
+        self.raster_wrangler = raster_wrangler.RasterWrangler()
 
     @property
     def parameter_list(self):
@@ -325,6 +327,15 @@ class Store(object):
                 return True
         return False
 
+    def getDependeeValue(self, depender, dependee):
+        """ Return the required value of a dependee to fulfill a dependency. """
+        try:
+            value = self.parameter_associations[depender][dependee]
+        except KeyError:
+            raise KeyError("Invalid dependency! ", depender, ", ", dependee)
+
+        return value
+
     def isviewdepender(self, name):
         """ check if the named parameter depends on any others """
         if name in self.view_associations.keys():
@@ -342,9 +353,33 @@ class Store(object):
         """ return a list of all the parameters that depend on the given one """
         result = []
         for depender, dependees in self.parameter_associations.iteritems():
-            if name in dependees:
+            if name in dependees["vis"]:
                 result.append(depender)
         return result
+
+    def getdependees(self, depender):
+        """ return a list of all the parameters that 'depender' depends on """
+        try:
+            result =  self.parameter_associations[depender]
+        except KeyError:
+            #This is a valid state, it only means there is no dependees
+            result = {}
+
+        return result
+
+    def getRelatedField(self, parameter):
+        ''' Returns the 'field' argument related to a 'parameter'. '''
+        for depender, dependees in self.parameter_associations.iteritems():
+            if parameter in dependees["vis"] and \
+               self.isfield(depender):
+                return depender
+
+        return None
+
+    def hasRelatedParameter(self, fieldName):
+        ''' Predicate to know if a field has a related 'parameter' argument. '''
+        paramName = self.parameter_associations[fieldName]["vis"][0]
+        return  (paramName in self.parameter_list)
 
     def getviewdependers(self, name):
         """ return a list of all the parameters that depend on the given one """
@@ -403,14 +438,11 @@ class Store(object):
         plural) can be composited back together by a viewer.
         """
         properties['type'] = 'option'
-        properties['islayer'] = 'yes'
+        properties['role'] = 'layer'
         self.add_parameter(name, properties)
 
     def islayer(self, name):
-        if ('islayer' in self.parameter_list[name] and
-            self.parameter_list[name]['islayer'] == 'yes'):
-            return True
-        return False
+        return (self.parameter_list[name]['role'] == 'layer') if (name in self.parameter_list and 'role' in self.parameter_list[name]) else False
 
     def add_sublayer(self, name, properties, parent_layer, parents_value):
         """
@@ -426,15 +458,45 @@ class Store(object):
         depth, normal, color, scalar values.
         """
         properties['type'] = 'hidden'
-        properties['isfield'] = 'yes' #better yet, add a flag elsewhere in json
+        properties['role'] = 'field'
         self.add_parameter(name, properties)
         self.assign_parameter_dependence(name, parent_layer, parents_values)
 
     def isfield(self, name):
-        if ('isfield' in self.parameter_list[name] and
-            self.parameter_list[name]['isfield'] == 'yes'):
-            return True
-        return False
+        return (self.parameter_list[name]['role'] == 'field') if (name in self.parameter_list and 'role' in self.parameter_list[name]) else False
+
+    def add_control(self, name, properties):
+        """
+        A control is a togglable parameter for a filter. Examples include:
+        isovalue, offset.
+        """
+        properties['role'] = 'control'
+        self.add_parameter(name, properties)
+
+    def iscontrol(self, name):
+        return (self.parameter_list[name]['role'] == 'control') if (name in self.parameter_list and 'role' in self.parameter_list[name]) else False
+
+    def parameters_for_object(self, obj):
+        """
+        Given <obj>, an element of the layer <vis>, this method returns:
+        1. the names of independent parameters (t, theta, etc) that affect it
+        2. the name of its associated field
+        3. the names of the controls that affect it
+        """
+        independent_parameters = [par for par in self.__parameter_list.keys()
+                                  if 'role' not in self.__parameter_list[par]]
+
+        fields = [x for x in self.parameter_associations.keys()
+                  if obj in self.parameter_associations[x]['vis'] and
+                  self.isfield(x)]
+
+        field = fields[0] if fields else None
+
+        controls = [x for x in self.parameter_associations.keys()
+                    if obj in self.parameter_associations[x]['vis'] and
+                    self.iscontrol(x)]
+
+        return (independent_parameters,field,controls)
 
     def iterate(self, parameters=None, fixedargs=None, forGUI=False):
         """
@@ -447,6 +509,7 @@ class Store(object):
 
         #optimization - cache and reuse to avoid expensive search
         argstr = json.dumps((parameters,fixedargs,forGUI), sort_keys=True)
+        #todo: good for viewer but breaks exploration
         if argstr in self.cached_searches:
             for x in self.cached_searches[argstr]:
                 yield x
@@ -495,14 +558,17 @@ class Store(object):
                     if not (k in ok_desc and ok_desc[k] == v):
                         OK = False
             if OK:
-                strval = json.dumps(ok_desc, sort_keys=True)
+                strval = "{ "
+                for name in sorted(ok_desc.keys()):
+                    strval = strval + '"' + name + '": "' + str(ok_desc[name]) + '", '
+                strval = strval[0:-2] + "}"
+                #strval = json.dumps(ok_desc, sort_keys=True) #slower than hand rolled above
                 if not strval in ok_descs:
                     ok_descs.add(strval)
                     ordered_descs.append(ok_desc)
+                    yield ok_desc
 
         self.cached_searches[argstr] = ordered_descs
-        for descriptor in ordered_descs:
-            yield descriptor
 
 class FileStore(Store):
     """Implementation of a store based on named files and directories."""
@@ -546,6 +612,7 @@ class FileStore(Store):
 
     def save(self):
         """ writes out a modified file store """
+
         info_json = dict(
                 arguments = self.parameter_list,
                 name_pattern = self.filename_pattern,
@@ -594,18 +661,39 @@ class FileStore(Store):
         fixed = self.filename_pattern.format(**desc)
         base, ext = os.path.splitext(fixed)
 
-        #add any dependent parameters
-        for dep in sorted(self.parameter_associations.keys()):
-            if dep in desc:
-                base = base + "/" + dep + "=" + str(desc[dep])
+#        #add any dependent parameters
+#        for dep in sorted(self.parameter_associations.keys()):
+#            if dep in desc:
+#                #print "    ->>> base /// dep: ", base, " /// ", dep
+#                base = base + "/" + dep + "=" + str(desc[dep])
+        #a more intuitive layout than the above alphanumeric sort
+        #this one follows the graph and thus keeps related things, like
+        #all the rasters (fields) for a particular object (layer), close
+        #to one another
+        #TODO: optimize this
+        keys = [k for k in sorted(desc)]
+        ordered_keys = []
+        while len(keys):
+            k = keys.pop(0)
+            if not self.isdepender(k) and not self.isdependee(k):
+                continue
+            parents = self.getdependees(k)
+            ready = True
+            for p in parents:
+                if not (p in ordered_keys):
+                    ready = False
+                    #this is the crux - haven't seen a parent yet, so try again later
+                    keys.append(k)
+                    break
+            if ready:
+                ordered_keys.append(k)
+        for k in ordered_keys:
+            base = base + "/" + k + "=" + str(desc[k])
 
         #determine file type for this document
         doctype = self.determine_type(desc)
         if doctype == "Z":
-            if raster_wrangler.exrEnabled:
-                ext = ".exr"
-            else:
-                ext = ".im"
+            ext = self.raster_wrangler.zfileextension()
 
         fullpath = os.path.join(dirname, base+ext)
         return fullpath
@@ -619,39 +707,31 @@ class FileStore(Store):
         if not os.path.exists(dirname):
             os.makedirs(dirname)
 
-        if not document.data == None:
+        if not document.data is None:
             doctype = self.determine_type(document.descriptor)
             if doctype == 'RGB' or doctype == 'VALUE' or doctype == 'LUMINANCE':
-                raster_wrangler.rgbwriter(document.data, fname)
+                self.raster_wrangler.rgbwriter(document.data, fname)
             elif doctype == 'Z':
-                raster_wrangler.zwriter(document.data, fname)
+                self.raster_wrangler.zwriter(document.data, fname)
             else:
-                with open(fname, mode='w') as file:
-                    file.write(document.data)
+                self.raster_wrangler.genericwriter(document.data, fname)
 
     def _load_data(self, doc_file, descriptor):
         doctype = self.determine_type(descriptor)
         try:
             if doctype == 'RGB' or doctype == 'VALUE':
-                im = PIL.Image.open(doc_file)
-                data = np.array(im, np.uint8).reshape(im.size[1], im.size[0], 3)
+                data = self.raster_wrangler.rgbreader(doc_file)
             elif doctype == 'LUMINANCE':
-                im = PIL.Image.open(doc_file)
-                data = np.array(im, np.uint8).reshape(im.size[1], im.size[0], 3)
+                data = self.raster_wrangler.rgbreader(doc_file)
             elif doctype == 'Z':
-                if raster_wrangler.exrEnabled:
-                    data = exr.load_depth(doc_file)
-                else:
-                    try:
-                        im = PIL.Image.open(doc_file)
-                        data = np.array(im, np.float32).reshape(im.size[1], im.size[0])
-                    except:
-                        data = None
+                data = self.raster_wrangler.zreader(doc_file)
             else:
-                with open(doc_file, "r") as file:
-                    data = file.read()
+                data = self.raster_wrangler.genericreader(doc_file)
+
         except IOError:
             data = None
+            raise
+
         doc = Document(descriptor, data)
         doc.attributes = None
         return doc
@@ -660,11 +740,12 @@ class FileStore(Store):
         q = q if q else dict()
         target_desc = q
 
+        #print "->>> store::find():  target_desc->  ", target_desc
         for possible_desc in self.iterate(fixedargs=target_desc, forGUI=forGUI):
             if possible_desc == {}:
                 yield None
+            #print "->>> store::find() possible_desc: ", possible_desc
             filename = self._get_filename(possible_desc)
-            #print filename
             #optimization - cache and reuse to avoid file load
             if filename in self.cached_files:
                 yield self.cached_files[filename]
@@ -784,7 +865,7 @@ class SingleFileStore(Store):
 
         index = self.get_sliceindex(document)
 
-        if not document.data == None:
+        if not document.data is None:
             dirname = os.path.dirname(self.__dbfilename)
             if not os.path.exists(dirname):
                 os.makedirs(dirname)

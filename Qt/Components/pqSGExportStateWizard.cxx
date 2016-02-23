@@ -144,17 +144,15 @@ pqSGExportStateWizard::pqSGExportStateWizard(
   QWidget *parentObject, Qt::WindowFlags parentFlags)
 : Superclass(parentObject, parentFlags)
 {
-  this->CurrentView = 0;
   ::ActiveWizard = this;
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
   ::ActiveWizard = NULL;
   //this->setWizardStyle(ModernStyle);
   this->setOption(QWizard::NoCancelButton, false);
-  this->Internals->viewsContainer->hide();
+  this->Internals->wViewSelection->hide();
   this->Internals->rescaleDataRange->hide();
-  this->Internals->previousView->hide();
-  this->Internals->nextView->hide();
+  this->Internals->laRescaleDataRange->hide();
 
   QObject::connect(this->Internals->allInputs, SIGNAL(itemSelectionChanged()),
     this, SLOT(updateAddRemoveButton()));
@@ -173,76 +171,32 @@ pqSGExportStateWizard::pqSGExportStateWizard(
     this, SLOT(onRemove()));
 
   QObject::connect(this->Internals->outputRendering, SIGNAL(toggled(bool)),
-                   this->Internals->viewsContainer, SLOT(setVisible(bool)));
+                   this->Internals->wViewSelection, SLOT(setVisible(bool)));
+
   QObject::connect(this->Internals->outputRendering, SIGNAL(toggled(bool)),
                    this->Internals->rescaleDataRange, SLOT(setVisible(bool)));
+  QObject::connect(this->Internals->outputRendering, SIGNAL(toggled(bool)),
+                   this->Internals->laRescaleDataRange, SLOT(setVisible(bool)));
 
-  QObject::connect(this->Internals->nextView, SIGNAL(pressed()),
-                   this, SLOT(incrementView()));
-  QObject::connect(this->Internals->previousView, SIGNAL(pressed()),
-                   this, SLOT(decrementView()));
-
-  this->CurrentTrack = 0;
-  this->Internals->cinemaContainer->hide();
-  this->Internals->previousTrack->hide();
-  this->Internals->nextTrack->hide();
+  this->Internals->chbComposite->hide();
+  this->Internals->wCinemaTrackSelection->hide();
   QObject::connect(this->Internals->outputCinema, SIGNAL(toggled(bool)),
-                   this->Internals->cinemaContainer, SLOT(setVisible(bool)));
+                   this->Internals->wCinemaTrackSelection, SLOT(setVisible(bool)));
+  QObject::connect(this->Internals->outputCinema, SIGNAL(toggled(bool)),
+                   this->Internals->chbComposite, SLOT(setVisible(bool)));
   QObject::connect(this->Internals->outputCinema, SIGNAL(toggled(bool)),
                    this, SLOT(toggleCinema(bool)));
-  QObject::connect(this->Internals->nextTrack, SIGNAL(pressed()),
-                   this, SLOT(incrementTrack()));
-  QObject::connect(this->Internals->previousTrack, SIGNAL(pressed()),
-                   this, SLOT(decrementTrack()));
 
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
+
+  // populate views in stacked widget
   QList<pqRenderViewBase*> renderViews = smModel->findItems<pqRenderViewBase*>();
   QList<pqContextView*> contextViews = smModel->findItems<pqContextView*>();
-  int viewCounter = 0;
-  int numberOfViews = renderViews.size() + contextViews.size();
-  // first do 2D and 3D render views
-  for(QList<pqRenderViewBase*>::Iterator it=renderViews.begin();
-      it!=renderViews.end();it++)
-    {
-    QString viewName = (numberOfViews == 1 ? "image_%t.png" :
-                        QString("image_%1_%t.png").arg(viewCounter) );
-    pqImageOutputInfo* imageOutputInfo = new pqImageOutputInfo(
-      this->Internals->viewsContainer, parentFlags, *it,  viewName);
-    this->Internals->viewsContainer->addWidget(imageOutputInfo);
-    viewCounter++;
-    }
-  for(QList<pqContextView*>::Iterator it=contextViews.begin();
-      it!=contextViews.end();it++)
-    {
-    QString viewName = (numberOfViews == 1 ? "image_%t.png" :
-                        QString("image_%1_%t.png").arg(viewCounter) );
-    pqImageOutputInfo* imageOutputInfo = new pqImageOutputInfo(
-      this->Internals->viewsContainer, parentFlags, *it, viewName);
-    this->Internals->viewsContainer->addWidget(imageOutputInfo);
-    viewCounter++;
-    }
-  if(numberOfViews > 1)
-    {
-    this->Internals->nextView->setEnabled(true);
-    }
-  this->Internals->viewsContainer->setCurrentIndex(0);
-
+  this->Internals->wViewSelection->populateViews(renderViews, contextViews);
 
   //look for filters that cinema can parameterize
   QList<pqPipelineFilter*> filters = smModel->findItems<pqPipelineFilter*>();
-  for(QList<pqPipelineFilter*>::Iterator it=filters.begin();
-      it!=filters.end();it++)
-    {
-    if ((*it)->getProxy()->GetVTKClassName() &&
-        (!strcmp((*it)->getProxy()->GetVTKClassName(), "vtkPVContourFilter") ||
-         !strcmp((*it)->getProxy()->GetVTKClassName(), "vtkPVMetaSliceDataSet") ||
-         !strcmp((*it)->getProxy()->GetVTKClassName(), "vtkPVMetaClipDataSet")))
-      {
-      pqCinemaTrack *track = new pqCinemaTrack(this->Internals->cinemaContainer, parentFlags, *it);
-      this->Internals->cinemaContainer->addWidget(track);
-      }
-    }
-  this->Internals->cinemaContainer->setCurrentIndex(0);
+  this->Internals->wCinemaTrackSelection->populateTracks(filters);
 
   // a bit of a hack but we name the finish button here since for testing
   // it's having a hard time finding that button otherwise.
@@ -349,60 +303,9 @@ void pqSGExportStateWizard::onRemove()
 }
 
 //-----------------------------------------------------------------------------
-void pqSGExportStateWizard::incrementView()
-{
-  if(this->CurrentView >= this->Internals->viewsContainer->count()-1)
-    {
-    cerr << "Already on the last view.  Next View button should be disabled.\n";
-    this->Internals->nextView->setEnabled(false);
-    return;
-    }
-  if(this->CurrentView == 0)
-    {
-    this->Internals->previousView->setEnabled(true);
-    }
-  this->CurrentView++;
-  this->Internals->viewsContainer->setCurrentIndex(this->CurrentView);
-  if(this->CurrentView >= this->Internals->viewsContainer->count()-1)
-    {
-    this->Internals->nextView->setEnabled(false);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqSGExportStateWizard::decrementView()
-{
-  if(this->CurrentView <= 0)
-    {
-    cerr << "Already on the first view.  Previous View button should be disabled.\n";
-    this->Internals->previousView->setEnabled(false);
-    return;
-    }
-  if(this->CurrentView == this->Internals->viewsContainer->count()-1)
-    {
-    this->Internals->nextView->setEnabled(true);
-    }
-  this->CurrentView--;
-  this->Internals->viewsContainer->setCurrentIndex(this->CurrentView);
-  if(this->CurrentView <= 0)
-    {
-    this->Internals->previousView->setEnabled(false);
-    }
-}
-
-//-----------------------------------------------------------------------------
 QList<pqImageOutputInfo*> pqSGExportStateWizard::getImageOutputInfos()
 {
-  QList<pqImageOutputInfo*> infos;
-  for(int i=0;i<this->Internals->viewsContainer->count();i++)
-    {
-    if( pqImageOutputInfo* qinfo = qobject_cast<pqImageOutputInfo*>(
-          this->Internals->viewsContainer->widget(i)) )
-      {
-      infos.append(qinfo);
-      }
-    }
-  return infos;
+  return this->Internals->wViewSelection->getImageOutputInfos();
 }
 
 //-----------------------------------------------------------------------------
@@ -433,82 +336,20 @@ bool pqSGExportStateWizard::validateCurrentPage()
 //-----------------------------------------------------------------------------
 void pqSGExportStateWizard::toggleCinema(bool state)
 {
-  QList<pqImageOutputInfo*> imageOuts = this->getImageOutputInfos();
-  QList<pqImageOutputInfo*>::iterator i;
   if(state)
     {
-    this->Internals->cinemaContainer->setEnabled(true);
-    if (this->CurrentTrack >= this->Internals->cinemaContainer->count()-1)
-      {
-      this->Internals->nextTrack->setEnabled(false);
-      }
-    else
-      {
-      this->Internals->nextTrack->setEnabled(true);
-      }
-    if (this->CurrentTrack == 0)
-      {
-      this->Internals->previousTrack->setEnabled(false);
-      }
-    else
-      {
-      this->Internals->previousTrack->setEnabled(true);
-      }
-    //cinema depends on rendering being on
+    //cinema depends on rendering being on (unchecking it should not be possible)
     this->Internals->outputRendering->setChecked(true);
+    this->Internals->outputRendering->setEnabled(false);
     //add cinema controls to each view
-    for (i = imageOuts.begin(); i != imageOuts.end(); i++)
-      {
-      (*i)->showCinema();
-      }
+    this->Internals->wViewSelection->setCinemaVisible(true);
+    this->Internals->wCinemaTrackSelection->show();
     }
   else
     {
-    this->Internals->cinemaContainer->setEnabled(false);
-    this->Internals->nextTrack->setEnabled(false);
-    this->Internals->previousTrack->setEnabled(false);
-    for (i = imageOuts.begin(); i != imageOuts.end(); i++)
-      {
-      (*i)->hideCinema();
-      }
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqSGExportStateWizard::incrementTrack()
-{
-  if(this->CurrentTrack >= this->Internals->cinemaContainer->count()-1)
-    {
-    this->Internals->nextTrack->setEnabled(false);
-    return;
-    }
-  if(this->CurrentTrack == 0)
-    {
-    this->Internals->previousTrack->setEnabled(true);
-    }
-  this->CurrentTrack++;
-  this->Internals->cinemaContainer->setCurrentIndex(this->CurrentTrack);
-  if(this->CurrentTrack >= this->Internals->cinemaContainer->count()-1)
-    {
-    this->Internals->nextTrack->setEnabled(false);
-    }
-}
-//-----------------------------------------------------------------------------
-void pqSGExportStateWizard::decrementTrack()
-{
-  if(this->CurrentTrack <= 0)
-    {
-    this->Internals->previousTrack->setEnabled(false);
-    return;
-    }
-  if(this->CurrentTrack == this->Internals->cinemaContainer->count()-1)
-    {
-    this->Internals->nextTrack->setEnabled(true);
-    }
-  this->CurrentTrack--;
-  this->Internals->cinemaContainer->setCurrentIndex(this->CurrentTrack);
-  if(this->CurrentTrack <= 0)
-    {
-    this->Internals->previousTrack->setEnabled(false);
+    this->Internals->outputRendering->setChecked(false);
+    this->Internals->outputRendering->setEnabled(true);
+    this->Internals->wViewSelection->setCinemaVisible(false);
+    this->Internals->wCinemaTrackSelection->hide();
     }
 }

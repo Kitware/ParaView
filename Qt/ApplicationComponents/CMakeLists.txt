@@ -130,8 +130,6 @@ set (Module_SRCS
   pqEditColorMapReaction.h
   pqEnableWidgetDecorator.cxx
   pqEnableWidgetDecorator.h
-  pqExportCinemaReaction.cxx
-  pqExportCinemaReaction.h
   pqExportReaction.cxx
   pqExportReaction.h
   pqFileNamePropertyWidget.cxx
@@ -339,7 +337,6 @@ set (Module_MOC_HDRS
   pqEditCameraReaction.h
   pqEditColorMapReaction.h
   pqEnableWidgetDecorator.h
-  pqExportCinemaReaction.h
   pqExportReaction.h
   pqFileNamePropertyWidget.h
   pqFiltersMenuReaction.h

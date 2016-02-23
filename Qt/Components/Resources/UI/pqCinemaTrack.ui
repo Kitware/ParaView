@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>315</width>
-    <height>283</height>
+    <width>316</width>
+    <height>65</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+   <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -19,7 +19,7 @@
   <property name="minimumSize">
    <size>
     <width>0</width>
-    <height>283</height>
+    <height>0</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -49,45 +49,13 @@
       </widget>
      </item>
      <item>
-      <widget class="QRadioButton" name="radioButton">
-       <property name="toolTip">
-        <string>Check to allow the user to explore this parameter.</string>
-       </property>
-       <property name="layoutDirection">
-        <enum>Qt::LeftToRight</enum>
-       </property>
+      <widget class="QCheckBox" name="chbIncludeTrack">
        <property name="text">
-        <string>Cinema Explore</string>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
+        <string>Include Track</string>
        </property>
       </widget>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="QScrollArea" name="scrollArea">
-     <property name="toolTip">
-      <string>Specify values that cinema will expose to the user here.</string>
-     </property>
-     <property name="verticalScrollBarPolicy">
-      <enum>Qt::ScrollBarAlwaysOn</enum>
-     </property>
-     <property name="widgetResizable">
-      <bool>true</bool>
-     </property>
-     <widget class="QWidget" name="scrollAreaWidgetContents_2">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>274</width>
-        <height>224</height>
-       </rect>
-      </property>
-     </widget>
-    </widget>
    </item>
   </layout>
  </widget>

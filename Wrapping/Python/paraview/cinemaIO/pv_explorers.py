@@ -245,7 +245,6 @@ class Slice(explorers.Track):
 
     def prepare(self, explorer):
         super(Slice, self).prepare(explorer)
-        explorer.cinema_store.add_metadata({'type' : 'parametric-image-stack'})
 
     def execute(self, doc):
         if self.parameter in doc.descriptor:
@@ -265,7 +264,6 @@ class Contour(explorers.Track):
 
     def prepare(self, explorer):
         super(Contour, self).prepare(explorer)
-        explorer.cinema_store.add_metadata({'type': "parametric-image-stack"})
 
     def execute(self, doc):
         if self.parameter in doc.descriptor:
@@ -284,7 +282,6 @@ class Clip(explorers.Track):
 
     def prepare(self, explorer):
         super(Clip, self).prepare(explorer)
-        explorer.cinema_store.add_metadata({'type': 'parametric-image-stack'})
 
     def execute(self, doc):
         if self.argument in doc.descriptor:

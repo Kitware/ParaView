@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqImageOutputInfo.h
+   Module:  pqCinemaTrackSelection.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,64 +29,59 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef pqImageOutputInfo_h
-#define pqImageOutputInfo_h
+#ifndef pqCinemaTrackSelection_h
+#define pqCinemaTrackSelection_h
 
 #include "pqComponentsModule.h"
-#include <QString>
-#include <QStringList>
 #include <QWidget>
-#include <QScopedPointer>
 
 
-class pqView;
-namespace Ui { class ImageOutputInfo; }
-
-class PQCOMPONENTS_EXPORT pqImageOutputInfo : public QWidget
+namespace Ui
 {
-  Q_OBJECT
+  class CinemaTrackSelection;
+}
+
+class pqPipelineFilter;
+class pqCinemaTrack;
+
+/// @brief Widget to select among supported Cinema Tracks (filters).
+///
+/// The user selection can be queried as a string to be included in a Python
+/// script directly. The widget is used by pqCinemaConfiguration and
+/// pqSGExportStateWizard.
+class PQCOMPONENTS_EXPORT pqCinemaTrackSelection : public QWidget
+{
+  Q_OBJECT;
 
 public:
-  pqImageOutputInfo(QWidget* parent_ = NULL);
-  pqImageOutputInfo(QWidget* parentObject, Qt::WindowFlags parentFlags,
-    pqView* view, QString& viewName);
 
-  ~pqImageOutputInfo();
+  pqCinemaTrackSelection(QWidget* parent_ = NULL);
+  ~pqCinemaTrackSelection();
 
-  void setupScreenshotInfo();
+  /// @note Only some filters are currently supported by Cinema.
+  void populateTracks(QList<pqPipelineFilter*> tracks);
 
-  pqView* getView();
-  QString getImageFileName();
-  void hideFrequencyInput();
-  void showFrequencyInput();
-  void hideFitToScreen();
-  void showFitToScreen();
-  int getWriteFrequency();
-  bool fitToScreen();
-  int getMagnification();
+  QList<pqCinemaTrack*> getTracks();
 
-  /// Remove or add options depending on whether cinema is visible
-  /// and specA should be supported.
-  void setCinemaVisible(bool status, bool specASupport = true);
-  const QString getCameraType();
-  double getPhi();
-  double getTheta();
-  void setView(pqView* const view);
+  /// Returns a string containing a comma separated set of cinema tracks with each
+  /// track defined as in 'format'.
+  /// Order of track values:
+  /// 1. Track Name
+  /// 2. Value tuple
+  /// 
+  /// Example: Format as defined in pqCinemaConfiguration
+  /// format = "'%1' : 2%"
+  /// returns -> 'name1' : [a, b, c], 'name2' : [d, e, f], ... (for N tracks)
+  QString getSelectionAsPythonScript(QString const & format);
 
-public slots:
-  void updateImageFileName();
-  void updateImageFileNameExtension(const QString&);
-  void updateCinemaType(const QString&);
+private slots:
+
+  void onPreviousClicked();
+  void onNextClicked();
 
 private:
 
-  void initialize(Qt::WindowFlags parentFlags, pqView* view,
-    QString const & viewName);
-
-  void updateSpherical();
-
-  Q_DISABLE_COPY(pqImageOutputInfo)
-  QScopedPointer<Ui::ImageOutputInfo> Ui;
-  pqView* View;
+  Ui::CinemaTrackSelection* Ui;
 };
+
 #endif

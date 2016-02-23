@@ -591,6 +591,9 @@ if(PARAVIEW_ENABLE_PYTHON)
     pqImageOutputInfo.h
     pqCinemaTrack.cxx
     pqCinemaTrack.h
+    pqCinemaConfiguration.cxx
+    pqExportViewSelection.cxx
+    pqCinemaTrackSelection.cxx
     pqSGExportStateWizard.cxx
     pqSGExportStateWizard.h
     pqSGPluginManager.cxx
@@ -601,6 +604,9 @@ if(PARAVIEW_ENABLE_PYTHON)
   LIST(APPEND Module_MOC_HDRS
     pqImageOutputInfo.h
     pqCinemaTrack.h
+    pqCinemaConfiguration.h
+    pqExportViewSelection.h
+    pqCinemaTrackSelection.h
     pqSGExportStateWizard.h
     pqSGPluginManager.h
     pqSGWritersMenuManager.h
@@ -609,6 +615,9 @@ if(PARAVIEW_ENABLE_PYTHON)
     Resources/UI/pqImageOutputInfo.ui
     Resources/UI/pqCinemaTrack.ui
     Resources/UI/pqExportStateWizard.ui
+    Resources/UI/pqCinemaConfiguration.ui
+    Resources/UI/pqExportViewSelection.ui
+    Resources/UI/pqCinemaTrackSelection.ui
     )
 endif()
 

@@ -44,32 +44,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 //-----------------------------------------------------------------------------
-pqImageOutputInfo::pqImageOutputInfo(
-  QWidget *parentObject, Qt::WindowFlags parentFlags,
-  pqView* view, QString& viewName):
-  QWidget(parentObject, parentFlags),
-  Info(new Ui::ImageOutputInfo()),
-  View(view)
+pqImageOutputInfo::pqImageOutputInfo(QWidget* parent_)
+: QWidget(parent_)
+, Ui(new Ui::ImageOutputInfo())
 {
-  this->Info->setupUi(this);
+  this->initialize(0, NULL, "");
+}
+//-----------------------------------------------------------------------------
+pqImageOutputInfo::pqImageOutputInfo(QWidget *parentObject, Qt::WindowFlags
+  parentFlags, pqView* view, QString& viewName)
+: QWidget(parentObject, parentFlags)
+, Ui(new Ui::ImageOutputInfo())
+, View(view)
+{
+  this->initialize(parentFlags, view, viewName);
+};
 
-  this->Info->imageFileName->setText(viewName);
+//-----------------------------------------------------------------------------
+void pqImageOutputInfo::initialize(Qt::WindowFlags parentFlags, pqView* view,
+  QString const & viewName)
+{
+  this->View = view;
+  QWidget::setWindowFlags(parentFlags);
+  this->Ui->setupUi(this);
+  this->Ui->imageFileName->setText(viewName);
+
   QObject::connect(
-    this->Info->imageFileName, SIGNAL(editingFinished()),
+    this->Ui->imageFileName, SIGNAL(editingFinished()),
     this, SLOT(updateImageFileName()));
 
   QObject::connect(
-    this->Info->imageType, SIGNAL(currentIndexChanged(const QString&)),
+    this->Ui->imageType, SIGNAL(currentIndexChanged(const QString&)),
     this, SLOT(updateImageFileNameExtension(const QString&)));
 
   QObject::connect(
-    this->Info->cinemaExport, SIGNAL(currentIndexChanged(const QString&)),
+    this->Ui->cinemaExport, SIGNAL(currentIndexChanged(const QString&)),
     this, SLOT(updateCinemaType(const QString&)));
 
-  this->hideCinema();
+  this->setCinemaVisible(false);
 
   this->setupScreenshotInfo();
-};
+}
 
 //-----------------------------------------------------------------------------
 pqImageOutputInfo::~pqImageOutputInfo()
@@ -84,56 +99,62 @@ pqView* pqImageOutputInfo::getView()
 }
 
 //-----------------------------------------------------------------------------
+void pqImageOutputInfo::setView(pqView* const view)
+{
+  this->View = view;
+}
+
+//-----------------------------------------------------------------------------
 QString pqImageOutputInfo::getImageFileName()
 {
-  return this->Info->imageFileName->displayText();
+  return this->Ui->imageFileName->displayText();
 }
 //-----------------------------------------------------------------------------
 void pqImageOutputInfo::hideFrequencyInput()
 {
-  this->Info->imageWriteFrequency->hide();
-  this->Info->imageWriteFrequencyLabel->hide();
+  this->Ui->imageWriteFrequency->hide();
+  this->Ui->imageWriteFrequencyLabel->hide();
 }
 
 //-----------------------------------------------------------------------------
 void pqImageOutputInfo::showFrequencyInput()
 {
-  this->Info->imageWriteFrequency->show();
-    this->Info->imageWriteFrequencyLabel->show();
+  this->Ui->imageWriteFrequency->show();
+    this->Ui->imageWriteFrequencyLabel->show();
 }
 //-----------------------------------------------------------------------------
 void pqImageOutputInfo::hideFitToScreen()
 {
-  this->Info->fitToScreen->hide();
+  this->Ui->fitToScreen->hide();
 }
 
 //-----------------------------------------------------------------------------
 void pqImageOutputInfo::showFitToScreen()
 {
-  this->Info->fitToScreen->show();
+  this->Ui->fitToScreen->show();
 }
 //-----------------------------------------------------------------------------
 int pqImageOutputInfo::getWriteFrequency()
 {
-  return this->Info->imageWriteFrequency->value();
+  return this->Ui->imageWriteFrequency->value();
 }
 
 //-----------------------------------------------------------------------------
 bool pqImageOutputInfo::fitToScreen()
 {
-  return this->Info->fitToScreen->isChecked();
+  return this->Ui->fitToScreen->isChecked();
 }
 
 //-----------------------------------------------------------------------------
 int pqImageOutputInfo::getMagnification()
 {
-  return this->Info->imageMagnification->value();
+  return this->Ui->imageMagnification->value();
 }
 
 //-----------------------------------------------------------------------------
 void pqImageOutputInfo::updateImageFileName()
 {
-  QString fileName = this->Info->imageFileName->displayText();
+  QString fileName = this->Ui->imageFileName->displayText();
   if(fileName.isNull() || fileName.isEmpty())
     {
     fileName = "image";
@@ -142,15 +163,15 @@ void pqImageOutputInfo::updateImageFileName()
   if(fileName.contains(regExp) == 0)
     {
     fileName.append(".");
-    fileName.append(this->Info->imageType->currentText());
+    fileName.append(this->Ui->imageType->currentText());
     }
   else
     {  // update imageType if it is different
     int extensionIndex = fileName.lastIndexOf(".");
     QString anExtension = fileName.right(fileName.size()-extensionIndex-1);
-    int index = this->Info->imageType->findText(anExtension);
-    this->Info->imageType->setCurrentIndex(index);
-    fileName = this->Info->imageFileName->displayText();
+    int index = this->Ui->imageType->findText(anExtension);
+    this->Ui->imageType->setCurrentIndex(index);
+    fileName = this->Ui->imageFileName->displayText();
     }
 
   if(fileName.contains("%t") == 0)
@@ -158,29 +179,29 @@ void pqImageOutputInfo::updateImageFileName()
     fileName.insert(fileName.lastIndexOf("."), "_%t");
     }
 
-  this->Info->imageFileName->setText(fileName);
+  this->Ui->imageFileName->setText(fileName);
 }
 
 //-----------------------------------------------------------------------------
 void pqImageOutputInfo::updateImageFileNameExtension(
   const QString& fileExtension)
 {
-  QString displayText = this->Info->imageFileName->text();
+  QString displayText = this->Ui->imageFileName->text();
   std::string newFileName = vtksys::SystemTools::GetFilenameWithoutExtension(
     displayText.toLocal8Bit().constData());
 
   newFileName.append(".");
   newFileName.append(fileExtension.toLocal8Bit().constData());
-  this->Info->imageFileName->setText(QString::fromStdString(newFileName));
+  this->Ui->imageFileName->setText(QString::fromStdString(newFileName));
 }
 
 //-----------------------------------------------------------------------------
 void pqImageOutputInfo::setupScreenshotInfo()
 {
-  this->Info->thumbnailLabel->setVisible(true);
+  this->Ui->thumbnailLabel->setVisible(true);
   if(!this->View)
     {
-    cerr << "no view available which seems really weird\n";
+    cerr << "No view has been set!" << '\n';
     return;
     }
 
@@ -211,31 +232,39 @@ void pqImageOutputInfo::setupScreenshotInfo()
       result->GetPointer(0),
       result->GetNumberOfTuples()*result->GetNumberOfComponents(), "PNG");
 
-    this->Info->thumbnailLabel->setPixmap(thumbnail);
+    this->Ui->thumbnailLabel->setPixmap(thumbnail);
     }
 }
 
 //-----------------------------------------------------------------------------
-void pqImageOutputInfo::hideCinema()
+void pqImageOutputInfo::setCinemaVisible(bool status, bool specASupport)
 {
-  this->Info->cinemaLabel->hide();
-  this->Info->cinemaExport->setEnabled(false);
-  this->Info->cinemaExport->hide();
-  this->Info->phiLabel->hide();
-  this->Info->phiResolution->setEnabled(false);
-  this->Info->phiResolution->hide();
-  this->Info->thetaLabel->hide();
-  this->Info->thetaResolution->setEnabled(false);
-  this->Info->thetaResolution->hide();
-}
+  if (status)
+    {
+    this->Ui->gbCinemaOptions->show();
+    this->updateSpherical();
+    }
+  else
+    this->Ui->gbCinemaOptions->hide();
 
-//-----------------------------------------------------------------------------
-void pqImageOutputInfo::showCinema()
-{
-  this->Info->cinemaLabel->show();
-  this->Info->cinemaExport->setEnabled(true);
-  this->Info->cinemaExport->show();
-  this->updateSpherical();
+  // Remove/ add options depending on what is supported
+  if (!specASupport)
+    {
+    this->Ui->cinemaExport->clear();
+    QStringList items;
+    items << "None" << "Spherical";
+    this->Ui->cinemaExport->addItems(items);
+    }
+  else
+    {
+      if (this->Ui->cinemaExport->count() < 3)
+        {
+        this->Ui->cinemaExport->clear();
+        QStringList items;
+        items << "None" << "Static" << "Spherical";
+        this->Ui->cinemaExport->addItems(items);
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -249,41 +278,33 @@ void pqImageOutputInfo::updateCinemaType(
 void pqImageOutputInfo::updateSpherical()
 {
   const QString& exportChoice =
-    this->Info->cinemaExport->currentText();
+    this->Ui->cinemaExport->currentText();
   if (exportChoice == "Spherical")
     {
-    this->Info->phiLabel->show();
-    this->Info->phiResolution->setEnabled(true);
-    this->Info->phiResolution->show();
-    this->Info->thetaLabel->show();
-    this->Info->thetaResolution->setEnabled(true);
-    this->Info->thetaResolution->show();
+    //this->Ui->wCameraOptions->show();
+    this->Ui->wCameraOptions->setEnabled(true);
     }
   else
     {
-    this->Info->phiLabel->hide();
-    this->Info->phiResolution->setEnabled(false);
-    this->Info->phiResolution->hide();
-    this->Info->thetaLabel->hide();
-    this->Info->thetaResolution->setEnabled(false);
-    this->Info->thetaResolution->hide();
+    //this->Ui->wCameraOptions->hide();
+    this->Ui->wCameraOptions->setEnabled(false);
     }
 }
 
 //------------------------------------------------------------------------------
 const QString pqImageOutputInfo::getCameraType()
 {
-  return this->Info->cinemaExport->currentText();
+  return this->Ui->cinemaExport->currentText();
 }
 
 //------------------------------------------------------------------------------
 double pqImageOutputInfo::getPhi()
 {
-  return this->Info->phiResolution->value();
+  return this->Ui->phiResolution->value();
 }
 
 //------------------------------------------------------------------------------
 double pqImageOutputInfo::getTheta()
 {
-  return this->Info->thetaResolution->value();
+  return this->Ui->thetaResolution->value();
 }

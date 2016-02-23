@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QMessageBox>
 
+
 namespace
 {
   static const char* cp_python_export_code =
@@ -62,7 +63,7 @@ namespace
     "   rescale_data_range=%4,\n"
     "   enable_live_viz=%5,\n"
     "   live_viz_frequency=%6,\n"
-    "   cinema_tracks=%7,\n"
+    "   cinema_tracks={%7},\n"
     "   filename='%8')\n";
 }
 
@@ -146,112 +147,20 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
       }
     }
   else if(this->Internals->outputRendering->isChecked())
-    { // we are creating images so add information to the view proxies
-    vtkSMSessionProxyManager* proxyManager =
-        vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
-    for(int i=0;i<this->Internals->viewsContainer->count();i++)
-      {
-      pqImageOutputInfo* viewInfo = dynamic_cast<pqImageOutputInfo*>(
-        this->Internals->viewsContainer->widget(i));
-      pqView* view = viewInfo->getView();
-      QSize viewSize = view->getSize();
-      vtkSMViewProxy* viewProxy = view->getViewProxy();
-      vtkSMRenderViewProxy* rvp = vtkSMRenderViewProxy::SafeDownCast(viewProxy);
-      pqRenderView* rview = dynamic_cast<pqRenderView*>(view);
-      //cinema camera parameters
-      QString cinemaCam = "{}";
-      QString camType = viewInfo->getCameraType();
-      if (rvp && (camType != "None"))
-        {
-        cinemaCam = QString("{");
-        if (this->Internals->cinemaComposite->isChecked())
-          {
-          cinemaCam += "\"composite\":True, ";
-          }
-        cinemaCam += "\"camera\":\"";
-        cinemaCam += camType;
-        cinemaCam += "\"";
-        if (camType != "Static")
-          {
-          cinemaCam += ", ";
-
-          cinemaCam += "\"phi\":[";
-          int j;
-          for (j = -180; j < 180; j+= (360/viewInfo->getPhi()))
-            {
-            cinemaCam += QString::number(j) + ",";
-            }
-          cinemaCam.chop(1);
-          cinemaCam += "],";
-
-          cinemaCam += "\"theta\":[";
-          for (j = -180; j < 180; j+= (360/viewInfo->getTheta()))
-            {
-            cinemaCam += QString::number(j) + ",";
-            }
-          cinemaCam.chop(1);
-          cinemaCam += "], ";
-
-          vtkCamera *cam = rvp->GetActiveCamera();
-          double eye[3];
-          double at[3];
-          double up[3];
-          cam->GetPosition(eye);
-          rview->getCenterOfRotation(at);
-          cam->GetViewUp(up);
-          cinemaCam += "\"initial\":{ ";
-          cinemaCam += "\"eye\": [" +
-            QString::number(eye[0]) + "," + QString::number(eye[1]) + "," + QString::number(eye[2]) + "], ";
-          cinemaCam += "\"at\": [" +
-            QString::number(at[0]) + "," + QString::number(at[1]) + "," + QString::number(at[2]) + "], ";
-          cinemaCam += "\"up\": [" +
-            QString::number(up[0]) + "," + QString::number(up[1]) + "," + QString::number(up[2]) + "] ";
-          cinemaCam += "} ";
-          }
-        cinemaCam += "}";
-        }
-
-      QString info = QString(" '%1' : ['%2', %3, '%4', '%5', '%6', '%7', '%8'],").
-        arg(proxyManager->GetProxyName("views", viewProxy)).
-        arg(viewInfo->getImageFileName()).arg(viewInfo->getWriteFrequency()).
-        arg(static_cast<int>(viewInfo->fitToScreen())).
-        arg(viewInfo->getMagnification()).
-        arg(viewSize.width()).
-        arg(viewSize.height()).
-        arg(cinemaCam);
-      rendering_info+= info;
-      }
-    // remove the last comma -- assume that there's at least one view
-    rendering_info.chop(1);
+    {
+    // Format as defined in cpstate.py
+    QString format("'%1' : ['%2', %3, '%4', '%5', '%6', '%7', '%8']");
+    rendering_info = this->Internals->wViewSelection->getSelectionAsPythonScript(format,
+      this->Internals->chbComposite->isChecked());
     }
 
-  QString cinema_tracks = "{ "; //trailing space matters
+  QString cinema_tracks;
   if(this->Internals->outputCinema->isChecked())
     {
-    for(int i=0;i<this->Internals->cinemaContainer->count();i++)
-      {
-      pqCinemaTrack *p = dynamic_cast<pqCinemaTrack*>(this->Internals->cinemaContainer->widget(i));
-      if (!p->explore())
-        {
-        continue;
-        }
-      QString name = p->filterName();
-      QString values = "[";
-      QVariantList vals = p->scalars();
-      for (int j = 0; j < vals.count(); j++)
-        {
-        values += QString::number(vals.value(j).toDouble());
-        values += ",";
-        }
-      values.chop(1);
-      values += "]";
-      QString info = QString(" '%1' : %2,").arg(name).arg(values);
-      cinema_tracks+= info;
-      }
-
-    cinema_tracks.chop(1);
+    // Format as defined in pv_introspect.make_cinema_store.make_cinema_store (_userDefinedValues)
+    QString format("'%1' : %2");
+    cinema_tracks = this->Internals->wCinemaTrackSelection->getSelectionAsPythonScript(format);
     }
-  cinema_tracks+="}";
 
   QString filters ="ParaView Python State Files (*.py);;All files (*)";
 

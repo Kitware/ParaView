@@ -171,7 +171,7 @@ class pqAnnotationsModel : public QAbstractTableModel
       painter.setBrush(QBrush(this->Color));
       painter.drawEllipse(1, 1, radius-2, radius-2);
       painter.end();
-      return pix; 
+      return pix;
       }
     };
 
@@ -759,7 +759,7 @@ void pqColorAnnotationsPropertyWidget::addActiveAnnotations()
     // Set the merged annotations
     this->setAnnotations(mergedAnnotations);
 
-    }  
+    }
   catch (int)
     {
     QMessageBox::warning(
