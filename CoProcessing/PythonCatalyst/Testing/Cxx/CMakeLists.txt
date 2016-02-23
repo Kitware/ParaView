@@ -185,5 +185,20 @@ if (PARAVIEW_BUILD_QT_GUI)
       set_tests_properties(CoProcessingFullWorkflowCinema PROPERTIES LABELS "${CP_LABELS}")
     endif()
 
+    find_python_module(numpy numpy_found)
+    if (numpy_found)
+      add_test(NAME CoProcessingFullWorkflowCinemaComposite
+        COMMAND ${CMAKE_COMMAND}
+        -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:paraview>
+        -DCOPROCESSING_TEST_DIR:PATH=${PARAVIEW_TEST_DIR}
+        -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Plugins/CatalystScriptGenerator/Testing/CatalystCinemaCompositeGUI.xml
+        -DPVBATCH_EXECUTABLE:FILEPATH=$<TARGET_FILE:pvbatch>
+        -DCOPROCESSING_DRIVER_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/waveletdriver.py
+        -DTEST_NAME:STRING=CoProcessingFullWorkflowCinemaComposite
+        -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
+      set_tests_properties(CoProcessingFullWorkflowCinemaComposite PROPERTIES RUN_SERIAL ON)
+      set_tests_properties(CoProcessingFullWorkflowCinemaComposite PROPERTIES LABELS "${CP_LABELS}")
+    endif()
+
   ENDIF ()
 endif()
