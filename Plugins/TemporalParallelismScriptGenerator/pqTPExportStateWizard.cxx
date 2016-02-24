@@ -165,6 +165,13 @@ bool pqTPExportStateWizard::getCommandString(QString& command)
     }
 
   QString filename = file_dialog.getSelectedFiles()[0];
+#ifdef _WIN32
+  // Convert to forward slashes. The issue is that the path is interpreted as a
+  // Python string when passed to the interpreter, so a path such as "C:\tests"
+  // is read as "C:<TAB>ests" which isn't what we want. Since Windows is
+  // flexible anyways, just use Unix separators.
+  filename.replace('\\', '/');
+#endif
 
   // Last Page, export the state.
   pqPythonManager* manager = qobject_cast<pqPythonManager*>(
