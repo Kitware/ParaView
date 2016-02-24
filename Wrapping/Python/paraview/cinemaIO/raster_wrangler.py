@@ -63,13 +63,11 @@ try:
                                              vtkPNMReader,
                                              vtkTIFFReader,
                                              vtkJPEGReader,
-                                             vtkXMLImageDataReader,
                                              vtkPNGWriter,
                                              vtkBMPWriter,
                                              vtkPNMWriter,
                                              vtkTIFFWriter,
-                                             vtkJPEGWriter,
-                                             vtkXMLImageDataWriter)
+                                             vtkJPEGWriter)
         from paraview.vtk.vtkCommonDataModel import vtkImageData
         from paraview import numpy_support as n2v
     else:
@@ -79,14 +77,12 @@ try:
                          vtkPNMReader,
                          vtkTIFFReader,
                          vtkJPEGReader,
-                         vtkXMLImageDataReader,
                          vtkPNGWriter,
                          vtkBMPWriter,
                          vtkPNMWriter,
                          vtkTIFFWriter,
                          vtkJPEGWriter,
-                         vtkImageData,
-                         vtkXMLImageDataWriter)
+                         vtkImageData)
         from vtk.util import numpy_support as n2v
     vtkEnabled = True
 except ImportError:
@@ -192,7 +188,7 @@ class RasterWrangler(object):
             id.SetExtent(0, height-1, 0, width-1, 0, 0)
             id.GetPointData().SetScalars(vtkarray)
 
-            writer = _make_writer(fname)
+            writer = self._make_writer(fname)
             writer.SetInputData(id)
             writer.SetFileName(fname)
             writer.Write()
@@ -214,7 +210,7 @@ class RasterWrangler(object):
             id.SetExtent(0, height-1, 0, width-1, 0, 0)
             id.GetPointData().SetScalars(vtkarray)
 
-            writer = _make_writer(fname)
+            writer = self._make_writer(fname)
             writer.SetInputData(id)
             writer.SetFileName(fname)
             writer.Write()
