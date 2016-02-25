@@ -607,7 +607,7 @@ bool vtkSMTransferFunctionProxy::ApplyPreset(const Json::Value& arg, bool rescal
     // Since rescaling gets tricky especially when log scaling is involved
     // either in the preset or in the proxy we're loading the preset values on,
     // we will just "rescale" the range in the preset itself.
-    Json::Value& pointsValue = preset.isMember("RGBPoints")?
+    Json::Value& pointsValue = this->GetProperty("RGBPoints")?
       preset["RGBPoints"] : preset["Points"];
     if (pointsValue.isNull() || !pointsValue.isArray() ||
       (pointsValue.size()  % 4) != 0 || pointsValue.size() == 0)
