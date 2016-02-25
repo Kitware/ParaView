@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/TitleBar/SplitHorizontal" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/CentralWidgetFrame/EmptyView/scrollArea/qt_scrollarea_viewport/widgetFoo/ConvertActionsFrame/RenderView" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/BackgroundEditor/BackgroundType" command="set_string" arguments="Gradient" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="ConeSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsManageLinks" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/addButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page/ObjectTreeProxy1" command="expand" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page/ObjectTreeProxy1" command="setCurrent" arguments="0.0.0.0" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page/ObjectTreeProxy2" command="expand" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page/ObjectTreeProxy2" command="setCurrent" arguments="0.0.1.0" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/interactiveViewLinkCheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor" command="key" arguments="16777250" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.1/CentralWidgetFrame/Viewport" command="mousePress" arguments="(0.83,0.566667,1,1,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.1/CentralWidgetFrame/Viewport" command="mouseMove" arguments="(0.83,0.566667,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.1/CentralWidgetFrame/Viewport" command="mouseRelease" arguments="(0.83,0.566667,1,0,0)" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
+</pqevents>

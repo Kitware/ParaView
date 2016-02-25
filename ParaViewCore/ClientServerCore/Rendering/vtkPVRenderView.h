@@ -449,6 +449,7 @@ public:
   // Description:
   // Enable/disable showing of annotation for developers.
   void SetShowAnnotation(bool val);
+  vtkSetMacro(UpdateAnnotation, bool);
 
   // Description:
   // Set the vtkPVGridAxes3DActor to use for the view.
@@ -749,6 +750,7 @@ protected:
   int InteractiveRenderImageReductionFactor;
   int InteractionMode;
   bool ShowAnnotation;
+  bool UpdateAnnotation;
 
   // 2D and 3D interactor style
   vtkPVInteractorStyle* TwoDInteractorStyle;
