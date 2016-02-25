@@ -251,28 +251,31 @@ def add_control_and_colors(name, cs):
     fields = {'depth':'depth','luminance':'luminance'}
     ranges = {}
     defaultName = None
-    cda = source.GetCellDataInformation()
-    for a in range(0, cda.GetNumberOfArrays()):
-        arr = cda.GetArray(a)
-        arrName = arr.GetName()
-        if not arrName == "Normals":
-            for i in range(0, arr.GetNumberOfComponents()):
-                fName = arrName+"_"+str(i)
-                fields[fName] = 'value'
-                ranges[fName] = arr.GetRange(i)
-                if defaultName == None:
-                    defaultName = fName
-    pda = source.GetPointDataInformation()
-    for a in range(0, pda.GetNumberOfArrays()):
-        arr = pda.GetArray(a)
-        arrName = arr.GetName()
-        if not arrName == "Normals":
-            for i in range(0, arr.GetNumberOfComponents()):
-                fName = arrName+"_"+str(i)
-                fields[fName] = 'value'
-                ranges[fName] = arr.GetRange(i)
-                if defaultName == None:
-                    defaultName = fName
+    view_proxy = paraview.simple.GetActiveView()
+    rep = paraview.simple.GetRepresentation(source, view_proxy)
+    if rep.Representation != 'Outline':
+        cda = source.GetCellDataInformation()
+        for a in range(0, cda.GetNumberOfArrays()):
+            arr = cda.GetArray(a)
+            arrName = arr.GetName()
+            if not arrName == "Normals":
+                for i in range(0, arr.GetNumberOfComponents()):
+                    fName = arrName+"_"+str(i)
+                    fields[fName] = 'value'
+                    ranges[fName] = arr.GetRange(i)
+                    if defaultName == None:
+                        defaultName = fName
+        pda = source.GetPointDataInformation()
+        for a in range(0, pda.GetNumberOfArrays()):
+            arr = pda.GetArray(a)
+            arrName = arr.GetName()
+            if not arrName == "Normals":
+                for i in range(0, arr.GetNumberOfComponents()):
+                    fName = arrName+"_"+str(i)
+                    fields[fName] = 'value'
+                    ranges[fName] = arr.GetRange(i)
+                    if defaultName == None:
+                        defaultName = fName
     if defaultName == None:
         fields['white']='rgb'
         defaultName='white'
@@ -442,27 +445,28 @@ def explore(cs, proxies, iSave=True, currentTime=None):
                 cda = sp.GetCellDataInformation()
 
                 numVals = 0
-                for a in range(0, cda.GetNumberOfArrays()):
-                    arr = cda.GetArray(a)
-                    arrName = arr.GetName()
-                    if not arrName == "Normals":
-                        for i in range(0,arr.GetNumberOfComponents()):
-                            numVals+=1
-                            cC.AddValueRender(arrName+"_"+str(i),
-                                            True,
-                                            arrName,
-                                            i, arr.GetRange(i))
-                pda = sp.GetPointDataInformation()
-                for a in range(0, pda.GetNumberOfArrays()):
-                    arr = pda.GetArray(a)
-                    arrName = arr.GetName()
-                    if not arrName == "Normals":
-                        for i in range(0,arr.GetNumberOfComponents()):
-                            numVals+=1
-                            cC.AddValueRender(arrName+"_"+str(i),
-                                            False,
-                                            arrName,
-                                            i, arr.GetRange(i))
+                if rep.Representation != 'Outline':
+                    for a in range(0, cda.GetNumberOfArrays()):
+                        arr = cda.GetArray(a)
+                        arrName = arr.GetName()
+                        if not arrName == "Normals":
+                            for i in range(0,arr.GetNumberOfComponents()):
+                                numVals+=1
+                                cC.AddValueRender(arrName+"_"+str(i),
+                                                True,
+                                                arrName,
+                                                i, arr.GetRange(i))
+                    pda = sp.GetPointDataInformation()
+                    for a in range(0, pda.GetNumberOfArrays()):
+                        arr = pda.GetArray(a)
+                        arrName = arr.GetName()
+                        if not arrName == "Normals":
+                            for i in range(0,arr.GetNumberOfComponents()):
+                                numVals+=1
+                                cC.AddValueRender(arrName+"_"+str(i),
+                                                False,
+                                                arrName,
+                                                i, arr.GetRange(i))
                 if numVals == 0:
                     cC.AddSolidColor('white', [1,1,1])
                 col = pv_explorers.Color("color"+name, cC, rep)
