@@ -38,12 +38,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSettings.h"
 #include "pqPythonSyntaxHighlighter.h"
 
-#include <QApplication>
 #include <QAction>
+#include <QApplication>
 #include <QCloseEvent>
+#include <QDebug>
+#include <QFile>
 #include <QFileDialog>
 #include <QFileInfo>
-#include <QFile>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -160,10 +161,12 @@ bool pqPythonScriptEditor::saveAsMacro()
 {
   QString userMacroDir = pqCoreUtilities::getParaViewUserDirectory() + "/Macros";
   QDir existCheck(userMacroDir);
-  if(!existCheck.exists(userMacroDir))
+  if (!existCheck.exists() && !existCheck.mkpath(userMacroDir))
     {
-    existCheck.mkdir(userMacroDir);
+    qWarning() << "Could not create user Macro directory:" << userMacroDir;
+    return false;
     }
+
   QString fileName = pqFileDialog::getSaveFileName(NULL, this, 
     tr("Save Macro"), userMacroDir, tr("Python script (*.py)"));
   if (!fileName.isEmpty() && this->saveFile(fileName))
