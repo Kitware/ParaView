@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqColorEditorPropertyWidget.h"
 
 #include "pqApplicationCore.h"
+#include "pqChooseColorPresetReaction.h"
 #include "pqDataRepresentation.h"
 #include "pqEditColorMapReaction.h"
 #include "pqEditScalarBarReaction.h"
@@ -113,6 +114,13 @@ pqColorEditorPropertyWidget::pqColorEditorPropertyWidget(vtkSMProxy *smProxy,
   rsrr = new pqResetScalarRangeReaction(resetTemporalRangeAction, false, pqResetScalarRangeReaction::TEMPORAL);
   rsrr->setRepresentation(representation);
 
+  // choose preset button.
+  QAction* choosePresetAction = new QAction(this);
+  choosePresetAction->connect(Ui.ChoosePreset, SIGNAL(clicked()), SLOT(trigger()));
+  pqChooseColorPresetReaction* ccpr = new pqChooseColorPresetReaction(choosePresetAction, false);
+  ccpr->setRepresentation(representation);
+  representation->connect(ccpr, SIGNAL(presetApplied()), SLOT(renderViewEventually()));
+
   this->updateEnableState();
 }
 
@@ -132,18 +140,8 @@ void pqColorEditorPropertyWidget::updateEnableState()
   ui.Rescale->setEnabled(sbva->isEnabled());
   ui.RescaleCustom->setEnabled(sbva->isEnabled());
   ui.RescaleTemporal->setEnabled(sbva->isEnabled());
+  ui.ChoosePreset->setEnabled(sbva->isEnabled());
 
   const QAction* esba = this->Internals->EditScalarBarAction;
   ui.EditScalarBar->setEnabled(esba->isEnabled());
-}
-
-//-----------------------------------------------------------------------------
-void pqColorEditorPropertyWidget::editScalarBar()
-{
-  vtkSMProxy* lut = vtkSMPropertyHelper(this->proxy(), "LookupTable", true).GetAsProxy();
-  if (lut == NULL)
-    {
-    qDebug("No lookuptable found!");
-    return;
-    }
 }

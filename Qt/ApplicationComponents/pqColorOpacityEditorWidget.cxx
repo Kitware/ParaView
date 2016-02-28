@@ -34,11 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqSavePresetOptions.h"
 
 #include "pqActiveObjects.h"
+#include "pqChooseColorPresetReaction.h"
 #include "pqColorTableModel.h"
 #include "pqDataRepresentation.h"
 #include "pqOpacityTableModel.h"
 #include "pqPipelineRepresentation.h"
-#include "pqPresetDialog.h"
 #include "pqPropertiesPanel.h"
 #include "pqPropertyWidgetDecorator.h"
 #include "pqRescaleRange.h"
@@ -726,58 +726,18 @@ void pqColorOpacityEditorWidget::invertTransferFunctions()
 //-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::choosePreset(const char* presetName)
 {
-  pqPresetDialog dialog(this, pqPresetDialog::SHOW_NON_INDEXED_COLORS_ONLY);
-  dialog.setCurrentPreset(presetName);
-  dialog.setCustomizableLoadAnnotations(false);
-  this->connect(&dialog, SIGNAL(applyPreset(const Json::Value&)), SLOT(applyCurrentPreset()));
-  dialog.exec();
+  QAction* tmp = new QAction(NULL);
+  pqChooseColorPresetReaction* ccpr = new pqChooseColorPresetReaction(tmp, false);
+  ccpr->setTransferFunction(this->proxy());
+  this->connect(ccpr, SIGNAL(presetApplied()), SLOT(presetApplied()));
+  ccpr->choosePreset(presetName);
+  delete ccpr;
+  delete tmp;
 }
 
 //-----------------------------------------------------------------------------
-void pqColorOpacityEditorWidget::applyCurrentPreset()
+void pqColorOpacityEditorWidget::presetApplied()
 {
-  pqPresetDialog* dialog = qobject_cast<pqPresetDialog*>(this->sender());
-  Q_ASSERT(dialog);
-
-  vtkSMProxy* sofProxy = this->scalarOpacityFunctionProxy();
-
-  BEGIN_UNDO_SET("Apply preset");
-  if (dialog->loadColors())
-    {
-    vtkSMTransferFunctionProxy::ApplyPreset(
-      this->proxy(), dialog->currentPreset(), !dialog->usePresetRange());
-    }
-  if (dialog->loadOpacities())
-    {
-    if (sofProxy)
-      {
-      vtkSMTransferFunctionProxy::ApplyPreset(
-        sofProxy, dialog->currentPreset(), !dialog->usePresetRange());
-      }
-    else
-      {
-      qWarning("Cannot load opacities since ScalarOpacityFunctionProxy is not present.");
-      }
-    }
-  // We need to take extra care to avoid the color and opacity function ranges
-  // from straying away from each other. This can happen if only one of them is
-  // getting a preset and we're using the preset range.
-  if (dialog->usePresetRange() && (dialog->loadColors() ^ dialog->loadOpacities()) && sofProxy)
-    {
-    double range[2];
-    if (dialog->loadColors() &&
-      vtkSMTransferFunctionProxy::GetRange(this->proxy(), range))
-      {
-      vtkSMTransferFunctionProxy::RescaleTransferFunction(sofProxy, range);
-      }
-    else if (dialog->loadOpacities() &&
-      vtkSMTransferFunctionProxy::GetRange(sofProxy, range))
-      {
-      vtkSMTransferFunctionProxy::RescaleTransferFunction(this->proxy(), range);
-      }
-    }
-  END_UNDO_SET();
-
   emit this->changeFinished();
 
   // Assume the color map and opacity have changed and refresh
