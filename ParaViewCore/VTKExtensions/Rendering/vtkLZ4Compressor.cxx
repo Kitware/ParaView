@@ -94,10 +94,18 @@ int vtkLZ4Compressor::Decompress()
     }
 
   int maxDecompressedSize = this->Output->GetNumberOfComponents() * this->Output->GetNumberOfTuples();
-  int decompressedSize = LZ4_decompress_fast(
+  int decompressedSize = LZ4_decompress_safe(
     reinterpret_cast<const char*>(this->Input->GetPointer(0)),
     reinterpret_cast<char*>(this->Output->GetPointer(0)),
+    this->Input->GetNumberOfTuples(),
     maxDecompressedSize);
+
+//  // We use LZ4_decompress_safe for now since there seems to be some bug
+//  // in LZ4_decompress_fast which is causing segfaults on Windows.
+//  int decompressedSize = LZ4_decompress_fast(
+//    reinterpret_cast<const char*>(this->Input->GetPointer(0)),
+//    reinterpret_cast<char*>(this->Output->GetPointer(0)),
+//    maxDecompressedSize);
   return decompressedSize > 0? VTK_OK : VTK_ERROR;
 }
 
