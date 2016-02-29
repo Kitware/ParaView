@@ -11271,11 +11271,51 @@ source.</Documentation>
         <Documentation>Choose arrays whose entries will be used to form
         observations for statistical analysis.</Documentation>
       </StringVectorProperty>
+      <IntVectorProperty command="SetUseSilvermanRule"
+                         default_values="1"
+                         name="UseSilvermanRule"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This flag indicates kernel width must be automatically
+        computed using Silverman's rules (sigma*n^(-1/(d+4))).</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetKernelWidth"
+                         default_values="1"
+                         name="KernelWidth"
+                         number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="UseSilvermanRule"
+                                   value="0" />
+          <!-- show this widget when UseSilvermanRule==0 -->
+        </Hints>
+        <Documentation>Specify the kernel width used to compute the HDR.
+        </Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetGridSize"
+                         default_values="100"
+                         name="GridSize"
+                         number_of_elements="1">
+        <IntRangeDomain min="1" name="grid_range"/>
+        <Documentation>Width and height of the grid image to perform the PCA on.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUserQuantile"
+                         default_values="95"
+                         name="UserQuantile"
+                         number_of_elements="1">
+        <IntRangeDomain min="0" max="100" name="thresold_range"/>
+        <Documentation>
+        </Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetTransposeTable"
                          default_values="1"
                          name="TransposeTable"
                          label="Process the transposed of the input table"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>This flag indicates if the input table must
         be transposed first.</Documentation>
@@ -11283,28 +11323,11 @@ source.</Documentation>
       <IntVectorProperty command="SetRobustPCA"
                          default_values="0"
                          name="RobustPCA"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="never">
         <BooleanDomain name="bool" />
         <Documentation>This flag indicates if the PCA should be run
         in robust mode or not.</Documentation>
-      </IntVectorProperty>
-      <DoubleVectorProperty command="SetSigma"
-                         default_values="1"
-                         name="Sigma"
-                         label="HDR smoothing parameter"
-                         number_of_elements="1">
-        <DoubleRangeDomain name="range" />
-        <Documentation>Specify the smoothing parameter of the
-        HDR.</Documentation>
-      </DoubleVectorProperty>
-      <IntVectorProperty command="SetGridSize"
-                         default_values="100"
-                         name="GridSize"
-                         number_of_elements="1">
-        <IntRangeDomain min="1" name="grid_range"/>
-        <Documentation>
-          Width and height of the grid image to perform the PCA on.
-        </Documentation>
       </IntVectorProperty>
       <!-- View can be used to specify the preferred view for the proxy -->
       <Hints>
