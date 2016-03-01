@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkSMViewProxy.h"
 
 // pqCore
 #include "pqApplicationCore.h"
@@ -448,7 +449,8 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
     // set the input/output proxies
     if(idx.isValid())
       {
-      this->Ui->lineEdit->setText(model->getLinkName(idx));
+      QString name = model->getLinkName(idx);
+      this->Ui->lineEdit->setText(name);
 
       if (model->getLinkType(idx) == pqLinksModel::Proxy ||
           model->getLinkType(idx) == pqLinksModel::Camera)
@@ -518,7 +520,11 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
             }
           }
         }
-
+      if (model->getLinkType(idx) == pqLinksModel::Camera &&
+          model->hasInteractiveViewLink(name))
+        {
+        this->Ui->interactiveViewLinkCheckBox->setChecked(true);
+        }
       }
     }
   else
@@ -704,6 +710,10 @@ void pqLinksEditor::updateEnabledState()
         }
       }
     }
+  else if (this->SelectedProxy1 == this->SelectedProxy2)
+    {
+    enabled = false;
+    }
   else if(this->linkType() == pqLinksModel::Selection)
     {
     if (!vtkSMSourceProxy::SafeDownCast(this->SelectedProxy1) || 
@@ -712,6 +722,18 @@ void pqLinksEditor::updateEnabledState()
       enabled = false;
       }
     }
+
   this->Ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(enabled);
+
+  this->Ui->interactiveViewLinkCheckBox->setVisible(
+    vtkSMViewProxy::SafeDownCast(this->SelectedProxy1) != NULL &&
+    vtkSMViewProxy::SafeDownCast(this->SelectedProxy2) != NULL &&
+    this->SelectedProxy1 != this->SelectedProxy2 &&
+    this->linkType() == pqLinksModel::Proxy 
+    );
 }
 
+bool pqLinksEditor::interactiveViewLinkChecked()
+{
+  return this->Ui->interactiveViewLinkCheckBox->isChecked();
+}

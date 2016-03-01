@@ -45,6 +45,8 @@ class pqServerManagerModelItem;
 class vtkSMLink;
 class vtkSMProxy;
 class vtkSMProxyListDomain;
+class vtkSMProxyLocator;
+class vtkPVXMLElement;
 
 /// A Qt based model to represent the vtkSMLinks in the
 /// server manager.
@@ -118,7 +120,11 @@ public:
   /// add a camera based link
   void addCameraLink(const QString& name, 
                     vtkSMProxy* proxy1,
-                    vtkSMProxy* proxy2);
+                    vtkSMProxy* proxy2,
+                    bool interactiveViewLink = false);
+
+  /// return true if pqLinksModels contain an interactive view link associated to name
+  bool hasInteractiveViewLink(const QString& name);
 
   /// add a property based link
   void addPropertyLink(const QString& name,
@@ -148,15 +154,27 @@ signals:
   void linkAdded(int linkType);
 
   /// Fired when a link is removed
-  void linkRemoved();
+  void linkRemoved(const QString& name);
 
 protected slots:
   void onSessionCreated(pqServer*);
   void onSessionRemoved(pqServer*);
 
-  /// Convenience method used by the internal
-  void emitLinkRemoved();
+  /// method called when a state is loaded, 
+  /// will create interactive view link according to xml node
+  void onStateLoaded(vtkPVXMLElement* root, vtkSMProxyLocator* locator);
 
+  /// method called when state is saved
+  /// Will save interactive view links in xml
+  void onStateSaved(vtkPVXMLElement* root);
+
+  /// Create a interactive view link with provided parameters
+  void createInteractiveViewLink(const QString& name, vtkSMProxy* displayView, vtkSMProxy* linkedView, 
+    double xPos = 0.375, double yPos = 0.375, double xSize = 0.25, double ySize = 0.25);
+
+  /// Convenience method used by the internal
+  void emitLinkRemoved(const QString& name);
+  
 private:
   ItemType getLinkType(vtkSMLink* link) const;
   vtkSMProxy* getProxyFromIndex(const QModelIndex& idx, int dir) const;

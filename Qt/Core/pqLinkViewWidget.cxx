@@ -33,14 +33,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqLinkViewWidget.h"
 
-#include <QVBoxLayout>
+#include <QApplication>
+#include <QCheckBox>
+#include <QEvent>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QPushButton>
 #include <QLineEdit>
-#include <QEvent>
-#include <QApplication>
 #include <QMouseEvent>
+#include <QPushButton>
+#include <QVBoxLayout>
 
 #include "pqApplicationCore.h"
 #include "pqLinksModel.h"
@@ -64,6 +65,8 @@ pqLinkViewWidget::pqLinkViewWidget(pqRenderView* firstLink)
   hl->addWidget(label);
   this->LineEdit = new QLineEdit(this);
   hl->addWidget(this->LineEdit);
+  this->InteractiveViewLinkCheckBox = new QCheckBox("Interactive View Link", this);
+  l->addWidget(this->InteractiveViewLinkCheckBox);
   QPushButton* button = new QPushButton(this);
   l->addWidget(button);
   button->setText("Cancel");
@@ -138,7 +141,8 @@ bool pqLinkViewWidget::eventFilter(QObject* watched, QEvent* e)
         }
 
       model->addCameraLink(name, 
-        this->RenderView->getProxy(), otherView->getProxy());
+        this->RenderView->getProxy(), otherView->getProxy(), 
+        this->InteractiveViewLinkCheckBox->isChecked());
 
       this->close();
       }

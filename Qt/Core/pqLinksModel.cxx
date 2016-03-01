@@ -32,8 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqLinksModel.h"
 
+// Std includes
+#include <map>
+
 // Qt includes
 #include <QPointer>
+#include <QDebug>
 
 // vtk includes
 #include <vtkEventQtSlotConnect.h>
@@ -41,16 +45,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkCollection.h>
 
 // Server manager includes
+#include "vtkPVXMLElement.h"
 #include "vtkSMCameraLink.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyLink.h"
 #include "vtkSMProxyLink.h"
 #include "vtkSMProxyListDomain.h"
+#include "vtkSMProxyLocator.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkSMSelectionLink.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
 
 // pqCore includes
@@ -60,14 +71,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
+#include "pqInteractiveViewLink.h"
 
 class pqLinksModel::pqInternal : public vtkCommand
 {
 public:
   pqLinksModel* Model;
   QPointer<pqServer> Server;
+  QMap<QString, pqInteractiveViewLink*> InteractiveViewLinks;
   static pqInternal* New() { return new pqInternal; }
   static const char* columnHeaders[];
+
 
   void Execute(vtkObject*, unsigned long eid, void* callData)
     {
@@ -100,7 +114,7 @@ public:
           {
           this->Model->beginResetModel();
           delete *iter;
-          this->Model->emitLinkRemoved();
+          this->Model->emitLinkRemoved(linkName);
           this->LinkObjects.erase(iter);
           this->Model->endResetModel();
           CLEAR_UNDO_STACK();
@@ -112,7 +126,15 @@ public:
 
 protected:
   pqInternal() {}
-  ~pqInternal() {}
+  ~pqInternal() 
+  {
+    // clean up interactiveViewLinks
+    foreach (pqInteractiveViewLink* interLink, this->InteractiveViewLinks)
+      {
+      delete interLink;
+      }
+    this->InteractiveViewLinks.clear();
+  }
   QList<pqLinksModelObject*> LinkObjects;
 
 private:
@@ -143,6 +165,15 @@ pqLinksModel::pqLinksModel(QObject *p)
     this, SLOT(onSessionCreated(pqServer*)));
   QObject::connect(smmodel, SIGNAL(serverRemoved(pqServer*)),
     this, SLOT(onSessionRemoved(pqServer*)));
+
+  // Connect to state to create/store interactive view links
+  QObject::connect(pqApplicationCore::instance(),
+    SIGNAL(stateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*)),
+    this, SLOT(onStateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*)));
+  QObject::connect(pqApplicationCore::instance(),
+    SIGNAL(stateSaved(vtkPVXMLElement*)),
+    this, SLOT(onStateSaved(vtkPVXMLElement*)));
+
 }
 
 /// destruct a links model
@@ -164,6 +195,108 @@ void pqLinksModel::onSessionRemoved(pqServer* server)
 {
   vtkSMSessionProxyManager* pxm = server->proxyManager();
   pxm->RemoveObserver(this->Internal);
+}
+
+void pqLinksModel::onStateLoaded(vtkPVXMLElement* root, vtkSMProxyLocator* locator)
+{
+  if (!root || !locator)
+    {
+    return;
+    }
+
+  vtkPVXMLElement* xml = root->FindNestedElementByName("InteractiveViewLinks");
+  if (!xml || !xml->GetName() || 
+      strcmp(xml->GetName(), "InteractiveViewLinks") != 0)
+    {
+    return;
+    }
+
+  for (unsigned cc=0; cc < xml->GetNumberOfNestedElements(); cc++)
+    {
+    vtkPVXMLElement* child = xml->GetNestedElement(cc);
+    if (child && child->GetName() && strcmp(child->GetName(), "InteractiveViewLink")==0)
+      {
+      const char* name = child->GetAttribute( "name" );
+      if (!name)
+        {
+        qWarning() << "Dropping an unammed InteractiveViewLink";
+        continue;
+        }
+
+      int displayViewProxyId;
+      if (!child->GetScalarAttribute("DisplayViewProxy", &displayViewProxyId))
+        {
+        qWarning() << "InteractiveViewLink named :" << name << " is missing a DisplayViewProxy. Dropping.";
+        continue;
+        }
+      vtkSMProxy* displayViewProxy = locator->LocateProxy(displayViewProxyId);
+      if (!displayViewProxy)
+        {
+        qWarning() << "Failed to locate InteractiveViewLink DisplayViewProxy with ID: " << displayViewProxyId<<" . Dropping";
+        continue;
+        }
+
+      int linkedViewProxyId;
+      if (!child->GetScalarAttribute("LinkedViewProxy", &linkedViewProxyId))
+        {
+        qWarning() << "InteractiveViewLink named :" << name << " is missing a LinkedViewProxy. Dropping.";
+        continue;
+        }
+      vtkSMProxy* linkedViewProxy = locator->LocateProxy(linkedViewProxyId);
+      if (!linkedViewProxy)
+        {
+        qWarning() << "Failed to locate InteractiveViewLink LinkedViewProxy with ID: " << linkedViewProxyId<<" . Dropping";
+        continue;
+        }
+
+      double xPos, yPos, xSize, ySize;
+      if (!child->GetScalarAttribute("positionX", &xPos))
+        {
+        qWarning() << "InteractiveViewLink named :" << name << " is missing a positionX. Dropping.";
+        continue;
+        }
+      if (!child->GetScalarAttribute("positionY", &yPos))
+        {
+        qWarning() << "InteractiveViewLink named :" << name << " is missing a positionY. Dropping.";
+        continue;
+        }
+      if (!child->GetScalarAttribute("sizeX", &xSize))
+        {
+        qWarning() << "InteractiveViewLink named :" << name << " is missing a sizeX. Dropping.";
+        continue;
+        }
+      if (!child->GetScalarAttribute("sizeY", &ySize))
+        {
+        qWarning() << "InteractiveViewLink named :" << name << " is missing a sizeY. Dropping.";
+        continue;
+        }
+      this->createInteractiveViewLink(name, displayViewProxy, linkedViewProxy, xPos, yPos, xSize, ySize);
+      }
+    }
+}
+
+void pqLinksModel::onStateSaved(vtkPVXMLElement* root)
+{
+  Q_ASSERT(root != NULL);
+  vtkPVXMLElement* tempParent = vtkPVXMLElement::New();
+  tempParent->SetName("InteractiveViewLinks");
+  
+  // Save state of each stored pqInteractiveViewLink
+  foreach (QString linkName, this->Internal->InteractiveViewLinks.keys())
+    {
+    pqInteractiveViewLink* interLink = this->Internal->InteractiveViewLinks[linkName];
+    if (interLink != NULL)
+      {
+      vtkPVXMLElement* interLinkXML = vtkPVXMLElement::New();
+      interLinkXML->SetName("InteractiveViewLink");
+      interLinkXML->AddAttribute("name", linkName.toLatin1().data());
+      interLink->saveXMLState(interLinkXML);
+      tempParent->AddNestedElement(interLinkXML);
+      interLinkXML->Delete();
+      }
+    }
+  root->AddNestedElement(tempParent);
+  tempParent->Delete();
 }
 
 static vtkSMProxy* getProxyFromLink(vtkSMLink* link, int desiredDir)
@@ -484,7 +617,8 @@ void pqLinksModel::addProxyLink(const QString& name,
 
 void pqLinksModel::addCameraLink(const QString& name,
                                  vtkSMProxy* inputProxy,
-                                 vtkSMProxy* outputProxy)
+                                 vtkSMProxy* outputProxy,
+                                 bool interactiveViewLink)
 {
   vtkSMSessionProxyManager* pxm = this->Internal->Server->proxyManager();
   vtkSMCameraLink* link = vtkSMCameraLink::New();
@@ -498,6 +632,45 @@ void pqLinksModel::addCameraLink(const QString& name,
   link->Delete();
   emit this->linkAdded(pqLinksModel::Camera);
   CLEAR_UNDO_STACK();
+
+  if (interactiveViewLink)
+    {
+    this->createInteractiveViewLink(name, inputProxy, outputProxy);
+    }
+}
+
+void pqLinksModel::createInteractiveViewLink(const QString& name, vtkSMProxy* displayView, vtkSMProxy* linkedView,
+                                             double xPos, double yPos, double xSize, double ySize)
+{
+  // Look for corresponding pqRenderView
+  pqServerManagerModel* smModel =
+    pqApplicationCore::instance()->getServerManagerModel();
+  pqRenderView* firstView = NULL;
+  pqRenderView* otherView = NULL;
+  QList<pqRenderView*> views = smModel->findItems<pqRenderView*>();
+  foreach (pqRenderView* view, views)
+    {
+    if (view && view->getRenderViewProxy() == displayView)
+      {
+      firstView = view;
+      }
+    if (view && view->getRenderViewProxy() == linkedView)
+      {
+      otherView = view;
+      }
+    }
+
+  // If found, create the pqInteractiveViewLink
+  if (firstView != NULL && otherView != NULL)
+    {
+    this->Internal->InteractiveViewLinks[name] = 
+      new pqInteractiveViewLink(firstView, otherView, xPos, yPos, xSize, ySize);
+    }
+}
+
+bool pqLinksModel::hasInteractiveViewLink(const QString& name)
+{
+  return this->Internal->InteractiveViewLinks.contains(name);
 }
 
 void pqLinksModel::addPropertyLink(const QString& name,
@@ -568,14 +741,19 @@ void pqLinksModel::removeLink(const QString& name)
     {
     vtkSMSessionProxyManager* pxm = this->Internal->Server->proxyManager();
     pxm->UnRegisterLink(name.toLatin1().data());
-    this->emitLinkRemoved();
+    this->emitLinkRemoved(name);
     CLEAR_UNDO_STACK();
     }
 }
 
-void pqLinksModel::emitLinkRemoved()
+void pqLinksModel::emitLinkRemoved(const QString& name)
 {
-  emit this->linkRemoved();
+  if (this->Internal->InteractiveViewLinks.contains(name))
+    {
+    delete this->Internal->InteractiveViewLinks[name];
+    this->Internal->InteractiveViewLinks.remove(name);
+    }
+  emit this->linkRemoved(name);
 }
 
 pqProxy* pqLinksModel::representativeProxy(vtkSMProxy* pxy)
@@ -818,5 +996,3 @@ void pqLinksModelObject::refresh()
     this->linkUndoStacks();
     }
 }
-
-

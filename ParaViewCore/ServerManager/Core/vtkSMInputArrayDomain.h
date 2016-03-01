@@ -29,17 +29,22 @@
 // appropriate.
 //
 // Supported XML attributes:
-// \li \c attribute_type : (optional) value can be 'point', 'cell', 'any',
-//                         'vertex', 'edge', 'row', 'none'. If no specified,
-//                         'any' is assumed. This indicates the attribute type
-//                         for acceptable arrays. Note "any" implies all types
-//                         of attribute data (thus doesn't include field data
-//                         since it's not attribute data).
+// \li \c attribute_type : (optional) value can be 'point', 'cell', 'field',
+//                         'vertex', 'edge', 'row', 'none', 'any-except-field', 'any'.
+//                         If not specified, 'any-except-field' is assumed. This
+//                         indicates the attribute type for acceptable arrays.
 // \li \c number_of_components : (optional) 0 by default. If non-zero, indicates
 //                         the component count for acceptable arrays.
 //
 // This domain doesn't support any required properties (to help clean old
 // code, we print a warning if any required properties are specified).
+//
+// .SECTION Note on change in behaviour
+// Prior to ParaView 5.0, attribute_type="any" meant all attributes excepting
+// field data. For being consistent with general understanding of "any", this
+// has been changed to include field data arrays since 5.0. Use
+// "any-except-field" for cases where the intention is to match any attribute arrays except
+// field data arrays.
 #ifndef vtkSMInputArrayDomain_h
 #define vtkSMInputArrayDomain_h
 
@@ -96,11 +101,12 @@ public:
     POINT = vtkDataObject::POINT,
     CELL = vtkDataObject::CELL,
     FIELD = vtkDataObject::FIELD,
-    ANY = vtkDataObject::POINT_THEN_CELL,
+    ANY_EXCEPT_FIELD = vtkDataObject::POINT_THEN_CELL,
     VERTEX = vtkDataObject::VERTEX,
     EDGE = vtkDataObject::EDGE,
     ROW = vtkDataObject::ROW,
-    NUMBER_OF_ATTRIBUTE_TYPES = vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES
+    ANY = vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES,
+    NUMBER_OF_ATTRIBUTE_TYPES = ANY+1,
     };
 
   // Description:

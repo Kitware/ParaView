@@ -93,7 +93,7 @@ QObject(_parent)
   QObject::connect(pqApplicationCore::instance()->getLinksModel(),
                    SIGNAL(linkAdded(int)), this, SLOT(onLinkAdded(int)));
   QObject::connect(pqApplicationCore::instance()->getLinksModel(),
-                   SIGNAL(linkRemoved()), this, SLOT(onLinkRemoved()));
+                   SIGNAL(linkRemoved(const QString&)), this, SLOT(onLinkRemoved()));
 }
 
 //-----------------------------------------------------------------------------

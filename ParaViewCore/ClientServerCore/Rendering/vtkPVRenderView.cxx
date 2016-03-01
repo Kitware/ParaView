@@ -460,6 +460,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->Annotation->GetTextActor()->GetTextProperty()->SetJustificationToLeft();
   this->Annotation->SetVisibility(0);
   this->ShowAnnotation = false;
+  this->UpdateAnnotation = true;
 
   // We update the annotation text before the 2D renderer renders.
   this->NonCompositedRenderer->AddObserver(
@@ -2486,7 +2487,7 @@ void vtkPVRenderView::SetShowAnnotation(bool val)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::UpdateAnnotationText()
 {
-  if (this->ShowAnnotation && !this->MakingSelection)
+  if (this->UpdateAnnotation && this->ShowAnnotation && !this->MakingSelection)
     {
     std::ostringstream stream;
     stream << this->Annotation->GetText();

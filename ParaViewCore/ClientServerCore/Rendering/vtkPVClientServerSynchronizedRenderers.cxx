@@ -32,7 +32,7 @@ vtkCxxSetObjectMacro(vtkPVClientServerSynchronizedRenderers, Compressor,
 vtkPVClientServerSynchronizedRenderers::vtkPVClientServerSynchronizedRenderers()
 {
   this->Compressor = NULL;
-  this->ConfigureCompressor("vtkSquirtCompressor 0 3");
+  this->ConfigureCompressor("vtkLZ4Compressor 0 3");
   this->LossLessCompression = true;
 }
 

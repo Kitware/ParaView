@@ -34,7 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QWidget>
 #include <pqCoreModule.h>
+
 class pqRenderView;
+class QCheckBox;
 class QLineEdit;
 
 /// a popup window that helps the user select another view
@@ -57,6 +59,7 @@ protected:
 private:
   pqRenderView* RenderView;
   QLineEdit* LineEdit;
+  QCheckBox* InteractiveViewLinkCheckBox;
 };
 
 #endif

@@ -33,6 +33,8 @@
 """
 
 import numpy
+import os
+import warnings
 
 exrEnabled = False
 try:
@@ -56,7 +58,12 @@ try:
     if "paraview" in sys.modules:
         import paraview.vtk
         import paraview.vtk.vtkIOImage
-        from paraview.vtk.vtkIOImage import (vtkPNGWriter,
+        from paraview.vtk.vtkIOImage import (vtkPNGReader,
+                                             vtkBMPReader,
+                                             vtkPNMReader,
+                                             vtkTIFFReader,
+                                             vtkJPEGReader,
+                                             vtkPNGWriter,
                                              vtkBMPWriter,
                                              vtkPNMWriter,
                                              vtkTIFFWriter,
@@ -65,7 +72,12 @@ try:
         from paraview import numpy_support as n2v
     else:
         import vtk
-        from vtk import (vtkPNGWriter,
+        from vtk import (vtkPNGReader,
+                         vtkBMPReader,
+                         vtkPNMReader,
+                         vtkTIFFReader,
+                         vtkJPEGReader,
+                         vtkPNGWriter,
                          vtkBMPWriter,
                          vtkPNMWriter,
                          vtkTIFFWriter,
@@ -76,79 +88,208 @@ try:
 except ImportError:
     pass
 
-def _make_writer(filename):
-    "Internal function."
-    extension = None
-    parts = filename.split('.')
-    if len(parts) > 1:
-        extension = parts[-1]
-    else:
-        raise RuntimeError, "Filename has no extension, please specify a write"
+class RasterWrangler(object):
+    """
+    Isolates the specifics of raster file formats from the cinema store.
+    In particular this delegates the task to one or more subsidiary modules.
+    The choice of which is open to facilitate packaging in different
+    places, i.e. PIL for desktop and small packages, VTK for HPC contexts.
+    """
+    def __init__(self):
+        self.backends = set()
+        if exrEnabled:
+            self.backends.add("OpenEXR")
+        elif pilEnabled:
+            self.backends.add("PIL")
+        elif vtkEnabled:
+            self.backends.add("VTK")
 
-    if extension == 'png':
-        return vtkPNGWriter()
-    elif extension == 'bmp':
-        return vtkBMPWriter()
-    elif extension == 'ppm':
-        return vtkPNMWriter()
-    elif extension == 'tif' or extension == 'tiff':
-        return vtkTIFFWriter()
-    elif extension == 'jpg' or extension == 'jpeg':
-        return vtkJPEGWriter()
-    else:
-        raise RuntimeError, "Cannot infer filetype from extension:", extension
+    def enableOpenEXR(self):
+        if exrEnabled:
+            self.backends.add("OpenEXR")
+        else:
+            warnings.warn("OpenEXR module not found", ImportWarning)
 
-def rgbwriter(imageslice, fname):
-    if pilEnabled:
-        imageslice = numpy.flipud(imageslice)
-        pimg = PIL.Image.fromarray(imageslice)
-        pimg.save(fname)
-        return
+    def enablePIL(self):
+        if pilEnabled:
+            self.backends.add("PIL")
+        else:
+            warnings.warn("PIL module not found", ImportWarning)
 
-    if vtkEnabled:
-        height = imageslice.shape[1]
-        width = imageslice.shape[0]
-        contig = imageslice.reshape(height*width,3)
-        vtkarray = n2v.numpy_to_vtk(contig)
-        id = vtkImageData()
-        id.SetExtent(0, height-1, 0, width-1, 0, 0)
-        id.GetPointData().SetScalars(vtkarray)
+    def enableVTK(self):
+        if vtkEnabled:
+            self.backends.add("VTK")
+        else:
+            warnings.warn("VTK module not found", ImportWarning)
 
-        writer = _make_writer(fname)
-        writer.SetInputData(id)
-        writer.SetFileName(fname)
-        writer.Write()
-        return
+    def _make_writer(self,filename):
+        "Internal function."
+        extension = None
+        parts = filename.split('.')
+        if len(parts) > 1:
+            extension = parts[-1]
+        else:
+            raise RuntimeError, "Filename has no extension, cannot guess writer to use"
 
-    print "Warning: need PIL or VTK to write to " + fname
+        if extension == 'png':
+            return vtkPNGWriter()
+        elif extension == 'bmp':
+            return vtkBMPWriter()
+        elif extension == 'ppm':
+            return vtkPNMWriter()
+        elif extension == 'tif' or extension == 'tiff':
+            return vtkTIFFWriter()
+        elif extension == 'jpg' or extension == 'jpeg':
+            return vtkJPEGWriter()
+        elif extension == 'vti':
+            return vtkXMLImageDataWriter()
+        else:
+            raise RuntimeError, "Cannot infer filetype from extension:", extension
 
-def zwriter(imageslice, fname):
-    if exrEnabled:
-        imageslice = numpy.flipud(imageslice)
-        exr.save_depth(imageslice, fname)
-        return
+    def _make_reader(self,filename):
+        "Internal function."
+        extension = None
+        parts = filename.split('.')
+        if len(parts) > 1:
+            extension = parts[-1]
+        else:
+            raise RuntimeError, "Filename has no extension, please guess reader to use"
 
-    if pilEnabled:
-        imageslice = numpy.flipud(imageslice)
-        pimg = PIL.Image.fromarray(imageslice)
-        #TODO:
-        # don't let ImImagePlugin.py insert the Name: filename in line two
-        # why? because ImImagePlugin.py reader has a 100 character limit
-        pimg.save(fname)
-        return
+        if extension == 'png':
+            return vtkPNGReader()
+        elif extension == 'bmp':
+            return vtkBMPReader()
+        elif extension == 'ppm':
+            return vtkPNMReader()
+        elif extension == 'tif' or extension == 'tiff':
+            return vtkTIFFReader()
+        elif extension == 'jpg' or extension == 'jpeg':
+            return vtkJPEGReader()
+        elif extension == 'vti':
+            return vtkXMLImageDataReader()
+        else:
+            raise RuntimeError, "Cannot infer filetype from extension:", extension
 
-    if vtkEnabled:
-        height = imageslice.shape[1]
-        width = imageslice.shape[0]
+    def genericreader(self, fname):
+        with open(fname, "r") as file:
+            return file.read()
 
-        file = open(fname, mode='w')
-        file.write("Image type: L 32F image\r\n")
-        file.write("Name: A cinema depth image\r\n")
-        file.write("Image size (x*y): "+str(height) + "*" + str(width) + "\r\n")
-        file.write("File size (no of images): 1\r\n")
-        file.write(chr(26))
-        imageslice.tofile(file)
-        file.close()
-        return
+    def genericwriter(self, imageslice, fname):
+        with open(fname, "w") as file:
+            file.write(imageslice)
 
-    print "Warning: need OpenEXR or PIL or VTK to write to " + fname
+    def rgbreader(self, fname):
+        if "VTK" in self.backends:
+            height = imageslice.shape[1]
+            width = imageslice.shape[0]
+            contig = imageslice.reshape(height*width,3)
+            vtkarray = n2v.numpy_to_vtk(contig)
+            id = vtkImageData()
+            id.SetExtent(0, height-1, 0, width-1, 0, 0)
+            id.GetPointData().SetScalars(vtkarray)
+
+            writer = self._make_writer(fname)
+            writer.SetInputData(id)
+            writer.SetFileName(fname)
+            writer.Write()
+
+        elif "PIL" in self.backends:
+            im = PIL.Image.open(fname)
+            return numpy.array(im, numpy.uint8).reshape(im.size[1],im.size[0],3)
+
+        else:
+            print "Warning: need PIL or VTK to read from " + fname
+
+    def rgbwriter(self, imageslice, fname):
+        if "VTK" in self.backends:
+            height = imageslice.shape[1]
+            width = imageslice.shape[0]
+            contig = imageslice.reshape(height*width,3)
+            vtkarray = n2v.numpy_to_vtk(contig)
+            id = vtkImageData()
+            id.SetExtent(0, height-1, 0, width-1, 0, 0)
+            id.GetPointData().SetScalars(vtkarray)
+
+            writer = self._make_writer(fname)
+            writer.SetInputData(id)
+            writer.SetFileName(fname)
+            writer.Write()
+
+        elif "PIL" in self.backends:
+            imageslice = numpy.flipud(imageslice)
+            pimg = PIL.Image.fromarray(imageslice)
+            pimg.save(fname)
+
+        else:
+            print "Warning: need PIL or VTK to write to " + fname
+
+    def zfileextension(self):
+        if "OpenEXR" in self.backends:
+            return ".exr"
+
+        else:
+            return ".im"
+
+    def zreader(self, fname):
+        if "OpenEXR" in self.backends:
+            return exr.load_depth(fname)
+
+        elif "PIL" in self.backends:
+            im = PIL.Image.open(fname)
+            return numpy.array(im, numpy.float32).reshape(im.size[1],im.size[0])
+
+        else:
+            print "Warning: need OpenEXR or PIL to read from " + fname
+
+    def zwriter(self, imageslice, fname):
+        if "OpenEXR" in self.backends:
+            imageslice = numpy.flipud(imageslice)
+            exr.save_depth(imageslice, fname)
+
+        elif "VTK" in self.backends:
+            height = imageslice.shape[1]
+            width = imageslice.shape[0]
+
+            file = open(fname, mode='w')
+            file.write("Image type: L 32F image\r\n")
+            file.write("Name: A cinema depth image\r\n")
+            file.write("Image size (x*y): "+str(height) + "*" + str(width) + "\r\n")
+            file.write("File size (no of images): 1\r\n")
+            file.write(chr(26))
+            imageslice.tofile(file)
+            file.close()
+
+        elif "PIL" in self.backends:
+            imageslice = numpy.flipud(imageslice)
+            pimg = PIL.Image.fromarray(imageslice)
+            #TODO:
+            # don't let ImImagePlugin.py insert the Name: filename in line two
+            # why? because ImImagePlugin.py reader has a 100 character limit
+            pimg.save(fname)
+
+        else:
+            print "Warning: need OpenEXR or PIL or VTK to write to " + fname
+
+    def assertvalidimage(self, filename):
+
+        if not os.path.isfile(filename):
+            raise IOError(filename + " does not exist.")
+
+        if "OpenEXR" in self.backends:
+            if not exr.isOpenExrFile(filename):
+                raise IOError(filename + " cannot be opened using OpenEXR.")
+
+        elif "VTK" in self.backends:
+            reader = self._make_reader(filename)
+            if not reader.CanReadFile(filename):
+                raise IOError("VTK Cannot open file " + filename)
+
+        elif "PIL" in self.backends:
+            try:
+                PIL.Image.open(filename)
+            except IOError:
+                raise
+
+        else:
+            raise RuntimeError(
+                "Warning: need OpenEXR or PIL or VTK to validate file store")

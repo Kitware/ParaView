@@ -912,6 +912,48 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
 
         return { 'range': dataRange, 'image': b64Str }
 
+    @exportRpc("pv.color.manager.lut.image.all")
+    def getLutImages(self, numSamples):
+        colorArray = vtkUnsignedCharArray()
+        colorArray.SetNumberOfComponents(3)
+        colorArray.SetNumberOfTuples(numSamples)
+
+        pxm = simple.servermanager.ProxyManager()
+        lutProxy = pxm.NewProxy('lookup_tables', 'PVLookupTable')
+        lut = lutProxy.GetClientSideObject()
+        dataRange = lut.GetRange()
+        delta = (dataRange[1] - dataRange[0]) / float(numSamples)
+
+        # Add the color array to an image data
+        imgData = vtkImageData()
+        imgData.SetDimensions(numSamples, 1, 1)
+        imgData.GetPointData().SetScalars(colorArray)
+
+        # Use the vtk data encoder to base-64 encode the image as png, using no compression
+        encoder = vtkDataEncoder()
+
+        # Result container
+        result = {}
+
+        # Loop over all presets
+        self.findColorMapText('')
+        for name in self.colorMapNames:
+            colorMapText = self.findColorMapText(name)
+            vtkSMTransferFunctionProxy.ApplyColorMap(lutProxy, colorMapText)
+            rgb = [ 0, 0, 0 ]
+            for i in range(numSamples):
+                lut.GetColor(dataRange[0] + float(i) * delta, rgb)
+                r = int(round(rgb[0] * 255))
+                g = int(round(rgb[1] * 255))
+                b = int(round(rgb[2] * 255))
+                colorArray.SetTuple3(i, r, g, b)
+
+            result[name] = encoder.EncodeAsBase64Png(imgData, 0)
+
+        simple.Delete(lutProxy)
+
+        return result
+
     # RpcName: setSurfaceOpacity => pv.color.manager.surface.opacity.set
     @exportRpc("pv.color.manager.surface.opacity.set")
     def setSurfaceOpacity(self, representation, enabled):
@@ -1715,7 +1757,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         return { 'success': True, 'id': reader.GetGlobalIDAsString() }
 
     @exportRpc("pv.proxy.manager.get")
-    def get(self, proxyId):
+    def get(self, proxyId, ui=True):
         """
         Returns the proxy state for the given proxyId as a JSON object.
         """
@@ -1723,8 +1765,11 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         proxyId = str(proxyId)
         self.fillPropertyList(proxyId, proxyProperties)
         proxyProperties = self.reorderProperties(proxyId, proxyProperties)
-        uiProperties = self.getUiProperties(proxyId, proxyProperties)
-        proxyJson = { 'id': proxyId, 'properties': proxyProperties, 'ui': uiProperties }
+        proxyJson = { 'id': proxyId, 'properties': proxyProperties }
+
+        # Perform costly request only when needed
+        if ui:
+            proxyJson['ui'] = self.getUiProperties(proxyId, proxyProperties)
 
         if 'specialHints' in self.propertyDetailsMap:
             proxyJson['hints'] = self.propertyDetailsMap['specialHints']
