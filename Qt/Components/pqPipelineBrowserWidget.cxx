@@ -338,7 +338,7 @@ const QModelIndex pqPipelineBrowserWidget::pipelineModelIndex(const QModelIndex&
   const QSortFilterProxyModel* filterModel = qobject_cast<const QSortFilterProxyModel*>(index.model());
   assert("Invalid model used inside index" && filterModel);
 
-  // Make a recusrive call to support unknown filter depth
+  // Make a recursive call to support unknown filter depth
   return this->pipelineModelIndex(filterModel->mapToSource(index));
 }
 

@@ -103,8 +103,7 @@ void pqCinemaConfiguration::populateElements()
   QList<pqContextView*> cViews = smModel->findItems<pqContextView*>();
   this->Ui->wViewSelection->populateViews(rViews, cViews);
 
-  QList<pqPipelineFilter*> filters = smModel->findItems<pqPipelineFilter*>();
-  this->Ui->wTrackSelection->populateTracks(filters);
+  this->Ui->wTrackSelection->initializePipelineBrowser();
 }
 
 void pqCinemaConfiguration::hideEvent(QHideEvent* event_)

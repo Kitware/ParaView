@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 // ============================================================================
+/// @brief Concrete implementation for seleciton of proxy arrays.
 class pqArraySelectionModel : public pqAbstractItemSelectionModel
 {
 public:
@@ -62,7 +63,7 @@ public:
   {
     this->initializeRootItem();
   };
-  
+
   ~pqArraySelectionModel()
   {
   };
@@ -81,7 +82,7 @@ public:
       {
       return;
       }
-    
+
     vtkPVDataSetAttributesInformation const* attribInfo = dataInfo->GetPointDataInformation();
     if (!attribInfo)
       {
@@ -89,6 +90,7 @@ public:
       }
 
     int const numArrays = attribInfo->GetNumberOfArrays();
+    QList<QTreeWidgetItem*> newItems;
     for (int i = 0 ; i < numArrays ; i++)
       {
       vtkPVArrayInformation* arrInfo = attribInfo->GetArrayInformation(i);
@@ -96,21 +98,22 @@ public:
         {
         continue;
         }
-      
-      QList<QTreeWidgetItem*> newItems;
+
       QTreeWidgetItem* item = new QTreeWidgetItem();
       item->setData(0, Qt::DisplayRole, arrInfo->GetName());
       //item->setData(0, Qt::DecorationRole, pixmaps[k]);
       QString dataType = vtkImageScalarTypeNameMacro(arrInfo->GetDataType());
       item->setData(1, Qt::DisplayRole, dataType);
       item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsSelectable);
-      //qDebug() << "->>> Array " << i << ": " << QString(arrInfo->GetName());
 
-      item->setCheckState(0, Qt::Checked);
+      // Ignore Normals arrays by default
+      Qt::CheckState check = QString(arrInfo->GetName()) == QString("Normals") ?
+        Qt::Unchecked : Qt::Checked;
+      item->setCheckState(0, check);
+
       newItems.append(item);
-
-      RootItem->addChildren(newItems);
       }
+    RootItem->addChildren(newItems);
   };
 
   QString getModelSelection()
@@ -126,16 +129,7 @@ pqCinemaTrackSelection::pqCinemaTrackSelection(QWidget* parent_)
 , Ui(new Ui::CinemaTrackSelection())
 {
   this->Ui->setupUi(this);
-  this->initializePipelineBrowser();
-
-  // view's decoration
   this->Ui->viewArrayPicker->setRootIsDecorated(false);
-
-  connect(this->Ui->pbPrevious, SIGNAL(clicked()), this, SLOT(onPreviousClicked()));
-  connect(this->Ui->pbNext, SIGNAL(clicked()), this, SLOT(onNextClicked()));
-
-  // TODO Connect selection changed (selectionModel) to checkbox toggling
-  this->Ui->wOldSelection->hide();
 }
 
 // ----------------------------------------------------------------------------
@@ -148,10 +142,8 @@ pqCinemaTrackSelection::~pqCinemaTrackSelection()
 void pqCinemaTrackSelection::initializePipelineBrowser()
 {
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
-
-  // pqPipelineBrowser takes ownership of the model
-  pqPipelineModel* model = new pqPipelineModel(*smModel, NULL);
   pqPipelineBrowserWidget* plBrowser = this->Ui->wPipelineBrowser;
+  pqPipelineModel* model = new pqPipelineModel(*smModel, plBrowser);
   plBrowser->setModel(model);
   plBrowser->expandAll();
 
@@ -159,14 +151,17 @@ void pqCinemaTrackSelection::initializePipelineBrowser()
   connect(selModel, SIGNAL(currentChanged(QModelIndex const &, QModelIndex const &)),
     this, SLOT(onPipelineItemChanged(QModelIndex const &, QModelIndex const &)));
 
-  // TODO change the view depending on the wViewSelection FIXME
+  // As before, the track selection will be applied to all of the views.  If necessary,
+  // the models/tracks can be stored per view to keep selections separate.
   QList<pqRenderViewBase*> views = smModel->findItems<pqRenderViewBase*>();
   plBrowser->setActiveView(views[0]);
 
   this->initializePipelineItemValues(smModel->findItems<pqPipelineSource*>());
 }
 
-void pqCinemaTrackSelection::initializePipelineItemValues(QList<pqPipelineSource*> const & items)
+// ----------------------------------------------------------------------------
+void pqCinemaTrackSelection::initializePipelineItemValues(QList<pqPipelineSource*>
+   const & items)
 {
   foreach(pqPipelineSource* plItem, items)
     {
@@ -174,14 +169,14 @@ void pqCinemaTrackSelection::initializePipelineItemValues(QList<pqPipelineSource
 
     if (!port)
       {
-      qDebug() << "Failed to query outputPort from index(";
+      PV_DEBUG_PANELS() << "Failed to query outputPort from index(";
       continue;
       }
 
     vtkSMSourceProxy* proxy = port->getSourceProxy();
     if (!proxy)
       {
-      qDebug() << "Failed to query proxy!";
+      PV_DEBUG_PANELS() << "Failed to query proxy!";
       continue;
       }
 
@@ -190,13 +185,13 @@ void pqCinemaTrackSelection::initializePipelineItemValues(QList<pqPipelineSource
     values.first->populateModel(proxy);
     values.second = NULL;
 
-    // add only cinema-supported filters    
-    Qt::WindowFlags parentFlags = this->Ui->swTracks->windowFlags();
+    // add only cinema-supported filters
+    QWidget* parent = this->Ui->wTabValues;
+    Qt::WindowFlags parentFlags = parent->windowFlags();
     if (!strcmp(proxy->GetVTKClassName(), "vtkPVContourFilter")    ||
         !strcmp(proxy->GetVTKClassName(), "vtkPVMetaSliceDataSet") ||
         !strcmp(proxy->GetVTKClassName(), "vtkPVMetaClipDataSet"))
       {
-      QWidget* parent = this->Ui->wTabValues;
       pqPipelineFilter* plFilter = static_cast<pqPipelineFilter*>(plItem);
       values.second = new pqCinemaTrack(parent, parentFlags, plFilter);
       parent->layout()->addWidget(values.second);
@@ -210,10 +205,8 @@ void pqCinemaTrackSelection::onPipelineItemChanged(QModelIndex const & current,
   QModelIndex const & previous)
 {
   pqPipelineSource* source = this->getPipelineSource(current);
-  pqOutputPort const* port = source ? source->getOutputPort(0) : NULL;
-   // qobject_cast<pqOutputPort const*>(smModelItem);
+  pqOutputPort const* port = source ? source->getOutputPort(0) : NULL;  // qobject_cast<pqOutputPort const*>(smModelItem);
 
-  // TODO review why using here the port and not on init, is this check necessary???
   if (!port)
     {
     PV_DEBUG_PANELS() << "Failed to query outputPort from index(" << current.row()
@@ -222,28 +215,37 @@ void pqCinemaTrackSelection::onPipelineItemChanged(QModelIndex const & current,
     // TODO create a functions which sets a null model and disables the widgets
     this->Ui->viewArrayPicker->setModel(NULL);
     this->Ui->tabProxyProperties->setEnabled(false);
-
     return;
     }
 
+  //set current item's pipeline model
   vtkSMSourceProxy* proxy = port->getSourceProxy();
-  //proxy->PrintSelf(std::cout, vtkIndent());
   ItemValuesMap::iterator valuesIt = this->PipelineItemValues.find(QString(source->getSMName()));
   if (valuesIt == this->PipelineItemValues.end())
     {
     return;
     }
-  
-  // set the current model
+
   this->Ui->viewArrayPicker->setModel(valuesIt->second.first);
   this->Ui->tabProxyProperties->setEnabled(true);
   QHeaderView* header = this->Ui->viewArrayPicker->header();
   header->resizeSections(QHeaderView::ResizeToContents);
   header->setStretchLastSection(true);
 
-
-////////////////// update track value input widget //////////////////////
-  //hide the previous
+  //set current item's value input widget if available
+  // show the current
+  pqCinemaTrack* track = valuesIt->second.second;
+  if (track)
+    {
+    track->show();
+    this->Ui->tabProxyProperties->setTabEnabled(1, true);
+    }
+  else
+    {
+    this->Ui->tabProxyProperties->setCurrentIndex(0);
+    this->Ui->tabProxyProperties->setTabEnabled(1, false);
+    }
+  // hide the previous
   pqPipelineSource* prevItem = this->getPipelineSource(previous);
   if (!prevItem)
     {
@@ -258,16 +260,6 @@ void pqCinemaTrackSelection::onPipelineItemChanged(QModelIndex const & current,
       {
       prevTrack->hide();
       }
-    }
-  this->Ui->wTabValues->setEnabled(false);
-
-  // set the current value input widget if any
-  pqCinemaTrack* track = valuesIt->second.second;
-  if (track)
-    {
-    //update the current one
-    track->show();
-    this->Ui->wTabValues->setEnabled(true);
     }
 }
 
@@ -290,70 +282,8 @@ pqPipelineSource* pqCinemaTrackSelection::getPipelineSource(QModelIndex const & 
   // query an item from the PipelineModel and get its vtkSMSourceProxy
   pqServerManagerModelItem* smModelItem = model->getItemFor(plModelIndex);
   pqPipelineSource* source = qobject_cast<pqPipelineSource*>(smModelItem);
-  
+
   return source;
-}
-
-// ----------------------------------------------------------------------------
-void pqCinemaTrackSelection::onPreviousClicked()
-{
-  int previousIndex = this->Ui->swTracks->currentIndex() - 1;
-  if (previousIndex >= 0)
-    {
-    this->Ui->swTracks->setCurrentIndex(previousIndex);
-    if (previousIndex == 0) // first track
-      {
-      this->Ui->pbPrevious->setEnabled(false);
-      }
-
-    if (!this->Ui->pbNext->isEnabled())
-      {
-      this->Ui->pbNext->setEnabled(true);
-      }
-    }
-}
-
-// ----------------------------------------------------------------------------
-void pqCinemaTrackSelection::onNextClicked()
-{
-  int nextIndex = this->Ui->swTracks->currentIndex() + 1;
-  if (nextIndex < this->Ui->swTracks->count())
-    {
-    this->Ui->swTracks->setCurrentIndex(nextIndex);
-    if (nextIndex == this->Ui->swTracks->count() - 1) // last track
-      {
-      this->Ui->pbNext->setEnabled(false);
-      }
-
-    if (!this->Ui->pbPrevious->isEnabled())
-      {
-      this->Ui->pbPrevious->setEnabled(true);
-      }
-    }
-}
-
-// ----------------------------------------------------------------------------
-void pqCinemaTrackSelection::populateTracks(QList<pqPipelineFilter*> tracks)
-{
-  Qt::WindowFlags parentFlags = this->Ui->swTracks->windowFlags();
-  foreach(pqPipelineFilter* t, tracks)
-    {
-    // add only cinema-supported filters
-    if (t->getProxy()->GetVTKClassName() &&
-       (!strcmp(t->getProxy()->GetVTKClassName(), "vtkPVContourFilter")    ||
-        !strcmp(t->getProxy()->GetVTKClassName(), "vtkPVMetaSliceDataSet") ||
-        !strcmp(t->getProxy()->GetVTKClassName(), "vtkPVMetaClipDataSet")) )
-      {
-      pqCinemaTrack* track = new pqCinemaTrack(this->Ui->swTracks, parentFlags, t);
-      this->Ui->swTracks->addWidget(track);
-      }
-    }
-
-  if (this->Ui->swTracks->count() > 1)
-    {
-    this->Ui->swTracks->setCurrentIndex(0);
-    this->Ui->pbNext->setEnabled(true);
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -361,14 +291,14 @@ QList<pqCinemaTrack*> pqCinemaTrackSelection::getTracks()
 {
   QList<pqCinemaTrack*> tracks;
 
-  for (int i = 0 ; i < this->Ui->swTracks->count() ; i++)
-    {
-    if (pqCinemaTrack* track = qobject_cast<pqCinemaTrack*>(
-          this->Ui->swTracks->widget(i)) )
-      {
-      tracks.append(track);
-      }
-    }
+//  for (int i = 0 ; i < this->Ui->swTracks->count() ; i++)
+//    {
+//    if (pqCinemaTrack* track = qobject_cast<pqCinemaTrack*>(
+//          this->Ui->swTracks->widget(i)) )
+//      {
+//      tracks.append(track);
+//      }
+//    }
 
   return tracks;
 }
@@ -376,6 +306,11 @@ QList<pqCinemaTrack*> pqCinemaTrackSelection::getTracks()
 //------------------------------------------------------------------------------
 QString pqCinemaTrackSelection::getSelectionAsPythonScript(QString const & format)
 {
+  if (!this->Ui->gbTrackSelection->isChecked())
+  {
+    // Output default values
+  }
+
   QString cinema_tracks;
   QList<pqCinemaTrack*> tracks = this->getTracks();
 
@@ -406,45 +341,3 @@ QString pqCinemaTrackSelection::getSelectionAsPythonScript(QString const & forma
 
   return cinema_tracks;
 }
-
-// ----------------------------------------------------------------------------
-//void pqCinemaTrackSelection::populateArrayPicker(vtkSMSourceProxy* proxy)
-//{
-//  // clear and re-populate value-arrays
-//  pqTreeWidget* arrayPicker = this->Ui->wArrayPicker;
-//  arrayPicker->clear();
-//
-//  vtkPVDataInformation* dataInfo = proxy->GetDataInformation();
-//  if (!dataInfo)
-//    {
-//    return;
-//    }
-//  
-//  vtkPVDataSetAttributesInformation const* attribInfo = dataInfo->GetPointDataInformation();
-//  if (!attribInfo)
-//    {
-//    return;
-//    }
-//
-//  int const numArrays = attribInfo->GetNumberOfArrays();
-//  for (int i = 0 ; i < numArrays ; i++)
-//    {
-//      vtkPVArrayInformation* arrInfo = attribInfo->GetArrayInformation(i);
-//      if (!arrInfo)
-//        {
-//        continue;
-//        }
-//
-//      //QTreeWidgetItem* item = new QTreeWidgetItem(arrayPicker);
-//      pqTreeWidgetItem* item = new pqTreeWidgetItem(arrayPicker);
-//      item->setData(0, Qt::DisplayRole, arrInfo->GetName());
-//      //item->setData(0, Qt::DecorationRole, pixmaps[k]);
-//      QString dataType = vtkImageScalarTypeNameMacro(arrInfo->GetDataType());
-//      item->setData(1, Qt::DisplayRole, dataType);
-//      //item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable); // Qt::ItemIsSelectable
-//
-//      arrayPicker->header()->resizeSections(QHeaderView::ResizeToContents);
-//      //arrayPicker->setItemDelegate(new pqNonEditableStyledItemDelegate(this));
-//      //qDebug() << "->>> Array " << i << ": " << QString(arrInfo->GetName());
-//    }
-//}

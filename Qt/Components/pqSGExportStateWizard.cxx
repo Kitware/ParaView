@@ -180,6 +180,9 @@ pqSGExportStateWizard::pqSGExportStateWizard(
 
   this->Internals->chbComposite->hide();
   this->Internals->wCinemaTrackSelection->hide();
+
+  QObject::connect(this->Internals->outputCinema, SIGNAL(toggled(bool)),
+                   this->Internals->outputRendering, SLOT(setChecked(bool)));
   QObject::connect(this->Internals->outputCinema, SIGNAL(toggled(bool)),
                    this->Internals->wCinemaTrackSelection, SLOT(setVisible(bool)));
   QObject::connect(this->Internals->outputCinema, SIGNAL(toggled(bool)),
@@ -194,9 +197,8 @@ pqSGExportStateWizard::pqSGExportStateWizard(
   QList<pqContextView*> contextViews = smModel->findItems<pqContextView*>();
   this->Internals->wViewSelection->populateViews(renderViews, contextViews);
 
-  //look for filters that cinema can parameterize
-  QList<pqPipelineFilter*> filters = smModel->findItems<pqPipelineFilter*>();
-  this->Internals->wCinemaTrackSelection->populateTracks(filters);
+  // populate the pipeline browser
+  this->Internals->wCinemaTrackSelection->initializePipelineBrowser();
 
   // a bit of a hack but we name the finish button here since for testing
   // it's having a hard time finding that button otherwise.
@@ -339,17 +341,13 @@ void pqSGExportStateWizard::toggleCinema(bool state)
   if(state)
     {
     //cinema depends on rendering being on (unchecking it should not be possible)
-    this->Internals->outputRendering->setChecked(true);
     this->Internals->outputRendering->setEnabled(false);
     //add cinema controls to each view
     this->Internals->wViewSelection->setCinemaVisible(true);
-    this->Internals->wCinemaTrackSelection->show();
     }
   else
     {
-    this->Internals->outputRendering->setChecked(false);
     this->Internals->outputRendering->setEnabled(true);
     this->Internals->wViewSelection->setCinemaVisible(false);
-    this->Internals->wCinemaTrackSelection->hide();
     }
 }

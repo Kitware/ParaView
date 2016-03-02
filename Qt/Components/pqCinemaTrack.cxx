@@ -54,7 +54,7 @@ pqCinemaTrack::pqCinemaTrack(
   pqPipelineFilter* filter)
 : QWidget(parentObject, parentFlags)
 , Track(new Ui::CinemaTrack())
-, valsWidget(NULL) 
+, valsWidget(NULL)
 {
   this->Track->setupUi(this);
 
@@ -118,7 +118,7 @@ void pqCinemaTrack::toggleTrack(bool checked)
 //-----------------------------------------------------------------------------
 bool pqCinemaTrack::explore() const
 {
-  return (this->Track->chbIncludeTrack->isChecked() && 
+  return (this->Track->chbIncludeTrack->isChecked() &&
           this->valsWidget &&
           !this->valsWidget->scalars().isEmpty());
 }
