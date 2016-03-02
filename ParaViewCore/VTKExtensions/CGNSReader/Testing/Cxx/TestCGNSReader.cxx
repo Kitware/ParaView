@@ -49,10 +49,14 @@ int TestOutput(vtkMultiBlockDataSet* mb, int nCells, VTKCellType type)
 
 int TestCGNSReader(int argc, char* argv[])
 {
-  char* mixed = 
-    vtkTestUtilities::ExpandDataFileName(argc, argv, "Data/CGNSReader/Example_mixed.cgns");
-  char* nfacen = 
-    vtkTestUtilities::ExpandDataFileName(argc, argv, "Data/CGNSReader/Example_nface_n.cgns");
+  if (argc < 4) return 0; // for some reason two tests are run, one without data data on the cmdline
+
+  const char* mixed = argv[2];
+  const char* nfacen = argv[3];
+  
+    
+  cout << "Opening " << mixed << endl;
+  cout << "Opening " << nfacen << endl;
 
   vtkNew<vtkCGNSReader> mixedReader;
     
@@ -72,10 +76,6 @@ int TestCGNSReader(int argc, char* argv[])
   if (0 != TestOutput(mb, 7, VTK_POLYHEDRON))
     return 1;
   
-  
-  delete [] mixed;
-  delete [] nfacen;
-
   
   cout << __FILE__ << " tests passed." << endl;
   return 0;
