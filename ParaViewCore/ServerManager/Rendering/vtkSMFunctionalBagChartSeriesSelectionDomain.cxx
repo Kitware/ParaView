@@ -35,8 +35,11 @@ vtkSMFunctionalBagChartSeriesSelectionDomain::~vtkSMFunctionalBagChartSeriesSele
 //----------------------------------------------------------------------------
 bool vtkSMFunctionalBagChartSeriesSelectionDomain::GetDefaultSeriesVisibility(const char* name)
 {
-  return (vtksys::SystemTools::StringStartsWith(name, "Q") ||
-    vtksys::SystemTools::StringEndsWith(name, "_outlier"));
+  return
+    vtksys::SystemTools::StringStartsWith(name, "Q3Points") ||
+    vtksys::SystemTools::StringStartsWith(name, "QMedPoints") ||
+    vtksys::SystemTools::StringEndsWith(name, "_outlier") ||
+    vtksys::SystemTools::StringEndsWith(name, "_median");
 }
 
 //----------------------------------------------------------------------------
@@ -51,24 +54,26 @@ std::vector<vtkStdString> vtkSMFunctionalBagChartSeriesSelectionDomain::GetDefau
       {
       vtksys::SystemTools::ReplaceString(name, "_outlier", "");
       }
-    else if (name == "Q3Points")
+    else if (vtksys::SystemTools::StringStartsWith(name, "Q3Points"))
       {
-      name = "99%";
+      // Fetch the ratio after the "Q3Points" string
+      name = name.substr(8) + std::string("%");
       }
     else if (name == "QMedPoints")
       {
       name = "50%";
       }
-    else if (name == "QMedianLine")
+    else if (vtksys::SystemTools::StringEndsWith(name, "_median"))
       {
-      name = "Median";
+      vtksys::SystemTools::ReplaceString(name, "_median", "");
+      name = "Median (" + name + ")";
       }
     values.push_back(name.c_str());
     return values;
     }
   else if (this->DefaultMode == COLOR)
     {
-    if (name == "Q3Points")
+    if (vtksys::SystemTools::StringStartsWith(name, "Q3Points"))
       {
       values.push_back("0.50");
       values.push_back("0.00");
@@ -82,7 +87,7 @@ std::vector<vtkStdString> vtkSMFunctionalBagChartSeriesSelectionDomain::GetDefau
       values.push_back("0.00");
       return values;
       }
-    else if (name == "QMedianLine")
+    else if (vtksys::SystemTools::StringEndsWith(name, "_median"))
       {
       values.push_back("0.00");
       values.push_back("0.00");

@@ -24,8 +24,8 @@
 #include "vtkChartRepresentation.h"
 
 class vtkChartXY;
-class vtkScalarsToColors;
 class vtkImageData;
+class vtkScalarsToColors;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVBagChartRepresentation : public vtkChartRepresentation
 {
@@ -63,11 +63,6 @@ public:
   vtkGetObjectMacro(LookupTable, vtkScalarsToColors);
 
   // Description:
-  // Set/get whether the bag is visible. False by default.
-  vtkSetMacro(BagVisibility, int);
-  vtkGetMacro(BagVisibility, int);
-
-  // Description:
   // Set/get the color to used for the bag in the plot.
   vtkSetVector3Macro(BagColor, double);
   vtkGetVector3Macro(BagColor, double);
@@ -103,15 +98,15 @@ public:
   vtkGetMacro(GridLineStyle, int);
 
   // Description:
-  // Set/get the color to used for the P99 isoline in the plot.
-  vtkSetVector3Macro(P99Color, double);
-  vtkGetVector3Macro(P99Color, double);
+  // Set/get the color to used for the user defined quartile isoline in the plot.
+  vtkSetVector3Macro(PUserColor, double);
+  vtkGetVector3Macro(PUserColor, double);
 
   // Description:
   // Set/get the color to used for the P50 isoline in the plot.
   vtkSetVector3Macro(P50Color, double);
   vtkGetVector3Macro(P50Color, double);
-  
+
   // Description:
   // Set/get the series to use as the X-axis.
   vtkSetStringMacro(XAxisSeriesName);
@@ -170,13 +165,14 @@ private:
   double PointColor[3];
   int GridLineThickness;
   int GridLineStyle;
-  double P99Color[3];
+  double PUserColor[3];
   double P50Color[3];
   char* XAxisSeriesName;
   char* YAxisSeriesName;
   char* DensitySeriesName;
   bool UseIndexForXAxis;
   vtkSmartPointer<vtkImageData> LocalGrid;
+  vtkSmartPointer<vtkTable> LocalThreshold;
 //ETX
 };
 
