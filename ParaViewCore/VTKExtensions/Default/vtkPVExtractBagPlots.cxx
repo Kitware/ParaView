@@ -200,7 +200,7 @@ void vtkPVExtractBagPlots::GetEigenvectors(vtkMultiBlockDataSet* outputMetaDS,
         eigenvector.push_back(currentCol->GetValue(i));
         }
 
-      eigenvectors->InsertNextTupleValue(&eigenvector.front());
+      eigenvectors->InsertNextTypedTuple(&eigenvector.front());
       eval++;
       }
     }
