@@ -6763,7 +6763,7 @@ array.
       </IntVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetOutputPointsPrecision"
-                         default_values="0"
+                         default_values="2"
                          name="OutputPointsPrecision"
                          number_of_elements="1"
                          panel_visibility="advanced" >
