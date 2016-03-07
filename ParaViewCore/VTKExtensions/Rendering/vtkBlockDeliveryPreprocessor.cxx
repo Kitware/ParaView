@@ -20,6 +20,7 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiBlockDataSet.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
@@ -28,20 +29,48 @@
 #include "vtkTable.h"
 #include "vtkUniformGridAMRDataIterator.h"
 
+#include <set>
+
+class vtkBlockDeliveryPreprocessor::CompositeDataSetIndicesType :
+  public std::set<unsigned int>
+{
+};
+
 vtkStandardNewMacro(vtkBlockDeliveryPreprocessor);
 //----------------------------------------------------------------------------
 vtkBlockDeliveryPreprocessor::vtkBlockDeliveryPreprocessor()
 {
-  this->CompositeDataSetIndex = 0;
   this->FieldAssociation = vtkDataObject::FIELD_ASSOCIATION_POINTS;
   this->FlattenTable = 0;
   this->GenerateOriginalIds = true;
   this->GenerateCellConnectivity = false;
+  this->CompositeDataSetIndices = new CompositeDataSetIndicesType();
 }
 
 //----------------------------------------------------------------------------
 vtkBlockDeliveryPreprocessor::~vtkBlockDeliveryPreprocessor()
 {
+  delete this->CompositeDataSetIndices;
+}
+
+//----------------------------------------------------------------------------
+void vtkBlockDeliveryPreprocessor::AddCompositeDataSetIndex(unsigned int index)
+{
+  if (this->CompositeDataSetIndices->find(index) == this->CompositeDataSetIndices->end())
+    {
+    this->CompositeDataSetIndices->insert(index);
+    this->Modified();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkBlockDeliveryPreprocessor::RemoveAllCompositeDataSetIndices()
+{
+  if (this->CompositeDataSetIndices->size() > 0)
+    {
+    this->CompositeDataSetIndices->clear();
+    this->Modified();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -93,8 +122,6 @@ int vtkBlockDeliveryPreprocessor::RequestData(vtkInformation*,
   vtkInformationVector** inputVector,
   vtkInformationVector* outputVector)
 {
-  //cout << "vtkBlockDeliveryPreprocessor::CompositeDataSetIndex: "
-  // << this->CompositeDataSetIndex << endl;
   vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
   vtkDataObject* outputDO = vtkDataObject::GetData(outputVector, 0);
 
@@ -124,26 +151,31 @@ int vtkBlockDeliveryPreprocessor::RequestData(vtkInformation*,
     split->Update();
     }
 
-  vtkMultiBlockDataSet* output = vtkMultiBlockDataSet::SafeDownCast(
-    outputDO);
+  vtkMultiBlockDataSet* output = vtkMultiBlockDataSet::SafeDownCast(outputDO);
   if (!output)
     {
     outputDO->ShallowCopy(filter->GetOutputDataObject(0));
     return 1;
     }
 
-  if (this->CompositeDataSetIndex != 0)
+  if (this->CompositeDataSetIndices->size() == 0 ||
+    (this->CompositeDataSetIndices->size() == 1 &&
+     (*this->CompositeDataSetIndices->begin()) == 0))
     {
-    vtkSmartPointer<vtkExtractBlock> eb = vtkSmartPointer<vtkExtractBlock>::New();
-    eb->SetInputConnection(filter->GetOutputPort());
-    eb->AddIndex(this->CompositeDataSetIndex);
-    eb->PruneOutputOff();
-    eb->Update();
-    output->ShallowCopy(eb->GetOutput());
+    output->ShallowCopy(filter->GetOutputDataObject(0));
     }
   else
     {
-    output->ShallowCopy(filter->GetOutputDataObject(0));
+    vtkNew<vtkExtractBlock> eb;
+    eb->SetInputConnection(filter->GetOutputPort());
+    for (CompositeDataSetIndicesType::iterator iter = this->CompositeDataSetIndices->begin();
+      iter != this->CompositeDataSetIndices->end(); ++iter)
+      {
+      eb->AddIndex(*iter);
+      }
+    eb->PruneOutputOff();
+    eb->Update();
+    output->ShallowCopy(eb->GetOutput());
     }
 
   // Add meta-data about composite-index/hierarchical index to help
