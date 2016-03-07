@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqSavePresetOptions.h"
 
 #include "pqActiveObjects.h"
+#include "pqChooseColorPresetReaction.h"
 #include "pqDataRepresentation.h"
-#include "pqPresetDialog.h"
 #include "pqPropertiesPanel.h"
 #include "pqPropertyWidgetDecorator.h"
 #include "pqUndoStack.h"
@@ -896,27 +896,13 @@ void pqColorAnnotationsPropertyWidget::removeAllAnnotations()
 //-----------------------------------------------------------------------------
 void pqColorAnnotationsPropertyWidget::choosePreset(const char* presetName)
 {
-  pqPresetDialog dialog(this, pqPresetDialog::SHOW_INDEXED_COLORS_ONLY);
-  dialog.setCurrentPreset(presetName);
-  dialog.setCustomizableLoadColors(false);
-  dialog.setCustomizableLoadOpacities(false);
-  dialog.setCustomizableUsePresetRange(false);
-  dialog.setCustomizableLoadAnnotations(true);
-  this->connect(&dialog, SIGNAL(applyPreset(const Json::Value&)), SLOT(applyCurrentPreset()));
-  dialog.exec();
-}
-
-//-----------------------------------------------------------------------------
-void pqColorAnnotationsPropertyWidget::applyCurrentPreset()
-{
-  pqPresetDialog* dialog = qobject_cast<pqPresetDialog*>(this->sender());
-  Q_ASSERT(dialog);
-
-  BEGIN_UNDO_SET("Apply color preset");
-  vtkSMTransferFunctionProxy::ApplyPreset(this->proxy(),
-    dialog->currentPreset(), !dialog->loadAnnotations());
-  END_UNDO_SET();
-  emit this->changeFinished();
+  QAction* tmp = new QAction(NULL);
+  pqChooseColorPresetReaction* ccpr = new pqChooseColorPresetReaction(tmp, false);
+  ccpr->setTransferFunction(this->proxy());
+  this->connect(ccpr, SIGNAL(presetApplied()), SIGNAL(changeFinished()));
+  ccpr->choosePreset(presetName);
+  delete ccpr;
+  delete tmp;
 }
 
 //-----------------------------------------------------------------------------
