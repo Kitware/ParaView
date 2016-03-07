@@ -6590,8 +6590,8 @@
       </DoubleVectorProperty>
       <IntVectorProperty clean_command="ResetCompositeDataSetIndices"
                    command="AddCompositeDataSetIndex"
-                   default_values="2 3"
-                   number_of_elements="2"
+                   default_values="2 3 4"
+                   number_of_elements="3"
                    name="CompositeDataSetIndex"
                    number_of_elements_per_command="1"
                    panel_visibility="default"
@@ -6688,13 +6688,6 @@
           </RequiredProperties>
         </BagChartSeriesListDomain>
       </StringVectorProperty>
-      <IntVectorProperty command="SetBagVisibility"
-                         default_values="0"
-                         name="BagVisibility"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Visibility of the bag.</Documentation>
-      </IntVectorProperty>
       <DoubleVectorProperty command="SetBagColor"
                             name="BagColor"
                             number_of_elements="3"
@@ -6753,8 +6746,8 @@
         <Documentation>Set the size of the points.</Documentation>
         <IntRangeDomain name="range" min="1" max="10" />
       </IntVectorProperty>
-      <DoubleVectorProperty command="SetP99Color"
-                                  name="P99Color"
+      <DoubleVectorProperty command="SetPUserColor"
+                                  name="PUserColor"
                                   number_of_elements="3"
                                   default_values="0.5 0.0 0.5"
                                   panel_widget="color_selector"
@@ -6803,7 +6796,6 @@
       </PropertyGroup>
       <PropertyGroup label="Bag Styling"
                      panel_visibility="default" >
-        <Property name="BagVisibility" />
         <Property name="BagColor" />
         <Property name="LineThickness" />
         <Property name="LineStyle" />
@@ -6813,7 +6805,7 @@
       </PropertyGroup>
       <PropertyGroup label="Grid Styling"
                      panel_visibility="default" >
-        <Property name="P99Color" />
+        <Property name="PUserColor" />
         <Property name="P50Color" />
         <Property name="GridLineThickness" />
         <Property name="GridLineStyle" />
