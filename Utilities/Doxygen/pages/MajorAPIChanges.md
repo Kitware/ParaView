@@ -114,6 +114,27 @@ pqLinePropertyWidget | InteractiveLine | LineSourceWidgetRepresentation | pqLine
 pqSpherePropertyWidget | InteractiveSphere | SphereWidgetRepresentation | pqSphereWidget, pqOrbitWidget
 pqSplinePropertyWidget | InteractiveSpline or InteractivePolyLine | SplineWidgetRepresentation or PolyLineWidgetRepresentation | pqSplineWidget, pqPolyLineWidget
 
+###Changes to vtkDataArray Subclasses and In-Situ Arrays###
+
+vtkDataArray can now support alternate memory layouts via the
+vtkAOSDataArrayTemplate or other subclasses of
+vtkGenericDataArray. While the older (and slower) vtkTypedDataArray
+and vtkMappedDataArray interfaces still exist, they should not be used
+and direct vtkGenericDataArray subclasses are preferred. See
+http://www.vtk.org/Wiki/VTK/Tutorials/DataArrays for more details on
+working with the new arrays.
+
+The following methods have been deprecated in vtkAOSDataArray:
+
+~~~{.cpp}
+void GetTupleValue(vtkIdType tupleIdx, ValueType *tuple)
+void SetTupleValue(vtkIdType tupleIdx, const ValueType *tuple)
+void InsertTupleValue(vtkIdType tupleIdx, const ValueType *tuple)
+vtkIdType InsertNextTupleValue(const ValueType *tuple)
+~~~
+
+The replacements use `TypedTuple` in place of `TupleValue`.
+
 Changes in 5.0.1
 ----------------
 

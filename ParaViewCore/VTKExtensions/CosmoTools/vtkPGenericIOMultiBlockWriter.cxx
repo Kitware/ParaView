@@ -182,7 +182,7 @@ static inline void computeDataForArray(vtkDataArray* array, char* data, int inde
     case gio::GENERIC_IO_DOUBLE_TYPE:
       {
       double* ptr = (double*)data;
-      vtkDataArrayTemplate<double>* darray = vtkDoubleArray::FastDownCast(array);
+      vtkDoubleArray *darray = vtkDoubleArray::FastDownCast(array);
       for (int j = 0; j < array->GetNumberOfTuples(); ++j)
         {
         ptr[j] = darray->GetTuple(j)[indexInTuple];
@@ -192,7 +192,7 @@ static inline void computeDataForArray(vtkDataArray* array, char* data, int inde
     case gio::GENERIC_IO_FLOAT_TYPE:
       {
       float* ptr = (float*)data;
-      vtkDataArrayTemplate<float>* darray = vtkFloatArray::FastDownCast(array);
+      vtkFloatArray *darray = vtkFloatArray::FastDownCast(array);
       for (int j = 0; j < array->GetNumberOfTuples(); ++j)
         {
         ptr[j] = darray->GetTuple(j)[indexInTuple];
@@ -202,7 +202,7 @@ static inline void computeDataForArray(vtkDataArray* array, char* data, int inde
     case gio::GENERIC_IO_INT32_TYPE:
       {
       int* ptr = (int*)data;
-      vtkDataArrayTemplate<int>* darray = vtkIntArray::FastDownCast(array);
+      vtkIntArray *darray = vtkIntArray::FastDownCast(array);
       for (int j = 0; j < array->GetNumberOfTuples(); ++j)
         {
         ptr[j] = darray->GetTuple(j)[indexInTuple];
@@ -212,7 +212,7 @@ static inline void computeDataForArray(vtkDataArray* array, char* data, int inde
     case gio::GENERIC_IO_INT64_TYPE:
       {
       long long* ptr = (long long*)data;
-      vtkDataArrayTemplate<vtkTypeInt64>* darray = vtkTypeInt64Array::FastDownCast(array);
+      vtkTypeInt64Array *darray = vtkTypeInt64Array::FastDownCast(array);
       for (int j = 0; j < array->GetNumberOfTuples(); ++j)
         {
         ptr[j] = darray->GetTuple(j)[indexInTuple];
@@ -222,7 +222,7 @@ static inline void computeDataForArray(vtkDataArray* array, char* data, int inde
     case gio::GENERIC_IO_UINT32_TYPE:
       {
       unsigned int* ptr = (unsigned int*)data;
-      vtkDataArrayTemplate<unsigned int>* darray = vtkUnsignedIntArray::FastDownCast(array);
+      vtkUnsignedIntArray *darray = vtkUnsignedIntArray::FastDownCast(array);
       for (int j = 0; j < array->GetNumberOfTuples(); ++j)
         {
         ptr[j] = darray->GetTuple(j)[indexInTuple];
@@ -232,7 +232,7 @@ static inline void computeDataForArray(vtkDataArray* array, char* data, int inde
     case gio::GENERIC_IO_UINT64_TYPE:
       {
       unsigned long long* ptr = (unsigned long long*)data;
-      vtkDataArrayTemplate<vtkTypeUInt64>* darray = vtkTypeUInt64Array::FastDownCast(array);
+      vtkTypeUInt64Array *darray = vtkTypeUInt64Array::FastDownCast(array);
       for (int j = 0; j < array->GetNumberOfTuples(); ++j)
         {
         ptr[j] = darray->GetTuple(j)[indexInTuple];
@@ -311,11 +311,11 @@ void vtkPGenericIOMultiBlockWriter::WriteData()
   vtkFieldData* fieldData = input->GetFieldData();
   if (fieldData->HasArray("genericio_phys_origin"))
     {
-    vtkDataArrayTemplate<double>* originArray = vtkDoubleArray::FastDownCast(fieldData->GetArray("genericio_phys_origin"));
+    vtkDoubleArray *originArray = vtkDoubleArray::FastDownCast(fieldData->GetArray("genericio_phys_origin"));
     if (originArray)
       {
       double origin[3];
-      originArray->GetTupleValue(0,origin);
+      originArray->GetTypedTuple(0,origin);
       this->Internals->Writer->SetPhysOrigin(origin);
       }
     else
@@ -329,11 +329,11 @@ void vtkPGenericIOMultiBlockWriter::WriteData()
     }
   if (fieldData->HasArray("genericio_phys_scale"))
     {
-    vtkDataArrayTemplate<double>* scaleArray = vtkDoubleArray::FastDownCast(fieldData->GetArray("genericio_phys_scale"));
+    vtkDoubleArray *scaleArray = vtkDoubleArray::FastDownCast(fieldData->GetArray("genericio_phys_scale"));
     if (scaleArray)
       {
       double scale[3];
-      scaleArray->GetTupleValue(0,scale);
+      scaleArray->GetTypedTuple(0,scale);
       this->Internals->Writer->SetPhysScale(scale);
       }
     else
@@ -347,12 +347,12 @@ void vtkPGenericIOMultiBlockWriter::WriteData()
     }
   if (fieldData->HasArray("genericio_global_dimensions"))
     {
-    vtkDataArrayTemplate<unsigned long long>* dimsArray = vtkUnsignedLongLongArray::FastDownCast(fieldData->GetArray("genericio_global_dimensions"));
+    vtkUnsignedLongLongArray *dimsArray = vtkUnsignedLongLongArray::FastDownCast(fieldData->GetArray("genericio_global_dimensions"));
     if (dimsArray)
       {
       uint64_t dims[3];
       assert(sizeof(uint64_t) == sizeof(unsigned long long));
-      dimsArray->GetTupleValue(0,(unsigned long long*)dims);
+      dimsArray->GetTypedTuple(0,(unsigned long long*)dims);
       this->Internals->Writer->SetGlobalDimensions(dims);
       }
     else
@@ -399,11 +399,11 @@ void vtkPGenericIOMultiBlockWriter::WriteData()
       vtkFieldData* blockFD = grid->GetFieldData();
       if (blockFD->HasArray("genericio_block_coords"))
         {
-        vtkDataArrayTemplate<unsigned long long>* coordsArray = vtkUnsignedLongLongArray::FastDownCast(blockFD->GetArray("genericio_block_coords"));
+        vtkUnsignedLongLongArray *coordsArray = vtkUnsignedLongLongArray::FastDownCast(blockFD->GetArray("genericio_block_coords"));
         if (coordsArray)
           {
           assert(sizeof(uint64_t) == sizeof(unsigned long long));
-          coordsArray->GetTupleValue(0,(unsigned long long*)coords);
+          coordsArray->GetTypedTuple(0,(unsigned long long*)coords);
           }
         else
           {

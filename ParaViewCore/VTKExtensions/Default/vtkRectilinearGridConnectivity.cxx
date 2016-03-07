@@ -2204,7 +2204,7 @@ void vtkRectilinearGridConnectivity::ExtractFragmentPolyhedra
               mVolumes->InsertValue( cellIdxs[n], integVol );
               for ( a = 0; a < numArays; a ++ )
                 {
-                volArays[a]->InsertTupleValue( cellIdxs[n], integVal[a] );
+                volArays[a]->InsertTypedTuple( cellIdxs[n], integVal[a] );
                 }
               }
 
@@ -2255,7 +2255,7 @@ void vtkRectilinearGridConnectivity::ExtractFragmentPolyhedra
           mVolumes->InsertValue( cellIdxs[n], integVol );
           for ( a = 0; a < numArays; a ++ )
             {
-            volArays[a]->InsertTupleValue( cellIdxs[n], integVal[a] );
+            volArays[a]->InsertTypedTuple( cellIdxs[n], integVal[a] );
             }
           }
 
@@ -2940,10 +2940,10 @@ void vtkRectilinearGridConnectivity::ExtractFragmentPolygons
       // not useful any more and is ignored below)
       cellIndx = plyCells->InsertNextCell( numbPnts, facePIds );
       fragIdxs->InsertValue( cellIndx, thisFace->FragmentId );
-      this->FragmentValues->GetTupleValue( thisFace->FragmentId, tupleBuf );
+      this->FragmentValues->GetTypedTuple( thisFace->FragmentId, tupleBuf );
       for ( theShift = 0, i = 0; i < numArays; i ++ )
         {
-        attrVals[i]->InsertTupleValue( cellIndx, tupleBuf + theShift );
+        attrVals[i]->InsertTypedTuple( cellIndx, tupleBuf + theShift );
         theShift += numComps[i];
         }
 
@@ -3497,10 +3497,10 @@ void vtkRectilinearGridConnectivity::GenerateOutputFromSingleProcess
         polygons->InsertNextCell( numbPnts, facePIds );
         fragIdxs->InsertNextValue( thisFace->FragmentId );
         partIdxs->InsertNextValue( partIndx );
-        this->FragmentValues->GetTupleValue( thisFace->FragmentId, tupleBuf );
+        this->FragmentValues->GetTypedTuple( thisFace->FragmentId, tupleBuf );
         for ( theShift = 0, i = 0; i < numArays; i ++ )
           {
-          attrVals[i]->InsertNextTupleValue( tupleBuf + theShift );
+          attrVals[i]->InsertNextTypedTuple( tupleBuf + theShift );
           theShift += numComps[i];
           }
         }
@@ -3704,7 +3704,7 @@ void  vtkRectilinearGridConnectivity::CreateInterProcessPolygons
       uniFIdxs->SetComponent( cellIndx, 0, fIdxsPtr[inCellId] );
       for ( i = 0; i < numArays; i ++ )
         {
-        attrVals[i]->SetTupleValue
+        attrVals[i]->SetTypedTuple
                      ( cellIndx, attrPtrs[i] + inCellId * numComps[i] );
         }
 
@@ -4210,10 +4210,10 @@ void vtkRectilinearGridConnectivity::GenerateOutputFromMultiProcesses
         fragIdxs->InsertNextValue( thisFace->FragmentId );
         procIdxs->InsertNextValue( thisFace->ProcessId );
         partIdxs->InsertNextValue( partIndx );
-        this->FragmentValues->GetTupleValue( thisFace->FragmentId, tupleBuf );
+        this->FragmentValues->GetTypedTuple( thisFace->FragmentId, tupleBuf );
         for ( theShift = 0, i = 0; i < numArays; i ++ )
           {
-          attrVals[i]->InsertNextTupleValue( tupleBuf + theShift );
+          attrVals[i]->InsertNextTypedTuple( tupleBuf + theShift );
           theShift += numComps[i];
           }
         }

@@ -803,7 +803,7 @@ void vtkPGenericIOReader::LoadData(vtkUnstructuredGrid *grid,
         nextBlockStart += this->Reader->GetNumberOfElementsInBlock(nextBlockIdx);
         ++nextBlockIdx;
         }
-      dataArray->SetTupleValue(i,coords);
+      dataArray->SetTypedTuple(i,coords);
       }
       if (this->HaloList->GetNumberOfIds() != 0)
         {
@@ -817,8 +817,8 @@ void vtkPGenericIOReader::LoadData(vtkUnstructuredGrid *grid,
              itr != pointsInSelectedHalos.end(); ++itr, ++i)
           {
           vtkTypeUInt64 data[3];
-          dataArray->GetTupleValue(*itr,data);
-          onlyDataInHalo->SetTupleValue(i,data);
+          dataArray->GetTypedTuple(*itr,data);
+          onlyDataInHalo->SetTypedTuple(i,data);
           }
         dataArray = onlyDataInHalo;
         }

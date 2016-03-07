@@ -2304,7 +2304,7 @@ int vtkSpyPlotReader::PrepareMarkers (vtkMultiBlockDataSet* mbds,
       vtkIdType id = mark + offset;
       poly->InsertNextCell (VTK_VERTEX, 1, &id);
 
-      location->SetTupleValue (mark + offset, b);
+      location->SetTypedTuple (mark + offset, b);
 
       blockId->SetValue (mark + offset, reader->MarkersDumps[m].Block->GetValue (mark));
 
