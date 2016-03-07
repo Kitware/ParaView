@@ -1777,7 +1777,7 @@ int vtkCGNSReader::GetUnstructuredZone(int base, int zone,
         // the documentation specifies that the faces of NFACE_n are always in NGON_n
         // format, so look for another section that has that element type.        
         if (osec == sec) continue; // skip self
-        if (sectionInfoList[osec].elemType == NGON_n)
+        if (sectionInfoList[osec].elemType == CGNS_ENUMV(NGON_n))
           {            
           fDataSize = sectionInfoList[osec].eDataSize;
           // resize to fit the next batch of element connectivity values
