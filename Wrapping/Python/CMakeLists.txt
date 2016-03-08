@@ -45,7 +45,7 @@ set(_vtkpy_modules
   # bug, the dependency wasn't being setup properly. Hence we directly depend on
   # the generated file. Once Ninja or Cmake is fixed, we can remove this file
   # depedency and leave the target dependecy.
-  ${CMAKE_BINARY_DIR}/VTK/Wrapping/Python/vtk_compile_complete
+  ${VTK_BINARY_DIR}/Wrapping/Python/vtk_compile_complete
   vtkpython_pyc
   )
 if (TARGET vtkWebPython)
