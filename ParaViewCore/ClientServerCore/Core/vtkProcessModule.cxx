@@ -270,7 +270,8 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int &argc, char** &argv)
 
   // Create the process module.
   vtkProcessModule::Singleton = vtkSmartPointer<vtkProcessModule>::New();
-  vtkProcessModule::Singleton->InitializePythonEnvironment(argc, argv);
+  vtkProcessModule::Singleton->DetermineExecutablePath(argc, argv);
+  vtkProcessModule::Singleton->InitializePythonEnvironment();
   return true;
 }
 
@@ -547,10 +548,39 @@ void vtkProcessModule::SetOptions(vtkPVOptions* options)
 }
 
 //----------------------------------------------------------------------------
-bool vtkProcessModule::InitializePythonEnvironment(int argc, char** argv)
+void vtkProcessModule::DetermineExecutablePath(int argc, char* argv[])
+{
+  assert(argc >= 1);
+
+  if (argc > 0)
+    {
+    std::string errMsg;
+    if (!vtksys::SystemTools::FindProgramPath(argv[0], this->ProgramPath, errMsg))
+      {
+      // if FindProgramPath fails. We really don't have much of an alternative
+      // here. Python module importing is going to fail.
+      this->ProgramPath = vtksys::SystemTools::CollapseFullPath(argv[0]);
+      }
+    this->SelfDir = vtksys::SystemTools::GetFilenamePath(this->ProgramPath);
+    }
+  else
+    {
+    this->SelfDir = vtksys::SystemTools::GetCurrentWorkingDirectory(/*collapse=*/true);
+    this->ProgramPath = this->SelfDir + "/unknown_exe";
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkProcessModule::SetExecutablePath(const std::string& path)
+{
+  this->ProgramPath = vtksys::SystemTools::CollapseFullPath(path);
+  this->SelfDir = vtksys::SystemTools::GetFilenamePath(this->ProgramPath);
+}
+
+//----------------------------------------------------------------------------
+bool vtkProcessModule::InitializePythonEnvironment()
 {
 #ifdef PARAVIEW_ENABLE_PYTHON
-  assert(argc >= 1);
   if (!vtkPythonInterpreter::IsInitialized())
     {
     // If someone already initialized Python before ProcessModule was started,
@@ -559,30 +589,9 @@ bool vtkProcessModule::InitializePythonEnvironment(int argc, char** argv)
     vtkProcessModule::FinalizePython = true;
     }
 
-  std::string self_dir, programname;
-
-  if (argc > 0)
-    {
-    std::string errMsg;
-    if (!vtksys::SystemTools::FindProgramPath(argv[0], programname, errMsg))
-      {
-      // if FindProgramPath fails. We really don't have much of an alternative
-      // here. Python module importing is going to fail.
-      programname = vtksys::SystemTools::CollapseFullPath(argv[0]);
-      }
-    self_dir = vtksys::SystemTools::GetFilenamePath(programname.c_str());
-    }
-  else
-    {
-    self_dir = vtksys::SystemTools::GetCurrentWorkingDirectory(/*collapse=*/true);
-    programname = self_dir + "/unknown_exe";
-    }
-
-  vtkPythonInterpreter::SetProgramName(programname.c_str());
-  vtkPythonAppInitPrependPath(self_dir.c_str());
+  vtkPythonInterpreter::SetProgramName(this->ProgramPath.c_str());
+  vtkPythonAppInitPrependPath(this->SelfDir);
 #endif
-  (void)argc;
-  (void)argv;
   return true;
 }
 
