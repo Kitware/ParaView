@@ -747,7 +747,9 @@ if (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_ENABLE_CATALYST)
 
   list(APPEND VTK_PYTHON_MODULES ${vtk-module})
   set(vtkPVPythonCatalyst_HEADERS vtkCPPythonScriptPipeline)
-  vtk_add_python_wrapping(${vtk-module})
+  vtk_add_python_wrapping(${vtk-module} pv_wrapping_sources)
+  vtk_add_python_wrapping_library(${vtk-module} pv_wrapping_sources ${vtk-module})
+
   if (BUILD_TESTING)
     set (_test_module_name "${vtk-module}-Test-Cxx")
     add_subdirectory(
