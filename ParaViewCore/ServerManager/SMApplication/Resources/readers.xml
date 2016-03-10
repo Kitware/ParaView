@@ -4627,6 +4627,35 @@
       </Hints>
       <!-- End xyzreader -->
     </SourceProxy>
+    <SourceProxy class="vtkXYZMolReader2"
+                 label="XYZ Reader2"
+                 name="xyzreader2">
+      <Documentation long_help="Reads XYZ molecular data files into a polygonal dataset."
+                     short_help="Read XYZ molecular data files.">The XYZ reader
+                     reads XYZ molecular data files. The expected file
+                     extension is .xyz. The output of this reader is a
+                     vtkMolecule</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never" >
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the XYZ
+        reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="xyz"
+                       file_description="XMol Molecule Files Version 2" />
+      </Hints>
+      <!-- End xyzreader2 -->
+    </SourceProxy>
     <SourceProxy class="vtkPPhastaReader"
                  label="Phasta Reader"
                  name="PhastaReader">
@@ -4792,6 +4821,33 @@
                        file_description="Gaussian Cube Files" />
       </Hints>
       <!-- End gaussiancubereader -->
+    </SourceProxy>
+    <SourceProxy class="vtkGaussianCubeReader2"
+                 label="Gaussian Cube Reader2"
+                 name="gaussiancubereader">
+      <Documentation long_help="Produce a vtkMolecule by reading a Gaussian Cube file."
+                     short_help="Read Gaussian Cube data files.">The Gaussian
+                     Cube reader produces vtkMolecule data by reading data files
+                     produced by the Gaussian software package. The expected
+                     file extension is .cube.</Documentation>
+      <OutputPort index="0"
+                  name="Molecule" />
+      <OutputPort index="1"
+                  name="Gridded Data" />
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never" >
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the Gaussian
+        Cube reader.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="cube"
+                       file_description="Gaussian Cube Files Version 2" />
+      </Hints>
+      <!-- End gaussiancubereader2 -->
     </SourceProxy>
     <SourceProxy class="vtkPVEnSightMasterServerReader2"
                  label="EnSight Master Server Reader"
