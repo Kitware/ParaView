@@ -9,10 +9,10 @@
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="RTData" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionEditColorMap" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/ChoosePreset" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/pqPresetDialog/gradients" command="mousePress" arguments="1,1,0,228,13,/6:0" />
-  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/pqPresetDialog/gradients" command="mouseRelease" arguments="1,0,0,228,13,/6:0" />
-  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/pqPresetDialog/apply" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/pqPresetDialog/close" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="mousePress" arguments="1,1,0,228,13,/6:0" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="mouseRelease" arguments="1,0,0,228,13,/6:0" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/apply" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/close" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/ColorEditor/1QVTKWidget0" command="mousePress" arguments="(0.402516,0.525,1,1,0)" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/ColorEditor/1QVTKWidget0" command="mouseMove" arguments="(0.402516,0.525,1,0,0)" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/ColorEditor/1QVTKWidget0" command="mouseRelease" arguments="(0.402516,0.525,1,0,0)" />
@@ -57,18 +57,18 @@
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/SearchBox/SearchLineEdit" command="key" arguments="16777216" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/SaveAsPreset" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/SavePresetOptions/buttonBox/1QPushButton0" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/pqPresetDialog/exportPresets" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/pqPresetDialog/ExportPresets" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/mycolormap.json" />
-  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/pqPresetDialog/remove" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/pqPresetDialog/gradients" command="mousePress" arguments="1,1,0,188,17,/119:0" />
-  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/pqPresetDialog/gradients" command="mouseRelease" arguments="1,0,0,188,17,/119:0" />
-  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/pqPresetDialog/apply" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/pqPresetDialog/gradients" command="mousePress" arguments="1,1,0,225,13,/120:0" />
-  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/pqPresetDialog/gradients" command="mouseRelease" arguments="1,0,0,225,13,/120:0" />
-  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/pqPresetDialog/apply" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/pqPresetDialog/importPresets" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/pqPresetDialog/ImportPresets" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/mycolormap.json" />
-  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/pqPresetDialog/apply" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/pqPresetDialog/close" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/exportPresets" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/ExportPresets" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/mycolormap.json" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/remove" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="mousePress" arguments="1,1,0,188,17,/119:0" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="mouseRelease" arguments="1,0,0,188,17,/119:0" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/apply" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="mousePress" arguments="1,1,0,225,13,/120:0" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="mouseRelease" arguments="1,0,0,225,13,/120:0" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/apply" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/importPresets" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/ImportPresets" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/mycolormap.json" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/apply" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/close" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/qt_dockwidget_closebutton" command="activate" arguments="" />
 </pqevents>

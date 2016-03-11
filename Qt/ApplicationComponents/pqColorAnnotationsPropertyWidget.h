@@ -96,9 +96,6 @@ private slots:
   /// save current transfer function as preset.
   void saveAsPreset();
 
-  /// apply a present.
-  void applyCurrentPreset();
-
   /// Ensures that the color-swatches for indexedColors are shown only when this
   /// is set to true.
   void updateIndexedLookupState();

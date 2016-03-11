@@ -390,7 +390,7 @@ void vtkCTHDataArray::BuildFallback ()
     // Avoid calling GetPointer so that we don't make an unnecessary copy.
     for (vtkIdType i = 0; i < this->Size; i ++)
       {
-      da->SetTupleValue (i, this->GetTuple (i));
+      da->SetTypedTuple (i, this->GetTuple (i));
       }
     this->Fallback = da;
     }

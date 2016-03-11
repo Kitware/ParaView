@@ -454,8 +454,8 @@ void vtkPANLSubhaloFinder::ExecuteSubHaloFinder(vtkUnstructuredGrid* input,
     vel[0] = subAvgVX[i];
     vel[1] = subAvgVY[i];
     vel[2] = subAvgVZ[i];
-    fofCenterOfMass->SetTupleValue(i,com);
-    haloVelocity->SetTupleValue(i,vel);
+    fofCenterOfMass->SetTypedTuple(i,com);
+    haloVelocity->SetTypedTuple(i,vel);
     velocityDispersion->SetValue(i,subVelDisp[i]);
     mass->SetValue(i,subMass[i]);
     count->SetValue(i,parentFOFCount[i]);

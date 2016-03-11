@@ -49,7 +49,6 @@ public:
 
 private slots:
   void updateEnableState();
-  void editScalarBar();
 
 private:
   class pqInternals;

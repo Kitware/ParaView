@@ -171,8 +171,8 @@ protected slots:
   /// update the transfer function with the text in CurrentDataValue text field.
   void currentDataEdited();
 
-  /// apply a present.
-  void applyCurrentPreset();
+  /// called when a preset is applied.
+  void presetApplied();
 
   /// Ensures that the color-swatches for indexedColors are shown only when this
   /// is set to true.

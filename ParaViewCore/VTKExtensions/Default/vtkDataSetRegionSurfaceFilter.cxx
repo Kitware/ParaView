@@ -641,7 +641,7 @@ int vtkDataSetRegionSurfaceFilter::UnstructuredGridExecute(vtkDataSet *dataSetIn
           for (cellPtId = 0; cell->GetPointId(cellPtId) != ptId; cellPtId++)
             {
             }
-          parametricCoords->InsertNextTupleValue(pc + 3*cellPtId);
+          parametricCoords->InsertNextTypedTuple(pc + 3*cellPtId);
           }
         // Subdivide these triangles as many more times as necessary.  Remember
         // that we have already done the first subdivision.
@@ -663,7 +663,7 @@ int vtkDataSetRegionSurfaceFilter::UnstructuredGridExecute(vtkDataSet *dataSetIn
             for (k = 0; k < 3; k++)
               {
               inPts[k] = outPts->GetId(i+k);
-              parametricCoords->GetTupleValue(i+k, inParamCoords[k]);
+              parametricCoords->GetTypedTuple(i+k, inParamCoords[k]);
               }
             for (k = 3; k < 6; k++)
               {
@@ -690,7 +690,7 @@ int vtkDataSetRegionSurfaceFilter::UnstructuredGridExecute(vtkDataSet *dataSetIn
               {
               int localId = subtriangles[k];
               outPts2->InsertNextId(inPts[localId]);
-              parametricCoords2->InsertNextTupleValue(inParamCoords[localId]);
+              parametricCoords2->InsertNextTypedTuple(inParamCoords[localId]);
               }
             } // Iterate over triangles
           // Now that we have recorded the subdivided triangles in outPts2 and

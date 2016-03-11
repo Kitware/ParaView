@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout" columnstretch="1,0,0,0,0,0">
+  <layout class="QGridLayout" name="gridLayout" columnstretch="1,0,0,0,0,0,0">
    <item row="1" column="2">
     <widget class="QPushButton" name="RescaleCustom">
      <property name="toolTip">
@@ -28,10 +28,10 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="0" colspan="6">
+   <item row="0" column="0" colspan="7">
     <widget class="pqDisplayColorWidget" name="DisplayColorWidget" native="true"/>
    </item>
-   <item row="2" column="4">
+   <item row="2" column="5">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -87,7 +87,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="4">
+   <item row="1" column="5">
     <widget class="QPushButton" name="ShowScalarBar">
      <property name="toolTip">
       <string>Show/hide color legend</string>
@@ -110,7 +110,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="5">
+   <item row="1" column="6">
     <widget class="QPushButton" name="EditScalarBar">
      <property name="toolTip">
       <string>Edit color legend properties</string>
@@ -135,6 +135,26 @@
      <property name="icon">
       <iconset resource="../../../Components/Resources/pqComponents.qrc">
        <normaloff>:/pqWidgets/Icons/pqResetRangeTemporal24.png</normaloff>:/pqWidgets/Icons/pqResetRangeTemporal24.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="4">
+    <widget class="QPushButton" name="ChoosePreset">
+     <property name="toolTip">
+      <string>Choose preset</string>
+     </property>
+     <property name="statusTip">
+      <string>Toggle Color Legend Visibility</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../../../Components/Resources/pqComponents.qrc">
+       <normaloff>:/pqWidgets/Icons/pqFavorites32.png</normaloff>:/pqWidgets/Icons/pqFavorites32.png</iconset>
+     </property>
+     <property name="flat">
+      <bool>false</bool>
      </property>
     </widget>
    </item>

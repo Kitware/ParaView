@@ -23,6 +23,8 @@
 #include "vtkObject.h"
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer.
 
+#include <string> // for std::string
+
 class vtkMultiProcessController;
 class vtkNetworkAccessManager;
 class vtkPVOptions;
@@ -235,6 +237,24 @@ protected:
   // session id is ever repeated.
   vtkIdType MaxSessionId;
 
+  // Description:
+  // Sets the executable path of the process so that ParaView can, e.g., set up
+  // paths for Python properly.
+  void SetExecutablePath(const std::string& path);
+
+  // Description:
+  // The full path to the current executable that is running (or empty if unknown).
+  std::string GetProgramPath() const
+  {
+    return this->ProgramPath;
+  }
+  // Description:
+  // The directory containing the current executable (or empty if unknown).
+  std::string GetSelfDir() const
+  {
+    return this->SelfDir;
+  }
+
 protected:
   vtkProcessModuleInternals* Internals;
 
@@ -247,10 +267,12 @@ private:
   vtkProcessModule(const vtkProcessModule&); // Not implemented.
   void operator=(const vtkProcessModule&); // Not implemented.
 
+  void DetermineExecutablePath(int argc, char** argv);
+
   // Helper to initialize Python environment. This doesn't initialize Python
   // but simply sets up the environment so when Python is initialized, it can
-  // find ParaView modules. This does nothing is not build with Python support.
-  bool InitializePythonEnvironment(int argc, char** argv);
+  // find ParaView modules. This does nothing if not build with Python support.
+  bool InitializePythonEnvironment();
 
   static ProcessTypes ProcessType;
 
@@ -269,6 +291,9 @@ private:
   bool MultipleSessionsSupport;
 
   vtkIdType EventCallDataSessionId;
+
+  std::string ProgramPath;
+  std::string SelfDir;
 //ETX
 };
 

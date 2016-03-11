@@ -57,5 +57,4 @@ set_source_files_properties(
 )
 
 vtk_module_library(vtkPVVTKExtensionsCGNSReader ${Module_SRCS})
-target_link_libraries(vtkPVVTKExtensionsCGNSReader
-  LINK_PRIVATE ${CGNS_LIBRARIES})
+vtk_module_link_libraries(vtkPVVTKExtensionsCGNSReader LINK_PRIVATE ${CGNS_LIBRARIES})

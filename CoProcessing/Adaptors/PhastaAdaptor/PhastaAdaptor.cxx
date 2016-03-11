@@ -46,7 +46,7 @@ extern "C" void createpointsandallocatecells(
     {
     double tuple[3] = {coordsArray[i], coordsArray[i+*numPoints], 
                        coordsArray[i+*numPoints*2]};
-    coords->SetTupleValue(i, tuple);
+    coords->SetTypedTuple(i, tuple);
     }
   nodePoints->SetData(coords);
   coords->Delete();
