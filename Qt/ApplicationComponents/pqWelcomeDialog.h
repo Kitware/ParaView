@@ -21,15 +21,6 @@ public:
   ~pqWelcomeDialog();
 
 protected slots:
-  /// Handle ParaView Guide button
-  void onParaViewGuideButtonClicked(bool);
-
-  /// Handle tutorials button
-  void onParaViewTutorialsButtonClicked(bool);
-
-  /// Handle help button
-  void onHelpButtonClicked(bool);
-
   /// React to checkbox events
   void onDoNotShowAgainStateChanged(int);
 

@@ -2,13 +2,10 @@
 #include "ui_pqWelcomeDialog.h"
 
 #include "pqApplicationCore.h"
-#include "pqHelpReaction.h"
 #include "pqServer.h"
 #include "pqSettings.h"
 
 #include <QCoreApplication>
-#include <QDesktopServices>
-#include <QHelpEngine>
 #include <QString>
 
 #include "vtkSMPropertyHelper.h"
@@ -21,13 +18,6 @@ pqWelcomeDialog::pqWelcomeDialog(QWidget *parent)
 {
     ui->setupUi(this);
 
-    QObject::connect(this->ui->ParaViewGuideButton, SIGNAL(clicked(bool)),
-                     this, SLOT(onParaViewGuideButtonClicked(bool)));
-    QObject::connect(this->ui->ParaViewTutorialsButton, SIGNAL(clicked(bool)),
-                     this, SLOT(onParaViewTutorialsButtonClicked(bool)));
-    QObject::connect(this->ui->HelpButton, SIGNAL(clicked(bool)),
-                     this, SLOT(onHelpButtonClicked(bool)));
-
     QObject::connect(this->ui->DoNotShowAgainButton, SIGNAL(stateChanged(int)),
                      this, SLOT(onDoNotShowAgainStateChanged(int)));
 }
@@ -36,34 +26,6 @@ pqWelcomeDialog::pqWelcomeDialog(QWidget *parent)
 pqWelcomeDialog::~pqWelcomeDialog()
 {
     delete ui;
-}
-
-//-----------------------------------------------------------------------------
-void pqWelcomeDialog::onParaViewGuideButtonClicked(bool clicked)
-{
-#if defined (_WIN32)
-  QString filePath = QCoreApplication::applicationDirPath() + "/../doc/ParaViewGuide-CE.pdf";
-#elif defined(__APPLE__)
-  QString filePath = QCoreApplication::applicationDirPath() + "/../../../doc/ParaViewGuide-CE.pdf";
-#else
-  QString filePath = QCoreApplication::applicationDirPath() + "/../../doc/ParaViewGuide-CE.pdf";
-#endif
-
-  QUrl url = QUrl::fromLocalFile(filePath);
-  QDesktopServices::openUrl(QUrl(url));
-}
-
-//-----------------------------------------------------------------------------
-void pqWelcomeDialog::onParaViewTutorialsButtonClicked(bool clicked)
-{
-  QDesktopServices::openUrl(QUrl("http://www.paraview.org/tutorials"));
-}
-
-//-----------------------------------------------------------------------------
-void pqWelcomeDialog::onHelpButtonClicked(bool clicked)
-{
-  this->close();
-  pqHelpReaction::showHelp();
 }
 
 //-----------------------------------------------------------------------------

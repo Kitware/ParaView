@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>560</width>
-    <height>654</height>
+    <width>574</width>
+    <height>550</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -42,38 +42,8 @@
       </sizepolicy>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="3" column="0">
-       <widget class="QPushButton" name="ParaViewTutorialsButton">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-          <horstretch>1</horstretch>
-          <verstretch>1</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>20</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-          <underline>true</underline>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">color: blue;</string>
-        </property>
-        <property name="text">
-         <string>ParaView Tutorials</string>
-        </property>
-        <property name="autoDefault">
-         <bool>false</bool>
-        </property>
-        <property name="flat">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
       <item row="2" column="1">
-       <widget class="QPushButton" name="ParaViewGuideButton">
+       <widget class="QPushButton" name="ExampleVisualizationsButton">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
           <horstretch>1</horstretch>
@@ -92,37 +62,7 @@
          <string notr="true">color: blue;</string>
         </property>
         <property name="text">
-         <string>The ParaView Guide</string>
-        </property>
-        <property name="autoDefault">
-         <bool>false</bool>
-        </property>
-        <property name="flat">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QPushButton" name="HelpButton">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-          <horstretch>1</horstretch>
-          <verstretch>1</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>20</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-          <underline>true</underline>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">color: blue;</string>
-        </property>
-        <property name="text">
-         <string>Help</string>
+         <string>Example Visualizations</string>
         </property>
         <property name="autoDefault">
          <bool>false</bool>
@@ -153,54 +93,6 @@
         </property>
         <property name="text">
          <string>Getting Started Guide</string>
-        </property>
-        <property name="autoDefault">
-         <bool>false</bool>
-        </property>
-        <property name="flat">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QPushButton" name="ExampleVisualizationsButton">
-        <property name="font">
-         <font>
-          <pointsize>20</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-          <underline>true</underline>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">color: blue;</string>
-        </property>
-        <property name="text">
-         <string>Example Visualizations</string>
-        </property>
-        <property name="autoDefault">
-         <bool>false</bool>
-        </property>
-        <property name="flat">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1">
-       <widget class="QPushButton" name="ExampleDataSetsButton">
-        <property name="font">
-         <font>
-          <pointsize>20</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-          <underline>true</underline>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">color: blue;</string>
-        </property>
-        <property name="text">
-         <string>Example Data Sets</string>
         </property>
         <property name="autoDefault">
          <bool>false</bool>
