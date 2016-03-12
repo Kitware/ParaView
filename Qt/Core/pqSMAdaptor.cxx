@@ -1269,14 +1269,14 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
 
     if(Type == CHECKED)
       {
-      if (num > 0)
+      if (num > 0 || dvp->GetRepeatable())
         {
         dvp->SetElements(dvalues, num);
         }
       }
     else if(Type == UNCHECKED)
       {
-      if (num > 0)
+      if (num > 0 || dvp->GetRepeatable())
         {
         dvp->SetUncheckedElements(dvalues, num);
         }

@@ -318,6 +318,13 @@ public:
       this->Property->Modified();
       this->ClearUncheckedElements();
       }
+    else if (this->Property->GetRepeatable())
+      {
+      this->Values.clear();
+      this->Initialized = true;
+      this->Property->Modified();
+      this->ClearUncheckedElements();            
+      }
     }
 
   //---------------------------------------------------------------------------

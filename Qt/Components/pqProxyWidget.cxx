@@ -1312,7 +1312,7 @@ bool pqProxyWidget::restoreDefaults()
           {
           anyReset = true;
           }
-        smproperty->ResetToXMLDefaults();
+        smproperty->ResetToDefault();
         }
       }
     }
