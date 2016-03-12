@@ -22,7 +22,6 @@
 #include "vtkCellData.h"
 #include "vtkCellTypes.h"
 #include "vtkCellIterator.h"
-#include "vtkCleanArrays.h"
 #include "vtkCommand.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkCompositeDataSet.h"
