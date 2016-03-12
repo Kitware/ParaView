@@ -35,11 +35,15 @@
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vtkPVVTKExtensionsCGNSReaderModule.h" // for export macro
-#include "vtkCGNSReaderInternal.h" // For parsing information request
 
 class vtkDataSet;
 class vtkDataArraySelection;
 class vtkCallbackCommand;
+
+namespace CGNSRead
+{
+class vtkCGNSMetaData;
+}
 
 class vtkMultiProcessController;
 class VTKPVVTKEXTENSIONSCGNSREADER_EXPORT vtkCGNSReader : public vtkMultiBlockDataSetAlgorithm
@@ -136,51 +140,21 @@ protected:
                                         void* clientdata, void* calldata);
 
   int GetCurvilinearZone(int  base, int zone,
-                         int cell_dim, int phys_dim, cgsize_t *zsize,
+                         int cell_dim, int phys_dim, void *zsize,
                          vtkMultiBlockDataSet *mbase);
 
   int GetUnstructuredZone(int  base, int zone,
-                          int cell_dim, int phys_dim, cgsize_t *zsize,
+                          int cell_dim, int phys_dim, void *zsize,
                           vtkMultiBlockDataSet *mbase);
   vtkMultiProcessController* Controller;
   vtkIdType ProcRank;
   vtkIdType ProcSize;
 
-#ifndef __WRAP__
-  bool IsVarEnabled(CGNS_ENUMT(GridLocation_t) varcentering,
-                    const CGNSRead::char_33 name);
-
-  int getGridAndSolutionName(int base,
-                             CGNSRead::char_33 GridCoordName, CGNSRead::char_33 SolutionName,
-                             bool& readGridCoordName, bool& readSolutionName);
-
-  int getCoordsIdAndFillRind(const CGNSRead::char_33 GridCoordName,
-                             const int physicalDim, std::size_t& nCoordsArray,
-                             std::vector<double>& gridChildId, int* rind);
-
-  int getVarsIdAndFillRind(const double cgioSolId,
-                           std::size_t& nVarArray, CGNS_ENUMT(GridLocation_t)& varCentering,
-                           std::vector<double>& solChildId, int* rind);
-
-  int fillArrayInformation(const std::vector<double>& solChildId,
-                           const int physicalDim,
-                           std::vector< CGNSRead::CGNSVariable >& cgnsVars,
-                           std::vector< CGNSRead::CGNSVector >& cgnsVectors);
-
-  int AllocateVtkArray(const int physicalDim, const vtkIdType nVals,
-                       const CGNS_ENUMT(GridLocation_t) varCentering,
-                       const std::vector< CGNSRead::CGNSVariable >& cgnsVars,
-                       const std::vector< CGNSRead::CGNSVector >& cgnsVectors,
-                       std::vector<vtkDataArray *>& vtkVars);
-
-  int AttachReferenceValue(const int base, vtkDataSet* ds);
-#endif
-
 private:
   vtkCGNSReader(const vtkCGNSReader&);  // Not implemented.
   void operator=(const vtkCGNSReader&);  // Not implemented.
 
-  CGNSRead::vtkCGNSMetaData Internal;  // Metadata
+  CGNSRead::vtkCGNSMetaData *Internal;  // Metadata
 
   char *FileName; // cgns file name
   int LoadBndPatch; // option to set section loading for unstructured grid
@@ -194,6 +168,9 @@ private:
   //
   unsigned int NumberOfBases;
   int ActualTimeStep;
+
+  class vtkPrivate;
+  friend class vtkPrivate;
 };
 
 #endif // vtkCGNSReader_h
