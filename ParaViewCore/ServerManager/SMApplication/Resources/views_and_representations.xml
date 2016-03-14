@@ -7140,21 +7140,29 @@
           </RequiredProperties>
         </FieldDataDomain>
       </IntVectorProperty>
-      <IntVectorProperty command="SetCompositeDataSetIndex"
-                         default_values="0"
+
+      <IntVectorProperty clean_command="RemoveAllCompositeDataSetIndices"
+                         command="AddCompositeDataSetIndex"
                          name="CompositeDataSetIndex"
-                         number_of_elements="1">
-        <Documentation>In case of Composite datasets, set the flat index of the
-        dataset to pass. The flat index must point to a non-empty,
-        non-composite dataset for anything to be passed through. If the input
-        is not a composite dataset, then this index is ignored.</Documentation>
-        <CompositeTreeDomain mode="leaves"
-                             name="tree">
+                         number_of_elements_per_command="1"
+                         panel_visibility="default"
+                         repeat_command="1">
+        <CompositeTreeDomain mode="all" name="tree" default_mode="nonempty-leaf">
           <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
+            <Property function="Input" name="Input" />
           </RequiredProperties>
         </CompositeTreeDomain>
+        <Hints>
+          <WidgetHeight number_of_rows="20" />
+        </Hints>
+        <Documentation>
+          In case of composite datasets, set the list of flat indices to
+          show in the spreadsheet view. If the input is not a composite dataset
+          the value is ignored. If nothing is selected for composite dataset, it
+          is same as selecting the root node i.e. all blocks in the dataset.
+          Note, then multiple blocks are being shown in the spreadsheet view,
+          partial arrays, if any are skipped.
+        </Documentation>
       </IntVectorProperty>
       <InputProperty command="SetInputConnection"
                      is_internal="1"

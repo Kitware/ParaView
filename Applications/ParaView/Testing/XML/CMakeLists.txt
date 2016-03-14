@@ -285,6 +285,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/SolidColorSource.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SpreadSheet1.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SpreadSheet2.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SpreadSheet3.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SPTimeseries.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SpyPlotHistoryReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLinkBasic.xml
@@ -579,6 +580,12 @@ set (VolumeRenderingWithContour_THRESHOLD 50)
 IF (PARAVIEW_USE_MPI)
   SET (SpreadSheet1_DISABLE_CS TRUE)
   SET (SpreadSheet1_DISABLE_CRS TRUE)
+
+  # Disabled since the 1 column in spreadsheet view ends up being "Process ID"
+  # which messes up the sorting in this test. Need to extend the testing framework
+  # or fix spreadsheet view for these to work properly.
+  SET (SpreadSheet3_DISABLE_CS TRUE)
+  SET (SpreadSheet3_DISABLE_CRS TRUE)
 
   # The hierchical fractal source is a temporary testing source and it does not
   # create the dataset correctly in parallel. Since it's a testing source, I am

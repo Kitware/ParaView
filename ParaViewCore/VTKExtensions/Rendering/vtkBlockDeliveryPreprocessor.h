@@ -34,10 +34,9 @@ public:
 
   // Description:
   // In case of Composite datasets, set the flat index of the subtree to pass.
-  // Default is 0 which results in passing the entire composite tree.
-  vtkSetMacro(CompositeDataSetIndex, unsigned int);
-  vtkGetMacro(CompositeDataSetIndex, unsigned int);
-  void SetCompositeDataSetIndex() { this->SetCompositeDataSetIndex(0); }
+  // Default or empty results in passing the entire composite tree.
+  void AddCompositeDataSetIndex(unsigned int index);
+  void RemoveAllCompositeDataSetIndices();
 
   // Description:
   // Allow user to enable/disable cell connectivity generation in the datamodel
@@ -89,13 +88,15 @@ protected:
                           vtkInformationVector*);
 
   int FieldAssociation;
-  unsigned int CompositeDataSetIndex;
   int FlattenTable;
   bool GenerateOriginalIds;
   bool GenerateCellConnectivity;
 private:
   vtkBlockDeliveryPreprocessor(const vtkBlockDeliveryPreprocessor&); // Not implemented
   void operator=(const vtkBlockDeliveryPreprocessor&); // Not implemented
+
+  class CompositeDataSetIndicesType;
+  CompositeDataSetIndicesType *CompositeDataSetIndices;
 //ETX
 };
 

@@ -31,6 +31,7 @@ vtkSMCompositeTreeDomain::vtkSMCompositeTreeDomain()
   this->Information = 0;
   this->LastInformation = 0;
   this->Mode = ALL;
+  this->DefaultMode = DEFAULT;
   this->Source = 0;
   this->SourcePort = 0;
 }
@@ -157,6 +158,18 @@ int vtkSMCompositeTreeDomain::ReadXMLAttributes(
       return 0;
       }
     }
+  if (const char* default_mode = element->GetAttribute("default_mode"))
+    {
+    if (strcmp(default_mode, "nonempty-leaf") == 0)
+      {
+      this->DefaultMode = NONEMPTY_LEAF;
+      }
+    else
+      {
+      vtkErrorMacro("Unrecognized 'default_mode': " << mode);
+      return 0;
+      }
+    }
   return 1;
 }
 
@@ -167,9 +180,9 @@ int vtkSMCompositeTreeDomain::SetDefaultValues(
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(property);
   vtkSMPropertyHelper helper(property);
   helper.SetUseUnchecked(use_unchecked_values);
-  if (ivp && this->Information && helper.GetNumberOfElements() == 1)
+  if (ivp && this->Information)
     {
-    if (this->Mode == LEAVES)
+    if (this->Mode == LEAVES || this->DefaultMode == NONEMPTY_LEAF)
       {
       // change the property default to be the first non-empty leaf.
       vtkPVDataInformation* info = this->Information;
@@ -209,6 +222,19 @@ void vtkSMCompositeTreeDomain::PrintSelf(ostream& os, vtkIndent indent)
     break;
   case NONE:
     os << "NONE";
+  default:
+    os << "UNKNOWN";
+    }
+  os << endl;
+  os << indent << "DefaultMode: ";
+  switch (this->DefaultMode)
+    {
+  case DEFAULT:
+    os << "DEFAULT";
+    break;
+  case NONEMPTY_LEAF:
+    os << "NONEMPTY_LEAF";
+    break;
   default:
     os << "UNKNOWN";
     }

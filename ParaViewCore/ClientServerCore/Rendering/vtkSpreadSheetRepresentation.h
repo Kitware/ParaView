@@ -29,8 +29,10 @@
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"
+#include "vtkNew.h" // needed for vtkNew.
 
 class vtkBlockDeliveryPreprocessor;
+class vtkCleanArrays;
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkSpreadSheetRepresentation : public vtkPVDataRepresentation
 {
 public:
@@ -55,7 +57,18 @@ public:
   // Forwarded to vtkBlockDeliveryPreprocessor.
   void SetFieldAssociation(int val);
   int GetFieldAssociation();
-  void SetCompositeDataSetIndex(int val);
+
+
+  // Description:
+  // Select the block indices to extract.
+  // Each node in the multi-block tree is identified by an \c index. The index can
+  // be obtained by performing a preorder traversal of the tree (including empty
+  // nodes). eg. A(B (D, E), C(F, G)).
+  // Inorder traversal yields: A, B, D, E, C, F, G
+  // Index of A is 0, while index of C is 4.
+  void AddCompositeDataSetIndex(unsigned int index);
+  void RemoveAllCompositeDataSetIndices();
+
 
 //BTX
 protected:
@@ -71,8 +84,11 @@ protected:
   virtual int RequestData(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
-  vtkBlockDeliveryPreprocessor* DataConditioner;
-  vtkBlockDeliveryPreprocessor* ExtractedDataConditioner;
+  vtkNew<vtkCleanArrays> CleanArrays;
+  vtkNew<vtkBlockDeliveryPreprocessor> DataConditioner;
+
+  vtkNew<vtkCleanArrays> ExtractedCleanArrays;
+  vtkNew<vtkBlockDeliveryPreprocessor> ExtractedDataConditioner;
 
 private:
   vtkSpreadSheetRepresentation(const vtkSpreadSheetRepresentation&); // Not implemented
