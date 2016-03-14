@@ -165,7 +165,7 @@ void vtkPythonAnnotationFilter::EvaluateExpression()
   stream
     << "def vtkPythonAnnotationFilter_EvaluateExpression():" << endl
     << "    from paraview import annotation as pv_ann" << endl
-    << "    from vtkPVClientServerCoreCorePython import vtkPythonAnnotationFilter" << endl
+    << "    from vtk.vtkPVClientServerCoreCore import vtkPythonAnnotationFilter" << endl
     << "    me = vtkPythonAnnotationFilter('" << vtkGetReferenceAsString(this) << " ')" << endl
     << "    pv_ann.execute(me)" << endl
     << "    del me" << endl

@@ -154,7 +154,7 @@ int vtkPythonExtractSelection::RequestData(
   stream
     << "def vtkPythonExtractSelection_RequestData():" << endl
     << "    from paraview import extract_selection as pv_es" << endl
-    << "    from vtkPVClientServerCoreCorePython import vtkPythonExtractSelection" << endl
+    << "    from vtk.vtkPVClientServerCoreCore import vtkPythonExtractSelection" << endl
     << "    me = vtkPythonExtractSelection('" << aplus << " ')" << endl
     << "    pv_es.execute(me)" << endl
     << "    del me" << endl

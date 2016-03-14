@@ -6,7 +6,7 @@ approriate for co-processing.
 """
 
 from paraview import simple, servermanager
-from vtkPVVTKExtensionsCorePython import *
+from vtk.vtkPVVTKExtensionsCore import *
 import math
 
 # -----------------------------------------------------------------------------

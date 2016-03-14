@@ -78,17 +78,17 @@ import exceptions, traceback, logging, random, sys, threading, time, os, paravie
 from mpi4py import MPI
 from vtk.web import server
 from paraview.vtk import *
-from vtkCommonCorePython import *
-from vtkCommonDataModelPython import *
-from vtkCommonExecutionModelPython import *
-from vtkFiltersSourcesPython import *
-from vtkParallelCorePython import *
-from vtkParaViewWebCorePython import *
-from vtkPVClientServerCoreCorePython import *
-from vtkPVServerManagerApplicationPython import *
-from vtkPVServerManagerCorePython import *
-from vtkPVVTKExtensionsCorePython import *
-from vtkWebCorePython import *
+from vtk.vtkCommonCore import *
+from vtk.vtkCommonDataModel import *
+from vtk.vtkCommonExecutionModel import *
+from vtk.vtkFiltersSources import *
+from vtk.vtkParallelCore import *
+from vtk.vtkParaViewWebCore import *
+from vtk.vtkPVClientServerCoreCore import *
+from vtk.vtkPVServerManagerApplication import *
+from vtk.vtkPVServerManagerCore import *
+from vtk.vtkPVVTKExtensionsCore import *
+from vtk.vtkWebCore import *
 
 from paraview.web import wamp as pv_wamp
 

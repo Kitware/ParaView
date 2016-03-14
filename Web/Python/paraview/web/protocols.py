@@ -21,7 +21,7 @@ from paraview.web import helper
 from vtk.web import protocols as vtk_protocols
 from decorators import *
 
-from vtkWebCorePython import vtkWebInteractionEvent
+from vtk.vtkWebCore import vtkWebInteractionEvent
 
 from vtk import vtkImageData
 from vtk import vtkUnsignedCharArray
@@ -31,15 +31,15 @@ from vtk import vtkDataEncoder
 #    vtkSMPVRepresentationProxy
 #    vtkSMTransferFunctionProxy
 #    vtkSMTransferFunctionManager
-from vtkPVServerManagerRenderingPython import *
+from vtk.vtkPVServerManagerRendering import *
 
 # Needed for:
 #    vtkSMProxyManager
-from vtkPVServerManagerCorePython import *
+from vtk.vtkPVServerManagerCore import *
 
 # Needed for:
 #    vtkDataObject
-from vtkCommonDataModelPython import *
+from vtk.vtkCommonDataModel import *
 
 # =============================================================================
 #
@@ -2575,8 +2575,8 @@ class ParaViewWebFileListing(ParaViewWebProtocol):
 # Handle Data Selection
 #
 # =============================================================================
-from vtkPVClientServerCoreRenderingPython import *
-from vtkCommonCorePython import *
+from vtk.vtkPVClientServerCoreRendering import *
+from vtk.vtkCommonCore import *
 
 class ParaViewWebSelectionHandler(ParaViewWebProtocol):
 

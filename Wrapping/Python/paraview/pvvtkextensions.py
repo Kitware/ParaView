@@ -1,4 +1,4 @@
 from paraview import vtk
-from vtkPVVTKExtensionsCorePython import *
-from vtkPVVTKExtensionsDefaultPython import *
-from vtkPVVTKExtensionsRenderingPython import *
+from vtk.vtkPVVTKExtensionsCore import *
+from vtk.vtkPVVTKExtensionsDefault import *
+from vtk.vtkPVVTKExtensionsRendering import *

@@ -150,7 +150,7 @@ void vtkPythonView::Update()
     // Import necessary items from ParaView
     std::ostringstream importStream;
     importStream << "import paraview" << endl
-                 << "from vtkPVClientServerCoreRenderingPython import vtkPythonView" << endl
+                 << "from vtk.vtkPVClientServerCoreRendering import vtkPythonView" << endl
                  << "pythonView = vtkPythonView('" << addressOfThis << " ')" << endl;
     this->RunSimpleStringWithCustomLocals(importStream.str().c_str());
 

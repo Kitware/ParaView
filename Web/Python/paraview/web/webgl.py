@@ -10,7 +10,7 @@ from twisted.web.error import Error
 
 from paraview import simple
 from paraview.web import helper
-from vtkParaViewWebCorePython import vtkPVWebApplication
+from vtk.vtkParaViewWebCore import vtkPVWebApplication
 
 import exceptions
 import base64
