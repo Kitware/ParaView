@@ -45,7 +45,11 @@ A simple example::
 #     PURPOSE.  See the above copyright notice for more information.
 #
 #==============================================================================
-import paraview, re, os, os.path, new, sys, atexit, vtk
+import paraview, re, os, os.path, new, sys, atexit
+
+# prefer `vtk` from `paraview` since it doesn't import all
+# vtk modules.
+from paraview import vtk
 
 from vtk.vtkPVServerImplementationCore import *
 from vtk.vtkPVClientServerCoreCore import *

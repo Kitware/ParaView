@@ -35,9 +35,6 @@ if (NOT PARAVIEW_ENABLE_PYTHON)
   return()
 endif()
 
-set(PV_PYTHON_MODULE_BINARY_DIR "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/site-packages/paraview")
-
-
 # Copy generated module files from VTK into place in the build tree
 set(_vtkpy_modules
   # Ninja BUG 760: In past this depended on vtkpython_pyc. However, due to Ninja
@@ -98,12 +95,16 @@ configure_file(cpexport.py.in cpexport.py @ONLY)
 add_custom_command(
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/pv_copy_and_compile_py_files_complete"
 
-  # Empty '$pydir/paraview' to remove old files.
-  COMMAND ${CMAKE_COMMAND} ARGS -E echo "emptying '.../site-packages/paraview'"
-  COMMAND ${CMAKE_COMMAND} ARGS -E remove_directory "${VTK_BUILD_PYTHON_MODULE_DIR}/paraview"
-
-  COMMAND ${CMAKE_COMMAND} ARGS -E echo "emptying '.../site-packages/vtk'"
-  COMMAND ${CMAKE_COMMAND} ARGS -E remove_directory "${VTK_BUILD_PYTHON_MODULE_DIR}/vtk"
+  # We will presently skip removing old py files since the code to put together
+  # *.py files for the `paraview` package is scattered around e.g. under the Web module.
+  # The responsibility to put together the `paraview` Python package should really be in one place
+  # (which is here). Let's do that in near future. Until then, let's leave these "empty dir" lines
+  # commented out.
+  # # Empty '$pydir/paraview' to remove old files.
+  # COMMAND ${CMAKE_COMMAND} ARGS -E echo "emptying '.../site-packages/paraview'"
+  # COMMAND ${CMAKE_COMMAND} ARGS -E remove_directory "${VTK_BUILD_PYTHON_MODULE_DIR}/paraview"
+  # COMMAND ${CMAKE_COMMAND} ARGS -E echo "emptying '.../site-packages/vtk'"
+  # COMMAND ${CMAKE_COMMAND} ARGS -E remove_directory "${VTK_BUILD_PYTHON_MODULE_DIR}/vtk"
 
   COMMAND ${CMAKE_COMMAND} ARGS -E echo "copying paraview/*.py to '.../site-paraview/paraview'"
   COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory

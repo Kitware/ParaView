@@ -61,7 +61,7 @@ void vtkAnnotateGlobalDataFilter::EvaluateExpression()
   stream
     << "def vtkAnnotateGlobalDataFilter_EvaluateExpression():" << endl
     << "    from paraview import annotation as pv_ann" << endl
-    << "    from vtk.vtkPVClientServerCoreDefault import vtkAnnotateGlobalDataFilter" << endl
+    << "    from paraview.vtk.vtkPVClientServerCoreDefault import vtkAnnotateGlobalDataFilter" << endl
     << "    me = vtkAnnotateGlobalDataFilter('" << vtkGetReferenceAsString(this) << " ')" << endl
     << "    pv_ann.execute_on_global_data(me)" << endl
     << "    del me" << endl

@@ -68,7 +68,7 @@ void vtkAnnotateAttributeDataFilter::EvaluateExpression()
   stream
     << "def vtkAnnotateAttributeDataFilter_EvaluateExpression():" << endl
     << "    from paraview import annotation as pv_ann" << endl
-    << "    from vtk.vtkPVClientServerCoreDefault import vtkAnnotateAttributeDataFilter" << endl
+    << "    from paraview.vtk.vtkPVClientServerCoreDefault import vtkAnnotateAttributeDataFilter" << endl
     << "    me = vtkAnnotateAttributeDataFilter('" << vtkGetReferenceAsString(this) << " ')" << endl
     << "    pv_ann.execute_on_attribute_data(me," << (evaluate_locally? "True" : "False")
                                                   << ")" << endl
