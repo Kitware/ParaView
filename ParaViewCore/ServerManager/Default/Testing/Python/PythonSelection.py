@@ -7,9 +7,11 @@ s = Sphere()
 c =Cone(Resolution=10)
 GroupDatasets(Input=[s,c])
 GenerateIds()
+sel = SelectCells("Ids > 4")
+
+e = ExtractSelection(Selection=sel)
 r = Show()
 r.ColorArrayName = None
-SelectCells("Ids > 2")
 RenderView1 = Render()
 
 if not smtesting.DoRegressionTesting(RenderView1.SMProxy):
