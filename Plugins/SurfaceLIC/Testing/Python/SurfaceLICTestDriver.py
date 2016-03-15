@@ -22,7 +22,7 @@ if opengl2:
     del mapper
 else:
     em = rw.GetExtensionManager()
-    painter = vtk.vtkRenderingLIC.vtkSurfaceLICPainter()
+    painter = vtk.vtkSurfaceLICPainter()
     ok = painter.IsSupported(rw)
     print
     print 'SurfaceLIC %s Supported by:\n  %s\n  %s\n  %s\n'%(
