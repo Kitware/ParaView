@@ -28,6 +28,7 @@ class vtkCSVExporter::vtkInternals
 {
 public:
   std::string Header;
+  std::string XColumnName;
   std::map<double, std::pair<std::string, int> > Lines;
   int ColumnCount;
 
@@ -50,7 +51,7 @@ public:
     }
   void DumpLines(const char* delim, ofstream& ofs)
     {
-    ofs << "X" << delim << this->Header.c_str() << endl;
+    ofs << (this->XColumnName.empty()? "X" : this->XColumnName.c_str()) << delim << this->Header.c_str() << endl;
     for (std::map<double, std::pair<std::string, int> >::iterator iter = this->Lines.begin();
       iter != this->Lines.end(); ++iter)
       {
@@ -124,6 +125,10 @@ void vtkCSVExporter::AddColumn(
   this->Internals->Header += "\"" + std::string(yarrayname) + "\"";
 
   assert(xarray == NULL || (xarray->GetNumberOfTuples() == yarray->GetNumberOfTuples()));
+  if (xarray && xarray->GetName() && this->Internals->XColumnName.empty())
+    {
+    this->Internals->XColumnName = "\"" + std::string(xarray->GetName()) + "\"";
+    }
   for (vtkIdType cc=0, max=yarray->GetNumberOfTuples(); cc < max; ++cc)
     {
     this->Internals->AddColumnValue(this->FieldDelimiter,
