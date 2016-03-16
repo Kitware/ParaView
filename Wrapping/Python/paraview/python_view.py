@@ -19,23 +19,23 @@ convenience classes in Python.
 import paraview
 import vtk
 
-from vtkPVServerImplementationCorePython import *
-from vtkPVClientServerCoreCorePython import *
-from vtkPVServerManagerCorePython import *
+from vtk.vtkPVServerImplementationCore import *
+from vtk.vtkPVClientServerCoreCore import *
+from vtk.vtkPVServerManagerCore import *
 
 try:
-  from vtkPVServerManagerDefaultPython import *
+  from vtk.vtkPVServerManagerDefault import *
 except:
-  paraview.print_error("Error: Cannot import vtkPVServerManagerDefaultPython")
+  paraview.print_error("Error: Cannot import vtkPVServerManagerDefault")
 try:
-  from vtkPVServerManagerRenderingPython import *
+  from vtk.vtkPVServerManagerRendering import *
 except:
-  paraview.print_error("Error: Cannot import vtkPVServerManagerRenderingPython")
+  paraview.print_error("Error: Cannot import vtkPVServerManagerRendering")
 try:
-  from vtkPVServerManagerApplicationPython import *
+  from vtk.vtkPVServerManagerApplication import *
 except:
-  paraview.print_error("Error: Cannot import vtkPVServerManagerApplicationPython")
-from vtkPVCommonPython import *
+  paraview.print_error("Error: Cannot import vtkPVServerManagerApplication")
+from vtk.vtkPVCommon import *
 
 
 def numpy_to_image(numpy_array):

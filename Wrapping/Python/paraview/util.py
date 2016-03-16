@@ -1,5 +1,5 @@
 from paraview import vtk 
-from vtkPVVTKExtensionsDefaultPython import *
+from vtk.vtkPVVTKExtensionsDefault import *
 
 def SetOutputWholeExtent(algorithm, extent):
     """

@@ -54,7 +54,7 @@ from paraview.web import wamp      as pv_wamp
 from paraview.web import protocols as pv_protocols
 
 from vtk.web import server
-from vtkWebCorePython import *
+from vtk.vtkWebCore import *
 
 # import annotations
 from autobahn.wamp import register as exportRpc

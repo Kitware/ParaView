@@ -137,7 +137,7 @@ void vtkPythonCalculator::Exec(const char* expression)
   python_stream
     << "import paraview\n"
     << "from paraview import calculator\n"
-    << "from vtkPVClientServerCoreDefaultPython import vtkPythonCalculator\n"
+    << "from paraview.vtk.vtkPVClientServerCoreDefault import vtkPythonCalculator\n"
     << "calculator.execute(vtkPythonCalculator('" << aplus << "'), '"
     << orgscript.c_str() << "')\n";
 

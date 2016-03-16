@@ -13,11 +13,11 @@ import paraview
 from paraview import simple, servermanager
 from paraview.servermanager import ProxyProperty, InputProperty
 
-from vtkPVServerManagerCorePython import *
+from vtk.vtkPVServerManagerCore import *
 
 # Needed for:
 #    vtkSMPVRepresentationProxy
-from vtkPVServerManagerRenderingPython import *
+from vtk.vtkPVServerManagerRendering import *
 
 # =============================================================================
 # Pipeline management

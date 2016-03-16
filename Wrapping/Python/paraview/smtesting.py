@@ -4,7 +4,7 @@ import os
 import re
 import sys
 import exceptions
-from vtkPVServerManagerDefaultPython import *
+from vtk.vtkPVServerManagerDefault import *
 
 # we get different behavior based on how we import servermanager
 # so we want to import servermanager the same way in this module
