@@ -212,6 +212,20 @@ public:
   // implies that satellites process same code as the root node. This is
   // applicable only for PROCESS_BATCH.
   vtkGetMacro(SymmetricMPIMode, bool);
+
+  // Description:
+  // The full path to the current executable that is running (or empty if unknown).
+  std::string GetProgramPath() const
+  {
+    return this->ProgramPath;
+  }
+  // Description:
+  // The directory containing the current executable (or empty if unknown).
+  std::string GetSelfDir() const
+  {
+    return this->SelfDir;
+  }
+
 //BTX
 protected:
   vtkProcessModule();
@@ -241,19 +255,6 @@ protected:
   // Sets the executable path of the process so that ParaView can, e.g., set up
   // paths for Python properly.
   void SetExecutablePath(const std::string& path);
-
-  // Description:
-  // The full path to the current executable that is running (or empty if unknown).
-  std::string GetProgramPath() const
-  {
-    return this->ProgramPath;
-  }
-  // Description:
-  // The directory containing the current executable (or empty if unknown).
-  std::string GetSelfDir() const
-  {
-    return this->SelfDir;
-  }
 
 protected:
   vtkProcessModuleInternals* Internals;
