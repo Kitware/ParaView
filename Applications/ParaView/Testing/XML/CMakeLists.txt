@@ -81,6 +81,7 @@ endif()
 
 SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/AxesGrid.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/CameraLink.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Contour.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/DisconnectAndSaveAnimation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Ensemble.xml
@@ -201,7 +202,6 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/3DWidgetInCustomFilter.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CalcParens.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Calculator.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/CameraLink.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ChangingTimestepsInStateFiles.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ChartAxisRangeAndLabels.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CheckableHeader.xml
