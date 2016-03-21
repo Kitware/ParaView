@@ -32,8 +32,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "@PLUGIN_NAME@_Plugin.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkPVPluginLoader.h"
 
 @EXTRA_INCLUDES@
+
+namespace
+{
+  // This ensures that when the shared library for this plugin is
+  // unloaded during finalization sequence, it notifies the vtkPVPluginLoader
+  // so it does not double-dlclose() an already unloaded plugin.
+  // This does not affect static builds and hence we don't need to worry about
+  // making sure this instance gets created in static builds.
+  static class @PLUGIN_NAME@_PluginCleaner
+    {
+  public:
+    @PLUGIN_NAME@_PluginCleaner()
+      {
+      }
+    ~@PLUGIN_NAME@_PluginCleaner()
+      {
+      // The plugin library is being unloaded.
+      // Let the plugin loader know so it doesn't try to unload it again.
+      vtkPVPluginLoader::PluginLibraryUnloaded("@PLUGIN_NAME@");
+      }
+    } @PLUGIN_NAME@_PluginCleaner_Instance;
+}
 
 //-----------------------------------------------------------------------------
 // Used to push a string returns from a function to a vector.
