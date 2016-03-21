@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVRGrabWorldStyle.h"
 #include "vtkVRSpaceNavigatorGrabWorldStyle.h"
 #include "vtkVRTrackStyle.h"
+#include "vtkVRVirtualHandStyle.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkVRInteractorStyleFactory)
@@ -65,6 +66,10 @@ vtkVRInteractorStyleFactory::vtkVRInteractorStyleFactory()
   // Add SpaceNavigatorGrabWorldStye
   this->InteractorStyleClassNames.push_back("vtkVRSpaceNavigatorGrabWorldStyle");
   this->InteractorStyleDescriptions.push_back("Space Navigator Grab");
+  
+  // Add Virtual Hand - DJZ
+  this->InteractorStyleClassNames.push_back("vtkVRVirtualHandStyle");
+  this->InteractorStyleDescriptions.push_back("Virtual Hand");
 }
 
 //-----------------------------------------------------------------------------
@@ -148,6 +153,10 @@ vtkVRInteractorStyleFactory::NewInteractorStyleFromClassName(
     {
     return vtkVRSpaceNavigatorGrabWorldStyle::New();
     }
+  else if (name == "vtkVRVirtualHandStyle")
+    {
+    return vtkVRVirtualHandStyle::New();
+    } 
 
   return NULL;
 }
