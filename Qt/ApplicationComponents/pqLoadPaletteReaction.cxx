@@ -49,6 +49,7 @@ pqLoadPaletteReaction::pqLoadPaletteReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
   QMenu* menu = new QMenu();
+  this->Menu = menu;
   menu->setObjectName("LoadPaletteMenu");
   parentObject->setMenu(menu);
   this->connect(menu, SIGNAL(aboutToShow()), SLOT(populateMenu()));
@@ -60,6 +61,11 @@ pqLoadPaletteReaction::pqLoadPaletteReaction(QAction* parentObject)
 //-----------------------------------------------------------------------------
 pqLoadPaletteReaction::~pqLoadPaletteReaction()
 {
+  if (QAction* pa = this->parentAction())
+    {
+    pa->setMenu(NULL);
+    }
+  delete this->Menu;
 }
 
 //-----------------------------------------------------------------------------
