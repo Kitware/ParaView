@@ -17,10 +17,8 @@
 #include <pqTreeWidgetItemObject.h>
 #include <vtkPVConfig.h>
 
-#if defined(_WIN32) || defined(WIN32)
-#  if !defined(__CYGWIN__)
-#    include <winsock.h> // WSADATA, include before sys/types.h
-#  endif
+#if defined(_WIN32) && !defined(__CYGWIN__)
+#  include <winsock.h> // WSADATA, include before sys/types.h
 #endif
 
 
