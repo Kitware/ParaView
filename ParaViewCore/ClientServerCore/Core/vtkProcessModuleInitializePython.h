@@ -122,7 +122,8 @@ namespace
   //      - SELF_DIR
   //      - SELF_DIR/../lib/paraview-<major>.<minor>/
   //    + ParaView Python modules
-  //      - SELF_DIR/../lib/paraview-<major>.<minor>/site-packages
+  //      - SELF_DIR/Lib
+  //      - SELF_DIR/Lib/site-packages
   //    + VTK Python Module libraries
   //      - SELF_DIR/../lib/paraview-<major>.<minor>/site-packages/vtk
   //===========================================================================
@@ -156,6 +157,8 @@ namespace
     else
       {
       vtkPythonAppInitPrependPythonPath(SELF_DIR);
+      vtkPythonAppInitPrependPythonPath(SELF_DIR + "Lib");
+      vtkPythonAppInitPrependPythonPath(SELF_DIR + "Lib/site-packages");
       vtkPythonAppInitPrependPythonPath(
         SELF_DIR + "/../lib/paraview-" PARAVIEW_VERSION);
       vtkPythonAppInitPrependPythonPath(
