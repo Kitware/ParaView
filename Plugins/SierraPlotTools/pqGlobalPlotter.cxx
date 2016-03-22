@@ -32,34 +32,14 @@
 #include "vtkSMProperty.h"
 #include "vtkPVDataInformation.h"
 
-///
-/// pqGlobalPlotter::pqInternal
-///
-
-class pqGlobalPlotter::pqInternal
-{
-public:
-
-  pqInternal();
-  ~pqInternal();
-
-  QAction * headingHoverAction;
-};
-
-///////////////////////////////////////////////////////////////////////////////
-pqGlobalPlotter::pqInternal::pqInternal() :
-  headingHoverAction(NULL)
-{
-}
-
-///
-/// pqGlobalPlotter
-///
-
 //-----------------------------------------------------------------------------
 pqGlobalPlotter::pqGlobalPlotter()
 {
-  this->Internal = new pqGlobalPlotter::pqInternal();
+}
+
+//-----------------------------------------------------------------------------
+pqGlobalPlotter::~pqGlobalPlotter()
+{
 }
 
 //-----------------------------------------------------------------------------

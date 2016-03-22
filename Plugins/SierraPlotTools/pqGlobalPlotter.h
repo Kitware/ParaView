@@ -32,10 +32,7 @@ class pqGlobalPlotter : public pqPlotter
 public:
 
   pqGlobalPlotter();
-
-  virtual ~pqGlobalPlotter()
-  {
-  }
+  virtual ~pqGlobalPlotter();
 
   virtual QStringList getTheVars(vtkSMProxy * meshReaderProxy);
 
@@ -56,10 +53,6 @@ public:
   virtual QString getPlotterTextEditObjectName();
 
 protected:
-
-  class pqInternal;
-  pqInternal * Internal;
-
 };
 
 #endif // pqGlobalPlotter_h
