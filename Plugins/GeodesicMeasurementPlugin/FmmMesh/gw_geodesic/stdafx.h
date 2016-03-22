@@ -61,7 +61,7 @@ using std::endl;
 /* win32 #include                                                       */
 /*----------------------------------------------------------------------*/
 
-#ifdef WIN32
+#ifdef _WIN32
     /** main win32 header */
 //    #include <windows.h>
 #endif // _USE_WIN32_

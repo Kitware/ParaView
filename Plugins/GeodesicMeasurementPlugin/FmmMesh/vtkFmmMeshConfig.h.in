@@ -6,7 +6,7 @@
 */
 #cmakedefine VTKFMMMESH_BUILD_SHARED_LIBS
 
-#ifdef WIN32
+#ifdef _WIN32
 
   #ifndef VTKFMMMESH_BUILD_SHARED_LIBS // static lib
   #  define FMMMESH_EXPORT
