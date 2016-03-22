@@ -123,7 +123,7 @@ public:
   bool SetMPIRun(std::string mpiexec);
 };
 
-#ifdef WIN32
+#ifdef _WIN32
 #  define PARAVIEW_SERVER "pvserver.exe"
 #else
 #  define PARAVIEW_SERVER "pvserver"
@@ -244,7 +244,7 @@ int vtkProcessModuleAutoMPIInternals::
 
   vtksysProcess_SetWorkingDirectory(server, app_dir.c_str());
 
-#if defined(WIN32)
+#if defined(_WIN32)
   // On Windows, spaces in the path when launching the MPI job can cause severe
   // issue. So we use the relative executable path for the server. Since we are
   // setting the working directory to be the one containing the server
@@ -531,7 +531,7 @@ int vtkProcessModuleAutoMPIInternals::StartServer(vtksysProcess* server, const c
     // We wait for 10s at most to get the "Waiting" text printed out by
     // pvserver.
     double timeout = 10.0;
-#ifdef WIN32
+#ifdef _WIN32
     timeout = 20.0; // windows can be slow with MPI process launch.
 #endif
 
