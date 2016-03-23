@@ -50,6 +50,7 @@ import paraview, re, os, os.path, new, sys, atexit
 # prefer `vtk` from `paraview` since it doesn't import all
 # vtk modules.
 from paraview import vtk
+from paraview import _backwardscompatibilityhelper as _bc
 
 from vtk.vtkPVServerImplementationCore import *
 from vtk.vtkPVClientServerCoreCore import *
@@ -462,16 +463,14 @@ class Proxy(object):
             return self.__GetActiveCamera
         if name == "SaveDefinition" and hasattr(self.SMProxy, "SaveDefinition"):
             return self.__SaveDefinition
-        if name == "ColorAttributeType" and self.SMProxy.GetProperty("ColorArrayName"):
-            if paraview.compatibility.GetVersion() <= 4.1:
-                if self.GetProperty("ColorArrayName")[0] == "CELLS":
-                    return "CELL_DATA"
-                else:
-                    return "POINT_DATA"
-            else:
-                # if ColorAttributeType is being used, warn.
-                paraview.print_debug_info(\
-                    "'ColorAttributeType' is obsolete. Simply use 'ColorArrayName' instead.  Refer to ParaView Python API changes documentation online.")
+
+        try:
+            return _bc.getattr(self, name)
+        except _bc.NotSupportedException:
+            # we fall through and let getattr() raise the appropriate exception.
+            pass
+        except _bc.Continue:
+            pass
         # If not a property, see if SMProxy has the method
         try:
             proxyAttr = getattr(self.SMProxy, name)

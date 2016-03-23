@@ -17,17 +17,24 @@ assert ((paraview.compatibility.GetVersion() >= 4.1) == True),\
 
 Sphere()
 r = Show()
+v = GetActiveView()
+
 assert (len(r.ColorArrayName) == 2),\
     "'ColorArrayName' must be a 2-tuple"
 
-raisedException = False
 try:
-  a = r.ColorAttributeType
+    a = r.ColorAttributeType
 except AttributeError:
-  raisedException = True
+    pass
+else:
+    raise RuntimeError("Accessing 'ColorAttributeType' must have raised an exception.")
 
-assert raisedException, "Accessing ColorAttributeType must have raised an exception."
-
+try:
+    v = v.CameraClippingRange
+except AttributeError:
+    pass
+else:
+    raise RuntimeError("Accessing 'CameraClippingRange' must have raised an exception.")
 
 # Now switch backwards compatibility to 4.1
 paraview.compatibility.major = 4
@@ -49,3 +56,12 @@ r.ColorArrayName = "Alpha"
 paraview.compatibility.major = None
 paraview.compatibility.minor = None
 assert (r.ColorArrayName[:] == ["CELLS", "Alpha"]), "'ColorArrayName' value is not as expected."
+
+
+paraview.compatibility.major = 5
+paraview.compatibility.minor = 0
+try:
+    a = v.CameraClippingRange
+    v.CameraClippingRange = [0, 0, 0]
+except AttributeError:
+    raise RuntimeError("Accessing 'CameraClippingRange' must *not* have raised an exception.")
