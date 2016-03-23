@@ -30,7 +30,7 @@
 #ifndef SQPOSIXOnWindowsWarningSupression_h
 #define SQPOSIXOnWindowsWarningSupression_h
 
-#if defined(WIN32)
+#if defined(_MSC_VER)
 // The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name
 #pragma warning(disable : 4996)
 #endif

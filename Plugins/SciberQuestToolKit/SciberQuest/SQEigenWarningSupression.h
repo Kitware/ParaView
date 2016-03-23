@@ -40,7 +40,7 @@
 #endif
 #endif
 
-#if defined(WIN32)
+#if defined(_MSC_VER)
 #pragma warning(disable : 4512) // assignment operator could not be generated
 #pragma warning(disable : 4181) // qualifier applied to reference type ignored
 #endif
