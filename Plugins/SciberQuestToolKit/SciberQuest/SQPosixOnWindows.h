@@ -30,7 +30,7 @@
 #ifndef SQPosixOnWindows_h
 #define SQPosixOnWindows_h
 
-#if defined(WIN32)
+#if defined(_WIN32)
 
 // imitate posix_memalign on windows.
 #include <malloc.h>

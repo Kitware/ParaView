@@ -56,7 +56,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnsignedCharArray.h"
 
-#ifdef WIN32
+#ifdef _WIN32
   #include <Winsock2.h>
 #else
   #include <unistd.h>

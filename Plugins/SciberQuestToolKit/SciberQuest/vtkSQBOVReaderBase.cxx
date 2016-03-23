@@ -69,7 +69,7 @@
 #include <sstream>
 
 // #define SQTK_DEBUG
-#ifdef WIN32
+#ifdef _WIN32
   // only usefull in terminals
   #undef SQTK_DEBUG
 #endif
