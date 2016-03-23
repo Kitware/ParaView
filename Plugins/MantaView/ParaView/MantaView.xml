@@ -29,8 +29,6 @@
          <Property name="CameraViewUpInfo" panel_visibility="never"/>
          <Property name="CameraViewUp" panel_visibility="never"/>
          <Property name="CameraViewAngle" panel_visibility="never"/>
-         <Property name="CameraClippingRangeInfo" panel_visibility="never"/>
-         <Property name="CameraClippingRange" panel_visibility="never"/>
          <Property name="CameraParallelScale" panel_visibility="never"/>
          <Property name="CameraParallelScaleInfo" panel_visibility="never"/>
          <Property name="EyeAngle" panel_visibility="never"/>
