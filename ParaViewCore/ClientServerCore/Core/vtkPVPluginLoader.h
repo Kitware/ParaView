@@ -109,6 +109,12 @@ public:
   // Sets the function used to load static plugins.
   static void SetStaticPluginLoadFunction(vtkPluginLoadFunction function);
 
+  // Description:
+  // Internal method used in pqParaViewPlugin.cxx.in to tell the
+  // vtkPVPluginLoader that a library was unloaded so it doesn't try to unload
+  // it again.
+  static void PluginLibraryUnloaded(const char* pluginname);
+
 protected:
   vtkPVPluginLoader();
   ~vtkPVPluginLoader();

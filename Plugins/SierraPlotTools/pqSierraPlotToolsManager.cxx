@@ -116,6 +116,10 @@ public:
       plotter->setDomain(theDomain);
       enabledFlag = theEnabledFlag;
     }
+    ~PlotterMetaData()
+      {
+      delete this->plotter;
+      }
 
     plotVariableType type;
     pqPlotter::plotDomain domain;
@@ -125,7 +129,6 @@ public:
   };
 
   pqInternal() :
-    ActionPlaceholder(NULL),
     plotGUI(NULL),
     currentMetaPlotter(NULL)
     {
@@ -174,6 +177,11 @@ public:
 
   virtual ~pqInternal()
     {
+    foreach(PlotterMetaData* md, this->plotterMap)
+      {
+      delete md;
+      }
+    this->plotterMap.clear();
     }
 
   // This method checks to see if the selection range (e.g. via the line edit box)
@@ -227,7 +235,7 @@ public:
   void adjustPlotterForPickedVariables(pqPipelineSource * meshReader);
 
   Ui::pqSierraPlotToolsActionHolder Actions;
-  QWidget *ActionPlaceholder;
+  QWidget ActionPlaceholder;
   pqPlotVariablesDialog * plotGUI;
   //pqPlotter * plotter;
   QString whoAmI;
@@ -236,7 +244,7 @@ public:
 
   QVector<QString> plotMenuItemsList;
   QMap<QString, PlotterMetaData *> plotterMap;
-  PlotterMetaData * currentMetaPlotter;
+  PlotterMetaData* currentMetaPlotter;
 };
 
 //=============================================================================
@@ -520,23 +528,11 @@ bool pqSierraPlotToolsManager::pqInternal::withinRange(QList<int> & nodeList, pq
 //
 // Singleton instance of pqSierraPlotToolsManager *
 //
-QPointer<pqSierraPlotToolsManager> pqSierraPlotToolsManagerInstance = NULL;
-
 pqSierraPlotToolsManager *pqSierraPlotToolsManager::instance()
 {
-  if (pqSierraPlotToolsManagerInstance == NULL)
-    {
-    pqApplicationCore *core = pqApplicationCore::instance();
-    if (!core)
-      {
-      qFatal("Cannot use the SierraPlotTools Tools without an application core instance.");
-      return NULL;
-      }
 
-    pqSierraPlotToolsManagerInstance = new pqSierraPlotToolsManager(core);
-    }
-
-  return pqSierraPlotToolsManagerInstance;
+  static pqSierraPlotToolsManager theManager(NULL);
+  return &theManager;
 }
 
 //-----------------------------------------------------------------------------
@@ -546,8 +542,7 @@ pqSierraPlotToolsManager::pqSierraPlotToolsManager(QObject *p) : QObject(p)
 
   // This widget serves no real purpose other than initializing the Actions
   // structure created with designer that holds the actions.
-  this->Internal->ActionPlaceholder = new QWidget(NULL);
-  this->Internal->Actions.setupUi(this->Internal->ActionPlaceholder);
+  this->Internal->Actions.setupUi(&this->Internal->ActionPlaceholder);
 
   QObject::connect(this->actionDataLoadManager(), SIGNAL(triggered(bool)),
                    this, SLOT(showDataLoadManager()));
@@ -570,7 +565,6 @@ pqSierraPlotToolsManager::pqSierraPlotToolsManager(QObject *p) : QObject(p)
 //-----------------------------------------------------------------------------
 pqSierraPlotToolsManager::~pqSierraPlotToolsManager()
 {
-  delete this->Internal->ActionPlaceholder;
   delete this->Internal;
 }
 

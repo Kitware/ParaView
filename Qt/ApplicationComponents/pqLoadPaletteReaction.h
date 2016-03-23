@@ -33,6 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqLoadPaletteReaction_h
 
 #include "pqReaction.h"
+#include <QPointer>
+
+class QMenu;
 
 /// @ingroup Reactions
 /// pqLoadPaletteReaction is used to setup an action that allows the user to
@@ -55,6 +58,7 @@ private slots:
 
 private:
   Q_DISABLE_COPY(pqLoadPaletteReaction);
+  QPointer<QMenu> Menu;
 };
 
 #endif
