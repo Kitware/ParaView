@@ -57,7 +57,7 @@
 #include "vtkUnsignedCharArray.h"
 
 #ifdef _WIN32
-  #include <Winsock2.h>
+  #include <winsock2.h>
 #else
   #include <unistd.h>
 #endif
