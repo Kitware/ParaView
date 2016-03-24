@@ -510,7 +510,7 @@ def record(csname="/tmp/test_pv/info.json"):
     restore_visibility(pxystate)
     cs.save()
 
-def export_scene(baseDirName, viewSelection, trackSelection):
+def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
     '''This explores a set of user-defined views and tracks. export_scene is
     called from vtkCinemaExport.  The expected order of parameters is as follows:
 
@@ -521,13 +521,19 @@ def export_scene(baseDirName, viewSelection, trackSelection):
 
     - trackSelection:
 
-    Directory of the form {'TrackName' : [v1, v2, v3], ...}
+    Directory of the form {'FilterName' : [v1, v2, v3], ...}
+
+    - arraySelection:
+
+    Directory of the form {'FilterName' : ['arrayName1', 'arrayName2', ...], ... }
 
     Note:  baseDirName is used as the parent directory of the database generated for
     each view in viewSelection. 'Image filename' is used as the database directory name.
     '''
 
     import paraview.simple as pvs
+
+    print "->>> export_scene, arrSelection arg: ", arraySelection
 
     # save initial state
     initialView = pvs.GetActiveView()

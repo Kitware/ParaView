@@ -150,7 +150,7 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
     {
     // Format as defined in cpstate.py
     QString format("'%1' : ['%2', %3, '%4', '%5', '%6', '%7', '%8']");
-    rendering_info = this->Internals->wViewSelection->getSelectionAsPythonScript(format,
+    rendering_info = this->Internals->wViewSelection->getSelectionAsString(format,
       this->Internals->chbComposite->isChecked());
     }
 
@@ -159,7 +159,7 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
     {
     // Format as defined in pv_introspect.make_cinema_store.make_cinema_store (_userDefinedValues)
     QString format("'%1' : %2");
-    cinema_tracks = this->Internals->wCinemaTrackSelection->getSelectionAsPythonScript(format);
+    cinema_tracks = this->Internals->wCinemaTrackSelection->getTrackSelectionAsString(format);
     }
 
   QString filters ="ParaView Python State Files (*.py);;All files (*)";

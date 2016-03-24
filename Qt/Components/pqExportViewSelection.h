@@ -87,7 +87,7 @@ public:
   /// returns -> 'ViewName1' : ['Imname', 1, 1, 1, 1, 1, {'composite': True ...}],
   ///            'ViewName2' : [...],
   ///            ... (for N views)
-  QString getSelectionAsPythonScript(QString const & scriptFromat, bool isComposite = true);
+  QString getSelectionAsString(QString const & scriptFromat, bool isComposite = true);
 
 private slots:
 

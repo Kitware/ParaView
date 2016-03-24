@@ -116,9 +116,23 @@ public:
     RootItem->addChildren(newItems);
   };
 
-  QString getModelSelection()
+  QStringList getCheckedItemNames()
   {
-    return QString();
+    QStringList itemNames;
+    int const numItems = this->RootItem->childCount();
+    for (int i = 0; i < numItems; i++)
+      {
+        QTreeWidgetItem* item = this->RootItem->child(i);
+        QModelIndex index = pqAbstractItemSelectionModel::index(i, 0, QModelIndex());
+
+        if (pqAbstractItemSelectionModel::data(index, Qt::CheckStateRole) == Qt::Unchecked)
+          continue;
+
+        QString displayedName = pqAbstractItemSelectionModel::data(index, Qt::DisplayRole).toString();
+        itemNames.append(displayedName);
+      }
+
+    return itemNames;
   };
 };
 
@@ -291,25 +305,26 @@ QList<pqCinemaTrack*> pqCinemaTrackSelection::getTracks()
 {
   QList<pqCinemaTrack*> tracks;
 
-//  for (int i = 0 ; i < this->Ui->swTracks->count() ; i++)
-//    {
-//    if (pqCinemaTrack* track = qobject_cast<pqCinemaTrack*>(
-//          this->Ui->swTracks->widget(i)) )
-//      {
-//      tracks.append(track);
-//      }
-//    }
+  ItemValuesMap const & valuesMap = this->PipelineItemValues;  
+  for (ItemValuesMap::const_iterator it = valuesMap.begin(); it != valuesMap.end(); it++)
+    {
+    if (pqCinemaTrack* track = qobject_cast<pqCinemaTrack*>((*it).second.second))
+      {
+      tracks.append(track);
+      }
+    }
 
   return tracks;
 }
 
 //------------------------------------------------------------------------------
-QString pqCinemaTrackSelection::getSelectionAsPythonScript(QString const & format)
+QString pqCinemaTrackSelection::getTrackSelectionAsString(QString const & format)
 {
   if (!this->Ui->gbTrackSelection->isChecked())
-  {
-    // Output default values
-  }
+    {
+    // An empty string will be handled by the cinema python scripts as default values
+    return QString();
+    }
 
   QString cinema_tracks;
   QList<pqCinemaTrack*> tracks = this->getTracks();
@@ -335,9 +350,53 @@ QString pqCinemaTrackSelection::getSelectionAsPythonScript(QString const & forma
     QString info = format.arg(name).arg(values);
     cinema_tracks+= info;
 
+    // append a comma except to the last element
     if (index < tracks.count() - 1)
       cinema_tracks += ", ";
     }
 
   return cinema_tracks;
+}
+
+// -----------------------------------------------------------------------------
+QString pqCinemaTrackSelection::getArraySelectionAsString(QString const & format)
+{
+  if (!this->Ui->gbTrackSelection->isChecked())
+    {
+    // An empty string will be handled by the cinema python scripts as default values
+    return QString();
+    }
+
+  QString array_selection("'arraySelection' : {");
+  ItemValuesMap const & valuesMap = this->PipelineItemValues;
+  for (ItemValuesMap::const_iterator it = valuesMap.begin(); it != valuesMap.end(); it++)
+    {
+    pqArraySelectionModel* model = (*it).second.first;
+    if (model)
+      {
+      QString const & pipelineItemName = (*it).first;
+      QStringList arrayNames = model->getCheckedItemNames();
+
+      // append to the selection string
+      if (arrayNames.count() > 0)
+        {
+        QString values = "[";
+        for (int j = 0; j < arrayNames.count(); j++)
+          {
+          values += QString("'") + arrayNames.at(j) + QString("'");
+          if (j < arrayNames.count() - 1)
+            values += ", ";
+          }
+        values += "]";
+        QString info = format.arg(pipelineItemName).arg(values);
+        array_selection += info;
+        array_selection += ", ";
+        }
+      }
+    }
+  // chop off the last ", "
+  array_selection.chop(2);
+  array_selection += "}";
+
+  return array_selection;
 }

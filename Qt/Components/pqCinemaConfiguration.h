@@ -51,6 +51,7 @@ class PQCOMPONENTS_EXPORT pqCinemaConfiguration : public pqPropertyWidget
   Q_OBJECT;
   Q_PROPERTY(QString viewSelection READ viewSelection);
   Q_PROPERTY(QString trackSelection READ trackSelection);
+  Q_PROPERTY(QString arraySelection READ arraySelection);
 
   typedef pqPropertyWidget Superclass;
 
@@ -69,6 +70,10 @@ public:
   /// the user-selected track options.
   QString trackSelection();
 
+  /// Get method for the arraySelection Q_PROPERTY. Defines a python script extract describing
+  /// the user-selected array options.
+  QString arraySelection();
+
 protected:
 
   /// Updates the vtkCinemaExporter proxy by emitting pqPropertyWidget's changeFinished() signal.
@@ -76,11 +81,11 @@ protected:
 
 signals:
 
-  void compositeChanged();
-
   void viewSelectionChanged();
 
   void trackSelectionChanged();
+
+  void arraySelectionChanged();
 
 private:
 

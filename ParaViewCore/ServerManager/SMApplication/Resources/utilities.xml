@@ -2804,10 +2804,17 @@
         <Documentation>Script string defining the track selection.</Documentation>
       </StringVectorProperty>
 
+      <StringVectorProperty name="ArraySelection"
+                            command="SetArraySelection"
+                            number_of_elements="1">
+        <Documentation>Script string defining the arrays selected in an item.</Documentation>
+      </StringVectorProperty>
+
       <PropertyGroup label="Cinema Configuration"
                      panel_widget="cinema_export_selector">
         <Property name="ViewSelection"/>
-        <Property name="TrackSelection" />
+        <Property name="TrackSelection"/>
+        <Property name="ArraySelection"/>
       </PropertyGroup>
       <!-- End of Cinema Exporter -->
     </RenderViewExporterProxy>

@@ -155,7 +155,7 @@ void pqExportViewSelection::setCinemaVisible(bool status, bool specASupport)
     }
 }
 
-QString pqExportViewSelection::getSelectionAsPythonScript(QString const & scriptFormat, bool isComposite)
+QString pqExportViewSelection::getSelectionAsString(QString const & scriptFormat, bool isComposite)
 {
   QString rendering_info;
 

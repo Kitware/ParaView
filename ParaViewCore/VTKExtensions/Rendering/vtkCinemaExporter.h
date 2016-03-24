@@ -44,6 +44,9 @@ public:
   vtkSetStringMacro(TrackSelection);
   vtkGetStringMacro(TrackSelection);
 
+  vtkSetStringMacro(ArraySelection);
+  vtkGetStringMacro(ArraySelection);
+
 protected:
   vtkCinemaExporter();
   ~vtkCinemaExporter();
@@ -57,6 +60,8 @@ protected:
   char* ViewSelection;
 
   char* TrackSelection;
+
+  char* ArraySelection;
 
 private:
   /// @brief Defines the Python script to be ran.

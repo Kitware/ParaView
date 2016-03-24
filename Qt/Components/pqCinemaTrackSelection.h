@@ -80,7 +80,9 @@ public:
   /// Example: Format as defined in pqCinemaConfiguration
   /// format = "'%1' : 2%"
   /// returns -> 'name1' : [a, b, c], 'name2' : [d, e, f], ... (for N tracks)
-  QString getSelectionAsPythonScript(QString const & format);
+  QString getTrackSelectionAsString(QString const & format);
+
+  QString getArraySelectionAsString(QString const & format);
 
   /// Creates a PipelineModel which gets populated using the current
   /// ServerManagerModel and passes it to the View object.
@@ -94,7 +96,7 @@ private slots:
 private:
 
   /// Creates cinema track widgets (for value customization) and value
-  /// array selection models. 
+  /// array selection models.
   /// @note Only some filters are currently supported by Cinema.
   void initializePipelineItemValues(QList<pqPipelineSource*> const & items);
 
