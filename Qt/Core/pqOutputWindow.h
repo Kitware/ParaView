@@ -82,14 +82,18 @@ private slots:
   /// Standard methods for a QDialog. Both hide the dialog.
   void accept();
   void reject();
+
   /// Clears all messages from the output window
   void clear();
+
   /// Sets the console view if 'on' is true or the table view if 'on' is false.
   void setConsoleView(int on);
+
   /// Slots called to filter (on or off) errors, warnings or debug messages.
   void errorToggled(bool checked);
   void warningToggled(bool checked);
   void debugToggled(bool checked);
+
   /// Slots called on progress handlers' StartEvent
   void onProgressStartEvent();
 
@@ -106,6 +110,7 @@ private:
   virtual void hideEvent(QHideEvent*);
   
   bool Show[MESSAGE_TYPE_COUNT];
+
   /// One past the index of the last error
   int StartEventIndex;
   struct pqImplementation;

@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqOutputWindowModel_h
 
 #include "pqCoreModule.h"
+
 #include <QAbstractTableModel>
 
 class QTableView;
@@ -59,10 +60,15 @@ class PQCORE_EXPORT pqOutputWindowModel : public QAbstractTableModel
 public:
   pqOutputWindowModel(QObject *parent, const QList<MessageT>& messages);
   ~pqOutputWindowModel();
+
   int rowCount(const QModelIndex &parent = QModelIndex()) const ;
+
   int columnCount(const QModelIndex &parent = QModelIndex()) const;
+
   QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+
   virtual Qt::ItemFlags flags(const QModelIndex & index) const;
+
   virtual bool setData(const QModelIndex & index, const QVariant & value, 
                        int role = Qt::EditRole);
   
@@ -70,15 +76,19 @@ public:
 
   /// Appends the last message to the table
   void appendLastRow();
+
   /// clears the table
   void clear();
+
   /// Shows in the table only messages that match the 'show' array.
   /// 'show' tells us if a pqOutputArray::MessageType element should be shown 
   /// or not
   void ShowMessages(bool* show);
+
   /// Expand/Contract a row to show/hide the location of the message
   void expandRow(int r);
   void contractRow(int r);
+
   /// Updates the model when the count for the message at 'messageIndex'
   /// was updated
   void updateCount(int messageIndex);
@@ -92,6 +102,7 @@ private:
   QList<int> Rows;  // element is index in Messages,
                     // when an element is expanded, the index is duplicated
   QTableView* View;
+
   struct pqInternals;
   QScopedPointer<pqInternals> Internals;
 };

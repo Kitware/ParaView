@@ -131,8 +131,10 @@ QVariant pqOutputWindowModel::data(const QModelIndex &_index, int role) const
             ((r == this->Rows.size() - 1 || 
               this->Rows[r] != this->Rows[r + 1]) ? 
              pqCheckBoxDelegate::NOT_EXPANDED : pqCheckBoxDelegate::EXPANDED);
+
           case COLUMN_COUNT:
             return QString::number(this->Messages[this->Rows[r]].Count);
+
           case COLUMN_MESSAGE:
             return this->Messages[this->Rows[r]].Message;
           }
@@ -159,6 +161,7 @@ QVariant pqOutputWindowModel::data(const QModelIndex &_index, int role) const
       break;
       }
     }
+
   return QVariant();
 }
 
@@ -180,6 +183,7 @@ bool pqOutputWindowModel::setData(const QModelIndex & _index,
             case pqCheckBoxDelegate::EXPANDED:
               this->expandRow(r);
               break;
+
             case pqCheckBoxDelegate::NOT_EXPANDED:
               this->contractRow(r);
               break;
