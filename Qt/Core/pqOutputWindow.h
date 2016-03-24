@@ -100,6 +100,10 @@ private slots:
 private:
   pqOutputWindow(const pqOutputWindow&);
   pqOutputWindow& operator=(const pqOutputWindow&);
+
+  /// Set up list of expressions that determine which messages to suppress
+  void setupSuppressionExpressions();
+
   void addMessage(int messageType, const QString& text);
   void addPythonMessages(int messageType, const QString& text);
 

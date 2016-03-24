@@ -114,8 +114,9 @@ struct pqOutputWindow::pqImplementation
     this->TableModel = new pqOutputWindowModel(parent, Messages);
   }
 
-  Ui::pqOutputWindow Ui;
-  QList<MessageT> Messages;
+  Ui::pqOutputWindow   Ui;
+  QStringList          SuppressionExpressions;
+  QList<MessageT>      Messages;
   pqOutputWindowModel* TableModel;
 };
 
@@ -127,6 +128,8 @@ pqOutputWindow::pqOutputWindow(QWidget* Parent) :
   StartEventIndex(0),
   Implementation(new pqImplementation(this))
 {
+  this->setupSuppressionExpressions();
+
   for (int i = 0; i < MESSAGE_TYPE_COUNT; ++i)
     {
     this->Show[i] = true;
@@ -232,18 +235,14 @@ void pqOutputWindow::onDisplayText(const QString& text)
 void pqOutputWindow::onDisplayWarningText(const QString& text)
 {
   Ui::pqOutputWindow& ui = this->Implementation->Ui;
-  if (
-    text.contains("QEventDispatcherUNIX::unregisterTimer", Qt::CaseSensitive) ||
-    text.contains("looking for 'HistogramView") ||
-    text.contains("(looking for 'XYPlot") ||
-    text.contains("Unrecognised OpenGL version") ||
-    /* Skip DBusMenuExporterPrivate errors. These, I suspect, are due to
-     * repeated menu actions in the menus. */
-    text.contains("DBusMenuExporterPrivate") ||
-    text.contains("DBusMenuExporterDBus")
-    )
+
+  // See if message should be supressed
+  for (int i = 0; i < this->Implementation->SuppressionExpressions.size(); ++i)
     {
-    return;
+    if (text.contains(this->Implementation->SuppressionExpressions[i]))
+      {
+      return;
+      }
     }
 
   QTextCharFormat format = ui.consoleWidget->getFormat();
@@ -380,6 +379,20 @@ void pqOutputWindow::debugToggled(bool checked)
 {
   this->Show[DEBUG] = checked;
   this->Implementation->TableModel->ShowMessages(this->Show);
+}
+
+//-----------------------------------------------------------------------------
+void pqOutputWindow::setupSuppressionExpressions()
+{
+  this->Implementation->SuppressionExpressions
+    << "QEventDispatcherUNIX::unregisterTimer"
+    << "looking for 'HistogramView"
+    << "(looking for 'XYPlot"
+    << "Unrecognised OpenGL version"
+    /* Skip DBusMenuExporterPrivate errors. These, I suspect, are due to
+     * repeated menu actions in the menus. */
+    << "DBusMenuExporterPrivate"
+    << "DBusMenuExporterDBus";
 }
 
 //-----------------------------------------------------------------------------
