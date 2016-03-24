@@ -183,6 +183,11 @@ pqOutputWindow::~pqOutputWindow()
 //-----------------------------------------------------------------------------
 void pqOutputWindow::onDisplayTextInWindow(const QString& text)
 {
+  if (this->shouldMessageBeSuppressed(text))
+    {
+    return;
+    }
+
   Ui::pqOutputWindow& ui = this->Implementation->Ui;
   QTextCharFormat format = ui.consoleWidget->getFormat();
   format.setForeground(Qt::darkGreen);
@@ -199,6 +204,11 @@ void pqOutputWindow::onDisplayTextInWindow(const QString& text)
 //-----------------------------------------------------------------------------
 void pqOutputWindow::onDisplayErrorTextInWindow(const QString& text)
 {
+  if (this->shouldMessageBeSuppressed(text))
+    {
+    return;
+    }
+
   Ui::pqOutputWindow& ui = this->Implementation->Ui;
   QTextCharFormat format = ui.consoleWidget->getFormat();
   format.setForeground(Qt::darkRed);
@@ -216,6 +226,11 @@ void pqOutputWindow::onDisplayErrorTextInWindow(const QString& text)
 //-----------------------------------------------------------------------------
 void pqOutputWindow::onDisplayText(const QString& text)
 {
+  if (this->shouldMessageBeSuppressed(text))
+    {
+    return;
+    }
+
   Ui::pqOutputWindow& ui = this->Implementation->Ui;
   QTextCharFormat format = ui.consoleWidget->getFormat();
   format.setForeground(Qt::darkGreen);
@@ -236,13 +251,9 @@ void pqOutputWindow::onDisplayWarningText(const QString& text)
 {
   Ui::pqOutputWindow& ui = this->Implementation->Ui;
 
-  // See if message should be supressed
-  for (int i = 0; i < this->Implementation->SuppressionExpressions.size(); ++i)
+  if (this->shouldMessageBeSuppressed(text))
     {
-    if (text.contains(this->Implementation->SuppressionExpressions[i]))
-      {
-      return;
-      }
+    return;
     }
 
   QTextCharFormat format = ui.consoleWidget->getFormat();
@@ -263,6 +274,11 @@ void pqOutputWindow::onDisplayWarningText(const QString& text)
 //-----------------------------------------------------------------------------
 void pqOutputWindow::onDisplayGenericWarningText(const QString& text)
 {
+  if (this->shouldMessageBeSuppressed(text))
+    {
+    return;
+    }
+
   Ui::pqOutputWindow& ui = this->Implementation->Ui;
   QTextCharFormat format = ui.consoleWidget->getFormat();
   format.setForeground(Qt::black);
@@ -282,6 +298,11 @@ void pqOutputWindow::onDisplayGenericWarningText(const QString& text)
 //-----------------------------------------------------------------------------
 void pqOutputWindow::onDisplayErrorText(const QString& text)
 {
+  if (this->shouldMessageBeSuppressed(text))
+    {
+    return;
+    }
+
   Ui::pqOutputWindow& ui = this->Implementation->Ui;
   if (
     text.contains("Unrecognised OpenGL version") ||
@@ -393,6 +414,21 @@ void pqOutputWindow::setupSuppressionExpressions()
      * repeated menu actions in the menus. */
     << "DBusMenuExporterPrivate"
     << "DBusMenuExporterDBus";
+}
+
+//-----------------------------------------------------------------------------
+bool pqOutputWindow::shouldMessageBeSuppressed(const QString& text)
+{
+  // See if message should be supressed
+  for (int i = 0; i < this->Implementation->SuppressionExpressions.size(); ++i)
+    {
+    if (text.contains(this->Implementation->SuppressionExpressions[i]))
+      {
+      return true;
+      }
+    }
+
+  return false;
 }
 
 //-----------------------------------------------------------------------------

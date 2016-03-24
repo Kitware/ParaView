@@ -104,6 +104,9 @@ private:
   /// Set up list of expressions that determine which messages to suppress
   void setupSuppressionExpressions();
 
+  /// Check to see if the message should be suppressed
+  bool shouldMessageBeSuppressed(const QString& text);
+
   void addMessage(int messageType, const QString& text);
   void addPythonMessages(int messageType, const QString& text);
 
