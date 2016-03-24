@@ -55,11 +55,13 @@ enum ColumnLocation
 };
 };
 
+//-----------------------------------------------------------------------------
 struct pqOutputWindowModel::pqInternals
 {
   QList<QIcon> Icons;
 };
 
+//-----------------------------------------------------------------------------
 pqOutputWindowModel::pqOutputWindowModel(
   QObject *_parent, const QList<MessageT>& messages) :
   QAbstractTableModel(_parent),
@@ -70,22 +72,26 @@ pqOutputWindowModel::pqOutputWindowModel(
   Q_ASSERT (EXPANDED_ROW_EXTRA == 1);
 }
 
+//-----------------------------------------------------------------------------
 pqOutputWindowModel::~pqOutputWindowModel()
 {
 }
 
+//-----------------------------------------------------------------------------
 int pqOutputWindowModel::rowCount(const QModelIndex &_parent) const
 {
   (void)_parent;
   return this->Rows.size();
 }
 
+//-----------------------------------------------------------------------------
 int pqOutputWindowModel::columnCount(const QModelIndex &_parent) const
 {
   (void)_parent;
   return NUMBER_OF_COLUMNS;
 }
 
+//-----------------------------------------------------------------------------
 Qt::ItemFlags pqOutputWindowModel::flags(const QModelIndex & _index) const
 {
   int r = _index.row();
@@ -98,6 +104,7 @@ Qt::ItemFlags pqOutputWindowModel::flags(const QModelIndex & _index) const
   return f;
 }
 
+//-----------------------------------------------------------------------------
 QVariant pqOutputWindowModel::data(const QModelIndex &_index, int role) const
 {
   int r = _index.row();
@@ -155,6 +162,7 @@ QVariant pqOutputWindowModel::data(const QModelIndex &_index, int role) const
   return QVariant();
 }
 
+//-----------------------------------------------------------------------------
 bool pqOutputWindowModel::setData(const QModelIndex & _index, 
                                   const QVariant & value, int role)
 {
@@ -182,6 +190,7 @@ bool pqOutputWindowModel::setData(const QModelIndex & _index,
   return true;
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindowModel::appendLastRow()
 {
   this->beginInsertRows(QModelIndex(), this->Rows.size(), this->Rows.size());
@@ -194,7 +203,7 @@ void pqOutputWindowModel::appendLastRow()
   this->View->resizeRowToContents(this->Rows.size() - 1);
 }
 
-
+//-----------------------------------------------------------------------------
 void pqOutputWindowModel::expandRow(int r)
 {
   this->beginInsertRows(QModelIndex(), r+1, r+1);
@@ -203,6 +212,7 @@ void pqOutputWindowModel::expandRow(int r)
   this->View->resizeRowToContents(r+1);
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindowModel::contractRow(int r)
 {
   beginRemoveRows(QModelIndex(), r+1, r+1);
@@ -210,7 +220,7 @@ void pqOutputWindowModel::contractRow(int r)
   endRemoveRows();
 }
 
-
+//-----------------------------------------------------------------------------
 void pqOutputWindowModel::clear()
 {
   if (this->Rows.size() > 0)
@@ -221,6 +231,7 @@ void pqOutputWindowModel::clear()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindowModel::ShowMessages(bool* show)
 {
   this->clear();
@@ -253,6 +264,7 @@ void pqOutputWindowModel::ShowMessages(bool* show)
   this->View->resizeRowsToContents();
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindowModel::setView(QTableView* view)
 {
   Q_ASSERT(this->View == NULL);
@@ -271,6 +283,7 @@ void pqOutputWindowModel::setView(QTableView* view)
     style->standardIcon(QStyle::SP_MessageBoxInformation));
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindowModel::resizeColumnsToContents()
 {
   for (int i = 0; i < NUMBER_OF_COLUMNS - 1; ++i)
@@ -279,7 +292,7 @@ void pqOutputWindowModel::resizeColumnsToContents()
     }
 }
 
-
+//-----------------------------------------------------------------------------
 void pqOutputWindowModel::updateCount(int messageIndex)
 {
   for (int i = 0; i < this->Rows.size(); ++i)

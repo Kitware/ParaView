@@ -172,10 +172,12 @@ pqOutputWindow::pqOutputWindow(QWidget* Parent) :
   ui.tableView->setModel(this->Implementation->TableModel);
 }
 
+//-----------------------------------------------------------------------------
 pqOutputWindow::~pqOutputWindow()
 {
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::onDisplayTextInWindow(const QString& text)
 {
   Ui::pqOutputWindow& ui = this->Implementation->Ui;
@@ -191,6 +193,7 @@ void pqOutputWindow::onDisplayTextInWindow(const QString& text)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::onDisplayErrorTextInWindow(const QString& text)
 {
   Ui::pqOutputWindow& ui = this->Implementation->Ui;
@@ -207,6 +210,7 @@ void pqOutputWindow::onDisplayErrorTextInWindow(const QString& text)
 
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::onDisplayText(const QString& text)
 {
   Ui::pqOutputWindow& ui = this->Implementation->Ui;
@@ -224,6 +228,7 @@ void pqOutputWindow::onDisplayText(const QString& text)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::onDisplayWarningText(const QString& text)
 {
   Ui::pqOutputWindow& ui = this->Implementation->Ui;
@@ -240,6 +245,7 @@ void pqOutputWindow::onDisplayWarningText(const QString& text)
     {
     return;
     }
+
   QTextCharFormat format = ui.consoleWidget->getFormat();
   format.setForeground(Qt::black);
   format.clearBackground();
@@ -255,6 +261,7 @@ void pqOutputWindow::onDisplayWarningText(const QString& text)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::onDisplayGenericWarningText(const QString& text)
 {
   Ui::pqOutputWindow& ui = this->Implementation->Ui;
@@ -273,6 +280,7 @@ void pqOutputWindow::onDisplayGenericWarningText(const QString& text)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::onDisplayErrorText(const QString& text)
 {
   Ui::pqOutputWindow& ui = this->Implementation->Ui;
@@ -301,18 +309,21 @@ void pqOutputWindow::onDisplayErrorText(const QString& text)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::accept()
 {
   this->hide();
   Superclass::accept();
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::reject()
 {
   this->hide();
   Superclass::reject();
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::clear()
 {
   Ui::pqOutputWindow& ui = this->Implementation->Ui;
@@ -321,6 +332,7 @@ void pqOutputWindow::clear()
   this->Implementation->TableModel->clear();
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::showEvent(QShowEvent* e)
 {
   pqApplicationCore* core = pqApplicationCore::instance();
@@ -331,6 +343,7 @@ void pqOutputWindow::showEvent(QShowEvent* e)
   Superclass::showEvent(e);
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::hideEvent(QHideEvent* e)
 {
   pqApplicationCore* core = pqApplicationCore::instance();
@@ -341,31 +354,35 @@ void pqOutputWindow::hideEvent(QHideEvent* e)
   Superclass::hideEvent(e);
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::setConsoleView(int on)
 {
   Ui::pqOutputWindow& ui = this->Implementation->Ui;
   ui.stackedWidget->setCurrentIndex(on ? 1 : 0);
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::errorToggled(bool checked)
 {
   this->Show[ERROR] = checked;
   this->Implementation->TableModel->ShowMessages(this->Show);
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::warningToggled(bool checked)
 {
   this->Show[WARNING] = checked;
   this->Implementation->TableModel->ShowMessages(this->Show);
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::debugToggled(bool checked)
 {
   this->Show[DEBUG] = checked;
   this->Implementation->TableModel->ShowMessages(this->Show);
 }
 
-
+//-----------------------------------------------------------------------------
 void pqOutputWindow::addMessage(int messageType, const QString& text)
 {
   QString location;
@@ -376,6 +393,7 @@ void pqOutputWindow::addMessage(int messageType, const QString& text)
   this->addMessage(messageType, location.trimmed(), message.trimmed());
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::addPythonMessages(int messageType, const QString& text)
 {
   QList<QString> location;
@@ -393,7 +411,7 @@ void pqOutputWindow::addPythonMessages(int messageType, const QString& text)
     }
 }
 
-
+//-----------------------------------------------------------------------------
 void pqOutputWindow::addMessage(int messageType,
                                 const QString& location, const QString& message)
 {
@@ -419,6 +437,7 @@ void pqOutputWindow::addMessage(int messageType,
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::onProgressStartEvent()
 {
   this->StartEventIndex = this->Implementation->Messages.size();
