@@ -413,7 +413,9 @@ void pqOutputWindow::setupSuppressionExpressions()
     /* Skip DBusMenuExporterPrivate errors. These, I suspect, are due to
      * repeated menu actions in the menus. */
     << "DBusMenuExporterPrivate"
-    << "DBusMenuExporterDBus";
+    << "DBusMenuExporterDBus"
+    /* This error appears in Qt 5.6 on Mac OS X 10.11.1 (and maybe others) */
+    << "QNSView mouseDragged: Internal mouse button tracking invalid";
 }
 
 //-----------------------------------------------------------------------------
