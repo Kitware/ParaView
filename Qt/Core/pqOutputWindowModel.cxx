@@ -78,26 +78,26 @@ pqOutputWindowModel::~pqOutputWindowModel()
 }
 
 //-----------------------------------------------------------------------------
-int pqOutputWindowModel::rowCount(const QModelIndex &_parent) const
+int pqOutputWindowModel::rowCount(const QModelIndex & parent_) const
 {
-  (void)_parent;
+  Q_UNUSED(parent_);
   return this->Rows.size();
 }
 
 //-----------------------------------------------------------------------------
-int pqOutputWindowModel::columnCount(const QModelIndex &_parent) const
+int pqOutputWindowModel::columnCount(const QModelIndex & parent_) const
 {
-  (void)_parent;
+  Q_UNUSED(parent_);
   return NUMBER_OF_COLUMNS;
 }
 
 //-----------------------------------------------------------------------------
-Qt::ItemFlags pqOutputWindowModel::flags(const QModelIndex & _index) const
+Qt::ItemFlags pqOutputWindowModel::flags(const QModelIndex & index_) const
 {
-  int r = _index.row();
+  int r = index_.row();
   Qt::ItemFlags f;
   if (! this->Messages[this->Rows[r]].Location.isEmpty() ||
-      _index.column() != COLUMN_EXPANDED)
+      index_.column() != COLUMN_EXPANDED)
     {
     f |= Qt::ItemIsEnabled;
     }
@@ -105,9 +105,9 @@ Qt::ItemFlags pqOutputWindowModel::flags(const QModelIndex & _index) const
 }
 
 //-----------------------------------------------------------------------------
-QVariant pqOutputWindowModel::data(const QModelIndex &_index, int role) const
+QVariant pqOutputWindowModel::data(const QModelIndex & index_, int role) const
 {
-  int r = _index.row();
+  int r = index_.row();
   switch(role)
     {
     case Qt::DisplayRole:
@@ -116,14 +116,14 @@ QVariant pqOutputWindowModel::data(const QModelIndex &_index, int role) const
           this->Rows[r] == this->Rows[r - EXPANDED_ROW_EXTRA])
         {
         // row expansion.
-        return (_index.column() == COLUMN_MESSAGE) ? 
+        return (index_.column() == COLUMN_MESSAGE) ? 
           this->Messages[this->Rows[r]].Location :
           QVariant();
         }
       else
         {
         // regular row (not an expansion)
-        switch (_index.column())
+        switch (index_.column())
           {
           case COLUMN_EXPANDED:
             return this->Messages[this->Rows[r]].Location.isEmpty() ? 
@@ -144,7 +144,7 @@ QVariant pqOutputWindowModel::data(const QModelIndex &_index, int role) const
       }
     case Qt::TextAlignmentRole:
       {      
-      if (_index.column() == COLUMN_COUNT)
+      if (index_.column() == COLUMN_COUNT)
         {
         return Qt::AlignCenter;
         }
@@ -154,7 +154,7 @@ QVariant pqOutputWindowModel::data(const QModelIndex &_index, int role) const
       {
       if ((r - EXPANDED_ROW_EXTRA < 0 ||
            this->Rows[r] != this->Rows[r - EXPANDED_ROW_EXTRA]) &&
-          (_index.column() == COLUMN_TYPE))
+          (index_.column() == COLUMN_TYPE))
         {
         return this->Internals->Icons[this->Messages[this->Rows[r]].Type];
         }
@@ -166,17 +166,17 @@ QVariant pqOutputWindowModel::data(const QModelIndex &_index, int role) const
 }
 
 //-----------------------------------------------------------------------------
-bool pqOutputWindowModel::setData(const QModelIndex & _index, 
+bool pqOutputWindowModel::setData(const QModelIndex & index_,
                                   const QVariant & value, int role)
 {
-  int r = _index.row();  
+  int r = index_.row();  
   if (role == Qt::EditRole)
     {
       if (r - EXPANDED_ROW_EXTRA < 0 ||
           this->Rows[r] != this->Rows[r - EXPANDED_ROW_EXTRA])
         {
         // regular row (not an expansion)
-        if (_index.column() == COLUMN_EXPANDED)
+        if (index_.column() == COLUMN_EXPANDED)
           {
           switch (value.toInt())
             {
