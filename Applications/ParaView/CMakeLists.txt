@@ -75,11 +75,15 @@ endif()
 # ParaView itself needs vtkPVStaticPluginsInit as well.
 set(SUPPORT_STATIC_PLUGINS TRUE)
 
+set(title "ParaView ${PARAVIEW_VERSION_FULL} ${PARAVIEW_BUILD_ARCHITECTURE}-bit")
+if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
+  set(title "${title} (Legacy Rendering Backend)")
+endif()
 #------------------------------------------------------------------------------
 # Build the client
 build_paraview_client(paraview
     APPLICATION_NAME "ParaView"
-    TITLE "ParaView ${PARAVIEW_VERSION_FULL} ${PARAVIEW_BUILD_ARCHITECTURE}-bit"
+    TITLE ${title}
     ORGANIZATION  "ParaView"
     VERSION_MAJOR ${PARAVIEW_VERSION_MAJOR}
     VERSION_MINOR ${PARAVIEW_VERSION_MINOR}
