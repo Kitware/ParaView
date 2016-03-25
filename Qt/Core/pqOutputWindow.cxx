@@ -114,8 +114,9 @@ struct pqOutputWindow::pqImplementation
     this->TableModel = new pqOutputWindowModel(parent, Messages);
   }
 
-  Ui::pqOutputWindow Ui;
-  QList<MessageT> Messages;
+  Ui::pqOutputWindow   Ui;
+  QStringList          SuppressionExpressions;
+  QList<MessageT>      Messages;
   pqOutputWindowModel* TableModel;
 };
 
@@ -127,6 +128,8 @@ pqOutputWindow::pqOutputWindow(QWidget* Parent) :
   StartEventIndex(0),
   Implementation(new pqImplementation(this))
 {
+  this->setupSuppressionExpressions();
+
   for (int i = 0; i < MESSAGE_TYPE_COUNT; ++i)
     {
     this->Show[i] = true;
@@ -172,12 +175,19 @@ pqOutputWindow::pqOutputWindow(QWidget* Parent) :
   ui.tableView->setModel(this->Implementation->TableModel);
 }
 
+//-----------------------------------------------------------------------------
 pqOutputWindow::~pqOutputWindow()
 {
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::onDisplayTextInWindow(const QString& text)
 {
+  if (this->shouldMessageBeSuppressed(text))
+    {
+    return;
+    }
+
   Ui::pqOutputWindow& ui = this->Implementation->Ui;
   QTextCharFormat format = ui.consoleWidget->getFormat();
   format.setForeground(Qt::darkGreen);
@@ -191,8 +201,14 @@ void pqOutputWindow::onDisplayTextInWindow(const QString& text)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::onDisplayErrorTextInWindow(const QString& text)
 {
+  if (this->shouldMessageBeSuppressed(text))
+    {
+    return;
+    }
+
   Ui::pqOutputWindow& ui = this->Implementation->Ui;
   QTextCharFormat format = ui.consoleWidget->getFormat();
   format.setForeground(Qt::darkRed);
@@ -207,8 +223,14 @@ void pqOutputWindow::onDisplayErrorTextInWindow(const QString& text)
 
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::onDisplayText(const QString& text)
 {
+  if (this->shouldMessageBeSuppressed(text))
+    {
+    return;
+    }
+
   Ui::pqOutputWindow& ui = this->Implementation->Ui;
   QTextCharFormat format = ui.consoleWidget->getFormat();
   format.setForeground(Qt::darkGreen);
@@ -224,22 +246,16 @@ void pqOutputWindow::onDisplayText(const QString& text)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::onDisplayWarningText(const QString& text)
 {
   Ui::pqOutputWindow& ui = this->Implementation->Ui;
-  if (
-    text.contains("QEventDispatcherUNIX::unregisterTimer", Qt::CaseSensitive) ||
-    text.contains("looking for 'HistogramView") ||
-    text.contains("(looking for 'XYPlot") ||
-    text.contains("Unrecognised OpenGL version") ||
-    /* Skip DBusMenuExporterPrivate errors. These, I suspect, are due to
-     * repeated menu actions in the menus. */
-    text.contains("DBusMenuExporterPrivate") ||
-    text.contains("DBusMenuExporterDBus")
-    )
+
+  if (this->shouldMessageBeSuppressed(text))
     {
     return;
     }
+
   QTextCharFormat format = ui.consoleWidget->getFormat();
   format.setForeground(Qt::black);
   format.clearBackground();
@@ -255,8 +271,14 @@ void pqOutputWindow::onDisplayWarningText(const QString& text)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::onDisplayGenericWarningText(const QString& text)
 {
+  if (this->shouldMessageBeSuppressed(text))
+    {
+    return;
+    }
+
   Ui::pqOutputWindow& ui = this->Implementation->Ui;
   QTextCharFormat format = ui.consoleWidget->getFormat();
   format.setForeground(Qt::black);
@@ -273,8 +295,14 @@ void pqOutputWindow::onDisplayGenericWarningText(const QString& text)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::onDisplayErrorText(const QString& text)
 {
+  if (this->shouldMessageBeSuppressed(text))
+    {
+    return;
+    }
+
   Ui::pqOutputWindow& ui = this->Implementation->Ui;
   if (
     text.contains("Unrecognised OpenGL version") ||
@@ -301,18 +329,21 @@ void pqOutputWindow::onDisplayErrorText(const QString& text)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::accept()
 {
   this->hide();
   Superclass::accept();
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::reject()
 {
   this->hide();
   Superclass::reject();
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::clear()
 {
   Ui::pqOutputWindow& ui = this->Implementation->Ui;
@@ -321,6 +352,7 @@ void pqOutputWindow::clear()
   this->Implementation->TableModel->clear();
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::showEvent(QShowEvent* e)
 {
   pqApplicationCore* core = pqApplicationCore::instance();
@@ -331,6 +363,7 @@ void pqOutputWindow::showEvent(QShowEvent* e)
   Superclass::showEvent(e);
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::hideEvent(QHideEvent* e)
 {
   pqApplicationCore* core = pqApplicationCore::instance();
@@ -341,31 +374,66 @@ void pqOutputWindow::hideEvent(QHideEvent* e)
   Superclass::hideEvent(e);
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::setConsoleView(int on)
 {
   Ui::pqOutputWindow& ui = this->Implementation->Ui;
   ui.stackedWidget->setCurrentIndex(on ? 1 : 0);
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::errorToggled(bool checked)
 {
   this->Show[ERROR] = checked;
   this->Implementation->TableModel->ShowMessages(this->Show);
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::warningToggled(bool checked)
 {
   this->Show[WARNING] = checked;
   this->Implementation->TableModel->ShowMessages(this->Show);
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::debugToggled(bool checked)
 {
   this->Show[DEBUG] = checked;
   this->Implementation->TableModel->ShowMessages(this->Show);
 }
 
+//-----------------------------------------------------------------------------
+void pqOutputWindow::setupSuppressionExpressions()
+{
+  this->Implementation->SuppressionExpressions
+    << "QEventDispatcherUNIX::unregisterTimer"
+    << "looking for 'HistogramView"
+    << "(looking for 'XYPlot"
+    << "Unrecognised OpenGL version"
+    /* Skip DBusMenuExporterPrivate errors. These, I suspect, are due to
+     * repeated menu actions in the menus. */
+    << "DBusMenuExporterPrivate"
+    << "DBusMenuExporterDBus"
+    /* This error appears in Qt 5.6 on Mac OS X 10.11.1 (and maybe others) */
+    << "QNSView mouseDragged: Internal mouse button tracking invalid";
+}
 
+//-----------------------------------------------------------------------------
+bool pqOutputWindow::shouldMessageBeSuppressed(const QString& text)
+{
+  // See if message should be supressed
+  for (int i = 0; i < this->Implementation->SuppressionExpressions.size(); ++i)
+    {
+    if (text.contains(this->Implementation->SuppressionExpressions[i]))
+      {
+      return true;
+      }
+    }
+
+  return false;
+}
+
+//-----------------------------------------------------------------------------
 void pqOutputWindow::addMessage(int messageType, const QString& text)
 {
   QString location;
@@ -376,6 +444,7 @@ void pqOutputWindow::addMessage(int messageType, const QString& text)
   this->addMessage(messageType, location.trimmed(), message.trimmed());
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::addPythonMessages(int messageType, const QString& text)
 {
   QList<QString> location;
@@ -393,7 +462,7 @@ void pqOutputWindow::addPythonMessages(int messageType, const QString& text)
     }
 }
 
-
+//-----------------------------------------------------------------------------
 void pqOutputWindow::addMessage(int messageType,
                                 const QString& location, const QString& message)
 {
@@ -419,6 +488,7 @@ void pqOutputWindow::addMessage(int messageType,
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindow::onProgressStartEvent()
 {
   this->StartEventIndex = this->Implementation->Messages.size();

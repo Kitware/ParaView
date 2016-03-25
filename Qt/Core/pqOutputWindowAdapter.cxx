@@ -34,22 +34,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkObjectFactory.h>
 
+//-----------------------------------------------------------------------------
 vtkStandardNewMacro(pqOutputWindowAdapter);
 
+//-----------------------------------------------------------------------------
 pqOutputWindowAdapter::pqOutputWindowAdapter()
 {
   this->Active=true;
 }
 
+//-----------------------------------------------------------------------------
 pqOutputWindowAdapter::~pqOutputWindowAdapter()
 {
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindowAdapter::setActive(bool active)
 {
   this->Active=active;
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindowAdapter::DisplayTextInWindow(const QString& text)
 {
   if (this->Active)
@@ -58,6 +63,7 @@ void pqOutputWindowAdapter::DisplayTextInWindow(const QString& text)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindowAdapter::DisplayErrorTextInWindow(const QString& text)
 {
   if (this->Active)
@@ -66,6 +72,7 @@ void pqOutputWindowAdapter::DisplayErrorTextInWindow(const QString& text)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindowAdapter::DisplayText(const char* text)
 {
   if(this->Active)
@@ -74,6 +81,7 @@ void pqOutputWindowAdapter::DisplayText(const char* text)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindowAdapter::DisplayErrorText(const char* text)
 {
   if(this->Active)
@@ -82,6 +90,7 @@ void pqOutputWindowAdapter::DisplayErrorText(const char* text)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindowAdapter::DisplayWarningText(const char* text)
 {
   if(this->Active)
@@ -90,6 +99,7 @@ void pqOutputWindowAdapter::DisplayWarningText(const char* text)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqOutputWindowAdapter::DisplayGenericWarningText(const char* text)
 {
   if(this->Active)

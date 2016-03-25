@@ -68,14 +68,19 @@ public:
 signals:
   /// Signal emitted by VTK messages
   void displayText(const QString&);
+
   /// Signal emitted by VTK error messages
   void displayErrorText(const QString&);
+
   /// Signal emitted by VTK warning messages
   void displayWarningText(const QString&);
+
   /// Signal emitted by VTK warning messages
   void displayGenericWarningText(const QString&);
+
   /// Signal emitted by Python messages
   void displayTextInWindow(const QString&);
+
   /// Signal emitted by Python errors.
   void displayErrorTextInWindow(const QString&);
 
