@@ -30,7 +30,6 @@ Do that like so:
           been tried since before 3.9's view restructuring
 """
 
-import time
 import sys
 from paraview.simple import *
 
@@ -601,6 +600,7 @@ def parse_logs(show_parse = False, tabular = False) :
     return timersummary
 
 def __render(ss, v, title, nframes):
+    import time
     print '============================================================'
     print title
     res = []
