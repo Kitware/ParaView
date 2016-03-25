@@ -1,4 +1,4 @@
-import paraview.benchmark as bm
+from . import logbase
 import math
 import sys
 import re
@@ -130,11 +130,11 @@ def process_logs(merge_before_nframes=0):
     Keyword arguments:
     merge_before_nframes -- All entries before this many frames will be merged
     '''
-    bm.get_logs()
+    logbase.get_logs()
 
     # We can't guarantee the order the logs will be iterated in
-    all_frames = [None] * len(bm.logs)
-    for log in bm.logs:
+    all_frames = [None] * len(logbase.logs)
+    for log in logbase.logs:
         all_frames[log.rank] = _parse_a_log(log, merge_before_nframes)
     return all_frames
 
@@ -222,34 +222,33 @@ class BasicStats:
         return 'Count: %(count)d, Mean: %(mean)f, StdDev: %(stddev)f, Min: %(min)f, Max: %(max)f' % {'count': self.N, 'min': self.Min, 'max': self.Max, 'mean': self.Mean, 'stddev': self.StdDev}
 
 
-def _collect_duration_stats(logs):
-    '''Copmpute statistics Group a set of logs as a list of durrations'''
+def _collect_stats(logs, stat_summary):
+    '''Compute statistics Group a set of logs as a list of durrations'''
     stats = []
     for l in logs:
         if isinstance(l, dict):
             b = BasicStats(l['Duration'])
-            stats.append({'Id': l['Id'], 'Name': l['Name'], 'Stats': b, 'Duration': b.Mean})
+            stats.append({'Id': l['Id'], 'Name': l['Name'], 'Stats': b, 'Duration': getattr(b, stat_summary)})
         else:
             assert isinstance(l, list)
-            stats.append(_collect_duration_stats(l))
+            stats.append(_collect_stats(l, stat_summary))
     return stats
 
 
-def collect_duration_stats(frame_logs):
-    '''Collect statistics on the 'Duration' key in a set of logs'''
+def collect_stats(frame_logs, stat_summary='Mean'):
+    '''Collect statistics on the specified key in a set of logs'''
     if isinstance(frame_logs[0], FrameLog):
         frame_logs = [x.Logs for x in frame_logs]
     log_collection = _init_log_collection(frame_logs[0])
     for f in frame_logs[1:]:
-        assert len(log_collection) == len(f)
         for log_collection_entry, l in zip(log_collection, f):
             _append_log_collection(log_collection_entry, l)
-    return _collect_duration_stats(log_collection)
+    return _collect_stats(log_collection, stat_summary)
 
 
 def process_stats_across_ranks(rank_frame_logs):
     '''Calculate stats across all ranks for each frame'''
-    return [collect_duration_stats([rank_frame_logs[r][f] for r in range(0, len(rank_frame_logs))]) for f in range(1, len(rank_frame_logs[0]))]
+    return [collect_stats([rank_frame_logs[r][f] for r in range(0, len(rank_frame_logs))], 'Max') for f in range(1, len(rank_frame_logs[0]))]
 
 
 def summarize_all_logs(rank_frame_logs):
@@ -257,7 +256,7 @@ def summarize_all_logs(rank_frame_logs):
     try:
         frame_stats = process_stats_across_ranks(rank_frame_logs)
         try:
-            summary_stats = collect_duration_stats(frame_stats)
+            summary_stats = collect_stats(frame_stats)
         except:
             return frame_stats, None
     except:
