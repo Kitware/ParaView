@@ -284,7 +284,7 @@ int vtkSMBoundsDomain::ReadXMLAttributes(
       this->Mode = vtkSMBoundsDomain::SCALED_EXTENT;
       if (!has_default_mode)
         {
-        this->DefaultMode = vtkSMDoubleRangeDomain::MAX;
+        this->DefaultDefaultMode = vtkSMDoubleRangeDomain::MAX;
         }
       }
     else if (strcmp(mode, "approximate_cell_length") == 0)
