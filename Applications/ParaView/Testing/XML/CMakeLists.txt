@@ -262,6 +262,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/PlotOverTimeAutoApply.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PolygonCellSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PolygonPointSelection.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/PointInterpolator.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ProbePicking.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion1.xml
@@ -388,6 +389,10 @@ if (PARAVIEW_USE_MPI)
     )
     set(CGNSReader-5blocks_cgns_DISABLE_CRS TRUE)
   endif()
+
+  # PointInterpolator only works in non-distributed modes.
+  set(PointInterpolator_DISABLE_CRS TRUE)
+  set(PointInterpolator_DISABLE_CS TRUE)
 endif()
 if(PARAVIEW_ENABLE_PYTHON)
   list(APPEND TESTS_WITH_BASELINES
