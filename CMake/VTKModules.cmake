@@ -349,6 +349,9 @@ set(_vtk_modules
 
   vtkPVAnimation
   # Needed for animation support.
+
+  vtkPVVTKExtensionsPoints
+  # Needed for SPH filters.
   )
 
 if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")

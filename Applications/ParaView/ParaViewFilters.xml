@@ -118,6 +118,11 @@
     <Proxy group="filters" name="EnvironmentAnnotation" />
   </Category>
 
+  <Category name="Point Interpolation" menu_label="Point Interpolation">
+    <Proxy group="filters" name="PointInterpolator" />
+    <Proxy group="filters" name="SPHInterpolator" />
+  </Category>
+
   <Proxy group="filters" name="AddFieldArrays" />
   <Proxy group="filters" name="ImageDataToAMR" />
   <Proxy group="filters" name="UniformGridPartitioner" />

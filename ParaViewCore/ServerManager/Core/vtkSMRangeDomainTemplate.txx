@@ -21,13 +21,14 @@
 #include "vtkSMUncheckedPropertyHelper.h"
 #include "vtkSMVectorProperty.h"
 
+#include <vtksys/SystemTools.hxx>
 #include <assert.h>
 
 //-----------------------------------------------------------------------------
 template <class T>
 vtkSMRangeDomainTemplate<T>::vtkSMRangeDomainTemplate()
 {
-  this->DefaultMode = MID;
+  this->DefaultDefaultMode = MID;
 }
 
 //-----------------------------------------------------------------------------
@@ -213,20 +214,35 @@ int vtkSMRangeDomainTemplate<T>::ReadXMLAttributes(
   const char* default_mode = element->GetAttribute("default_mode");
   if (default_mode)
     {
-    if (strcmp(default_mode, "min") == 0)
+    typedef std::vector<vtksys::String> VStrings;
+    const VStrings modes = vtksys::SystemTools::SplitString(default_mode, ',');
+
+    this->DefaultModeVector.clear();
+    for (VStrings::const_iterator iter = modes.begin(); iter != modes.end(); ++iter)
       {
-      this->DefaultMode = MIN;
-      }
-    else if (strcmp(default_mode, "max") == 0)
-      {
-      this->DefaultMode = MAX;
-      }
-    if (strcmp(default_mode, "mid") == 0)
-      {
-      this->DefaultMode = MID;
+      if (*iter == "min")
+        {
+        this->DefaultModeVector.push_back(MIN);
+        this->DefaultDefaultMode = MIN;
+        }
+      else if (*iter == "max")
+        {
+        this->DefaultModeVector.push_back(MAX);
+        this->DefaultDefaultMode = MAX;
+        }
+      else if (iter->empty() || (*iter == "mid"))
+        {
+        this->DefaultModeVector.push_back(MID);
+        this->DefaultDefaultMode = MID;
+        }
+      else
+        {
+        vtkWarningMacro("Invalid 'default_mode': " << iter->c_str() << ". 'mid' assumed.");
+        this->DefaultModeVector.push_back(MID);
+        this->DefaultDefaultMode = MID;
+        }
       }
     }
-
   this->SetEntries(new_entries);
   return 1;
 }
@@ -314,17 +330,19 @@ bool vtkSMRangeDomainTemplate<T>::GetComputedDefaultValue(unsigned int index, T&
   min = this->GetMinimum(index, minExists);
   max = this->GetMaximum(index, maxExists);
 
-  if ( (minExists && !maxExists) || this->DefaultMode == MIN)
+  DefaultModes defaultMode = this->GetDefaultMode(index);
+
+  if ( (minExists && !maxExists) || defaultMode == MIN)
     {
     value = min;
     return minExists != 0;
     }
-  else if ( (maxExists && !minExists) || this->DefaultMode == MAX)
+  else if ( (maxExists && !minExists) || defaultMode == MAX)
     {
     value = max;
     return maxExists != 0;
     }
-  else if (minExists && maxExists && this->DefaultMode == MID)
+  else if (minExists && maxExists && defaultMode == MID)
     {
     value = (min + max) / 2;
     return true;
@@ -335,9 +353,11 @@ bool vtkSMRangeDomainTemplate<T>::GetComputedDefaultValue(unsigned int index, T&
 
 //-----------------------------------------------------------------------------
 template <class T>
-int vtkSMRangeDomainTemplate<T>::GetDefaultMode()
+typename vtkSMRangeDomainTemplate<T>::DefaultModes
+vtkSMRangeDomainTemplate<T>::GetDefaultMode(unsigned int index)
 {
-  return this->DefaultMode;
+  return (index < static_cast<unsigned int>(this->DefaultModeVector.size()))?
+    this->DefaultModeVector[index] : this->DefaultDefaultMode;
 }
 
 //-----------------------------------------------------------------------------
@@ -345,6 +365,23 @@ template <class T>
 void vtkSMRangeDomainTemplate<T>::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "DefaultMode: " << this->GetDefaultMode() << endl;
+  os << indent << "DefaultMode: ";
+  for (typename std::vector<DefaultModes>::const_iterator iter=this->DefaultModeVector.begin();
+    iter != this->DefaultModeVector.end(); ++iter)
+    {
+    switch (*iter)
+      {
+    case MIN:
+      os << "min,";
+      break;
+    case MAX:
+      os << "max,";
+      break;
+    case MID:
+      os << "mid,";
+      break;
+      }
+    }
+  os << endl;
 }
 #endif
