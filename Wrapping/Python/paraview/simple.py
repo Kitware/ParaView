@@ -37,7 +37,6 @@ A simple example::
 
 import paraview
 import servermanager
-import lookuptable
 
 # Bring OutputPort in our namespace.
 from servermanager import OutputPort
@@ -1045,6 +1044,7 @@ def _GetLUTReaderInstance():
     it if needed."""
     global _lutReader
     if _lutReader is None:
+      import lookuptable
       _lutReader = lookuptable.vtkPVLUTReader()
     return _lutReader
 
