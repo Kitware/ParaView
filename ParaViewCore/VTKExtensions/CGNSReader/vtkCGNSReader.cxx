@@ -877,11 +877,17 @@ int vtkCGNSReader::GetCurvilinearZone(int base, int zone,
             continue;
             }
 
+          int arrIndex(-1);
           if ((cgnsVars[nv].isComponent == false) ||
               (cgnsVars[nv].xyzIndex == 1))
             {
-            dsa->AddArray(vtkVars[nv]);
+            arrIndex = dsa->AddArray(vtkVars[nv]);
             vtkVars[nv]->Delete();
+            }   
+          if (arrIndex >= 0 && cgnsVars[nv].isComponent && cgnsVars[nv].xyzIndex == 1)
+            {
+            vtkDataArray* arr = dsa->GetArray(arrIndex);
+            dsa->SetVectors(arr);
             }
           vtkVars[nv] = 0;
           }
@@ -1069,11 +1075,17 @@ int vtkCGNSReader::GetCurvilinearZone(int base, int zone,
             continue;
             }
 
+          int arrIndex(-1);
           if ((cgnsVars[nv].isComponent == false) ||
               (cgnsVars[nv].xyzIndex == 1))
             {
-            dsa->AddArray(vtkVars[nv]);
+            arrIndex = dsa->AddArray(vtkVars[nv]);
             vtkVars[nv]->Delete();
+            }
+          if (arrIndex >= 0 && cgnsVars[nv].isComponent && cgnsVars[nv].xyzIndex == 1)
+            {
+            vtkDataArray* arr = dsa->GetArray(arrIndex);
+            dsa->SetVectors(arr);
             }
           vtkVars[nv] = 0;
           }
@@ -1252,13 +1264,20 @@ int vtkCGNSReader::GetCurvilinearZone(int base, int zone,
             continue;
             }
 
+          int arrIndex(-1);
           if ((cgnsVars[nv].isComponent == false) ||
               (cgnsVars[nv].xyzIndex == 1))
             {
-            dsa->AddArray(vtkVars[nv]);
+            arrIndex = dsa->AddArray(vtkVars[nv]);
             vtkVars[nv]->Delete();
             }
           vtkVars[nv] = 0;
+          
+          if (arrIndex >= 0 && cgnsVars[nv].isComponent && cgnsVars[nv].xyzIndex == 1)
+            {
+            vtkDataArray* arr = dsa->GetArray(arrIndex);
+            dsa->SetVectors(arr);
+            }
           }
         }
       cgio_release_id(cgioNum, zoneChildId[nn]);
@@ -2121,11 +2140,17 @@ int vtkCGNSReader::GetUnstructuredZone(int base, int zone,
         continue;
         }
 
+      int arrIndex(-1);
       if ((cgnsVars[nv].isComponent == false) ||
           (cgnsVars[nv].xyzIndex == 1))
         {
-        dsa->AddArray(vtkVars[nv]);
+        arrIndex = dsa->AddArray(vtkVars[nv]);
         vtkVars[nv]->Delete();
+        }
+      if (arrIndex >= 0 && cgnsVars[nv].isComponent && cgnsVars[nv].xyzIndex == 1)
+        {
+        vtkDataArray* arr = dsa->GetArray(arrIndex);
+        dsa->SetVectors(arr);
         }
       vtkVars[nv] = 0;
       }
