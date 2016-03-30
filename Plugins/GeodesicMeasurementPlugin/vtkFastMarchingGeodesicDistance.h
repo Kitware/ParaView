@@ -33,7 +33,7 @@
 // .SECTION Inputs and Outputs
 // The input to the filter must be a triangle mesh. The output is the same mesh
 // with a point data attribute capturing the distance field from the user
-// specified seed(s) via SetSeedList.
+// specified seed(s) via SetSeedList or SetSeedsFromNonZeroField.
 //
 // .SECTION Termination Criteria
 // The fast marching may be prematurely terminated via any of the optional
@@ -161,7 +161,10 @@ protected:
   virtual int Compute();
 
   // Add the seeds
-  virtual void AddSeeds();
+  virtual void AddSeedsInternal();
+
+  // Add the seeds based on the non-zero values of a nonZeroField
+  void SetSeedsFromNonZeroField( vtkDataArray* nonZeroField );
 
   // Copy the resulting distance field from GeoMesh into the float array
   void CopyDistanceField( vtkPolyData *pd );
