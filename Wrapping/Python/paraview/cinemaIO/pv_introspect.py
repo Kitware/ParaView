@@ -245,42 +245,85 @@ def filter_has_parameters(name):
                      paraview.simple.servermanager.filters.Slice,
                      paraview.simple.servermanager.filters.Contour]))
 
-def add_control_and_colors(name, cs):
+def add_control_and_colors(name, cs, arrayNames):
     source = paraview.simple.FindSource(name)
     #make up list of color options
     fields = {'depth':'depth','luminance':'luminance'}
     ranges = {}
-    defaultName = None
     view_proxy = paraview.simple.GetActiveView()
     rep = paraview.simple.GetRepresentation(source, view_proxy)
+
+    # select value arrays
     if rep.Representation != 'Outline':
-        cda = source.GetCellDataInformation()
-        for a in range(0, cda.GetNumberOfArrays()):
-            arr = cda.GetArray(a)
-            arrName = arr.GetName()
-            if not arrName == "Normals":
-                for i in range(0, arr.GetNumberOfComponents()):
-                    fName = arrName+"_"+str(i)
-                    fields[fName] = 'value'
-                    ranges[fName] = arr.GetRange(i)
-                    if defaultName == None:
-                        defaultName = fName
-        pda = source.GetPointDataInformation()
-        for a in range(0, pda.GetNumberOfArrays()):
-            arr = pda.GetArray(a)
-            arrName = arr.GetName()
-            if not arrName == "Normals":
-                for i in range(0, arr.GetNumberOfComponents()):
-                    fName = arrName+"_"+str(i)
-                    fields[fName] = 'value'
-                    ranges[fName] = arr.GetRange(i)
-                    if defaultName == None:
-                        defaultName = fName
+        if len(arrayNames) == 0:
+            defaultName = add_default_array_selection(source, fields, ranges)
+        else:
+            defaultName = add_customized_array_selection(name, source, fields, ranges, arrayNames)
+
     if defaultName == None:
         fields['white']='rgb'
         defaultName='white'
+
     cparam = cinema_store.make_field("color"+name, fields, default=defaultName, valueRanges=ranges)
     cs.add_field("color"+name,cparam,'vis',[name])
+
+def add_customized_array_selection(sourceName, source, fields, ranges, arrayNames):
+
+    isArrayNotSelected = lambda sName, aName, arrays: (sName not in arrays) or \
+      (aName not in arrays[sName])
+    defaultName = None
+    cda = source.GetCellDataInformation()
+
+    for a in range(0, cda.GetNumberOfArrays()):
+        arr = cda.GetArray(a)
+        arrName = arr.GetName()
+
+        if isArrayNotSelected(sourceName, arrName, arrayNames): continue
+        for i in range(0, arr.GetNumberOfComponents()):
+            fName = arrName+"_"+str(i)
+            fields[fName] = 'value'
+            ranges[fName] = arr.GetRange(i)
+            if defaultName == None:
+                defaultName = fName
+    pda = source.GetPointDataInformation()
+    for a in range(0, pda.GetNumberOfArrays()):
+        arr = pda.GetArray(a)
+        arrName = arr.GetName()
+
+        if isArrayNotSelected(sourceName, arrName, arrayNames): continue
+        for i in range(0, arr.GetNumberOfComponents()):
+            fName = arrName+"_"+str(i)
+            fields[fName] = 'value'
+            ranges[fName] = arr.GetRange(i)
+            if defaultName == None:
+                defaultName = fName
+    return defaultName
+
+def add_default_array_selection(source, fields, ranges):
+    defaultName = None
+    cda = source.GetCellDataInformation()
+    for a in range(0, cda.GetNumberOfArrays()):
+        arr = cda.GetArray(a)
+        arrName = arr.GetName()
+        if not arrName == "Normals":
+            for i in range(0, arr.GetNumberOfComponents()):
+                fName = arrName+"_"+str(i)
+                fields[fName] = 'value'
+                ranges[fName] = arr.GetRange(i)
+                if defaultName == None:
+                    defaultName = fName
+    pda = source.GetPointDataInformation()
+    for a in range(0, pda.GetNumberOfArrays()):
+        arr = pda.GetArray(a)
+        arrName = arr.GetName()
+        if not arrName == "Normals":
+            for i in range(0, arr.GetNumberOfComponents()):
+                fName = arrName+"_"+str(i)
+                fields[fName] = 'value'
+                ranges[fName] = arr.GetRange(i)
+                if defaultName == None:
+                    defaultName = fName
+    return defaultName
 
 def make_cinema_store(proxies, ocsfname, forcetime=False, _userDefinedValues={}):
     """
@@ -333,7 +376,8 @@ def make_cinema_store(proxies, ocsfname, forcetime=False, _userDefinedValues={})
                 repeat = True
         dependency_list = [proxy['name'] for proxy in proxies if proxy['id'] in dependency_set]
         cs.assign_parameter_dependence(proxy_name,'vis',dependency_list)
-        add_control_and_colors(proxy_name,cs)
+        arrNames = _userDefinedValues['arraySelection'] if ('arraySelection' in _userDefinedValues) else {}
+        add_control_and_colors(proxy_name, cs, arrNames)
         cs.assign_parameter_dependence("color"+proxy_name,'vis',[proxy_name])
 
     fnp = ""
@@ -386,7 +430,7 @@ def testexplore(cs):
     e.explore()
 
 
-def explore(cs, proxies, iSave=True, currentTime=None):
+def explore(cs, proxies, iSave=True, currentTime=None, arrayNames = {}):
     """
     Takes in the store, which contains only the list of parameters,
     """
@@ -442,31 +486,13 @@ def explore(cs, proxies, iSave=True, currentTime=None):
                 cC.AddDepth('depth')
                 cC.AddLuminance('luminance')
                 sp.UpdatePipeline(ctime_float)
-                cda = sp.GetCellDataInformation()
 
-                numVals = 0
                 if rep.Representation != 'Outline':
-                    for a in range(0, cda.GetNumberOfArrays()):
-                        arr = cda.GetArray(a)
-                        arrName = arr.GetName()
-                        if not arrName == "Normals":
-                            for i in range(0,arr.GetNumberOfComponents()):
-                                numVals+=1
-                                cC.AddValueRender(arrName+"_"+str(i),
-                                                True,
-                                                arrName,
-                                                i, arr.GetRange(i))
-                    pda = sp.GetPointDataInformation()
-                    for a in range(0, pda.GetNumberOfArrays()):
-                        arr = pda.GetArray(a)
-                        arrName = arr.GetName()
-                        if not arrName == "Normals":
-                            for i in range(0,arr.GetNumberOfComponents()):
-                                numVals+=1
-                                cC.AddValueRender(arrName+"_"+str(i),
-                                                False,
-                                                arrName,
-                                                i, arr.GetRange(i))
+                    if len(arrayNames) == 0:
+                        numVals = explore_default_array_selection(sp, cC)
+                    else:
+                        numVals = explore_customized_array_selection(name, sp, cC, arrayNames)
+
                 if numVals == 0:
                     cC.AddSolidColor('white', [1,1,1])
                 col = pv_explorers.Color("color"+name, cC, rep)
@@ -488,6 +514,63 @@ def explore(cs, proxies, iSave=True, currentTime=None):
         for t in times:
             view_proxy.ViewTime=t
             e.explore({'time':float_limiter(t)})
+
+def explore_default_array_selection(source, colorList):
+    numVals = 0
+    cda = source.GetCellDataInformation()
+    for a in range(0, cda.GetNumberOfArrays()):
+        arr = cda.GetArray(a)
+        arrName = arr.GetName()
+        if not arrName == "Normals":
+            for i in range(0,arr.GetNumberOfComponents()):
+                numVals+=1
+                colorList.AddValueRender(arrName+"_"+str(i),
+                                True,
+                                arrName,
+                                i, arr.GetRange(i))
+    pda = source.GetPointDataInformation()
+    for a in range(0, pda.GetNumberOfArrays()):
+        arr = pda.GetArray(a)
+        arrName = arr.GetName()
+        if not arrName == "Normals":
+            for i in range(0,arr.GetNumberOfComponents()):
+                numVals+=1
+                colorList.AddValueRender(arrName+"_"+str(i),
+                                False,
+                                arrName,
+                                i, arr.GetRange(i))
+    return numVals
+
+def explore_customized_array_selection(sourceName, source, colorList, arrayNames):
+    isArrayNotSelected = lambda sName, aName, arrays: (sName not in arrays) or \
+      (aName not in arrays[sName])
+    numVals = 0
+    cda = source.GetCellDataInformation()
+
+    for a in range(0, cda.GetNumberOfArrays()):
+        arr = cda.GetArray(a)
+        arrName = arr.GetName()
+
+        if isArrayNotSelected(sourceName, arrName, arrayNames): continue
+        for i in range(0,arr.GetNumberOfComponents()):
+            numVals+=1
+            colorList.AddValueRender(arrName+"_"+str(i),
+                            True,
+                            arrName,
+                            i, arr.GetRange(i))
+    pda = source.GetPointDataInformation()
+    for a in range(0, pda.GetNumberOfArrays()):
+        arr = pda.GetArray(a)
+        arrName = arr.GetName()
+
+        if isArrayNotSelected(sourceName, arrName, arrayNames): continue
+        for i in range(0,arr.GetNumberOfComponents()):
+            numVals+=1
+            colorList.AddValueRender(arrName+"_"+str(i),
+                            False,
+                            arrName,
+                            i, arr.GetRange(i))
+    return numVals
 
 def record(csname="/tmp/test_pv/info.json"):
     paraview.simple.Render()
@@ -530,10 +613,7 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
     Note:  baseDirName is used as the parent directory of the database generated for
     each view in viewSelection. 'Image filename' is used as the database directory name.
     '''
-
     import paraview.simple as pvs
-
-    print "->>> export_scene, arrSelection arg: ", arraySelection
 
     # save initial state
     initialView = pvs.GetActiveView()
@@ -577,6 +657,7 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
             userDefValues["phi"] = cinemaParams["phi"]
 
         userDefValues.update(trackSelection)
+        userDefValues.update(arraySelection)
 
         # generate file path
         import os.path
@@ -588,7 +669,8 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
         cs = make_cinema_store(p, filePath, forcetime = False,
           _userDefinedValues = userDefValues)
 
-        explore(cs, p)
+        explore(cs, p, arrayNames = userDefValues['arraySelection'] if
+          ('arraySelection' in userDefValues) else {})
 
         view.LockBounds = 0
         cs.save()
