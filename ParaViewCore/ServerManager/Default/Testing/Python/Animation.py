@@ -22,7 +22,6 @@ RenderView1 = GetRenderView()
 DataRepresentation1 = Show()
 
 RenderView1.CameraPosition = [0.21706008911132812, 4.0, 46.629626614745732]
-RenderView1.CameraClippingRange = [31.543954700099739, 77.288757398167974]
 RenderView1.CameraFocalPoint = [0.21706008911132812, 4.0, -5.1109471321105957]
 RenderView1.CameraParallelScale = 13.391445890217907
 RenderView1.CenterOfRotation = [0.21706008911132812, 4.0, -5.1109471321105957]
@@ -43,7 +42,6 @@ KeyFrame875.KeyTime = 1.0
 RenderView1.CameraViewUp = [0.0, 0.0, 1.0]
 RenderView1.CameraPosition = [0.21706008911132812, 55.740573746856327, -5.1109471321105957]
 RenderView1.CameraFocalPoint = [0.21706008911132812, 4.0, -5.1109471321105957]
-RenderView1.CameraClippingRange = [43.263168009387762, 62.536682353059177]
 
 CameraAnimationCue1.KeyFrames = [ KeyFrame873, KeyFrame875 ]
 

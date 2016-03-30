@@ -302,8 +302,6 @@ void vtkPVComparativeView::Initialize(vtkSMViewProxy* rootView)
   this->Internal->ViewLink->AddException("CameraFocalPoint");
   this->Internal->ViewLink->AddException("CameraViewUpInfo");
   this->Internal->ViewLink->AddException("CameraViewUp");
-  this->Internal->ViewLink->AddException("CameraClippingRangeInfo");
-  this->Internal->ViewLink->AddException("CameraClippingRange");
   this->Internal->ViewLink->AddException("CameraViewAngleInfo");
   this->Internal->ViewLink->AddException("CameraViewAngle");
 

@@ -1,6 +1,16 @@
 API Changes between ParaView versions
 =====================================
 
+Changes in 5.1
+--------------
+
+CameraClippingRange on render view
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+For a few releases, ``CameraClippingRange`` property would not have any effect on a render view.
+Since the clipping range is now managed by the ``vtkPVRenderView`` automatically, the user is not expected
+to set this property any more. This release finally removes this property. To fix any existing Python scripts,
+simply remove any code ``view.CameraClippingRange = ...`` from your script.
+
 Changes in 4.2
 --------------
 

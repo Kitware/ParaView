@@ -658,7 +658,7 @@ class ViewProxyFilter(ProxyFilter):
         # missing something in the design of vtkSMProperties here. We need to
         # reclassify properties to cleanly address all its "roles".
         if prop.get_property_name() in [\
-            "ViewTime", "CacheKey", "Representations", "CameraClippingRange"]: return True
+            "ViewTime", "CacheKey", "Representations"]: return True
         return ProxyFilter.should_never_trace(self, prop, hide_gui_hidden=False)
 
 class AnimationProxyFilter(ProxyFilter):

@@ -2229,14 +2229,6 @@
         <Element index="0" value="0"/>
         <Domain name="range" id="3853.ViewTime.range"/>
       </Property>
-      <Property name="CameraClippingRange" id="3853.CameraClippingRange" number_of_elements="2">
-        <Element index="0" value="0.0106875880973046"/>
-        <Element index="1" value="10.6875880973046"/>
-      </Property>
-      <Property name="CameraClippingRangeInfo" id="3853.CameraClippingRangeInfo" number_of_elements="2">
-        <Element index="0" value="0.0106875880973046"/>
-        <Element index="1" value="10.6875880973046"/>
-      </Property>
       <Property name="CameraFocalPoint" id="3853.CameraFocalPoint" number_of_elements="3">
         <Element index="0" value="17.5211011130289"/>
         <Element index="1" value="3.14623389325244"/>

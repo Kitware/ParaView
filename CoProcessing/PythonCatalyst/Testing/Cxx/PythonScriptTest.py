@@ -34,7 +34,6 @@ def DoCoProcessing(datadescription):
 
   RenderView1.CameraPosition = [5.0, 25.0, 347.53624862725769]
   RenderView1.CameraFocalPoint = [5.0, 25.0, 307.5]
-  RenderView1.CameraClippingRange = [24.710886140985117, 59.424292356666555]
   RenderView1.CameraParallelScale = 13.743685418725535
   DataRepresentation2 = Show()
   DataRepresentation2.ScaleFactor = 1.5
@@ -52,7 +51,6 @@ def DoCoProcessing(datadescription):
   RenderView1.Background=[1,1,1]  #white
   RenderView1.CameraPosition = [5.0, 25.0, 347.53624862725769]
   RenderView1.CameraFocalPoint = [5.0, 25.0, 307.5]
-  RenderView1.CameraClippingRange = [24.710886140985117, 59.424292356666555]
   RenderView1.CameraParallelScale = 13.743685418725535
 
   fname = 'CPPressure' + str(timestep) + '.png'
