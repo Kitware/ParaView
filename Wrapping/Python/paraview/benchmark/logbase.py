@@ -11,39 +11,11 @@ Do that like so:
 
 1. optionally, call maximize logs first
 2. setup and run your visualization pipeline (via GUI or script as you prefer)
-3. either
-      call print_logs() to print out the logs in raw format
-
-      call parse_logs() to let the script identify and report on per frame and per filter execution times
-
-
-::
-
-    WARNING: This was meant for server side rendering, but it could work
-             reasonably well when geometry is delivered to the client and rendered there
-             if the script were changed to recognize MPIMoveData as end of frame and did
-             something sensible on the server which has no other end of frame knowledge
-
-    TODO: builtin mode shouldn't show server info, it is redundant
-    TODO: this doesn't handle split render/data server mode
-    TODO: the end of frame markers are heuristic, likely buggy, and have not
-          been tried since before 3.9's view restructuring
+3. call print_logs() to print out the logs in raw format
 """
 
-import time
-import sys
 from paraview.simple import *
-
-try:
-    import numpy
-    numpy_loaded = True
-except ImportError:
-    numpy_loaded = False
-
-import re
 import paraview
-import copy
-import pickle
 
 start_frame = 0
 default_log_threshold = dict()
@@ -132,6 +104,7 @@ def dump_logs( filename ) :
     raw format, then load them somewhere else. You can then do a detailed
     analysis and you always have the raw data to go back to.
     """
+    import pickle
     global logs
     f = open(filename, "w")
     pickle.dump(logs, f)
@@ -142,6 +115,7 @@ def import_logs( filename ) :
     This is for bringing in a saved log files and parse it after the fact.
     TODO: add an option to load in raw parview logs in text format
     """
+    import pickle
     global logs
     logs = []
     f = open(filename, "r")

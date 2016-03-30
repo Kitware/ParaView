@@ -1,5 +1,4 @@
 import datetime as dt
-
 from paraview import servermanager
 from paraview.simple import *
 from paraview.benchmark import *
@@ -177,8 +176,8 @@ print 'NUMCELLS(', p, ',):', ap.GetOutput().GetNumberOfCells()
         view.CameraViewUp = c.GetViewUp()
         view.CameraViewAngle = c.GetViewAngle()
         Render()
-        flush_render_buffer()
         memtime_stamp()
+    flush_render_buffer()
     fpsT1 = dt.datetime.now()
 
     if controller.GetLocalProcessId() == 0:

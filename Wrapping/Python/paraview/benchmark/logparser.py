@@ -1,12 +1,11 @@
 from . import logbase
-import math
 import sys
-import re
 
 
 class FrameLogEntry:
     '''A basic container for holding timing information for a given filter'''
 
+    import re
     _timere = '([-+]?\d*\.?\d+([eE][-+]?\d+)?) +seconds'
     _match_filter = re.compile('Execute (\w+) id: +(\d+), +' + _timere)
     _match_vfilter = re.compile('Execute (\w+) *, +' + _timere)
@@ -217,6 +216,7 @@ class BasicStats:
             if self.N == 1:
                 self._StdDev = 0
             else:
+                import math
                 self._StdDev = math.sqrt((self.Ex2 - (self.Ex * self.Ex) / self.N) / (self.N - 1))
         return self._StdDev
 
