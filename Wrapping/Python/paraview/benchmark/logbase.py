@@ -48,16 +48,30 @@ import pickle
 start_frame = 0
 default_log_threshold = dict()
 
+def component_to_string(comp):
+    session = servermanager.ProxyManager().GetSessionProxyManager().GetSession()
+    if comp == session.NONE: return 'None'
+    if comp == session.DATA_SERVER: return 'DataServer'
+    if comp == session.DATA_SERVER_ROOT: return 'DataServerRoot'
+    if comp == session.RENDER_SERVER: return 'RenderServer'
+    if comp == session.RENDER_SERVER_ROOT: return 'RenderServerRoot'
+    if comp == session.SERVERS: return 'Servers'
+    if comp == session.CLIENT: return 'Client'
+    if comp == session.CLIENT_AND_SERVERS: return 'ClientAndServers'
+    return None
+
 class OneLog :
-    def __init__(self):
-        self.runmode = 'batch'
-        self.servertype = 'unified'
-        self.rank = 0
+    def __init__(self, runmode='batch', servertype='unified', component=0, rank=0):
+        self.runmode = runmode
+        self.servertype = servertype
+        self.component = component_to_string(component)
+        self.rank = rank
         self.lines = []
 
     def print_log(self, showlines=False):
         print "#RunMode:", self.runmode,
         print "ServerType:", self.servertype,
+        print "Component:", self.component,
         print "processor#:", self.rank
         if showlines:
             for i in self.lines:
@@ -178,10 +192,7 @@ def get_logs() :
         session.GatherInformation(component, timerInfo, 0)
 
         for i in range(timerInfo.GetNumberOfLogs()):
-            alog = OneLog()
-            alog.runmode = runmode
-            alog.servertype = servertype
-            alog.rank = i
+            alog = OneLog(runmode, servertype, component, i)
 
             if is_symmetric_mode:
                 # in Symmetric mode, GatherInformation() only collects
@@ -189,8 +200,7 @@ def get_logs() :
                 # vtkPVTimerInformation will only have info for local process.
                 alog.rank = pm.GetPartitionId()
 
-            for line in timerInfo.GetLog(i).split('\n'):
-                alog.lines.append(line)
+            alog.lines = timerInfo.GetLog(i).split('\n');
             logs.append(alog)
 
 def print_logs() :

@@ -132,11 +132,13 @@ def process_logs(merge_before_nframes=0):
     '''
     logbase.get_logs()
 
-    # We can't guarantee the order the logs will be iterated in
-    all_frames = [None] * len(logbase.logs)
+    comp_rank_frame_logs = { }
     for log in logbase.logs:
-        all_frames[log.rank] = _parse_a_log(log, merge_before_nframes)
-    return all_frames
+        rank_frame_logs = comp_rank_frame_logs.setdefault(log.component, [])
+        if len(rank_frame_logs) < log.rank + 1:
+            rank_frame_logs.extend([None] * (log.rank + 1 - len(rank_frame_logs)))
+        rank_frame_logs[log.rank] = _parse_a_log(log, merge_before_nframes)
+    return comp_rank_frame_logs
 
 
 def _init_log_collection(logs):
@@ -245,10 +247,13 @@ def collect_stats(frame_logs, stat_summary='Mean'):
             _append_log_collection(log_collection_entry, l)
     return _collect_stats(log_collection, stat_summary)
 
-
 def process_stats_across_ranks(rank_frame_logs):
     '''Calculate stats across all ranks for each frame'''
-    return [collect_stats([rank_frame_logs[r][f] for r in range(0, len(rank_frame_logs))], 'Max') for f in range(1, len(rank_frame_logs[0]))]
+    frame_stats = []
+    for f in range(1, len(rank_frame_logs[0])):
+        rank_logs = [r[f] for r in rank_frame_logs]
+        frame_stats.append(collect_stats(rank_logs, 'Max'))
+    return frame_stats
 
 
 def summarize_all_logs(rank_frame_logs):
