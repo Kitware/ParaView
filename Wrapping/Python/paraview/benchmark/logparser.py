@@ -117,10 +117,11 @@ def _parse_a_log(log, merge_before_nframes=0):
             f.Logs.append(entry)
 
     # Combine the initial entries into a single 'Frame 0' entry
-    f0 = all_frames[0]
-    map(lambda f: f0.Logs.extend(f.Logs), all_frames[1:-merge_before_nframes])
-
-    return [f0] + all_frames[-merge_before_nframes:]
+    if merge_before_nframes > 0:
+        f0 = all_frames[0]
+        map(lambda f: f0.Logs.extend(f.Logs), all_frames[1:-merge_before_nframes])
+        return [f0] + all_frames[-merge_before_nframes:]
+    return all_frames
 
 
 def process_logs(merge_before_nframes=0):
