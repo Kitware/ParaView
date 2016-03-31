@@ -92,6 +92,7 @@ set (Module_SRCS
   vtkSMProxy.cxx
   vtkSMProxyDefinitionManager.cxx
   vtkSMProxyGroupDomain.cxx
+  vtkSMProxyInitializationHelper.cxx
   vtkSMProxyIterator.cxx
   vtkSMProxyLink.cxx
   vtkSMProxyListDomain.cxx
@@ -136,6 +137,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMDomain
   vtkSMLink
   vtkSMPropertyHelper
+  vtkSMProxyInitializationHelper
   vtkSMProxyManager  # since New() is protected.
   vtkSMRangeDomainTemplate
   vtkSMRemoteObject
