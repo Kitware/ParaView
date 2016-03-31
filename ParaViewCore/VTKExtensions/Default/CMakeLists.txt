@@ -125,6 +125,7 @@ set(Module_SRCS
   vtkPVMetaSliceDataSet.cxx
   vtkPVNullSource.cxx
   vtkPVPlane.cxx
+  vtkPVPLYWriter.cxx
   vtkPVSelectionSource.cxx
   vtkPVTextSource.cxx
   vtkPVTransform.cxx
