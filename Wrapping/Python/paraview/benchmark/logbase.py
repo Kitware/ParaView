@@ -1,17 +1,13 @@
 """
 This module has utilities to benchmark paraview.
 
-First, when run standalone, this will do a simple rendering benchmark test. The
-test renders a sphere with various rendering settings and reports the rendering
-rate achieved in triangles/sec. run() is the entrypoint for that usage.
-
-Second, you can set up arbitrary pipelines and this module helps you obtain,
+You can set up arbitrary pipelines and this module helps you obtain,
 interpret and report the information recorded by ParaView's logs.
 Do that like so:
 
-1. optionally, call maximize logs first
-2. setup and run your visualization pipeline (via GUI or script as you prefer)
-3. call print_logs() to print out the logs in raw format
+1. Optionally, call maximize logs first
+2. Setup and run your visualization pipeline (via GUI or script as you prefer)
+3. Call print_logs() to print out the logs in raw format
 """
 
 from paraview.simple import *
@@ -79,22 +75,26 @@ def maximize_logs () :
     tl.UpdateVTKObjects()
 
 def get_memuse() :
+    pm = paraview.servermanager.vtkProcessModule.GetProcessModule()
     session = servermanager.ProxyManager().GetSessionProxyManager().GetSession()
 
     retval = []
-    infos = servermanager.vtkPVMemoryUseInformation()
-    session.GatherInformation(session.CLIENT, infos, 0)
-    procUse = str(infos.GetProcMemoryUse(0))
-    hostUse = str(infos.GetHostMemoryUse(0))
-    retval.append("CLIENT " + procUse + " / " + hostUse)
+    if pm.GetProcessTypeAsInt() == pm.PROCESS_BATCH:
+        components = {'CL_DS_RS': session.CLIENT_AND_SERVERS}
+    else:
+        if session.GetRenderClientMode() == session.RENDERING_UNIFIED:
+            components = {'CL': session.CLIENT, 'DS_RS': session.SERVERS}
+        else:
+            components = {'CL': session.CLIENT, 'RS': session.RENDER_SERVER, 'DS': session.DATA_SERVER}
 
-    infos = servermanager.vtkPVMemoryUseInformation()
-    session.GatherInformation(session.DATA_SERVER, infos, 0)
-    for i in range(0,infos.GetSize()):
-        rank = str(infos.GetRank(i))
-        procUse = str(infos.GetProcMemoryUse(i))
-        hostUse = str(infos.GetHostMemoryUse(i))
-        retval.append("DS[" + rank + "] " + procUse + " / " + hostUse)
+    for comp_label, comp_type in components.items():
+        infos = servermanager.vtkPVMemoryUseInformation()
+        session.GatherInformation(comp_type, infos, 0)
+        for i in range(0,infos.GetSize()):
+            retval.append('%(l)s[%(r)d] %(pu)d / %(hu)d' %
+                          {'l': comp_label, 'r': infos.GetRank(i),
+                           'pu': infos.GetProcMemoryUse(i),
+                           'hu': infos.GetHostMemoryUse(i)})
     return retval
 
 def dump_logs( filename ) :
@@ -113,7 +113,7 @@ def dump_logs( filename ) :
 def import_logs( filename ) :
     """
     This is for bringing in a saved log files and parse it after the fact.
-    TODO: add an option to load in raw parview logs in text format
+    TODO: add an option to load in raw paraview logs in text format
     """
     import pickle
     global logs
@@ -179,7 +179,7 @@ def get_logs() :
 
 def print_logs() :
     """
-    Print logs on the root node by gathering logs accross all the nodes
+    Print logs on the root node by gathering logs across all the nodes
     regardless if the process was started in symmetric mode or not.
     """
     global logs
@@ -187,7 +187,7 @@ def print_logs() :
     if len(logs) == 0:
         get_logs()
 
-    # Handle symetric mode specificaly if need be
+    # Handle symmetric mode specifically if need be
     pm = paraview.servermanager.vtkProcessModule.GetProcessModule()
     is_symmetric_mode = False
     if pm != None:

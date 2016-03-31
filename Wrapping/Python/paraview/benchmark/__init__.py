@@ -1,7 +1,7 @@
 '''
 This module has utilities to benchmark paraview.
 
-logbase contains core routines for colelcting and gathering timing logs from
+logbase contains core routines for collecting and gathering timing logs from
 all nodes.
 logparser contains additional routines for parsing the raw logs and
 calculating statistics across ranks and frames.

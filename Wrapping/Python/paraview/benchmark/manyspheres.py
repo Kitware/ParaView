@@ -1,11 +1,41 @@
 import datetime as dt
 from paraview import servermanager
 from paraview.simple import *
-from paraview.benchmark import *
+#from paraview.benchmark import *
+import logbase, logparser
 
 logbase.maximize_logs()
 records = []
 n0 = dt.datetime.now()
+
+def get_render_view(size):
+    '''Similar to GetRenderView except if a new view is created, it's
+    created with the specified size instead of having t resize afterwards
+    '''
+    view = active_objects.view
+    if not view:
+        # it's possible that there's no active view, but a render view exists.
+        # If so, locate that and return it (before trying to create a new one).
+        view = servermanager.GetRenderView()
+    if not view:
+        view = CreateRenderView(ViewSize=size)
+    return view
+
+
+def save_render_buffer(fname):
+    '''Similar to SaveScreenshot except a re-render will not be triggered'''
+    import vtk
+    w = GetRenderView().SMProxy.GetRenderWindow()
+    w2i = vtk.vtkWindowToImageFilter()
+    w2i.ReadFrontBufferOff()
+    w2i.ShouldRerenderOff()
+    w2i.SetInput(w)
+    w2i.Modified()
+    tiff = TIFFWriter()
+    tiff.Input = w2i.GetOutput()
+    tiff.FileName = fname
+    tiff.UpdatePipeline()
+
 
 def flush_render_buffer():
     '''When running as a single process use the WindowToImage filter to
@@ -15,7 +45,7 @@ def flush_render_buffer():
     compositing forces the frame buffer read.
     '''
 
-    # If we're not using offscreen rendering then we can bypass this since
+    # If we're not using off-screen rendering then we can bypass this since
     # the frame buffer display will force a GL flush
     w = GetRenderView().SMProxy.GetRenderWindow()
     if not w.GetOffScreenRendering():
@@ -23,7 +53,7 @@ def flush_render_buffer():
 
     import vtk
 
-    # If we're using MPI we can also bybass this since compositing will
+    # If we're using MPI we can also bypass this since compositing will
     # for a GL flush
     controller = vtk.vtkMultiProcessController.GetGlobalController()
     if controller.GetNumberOfProcesses() > 1:
@@ -58,8 +88,7 @@ def run(output_basename='log', num_spheres=8, num_spheres_in_scene=None,
     import vtk
     controller = vtk.vtkMultiProcessController.GetGlobalController()
 
-    view = GetRenderView()
-    view.ViewSize = view_size
+    view = get_render_view(view_size)
 
     import math
     edge = math.ceil(math.pow(num_spheres_in_scene, (1.0 / 3.0)))
@@ -117,11 +146,8 @@ for x in range(start,end):
     # pd.GetPointData().RemoveArray('Normals')
     ap.AddInputData(pd)
 
-print 'Appending PolyData objects'
 ap.Update()
-
 self.GetOutput().ShallowCopy(ap.GetOutput())
-print 'NUMCELLS(', p, ',):', ap.GetOutput().GetNumberOfCells()
 ''')
 
     paramprop = gen.GetProperty('Parameters')
@@ -142,7 +168,7 @@ print 'NUMCELLS(', p, ',):', ap.GetOutput().GetNumberOfCells()
     deltaAz = 45.0 / num_frames
     deltaEl = 45.0 / num_frames
 
-    ResetCamera()
+    Render()
 
     # Use a dummy camera to workaround MPI bugs when directly interacting with
     # the view's camera
@@ -162,11 +188,12 @@ print 'NUMCELLS(', p, ',):', ap.GetOutput().GetNumberOfCells()
     fdigits = int(math.ceil(math.log(num_frames, 10)))
     frame_fname_fmt = output_basename + '.scene.f%(f)0' + str(fdigits) + 'd.tiff'
     SaveScreenshot(frame_fname_fmt % {'f': 0})
-    memtime_stamp()
-    vtk.vtkTimerLog.MarkStartEvent('GetTotalCellCount')
+    vtk.vtkTimerLog.MarkStartEvent('GetViewItemStats')
     num_polys = sum([r.GetRepresentedDataInformation().GetNumberOfCells() for r in view.Representations])
-    vtk.vtkTimerLog.MarkEndEvent('GetTotalCellCount')
+    num_points = sum([r.GetRepresentedDataInformation().GetNumberOfPoints() for r in view.Representations])
+    vtk.vtkTimerLog.MarkEndEvent('GetViewItemStats')
 
+    memtime_stamp()
     fpsT0 = dt.datetime.now()
     for frame in range(1, num_frames):
         c.Azimuth(deltaAz)
@@ -176,80 +203,31 @@ print 'NUMCELLS(', p, ',):', ap.GetOutput().GetNumberOfCells()
         view.CameraViewUp = c.GetViewUp()
         view.CameraViewAngle = c.GetViewAngle()
         Render()
+        flush_render_buffer()
         memtime_stamp()
-    flush_render_buffer()
     fpsT1 = dt.datetime.now()
 
     if controller.GetLocalProcessId() == 0:
         if save_logs:
+            # Save the arguments this was executed with
             with open(output_basename + '.args.txt', 'w') as argfile:
                 argfile.write(str({
                     'output_basename': output_basename,
                     'num_spheres': num_spheres,
-                    'num_spheres_in_scene':num_spheres_in_scene,
+                    'num_spheres_in_scene': num_spheres_in_scene,
                     'resolution': resolution, 'view_size': view_size,
                     'num_frames': num_frames, 'save_logs': save_logs,
                     'color': color}))
-        process_logs(num_frames, (fpsT1-fpsT0).total_seconds(), num_polys,
-                     'Polys', save_logs, output_basename)
 
+            # Save the memory statistics collected
+            with open(output_basename + '.mem.txt', 'w') as ofile:
+                ofile.write('\n'.join([str(x) for x in records]))
 
-def process_logs(num_frames, num_seconds_m0, items_per_frame, item_label,
-                 save_logs=False, output_basename=None):
-    '''Process the timing logs to display, save, and gather stats'''
-
-    if save_logs:
-        with open(output_basename + '.mem.txt', 'w') as ofile:
-            ofile.write('\n'.join([str(x) for x in records]))
-
-    comp_rank_frame_logs = logparser.process_logs(num_frames - 1)
-    if save_logs:
-        logbase.dump_logs(output_basename + '.logs.raw.bin')
-        with open(output_basename + '.logs.parsed.bin', 'wb') as ofile:
-            import pickle
-            pickle.dump(comp_rank_frame_logs, ofile)
-
-    # Only deal with the server logs
-    if 'Servers' in comp_rank_frame_logs.keys():
-        rank_frame_logs = comp_rank_frame_logs['Servers']
-    elif 'ClientAndServers' in comp_rank_frame_logs.keys():
-        rank_frame_logs = comp_rank_frame_logs['ClientAndServers']
-    else:
-        rank_frame_logs = None
-
-    print '\nStatistics:\n' + '=' * 40 + '\n'
-    if rank_frame_logs:
-        print 'Rank 0 Frame 0\n' + '-' * 40
-        print rank_frame_logs[0][0]
-        print ''
-        if save_logs:
-            with open(output_basename + '.stats.r0f0.txt', 'w') as ofile:
-                ofile.write(str(rank_frame_logs[0][0]))
-
-        frame_stats, summary_stats = logparser.summarize_all_logs(rank_frame_logs)
-        if frame_stats:
-            for f in range(0, len(frame_stats)):
-                print 'Frame ' + str(f + 1) + '\n' + '-' * 40
-                logparser.write_stats_to_file(frame_stats[f], outfile=sys.stdout)
-                print ''
-                with open(output_basename + '.stats.frame.txt', 'w') as ofile:
-                    for f in range(0, len(frame_stats)):
-                        ofile.write('Frame ' + str(f + 1) + '\n' + '-' * 40 + '\n')
-                        logparser.write_stats_to_file(frame_stats[f], outfile=ofile)
-                        ofile.write('\n')
-
-        if summary_stats:
-            print 'Frame Summary\n' + '-' * 40
-            logparser.write_stats_to_file(summary_stats, outfile=sys.stdout)
-            if save_logs:
-                with open(output_basename + '.stats.summary.txt', 'w') as ofile:
-                    logparser.write_stats_to_file(summary_stats, outfile=ofile)
-
-    fps = (num_frames - 1) / num_seconds_m0
-    ips = fps * items_per_frame
-    print ''
-    print 'Frames / Sec: %(fps).2f' % {'fps': fps}
-    print '%(ilabel)s / Sec: %(ips)d' % {'ilabel': item_label, 'ips': int(ips)}
+        # Process frame timing statistics
+        logparser.summarize_results(num_frames, (fpsT1-fpsT0).total_seconds(),
+                                    num_polys, 'Polys', save_logs,
+                                    output_basename)
+        print 'Points / Frame: %(np)d' % {'np': num_points}
 
 
 def main(argv):
@@ -264,7 +242,7 @@ def main(argv):
                         help='The number of spheres in the entire scene, including those not rendered.')
     parser.add_argument('-r', '--resolution', default=4, type=int,
                         help='Theta and Phi resolution to use for the spheres')
-    parser.add_argument('-v', '--view-size', default=[400,400],
+    parser.add_argument('-v', '--view-size', default=[400, 400],
                         type=lambda s: [int(x) for x in s.split(',')],
                         help='View size used to render')
     parser.add_argument('-f', '--frames', default=10, type=int,

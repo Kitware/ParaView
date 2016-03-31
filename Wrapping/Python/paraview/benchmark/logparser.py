@@ -1,5 +1,5 @@
-from . import logbase
 import sys
+import logbase
 
 
 class FrameLogEntry:
@@ -10,7 +10,8 @@ class FrameLogEntry:
     _match_filter = re.compile('Execute (\w+) id: +(\d+), +' + _timere)
     _match_vfilter = re.compile('Execute (\w+) *, +' + _timere)
     _match_comp_comp = re.compile('TreeComp composite, *' + _timere)
-    _match_comp_xmit = re.compile('TreeComp (Send|Receive) (\d+) (to|from) (\d+) uchar (\d+), +' + _timere)
+    _match_comp_xmit = re.compile(
+        'TreeComp (Send|Receive) (\d+) (to|from) (\d+) uchar (\d+), +' + _timere)
     _match_composite = re.compile('Compositing, +' + _timere)
     _match_send = re.compile('Sending, +' + _timere)
     _match_receive = re.compile('Receiving, +' + _timere)
@@ -23,7 +24,7 @@ class FrameLogEntry:
         ls = log_msg.strip()
         self.Indent = log_msg.find(ls)
         if not ls:
-            self.Id ='-1'
+            self.Id = '-1'
             return
         self.Id, self.Name, self.Duration = FrameLogEntry._parse_message(ls)
 
@@ -65,13 +66,18 @@ class FrameLogEntry:
         return None, None, None
 
     def __repr__(self):
-        return '%(ind)s%(id)s %(name)s %(t)f' % {'ind': ' ' * self.Indent, 'id': self.Id, 'name': self.Name, 't': float('NaN') if self.Duration is None else self.Duration}
+        return '%(ind)s%(id)s %(name)s %(t)f' % \
+            {'ind': ' ' * self.Indent, 'id': self.Id, 'name': self.Name,
+             't': float('NaN') if self.Duration is None else self.Duration}
 
     def __eq__(self, other):
-        return self.Indent == other.Indent and self.Id == other.Id and self.Name == other.Name
+        return self.Indent == other.Indent and self.Id == other.Id and \
+            self.Name == other.Name
+
 
 class FrameLog:
     '''Hold the log entries for an entire (sub-)frame'''
+
     def __init__(self, parent=None, indent=0):
         self.Parent = parent
         self.Indent = indent
@@ -119,7 +125,8 @@ def _parse_a_log(log, merge_before_nframes=0):
     # Combine the initial entries into a single 'Frame 0' entry
     if merge_before_nframes > 0:
         f0 = all_frames[0]
-        map(lambda f: f0.Logs.extend(f.Logs), all_frames[1:-merge_before_nframes])
+        map(lambda f: f0.Logs.extend(f.Logs),
+            all_frames[1:-merge_before_nframes])
         return [f0] + all_frames[-merge_before_nframes:]
     return all_frames
 
@@ -132,11 +139,12 @@ def process_logs(merge_before_nframes=0):
     '''
     logbase.get_logs()
 
-    comp_rank_frame_logs = { }
+    comp_rank_frame_logs = {}
     for log in logbase.logs:
         rank_frame_logs = comp_rank_frame_logs.setdefault(log.component, [])
         if len(rank_frame_logs) < log.rank + 1:
-            rank_frame_logs.extend([None] * (log.rank + 1 - len(rank_frame_logs)))
+            rank_frame_logs.extend(
+                [None] * (log.rank + 1 - len(rank_frame_logs)))
         rank_frame_logs[log.rank] = _parse_a_log(log, merge_before_nframes)
     return comp_rank_frame_logs
 
@@ -151,7 +159,8 @@ def _init_log_collection(logs):
             l = l.Logs
 
         if isinstance(l, dict):
-            col.append({'Id': l['Id'], 'Name': l['Name'], 'Duration': [l['Duration']]})
+            col.append({'Id': l['Id'], 'Name': l['Name'],
+                        'Duration': [l['Duration']]})
         else:
             assert isinstance(l, list)
             col.append(_init_log_collection(l))
@@ -177,6 +186,7 @@ def _append_log_collection(col_entry, log):
 
 
 class BasicStats:
+
     def __init__(self, samples=[]):
         self.K = 0
         self.N = 0
@@ -218,7 +228,8 @@ class BasicStats:
                 self._StdDev = 0
             else:
                 import math
-                self._StdDev = math.sqrt((self.Ex2 - (self.Ex * self.Ex) / self.N) / (self.N - 1))
+                self._StdDev = math.sqrt(
+                    (self.Ex2 - (self.Ex * self.Ex) / self.N) / (self.N - 1))
         return self._StdDev
 
     def __repr__(self):
@@ -226,12 +237,13 @@ class BasicStats:
 
 
 def _collect_stats(logs, stat_summary):
-    '''Compute statistics Group a set of logs as a list of durrations'''
+    '''Compute statistics and group a set of logs as a list of durations'''
     stats = []
     for l in logs:
         if isinstance(l, dict):
             b = BasicStats(l['Duration'])
-            stats.append({'Id': l['Id'], 'Name': l['Name'], 'Stats': b, 'Duration': getattr(b, stat_summary)})
+            stats.append({'Id': l['Id'], 'Name': l[
+                         'Name'], 'Stats': b, 'Duration': getattr(b, stat_summary)})
         else:
             assert isinstance(l, list)
             stats.append(_collect_stats(l, stat_summary))
@@ -248,6 +260,7 @@ def collect_stats(frame_logs, stat_summary='Mean'):
             _append_log_collection(log_collection_entry, l)
     return _collect_stats(log_collection, stat_summary)
 
+
 def process_stats_across_ranks(rank_frame_logs):
     '''Calculate stats across all ranks for each frame'''
     frame_stats = []
@@ -257,7 +270,7 @@ def process_stats_across_ranks(rank_frame_logs):
     return frame_stats
 
 
-def summarize_all_logs(rank_frame_logs):
+def summarize_stats(rank_frame_logs):
     '''Summarize statistics across ranks, and then across frames'''
     try:
         frame_stats = process_stats_across_ranks(rank_frame_logs)
@@ -275,7 +288,72 @@ def write_stats_to_file(stats, indent=0, outfile=sys.stdout):
     '''Print the statics for a given frame'''
     for s in stats:
         if isinstance(s, dict):
-            outfile.write(' ' * indent + s['Id'] + ' ' + s['Name'] + ', ' + str(s['Stats']) + '\n')
+            outfile.write(
+                ' ' * indent + s['Id'] + ' ' + s['Name'] + ', ' + str(s['Stats']) + '\n')
         else:
             assert isinstance(s, list)
             write_stats_to_file(s, indent + 4, outfile)
+
+
+def summarize_results(num_frames, num_seconds_m0, items_per_frame, item_label,
+                      save_logs=False, output_basename=None):
+    '''Process the timing logs to display, save, and gather stats
+
+    Keyword arguments:
+    num_frames      -- Number of frames to process
+    num_seconds_m0  -- Total number of seconds, excluding the first frame
+    items_per_frame -- Number of items per frame getting processed
+    item_label      -- Output label for associated items_per_frame
+    save_logs       -- Whether or not to write the logs to a file
+    output_basename -- Basename to use for output files
+    '''
+
+    comp_rank_frame_logs = process_logs(num_frames - 1)
+    if save_logs:
+        logbase.dump_logs(output_basename + '.logs.raw.bin')
+        with open(output_basename + '.logs.parsed.bin', 'wb') as ofile:
+            import pickle
+            pickle.dump(comp_rank_frame_logs, ofile)
+
+    # Only deal with the server logs
+    if 'Servers' in comp_rank_frame_logs.keys():
+        rank_frame_logs = comp_rank_frame_logs['Servers']
+    elif 'ClientAndServers' in comp_rank_frame_logs.keys():
+        rank_frame_logs = comp_rank_frame_logs['ClientAndServers']
+    else:
+        rank_frame_logs = None
+
+    print '\nStatistics:\n' + '=' * 40 + '\n'
+    if rank_frame_logs:
+        print 'Rank 0 Frame 0\n' + '-' * 40
+        print rank_frame_logs[0][0]
+        print ''
+        if save_logs:
+            with open(output_basename + '.stats.r0f0.txt', 'w') as ofile:
+                ofile.write(str(rank_frame_logs[0][0]))
+
+        frame_stats, summary_stats = summarize_stats(rank_frame_logs)
+        if frame_stats:
+            for f in range(0, len(frame_stats)):
+                print 'Frame ' + str(f + 1) + '\n' + '-' * 40
+                write_stats_to_file(frame_stats[f], outfile=sys.stdout)
+                print ''
+                with open(output_basename + '.stats.frame.txt', 'w') as ofile:
+                    for f in range(0, len(frame_stats)):
+                        ofile.write('Frame ' + str(f + 1) + '\n' + '-' * 40 + '\n')
+                        write_stats_to_file(frame_stats[f], outfile=ofile)
+                        ofile.write('\n')
+
+        if summary_stats:
+            print 'Frame Summary\n' + '-' * 40
+            write_stats_to_file(summary_stats, outfile=sys.stdout)
+            if save_logs:
+                with open(output_basename + '.stats.summary.txt', 'w') as ofile:
+                    write_stats_to_file(summary_stats, outfile=ofile)
+
+    fps = (num_frames - 1) / num_seconds_m0
+    ips = fps * items_per_frame
+    print ''
+    print 'Frames / Sec: %(fps).2f' % {'fps': fps}
+    print '%(ilabel)s / Frame: %(ipf)d' % {'ilabel': item_label, 'ipf': items_per_frame}
+    print 'Mi%(ilabel)s / Sec: %(ips).3f' % {'ilabel': item_label, 'ips': ips / (1024.0 * 1024.0)}

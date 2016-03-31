@@ -3,6 +3,7 @@ import sys
 from paraview.simple import *
 import paraview
 
+
 def __render(ss, v, title, nframes):
     print '============================================================'
     print title
@@ -28,11 +29,13 @@ def __render(ss, v, title, nframes):
         res.append((ncells, ncells/tpr))
     return res
 
+
 def run(filename=None, nframes=60):
-    """ Runs the benchmark. If a filename is specified, it will write the
+    '''Runs the benchmark. If a filename is specified, it will write the
     results to that file as csv. The number of frames controls how many times
-    a particular configuration is rendered. Higher numbers lead to more accurate
-    averages. """
+    a particular configuration is rendered. Higher numbers lead to more
+    accurate averages.
+    '''
     # Turn off progress printing
     paraview.servermanager.SetProgressPrintingEnabled(0)
 
@@ -43,7 +46,7 @@ def run(filename=None, nframes=60):
     results = []
 
     # Start with these defaults
-    #v.RemoteRenderThreshold = 0
+    # v.RemoteRenderThreshold = 0
     obj = servermanager.misc.GlobalMapperProperties()
     obj.GlobalImmediateModeRendering = 0
 
@@ -82,7 +85,7 @@ def run(filename=None, nframes=60):
 
 
 def test_module():
-    """Simply exercises a few components of the module."""
+    '''Simply exercises a few components of the module.'''
     maximize_logs()
 
     paraview.servermanager.SetProgressPrintingEnabled(0)
