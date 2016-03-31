@@ -64,6 +64,9 @@ pqWriterDialog::pqWriterDialog(vtkSMProxy *proxy, QWidget *p) : Superclass(p),
   vbox->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum,
       QSizePolicy::Expanding));
 
+  this->Implementation->UI.label->setText(
+    this->Implementation->UI.label->text().replace(
+      "PROXYNAME", proxy->GetXMLLabel()));
   this->Implementation->HasConfigurableProperties =
     this->Implementation->ProxyWidget->filterWidgets(true);
 }
