@@ -352,6 +352,9 @@ set(_vtk_modules
 
   vtkPVVTKExtensionsPoints
   # Needed for SPH filters.
+  
+  vtkIOTecplotTable
+  # needed for vtkTecplotReader
   )
 
 if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
