@@ -66,7 +66,7 @@ pqPipelineBrowserWidget::pqPipelineBrowserWidget(QWidget* parentObject)
   this->configureModel();
 
   // Initialize pqFlatTreeView.
-  Superclass::setModel(this->FilteredPipelineModel);
+  this->Superclass::setModel(this->FilteredPipelineModel);
   this->getHeader()->hide();
   this->getHeader()->moveSection(1, 0);
   this->installEventFilter(this);

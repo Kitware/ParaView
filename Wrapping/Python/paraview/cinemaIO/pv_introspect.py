@@ -250,13 +250,14 @@ def add_control_and_colors(name, cs, arrayNames):
     #make up list of color options
     fields = {'depth':'depth','luminance':'luminance'}
     ranges = {}
+    defaultName = None
     view_proxy = paraview.simple.GetActiveView()
     rep = paraview.simple.GetRepresentation(source, view_proxy)
 
     # select value arrays
     if rep.Representation != 'Outline':
-        if len(arrayNames) == 0:
-            defaultName = add_default_array_selection(source, fields, ranges)
+        if None in arrayNames:
+            defaultName = add_legacy_array_selection(source, fields, ranges)
         else:
             defaultName = add_customized_array_selection(name, source, fields, ranges, arrayNames)
 
@@ -299,7 +300,7 @@ def add_customized_array_selection(sourceName, source, fields, ranges, arrayName
                 defaultName = fName
     return defaultName
 
-def add_default_array_selection(source, fields, ranges):
+def add_legacy_array_selection(source, fields, ranges):
     defaultName = None
     cda = source.GetCellDataInformation()
     for a in range(0, cda.GetNumberOfArrays()):
@@ -325,7 +326,7 @@ def add_default_array_selection(source, fields, ranges):
                     defaultName = fName
     return defaultName
 
-def make_cinema_store(proxies, ocsfname, forcetime=False, _userDefinedValues={}):
+def make_cinema_store(proxies, ocsfname, forcetime=False, _userDefinedValues = {}):
     """
     Takes in the pipeline, structured as a tree, and makes a cinema store definition
     containing all the parameters we might will vary.
@@ -376,7 +377,7 @@ def make_cinema_store(proxies, ocsfname, forcetime=False, _userDefinedValues={})
                 repeat = True
         dependency_list = [proxy['name'] for proxy in proxies if proxy['id'] in dependency_set]
         cs.assign_parameter_dependence(proxy_name,'vis',dependency_list)
-        arrNames = _userDefinedValues['arraySelection'] if ('arraySelection' in _userDefinedValues) else {}
+        arrNames = _userDefinedValues['arraySelection'] if ('arraySelection' in _userDefinedValues) else {None} #{None} triggers a legacy array selection (all except Normals).
         add_control_and_colors(proxy_name, cs, arrNames)
         cs.assign_parameter_dependence("color"+proxy_name,'vis',[proxy_name])
 
@@ -430,7 +431,7 @@ def testexplore(cs):
     e.explore()
 
 
-def explore(cs, proxies, iSave=True, currentTime=None, arrayNames = {}):
+def explore(cs, proxies, iSave=True, currentTime=None, arrayNames = {None}):
     """
     Takes in the store, which contains only the list of parameters,
     """
@@ -487,9 +488,10 @@ def explore(cs, proxies, iSave=True, currentTime=None, arrayNames = {}):
                 cC.AddLuminance('luminance')
                 sp.UpdatePipeline(ctime_float)
 
+                numVals = 0
                 if rep.Representation != 'Outline':
-                    if len(arrayNames) == 0:
-                        numVals = explore_default_array_selection(sp, cC)
+                    if None in arrayNames:
+                        numVals = explore_legacy_array_selection(sp, cC)
                     else:
                         numVals = explore_customized_array_selection(name, sp, cC, arrayNames)
 
@@ -515,7 +517,7 @@ def explore(cs, proxies, iSave=True, currentTime=None, arrayNames = {}):
             view_proxy.ViewTime=t
             e.explore({'time':float_limiter(t)})
 
-def explore_default_array_selection(source, colorList):
+def explore_legacy_array_selection(source, colorList):
     numVals = 0
     cda = source.GetCellDataInformation()
     for a in range(0, cda.GetNumberOfArrays()):
@@ -608,7 +610,7 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
 
     - arraySelection:
 
-    Directory of the form {'FilterName' : ['arrayName1', 'arrayName2', ...], ... }
+    Directory of the form {'arraySelection' : {'FilterName' : ['arrayName1', 'arrayName2', ...], ... } }
 
     Note:  baseDirName is used as the parent directory of the database generated for
     each view in viewSelection. 'Image filename' is used as the database directory name.
@@ -670,7 +672,7 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
           _userDefinedValues = userDefValues)
 
         explore(cs, p, arrayNames = userDefValues['arraySelection'] if
-          ('arraySelection' in userDefValues) else {})
+          ('arraySelection' in userDefValues) else {None})
 
         view.LockBounds = 0
         cs.save()

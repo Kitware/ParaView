@@ -35,29 +35,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QTreeWidgetItem;
 class vtkSMProxy;
 
-/// @brief Abstract class implementing a tree model with checkable
-/// items. It QTreeWidgetItem as its item class. Reimplement the virtual
-/// methods to fill it with data.
+/// @brief Abstract class implementing a tree model with checkable items.
+/// It uses QTreeWidgetItem as its item class. Reimplement the virtual methods
+/// to fill it with data.
 class pqAbstractItemSelectionModel : public QAbstractItemModel
 {
   Q_OBJECT
 
 protected:
 
-  pqAbstractItemSelectionModel(QObject* parent = NULL);
+  pqAbstractItemSelectionModel(QObject* parent_ = NULL);
   virtual ~pqAbstractItemSelectionModel();
 
 /// @{
 /// QAbstractItemModel implementation
-  int rowCount(const QModelIndex & parent = QModelIndex()) const;
-  int columnCount(const QModelIndex & parent = QModelIndex()) const;
+  int rowCount(const QModelIndex & parent_ = QModelIndex()) const;
+  int columnCount(const QModelIndex & parent_ = QModelIndex()) const;
 
-  QModelIndex index(int row, int column, const QModelIndex & parent = QModelIndex()) const;
-  QModelIndex parent(const QModelIndex & index) const;
-  QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
-  bool setData(const QModelIndex & index, const QVariant & value, int role);
+  QModelIndex index(int row, int column, const QModelIndex & parent_ = QModelIndex()) const;
+  QModelIndex parent(const QModelIndex & index_) const;
+  QVariant data(const QModelIndex & index_, int role = Qt::DisplayRole) const;
+  bool setData(const QModelIndex & index_, const QVariant & value, int role);
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-  Qt::ItemFlags flags(const QModelIndex & index) const;
+  Qt::ItemFlags flags(const QModelIndex & index_) const;
 /// @}
 
 /// Concrete classes should implement how the model is to be populated.
@@ -67,7 +67,7 @@ protected:
   virtual void initializeRootItem() = 0;
 
 /// Helper for a more comprehensive validation of indices.
-  bool isIndexValid(const QModelIndex & index) const;
+  bool isIndexValid(const QModelIndex & index_) const;
 
   /////////////////////////////////////////////////////////////////////////////
 

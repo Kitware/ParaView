@@ -58,8 +58,8 @@ class pqArraySelectionModel : public pqAbstractItemSelectionModel
 {
 public:
 
-  pqArraySelectionModel(QObject* parent = NULL)
-  : pqAbstractItemSelectionModel(parent)
+  pqArraySelectionModel(QObject* parent_ = NULL)
+  : pqAbstractItemSelectionModel(parent_)
   {
     this->initializeRootItem();
   };
@@ -122,13 +122,12 @@ public:
     int const numItems = this->RootItem->childCount();
     for (int i = 0; i < numItems; i++)
       {
-        QTreeWidgetItem* item = this->RootItem->child(i);
-        QModelIndex index = pqAbstractItemSelectionModel::index(i, 0, QModelIndex());
+        QModelIndex index_ = pqAbstractItemSelectionModel::index(i, 0, QModelIndex());
 
-        if (pqAbstractItemSelectionModel::data(index, Qt::CheckStateRole) == Qt::Unchecked)
+        if (pqAbstractItemSelectionModel::data(index_, Qt::CheckStateRole) == Qt::Unchecked)
           continue;
 
-        QString displayedName = pqAbstractItemSelectionModel::data(index, Qt::DisplayRole).toString();
+        QString displayedName = pqAbstractItemSelectionModel::data(index_, Qt::DisplayRole).toString();
         itemNames.append(displayedName);
       }
 
@@ -200,15 +199,16 @@ void pqCinemaTrackSelection::initializePipelineItemValues(QList<pqPipelineSource
     values.second = NULL;
 
     // add only cinema-supported filters
-    QWidget* parent = this->Ui->wTabValues;
-    Qt::WindowFlags parentFlags = parent->windowFlags();
-    if (!strcmp(proxy->GetVTKClassName(), "vtkPVContourFilter")    ||
-        !strcmp(proxy->GetVTKClassName(), "vtkPVMetaSliceDataSet") ||
-        !strcmp(proxy->GetVTKClassName(), "vtkPVMetaClipDataSet"))
+    QWidget* parent_ = this->Ui->wTabValues;
+    Qt::WindowFlags parentFlags = parent_->windowFlags();
+    const char* className = proxy->GetVTKClassName();
+    if (className && (!strcmp(className, "vtkPVContourFilter") ||
+        !strcmp(className, "vtkPVMetaSliceDataSet") ||
+        !strcmp(className, "vtkPVMetaClipDataSet")))
       {
       pqPipelineFilter* plFilter = static_cast<pqPipelineFilter*>(plItem);
-      values.second = new pqCinemaTrack(parent, parentFlags, plFilter);
-      parent->layout()->addWidget(values.second);
+      values.second = new pqCinemaTrack(parent_, parentFlags, plFilter);
+      parent_->layout()->addWidget(values.second);
       values.second->hide();
       }
     }
@@ -233,7 +233,6 @@ void pqCinemaTrackSelection::onPipelineItemChanged(QModelIndex const & current,
     }
 
   //set current item's pipeline model
-  vtkSMSourceProxy* proxy = port->getSourceProxy();
   ItemValuesMap::iterator valuesIt = this->PipelineItemValues.find(QString(source->getSMName()));
   if (valuesIt == this->PipelineItemValues.end())
     {
@@ -363,10 +362,11 @@ QString pqCinemaTrackSelection::getArraySelectionAsString(QString const & format
 {
   if (!this->Ui->gbTrackSelection->isChecked())
     {
-    // An empty string will be handled by the cinema python scripts as default values
-    return QString();
+    // Defaults to empty selection.
+    return QString("'arraySelection' : {}");
     }
 
+  bool allArraysUnchecked = true;
   QString array_selection("'arraySelection' : {");
   ItemValuesMap const & valuesMap = this->PipelineItemValues;
   for (ItemValuesMap::const_iterator it = valuesMap.begin(); it != valuesMap.end(); it++)
@@ -391,11 +391,16 @@ QString pqCinemaTrackSelection::getArraySelectionAsString(QString const & format
         QString info = format.arg(pipelineItemName).arg(values);
         array_selection += info;
         array_selection += ", ";
+        allArraysUnchecked = false;
         }
       }
     }
-  // chop off the last ", "
-  array_selection.chop(2);
+
+  if (!allArraysUnchecked)
+    {
+    // chop off the last ", "
+    array_selection.chop(2);
+    }
   array_selection += "}";
 
   return array_selection;

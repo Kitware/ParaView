@@ -36,8 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 // -----------------------------------------------------------------------------
-pqAbstractItemSelectionModel::pqAbstractItemSelectionModel(QObject* parent)
-: QAbstractItemModel(parent)
+pqAbstractItemSelectionModel::pqAbstractItemSelectionModel(QObject* parent_)
+: QAbstractItemModel(parent_)
 , RootItem(new QTreeWidgetItem())
 {
 }
@@ -50,34 +50,34 @@ pqAbstractItemSelectionModel::~pqAbstractItemSelectionModel()
 }
 
 // -----------------------------------------------------------------------------
-int pqAbstractItemSelectionModel::rowCount(const QModelIndex & parent) const
+int pqAbstractItemSelectionModel::rowCount(const QModelIndex & parent_) const
 {
-  QTreeWidgetItem* parentItem = !parent.isValid() ? RootItem :
-    static_cast<QTreeWidgetItem*>(parent.internalPointer());
+  QTreeWidgetItem* parentItem = !parent_.isValid() ? RootItem :
+    static_cast<QTreeWidgetItem*>(parent_.internalPointer());
 
   return parentItem->childCount();
 }
 
 // -----------------------------------------------------------------------------
-int pqAbstractItemSelectionModel::columnCount(const QModelIndex & parent) const
+int pqAbstractItemSelectionModel::columnCount(const QModelIndex & parent_) const
 {
-  QTreeWidgetItem* parentItem = !parent.isValid() ? RootItem :
-    static_cast<QTreeWidgetItem*>(parent.internalPointer());
+  QTreeWidgetItem* parentItem = !parent_.isValid() ? RootItem :
+    static_cast<QTreeWidgetItem*>(parent_.internalPointer());
 
   return parentItem->columnCount();
 }
 
 // -----------------------------------------------------------------------------
 QModelIndex pqAbstractItemSelectionModel::index(int row, int column,
-  const QModelIndex & parent) const
+  const QModelIndex & parent_) const
 {
-  if (!hasIndex(row, column, parent))
+  if (!hasIndex(row, column, parent_))
     {
     return QModelIndex();
     }
 
-  QTreeWidgetItem* parentItem = parent.isValid() ?
-   static_cast<QTreeWidgetItem*>(parent.internalPointer()) : RootItem;
+  QTreeWidgetItem* parentItem = parent_.isValid() ?
+   static_cast<QTreeWidgetItem*>(parent_.internalPointer()) : RootItem;
 
   QTreeWidgetItem* childItem = parentItem->child(row);
 
@@ -85,14 +85,14 @@ QModelIndex pqAbstractItemSelectionModel::index(int row, int column,
 }
 
 // -----------------------------------------------------------------------------
-QModelIndex pqAbstractItemSelectionModel::parent(const QModelIndex & index) const
+QModelIndex pqAbstractItemSelectionModel::parent(const QModelIndex & index_) const
 {
-  if (!index.isValid())
+  if (!index_.isValid())
     {
     return QModelIndex();
     }
 
-  QTreeWidgetItem* childItem = static_cast<QTreeWidgetItem*>(index.internalPointer());
+  QTreeWidgetItem* childItem = static_cast<QTreeWidgetItem*>(index_.internalPointer());
   QTreeWidgetItem* parentItem = childItem->parent();
 
   if (parentItem == RootItem)
@@ -104,23 +104,23 @@ QModelIndex pqAbstractItemSelectionModel::parent(const QModelIndex & index) cons
 }
 
 // -----------------------------------------------------------------------------
-QVariant pqAbstractItemSelectionModel::data(const QModelIndex & index, int role) const
+QVariant pqAbstractItemSelectionModel::data(const QModelIndex & index_, int role) const
 {
-  if (!this->isIndexValid(index))
+  if (!this->isIndexValid(index_))
     return QVariant();
 
-  QModelIndex parentIndex = index.parent();
-  QTreeWidgetItem* parent = (parentIndex.isValid()) ?
+  QModelIndex parentIndex = index_.parent();
+  QTreeWidgetItem* parent_ = (parentIndex.isValid()) ?
     static_cast<QTreeWidgetItem*>(parentIndex.internalPointer()) : this->RootItem;
 
-  QTreeWidgetItem* item = parent->child(index.row());
+  QTreeWidgetItem* item = parent_->child(index_.row());
   if (role == Qt::DisplayRole)
     {
-    return item->data(index.column(), role);
+    return item->data(index_.column(), role);
     }
-  else if (role == Qt::CheckStateRole && index.column() == 0)
+  else if (role == Qt::CheckStateRole && index_.column() == 0)
     {
-    return item->checkState(index.column());
+    return item->checkState(index_.column());
     }
   else
     {
@@ -129,20 +129,20 @@ QVariant pqAbstractItemSelectionModel::data(const QModelIndex & index, int role)
 }
 
 // -----------------------------------------------------------------------------
-bool pqAbstractItemSelectionModel::setData(const QModelIndex & index,
+bool pqAbstractItemSelectionModel::setData(const QModelIndex & index_,
   const QVariant & value, int role)
 {
-    if (!this->isIndexValid(index))
+    if (!this->isIndexValid(index_))
       {
       return false;
       }
 
-    QTreeWidgetItem* item = static_cast<QTreeWidgetItem*>(index.internalPointer());
+    QTreeWidgetItem* item = static_cast<QTreeWidgetItem*>(index_.internalPointer());
 
     if (role == Qt::CheckStateRole)
       {
       item->setCheckState(0, static_cast<Qt::CheckState>(value.toInt()));
-      emit QAbstractItemModel::headerDataChanged(Qt::Horizontal, index.column(), index.column());
+      emit QAbstractItemModel::headerDataChanged(Qt::Horizontal, index_.column(), index_.column());
 
       // No need to emit QAbstractItemModel::dataChanged(idx, idx) since in this case
       // the change comes from the view and it handles it directly.
@@ -166,26 +166,26 @@ QVariant pqAbstractItemSelectionModel::headerData(int section,
 }
 
 // -----------------------------------------------------------------------------
-Qt::ItemFlags pqAbstractItemSelectionModel::flags(const QModelIndex & index) const
+Qt::ItemFlags pqAbstractItemSelectionModel::flags(const QModelIndex & index_) const
 {
-  if(index.isValid() && index.column() == 0)
+  if(index_.isValid() && index_.column() == 0)
     {
     return (Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable);
     }
 
-  return QAbstractItemModel::flags(index);
+  return QAbstractItemModel::flags(index_);
 }
 
 // -----------------------------------------------------------------------------
-bool pqAbstractItemSelectionModel::isIndexValid(const QModelIndex & index) const
+bool pqAbstractItemSelectionModel::isIndexValid(const QModelIndex & index_) const
 {
-  if (!index.isValid())
+  if (!index_.isValid())
     {
     return false;
     }
 
-  QModelIndex const & parent = index.parent();
-  if (index.row() >= this->rowCount(parent) || index.column() >= this->columnCount(parent))
+  QModelIndex const & parent_ = index_.parent();
+  if (index_.row() >= this->rowCount(parent_) || index_.column() >= this->columnCount(parent_))
     {
     return false;
     }
