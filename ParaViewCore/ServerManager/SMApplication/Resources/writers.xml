@@ -721,8 +721,19 @@
                proxyname="PLYWriter"></Proxy>
         <ExposedProperties>
           <Property name="FileType" />
+          <Property name="EnableColoring" />
+          <Property name="ColorArrayName" />
+          <Property name="LookupTable" />
         </ExposedProperties>
+        <LinkProperties>
+          <Property name="DummyInput" with_property="Input" />
+        </LinkProperties>
       </SubProxy>
+      <PropertyGroup label="Color Properties">
+        <Property name="EnableColoring" />
+        <Property name="ColorArrayName" />
+        <Property name="LookupTable" />
+      </PropertyGroup>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -750,8 +761,9 @@
                   show="0" />
         <Property name="FileName"
                   show="0" />
-        <WriterFactory extensions="ply"
-                       file_description="PLY Polygonal File Format" />
+        <WriterFactory extensions="ply" file_description="PLY Polygonal File Format" />
+        <InitializationHelper class="vtkSMPLYWriterProxyInitializationHelper" />
+        <UseDocumentationForLabels />
       </Hints>
       <!-- End of PLYWriter -->
     </PSWriterProxy>

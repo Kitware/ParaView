@@ -1564,8 +1564,48 @@ int vtkSMProxy::ReadXMLAttributes( vtkSMSessionProxyManager* pm,
     return 0;
     }
 
+  // Setup subproxy links with parent proxy.
+  for (unsigned int cc=0, max_cc=element->GetNumberOfNestedElements(); cc < max_cc; ++cc)
+    {
+    vtkPVXMLElement* subElem = element->GetNestedElement(cc);
+    if (strcmp(subElem->GetName(), "SubProxy") != 0)
+      {
+      continue;
+      }
+    std::string subproxyName;
+    for (unsigned int kk=0, max_kk=subElem->GetNumberOfNestedElements(); kk < max_kk; ++kk)
+      {
+      vtkPVXMLElement* kElem = subElem->GetNestedElement(kk);
+      if (strcmp(kElem->GetName(), "Proxy") == 0)
+        {
+        subproxyName = kElem->GetAttributeOrDefault("name", "");
+        break;
+        }
+      }
+    vtkSMProxy* subProxy = subproxyName.empty()? NULL : this->GetSubProxy(subproxyName.c_str());
+    if (subProxy == NULL)
+      {
+      continue;
+      }
+    for (unsigned int kk=0, max_kk=subElem->GetNumberOfNestedElements(); kk < max_kk; ++kk)
+      {
+      vtkPVXMLElement* kElem = subElem->GetNestedElement(kk);
+      if (strcmp(kElem->GetName(), "LinkProperties") != 0)
+        {
+        continue;
+        }
+      for (unsigned int jj=0, max_jj=kElem->GetNumberOfNestedElements(); jj < max_jj; ++jj)
+        {
+        vtkPVXMLElement* jElem = kElem->GetNestedElement(jj);
+        if (strcmp(jElem->GetName(), "Property") == 0)
+          {
+          this->LinkProperty(this->GetProperty(jElem->GetAttribute("with_property")),
+            subProxy->GetProperty(jElem->GetAttribute("name")));
+          }
+        }
+      }
+    }
   this->DoNotModifyProperty = old_value;      // FIXME COLLAB: Prevent sending default values
-
   this->SetXMLElement(0);
   return 1;
 }

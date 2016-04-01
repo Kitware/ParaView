@@ -118,10 +118,62 @@
     <!-- ================================================================= -->
     <Proxy base_proxygroup="internal_writers"
            base_proxyname="DataWriterBase"
-           class="vtkPLYWriter"
+           class="vtkPVPLYWriter"
            name="PLYWriter">
       <Documentation short_help="Write polygonal data in Stanford University PLY format.">
       </Documentation>
+      <InputProperty name="DummyInput" panel_visibility="never">
+        <InputArrayDomain attribute_type="any" name="input_array" />
+      </InputProperty>
+
+      <IntVectorProperty name="EnableColoring"
+                         command="SetEnableColoring"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether color information should be saved in the PLY file.
+          If enable, the data source's coloring state i.e. the array to color with and the transfer function
+          from the active view will be used.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="ColorArrayName"
+                            no_custom_default="1"
+                            number_of_elements="5">
+        <Documentation>
+          The array that will be used for saving color information when
+          **Enable Coloring** is ON.
+        </Documentation>
+        <ArrayListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="DummyInput" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property function="Input" name="DummyInput" />
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableColoring"
+                                   value="-1" />
+          <!-- I am keeping this widget always hidden since I don't want the
+               user to be able to change the array in the Writer's dialog.
+               User should change the data's coloring properties in the active view
+               instead -->
+        </Hints>
+      </StringVectorProperty>
+      <ProxyProperty command="SetLookupTable" name="LookupTable" >
+        <Documentation>Set the lookup table to use for scalar
+        mapping.</Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
       <!-- End of PLYWriter -->
     </Proxy>
     <!-- ================================================================= -->

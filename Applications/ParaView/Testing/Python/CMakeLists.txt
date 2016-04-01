@@ -57,6 +57,7 @@ paraview_add_test_pvbatch(
 # in parallel.
 set(PVBATCH_TESTS
   StructuredGridVolumeRendering.py
+  PLYWriter.py
   )
 foreach (tfile IN LISTS PVBATCH_TESTS)
   get_filename_component(test ${tfile} NAME_WE)
