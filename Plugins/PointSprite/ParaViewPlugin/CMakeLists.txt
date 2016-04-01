@@ -40,25 +40,8 @@ IF(PARAVIEW_BUILD_QT_GUI)
       pqTransferFunctionDialog.h
       pqTransferFunctionEditor.h
       )
-  if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    include(ParaViewQt5)
-    include_directories(${Qt5Core_INCLUDE_DIRS})
-    qt5_wrap_ui(UI_SRCS
-      ${UI_FORMS}
-    )
-
-    qt5_wrap_cpp(MOC_SRCS
-      ${PLUGIN_MOC_SRCS})
-  else ()
-    include(${QT_USE_FILE})
-    include_directories(${QT_INCLUDES})
-    qt4_wrap_ui(UI_SRCS
-      ${UI_FORMS}
-    )
-
-    qt4_wrap_cpp(MOC_SRCS
-      ${PLUGIN_MOC_SRCS})
-  endif ()
+    qt_wrap_ui(UI_SRCS ${UI_FORMS})
+    qt_wrap_cpp(MOC_SRCS ${PLUGIN_MOC_SRCS})
 
     set(Plugin_SRCS
       pqDisplayArrayWidget.cxx

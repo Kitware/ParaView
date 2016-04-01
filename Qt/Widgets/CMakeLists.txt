@@ -183,12 +183,28 @@ set (QtWidgets_SRCS
   pqHelpWindow.h
 )
 
-if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  QT5_WRAP_CPP(QtWidgets_MOC_SOURCES ${QtWidgets_SRCS})
-else ()
-  QT4_WRAP_CPP(QtWidgets_MOC_SOURCES ${QtWidgets_SRCS})
-endif ()
+include(ParaViewQt)
 
+set(qt4_public_comps QtGui)
+set(qt4_private_comps QtHelp QtNetwork)
+
+set(qt5_public_comps Core Gui Widgets)
+set(qt5_private_comps Network Help)
+if(PARAVIEW_USE_QTWEBKIT)
+  list(APPEND qt4_private_comps QtWebKit)
+endif()
+if(APPLE)
+  list(APPEND qt5_private_comps PrintSupport)
+endif()
+
+find_package_qt(qt_public_targets REQUIRED
+  QT4_COMPONENTS ${qt4_public_comps}
+  QT5_COMPONENTS ${qt5_public_comps})
+find_package_qt(qt_private_targets REQUIRED
+  QT4_COMPONENTS ${qt4_private_comps}
+  QT5_COMPONENTS ${qt5_private_comps})
+
+QT_WRAP_CPP(QtWidgets_MOC_SOURCES ${QtWidgets_SRCS})
 
 ##########################################################################
 ## Add *.ui files to be uic processed.
@@ -198,15 +214,7 @@ SET(QtWidgets_UI_FORMS
   Resources/UI/pqQuickLaunchDialog.ui
 )
 
-if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  QT5_WRAP_UI(QtWidgets_UI_BUILT_SOURCES
-    ${QtWidgets_UI_FORMS}
-  )
-else ()
-  QT4_WRAP_UI(QtWidgets_UI_BUILT_SOURCES
-    ${QtWidgets_UI_FORMS}
-  )
-endif ()
+QT_WRAP_UI(QtWidgets_UI_BUILT_SOURCES ${QtWidgets_UI_FORMS})
 
 ##########################################################################
 ## Add resources.
@@ -214,15 +222,7 @@ SET(UI_RESOURCES
   Resources/QtWidgets.qrc
 )
 
-if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  QT5_ADD_RESOURCES(RCS_SOURCES
-    ${UI_RESOURCES}
-  )
-else ()
-  QT4_ADD_RESOURCES(RCS_SOURCES
-    ${UI_RESOURCES}
-  )
-endif ()
+QT_ADD_RESOURCES(RCS_SOURCES ${UI_RESOURCES})
 
 SOURCE_GROUP("Resources" FILES
   ${UI_RESOURCES}
@@ -240,37 +240,21 @@ SET(QT_WIDGETS_ALL_SRCS ${Module_SRCS} ${QtWidgets_MOC_SOURCES}
 
 ##########################################################################
 # import Qt build settings
-
-if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  # Setting this variable ensures that any module depending on pqWidgets
-  # automatically inherits the Qt include dirs.
-  set (${vtk-module}_INCLUDE_DIRS
-    ${Qt5Widgets_INCLUDE_DIRS}
-    ${Qt5Network_INCLUDE_DIRS}
-    ${Qt5Help_INCLUDE_DIRS}
-    ${Qt5PrintSupport_INCLUDE_DIRS})
-else ()
-  set (QT_USE_QTNETWORK 1)
-  set (QT_USE_QTHELP 1)
-  if(PARAVIEW_USE_QTWEBKIT)
-    set(QT_USE_QTWEBKIT 1)
-  endif()
-  find_package (Qt4 REQUIRED QUIET)
-  include (${QT_USE_FILE})
-
-  # Setting this variable ensures that any module depending on pqWidgets
-  # automatically inherits the Qt include dirs.
-  set (${vtk-module}_INCLUDE_DIRS
-    ${QT_INCLUDES})
-endif ()
-
 set(${vtk-module}_NO_HeaderTest 1)
 if(PARAVIEW_USE_QTWEBKIT)
   add_definitions(-DPARAVIEW_USE_QTWEBKIT)
 endif()
-vtk_module_library(${vtk-module} ${QT_WIDGETS_ALL_SRCS})
-target_link_libraries(${vtk-module} LINK_PUBLIC ${QT_LIBRARIES})
 
+if(PARAVIEW_QT_VERSION VERSION_GREATER "4")
+  vtk_module_export_code_find_package(Qt5 COMPONENTS ${qt5_public_comps})
+else()
+  vtk_module_export_code_find_package(Qt4 COMPONENTS ${qt4_public_comps})
+endif()
+
+vtk_module_library(${vtk-module} ${QT_WIDGETS_ALL_SRCS})
+target_link_libraries(${vtk-module}
+  LINK_PRIVATE ${qt_private_targets}
+  LINK_PUBLIC ${qt_public_targets})
 #IF (NOT PV_INSTALL_NO_DEVELOPMENT)
 #  # Headers
 #  GLOB_INSTALL_DEVELOPMENT(

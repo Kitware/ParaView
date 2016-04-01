@@ -327,33 +327,19 @@ if (PARAVIEW_ENABLE_PYTHON)
     )
 endif()
 
-
 #-------------------------------------------------------------------------
-if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  # Setting this variable ensures that any module depending on pqWidgets
-  # automatically inherits the Qt include dirs.
-  set (${vtk-module}_INCLUDE_DIRS ${Qt5Widgets_INCLUDE_DIRS})
-else ()
-  # import Qt4 build settings
-  find_package (Qt4 REQUIRED QUIET)
-  include (${QT_USE_FILE})
-  # Setting this variable ensures that any module depending on pqWidgets
-  # automatically inherits the Qt include dirs.
-  set (${vtk-module}_INCLUDE_DIRS
-    ${QT_INCLUDES})
-endif()
+include(ParaViewQt)
+find_package_qt(qt_private_targets REQUIRED QUIET
+  QT4_COMPONENTS QtHelp
+  QT5_COMPONENTS Help)
+
+qt_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
+qt_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
+qt_add_resources(__Module_RESOURCE_SRCS ${Module_RESOURCE_FILES})
+
 #-------------------------------------------------------------------------
 set(${vtk-module}_NO_HeaderTest 1)
 
-if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  qt5_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
-  qt5_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
-  qt5_add_resources(__Module_RESOURCE_SRCS ${Module_RESOURCE_FILES})
-else ()
-  qt4_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
-  qt4_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
-  qt4_add_resources(__Module_RESOURCE_SRCS ${Module_RESOURCE_FILES})
-endif ()
 
 SOURCE_GROUP("Resources" FILES
   ${Module_UI_FILES}
@@ -371,7 +357,8 @@ vtk_module_library(${vtk-module}
   ${__Module_RESOURCE_SRCS}
   ${__Module_MOC_SRCS}
   ${__Module_UI_SRCS})
-target_link_libraries(${vtk-module} LINK_PUBLIC ${QT_LIBRARIES})
+target_link_libraries(${vtk-module}
+  LINK_PRIVATE ${qt_private_targets})
 
 #IF (NOT PV_INSTALL_NO_DEVELOPMENT)
 #  # Headers

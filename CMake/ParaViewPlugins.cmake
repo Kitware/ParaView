@@ -1,7 +1,5 @@
 include(ParaViewMacros)
 
-# Requires ParaView_QT_DIR and ParaView_BINARY_DIR to be set.
-
 # Macro to install a plugin that's included in the ParaView source directory.
 # This is a macro internal to ParaView and should not be directly used by
 # external applications. This may change in future without notice.
@@ -772,36 +770,6 @@ MACRO(ADD_PARAVIEW_GUI_EXTENSION OUTSRCS NAME VERSION)
 
 ENDMACRO()
 
-# internal macro to work around deficiency in FindQt4.cmake, will be removed in
-# the future.
-MACRO(PARAVIEW_QT4_ADD_RESOURCES outfiles )
-  FOREACH (it ${ARGN})
-    GET_FILENAME_COMPONENT(outfilename ${it} NAME_WE)
-    GET_FILENAME_COMPONENT(infile ${it} ABSOLUTE)
-    GET_FILENAME_COMPONENT(rc_path ${infile} PATH)
-    SET(outfile ${CMAKE_CURRENT_BINARY_DIR}/qrc_${outfilename}.cxx)
-    #  parse file for dependencies
-    #  all files are absolute paths or relative to the location of the qrc file
-    FILE(READ "${infile}" _RC_FILE_CONTENTS)
-    STRING(REGEX MATCHALL "<file[^<]+" _RC_FILES "${_RC_FILE_CONTENTS}")
-    SET(_RC_DEPENDS)
-    FOREACH(_RC_FILE ${_RC_FILES})
-      STRING(REGEX REPLACE "^<file[^>]*>" "" _RC_FILE "${_RC_FILE}")
-      STRING(REGEX MATCH "^/|([A-Za-z]:/)" _ABS_PATH_INDICATOR "${_RC_FILE}")
-      IF(NOT _ABS_PATH_INDICATOR)
-        SET(_RC_FILE "${rc_path}/${_RC_FILE}")
-      ENDIF()
-      SET(_RC_DEPENDS ${_RC_DEPENDS} "${_RC_FILE}")
-    ENDFOREACH()
-    ADD_CUSTOM_COMMAND(OUTPUT ${outfile}
-      COMMAND ${QT_RCC_EXECUTABLE}
-      ARGS ${rcc_options} -name ${outfilename} -o ${outfile} ${infile}
-      MAIN_DEPENDENCY ${infile}
-      DEPENDS ${_RC_DEPENDS})
-    SET(${outfiles} ${${outfiles}} ${outfile})
-  ENDFOREACH ()
-ENDMACRO()
-
 # create a plugin
 #  A plugin may contain only server code, only gui code, or both.
 #  SERVER_MANAGER_SOURCES will be wrapped
@@ -921,19 +889,6 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
   ENDIF ()
 
   IF(PARAVIEW_BUILD_QT_GUI)
-
-    IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-      SET(Qt5_FIND_COMPONENTS
-        Gui
-        Help
-        Widgets
-        )
-      INCLUDE (ParaViewQt5)
-    ELSE ()
-      FIND_PACKAGE (Qt4)
-      INCLUDE (${QT_USE_FILE})
-    ENDIF ()
-
     # if server-manager xmls are specified, we can generate documentation from
     # them, if Qt is enabled.
     if (ARG_SERVER_MANAGER_XML)
@@ -990,8 +945,7 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
             "${QRC_RESOURCES_INIT}Q_INIT_RESOURCE(${rc_name});\n")
         endforeach()
       endif()
-
-      PARAVIEW_QT4_ADD_RESOURCES(QT_RCS ${ARG_GUI_RESOURCES})
+      qt_add_resources(QT_RCS ${ARG_GUI_RESOURCES})
       SET(GUI_SRCS ${GUI_SRCS} ${QT_RCS})
     ENDIF()
 
@@ -1093,7 +1047,8 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
     ENDIF()
 
     IF(plugin_type_gui OR GUI_SRCS)
-      target_link_libraries(${NAME} LINK_PUBLIC pqComponents)
+      target_link_libraries(${NAME}
+        LINK_PUBLIC pqComponents)
     ENDIF()
     IF(SM_SRCS)
       target_link_libraries(${NAME} LINK_PUBLIC vtkPVServerManagerApplication

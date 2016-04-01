@@ -11,16 +11,10 @@ else()
   include_directories(${VTK_INCLUDE_DIRS})
 endif()
 
-if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  set (Qt5_FIND_COMPONENTS
-    Widgets
-    Network
-    )
-  include (ParaViewQt5)
-else ()
-  set (QT_USE_QTNETWORK TRUE)
-  include (${QT_USE_FILE})
-endif ()
+include(ParaViewQt)
+find_package_qt(qt_targets REQUIRED
+                QT4_COMPONENTS QtGui QtNetwork
+                QT5_COMPONENTS Widgets Network)
 
 # Checks to see if we want to use VRPN or VRUI.
 # Both are disabled by default.
@@ -64,41 +58,22 @@ if(PARAVIEW_USE_VRUI)
     vtkVRUITrackerState.cxx)
 endif()
 
-if(PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  QT5_WRAP_CPP(MOC_SRCS
-    pqVRAddConnectionDialog.h
-    pqVRAddStyleDialog.h
-    pqVRConnectionManager.h
-    pqVRDockPanel.h
-    pqVRQueueHandler.h
-    pqVRStarter.h
-    ${VRPN_MOC_SRC}
-    ${VRUI_MOC_SRC}
-    )
+QT_WRAP_CPP(MOC_SRCS
+  pqVRAddConnectionDialog.h
+  pqVRAddStyleDialog.h
+  pqVRConnectionManager.h
+  pqVRDockPanel.h
+  pqVRQueueHandler.h
+  pqVRStarter.h
+  ${VRPN_MOC_SRC}
+  ${VRUI_MOC_SRC}
+  )
 
-  QT5_WRAP_UI(UI_SRCS
-    pqVRDockPanel.ui
-    pqVRAddConnectionDialog.ui
-    pqVRAddStyleDialog.ui
-    )
-else()
-  QT4_WRAP_CPP(MOC_SRCS
-    pqVRAddConnectionDialog.h
-    pqVRAddStyleDialog.h
-    pqVRConnectionManager.h
-    pqVRDockPanel.h
-    pqVRQueueHandler.h
-    pqVRStarter.h
-    ${VRPN_MOC_SRC}
-    ${VRUI_MOC_SRC}
-    )
-
-  QT4_WRAP_UI(UI_SRCS
-    pqVRDockPanel.ui
-    pqVRAddConnectionDialog.ui
-    pqVRAddStyleDialog.ui
-    )
-endif()
+QT_WRAP_UI(UI_SRCS
+  pqVRDockPanel.ui
+  pqVRAddConnectionDialog.ui
+  pqVRAddStyleDialog.ui
+  )
 
 if(PARAVIEW_USE_VRPN)
   INCLUDE_DIRECTORIES(${VRPN_INCLUDE_DIR} ${VRPN_LIBUSB_INCLUDE_DIR})
@@ -156,5 +131,6 @@ endif()
 target_link_libraries (VRPlugin
   LINK_PRIVATE
     pqApplicationComponents
-    vtkPVServerManagerRendering 
+    vtkPVServerManagerRendering
+    ${qt_targets}
 )

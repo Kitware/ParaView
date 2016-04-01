@@ -443,53 +443,15 @@ if (NOT PARAVIEW_INSTALL_DEVELOPMENT_FILES)
   set (VTK_INSTALL_NO_DEVELOPMENT TRUE)
 endif()
 
-# Setup Qt state
-if (PARAVIEW_ENABLE_QT_SUPPORT)
-  # need to set up Qt stuff here because there are Qt dependencies before
-  # ParaView requires this minimum version of Qt, and let's do it here before
-  # our first call to FindQt4.cmake
-  set (QT_REQUIRED TRUE)
-
-  include (ParaViewQtVersion)
-  if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    set (Qt5_FIND_COMPONENTS
-      Help
-      Network
-      UiTools
-      Widgets)
-    if(PARAVIEW_USE_QTWEBKIT)
-      list(APPEND Qt5_FIND_COMPONENTS WebKitWidgets)
-    endif()
-    include (ParaViewQt5)
-    if (NOT QT5_FOUND)
-      message( SEND_ERROR "Qt ${QT_MIN_VERSION} or greater not found. "
-        "Please set the Qt5Core_DIR variable." )
-    endif ()
-  else ()
-    find_package (Qt4)
-    if (NOT QT4_FOUND)
-      message (SEND_ERROR "Qt ${QT_MIN_VERSION} or greater not found. "
-        "Please set the QT_QMAKE_EXECUTABLE variable.")
-    else ()
-      # check is Qtversion  is 4.8.*. If so, we are good. Otherwise we will post a
-      # warning of versions (>= 4.7 && < 4.8). However we report errors for any
-      # version less than 4.7
-      string(REGEX MATCH "^4\\.[8]\\.[0-9]+" qt_version_match "${QTVERSION}")
-      if (NOT qt_version_match)
-        string(REGEX MATCH "^4\\.[0-6]+\\.[0-9]+" qt_version46_x_tmp "${QTVERSION}")
-        if (qt_version46_x_tmp)
-          message(SEND_ERROR "Qt ${QTVERSION} not supported. "
-            "Please use ${QT_OFFICIAL_VERSION} (you may need to clean your dirtied cache)."
-            "Minium required version is ${QT_MIN_VERSION}.")
-        else ()
-          message(WARNING "Warning: You are using Qt ${QTVERSION}. "
-            "Officially supported version is Qt ${QT_OFFICIAL_VERSION}")
-        endif ()
-      endif ()
-    endif ()
-  endif ()
-endif ()
-SET(PARAVIEW_QT_QMAKE_EXECUTABLE ${QT_QMAKE_EXECUTABLE})
+# Setup Qt state. We just do a quick top level check for Qt's exisiting here.
+# We let individual modules find_package(Qt..) as needed.
+if(PARAVIEW_ENABLE_QT_SUPPORT)
+  set(PARAVIEW_QT_VERSION "4" CACHE STRING  "Select Qt verision to use 4 or 5")
+  set_property(CACHE PARAVIEW_QT_VERSION PROPERTY STRINGS 4 5)
+  # Force VTK to use the same Qt version as ParaView.
+  set(VTK_QT_VERSION "${PARAVIEW_QT_VERSION}" CACHE INTERNAL "")
+  set(VTK_BUILD_QT_DESIGNER_PLUGIN OFF CACHE INTERNAL "")
+endif()
 
 # Setup testing.
 if (BUILD_TESTING)

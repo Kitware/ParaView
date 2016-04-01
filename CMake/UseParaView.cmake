@@ -30,22 +30,19 @@ foreach (defn IN LISTS cur_compile_definitions)
 endforeach()
 set_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS ${new_compile_definition})
 
-if (PARAVIEW_ENABLE_QT_SUPPORT)
-  if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    include(ParaViewQt5)
-  else ()
-    set(QT_QMAKE_EXECUTABLE ${PARAVIEW_QT_QMAKE_EXECUTABLE})
-    find_package(Qt4)
-    if (QT4_FOUND)
-      include("${QT_USE_FILE}")
-    endif()
-  endif()
-endif()
-
 # Import some commonly used cmake modules
 include (ParaViewMacros)
 include (ParaViewPlugins)
 include (ParaViewBranding)
+include (ParaViewQt)
+
+if(PARAVIEW_ENABLE_QT_SUPPORT)
+  if(PARAVIEW_QT_VERSION VERSION_GREATER "4")
+    # nothing to do. the module system handles it properly.
+  else()
+    set(QT_QMAKE_EXECUTABLE "${PARAVIEW_QT_QMAKE_EXECUTABLE}" CACHE FILEPATH "Qt4 qmake executable")
+  endif()
+endif()
 
 # Workaround for MPICH bug that produces error messages:
 # "SEEK_SET is #defined but must not be for the C++ binding of MPI.

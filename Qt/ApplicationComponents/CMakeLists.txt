@@ -528,25 +528,18 @@ set (Module_RESOURCE_FILES
   Resources/pqApplicationComponents.qrc
 )
 
+include(ParaViewQt)
+find_package_qt(qt_private_targets REQUIRED QUIET
+  QT4_COMPONENTS QtHelp
+  QT5_COMPONENTS Widgets Help)
+
 # not sure this is the best way, but "moc" is complaining about
 # interfaces defined under Components and this seems like the only way to fix
 # that issue.
-if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  qt5_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS}
-    OPTIONS -I ${CMAKE_CURRENT_SOURCE_DIR}/../Components)
-else ()
-  qt4_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS}
-    OPTIONS -I ${CMAKE_CURRENT_SOURCE_DIR}/../Components)
-endif()
-
-
-if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  qt5_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
-  qt5_add_resources(__Module_RESOURCE_SRCS ${Module_RESOURCE_FILES})
-else ()
-  qt4_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
-  qt4_add_resources(__Module_RESOURCE_SRCS ${Module_RESOURCE_FILES})
-endif()
+qt_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS}
+  OPTIONS -I ${CMAKE_CURRENT_SOURCE_DIR}/../Components)
+qt_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
+qt_add_resources(__Module_RESOURCE_SRCS ${Module_RESOURCE_FILES})
 
 SOURCE_GROUP("Resources" FILES
   ${Module_UI_FILES}
@@ -565,6 +558,8 @@ vtk_module_library(pqApplicationComponents
   ${__Module_RESOURCE_SRCS}
   ${__Module_MOC_SRCS}
   ${__Module_UI_SRCS})
+target_link_libraries(pqApplicationComponents
+  LINK_PRIVATE ${qt_private_targets})
 
 #IF (NOT PV_INSTALL_NO_DEVELOPMENT)
 #  # Headers
