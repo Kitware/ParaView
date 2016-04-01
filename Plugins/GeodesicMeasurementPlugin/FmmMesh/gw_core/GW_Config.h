@@ -55,7 +55,7 @@ namespace GW {
 /** \name Basic types */
 //-------------------------------------------------------------------------
 //@{
-#if defined(__UNIX__) || defined(__unix__)
+#if defined(__UNIX__) || defined(__unix__) || defined(__APPLE__)
     typedef char                    GW_I8;
     typedef unsigned char           GW_U8;
     typedef short                    GW_I16;
