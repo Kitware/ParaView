@@ -546,7 +546,7 @@ public:
       vtkNew<vtkSMPropertyIterator> propertyIter;
       this->Properties = vtkStringList::New();
       propertyIter->SetProxy(smproxy);
-      
+
       for (propertyIter->Begin(); !propertyIter->IsAtEnd(); propertyIter->Next())
         {
         QString propertyKeyName = propertyIter->GetKey();
@@ -602,7 +602,7 @@ pqProxyWidget::pqProxyWidget(
 
 //-----------------------------------------------------------------------------
 pqProxyWidget::pqProxyWidget(
-  vtkSMProxy* smproxy, const QStringList &properties, QWidget *parentObject, 
+  vtkSMProxy* smproxy, const QStringList &properties, QWidget *parentObject,
   Qt::WindowFlags wflags)
   : Superclass(parentObject, wflags)
 {
@@ -973,14 +973,17 @@ void pqProxyWidget::createPropertyWidgets(const QStringList &properties)
   vtkNew<vtkSMOrderedPropertyIterator> propertyIter;
   propertyIter->SetProxy(smproxy);
 
+  bool isCompoundProxy = smproxy->IsA("vtkSMCompoundSourceProxy");
+
   for (propertyIter->Begin(); !propertyIter->IsAtEnd(); propertyIter->Next())
     {
     vtkSMProperty *smProperty = propertyIter->GetProperty();
 
     QString propertyKeyName = propertyIter->GetKey();
     propertyKeyName.replace(" ", "");
-    const char *xmlLabel = smProperty->GetXMLLabel()? smProperty->GetXMLLabel():
-      propertyIter->GetKey();
+    const char *xmlLabel = (smProperty->GetXMLLabel() && !isCompoundProxy) ?
+      smProperty->GetXMLLabel() : propertyIter->GetKey();
+
     QString xmlDocumentation = pqProxyWidget::documentationText(smProperty);
 
     bool ignorePanelVisibility = false;
