@@ -445,6 +445,7 @@
         </DataTypeDomain>
         <ProxyListDomain name="proxy_list">
           <Proxy group="extended_sources" name="BoundedPlaneSource" />
+          <Proxy group="extended_sources" name="LineSource" />
         </ProxyListDomain>
         <Documentation>The data source that provides the structure to be interpolated on.</Documentation>
       </InputProperty>
@@ -614,6 +615,7 @@
         </DataTypeDomain>
         <ProxyListDomain name="proxy_list">
           <Proxy group="extended_sources" name="BoundedPlaneSource" />
+          <Proxy group="extended_sources" name="LineSource" />
         </ProxyListDomain>
         <Documentation>The data source that provides the structure to be interpolated on.</Documentation>
       </InputProperty>
