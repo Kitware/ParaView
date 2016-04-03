@@ -40,15 +40,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// To use this widget for a property group
 /// (vtkSMPropertyGroup), use "InteractiveBox" as the "panel_widget" in the
 /// XML configuration for the proxy. The property group should have properties for
-/// following functions:
+/// following functions (all of which are optional):
 /// \li \c Position: a 3-tuple vtkSMDoubleVectorProperty that will be linked to the
 /// translation/position of the box.
 /// \li \c Rotation: a 3-tuple vtkSMDoubleVectorProperty that will be linked to the
 /// orientation for the box.
 /// \li \c Scale : a 3-tuple vtkSMDoubleVectorProperty that will be linked to the
 /// scale for the box.
-/// \li \c Input: (optional) a vtkSMInputProperty that is used to get data
+/// \li \c Input: a vtkSMInputProperty that is used to get data
 /// information for bounds when placing/resetting the widget.
+///
+/// Note while all of the above are optional, it really doesn't make much sense
+/// to use this widget if any of them are not specified.
 class PQAPPLICATIONCOMPONENTS_EXPORT pqBoxPropertyWidget : public pqInteractivePropertyWidget
 {
   Q_OBJECT

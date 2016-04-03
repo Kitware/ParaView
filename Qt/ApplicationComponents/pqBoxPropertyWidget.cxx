@@ -57,6 +57,19 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
   new QDoubleValidator(ui.scaleY);
   new QDoubleValidator(ui.scaleZ);
 
+  vtkSMProxy* wdgProxy = this->widgetProxy();
+
+  // Let's link some of the UI elements that only affect the interactive widget
+  // properties without affecting properties on the main proxy.
+  this->WidgetLinks.addPropertyLink(ui.enableTranslation, "checked", SIGNAL(toggled(bool)),
+    wdgProxy, wdgProxy->GetProperty("TranslationEnabled"));
+  this->WidgetLinks.addPropertyLink(ui.enableScaling, "checked", SIGNAL(toggled(bool)),
+    wdgProxy, wdgProxy->GetProperty("ScalingEnabled"));
+  this->WidgetLinks.addPropertyLink(ui.enableRotation, "checked", SIGNAL(toggled(bool)),
+    wdgProxy, wdgProxy->GetProperty("RotationEnabled"));
+  this->WidgetLinks.addPropertyLink(ui.enableMoveFaces, "checked", SIGNAL(toggled(bool)),
+    wdgProxy, wdgProxy->GetProperty("MoveFacesEnabled"));
+
   if (vtkSMProperty* position = smgroup->GetProperty("Position"))
     {
     this->addPropertyLink(
@@ -69,7 +82,14 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
     }
   else
     {
-    qCritical("Missing required property for 'Position'.");
+    ui.labelTranslate->hide();
+    ui.translateX->hide();
+    ui.translateY->hide();
+    ui.translateZ->hide();
+
+    // see WidgetLinks above.
+    ui.enableTranslation->setChecked(false);
+    ui.enableTranslation->hide();
     }
 
   if (vtkSMProperty* rotation = smgroup->GetProperty("Rotation"))
@@ -84,7 +104,14 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
     }
   else
     {
-    qCritical("Missing required property for 'Rotation'.");
+    ui.labelRotate->hide();
+    ui.rotateX->hide();
+    ui.rotateY->hide();
+    ui.rotateZ->hide();
+
+    // see WidgetLinks above.
+    ui.enableRotation->setChecked(false);
+    ui.enableRotation->hide();
     }
 
   if (vtkSMProperty* scale = smgroup->GetProperty("Scale"))
@@ -99,26 +126,28 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
     }
   else
     {
-    qCritical("Missing required property for 'Scale'.");
+    ui.labelScale->hide();
+    ui.scaleX->hide();
+    ui.scaleY->hide();
+    ui.scaleZ->hide();
+
+    // see WidgetLinks above.
+    ui.enableScaling->setChecked(false);
+    ui.enableScaling->hide();
+    ui.enableMoveFaces->setChecked(false);
+    ui.enableMoveFaces->hide();
     }
 
-  // Let's link some of the UI elements that only affect the interactive widget
-  // properties without affecting properties on the main proxy.
-  vtkSMProxy* wdgProxy = this->widgetProxy();
-  this->WidgetLinks.addPropertyLink(ui.enableTranslation, "checked", SIGNAL(toggled(bool)),
-    wdgProxy, wdgProxy->GetProperty("TranslationEnabled"));
-  this->WidgetLinks.addPropertyLink(ui.enableScaling, "checked", SIGNAL(toggled(bool)),
-    wdgProxy, wdgProxy->GetProperty("ScalingEnabled"));
-  this->WidgetLinks.addPropertyLink(ui.enableRotation, "checked", SIGNAL(toggled(bool)),
-    wdgProxy, wdgProxy->GetProperty("RotationEnabled"));
-  this->WidgetLinks.addPropertyLink(ui.enableMoveFaces, "checked", SIGNAL(toggled(bool)),
-    wdgProxy, wdgProxy->GetProperty("MoveFacesEnabled"));
   this->connect(&this->WidgetLinks, SIGNAL(qtWidgetChanged()), SLOT(render()));
 
   // link show3DWidget checkbox
   this->connect(ui.show3DWidget, SIGNAL(toggled(bool)), SLOT(setWidgetVisible(bool)));
   ui.show3DWidget->connect(this, SIGNAL(widgetVisibilityToggled(bool)), SLOT(setChecked(bool)));
   this->setWidgetVisible(ui.show3DWidget->isChecked());
+
+  // hiding this since this is not connected to anything currently. Need to
+  // figure out what exactly should it do.
+  ui.resetBounds->hide();
 }
 
 //-----------------------------------------------------------------------------
@@ -132,7 +161,7 @@ void pqBoxPropertyWidget::placeWidget()
   vtkBoundingBox bbox = this->dataBounds();
   if (!bbox.IsValid())
     {
-    return;
+    bbox = vtkBoundingBox(0, 1, 0, 1, 0, 1);
     }
 
   vtkSMNewWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
