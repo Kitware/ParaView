@@ -182,6 +182,15 @@ void vtkSMBoundsDomain::SetDomainValues(double bounds[6])
       }
     this->SetEntries(entries);
     }
+  else if (this->Mode == vtkSMBoundsDomain::EXTENTS)
+    {
+    std::vector<vtkEntry> entries;
+    for (int j = 0; j < 3; j++)
+      {
+      entries.push_back(vtkEntry(0, bounds[2*j+1] - bounds[2*j]));
+      }
+    this->SetEntries(entries);
+    }
   else if (this->Mode == vtkSMBoundsDomain::MAGNITUDE)
     {
     // first check if the bounds have valid values before setting them
@@ -308,6 +317,14 @@ int vtkSMBoundsDomain::ReadXMLAttributes(
           this->DefaultModeVector[2*cc] = MIN;
           this->DefaultModeVector[2*cc + 1] = MAX;
           }
+        }
+      }
+    else if (strcmp(mode, "extents") == 0)
+      {
+      this->Mode = vtkSMBoundsDomain::EXTENTS;
+      if (!has_default_mode)
+        {
+        this->DefaultDefaultMode = vtkSMDoubleRangeDomain::MAX;
         }
       }
     else if (strcmp(mode, "approximate_cell_length") == 0)
