@@ -16,6 +16,7 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
+#include "vtkImageData.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
@@ -26,9 +27,10 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyLink.h"
-#include "vtkSMSessionProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRepresentationProxy.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMUtilities.h"
 #include "vtkSMViewProxy.h"
 
 #include <vector>
@@ -874,6 +876,40 @@ void vtkPVComparativeView::GetRepresentations(int x, int y,
       collection->AddItem(data.Clones[index-1].CloneRepresentation);
       }
     }
+}
+
+//----------------------------------------------------------------------------
+vtkImageData* vtkPVComparativeView::CaptureWindow(int magnification)
+{
+  std::vector<vtkSmartPointer<vtkImageData> > images;
+  for (vtkInternal::VectorOfViews::const_iterator iter =
+    this->Internal->Views.begin();
+    iter != this->Internal->Views.end(); ++iter)
+    {
+    vtkImageData* image = iter->GetPointer()->CaptureWindow(magnification);
+    if (image)
+      {
+      const int* image_extent = image->GetExtent();
+      images.push_back(image);
+      image->FastDelete();
+      }
+    if (this->OverlayAllComparisons)
+      {
+      break;
+      }
+    }
+
+  if (images.size() == 0)
+    {
+    return NULL;
+    }
+
+  vtkSmartPointer<vtkImageData> img = vtkSMUtilities::MergeImages(images);
+  if (img)
+    {
+    img->Register(this);
+    }
+  return img.GetPointer();
 }
 
 //----------------------------------------------------------------------------

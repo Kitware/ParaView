@@ -211,6 +211,15 @@ bool vtkSMComparativeViewProxy::MakeRenderWindowInteractor(bool quiet)
 }
 
 //----------------------------------------------------------------------------
+vtkImageData* vtkSMComparativeViewProxy::CaptureWindowInternal(int magnification)
+{
+  // This is needed to ensure that the views are laid out properly before trying
+  // to capture images from each of them.
+  this->Update();
+  return GET_PV_COMPARATIVE_VIEW()->CaptureWindow(magnification);
+}
+
+//----------------------------------------------------------------------------
 void vtkSMComparativeViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
