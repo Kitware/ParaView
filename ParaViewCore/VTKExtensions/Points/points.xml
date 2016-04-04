@@ -501,7 +501,7 @@
         <ProxyListDomain name="proxy_list">
           <Proxy group="extended_sources" name="BoundedPlaneSource" />
           <Proxy group="extended_sources" name="BoundedVolumeSource" />
-          <Proxy group="extended_sources" name="LineSource" />
+          <Proxy group="extended_sources" name="HighResLineSource" />
         </ProxyListDomain>
         <Documentation>The data source that provides the structure to be interpolated on.</Documentation>
       </InputProperty>
@@ -672,7 +672,7 @@
         <ProxyListDomain name="proxy_list">
           <Proxy group="extended_sources" name="BoundedPlaneSource" />
           <Proxy group="extended_sources" name="BoundedVolumeSource" />
-          <Proxy group="extended_sources" name="LineSource" />
+          <Proxy group="extended_sources" name="HighResLineSource" />
         </ProxyListDomain>
         <Documentation>The data source that provides the structure to be interpolated on.</Documentation>
       </InputProperty>
