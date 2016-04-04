@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Server Manager Includes.
 #include "pqQVTKWidget.h"
+#include "pqUndoStack.h"
 #include "vtkCollection.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkImageData.h"
@@ -43,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMComparativeViewProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkWeakPointer.h"
 
 // Qt Includes.
 #include <QMap>
@@ -66,6 +68,28 @@ public:
     }
 };
 
+namespace
+{
+/// This helps us monitor QResizeEvent after it has been processed (unlike a
+/// generic event filter).
+class pqComparativeWidget  : public QWidget
+{
+public:
+  vtkWeakPointer<vtkSMProxy> ViewProxy;
+  void resizeEvent(QResizeEvent * evt)
+    {
+    this->QWidget::resizeEvent(evt);
+
+    BEGIN_UNDO_EXCLUDE();
+    int view_size[2];
+    view_size[0] = this->size().width();
+    view_size[1] = this->size().height();
+    vtkSMPropertyHelper(this->ViewProxy, "ViewSize").Set(view_size, 2);
+    this->ViewProxy->UpdateProperty( "ViewSize");
+    END_UNDO_EXCLUDE();
+    }
+};
+}
 //-----------------------------------------------------------------------------
 pqComparativeRenderView::pqComparativeRenderView(
   const QString& group,
@@ -95,7 +119,8 @@ pqComparativeRenderView::~pqComparativeRenderView()
 //-----------------------------------------------------------------------------
 QWidget* pqComparativeRenderView::createWidget()
 {
-  QWidget* container = new QWidget();
+  pqComparativeWidget* container = new pqComparativeWidget();
+  container->ViewProxy = this->getProxy();
   this->updateViewWidgets(container);
   return container;
 }
