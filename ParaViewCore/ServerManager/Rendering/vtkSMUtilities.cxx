@@ -68,6 +68,11 @@ int vtkSMUtilities::SaveImage(vtkImageData* image, const char* filename,
   else if (ext == ".png")
     {
     writer = vtkPNGWriter::New();
+    if (quality >=0 && quality <= 100)
+      {
+      int compression = (quality * 9) / 100;
+      static_cast<vtkPNGWriter*>(writer)->SetCompressionLevel(compression);
+      }
     }
   else if (ext == ".jpg" || ext == ".jpeg")
     {
