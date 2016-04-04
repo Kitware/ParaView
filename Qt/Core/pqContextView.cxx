@@ -209,16 +209,22 @@ void pqContextView::setSelection(vtkSelection* sel)
   pqOutputPort* opPort = pqRepr->getOutputPortFromInput();
   vtkSMSourceProxy* repSource = vtkSMSourceProxy::SafeDownCast(
     opPort->getSource()->getProxy());
+  
+  repSource->CleanSelectionInputs(opPort->getPortNumber());
 
   vtkSMProxy* selectionSource =
     vtkSMSelectionHelper::NewSelectionSourceFromSelection(
       repSource->GetSession(), sel);
 
-  // Set the selection on the representation's source
-  repSource->CleanSelectionInputs(opPort->getPortNumber());
-  repSource->SetSelectionInput(opPort->getPortNumber(),
-    vtkSMSourceProxy::SafeDownCast(selectionSource), 0);
-  selectionSource->Delete();
+  // If not selection has been made, 
+  // the selection source can be null.
+  if (selectionSource)
+    {
+    // Set the selection on the representation's source
+    repSource->SetSelectionInput(opPort->getPortNumber(),
+      vtkSMSourceProxy::SafeDownCast(selectionSource), 0);
+    selectionSource->Delete();
+    }
 
   emit this->selected(opPort);
 }
