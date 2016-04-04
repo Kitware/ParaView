@@ -228,6 +228,22 @@ const double* vtkSMViewLayoutProxy::GetMultiViewImageBorderColor()
 }
 
 //----------------------------------------------------------------------------
+void vtkSMViewLayoutProxy::GetMultiViewImageBorderColor(unsigned char rgb[3])
+{
+  rgb[0] = static_cast<unsigned char>(vtkSMViewLayoutProxy::MultiViewImageBorderColor[0] *  0xff);
+  rgb[1] = static_cast<unsigned char>(vtkSMViewLayoutProxy::MultiViewImageBorderColor[1] *  0xff);
+  rgb[2] = static_cast<unsigned char>(vtkSMViewLayoutProxy::MultiViewImageBorderColor[2] *  0xff);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMViewLayoutProxy::GetMultiViewImageBorderColor(double rgb[3])
+{
+  rgb[0] = vtkSMViewLayoutProxy::MultiViewImageBorderColor[0];
+  rgb[1] = vtkSMViewLayoutProxy::MultiViewImageBorderColor[1];
+  rgb[2] = vtkSMViewLayoutProxy::MultiViewImageBorderColor[2];
+}
+
+//----------------------------------------------------------------------------
 int vtkSMViewLayoutProxy::GetMultiViewImageBorderWidth()
 {
   return vtkSMViewLayoutProxy::MultiViewImageBorderWidth;
@@ -1028,9 +1044,7 @@ vtkImageData* vtkSMViewLayoutProxy::CaptureWindow(int magnification)
     }
 
   unsigned char color[3];
-  color[0] = static_cast<unsigned char>(vtkSMViewLayoutProxy::MultiViewImageBorderColor[0] *  0xff);
-  color[1] = static_cast<unsigned char>(vtkSMViewLayoutProxy::MultiViewImageBorderColor[1] *  0xff);
-  color[2] = static_cast<unsigned char>(vtkSMViewLayoutProxy::MultiViewImageBorderColor[2] *  0xff);
+  vtkSMViewLayoutProxy::GetMultiViewImageBorderColor(color);
   vtkSmartPointer<vtkImageData> img = vtkSMUtilities::MergeImages(
     images, vtkSMViewLayoutProxy::MultiViewImageBorderWidth, color);
   if (img)

@@ -31,7 +31,9 @@
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMUtilities.h"
+#include "vtkSMViewLayoutProxy.h"
 #include "vtkSMViewProxy.h"
+#include "vtkVectorOperators.h"
 
 #include <vector>
 #include <map>
@@ -40,6 +42,52 @@
 #include <sstream>
 
 #include <assert.h>
+
+namespace
+{
+  typedef vtkTypeInt64 Fixed64;
+  static inline Fixed64 toFixed(int i) { return (Fixed64)i * 256; }
+  static inline int fRound(Fixed64 i) { return (i % 256 < 128) ? i / 256 : 1 + i / 256; }
+  struct LayoutStruct
+    {
+    int pos;
+    int size;
+    };
+
+  // This code is loosely based on the QGridLayout's workhouse qGeomCalc (in qlayoutengine.cpp
+  // for Qt version 5.6) which portions out available space to a collection of items in a row or
+  // a column.
+  //
+  // The calculation is done in fixed point: "fixed" variables are scaled by a factor of 256.
+  void vtkGeomCalc(std::vector<LayoutStruct>& chain,
+    int start, int count, int pos, int space, int spacing)
+    {
+    assert(start == 0 && count > 1 && pos >= 0 && space >= 0 && space >= 0);
+    // amount of space left after borders are added between views.
+    int space_left = space - (count > 1? count - 1 : 0) * spacing;
+
+    int space_allocated = 0;
+    Fixed64 fp_space = toFixed(space_left);
+    Fixed64 fp_w = 0;
+    for (int i=start; i < count; ++i)
+      {
+      LayoutStruct* data = &chain[i];
+      fp_w += (fp_space / count);
+      int w = fRound(fp_w);
+      data->size = w;
+      fp_w -= toFixed(w); // give the difference to the next.
+      space_allocated += w;
+      }
+    space_left -= space_allocated;
+    assert(space_left == 0);
+
+    chain[start].pos = pos;
+    for (int i=start+1; i < count; ++i)
+      {
+      chain[i].pos = chain[i-1].pos + chain[i-1].size + spacing;
+      }
+    }
+}
 
 #define ENSURE_INIT() if (this->RootView == NULL) { return; }
 
@@ -400,32 +448,36 @@ void vtkPVComparativeView::Build(int dx, int dy)
   this->InvokeEvent(vtkCommand::ConfigureEvent);
 }
 
+
+
 //----------------------------------------------------------------------------
 void vtkPVComparativeView::UpdateViewLayout()
 {
   ENSURE_INIT();
 
-  int dx = this->OverlayAllComparisons? 1 : this->Dimensions[0];
-  int dy = this->OverlayAllComparisons? 1 : this->Dimensions[1];
-  int width =
-    (this->ViewSize[0] - (dx-1)*this->Spacing[0])/dx;
-  int height =
-    (this->ViewSize[1] - (dy-1)*this->Spacing[1])/dy;
+  int numCols = this->OverlayAllComparisons? 1: this->Dimensions[0];
+  int numRows = this->OverlayAllComparisons? 1: this->Dimensions[1];
+  assert(numCols >= 1 && numRows >= 1);
+  std::vector<LayoutStruct> colData(numCols);
+  std::vector<LayoutStruct> rowData(numRows);
 
-  size_t view_index = 0;
-  for (int y=0; y < dy; ++y)
+  // We mimic the logic from qlayoutengine.cpp (qGeomCalc) for sizing
+  // cells in a QGridLayout.
+  vtkGeomCalc(colData, 0, numCols, this->ViewPosition[0], this->ViewSize[0], this->Spacing[0]);
+  vtkGeomCalc(rowData, 0, numRows, this->ViewPosition[1], this->ViewSize[1], this->Spacing[1]);
+
+  for (int row=0, view_index=0; row < numRows; ++row)
     {
-    for (int x=0; x < dx; ++x, ++view_index)
+    for (int col=0; col < numCols; ++col, ++view_index)
       {
       vtkSMViewProxy* view = this->Internal->Views[view_index];
-      int view_pos[2];
-      view_pos[0] = this->ViewPosition[0] + width * x;
-      view_pos[1] = this->ViewPosition[1] + height * y;
-      vtkSMPropertyHelper(view, "ViewPosition").Set(view_pos, 2);
 
+      const vtkVector2i pos(colData[col].pos, rowData[row].pos);
+      vtkSMPropertyHelper(view, "ViewPosition").Set(pos.GetData(), 2);
+
+      const vtkVector2i size(colData[col].size, rowData[row].size);
       // Not all view classes have a ViewSize property
-      vtkSMPropertyHelper(view, "ViewSize", true).Set(0, width);
-      vtkSMPropertyHelper(view, "ViewSize", true).Set(1, height);
+      vtkSMPropertyHelper(view, "ViewSize", true).Set(size.GetData(), 2);
       view->UpdateVTKObjects();
       }
     }
@@ -889,7 +941,6 @@ vtkImageData* vtkPVComparativeView::CaptureWindow(int magnification)
     vtkImageData* image = iter->GetPointer()->CaptureWindow(magnification);
     if (image)
       {
-      const int* image_extent = image->GetExtent();
       images.push_back(image);
       image->FastDelete();
       }
@@ -904,7 +955,9 @@ vtkImageData* vtkPVComparativeView::CaptureWindow(int magnification)
     return NULL;
     }
 
-  vtkSmartPointer<vtkImageData> img = vtkSMUtilities::MergeImages(images);
+  unsigned char color[3];
+  vtkSMViewLayoutProxy::GetMultiViewImageBorderColor(color);
+  vtkSmartPointer<vtkImageData> img = vtkSMUtilities::MergeImages(images, 0, color);
   if (img)
     {
     img->Register(this);
