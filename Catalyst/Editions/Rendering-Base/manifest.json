@@ -398,6 +398,7 @@
         { "class": "vtkRenderer" },
         { "class": "vtkRendererCollection" },
         { "class": "vtkRendererDelegate" },
+        { "class": "vtkRenderPass" },
         { "class": "vtkRenderWindow" },
         { "class": "vtkRenderWindowInteractor" },
         { "class": "vtkShaderDeviceAdapter2" },
