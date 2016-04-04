@@ -21,6 +21,8 @@
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMObject.h"
+#include "vtkSmartPointer.h" // needed for vtkSmartPointer
+#include <vector> // needed for std::vector
 
 class vtkImageData;
 class vtkPoints;
@@ -72,6 +74,12 @@ public:
   // larger one (\c dest). The location of the smaller image in the larger image
   // are determined by their extents.
   static void Merge(vtkImageData* dest, vtkImageData* src,
+    int borderWidth=0, const unsigned char* borderColorRGB=NULL);
+
+  // Description:
+  // Merges multiple images into a single one and returns that.
+  static vtkSmartPointer<vtkImageData> MergeImages(
+    const std::vector<vtkSmartPointer<vtkImageData> >& images,
     int borderWidth=0, const unsigned char* borderColorRGB=NULL);
 
   // Description:
