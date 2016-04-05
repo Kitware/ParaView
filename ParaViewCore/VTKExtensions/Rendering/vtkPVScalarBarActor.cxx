@@ -365,8 +365,10 @@ void vtkPVScalarBarActor::ComputeScalarBarThickness()
 //----------------------------------------------------------------------------
 void vtkPVScalarBarActor::LayoutTitle()
 {
-  if (this->Title == NULL || !strlen(this->Title))
+  if ((this->Title == NULL || !strlen(this->Title)) &&
+      (this->ComponentTitle == NULL || !strlen(this->ComponentTitle)))
     {
+    this->P->TitleBox.Size[0] = this->P->TitleBox.Size[1] = 0;
     return;
     }
 
