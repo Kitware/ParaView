@@ -32,6 +32,8 @@
 // bounds. The range will have 6 ranges:
 // (xmin,xmax), (xmin,xmax), (ymin,ymax), (ymin,ymax), (zmin,zmax), and (zmin,zmax).
 // If default_mode is not specified, then "min,max,min,max,min,max" is assumed.
+// li \c EXTENTS: this mode for a property that takes a value between 0 and (max-min) for
+// each component.
 //
 // To determine the input data bounds, this domain depends on a required
 // property with function \c Input. The data-information from the source-proxy
@@ -77,7 +79,8 @@ public:
     ORIENTED_MAGNITUDE,
     SCALED_EXTENT,
     APPROXIMATE_CELL_LENGTH,
-    DATA_BOUNDS
+    DATA_BOUNDS,
+    EXTENTS,
   };
 
   vtkGetMacro(ScaleFactor, double);
