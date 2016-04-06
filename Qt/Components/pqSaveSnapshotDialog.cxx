@@ -63,6 +63,7 @@ pqSaveSnapshotDialog::pqSaveSnapshotDialog(QWidget* _parent,
 {
   this->Internal = new pqInternal();
   this->Internal->setupUi(this);
+  this->Internal->stereoMode->addItems(pqSaveSnapshotDialog::availableStereoModes());
 
   this->Internal->AspectRatio = 1.0;
   this->Internal->quality->setMinimum(0);
@@ -231,34 +232,35 @@ QString pqSaveSnapshotDialog::palette() const
   return paletteData;
 }
 
+//-----------------------------------------------------------------------------
+const QStringList& pqSaveSnapshotDialog::availableStereoModes()
+{
+  static QStringList list;
+  if (list.size() == 0)
+    {
+    list << "No Stereo"
+         << "Red-Blue"
+         << "Interlaced"
+         << "Left Eye Only"
+         << "Right Eye Only"
+         << "Dresden"
+         << "Anaglyph"
+         << "Checkerboard"
+         << "Split Viewport Horizontal";
+    }
+  return list;
+}
+
+//-----------------------------------------------------------------------------
+int pqSaveSnapshotDialog::stereoMode(const QString& val)
+{
+  int idx = pqSaveSnapshotDialog::availableStereoModes().indexOf(val);
+  return idx <=0? 0 : (idx + 1); // See the order of stereo types in vtkRenderWindow.h
+}
 
 //-----------------------------------------------------------------------------
 int pqSaveSnapshotDialog::getStereoMode() const
 {
-  QString stereoMode = this->Internal->stereoMode->currentText();
-  if (stereoMode == "Red-Blue")
-    {
-    return VTK_STEREO_RED_BLUE;
-    }
-  else if (stereoMode == "Interlaced")
-    {
-    return VTK_STEREO_INTERLACED;
-    }
-  else if (stereoMode == "Checkerboard")
-    {
-    return VTK_STEREO_CHECKERBOARD;
-    }
-  else if (stereoMode == "Side By Side Horizontal")
-    {
-    return VTK_STEREO_SPLITVIEWPORT_HORIZONTAL;
-    }
-  else if (stereoMode == "Left Eye Only")
-    {
-    return VTK_STEREO_LEFT;
-    }
-  else if (stereoMode == "Right Eye Only")
-    {
-    return VTK_STEREO_RIGHT;
-    }
-  return 0;
+  return pqSaveSnapshotDialog::stereoMode(
+    this->Internal->stereoMode->currentText());
 }

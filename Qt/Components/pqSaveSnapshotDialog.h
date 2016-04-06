@@ -44,6 +44,13 @@ public:
   pqSaveSnapshotDialog(QWidget* parent, Qt::WindowFlags f=0);
   ~pqSaveSnapshotDialog();
 
+  /// Helper method to get available stereo modes for a render view.
+  static const QStringList& availableStereoModes();
+
+  /// Helper method to convert a stereo mode label to a VTK_STEREO_* value
+  /// defined in vtkRenderWindow.
+  static int stereoMode(const QString& label);
+
   /// Set the default size for the snapshot.
   void setViewSize(const QSize& size);
 
