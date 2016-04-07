@@ -72,13 +72,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectBuilder.h"
 #include "pqProgressManager.h"
 #include "pqProxy.h"
-#include "pqRenderViewBase.h"
 #include "pqSaveSnapshotDialog.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
+#include "pqStereoModeHelper.h"
 #include "pqTabbedMultiViewWidget.h"
+#include "pqView.h"
 
 #include <sstream>
 
@@ -549,10 +550,7 @@ bool pqAnimationManager::saveAnimation()
   // Update Scene properties based on user options. 
   emit this->beginNonUndoableChanges();
 
-  if (stereo)
-    {
-    pqRenderViewBase::setStereo(stereo);
-    }
+  pqStereoModeHelper smhelper(stereo, scene->getServer());
 
   double playbackTimeWindow[2] = {1,-1};
   double start, end;
@@ -722,11 +720,6 @@ bool pqAnimationManager::saveAnimation()
   if (viewManager)
     {
     viewManager->cleanupAfterCapture();
-    }
-
-  if (stereo)
-    {
-    pqRenderViewBase::setStereo(0);
     }
   emit this->endNonUndoableChanges();
   return status;
