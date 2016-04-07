@@ -228,6 +228,22 @@ const double* vtkSMViewLayoutProxy::GetMultiViewImageBorderColor()
 }
 
 //----------------------------------------------------------------------------
+void vtkSMViewLayoutProxy::GetMultiViewImageBorderColor(unsigned char rgb[3])
+{
+  rgb[0] = static_cast<unsigned char>(vtkSMViewLayoutProxy::MultiViewImageBorderColor[0] *  0xff);
+  rgb[1] = static_cast<unsigned char>(vtkSMViewLayoutProxy::MultiViewImageBorderColor[1] *  0xff);
+  rgb[2] = static_cast<unsigned char>(vtkSMViewLayoutProxy::MultiViewImageBorderColor[2] *  0xff);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMViewLayoutProxy::GetMultiViewImageBorderColor(double rgb[3])
+{
+  rgb[0] = vtkSMViewLayoutProxy::MultiViewImageBorderColor[0];
+  rgb[1] = vtkSMViewLayoutProxy::MultiViewImageBorderColor[1];
+  rgb[2] = vtkSMViewLayoutProxy::MultiViewImageBorderColor[2];
+}
+
+//----------------------------------------------------------------------------
 int vtkSMViewLayoutProxy::GetMultiViewImageBorderWidth()
 {
   return vtkSMViewLayoutProxy::MultiViewImageBorderWidth;
@@ -1005,9 +1021,6 @@ vtkImageData* vtkSMViewLayoutProxy::CaptureWindow(int magnification)
 
   this->UpdateState();
 
-  int extent[6] = {VTK_INT_MAX, VTK_INT_MIN,
-    VTK_INT_MAX, VTK_INT_MIN, VTK_INT_MAX, VTK_INT_MIN};
-
   std::vector<vtkSmartPointer<vtkImageData> > images;
   for (vtkInternals::KDTreeType::iterator iter =
     this->Internals->KDTree.begin();
@@ -1018,14 +1031,6 @@ vtkImageData* vtkSMViewLayoutProxy::CaptureWindow(int magnification)
       vtkImageData* image = iter->ViewProxy->CaptureWindow(magnification);
       if (image)
         {
-        const int* image_extent = image->GetExtent();
-        extent[0] = std::min(extent[0], image_extent[0]);
-        extent[2] = std::min(extent[2], image_extent[2]);
-        extent[4] = std::min(extent[4], image_extent[4]);
-        extent[1] = std::max(extent[1], image_extent[1]);
-        extent[3] = std::max(extent[3], image_extent[3]);
-        extent[5] = std::max(extent[5], image_extent[5]);
-
         images.push_back(image);
         image->FastDelete();
         }
@@ -1038,28 +1043,15 @@ vtkImageData* vtkSMViewLayoutProxy::CaptureWindow(int magnification)
     return NULL;
     }
 
-  int numComponents = vtkSMViewProxy::GetTransparentBackground()? 4 : 3;
-  vtkImageData* image = vtkImageData::New();
-  image->SetExtent(extent);
-  image->AllocateScalars(VTK_UNSIGNED_CHAR, numComponents);
-
-  unsigned char* image_data =
-    reinterpret_cast<unsigned char*>(image->GetScalarPointer());
-  std::fill(
-    image_data, image_data + image->GetNumberOfPoints() * numComponents,
-    static_cast<unsigned char>(0));
-
   unsigned char color[3];
-  color[0] = static_cast<unsigned char>(vtkSMViewLayoutProxy::MultiViewImageBorderColor[0] *  0xff);
-  color[1] = static_cast<unsigned char>(vtkSMViewLayoutProxy::MultiViewImageBorderColor[1] *  0xff);
-  color[2] = static_cast<unsigned char>(vtkSMViewLayoutProxy::MultiViewImageBorderColor[2] *  0xff);
-  for (size_t cc=0; cc < images.size(); cc++)
+  vtkSMViewLayoutProxy::GetMultiViewImageBorderColor(color);
+  vtkSmartPointer<vtkImageData> img = vtkSMUtilities::MergeImages(
+    images, vtkSMViewLayoutProxy::MultiViewImageBorderWidth, color);
+  if (img)
     {
-    vtkSMUtilities::Merge(image, images[cc],
-      vtkSMViewLayoutProxy::MultiViewImageBorderWidth, color);
+    img->Register(this);
     }
-
-  return image;
+  return img.GetPointer();
 }
 
 //----------------------------------------------------------------------------

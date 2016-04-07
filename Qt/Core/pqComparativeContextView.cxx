@@ -32,15 +32,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComparativeContextView.h"
 
 #include "pqServer.h"
+#include "pqUndoStack.h"
+#include "QVTKWidget.h"
 #include "vtkCollection.h"
+#include "vtkContextView.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkPVServerInformation.h"
-#include "vtkSMContextViewProxy.h"
-#include "vtkSMComparativeViewProxy.h"
-#include "vtkSMPropertyHelper.h"
-#include "QVTKWidget.h"
-#include "vtkContextView.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMComparativeViewProxy.h"
+#include "vtkSMContextViewProxy.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkWeakPointer.h"
 
 #include <QMap>
 #include <QPointer>
@@ -60,6 +62,29 @@ public:
     }
 };
 
+namespace
+{
+/// This helps us monitor QResizeEvent after it has been processed (unlike a
+/// generic event filter).
+class pqComparativeWidget  : public QWidget
+{
+public:
+  vtkWeakPointer<vtkSMProxy> ViewProxy;
+  void resizeEvent(QResizeEvent * evt)
+    {
+    this->QWidget::resizeEvent(evt);
+
+    BEGIN_UNDO_EXCLUDE();
+    int view_size[2];
+    view_size[0] = this->size().width();
+    view_size[1] = this->size().height();
+    vtkSMPropertyHelper(this->ViewProxy, "ViewSize").Set(view_size, 2);
+    this->ViewProxy->UpdateProperty( "ViewSize");
+    END_UNDO_EXCLUDE();
+    }
+};
+}
+
 //-----------------------------------------------------------------------------
 pqComparativeContextView::pqComparativeContextView(const QString& type,
                                                    const QString& group,
@@ -70,7 +95,9 @@ pqComparativeContextView::pqComparativeContextView(const QString& type,
   : Superclass(type, group, name, view, server, parentObject)
 {
   this->Internal = new pqInternal();
-  this->Widget = new QWidget;
+  pqComparativeWidget* wdg = new pqComparativeWidget();
+  wdg->ViewProxy = view;
+  this->Widget = wdg;
   this->getConnector()->Connect(view, vtkCommand::ConfigureEvent,
                                 this, SLOT(updateViewWidgets()));
 }
@@ -182,7 +209,8 @@ void pqComparativeContextView::updateViewWidgets()
   delete wdg->layout();
 
   QGridLayout* layout = new QGridLayout(wdg);
-  layout->setSpacing(1);
+  layout->setHorizontalSpacing(vtkSMPropertyHelper(compView, "Spacing").GetAsInt(0));
+  layout->setVerticalSpacing(vtkSMPropertyHelper(compView, "Spacing").GetAsInt(1));
   layout->setMargin(0);
   for (int x = 0; x < dimensions[0]; ++x)
     {

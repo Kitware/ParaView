@@ -204,6 +204,8 @@ public:
   static void SetMultiViewImageBorderColor(double r, double g, double b);
   static void SetMultiViewImageBorderWidth(int width);
   static const double* GetMultiViewImageBorderColor();
+  static void GetMultiViewImageBorderColor(unsigned char rgb[3]);
+  static void GetMultiViewImageBorderColor(double rgb[3]);
   static int GetMultiViewImageBorderWidth();
 
 //BTX

@@ -29,6 +29,7 @@
 #include "vtkTIFFWriter.h"
 #include "vtkTimerLog.h"
 #include "vtkTransform.h"
+#include "vtkTuple.h"
 
 #include <vtksys/SystemTools.hxx>
 #include <sstream>
@@ -67,6 +68,11 @@ int vtkSMUtilities::SaveImage(vtkImageData* image, const char* filename,
   else if (ext == ".png")
     {
     writer = vtkPNGWriter::New();
+    if (quality >=0 && quality <= 100)
+      {
+      int compression = (quality * 9) / 100;
+      static_cast<vtkPNGWriter*>(writer)->SetCompressionLevel(compression);
+      }
     }
   else if (ext == ".jpg" || ext == ".jpeg")
     {
@@ -336,6 +342,81 @@ void vtkSMUtilities::FillImage(vtkImageData* image, const int extent[6],
     iter.NextSpan();
     }
 }
+
+//----------------------------------------------------------------------------
+vtkSmartPointer<vtkImageData> vtkSMUtilities::MergeImages(
+  const std::vector<vtkSmartPointer<vtkImageData> >& images,
+  int borderWidth, const unsigned char* borderColorRGB)
+{
+  if (images.size() == 0)
+    {
+    return NULL;
+    }
+  if (images.size() == 1)
+    {
+    return images[0];
+    }
+
+  int extent[6] = {VTK_INT_MAX, VTK_INT_MIN,
+    VTK_INT_MAX, VTK_INT_MIN, VTK_INT_MAX, VTK_INT_MIN};
+  int numComps = -1;
+  for (std::vector<vtkSmartPointer<vtkImageData> >::const_iterator iter = images.begin();
+    iter != images.end(); ++iter)
+    {
+    if (vtkImageData* image = iter->GetPointer())
+      {
+      const int* image_extent = image->GetExtent();
+      extent[0] = std::min(extent[0], image_extent[0]);
+      extent[2] = std::min(extent[2], image_extent[2]);
+      extent[4] = std::min(extent[4], image_extent[4]);
+      extent[1] = std::max(extent[1], image_extent[1]);
+      extent[3] = std::max(extent[3], image_extent[3]);
+      extent[5] = std::max(extent[5], image_extent[5]);
+
+      // all images should have same number of components.
+      assert(numComps == -1 || numComps == image->GetNumberOfScalarComponents());
+      assert(image->GetScalarType() == VTK_UNSIGNED_CHAR);
+      numComps = image->GetNumberOfScalarComponents();
+      }
+    }
+  if (numComps != 3 && numComps != 4)
+    {
+    vtkGenericWarningMacro("Invalid images specified. Cannot merge. Expecting 3/4 component images.");
+    return vtkSmartPointer<vtkImageData>();
+    }
+
+  vtkSmartPointer<vtkImageData> image = vtkSmartPointer<vtkImageData>::New();
+  image->SetExtent(extent);
+  image->AllocateScalars(VTK_UNSIGNED_CHAR, numComps);
+
+  vtkTuple<unsigned char, 4> rgba(static_cast<unsigned char>(0));
+  if (borderColorRGB)
+    {
+    memcpy(rgba.GetData(), borderColorRGB, 3*sizeof(unsigned char));
+    }
+  rgba[3] = 0xff;
+
+  if (numComps == 3)
+    {
+    vtkTuple<unsigned char, 3> *image_ptr =
+      reinterpret_cast<vtkTuple<unsigned char, 3> *>(image->GetScalarPointer());
+    std::fill(image_ptr, image_ptr + image->GetNumberOfPoints(),
+      vtkTuple<unsigned char, 3>(rgba.GetData()));
+    }
+  else if (numComps == 4)
+    {
+    vtkTuple<unsigned char, 4> *image_ptr =
+      reinterpret_cast<vtkTuple<unsigned char, 4> *>(image->GetScalarPointer());
+    std::fill(image_ptr, image_ptr + image->GetNumberOfPoints(), rgba);
+    }
+  for (std::vector<vtkSmartPointer<vtkImageData> >::const_iterator iter = images.begin();
+    iter != images.end(); ++iter)
+    {
+    vtkSMUtilities::Merge(image, iter->GetPointer(), borderWidth, borderColorRGB);
+    }
+  return image;
+}
+
 
 //----------------------------------------------------------------------------
 void vtkSMUtilities::PrintSelf(ostream& os, vtkIndent indent)
