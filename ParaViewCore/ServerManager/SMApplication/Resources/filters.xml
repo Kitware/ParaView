@@ -14613,6 +14613,19 @@ source.</Documentation>
         <Documentation>This property specifies the 3D coordinates for the
         center of the rotation.</Documentation>
       </DoubleVectorProperty>
+      <IntVectorProperty command="SetComputeRotationsOnTheFly"
+                         default_values="1"
+                         name="ComputeRotationsOnTheFly"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <Documentation>
+        Specify whether the rotations should be computed on-the-fly, which is
+        compute intensive, or if the arrays should be explicitly generated and
+        stored, at the cost of using more memory.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
       <!-- End AngularPeriodicFilter -->
     </SourceProxy>
     <!-- ==================================================================== -->
