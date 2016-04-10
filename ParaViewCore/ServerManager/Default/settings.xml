@@ -46,6 +46,16 @@
         </Documentation>
       </StringVectorProperty>
 
+      <IntVectorProperty name="ScreenPixelsPerInch"
+        number_of_elements="1"
+        default_values="96">
+        <IntRangeDomain name="range" min="80" />
+        <Documentation>
+          Set pixels per inch on the current screen/monitor. This is used for determining
+          pixel sizes for fonts and other 2D annotations.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty name="AutoApply"
         number_of_elements="1"
         default_values="0"
@@ -329,14 +339,14 @@
         </Documentation>
       </IntVectorProperty>
 
-
       <PropertyGroup label="General Options">
         <Property name="ShowWelcomeDialog" />
         <Property name="CrashRecovery" />
       </PropertyGroup>
 
-      <PropertyGroup label="Default View">
+      <PropertyGroup label="View Options">
         <Property name="DefaultViewType" />
+        <Property name="ScreenPixelsPerInch" />
       </PropertyGroup>
 
       <PropertyGroup label="Properties Panel Options">

@@ -161,6 +161,12 @@ public:
   }
   //@}
 
+  /**
+   * Satisfying vtkPVView API. We don't need to do anything here since the
+   * subviews have their own PPI settings.
+   */
+  void SetPPI(int) {}
+
   //@{
   /**
    * Set spacing between views.
