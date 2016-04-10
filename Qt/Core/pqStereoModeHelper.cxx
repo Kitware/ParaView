@@ -125,3 +125,29 @@ pqStereoModeHelper::pqStereoModeHelper(int stereoMode, pqView* view)
 pqStereoModeHelper::~pqStereoModeHelper()
 {
 }
+
+//-----------------------------------------------------------------------------
+const QStringList& pqStereoModeHelper::availableStereoModes()
+{
+  static QStringList list;
+  if (list.size() == 0)
+    {
+    list << "No Stereo"
+         << "Red-Blue"
+         << "Interlaced"
+         << "Left Eye Only"
+         << "Right Eye Only"
+         << "Dresden"
+         << "Anaglyph"
+         << "Checkerboard"
+         << "Split Viewport Horizontal";
+    }
+  return list;
+}
+
+//-----------------------------------------------------------------------------
+int pqStereoModeHelper::stereoMode(const QString& val)
+{
+  int idx = pqStereoModeHelper::availableStereoModes().indexOf(val);
+  return idx <=0? 0 : (idx + 1); // See the order of stereo types in vtkRenderWindow.h
+}

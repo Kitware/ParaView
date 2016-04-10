@@ -72,7 +72,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectBuilder.h"
 #include "pqProgressManager.h"
 #include "pqProxy.h"
-#include "pqSaveSnapshotDialog.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
@@ -360,7 +359,7 @@ bool pqAnimationManager::saveAnimation()
   Ui::pqAnimationSettingsDialog dialogUI;
   this->Internals->AnimationSettingsDialog = &dialogUI;
   dialogUI.setupUi(&dialog);
-  dialogUI.stereoMode->addItems(pqSaveSnapshotDialog::availableStereoModes());
+  dialogUI.stereoMode->addItems(pqStereoModeHelper::availableStereoModes());
 
   QIntValidator *intValidator = new QIntValidator(this);
   intValidator->setBottom(50);
@@ -480,9 +479,9 @@ bool pqAnimationManager::saveAnimation()
     }
   this->Internals->AnimationSettingsDialog = 0;
 
-  bool disconnect_and_save = 
+  bool disconnect_and_save =
     (dialogUI.checkBoxDisconnect->checkState() == Qt::Checked);
-  int stereo = pqSaveSnapshotDialog::stereoMode(dialogUI.stereoMode->currentText());
+  int stereo = pqStereoModeHelper::stereoMode(dialogUI.stereoMode->currentText());
   bool compression = (dialogUI.compression->checkState() == Qt::Checked);
 
   // Now obtain filename for the animation.

@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqStereoModeHelper_h
 
 #include <QScopedPointer> // needed for QScopedPointer.
+#include <QStringList> // needed for QStringList.
 #include "pqCoreModule.h" // needed for export macros.
 
 class pqServer;
@@ -43,9 +44,10 @@ class pqView;
 ///
 /// Often times, one wants to temporarily change the stereo mode for all views
 /// that support stereo and then restore it back to their previous value e.g.
-/// when saving screenshots, or animations. This class helps us to that. Simply
-/// instantiate this class on the stack. In the constructor is changes the
-/// stereo mode for all views and restores in the stereo mode in the destructor.
+/// when saving screenshots, or animations. This class helps us do that. Simply
+/// instantiate this class on the stack. In the constructor, it changes the
+/// stereo mode for all views (or a single view) and restores it back to its original
+/// value in the destructor.
 class PQCORE_EXPORT pqStereoModeHelper
 {
 public:
@@ -67,6 +69,18 @@ public:
   pqStereoModeHelper(int stereoMode, pqView* view);
 
   virtual ~pqStereoModeHelper();
+
+  /// Helper method to get available stereo modes for a render view.
+  ///
+  /// @return a list of labels for available stereo modes.
+  static const QStringList& availableStereoModes();
+
+  /// Helper method to convert a stereo mode label to a VTK_STEREO_* value
+  /// defined in vtkRenderWindow.
+  ///
+  /// @return 0 for invalid label or no-stereo, otherwise a positive integer
+  /// representating the chosen StereoType for a vtkRenderWindow.
+  static int stereoMode(const QString& label);
 
 private:
   Q_DISABLE_COPY(pqStereoModeHelper);

@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Includes.
 #include "pqApplicationCore.h"
 #include "pqSettings.h"
+#include "pqStereoModeHelper.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkRenderWindow.h" // for VTK_STEREO_*
 #include "vtkSMProxyDefinitionManager.h"
@@ -63,7 +64,7 @@ pqSaveSnapshotDialog::pqSaveSnapshotDialog(QWidget* _parent,
 {
   this->Internal = new pqInternal();
   this->Internal->setupUi(this);
-  this->Internal->stereoMode->addItems(pqSaveSnapshotDialog::availableStereoModes());
+  this->Internal->stereoMode->addItems(pqStereoModeHelper::availableStereoModes());
 
   this->Internal->AspectRatio = 1.0;
   this->Internal->quality->setMinimum(0);
@@ -233,34 +234,8 @@ QString pqSaveSnapshotDialog::palette() const
 }
 
 //-----------------------------------------------------------------------------
-const QStringList& pqSaveSnapshotDialog::availableStereoModes()
-{
-  static QStringList list;
-  if (list.size() == 0)
-    {
-    list << "No Stereo"
-         << "Red-Blue"
-         << "Interlaced"
-         << "Left Eye Only"
-         << "Right Eye Only"
-         << "Dresden"
-         << "Anaglyph"
-         << "Checkerboard"
-         << "Split Viewport Horizontal";
-    }
-  return list;
-}
-
-//-----------------------------------------------------------------------------
-int pqSaveSnapshotDialog::stereoMode(const QString& val)
-{
-  int idx = pqSaveSnapshotDialog::availableStereoModes().indexOf(val);
-  return idx <=0? 0 : (idx + 1); // See the order of stereo types in vtkRenderWindow.h
-}
-
-//-----------------------------------------------------------------------------
 int pqSaveSnapshotDialog::getStereoMode() const
 {
-  return pqSaveSnapshotDialog::stereoMode(
+  return pqStereoModeHelper::stereoMode(
     this->Internal->stereoMode->currentText());
 }
