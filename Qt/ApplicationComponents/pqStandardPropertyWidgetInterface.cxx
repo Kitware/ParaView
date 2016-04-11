@@ -77,6 +77,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef PARAVIEW_ENABLE_PYTHON
 #include "pqCinemaConfiguration.h"
 #endif
+#include "pqOSPRayHidingDecorator.h"
 
 #include <QtDebug>
 
@@ -308,6 +309,10 @@ pqStandardPropertyWidgetInterface::createWidgetDecorator(
   if (type == "GenericDecorator")
     {
     return new pqGenericPropertyWidgetDecorator(config, widget);
+    }
+  if (type == "OSPRayHidingDecorator")
+    {
+    return new pqOSPRayHidingDecorator(config, widget);
     }
 
   // *** NOTE: When adding new types, please update the header documentation ***

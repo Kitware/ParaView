@@ -14,11 +14,14 @@
 =========================================================================*/
 #include "vtkPVLODActor.h"
 
+#include "vtkInformation.h"
 #include "vtkMapper.h"
 #include "vtkMath.h"
 #include "vtkMatrix4x4.h"
 #include "vtkObjectFactory.h"
+#include "vtkPiecewiseFunction.h"
 #include "vtkProperty.h"
+#include "vtkPVConfig.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkTexture.h"
@@ -26,6 +29,10 @@
 #include "vtkTransform.h"
 
 #include <math.h>
+
+#ifdef PARAVIEW_USE_OSPRAY
+#include "vtkOSPRayActorNode.h"
+#endif
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODActor);
@@ -309,4 +316,55 @@ void vtkPVLODActor::PrintSelf(ostream& os, vtkIndent indent)
     }
 
   os << indent << "EnableLOD: " << this->EnableLOD << endl;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLODActor::SetEnableScaling(int val)
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  if (this->Mapper)
+    {
+    vtkInformation *info = this->Mapper->GetInformation();
+    info->Set(vtkOSPRayActorNode::ENABLE_SCALING(), val);
+    }
+  if (this->LODMapper)
+    {
+    vtkInformation *info = this->LODMapper->GetInformation();
+    info->Set(vtkOSPRayActorNode::ENABLE_SCALING(), val);
+    }
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLODActor::SetScalingArrayName(const char* val)
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  if (this->Mapper)
+    {
+    vtkInformation *mapperInfo = this->Mapper->GetInformation();
+    mapperInfo->Set(vtkOSPRayActorNode::SCALE_ARRAY_NAME(), val);
+    }
+  if (this->LODMapper)
+    {
+    vtkInformation *mapperInfo = this->LODMapper->GetInformation();
+    mapperInfo->Set(vtkOSPRayActorNode::SCALE_ARRAY_NAME(), val);
+    }
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLODActor::SetScalingFunction(vtkPiecewiseFunction* pwf)
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  if (this->Mapper)
+    {
+    vtkInformation *mapperInfo = this->Mapper->GetInformation();
+    mapperInfo->Set(vtkOSPRayActorNode::SCALE_FUNCTION(), pwf);
+    }
+  if (this->LODMapper)
+    {
+    vtkInformation *mapperInfo = this->LODMapper->GetInformation();
+    mapperInfo->Set(vtkOSPRayActorNode::SCALE_FUNCTION(), pwf);
+    }
+#endif
 }

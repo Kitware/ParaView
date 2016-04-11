@@ -100,6 +100,12 @@
 #include "vtkIceTSynchronizedRenderers.h"
 #endif
 
+#ifdef PARAVIEW_USE_OSPRAY
+#include "vtkOSPRayLightNode.h"
+#include "vtkOSPRayPass.h"
+#include "vtkOSPRayRendererNode.h"
+#endif
+
 #include <assert.h>
 #include <vector>
 #include <set>
@@ -116,6 +122,9 @@ public:
 #else
   vtkNew<vtkValuePasses> ValuePasses;
 #endif
+#ifdef PARAVIEW_USE_OSPRAY
+  vtkNew<vtkOSPRayPass> OSPRayPass;
+#endif
   vtkSmartPointer<vtkRenderPass> SavedRenderPass;
   int FieldAssociation;
   int FieldAttributeType;
@@ -127,6 +136,7 @@ public:
   bool SavedOrientationState;
   bool SavedAnnotationState;
   bool IsInCapture;
+  bool IsInOSPRay;
   vtkNew<vtkFloatArray> ArrayHolder;
   vtkNew<vtkWindowToImageFilter> ZGrabber;
 
@@ -298,6 +308,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->Internals->ScalarRange[0] = 0.0;
   this->Internals->ScalarRange[1] = -1.0;
   this->Internals->IsInCapture = false;
+  this->Internals->IsInOSPRay = false;
 
   // non-reference counted, so no worries about reference loops.
   this->Internals->DeliveryManager->SetRenderView(this);
@@ -2713,4 +2724,123 @@ void vtkPVRenderView::CaptureZBuffer()
 vtkFloatArray * vtkPVRenderView::GetCapturedZBuffer()
 {
   return this->Internals->ArrayHolder.GetPointer();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::ToggleOSPRay()
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  if (!this->Internals->IsInOSPRay)
+    {
+    this->Internals->SavedRenderPass = this->SynchronizedRenderers->GetRenderPass();
+    this->SynchronizedRenderers->SetRenderPass(this->Internals->OSPRayPass.GetPointer());
+    }
+  else
+    {
+    this->SynchronizedRenderers->SetRenderPass(this->Internals->SavedRenderPass);
+    }
+  this->Internals->IsInOSPRay = !this->Internals->IsInOSPRay;
+  this->Modified();
+  this->Render(false, false);
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetShadows(int v)
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  vtkRenderer *ren = this->GetRenderer();
+  ren->SetUseShadows(v!=0);
+#endif
+}
+
+//----------------------------------------------------------------------------
+int vtkPVRenderView::GetShadows()
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  vtkRenderer *ren = this->GetRenderer();
+  return ren->GetUseShadows();
+#else
+  return 0;
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetAmbientOcclusionSamples(int v)
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  vtkRenderer *ren = this->GetRenderer();
+  vtkOSPRayRendererNode::SetAmbientSamples(v, ren);
+#endif
+}
+
+//----------------------------------------------------------------------------
+int vtkPVRenderView::GetAmbientOcclusionSamples()
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  vtkRenderer *ren = this->GetRenderer();
+  return vtkOSPRayRendererNode::GetAmbientSamples(ren);
+#else
+  return 0;
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetSamplesPerPixel(int v)
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  vtkRenderer *ren = this->GetRenderer();
+  vtkOSPRayRendererNode::SetSamplesPerPixel(v, ren);
+#endif
+}
+
+//----------------------------------------------------------------------------
+int vtkPVRenderView::GetSamplesPerPixel()
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  vtkRenderer *ren = this->GetRenderer();
+  return vtkOSPRayRendererNode::GetSamplesPerPixel(ren);
+#else
+  return 1;
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetMaxFrames(int v)
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  vtkRenderer *ren = this->GetRenderer();
+  vtkOSPRayRendererNode::SetMaxFrames(v, ren);
+#endif
+}
+
+//----------------------------------------------------------------------------
+int vtkPVRenderView::GetMaxFrames()
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  vtkRenderer *ren = this->GetRenderer();
+  return vtkOSPRayRendererNode::GetMaxFrames(ren);
+#else
+  return 1;
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetLightScale(double v)
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  vtkRenderer *ren = this->GetRenderer();
+  vtkOSPRayLightNode::SetLightScale(v);
+#endif
+}
+
+//----------------------------------------------------------------------------
+double vtkPVRenderView::GetLightScale()
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  vtkRenderer *ren = this->GetRenderer();
+  return vtkOSPRayLightNode::GetLightScale();
+#else
+  return 0.5;
+#endif
 }

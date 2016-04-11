@@ -25,6 +25,10 @@ else()
     set(opengl2_private_depends vtkglew)
 endif()
 
+if(PARAVIEW_USE_OSPRAY)
+  list(APPEND __dependencies vtkRenderingOSPRay)
+endif()
+
 vtk_module(vtkPVVTKExtensionsRendering
   GROUPS
     Qt
