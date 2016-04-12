@@ -36,13 +36,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialog.h"
 #include "pqImageUtil.h"
 #include "pqPVApplicationCore.h"
-#include "pqRenderViewBase.h"
 #include "pqSaveSnapshotDialog.h"
 #include "pqSettings.h"
+#include "pqStereoModeHelper.h"
 #include "pqTabbedMultiViewWidget.h"
 #include "pqView.h"
 #include "vtkImageData.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMProxy.h"
 #include "vtkSMSessionProxyManager.h"
 
 #include <QDebug>
@@ -146,11 +147,10 @@ void pqSaveScreenshotReaction::saveScreenshot()
     chosenPalette->Delete();
     }
 
-  int stereo = ssDialog.getStereoMode();
-  if (stereo)
-    {
-    pqRenderViewBase::setStereo(stereo);
-    }
+  QScopedPointer<pqStereoModeHelper> helper(
+    ssDialog.saveAllViews()?
+    new pqStereoModeHelper(ssDialog.getStereoMode(), view->getServer()) :
+    new pqStereoModeHelper(ssDialog.getStereoMode(), view));
 
   pqSaveScreenshotReaction::saveScreenshot(file,
     size, ssDialog.quality(), ssDialog.saveAllViews());
@@ -159,18 +159,6 @@ void pqSaveScreenshotReaction::saveScreenshot()
   if (clone)
     {
     colorPalette->Copy(clone);
-    }
-
-  // restore stereo
-  if (stereo)
-    {
-    pqRenderViewBase::setStereo(0);
-    }
-
-  // check if need to render to clear the changes we did
-  // while saving the screenshot.
-  if (clone || stereo)
-    {
     pqApplicationCore::instance()->render();
     }
 }

@@ -292,8 +292,10 @@ bool pqRenderViewBase::eventFilter(QObject* caller, QEvent* e)
 }
 
 //-----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
 void pqRenderViewBase::setStereo(int mode)
 {
+  VTK_LEGACY_BODY(pqRenderViewBase::setStereo, "ParaView 5.1");
   QList<pqView*> views =
     pqApplicationCore::instance()->getServerManagerModel()->findItems<pqView*>();
   foreach (pqView* view, views)
@@ -316,6 +318,7 @@ void pqRenderViewBase::setStereo(int mode)
       }
     }
 }
+#endif
 
 //-----------------------------------------------------------------------------
 void pqRenderViewBase::beginDelayInteractiveRender()

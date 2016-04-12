@@ -72,12 +72,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectBuilder.h"
 #include "pqProgressManager.h"
 #include "pqProxy.h"
-#include "pqRenderViewBase.h"
-#include "pqSMAdaptor.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
+#include "pqSMAdaptor.h"
+#include "pqStereoModeHelper.h"
 #include "pqTabbedMultiViewWidget.h"
+#include "pqView.h"
 
 #include <sstream>
 
@@ -358,6 +359,7 @@ bool pqAnimationManager::saveAnimation()
   Ui::pqAnimationSettingsDialog dialogUI;
   this->Internals->AnimationSettingsDialog = &dialogUI;
   dialogUI.setupUi(&dialog);
+  dialogUI.stereoMode->addItems(pqStereoModeHelper::availableStereoModes());
 
   QIntValidator *intValidator = new QIntValidator(this);
   intValidator->setBottom(50);
@@ -477,41 +479,9 @@ bool pqAnimationManager::saveAnimation()
     }
   this->Internals->AnimationSettingsDialog = 0;
 
-  bool disconnect_and_save = 
+  bool disconnect_and_save =
     (dialogUI.checkBoxDisconnect->checkState() == Qt::Checked);
-  int stereo = dialogUI.stereoMode->currentIndex();
-  if (stereo)
-    {
-    QString stereoMode = dialogUI.stereoMode->currentText();
-    if (stereoMode == "Red-Blue")
-      {
-      stereo = VTK_STEREO_RED_BLUE;
-      }
-    else if (stereoMode == "Interlaced")
-      {
-      stereo = VTK_STEREO_INTERLACED;
-      }
-    else if (stereoMode == "Checkerboard")
-      {
-      stereo = VTK_STEREO_CHECKERBOARD;
-      }
-    else if (stereoMode == "Side By Side Horizontal")
-      {
-      stereo = VTK_STEREO_SPLITVIEWPORT_HORIZONTAL;
-      }
-    else if (stereoMode == "Left Eye Only")
-      {
-      stereo = VTK_STEREO_LEFT;
-      }
-    else if (stereoMode == "Right Eye Only")
-      {
-      stereo = VTK_STEREO_RIGHT;
-      }
-    else
-      {
-      stereo = 0;
-      }
-    }
+  int stereo = pqStereoModeHelper::stereoMode(dialogUI.stereoMode->currentText());
   bool compression = (dialogUI.compression->checkState() == Qt::Checked);
 
   // Now obtain filename for the animation.
@@ -579,10 +549,7 @@ bool pqAnimationManager::saveAnimation()
   // Update Scene properties based on user options. 
   emit this->beginNonUndoableChanges();
 
-  if (stereo)
-    {
-    pqRenderViewBase::setStereo(stereo);
-    }
+  pqStereoModeHelper smhelper(stereo, scene->getServer());
 
   double playbackTimeWindow[2] = {1,-1};
   double start, end;
@@ -752,11 +719,6 @@ bool pqAnimationManager::saveAnimation()
   if (viewManager)
     {
     viewManager->cleanupAfterCapture();
-    }
-
-  if (stereo)
-    {
-    pqRenderViewBase::setStereo(0);
     }
   emit this->endNonUndoableChanges();
   return status;

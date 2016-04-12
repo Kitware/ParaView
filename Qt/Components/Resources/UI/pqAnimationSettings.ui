@@ -115,41 +115,6 @@
      </item>
      <item row="6" column="1" colspan="3">
       <widget class="QComboBox" name="stereoMode">
-       <item>
-        <property name="text">
-         <string>No Stereo</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Red-Blue</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Interlaced</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Checkerboard</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Side By Side Horizontal</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Left Eye Only</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Right Eye Only</string>
-        </property>
-       </item>
       </widget>
      </item>
      <item row="4" column="2">

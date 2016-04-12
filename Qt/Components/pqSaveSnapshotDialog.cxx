@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Includes.
 #include "pqApplicationCore.h"
 #include "pqSettings.h"
+#include "pqStereoModeHelper.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkRenderWindow.h" // for VTK_STEREO_*
 #include "vtkSMProxyDefinitionManager.h"
@@ -63,6 +64,7 @@ pqSaveSnapshotDialog::pqSaveSnapshotDialog(QWidget* _parent,
 {
   this->Internal = new pqInternal();
   this->Internal->setupUi(this);
+  this->Internal->stereoMode->addItems(pqStereoModeHelper::availableStereoModes());
 
   this->Internal->AspectRatio = 1.0;
   this->Internal->quality->setMinimum(0);
@@ -231,34 +233,9 @@ QString pqSaveSnapshotDialog::palette() const
   return paletteData;
 }
 
-
 //-----------------------------------------------------------------------------
 int pqSaveSnapshotDialog::getStereoMode() const
 {
-  QString stereoMode = this->Internal->stereoMode->currentText();
-  if (stereoMode == "Red-Blue")
-    {
-    return VTK_STEREO_RED_BLUE;
-    }
-  else if (stereoMode == "Interlaced")
-    {
-    return VTK_STEREO_INTERLACED;
-    }
-  else if (stereoMode == "Checkerboard")
-    {
-    return VTK_STEREO_CHECKERBOARD;
-    }
-  else if (stereoMode == "Side By Side Horizontal")
-    {
-    return VTK_STEREO_SPLITVIEWPORT_HORIZONTAL;
-    }
-  else if (stereoMode == "Left Eye Only")
-    {
-    return VTK_STEREO_LEFT;
-    }
-  else if (stereoMode == "Right Eye Only")
-    {
-    return VTK_STEREO_RIGHT;
-    }
-  return 0;
+  return pqStereoModeHelper::stereoMode(
+    this->Internal->stereoMode->currentText());
 }

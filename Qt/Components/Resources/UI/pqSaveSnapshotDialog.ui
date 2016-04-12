@@ -143,41 +143,6 @@ p, li { white-space: pre-wrap; }
    </item>
    <item>
     <widget class="QComboBox" name="stereoMode">
-     <item>
-      <property name="text">
-       <string>No Stereo</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Red-Blue</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Interlaced</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Checkerboard</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Side By Side Horizontal</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Left Eye Only</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Right Eye Only</string>
-      </property>
-     </item>
     </widget>
    </item>
    <item>
