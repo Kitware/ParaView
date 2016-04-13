@@ -198,7 +198,8 @@ void pqApplyBehavior::applied(pqPropertiesPanel*)
     if (vtkSMPVRepresentationProxy::SafeDownCast(reprProxy) &&
       vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy) == false &&
       reprProxy->GetRepresentedDataInformation()->GetArrayInformation(
-        "vtkBlockColors", vtkDataObject::FIELD) != NULL)
+        "vtkBlockColors", vtkDataObject::FIELD) != NULL && 
+      reprProxy->GetRepresentedDataInformation()->GetNumberOfBlockLeafs(false) > 1)
       {
       vtkSMPVRepresentationProxy::SetScalarColoring(reprProxy,
         "vtkBlockColors", vtkDataObject::FIELD);
