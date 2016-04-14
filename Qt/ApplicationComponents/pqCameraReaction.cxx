@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -32,9 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCameraReaction.h"
 
 #include "pqActiveObjects.h"
-#include "pqRenderView.h"
 #include "pqPipelineRepresentation.h"
+#include "pqRenderView.h"
 
+#include "vtkCamera.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMRenderViewProxy.h"
 
@@ -113,11 +114,21 @@ void pqCameraReaction::onTriggered()
   case RESET_NEGATIVE_Y:
     this->resetNegativeY();
     break;
+
   case RESET_NEGATIVE_Z:
     this->resetNegativeZ();
     break;
+
   case ZOOM_TO_DATA:
     this->zoomToData();
+    break;
+
+  case ROTATE_CAMERA_CW:
+    this->rotateCamera(90.0);
+    break;
+
+  case ROTATE_CAMERA_CCW:
+    this->rotateCamera(-90.0);
     break;
     }
 }
@@ -192,6 +203,19 @@ void pqCameraReaction::zoomToData()
     {
     vtkSMRenderViewProxy* rm = renModule->getRenderViewProxy();
     rm->ZoomTo(repr->getProxy());
+    renModule->render();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqCameraReaction::rotateCamera(double angle)
+{
+  pqRenderView* renModule = qobject_cast<pqRenderView*>(
+    pqActiveObjects::instance().activeView());
+
+  if (renModule)
+    {
+    renModule->getRenderViewProxy()->GetActiveCamera()->Roll(angle);
     renModule->render();
     }
 }
