@@ -322,6 +322,10 @@ class ParaViewWebViewPortImageDelivery(ParaViewWebProtocol):
             reply["image"] = app.StillRenderToString(view.SMProxy, t, quality)
             tries -= 1
 
+        if not resize and options and options.has_key("clearCache") and options["clearCache"]:
+            app.InvalidateCache(view.SMProxy)
+            reply["image"] = app.StillRenderToString(view.SMProxy, t, quality)
+
         reply["stale"] = app.GetHasImagesBeingProcessed(view.SMProxy)
         reply["mtime"] = app.GetLastStillRenderToStringMTime()
         reply["size"] = [view.ViewSize[0], view.ViewSize[1]]
