@@ -96,7 +96,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqStereoModeHelper::pqStereoModeHelper(int stereoMode, pqServer* server)
+pqStereoModeHelper::pqStereoModeHelper(int paramStereoMode, pqServer* server)
   : Internals(new pqStereoModeHelper::pqInternals())
 {
   BEGIN_UNDO_EXCLUDE();
@@ -104,19 +104,19 @@ pqStereoModeHelper::pqStereoModeHelper(int stereoMode, pqServer* server)
     pqApplicationCore::instance()->getServerManagerModel()->findItems<pqView*>(server);
   foreach (pqView* view, views)
     {
-    this->Internals->PushStereoMode(view->getProxy(), stereoMode);
+    this->Internals->PushStereoMode(view->getProxy(), paramStereoMode);
     }
   END_UNDO_EXCLUDE();
 }
 
 //-----------------------------------------------------------------------------
-pqStereoModeHelper::pqStereoModeHelper(int stereoMode, pqView* view)
+pqStereoModeHelper::pqStereoModeHelper(int paramStereoMode, pqView* view)
   : Internals(new pqStereoModeHelper::pqInternals())
 {
   BEGIN_UNDO_EXCLUDE();
   if (view)
     {
-    this->Internals->PushStereoMode(view->getProxy(), stereoMode);
+    this->Internals->PushStereoMode(view->getProxy(), paramStereoMode);
     }
   END_UNDO_EXCLUDE();
 }
