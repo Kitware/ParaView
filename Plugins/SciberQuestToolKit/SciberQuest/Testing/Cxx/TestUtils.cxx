@@ -11,7 +11,7 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkInitializationHelper.h"
 #include "vtkSQLog.h"
 #include "vtkMultiProcessController.h"
-#if defined(PARAVIEW_USE_MPI) && !defined(WIN32)
+#if defined(PARAVIEW_USE_MPI) && !defined(_WIN32)
 #include "vtkMPIController.h"
 #else
 #include "vtkDummyController.h"
@@ -89,7 +89,7 @@ vtkMultiProcessController *Initialize(int *argc, char ***argv)
 
   vtkMultiProcessController *controller;
 
-  #if defined(PARAVIEW_USE_MPI) && !defined(WIN32)
+  #if defined(PARAVIEW_USE_MPI) && !defined(_WIN32)
   controller=vtkMPIController::New();
   controller->Initialize(argc,argv,0);
   #else
@@ -459,7 +459,7 @@ vtkActor *MapArrayToActor(
 std::string NativePath(std::string path)
 {
   std::string nativePath;
-  #ifdef WIN32
+  #ifdef _WIN32
   size_t n=path.size();
   for (size_t i=0; i<n; ++i)
     {

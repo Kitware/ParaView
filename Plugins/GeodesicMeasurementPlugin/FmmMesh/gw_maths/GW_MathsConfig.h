@@ -109,7 +109,7 @@ namespace GW {
     typedef double                  GW_Real64;
     typedef bool                    GW_Bool;
     typedef GW_Real64              GW_Float;
-#elif defined (WIN32)
+#elif defined (_WIN32)
     typedef char                GW_I8;
     typedef unsigned char       GW_U8;
     typedef short                GW_I16;

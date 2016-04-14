@@ -29,8 +29,8 @@
  */
 #include "postream.h"
 
-#ifdef WIN32
-  #include <Winsock2.h>
+#ifdef _WIN32
+  #include <winsock2.h>
 #else
   #include <unistd.h>
 #endif

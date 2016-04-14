@@ -38,7 +38,7 @@
 #include "vtkObjectFactory.h"
 
 #include <ctime>
-#if !defined(WIN32)
+#if !defined(_WIN32)
 #include <sys/time.h>
 #include <unistd.h>
 #else

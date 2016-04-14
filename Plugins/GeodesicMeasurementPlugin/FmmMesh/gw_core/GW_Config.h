@@ -14,8 +14,6 @@
 namespace GW {
 
 #define GW_VERSION 100
-#undef WIN32
-#define WIN32
 
 //-------------------------------------------------------------------------
 /** \name debug & inline directive */
@@ -57,7 +55,7 @@ namespace GW {
 /** \name Basic types */
 //-------------------------------------------------------------------------
 //@{
-#if defined(__UNIX__) || defined(__unix__)
+#if defined(__UNIX__) || defined(__unix__) || defined(__APPLE__)
     typedef char                    GW_I8;
     typedef unsigned char           GW_U8;
     typedef short                    GW_I16;
@@ -70,7 +68,7 @@ namespace GW {
     typedef double                  GW_Real64;
     typedef bool                    GW_Bool;
     typedef GW_Real64              GW_Float;
-#elif defined (WIN32)
+#elif defined (_WIN32)
     typedef char                GW_I8;
     typedef unsigned char       GW_U8;
     typedef short                GW_I16;

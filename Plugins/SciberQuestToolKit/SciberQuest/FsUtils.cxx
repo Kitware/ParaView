@@ -37,7 +37,7 @@
 #include <vector>
 #include <algorithm>
 
-#ifndef WIN32
+#ifndef _WIN32
   #include <dirent.h>
   #define PATH_SEP "/"
   #include <sys/types.h>
@@ -66,7 +66,7 @@ void ToLower(std::string &in)
 //******************************************************************************
 int FileExists(const char *path)
 {
-  #ifndef WIN32
+  #ifndef _WIN32
   struct stat s;
   int iErr=stat(path,&s);
   if (iErr==0)

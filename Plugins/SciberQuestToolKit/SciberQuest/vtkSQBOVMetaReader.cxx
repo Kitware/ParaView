@@ -71,7 +71,7 @@
 
 // #define SQTK_DEBUG
 
-#ifdef WIN32
+#ifdef _WIN32
   #undef SQTK_DEBUG
 #endif
 

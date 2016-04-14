@@ -48,7 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QToolButton>
 #include <QVBoxLayout>
 
-#if WIN32
+#if _WIN32
 # include "process.h"
 # define getpid _getpid
 #else

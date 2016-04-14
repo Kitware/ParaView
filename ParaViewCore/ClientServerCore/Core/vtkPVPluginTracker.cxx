@@ -36,7 +36,7 @@
 #include <vtksys/String.hxx>
 
 
-#if defined(WIN32) && !defined(__CYGWIN__)
+#if defined(_WIN32) && !defined(__CYGWIN__)
 /* String comparison routine. */
 # define VTKSTRNCASECMP _strnicmp
 #else

@@ -67,7 +67,7 @@
 
 typedef vtkStreamingDemandDrivenPipeline vtkSDDPipeline;
 
-#ifdef WIN32
+#ifdef _WIN32
   // only usefull in terminals
   #undef SQTK_DEBUG
 #endif

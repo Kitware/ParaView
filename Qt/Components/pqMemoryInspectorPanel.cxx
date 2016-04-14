@@ -158,7 +158,7 @@ QPlastiqueStyle *getMemoryUseWidgetStyle()
 // ****************************************************************************
 float getSystemWarningThreshold()
 {
-# ifdef WIN32
+# ifdef _WIN32
   return 0.90f;
 # else
   return 0.80f;
@@ -168,7 +168,7 @@ float getSystemWarningThreshold()
 // ****************************************************************************
 float getSystemCriticalThreshold()
 {
-# ifdef WIN32
+# ifdef _WIN32
   return 0.95f;
 # else
   return 0.90f;

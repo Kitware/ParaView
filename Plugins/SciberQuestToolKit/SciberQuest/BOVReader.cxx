@@ -49,7 +49,7 @@
 
 #include <sstream>
 
-#ifdef WIN32
+#ifdef _WIN32
   #define PATH_SEP "\\"
 #else
   #define PATH_SEP "/"
@@ -57,7 +57,7 @@
 
 //#define BOVReaderTIME
 
-#ifdef WIN32
+#ifdef _WIN32
   // these are only usefull in terminals
   #undef BOVReaderTIME
   #undef BOVReaderDEBUG

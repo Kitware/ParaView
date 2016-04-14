@@ -62,7 +62,7 @@
   vtkFloatTemplateMacroCase(VTK_DOUBLE, double, call); \
   vtkFloatTemplateMacroCase(VTK_FLOAT, float, call);
 
-#if defined(WIN32)
+#if defined(_MSC_VER)
 // TODO - move this to the file where it ocurs
 #pragma warning(disable : 4800) // int to bool performance
 #endif

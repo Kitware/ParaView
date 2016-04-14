@@ -371,7 +371,7 @@ std::string vtkInitializationHelper::GetUserSettingsDirectory()
 {
   std::string organizationName(vtkInitializationHelper::GetOrganizationName());
   std::string applicationName(vtkInitializationHelper::GetApplicationName());
-#if defined(WIN32)
+#if defined(_WIN32)
   const char* appData = getenv("APPDATA");
   if (!appData)
     {

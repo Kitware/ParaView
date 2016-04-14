@@ -36,7 +36,7 @@
 #include <fstream> // for fstream
 #include <sstream> // for istringstream
 
-#ifndef WIN32
+#ifndef _WIN32
   #define PATH_SEP "/"
 #else
   #define PATH_SEP "\\"

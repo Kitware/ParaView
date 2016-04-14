@@ -349,7 +349,7 @@ std::string MakeAbsolutePath(const std::string& path,
                             const std::string& working_dir)
 {
   std::string ret = path;
-#if defined(WIN32)
+#if defined(_WIN32)
   if(!IsUncPath(path) && !IsNetworkPath(path))
 #endif
     {
