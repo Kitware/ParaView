@@ -27,6 +27,8 @@
 #include <ctype.h>
 #include <cassert>
 #include <cmath>
+#include <cstring>
+
 
 vtkStandardNewMacro(vtkSMCoreUtilities);
 //----------------------------------------------------------------------------
@@ -160,8 +162,10 @@ bool AdjustTRange(T range[2], EquivSizeIntT)
     return false;
     }
 
-  EquivSizeIntT irange[2] = { *reinterpret_cast<EquivSizeIntT*>(&range[0]),
-                              *reinterpret_cast<EquivSizeIntT*>(&range[1]) };
+  EquivSizeIntT irange[2];
+  //needs to be a memcpy to avoid strict aliasing issues, doing a count
+  //of 2*sizeof(T) to couple both values at the same time
+  std::memcpy(irange, range, sizeof(T)*2 );
   const EquivSizeIntT minDelta = 65536;
 
   //determine the absolute delta between these two numbers.
@@ -174,13 +178,15 @@ bool AdjustTRange(T range[2], EquivSizeIntT)
   if(delta < minDelta && irange[1] < 0)
     {
     irange[1] = irange[0] - minDelta;
-    range[1] = *reinterpret_cast<T*>(&irange[1]);
+    //needs to be a memcpy to avoid strict aliasing issues
+    std::memcpy(range+1, irange+1, sizeof(T) );
     return true;
     }
   if(delta < minDelta)
     {
     irange[1] = irange[0] + minDelta;
-    range[1] = *reinterpret_cast<T*>(&irange[1]);
+    //needs to be a memcpy to avoid strict aliasing issues
+    std::memcpy(range+1, irange+1, sizeof(T) );
     return true;
     }
   return false;
@@ -202,12 +208,12 @@ bool vtkSMCoreUtilities::AdjustRange(double range[2])
     if(result)
       { //range should be left untouched to avoid loss of precision when no
         //adjustment was needed
-      range[0] = frange[0];
-      range[1] = frange[1];
+      range[0] = static_cast<double>(frange[0]);
+      range[1] = static_cast<double>(frange[1]);
       }
     return result;
     }
-  vtkTypeInt64 intType;
+  vtkTypeInt64 intType=0;
   return AdjustTRange(range, intType);
 }
 
