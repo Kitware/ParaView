@@ -12078,6 +12078,11 @@ source.</Documentation>
             <DataType value="vtkDataSet" />
           </Domain>
         </Property>
+        <Property name="GlyphMode"
+                  id="2429.GlyphMode"
+                  number_of_elements="1">
+          <Element index="0" value="0"/>
+        </Property>
         <Property id="2429.Scalars"
                   name="Scalars"
                   number_of_elements="5">
