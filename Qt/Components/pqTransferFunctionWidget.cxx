@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPiecewiseFunctionItem.h"
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMCoreUtilities.h"
 
 #include <QVBoxLayout>
 #include <QPointer>
@@ -67,6 +68,15 @@ class vtkTransferFunctionChartXY : public vtkChartXY
 {
   double XRange[2];
   bool DataValid;
+
+  bool IsDataRangeValid(const double r[2]) const
+    {
+    double mr[2] = {r[0], r[1]};
+    // If vtkSMCoreUtilities::AdjustRange() decided to adjust a valid range, it means the numbers
+    // are too close to each other.
+    return r[1] < r[0]? false :
+      (vtkSMCoreUtilities::AdjustRange(mr) == false);
+    }
 public:
   static vtkTransferFunctionChartXY* New();
   vtkTypeMacro(vtkTransferFunctionChartXY, vtkChartXY);
@@ -89,7 +99,7 @@ public:
         {
         this->XRange[0] = bounds[0];
         this->XRange[1] = bounds[1];
-        this->DataValid = ((this->XRange[1] - this->XRange[0]) >= 1e-22);
+        this->DataValid = this->IsDataRangeValid(this->XRange);
         this->RecalculateBounds();
         }
       }
