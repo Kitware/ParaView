@@ -240,8 +240,20 @@ def main():
         if win:
             frozendllmain_c = os.path.join(exec_prefix, 'Pc\\frozen_dllmain.c')
     else:
+        # the directory we're looking for is different for different systems
+        # so we look for a file that exists in that directory
+        import fnmatch
+        match = None
+        searchlib = os.path.join(exec_prefix, 'lib', 'python%s' % version)
+        for root, dirnames, filenames in os.walk(searchlib):
+            for filename in fnmatch.filter(filenames, 'config.c.in'):
+                match = root
+
+        if not match:
+            usage('could not find python lib directory')
+
         binlib = os.path.join(exec_prefix,
-                              'lib', 'python%s' % version, 'config')
+                              'lib', 'python%s' % version, match)
         incldir = os.path.join(prefix, 'include', 'python%s' % version)
         config_h_dir = os.path.join(exec_prefix, 'include',
                                     'python%s' % version)
