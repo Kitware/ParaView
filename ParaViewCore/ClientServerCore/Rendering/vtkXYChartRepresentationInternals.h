@@ -406,8 +406,13 @@ protected:
       }
 
     std::string default_label = self->GetDefaultSeriesLabel(tableName, columnName);
-    plot->SetLabel(this->GetSeriesParameter(self, tableName, columnName, role,
-        this->Labels, default_label));
+    std::string label = this->GetSeriesParameter(self, tableName, columnName, role,
+        this->Labels, default_label);
+    if (self->GetSeriesLabelPrefix())
+      {
+      label = std::string(self->GetSeriesLabelPrefix()) + label;
+      }
+    plot->SetLabel(label);
 
     vtkColor3d color = this->GetSeriesParameter(self, tableName, columnName, role,
       this->Colors, vtkColor3d(0, 0, 0));

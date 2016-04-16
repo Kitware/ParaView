@@ -104,6 +104,11 @@ public:
   vtkGetVector3Macro(SelectionColor, double);
 
   // Description:
+  // Get/Set the series label prefix.
+  vtkSetStringMacro(SeriesLabelPrefix);
+  vtkGetStringMacro(SeriesLabelPrefix);
+
+  // Description:
   // Called by vtkPVContextView::Export() to export the representation's data to
   // a CSV file. Return false on failure which will call the exporting process
   // to abort and raise an error. Default implementation simply returns false.
@@ -136,6 +141,7 @@ private:
   bool UseIndexForXAxis;
   bool PlotDataHasChanged;
   double SelectionColor[3];
+  char* SeriesLabelPrefix;
 //ETX
 };
 
