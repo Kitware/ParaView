@@ -628,6 +628,15 @@
           Indicate whether to shallow copy the input field data arrays to the output.
         </Documentation>
       </IntVectorProperty>
+
+      <ProxyProperty name="Locator" command="SetLocator" panel_visibility="advanced">
+        <Documentation>
+          Specify a point locator.
+        </Documentation>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="point_locators" name="StaticPointLocator" />
+        </ProxyListDomain>
+      </ProxyProperty>
     </SourceProxy>
 
     <!-- =================================================================== -->
@@ -779,6 +788,15 @@
           Indicate whether to shallow copy the input field data arrays to the output.
         </Documentation>
       </IntVectorProperty>
+
+      <ProxyProperty name="Locator" command="SetLocator" panel_visibility="advanced">
+        <Documentation>
+          Specify a point locator.
+        </Documentation>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="point_locators" name="StaticPointLocator" />
+        </ProxyListDomain>
+      </ProxyProperty>
     </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
