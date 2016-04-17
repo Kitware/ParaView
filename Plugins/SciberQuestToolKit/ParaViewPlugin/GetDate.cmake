@@ -6,14 +6,5 @@
 # Copyright 2012 SciberQuest Inc.
 #
 macro (GetDate RESULT)
-  if (CMAKE_VERSION VERSION_LESS 2.8.11)
-    set(${RESULT} "00/00/0000")
-    if (WIN32)
-      execute_process(COMMAND "cmd" " /C date /T" OUTPUT_VARIABLE ${RESULT} OUTPUT_STRIP_TRAILING_WHITESPACE)
-    elseif (UNIX)
-      execute_process(COMMAND "date" "+%m/%d/%Y" OUTPUT_VARIABLE ${RESULT} OUTPUT_STRIP_TRAILING_WHITESPACE)
-    endif ()
-  else ()
-    string(TIMESTAMP ${RESULT} "%m/%d/%Y")
-  endif ()
+  string(TIMESTAMP ${RESULT} "%m/%d/%Y")
 endmacro ()

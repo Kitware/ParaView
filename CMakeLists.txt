@@ -28,19 +28,7 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
-cmake_minimum_required(VERSION 2.8.8 FATAL_ERROR)
-
-# Link to Qt5's WinMain automatically (in executables).
-if (POLICY CMP0020)
-  cmake_policy(SET CMP0020 NEW)
-endif ()
-
-# Set a consistent MACOSX_RPATH default across all CMake versions.
-# When CMake 2.8.12 is required, change this default to 1.
-# When CMake 3.0.0 is required, remove this block (see CMP0042).
-if(NOT DEFINED CMAKE_MACOSX_RPATH)
-  set(CMAKE_MACOSX_RPATH 0)
-endif()
+cmake_minimum_required(VERSION 3.5)
 
 project(ParaView)
 
