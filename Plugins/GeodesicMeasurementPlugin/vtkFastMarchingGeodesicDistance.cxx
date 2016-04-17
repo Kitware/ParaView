@@ -30,6 +30,7 @@
 #include "vtkFloatArray.h"
 #include "vtkCellArray.h"
 #include "vtkCommand.h"
+#include "vtkNew.h"
 
 #include "gw_geodesic/GW_GeodesicMesh.h"
 #include "gw_geodesic/GW_GeodesicPath.h"
@@ -195,8 +196,19 @@ int vtkFastMarchingGeodesicDistance::RequestData(
   // Setup termination criteria, if any
   this->SetupCallbacks();
 
-  // Seeds for fast marching
-  this->AddSeeds();
+  // Extract seed point id list as points with non-zero values of a given field
+  vtkDataArray *inNonZeroField = this->GetInputArrayToProcess(0, input);
+  if (inNonZeroField)
+    {
+    this->SetSeedsFromNonZeroField(inNonZeroField);
+    }
+
+  // Set propagation weight field. NULL case is handled internally
+  vtkDataArray *inIsotropicMetricTensorLength = this->GetInputArrayToProcess(1, input);
+  this->SetPropagationWeights(inIsotropicMetricTensorLength);
+
+  // Internally setup seeds for fast marching
+  this->AddSeedsInternal();
 
   // Do the fast marching
   this->Compute();
@@ -301,7 +313,7 @@ void vtkFastMarchingGeodesicDistance::SetupGeodesicMesh( vtkPolyData *in )
 }
 
 //-----------------------------------------------------------------------------
-void vtkFastMarchingGeodesicDistance::AddSeeds()
+void vtkFastMarchingGeodesicDistance::AddSeedsInternal()
 {
   if (!this->Seeds || !this->Seeds->GetNumberOfIds())
     {
@@ -318,6 +330,23 @@ void vtkFastMarchingGeodesicDistance::AddSeeds()
       *((GW::GW_GeodesicVertex*)mesh->
         GetVertex((GW::GW_U32)(this->Seeds->GetId(i)))));
     }
+}
+
+//-----------------------------------------------------------------------------
+void vtkFastMarchingGeodesicDistance::SetSeedsFromNonZeroField(
+  vtkDataArray* nonZeroField)
+{
+  vtkIdType numpts = nonZeroField->GetNumberOfTuples();
+  //First extract seeds ids
+  vtkNew<vtkIdList> seedsId;
+  for (vtkIdType pointIdx = 0; pointIdx < numpts; pointIdx++)
+    {
+    if (nonZeroField->GetTuple1(pointIdx) != 0.0)
+      {
+      seedsId->InsertNextId(pointIdx);
+      }
+    }
+  this->SetSeeds(seedsId.Get());
 }
 
 //-----------------------------------------------------------------------------
@@ -486,15 +515,11 @@ void vtkFastMarchingGeodesicDistance::PrintSelf(ostream& os, vtkIndent indent)
     {
     this->ExclusionPointIds->PrintSelf(os, indent.GetNextIndent());
     }
-  os << indent << "PropagationWeights: " << this->ExclusionPointIds << endl;
+  os << indent << "PropagationWeights: " << this->PropagationWeights << endl;
   if (this->PropagationWeights)
     {
     this->PropagationWeights->PrintSelf(os, indent.GetNextIndent());
     }
-  os << indent << "MaximumDistance: " << this->MaximumDistance << endl;
-  os << indent << "NotVisitedValue: " << this->NotVisitedValue << endl;
-  os << indent << "NumberOfVisitedPoints: "
-     << this->NumberOfVisitedPoints << endl;
   os << indent << "FastMarchingIterationEventResolution: "
      << this->FastMarchingIterationEventResolution << endl;
   os << indent << "IterationIndex: " << this->IterationIndex << endl;
