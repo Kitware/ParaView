@@ -46,6 +46,7 @@ paraview_add_test_python(
   TestPythonViewScript.py
   TestColorHistogram.py
   TestClipCylinder.py
+  TestLineChartLabelPrefix.py
 )
 
 paraview_add_test_pvbatch(
