@@ -2583,6 +2583,7 @@ def updateModules(m):
     createModule('piecewise_functions', m.piecewise_functions)
     createModule("extended_sources", m.extended_sources)
     createModule("incremental_point_locators", m.misc)
+    createModule("point_locators", m.misc)
 
 def _createModules(m):
     """Called when the module is loaded, this creates sub-
@@ -2604,6 +2605,7 @@ def _createModules(m):
     m.extended_sources = createModule("extended_sources")
     m.misc = createModule("misc")
     createModule("incremental_point_locators", m.misc)
+    createModule("point_locators", m.misc)
 
 class PVModule(object):
     pass

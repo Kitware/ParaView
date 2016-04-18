@@ -548,8 +548,78 @@
                   show="0" />
       </Hints>
     </Proxy>
+    <!-- incremental point locators end -->
   </ProxyGroup>
-  <!-- incremental point locators end -->
+
+  <ProxyGroup name="point_locators">
+    <Proxy name="StaticPointLocator" label="Static Point Locator" class="vtkStaticPointLocator">
+      <Documentation>
+        This uses a spatial search object to quickly locate points
+        in 3D.  This locator works by dividing a specified region of
+        space into a regular array of cuboid buckets, and then keeping a
+        list of points that lie in each bucket. Typical operation involves giving
+        a position in 3D and finding the closest point; or finding the N closest
+        points.
+
+        This locator is an accelerated version of a point locator. It is
+        threaded (via vtkSMPTools), and supports one-time static construction
+        (i.e., incremental point insertion is not supported).
+      </Documentation>
+
+      <IntVectorProperty name="Automatic"
+        command="SetAutomatic"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Controls whether the locator resolution is computed automatically or not.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetDivisions"
+        default_values="50 50 50"
+        name="Divisions"
+        number_of_elements="3">
+        <Documentation>Specify the number of divisions in each axis / direction
+          (x, y, z) for creating a search structure of uniform fixed-resolution
+          bins / buckets.
+        </Documentation>
+        <IntRangeDomain name="range" min="1 1 1" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="enabled_state"
+            property="Automatic"
+            value="0" />
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="NumberOfPointsPerBucket"
+        command="SetNumberOfPointsPerBucket"
+        number_of_elements="1"
+        default_values="5">
+        <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          Specify the average number of points in each bucket. This is
+          used in conjunction with the **Automatic** (if enabled) to
+          determine the number of locator x-y-z divisions.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="enabled_state"
+            property="Automatic"
+            value="1" />
+        </Hints>
+      </IntVectorProperty>
+
+      <PropertyGroup label="Locator Parameters">
+        <Property name="Automatic" />
+        <Property name="Divisions" />
+        <Property name="NumberOfPointsPerBucket" />
+      </PropertyGroup>
+    </Proxy>
+
+  </ProxyGroup>
+
   <ProxyGroup name="implicit_functions">
     <NullProxy name="None"></NullProxy>
     <NullProxy name="Scalar"></NullProxy>
