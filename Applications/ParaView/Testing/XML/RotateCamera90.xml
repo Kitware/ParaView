@@ -3,9 +3,9 @@
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
   <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="ConeSource" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/cameraToolbar/1QToolButton9" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/cameraToolbar/1QToolButton9" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/cameraToolbar/1QToolButton10" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionRotate90degCW" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionRotate90degCW" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionRotate90degCCW" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
   <pqevent object="pqClientMainWindow/cameraToolbar/1QToolButton0" command="activate" arguments="" />
 </pqevents>
