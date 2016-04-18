@@ -15,7 +15,7 @@
   <pqevent object="pqClientMainWindow/cameraToolbar/1QToolButton5" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/cameraToolbar/1QToolButton6" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/cameraToolbar/1QToolButton7" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/cameraToolbar/1QToolButton8" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeZ" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/cameraToolbar/1QToolButton6" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
