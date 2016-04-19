@@ -7,6 +7,15 @@ started tracking these (starting after version 4.2).
 Changes in 5.1
 --------------
 
+###Removing `pqWriterDialog`###
+
+`pqWriterDialog` was used by `pqSaveDataReaction` to show a dialog for the user to
+change the writer's properties. However, since the class was added, we have
+created a new, more generic, pqProxyWidgetDialog that also allows the user to
+save his choices to the application settings. `pqSaveDataReaction` now simply
+uses `pqProxyWidgetDialog` instead of `pqWriterDialog`. `pqWriterDialog` class
+has been removed.
+
 ###Refactored 3DWidget panels###
 
 3DWidget panels were subclasses of `pqObjectPanel`, the Properties panel
