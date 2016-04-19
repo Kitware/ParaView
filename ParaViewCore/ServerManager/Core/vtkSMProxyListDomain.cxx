@@ -16,12 +16,15 @@
 
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVProxyDefinitionIterator.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxyLocator.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSessionProxyManager.h"
 
@@ -332,12 +335,39 @@ int vtkSMProxyListDomain::ReadXMLAttributes(vtkSMProperty* prop,
         found = 1;
         }
       }
-    }
+    else if (strcmp(proxyElement->GetName(), "Group") == 0)
+      {
+      // Recover group name
+      const char* name = proxyElement->GetAttribute("name");
 
+      if (name)
+        {
+        found = 1;
+
+        // Browse group and recover each proxy type
+        vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
+        vtkSMProxyDefinitionManager* pxdm = pxm->GetProxyDefinitionManager();
+        if (!pxdm)
+          {
+          vtkErrorMacro("No vtkSMProxyDefinitionManager available in vtkSMSessionProxyManager, cannot generate proxy list for groups");
+          continue;
+          }
+        else
+          {
+          vtkPVProxyDefinitionIterator* iter = pxdm->NewSingleGroupIterator(name);
+          for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+            {
+            this->AddProxy(name, iter->GetProxyName());
+            }
+          iter->Delete();
+          }
+        }
+      }
+    }
   if (!found)
     {
     vtkErrorMacro("Required element \"Proxy\" (with a 'name' and 'group' attribute) "
-                  "was not found.");
+                  " or \"Group\" ( with a name attribute ) was not found.");
     return 0;
     }
 
