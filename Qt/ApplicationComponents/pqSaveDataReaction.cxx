@@ -154,24 +154,22 @@ bool pqSaveDataReaction::saveActiveData(const QString& filename)
 
   if (writer->IsA("vtkSMPSWriterProxy") && port->getServer()->getNumberOfPartitions() > 1)
     {
-    //pqOptions* options = pqApplicationCore::instance()->getOptions();
-    // To avoid showing the dialog when running tests.
-    if (!pqApplicationCore::instance()->testUtility()->playingTest())
-      {
-      QMessageBox::StandardButton result = 
-        QMessageBox::question(
-          pqCoreUtilities::mainWidget(),
-          "Serial Writer Warning",
-          "This writer will collect all of the data to the first node before "
+    bool result =
+      pqCoreUtilities::promptUser(
+        // Let's try to warn separately for each type of writer.
+        QString("SerialWriterWarning_%1").arg(writer->GetXMLName()),
+        QMessageBox::Warning,
+        tr("Serial Writer Warning"),
+        QString(
+          tr("This writer (%1) will collect all of the data to the first node before "
           "writing because it does not support parallel IO. This may cause the "
-          "first node to run out of memory if the data is large. "
-          "Are you sure you want to continue?",
-          QMessageBox::Ok | QMessageBox::Cancel,
-          QMessageBox::Cancel);
-      if (result == QMessageBox::Cancel)
-        {
-        return false;
-        }
+          "first node to run out of memory if the data is large.\n"
+          "Are you sure you want to continue?")).arg(writer->GetXMLLabel()),
+        QMessageBox::Yes | QMessageBox::No | QMessageBox::Save,
+        pqCoreUtilities::mainWidget());
+    if (!result)
+      {
+      return false;
       }
     }
 
