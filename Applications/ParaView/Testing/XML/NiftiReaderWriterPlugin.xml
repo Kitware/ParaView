@@ -12,11 +12,11 @@
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveData" />
   <pqevent object="pqClientMainWindow/FileSaveDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/outbinary.nii" />
-  <pqevent object="pqWriterDialog/PropertiesFrame/qt_scrollarea_viewport/scrollAreaWidgetContents/Container/1pqProxyWidget0/FileType/ComboBox" command="set_string" arguments="Binary" />
-  <pqevent object="pqWriterDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/WriterSettingsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/FileType/ComboBox" command="set_string" arguments="Binary" />
+  <pqevent object="pqClientMainWindow/WriterSettingsDialog/widget/OKButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveData" />
   <pqevent object="pqClientMainWindow/FileSaveDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/outascii.nii" />
-  <pqevent object="pqWriterDialog/PropertiesFrame/qt_scrollarea_viewport/scrollAreaWidgetContents/Container/1pqProxyWidget0/FileType/ComboBox" command="set_string" arguments="Ascii" />
-  <pqevent object="pqWriterDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/WriterSettingsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/FileType/ComboBox" command="set_string" arguments="Ascii" />
+  <pqevent object="pqClientMainWindow/WriterSettingsDialog/widget/OKButton" command="activate" arguments="" />
 </pqevents>

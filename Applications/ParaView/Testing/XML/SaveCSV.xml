@@ -10,7 +10,7 @@
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveData" />
   <pqevent object="pqClientMainWindow/FileSaveDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/SaveCSV0.csv" />
   <pqevent object="pqClientMainWindow/FileSaveDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/SaveCSV.csv" />
-  <pqevent object="pqWriterDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/WriterSettingsDialog/widget/OKButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/SaveCSV0.csv" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />

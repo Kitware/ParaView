@@ -8,7 +8,7 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveData" />
   <pqevent object="pqClientMainWindow/FileSaveDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/GhostCellsGeneratorTest.pvtu" />
-  <pqevent object="pqWriterDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/WriterSettingsDialog/widget/OKButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/1QToolButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/GhostCellsGeneratorTest.pvtu" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
