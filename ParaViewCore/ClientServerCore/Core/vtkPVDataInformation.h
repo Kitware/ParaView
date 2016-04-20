@@ -161,6 +161,14 @@ public:
   vtkPVDataInformation* GetDataInformationForCompositeIndex(int index);
 
   // Description:
+  // Compute the number of block leaf from this information
+  // multipieces are counted as single block.
+  // The boolean skipEmpty parameter allows to choose to count empty dataset are not
+  // Calling this method with skipEmpty to false will correspond to the vtkBlockColors array
+  // in a multiblock.
+  unsigned int GetNumberOfBlockLeafs(bool skipEmpty);
+
+  // Description:
   // This is same as GetDataInformationForCompositeIndex() however note that the
   // index will get modified in this method.
   vtkPVDataInformation* GetDataInformationForCompositeIndex(int* index);

@@ -34,11 +34,13 @@
 #include "vtkPVInstantiator.h"
 #include "vtkMath.h"
 #include "vtkMultiProcessController.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformationHelper.h"
 #include "vtkPVCompositeDataInformation.h"
+#include "vtkPVCompositeDataInformationIterator.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVInformationKeys.h"
 #include "vtkRectilinearGrid.h"
@@ -1119,6 +1121,32 @@ vtkPVDataInformation::GetDataInformationForCompositeIndex(int* index)
 
   (*index)--;
   return this->CompositeDataInformation->GetDataInformationForCompositeIndex(index);
+}
+
+//----------------------------------------------------------------------------
+unsigned int vtkPVDataInformation::GetNumberOfBlockLeafs(bool skipEmpty)
+{
+  vtkNew<vtkPVCompositeDataInformationIterator> iter;
+  iter->SetDataInformation(this);
+  unsigned int nLeafs = 0;
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+    vtkPVDataInformation* info = iter->GetCurrentDataInformation();
+    if (info)
+      {
+      vtkPVCompositeDataInformation* cinfo = info->GetCompositeDataInformation();
+      if (!cinfo->GetDataIsComposite() || cinfo->GetDataIsMultiPiece())
+        {
+        nLeafs++;
+        }
+      }
+    else if (!skipEmpty)
+      {
+      // without skipEmpty, NULL data are counted as well.
+      nLeafs++;
+      }
+    }
+  return nLeafs;
 }
 
 //----------------------------------------------------------------------------
