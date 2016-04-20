@@ -1,0 +1,783 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="lagrangian_integration_models_abstract">
+    <Proxy class="vtkLagrangianBasicIntegrationModel"
+           name="BasicIntegrationModel">
+      <InputProperty is_internal="1"
+                     name="DummyInput">
+        <InputArrayDomain name="input_array"/>
+        <InputArrayDomain name="input_array_point"
+                          attribute_type="point"/>
+        <InputArrayDomain name="input_array_cell"
+                          attribute_type="cell"/>
+        <InputArrayDomain name="input_array_1"
+                          number_of_components="1"/>
+        <InputArrayDomain name="input_array_2"
+                          number_of_components="2"/>
+        <InputArrayDomain name="input_array_3"
+                          number_of_components="3"/>
+        <InputArrayDomain name="input_array_6"
+                          number_of_components="6"/>
+        <InputArrayDomain name="input_array_9"
+                          number_of_components="9"/>
+        <InputArrayDomain name="input_array_point_1"
+                          number_of_components="1"
+                          attribute_type="point"/>
+        <InputArrayDomain name="input_array_point_2"
+                          number_of_components="2"
+                          attribute_type="point"/>
+        <InputArrayDomain name="input_array_point_3"
+                          number_of_components="3"
+                          attribute_type="point"/>
+        <InputArrayDomain name="input_array_point_6"
+                          number_of_components="6"
+                          attribute_type="point"/>
+        <InputArrayDomain name="input_array_point_9"
+                          number_of_components="9"
+                          attribute_type="point"/>
+        <InputArrayDomain name="input_array_cell_1"
+                          number_of_components="1"
+                          attribute_type="cell"/>
+        <InputArrayDomain name="input_array_cell_2"
+                          number_of_components="2"
+                          attribute_type="cell"/>
+        <InputArrayDomain name="input_array_cell_3"
+                          number_of_components="3"
+                          attribute_type="cell"/>
+        <InputArrayDomain name="input_array_cell_6"
+                          number_of_components="6"
+                          attribute_type="cell"/>
+        <InputArrayDomain name="input_array_cell_9"
+                          number_of_components="9"
+                          attribute_type="cell"/>
+        <InputArrayDomain name="input_array_field"
+                          attribute_type="field"/>
+        <Documentation>Dummy input to create input array
+        domain for easier creation of new integration model.
+        Use these input array domains in your model xml.
+        </Documentation>
+      </InputProperty>
+      <InputProperty is_internal="1"
+                     name="DummySource">
+        <InputArrayDomain name="source_array"/>
+        <InputArrayDomain name="source_array_point"
+                          attribute_type="point"/>
+        <InputArrayDomain name="source_array_cell"
+                          attribute_type="cell"/>
+        <InputArrayDomain name="source_array_1"
+                          number_of_components="1"/>
+        <InputArrayDomain name="source_array_2"
+                          number_of_components="2"/>
+        <InputArrayDomain name="source_array_3"
+                          number_of_components="3"/>
+        <InputArrayDomain name="source_array_6"
+                          number_of_components="6"/>
+        <InputArrayDomain name="source_array_9"
+                          number_of_components="9"/>
+        <InputArrayDomain name="source_array_point_1"
+                          number_of_components="1"
+                          attribute_type="point"/>
+        <InputArrayDomain name="source_array_point_2"
+                          number_of_components="2"
+                          attribute_type="point"/>
+        <InputArrayDomain name="source_array_point_3"
+                          number_of_components="3"
+                          attribute_type="point"/>
+        <InputArrayDomain name="source_array_point_6"
+                          number_of_components="6"
+                          attribute_type="point"/>
+        <InputArrayDomain name="source_array_point_9"
+                          number_of_components="9"
+                          attribute_type="point"/>
+        <InputArrayDomain name="source_array_cell_1"
+                          number_of_components="1"
+                          attribute_type="cell"/>
+        <InputArrayDomain name="source_array_cell_2"
+                          number_of_components="2"
+                          attribute_type="cell"/>
+        <InputArrayDomain name="source_array_cell_3"
+                          number_of_components="3"
+                          attribute_type="cell"/>
+        <InputArrayDomain name="source_array_cell_6"
+                          number_of_components="6"
+                          attribute_type="cell"/>
+        <InputArrayDomain name="source_array_cell_9"
+                          number_of_components="9"
+                          attribute_type="cell"/>
+        <Documentation>Dummy source input to create input array
+        domain for easier creation of new integration model.
+        Use these input array domains in your model xml.</Documentation>
+      </InputProperty>
+      <InputProperty is_internal="1"
+                     name="DummySurface">
+        <InputArrayDomain name="surface_array"/>
+        <InputArrayDomain name="surface_array_point"
+                          attribute_type="point"/>
+        <InputArrayDomain name="surface_array_cell"
+                          attribute_type="cell"/>
+        <InputArrayDomain name="surface_array_1"
+                          number_of_components="1"/>
+        <InputArrayDomain name="surface_array_2"
+                          number_of_components="2"/>
+        <InputArrayDomain name="surface_array_3"
+                          number_of_components="3"/>
+        <InputArrayDomain name="surface_array_6"
+                          number_of_components="6"/>
+        <InputArrayDomain name="surface_array_9"
+                          number_of_components="9"/>
+        <InputArrayDomain name="surface_array_point_1"
+                          number_of_components="1"
+                          attribute_type="point"/>
+        <InputArrayDomain name="surface_array_point_2"
+                          number_of_components="2"
+                          attribute_type="point"/>
+        <InputArrayDomain name="surface_array_point_3"
+                          number_of_components="3"
+                          attribute_type="point"/>
+        <InputArrayDomain name="surface_array_point_6"
+                          number_of_components="6"
+                          attribute_type="point"/>
+        <InputArrayDomain name="surface_array_point_9"
+                          number_of_components="9"
+                          attribute_type="point"/>
+        <InputArrayDomain name="surface_array_cell_1"
+                          number_of_components="1"
+                          attribute_type="cell"/>
+        <InputArrayDomain name="surface_array_cell_2"
+                          number_of_components="2"
+                          attribute_type="cell"/>
+        <InputArrayDomain name="surface_array_cell_3"
+                          number_of_components="3"
+                          attribute_type="cell"/>
+        <InputArrayDomain name="surface_array_cell_6"
+                          number_of_components="6"
+                          attribute_type="cell"/>
+        <InputArrayDomain name="surface_array_cell_9"
+                          number_of_components="9"
+                          attribute_type="cell"/>
+        <InputArrayDomain name="surface_array_field"
+                          attribute_type="field"/>
+        <InputArrayDomain name="surface_array_field_1"
+                          number_of_components="1"
+                          attribute_type="field"/>
+        <Documentation>Dummy surface input to create input array
+        domain for easier creation of new integration model. Use these input
+        array domain in your domain xml.</Documentation>
+      </InputProperty>
+      <Hints>
+        <ProxyList>
+          <Link name="DummyInput" with_property="FlowInput"/>
+          <Link name="DummySource" with_property="ParticleSeeds"/>
+          <Link name="DummySurface" with_property="Surface"/>
+        </ProxyList>
+      </Hints>
+      <ProxyProperty command="SetLocator"
+                     name="Locator"
+                     panel_visibility="default">
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="cell_locators"
+                 name="CellLocator"/>
+          <Proxy group="cell_locators"
+                 name="CellTreeLocator"/>
+          <Proxy group="cell_locators"
+                 name="ModifiedBSPTree"/>
+        </ProxyListDomain>
+        <Documentation>Specify the locator used to
+        locate cells in the flow intput</Documentation>
+      </ProxyProperty>
+      <IntVectorProperty command="SetNonPlanarQuadSupport"
+                         default_values="1"
+                         name="NonPlanarQuadSupport"
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>If NonPlanarQuadSupport is true,
+        surface interaction for vtkQuad will use the bilinear patch
+        code to compute intersection.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            default_values_delimiter=";"
+                            default_values="0;1;0;0;ParticleVelocity"
+                            element_types="0 0 0 0 2"
+                            label="Particle Initial Velocity"
+                            name="ParticleInitialVelocity"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Vectors"
+                         input_domain_name="source_array_3"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="DummySource" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="DummySource" />
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Documentation>This property contains the name of the vector array from
+        the seeds to use as initial particle velocity.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetUseInitialIntegrationTime"
+                         default_values="0"
+                         name="UseInitialIntegrationTime"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        Set whether to use an initial integration time array from input
+        instead of zero values.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            default_values_delimiter=";"
+                            default_values="1;1;0;0;ParticleInitialIntegrationTime"
+                            element_types="0 0 0 0 2"
+                            label="Particle Initial Integration Time"
+                            name="ParticleInitialIntegrationTime"
+                            number_of_elements="5"
+                            panel_visibility="advanced">
+        <ArrayListDomain attribute_type="Vectors"
+                         input_domain_name="source_array_1"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="DummySource" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="DummySource" />
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseInitialIntegrationTime" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>This property contains the name of the scalar array from
+        the seeds to use as initial particle integration time.</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            default_values_delimiter=";"
+                            default_values="2;2;0;2;SurfaceType"
+                            element_types="0 0 0 0 2"
+                            label="Surface Type"
+                            name="SurfaceType"
+                            number_of_elements="5">
+        <ArrayListDomain name="array_list" input_domain_name="surface_array_field_1">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="DummySurface" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property contains the name of
+        the array to use as surface type.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="GetSeedArrayNames"
+                         information_only="1"
+                         name="SeedArrayNames">
+        <StringArrayHelper/>
+      </StringVectorProperty>
+      <IntVectorProperty command="GetSeedArrayComps"
+                         information_only="1"
+                         name="SeedArrayComps">
+        <IntArrayInformationHelper/>
+      </IntVectorProperty>
+      <IntVectorProperty command="GetSeedArrayTypes"
+                         information_only="1"
+                         name="SeedArrayTypes">
+        <IntArrayInformationHelper/>
+      </IntVectorProperty>
+      <StringVectorProperty command="GetSurfaceArrayNames"
+                         information_only="1"
+                         name="SurfaceArrayNames">
+        <StringArrayHelper/>
+      </StringVectorProperty>
+      <IntVectorProperty command="GetSurfaceArrayComps"
+                         information_only="1"
+                         name="SurfaceArrayComps">
+        <IntArrayInformationHelper/>
+      </IntVectorProperty>
+      <StringVectorProperty command="GetSurfaceArrayEnumValues"
+                         information_only="1"
+                         name="SurfaceArrayEnumValues">
+        <StringArrayHelper/>
+      </StringVectorProperty>
+      <IntVectorProperty command="GetSurfaceArrayTypes"
+                         information_only="1"
+                         name="SurfaceArrayTypes">
+        <IntArrayInformationHelper/>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="GetSurfaceArrayDefaultValues"
+                         information_only="1"
+                         name="SurfaceArrayDefaultValues">
+        <DoubleArrayInformationHelper/>
+      </DoubleVectorProperty>
+    </Proxy>
+  </ProxyGroup>
+  <!-- ==================================================================== -->
+  <ProxyGroup name="lagrangian_integration_models">
+    <Proxy base_proxygroup="lagrangian_integration_models_abstract"
+           base_proxyname="BasicIntegrationModel"
+           class="vtkLagrangianMatidaIntegrationModel"
+           name="MatidaIntegrationModel"
+           label="Matida Integration Model">
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            default_values_delimiter=";"
+                            default_values="3;0;0;3;FlowVelocity"
+                            element_types="0 0 0 0 2"
+                            label="Flow Velocity"
+                            name="FlowVelocity"
+                            number_of_elements="5">
+        <ArrayListDomain name="array_list"
+                         attribute_type="Vectors"
+                         input_domain_name="input_array_3">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="DummyInput" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="DummyInput" />
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Documentation>This property contains the name of
+        the array to use as flow velocity.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            default_values_delimiter=";"
+                            default_values="4;0;0;3;FlowDensity"
+                            element_types="0 0 0 0 2"
+                            label="Flow Density"
+                            name="FlowDensity"
+                            number_of_elements="5">
+        <ArrayListDomain name="array_list"
+                         attribute_type="Scalars"
+                         input_domain_name="input_array_1">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="DummyInput" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="DummyInput" />
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Documentation>This property contains the name of
+        the array to use as flow density.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            default_values_delimiter=";"
+                            default_values="5;0;0;3;FlowDynamicViscosity"
+                            element_types="0 0 0 0 2"
+                            label="Flow Dynamic Viscosity"
+                            name="FlowDynamicViscosity"
+                            number_of_elements="5">
+        <ArrayListDomain name="array_list"
+                         input_domain_name="input_array_1">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="DummyInput" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="DummyInput" />
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Documentation>This property contains the name of
+        the array to use as flow dynamic viscosity.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            default_values_delimiter=";"
+                            default_values="6;1;0;0;ParticleDiameter"
+                            element_types="0 0 0 0 2"
+                            label="Particle Diameter"
+                            name="ParticleDiameter"
+                            number_of_elements="5">
+        <ArrayListDomain name="array_list"
+                         input_domain_name="source_array_point_1">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="DummySource" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="DummySource" />
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Documentation>This property contains the name of
+        the array to use from seeds as particle diameter.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            default_values_delimiter=";"
+                            default_values="7;1;0;0;ParticleDensity"
+                            element_types="0 0 0 0 2"
+                            label="Particle Density"
+                            name="ParticleDensity"
+                            number_of_elements="5">
+        <ArrayListDomain name="array_list"
+                         input_domain_name="source_array_point_1">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="DummySource" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="DummySource" />
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Documentation>This property contains the name of
+        the array to use from seedsas particle density.</Documentation>
+      </StringVectorProperty>
+    </Proxy>
+  </ProxyGroup>
+  <!-- ==================================================================== -->
+  <ProxyGroup name="filters">
+    <SourceProxy class="vtkLagrangianParticleTracker"
+                 label="Lagrangian Particle Tracker"
+                 name="LagrangianParticleTracker">
+      <InputProperty clean_command="RemoveAllInputs"
+                     command="AddInputConnection"
+                     name="FlowInput"
+                     label="Flow Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array"
+                          number_of_components="3" />
+        <Documentation>This property specifies the flow input to the
+        Lagrangian Particle Tracker filter.</Documentation>
+      </InputProperty>
+      <InputProperty command="SetSourceConnection"
+                     label="Particle Seeds"
+                     name="ParticleSeeds">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="source_array_3"
+                          number_of_components="3" />
+        <InputArrayDomain attribute_type="point"
+                          name="source_array_1"
+                          number_of_components="1" />
+        <Documentation>This property specifies the input used to obtain the
+        seed points to generate particles.</Documentation>
+      </InputProperty>
+      <InputProperty command="SetSurfaceConnection"
+                     label="Surface"
+                     name="Surface">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="field"
+                          name="input_array"
+                          number_of_components="1" />
+        <Documentation>This property specifies the input used to surfaces the particles will interact with.
+        </Documentation>
+      </InputProperty>
+      <OutputPort name="ParticlePaths" index="0" />
+      <OutputPort name="ParticleInteractions" index="1" />
+      <ProxyProperty command="SetIntegrationModel"
+                     label="Integration Model"
+                     name="IntegrationModel"
+                     panel_visibility="default">
+        <ProxyListDomain name="proxy_list">
+          <Group name="lagrangian_integration_models"/>
+        </ProxyListDomain>
+      </ProxyProperty>
+      <ProxyProperty command="SetIntegrator"
+                     name="Integrator">
+        <ProxyListDomain name="proxy_list">
+          <Group name="integrators"/>
+        </ProxyListDomain>
+        <Documentation>This property determines which integrator (with
+        increasing accuracy) to use for integrating particles.</Documentation>
+      </ProxyProperty>
+      <IntVectorProperty command="SetCellLengthComputationMode"
+                         default_values="3"
+                         name="CellLengthComputationMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Last Cell Length"
+                 value="0" />
+          <Entry text="Current Cell Length"
+                 value="1" />
+          <Entry text="Last Cell Velocity Direction"
+                 value="2" />
+          <Entry text="Current Cell Velocity Direction"
+                 value="3" />
+          <Entry text="Last Cell Divergence Theorem"
+                 value="4" />
+          <Entry text="Current Cell Divergence Theorem"
+                 value="5" />
+        </EnumerationDomain>
+        <Documentation>This property controls how the filter computes a cell length
+        to generate Step value for the integrator using the StepFactor.
+        The current default method is "Current Cell Velocity Direction" but it
+        is not the fastest and may not work with very irregular mesh.
+        "Current Cell Divergence Theorem" is great for irregular mesh but it is
+        even more slow and it does not support Voxel cell types.
+        "Cell Length" based computation is fast but will work
+        only with non-elongated cell.</Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="SetStepFactor"
+                            default_values="1.0"
+                            name="Step"
+                            number_of_elements="1">
+        <Documentation>This property contains the step in cell unit
+        that the integration should take at each integration.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetStepFactorMin"
+                            default_values="0.9"
+                            name="MinStep"
+                            number_of_elements="1"
+                            panel_visibility="advanced" >
+        <Documentation>This property contains the minimum step in cell unit
+        that the integration should take at each integration with a non small
+        velocity.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetStepFactorMax"
+                            default_values="1.1"
+                            name="MaxStep"
+                            number_of_elements="1"
+                            panel_visibility="advanced" >
+        <Documentation>This property contains the maximum step in cell unit
+        that the integration should take at each integration.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetMaximumNumberOfSteps"
+                            default_values="100"
+                            name="NumberOfSteps"
+                            number_of_elements="1">
+        <Documentation>This property contains the absolute maximum number of steps
+        a particle can integrate before being terminated. Increasing this property
+        too much will cost time and memory during computation.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetAdaptiveStepReintegration"
+                         default_values="0"
+                         name="AdaptiveStepReintegration"
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>If AdaptativeStepReintegration is true, the Lagrangian
+        particle tracker will check the results of integration.
+        If the distance between the current point and the next point is greater
+        than StepFactorMax * cellLength, then the StepFactor will be decreased
+        and integration will be tried again until the distance is within the bounds
+        or the StepFactorMin limit the decrease of the StepFactor.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseParticlePathsRenderingThreshold"
+                         default_values="0"
+                         name="UseParticlePathsRenderingThreshold"
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>If UseParticlePathsRenderingThreshold is true, the tracker will check
+        if the number of points in the paths is greater than the
+        PathsRenderingPointsThreshold, in that case no output
+        will be rendered for the particle paths.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetParticlePathsRenderingPointsThreshold"
+                            default_values="100"
+                            name="PathsRenderingPointsThreshold"
+                            number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="UseParticlePathsRenderingThreshold"
+                                   value="1" />
+        </Hints>
+        <Documentation>This property contains a threshold of number of points.
+        If the particle paths contain more points than this threshold and UseParticlePathsRenderingThreshold
+        is true, then no output will be rendered for the particle paths.
+        </Documentation>
+      </IntVectorProperty>
+      <!-- End LagrangianParticleTracker -->
+    </SourceProxy>
+    <SourceProxy name="LagrangianSurfaceHelper"
+                 class="vtkLagrangianSurfaceHelper"
+                 label="Lagrangian Surface Helper">
+      <InputProperty command="SetInputConnection"
+                     label="Surface Input"
+                     name="SurfaceInput">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to generate surface data on.
+        </Documentation>
+      </InputProperty>
+      <ProxyProperty command="SetIntegrationModel"
+                     label="Integration Model"
+                     disable_sub_trace="1"
+                     name="IntegrationModel"
+                     panel_visibility="default">
+        <ProxyListDomain name="proxy_list">
+          <Group name="lagrangian_integration_models"/>
+        </ProxyListDomain>
+        <Hints>
+          <ProxyPropertyWidget selected_proxy_panel_visibility="never" />
+        </Hints>
+        <Documentation>This property specifies the integration model to use to generate data.
+        </Documentation>
+      </ProxyProperty>
+      <StringVectorProperty animateable="1"
+                            clean_command="RemoveAllArraysToGenerate"
+                            command="SetArrayToGenerate"
+                            name="ArrayToGenerate"
+                            element_types="2 0 0 0 2"
+                            number_of_elements_per_command="5"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfArrayToGenerate"
+                            use_index="1"
+                            panel_widget="integration_model_surface_helper_widget">
+        <Documentation>This property specifies arrays to generate in the output.
+        </Documentation>
+      </StringVectorProperty>
+      <!-- End LagrangianSeedHelperBase -->
+    </SourceProxy>
+  </ProxyGroup>
+  <ProxyGroup name="utilities">
+    <SourceProxy name="LagrangianSeedHelperBase">
+      <ProxyProperty command="SetIntegrationModel"
+                     label="Integration Model"
+                     name="IntegrationModel"
+                     disable_sub_trace="1"
+                     panel_visibility="default">
+        <ProxyListDomain name="proxy_list">
+          <Group name="lagrangian_integration_models"/>
+        </ProxyListDomain>
+        <Hints>
+          <ProxyPropertyWidget selected_proxy_panel_visibility="never" />
+        </Hints>
+        <Documentation>This property specifies the integration model to use to generate data.
+        </Documentation>
+      </ProxyProperty>
+      <StringVectorProperty animateable="1"
+                            clean_command="RemoveAllArraysToGenerate"
+                            command="SetArrayToGenerate"
+                            name="ArrayToGenerate"
+                            element_types="2 0 0 0 2"
+                            number_of_elements_per_command="5"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfArrayToGenerate"
+                            use_index="1"
+                            panel_widget="integration_model_seed_helper_widget">
+        <Documentation>This property specifies arrays to generate in the output.
+        </Documentation>
+      </StringVectorProperty>
+      <!-- End LagrangianSeedHelperBase -->
+    </SourceProxy>
+  </ProxyGroup>
+  <ProxyGroup name="filters">
+    <SourceProxy base_proxygroup="utilities"
+                 base_proxyname="LagrangianSeedHelperBase"
+                 class="vtkLagrangianSeedHelper"
+                 label="Lagrangian Seed Helper With Custom Seeds"
+                 name="LagrangianSeedHelperWithCustomSeeds">
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the flow input to use to
+        interpolate data for seeds.</Documentation>
+      </InputProperty>
+      <InputProperty command="SetSourceConnection"
+                     label="Seed Points Source"
+                     name="SeedPointsSource"
+                     panel_visibility="default">
+        <Documentation>This property specifies the input to generate seed data on.
+        </Documentation>
+      </InputProperty>
+      <!-- End LagrangianSeedHelperWithCustomSeeds -->
+    </SourceProxy>
+  </ProxyGroup>
+  <ProxyGroup name="filters">
+    <SourceProxy base_proxygroup="utilities"
+                 base_proxyname="LagrangianSeedHelperBase"
+                 class="vtkLagrangianSeedHelper"
+                 label="Lagrangian Seed Helper"
+                 name="LagrangianSeedHelper">
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the flow input to use to
+        interpolate data for seeds.</Documentation>
+      </InputProperty>
+      <InputProperty command="SetSourceConnection"
+                     label="Seed Points Source"
+                     name="SeedPointsSource"
+                     panel_visibility="default">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+        </ProxyGroupDomain>
+        <ProxyListDomain name="proxy_list">
+          <Group name="seed_sources"/>
+        </ProxyListDomain>
+        <Documentation>The value of this property determines how the seeds for
+        the streamlines will be generated.</Documentation>
+      </InputProperty>
+      <PropertyGroup label="SeedPoints">
+        <Property name="SeedPointsSource" />
+      </PropertyGroup>
+      <!-- End LagrangianSeedHelper -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
