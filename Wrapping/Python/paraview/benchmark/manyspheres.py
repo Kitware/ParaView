@@ -124,10 +124,10 @@ edge = math.ceil(math.pow(num_spheres_in_scene, (1.0 / 3.0)))
 controller = vtk.vtkMultiProcessController.GetGlobalController()
 np = controller.GetNumberOfProcesses()
 p = controller.GetLocalProcessId()
-start = (num_spheres / np) * p
-end = (num_spheres / np) * (p + 1)
-if (p == np - 1):
-    end = num_spheres
+
+ns=lambda p:num_spheres/np + (1 if p >= np-num_spheres%np else 0)
+start=int(sum([ns(P) for P in range(0,p)]))
+end=start+ns(p)
 
 ss = vtk.vtkSphereSource()
 ss.SetPhiResolution(res)
