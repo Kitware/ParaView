@@ -1143,6 +1143,14 @@
                     name="FontSize" />
         </ExposedProperties>
       </SubProxy>
+      <!--annotation text property -->
+      <SubProxy command="SetAnnotationTextProperty">
+        <Proxy name="AnnotationTextProperty"
+               proxygroup="properties"
+               proxyname="TextProperty"></Proxy>
+        <ShareProperties subproxy="LabelTextProperty" />
+      </SubProxy>
+
       <!--title text property -->
       <SubProxy command="SetTitleTextProperty">
         <Proxy name="TitleTextProperty"
