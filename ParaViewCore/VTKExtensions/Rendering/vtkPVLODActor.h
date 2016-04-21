@@ -78,8 +78,9 @@ public:
 
   // Description:
   // When set, LODMapper, if present it used, otherwise the regular mapper is
-  // used.
-  vtkSetMacro(EnableLOD, int);
+  // used. We deliberately don't change the MTime of the actor when toggling
+  // EnableLOD state to avoid rebuilding of rendering data structures.
+  void SetEnableLOD(int val) { this->EnableLOD = val; }
   vtkGetMacro(EnableLOD, int);
 
 protected:
