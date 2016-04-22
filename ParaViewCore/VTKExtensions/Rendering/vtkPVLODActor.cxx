@@ -332,6 +332,8 @@ void vtkPVLODActor::SetEnableScaling(int val)
     vtkInformation *info = this->LODMapper->GetInformation();
     info->Set(vtkOSPRayActorNode::ENABLE_SCALING(), val);
     }
+#else
+  (void)val;
 #endif
 }
 
@@ -349,6 +351,8 @@ void vtkPVLODActor::SetScalingArrayName(const char* val)
     vtkInformation *mapperInfo = this->LODMapper->GetInformation();
     mapperInfo->Set(vtkOSPRayActorNode::SCALE_ARRAY_NAME(), val);
     }
+#else
+  (void)val;
 #endif
 }
 
@@ -366,5 +370,7 @@ void vtkPVLODActor::SetScalingFunction(vtkPiecewiseFunction* pwf)
     vtkInformation *mapperInfo = this->LODMapper->GetInformation();
     mapperInfo->Set(vtkOSPRayActorNode::SCALE_FUNCTION(), pwf);
     }
+#else
+  (void)pwf;
 #endif
 }

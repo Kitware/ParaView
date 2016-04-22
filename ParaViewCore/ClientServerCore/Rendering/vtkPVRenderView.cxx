@@ -2742,6 +2742,8 @@ void vtkPVRenderView::ToggleOSPRay()
   this->Internals->IsInOSPRay = !this->Internals->IsInOSPRay;
   this->Modified();
   this->Render(false, false);
+#else
+  vtkWarningMacro("Refusing to switch to OSPRay since it is not built into this copy of ParaView");
 #endif
 }
 
@@ -2751,6 +2753,8 @@ void vtkPVRenderView::SetShadows(int v)
 #ifdef PARAVIEW_USE_OSPRAY
   vtkRenderer *ren = this->GetRenderer();
   ren->SetUseShadows(v!=0);
+#else
+  (void)v;
 #endif
 }
 
@@ -2771,6 +2775,8 @@ void vtkPVRenderView::SetAmbientOcclusionSamples(int v)
 #ifdef PARAVIEW_USE_OSPRAY
   vtkRenderer *ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetAmbientSamples(v, ren);
+#else
+  (void)v;
 #endif
 }
 
@@ -2791,6 +2797,8 @@ void vtkPVRenderView::SetSamplesPerPixel(int v)
 #ifdef PARAVIEW_USE_OSPRAY
   vtkRenderer *ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetSamplesPerPixel(v, ren);
+#else
+  (void)v;
 #endif
 }
 
@@ -2811,6 +2819,8 @@ void vtkPVRenderView::SetMaxFrames(int v)
 #ifdef PARAVIEW_USE_OSPRAY
   vtkRenderer *ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetMaxFrames(v, ren);
+#else
+  (void)v;
 #endif
 }
 
@@ -2829,8 +2839,9 @@ int vtkPVRenderView::GetMaxFrames()
 void vtkPVRenderView::SetLightScale(double v)
 {
 #ifdef PARAVIEW_USE_OSPRAY
-  vtkRenderer *ren = this->GetRenderer();
   vtkOSPRayLightNode::SetLightScale(v);
+#else
+  (void)v;
 #endif
 }
 
@@ -2838,7 +2849,6 @@ void vtkPVRenderView::SetLightScale(double v)
 double vtkPVRenderView::GetLightScale()
 {
 #ifdef PARAVIEW_USE_OSPRAY
-  vtkRenderer *ren = this->GetRenderer();
   return vtkOSPRayLightNode::GetLightScale();
 #else
   return 0.5;

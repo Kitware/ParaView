@@ -1038,6 +1038,8 @@ void vtkGeometryRepresentation::SetEnableScaling(int val)
 {
 #ifdef PARAVIEW_USE_OSPRAY
   this->Actor->SetEnableScaling(val);
+#else
+  (void)val;
 #endif
 }
 
@@ -1046,6 +1048,8 @@ void vtkGeometryRepresentation::SetScalingArrayName(const char* val)
 {
 #ifdef PARAVIEW_USE_OSPRAY
   this->Actor->SetScalingArrayName(val);
+#else
+  (void)val;
 #endif
 }
 
@@ -1054,5 +1058,7 @@ void vtkGeometryRepresentation::SetScalingFunction(vtkPiecewiseFunction* pwf)
 {
 #ifdef PARAVIEW_USE_OSPRAY
   this->Actor->SetScalingFunction(pwf);
+#else
+  (void)pwf;
 #endif
 }

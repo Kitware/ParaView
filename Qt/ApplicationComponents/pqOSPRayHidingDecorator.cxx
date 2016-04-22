@@ -48,9 +48,10 @@ pqOSPRayHidingDecorator::~pqOSPRayHidingDecorator()
 //-----------------------------------------------------------------------------
 bool pqOSPRayHidingDecorator::canShowWidget(bool show_advanced) const
 {
-#ifndef PARAVIEW_USE_OSPRAY
-  return false;
-#else
+#ifdef PARAVIEW_USE_OSPRAY
   return this->Superclass::canShowWidget(show_advanced);
+#else
+  (void) show_advanced;
+  return false;
 #endif
 }
