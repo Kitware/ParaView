@@ -2390,22 +2390,23 @@
         <Documentation>Terminantes the render state where lighting contributions
         are encoded into RGB.</Documentation>
       </Property>
-      <Property name="ToggleOSPRay"
-          command="ToggleOSPRay"
-          >
+      <IntVectorProperty name="EnableOSPRay"
+          command="SetEnableOSPRay"
+          default_values="0"
+          animateable="0"
+          number_of_elements="1">
+        <BooleanDomain name="bool" />
         <Documentation>Switches between rasterization and ray tracing.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
         </Hints>
-
-      </Property>
+      </IntVectorProperty>
       <IntVectorProperty
           name="Shadows"
           command="SetShadows"
           default_values="0"
           animateable="0"
-          number_of_elements="1"
-          >
+          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>Controls whether OSPRay casts shadow rays
         or not.</Documentation>
@@ -2418,8 +2419,7 @@
           command="SetAmbientOcclusionSamples"
           default_values="0"
           animateable="0"
-          number_of_elements="1"
-          >
+          number_of_elements="1">
         <IntRangeDomain
             min="0"
             name="range"/>
@@ -2434,8 +2434,7 @@
           command="SetSamplesPerPixel"
           default_values="1"
           animateable="0"
-          number_of_elements="1"
-          >
+          number_of_elements="1">
         <IntRangeDomain
             min="1"
             name="range"/>
@@ -2450,8 +2449,7 @@
           command="SetMaxFrames"
           default_values="1"
           animateable="0"
-          number_of_elements="1"
-          >
+          number_of_elements="1">
         <IntRangeDomain
             min="1"
             name="range"/>
@@ -2466,8 +2464,7 @@
           command="SetLightScale"
           default_values="0.5"
           animateable="0"
-          number_of_elements="1"
-          >
+          number_of_elements="1">
         <DoubleRangeDomain
             min="0.0"
             name="range"/>
@@ -2544,7 +2541,7 @@
       </PropertyGroup>
       <PropertyGroup label="OSPRay Rendering"
                      panel_visibility="advanced">
-        <Property name="ToggleOSPRay"/>
+        <Property name="EnableOSPRay"/>
         <Property name="Shadows"/>
         <Property name="AmbientSamples"/>
         <Property name="SamplesPerPixel"/>
@@ -3546,7 +3543,7 @@
 
           <PropertyGroup panel_visibility="advanced"
                          label="OSPRay" >
-            <Property name="UseScaleArray" />
+            <Property name="OSPRayUseScaleArray" />
             <Property name="OSPRayScaleArray" />
             <Property name="OSPRayScaleFunction" />
           </PropertyGroup>
@@ -8695,7 +8692,7 @@
       </IntVectorProperty>
       <IntVectorProperty command="SetEnableScaling"
                          default_values="0"
-                         name="UseScaleArray"
+                         name="OSPRayUseScaleArray"
                          number_of_elements="1">
         <Documentation>
           Allows OSPRay implicit points and lines to be sized by an array.

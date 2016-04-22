@@ -90,7 +90,7 @@ def run(output_basename='log', num_spheres=8, num_spheres_in_scene=None,
 
     view = get_render_view(view_size)
     if OSPRay:
-        view.ToggleOSPRay()
+        view.EnableOSPRay = 1
 
     import math
     edge = math.ceil(math.pow(num_spheres_in_scene, (1.0 / 3.0)))

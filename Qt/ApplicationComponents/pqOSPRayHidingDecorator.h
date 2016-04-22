@@ -34,6 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPropertyWidgetDecorator.h"
 
+/// pqOSPRayHidingDecorator's purpose is to prevent the GUI from
+/// showing any of the OSPRay specific rendering controls when
+/// Paraview is not configured with PARAVIEW_USE_OSPRAY
 class pqOSPRayHidingDecorator : public pqPropertyWidgetDecorator
 {
   Q_OBJECT

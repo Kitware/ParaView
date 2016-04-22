@@ -640,11 +640,12 @@ public:
 
   // Description:
   // Switches between rasterization and ray tracing.
-  void ToggleOSPRay();
+  void SetEnableOSPRay(bool);
+  bool GetEnableOSPRay();
   // Description:
   // Controls whether OSPRay sends casts shadow rays or not.
-  void SetShadows(int);
-  int GetShadows();
+  void SetShadows(bool);
+  bool GetShadows();
   // Description:
   // Sets the number of occlusion query rays that OSPRay sends at each intersection.
   void SetAmbientOcclusionSamples(int);

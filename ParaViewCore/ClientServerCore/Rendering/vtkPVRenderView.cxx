@@ -2727,10 +2727,15 @@ vtkFloatArray * vtkPVRenderView::GetCapturedZBuffer()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::ToggleOSPRay()
+void vtkPVRenderView::SetEnableOSPRay(bool v)
 {
 #ifdef PARAVIEW_USE_OSPRAY
-  if (!this->Internals->IsInOSPRay)
+  if (this->Internals->IsInOSPRay == v)
+    {
+    return;
+    }
+  this->Internals->IsInOSPRay = v;
+  if (this->Internals->IsInOSPRay)
     {
     this->Internals->SavedRenderPass = this->SynchronizedRenderers->GetRenderPass();
     this->SynchronizedRenderers->SetRenderPass(this->Internals->OSPRayPass.GetPointer());
@@ -2739,33 +2744,48 @@ void vtkPVRenderView::ToggleOSPRay()
     {
     this->SynchronizedRenderers->SetRenderPass(this->Internals->SavedRenderPass);
     }
-  this->Internals->IsInOSPRay = !this->Internals->IsInOSPRay;
   this->Modified();
   this->Render(false, false);
 #else
-  vtkWarningMacro("Refusing to switch to OSPRay since it is not built into this copy of ParaView");
+  if (v)
+    {
+    vtkWarningMacro("Refusing to switch to OSPRay since it is not built into this copy of ParaView");
+    }
 #endif
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SetShadows(int v)
+bool vtkPVRenderView::GetEnableOSPRay()
+{
+  return this->Internals->IsInOSPRay;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetShadows(bool v)
 {
 #ifdef PARAVIEW_USE_OSPRAY
   vtkRenderer *ren = this->GetRenderer();
-  ren->SetUseShadows(v!=0);
+  ren->SetUseShadows(v);
 #else
   (void)v;
 #endif
 }
 
 //----------------------------------------------------------------------------
-int vtkPVRenderView::GetShadows()
+bool vtkPVRenderView::GetShadows()
 {
 #ifdef PARAVIEW_USE_OSPRAY
   vtkRenderer *ren = this->GetRenderer();
-  return ren->GetUseShadows();
+  if (ren->GetUseShadows()==1)
+    {
+    return true;
+    }
+  else
+    {
+    return false;
+    }
 #else
-  return 0;
+  return false;
 #endif
 }
 
