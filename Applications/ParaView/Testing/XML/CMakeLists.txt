@@ -49,6 +49,7 @@ paraview_test_load_data(""
   NE2_ps_bath.png
   non_convex_polygon.vtu
   office.binary.vtk
+  porphyrin.cml
   PropertyLink.pvsm
   quadraticTetra01.vtu
   RectGrid2.vtk
@@ -91,6 +92,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateMultiView.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LogColorMap.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/MemoryInspectorPanel.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Molecule.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/NonlinearSubdivisionDisplay.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/QuartilePlot.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RemoteRendering.xml
@@ -692,6 +694,10 @@ set (LoadStateMultiView_THRESHOLD 20)
 
 # Selection not supported in CRS and is needed for this test.
 set (ResetToVisibleRange_DISABLE_CRS TRUE)
+
+# Molecules are not supported in client-serve modes, currently.
+set (Molecule_DISABLE_CS TRUE)
+set (Molecule_DISABLE_CRS TRUE)
 
 ##########################################################
 # List of known incompatible tests for Collaboration
