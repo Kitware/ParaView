@@ -116,9 +116,7 @@ void vtkPVLODActor::Render(vtkRenderer *ren, vtkMapper *vtkNotUsed(m))
     {
     this->Texture->Render(ren);
     }
-
   this->Device->SetTexture(this->Texture);
-  this->Device->SetMapper(mapper);
 
   // make sure the device has the same matrix
   matrix = this->Device->GetUserMatrix();
