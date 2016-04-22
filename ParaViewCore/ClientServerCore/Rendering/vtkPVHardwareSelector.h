@@ -63,6 +63,12 @@ public:
   // communicate between all active processes.
   void SetSynchronizedWindows(vtkPVSynchronizedRenderWindows*);
 
+  // Fixes a -Woverloaded-virtual warning.
+  using vtkOpenGLHardwareSelector::BeginRenderProp;
+  // Description:
+  // Set the local ProcessId.
+  void BeginRenderProp(vtkRenderWindow *);
+
 protected:
   vtkPVHardwareSelector();
   ~vtkPVHardwareSelector();

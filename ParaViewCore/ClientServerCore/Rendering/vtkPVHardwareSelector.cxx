@@ -24,6 +24,7 @@
 #include <map>
 
 
+#include "vtkProcessModule.h"
 //#define vtkPVHardwareSelectorDEBUG
 #ifdef vtkPVHardwareSelectorDEBUG
 #include "vtkPNMWriter.h"
@@ -179,6 +180,14 @@ void vtkPVHardwareSelector::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVHardwareSelector::BeginRenderProp(vtkRenderWindow *rw)
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  this->SetProcessID(pm->GetGlobalController()->GetLocalProcessId());
+
+  this->Superclass::BeginRenderProp(rw);
+}
 
 //----------------------------------------------------------------------------
 // just add debug output if compiled with vtkOpenGLHardwareSelectorDEBUG
