@@ -32,6 +32,7 @@
 class vtkCompositeDataDisplayAttributes;
 class vtkCompositePolyDataMapper2;
 class vtkMapper;
+class vtkPiecewiseFunction;
 class vtkPVCacheKeeper;
 class vtkPVGeometryFilter;
 class vtkPVLODActor;
@@ -208,6 +209,13 @@ public:
   static bool GetBounds(vtkDataObject* dataObject, double bounds[6],
                         vtkCompositeDataDisplayAttributes* cdAttributes);
 
+  // Description:
+  // For OSPRay controls sizing of implicit spheres (points) and
+  // cylinders (lines)
+  virtual void SetEnableScaling(int v);
+  virtual void SetScalingArrayName(const char*);
+  virtual void SetScalingFunction(vtkPiecewiseFunction *pwf);
+
 //BTX
 protected:
   vtkGeometryRepresentation();
@@ -289,6 +297,7 @@ protected:
   bool RequestGhostCellsIfNeeded;
   double DataBounds[6];
 
+  vtkPiecewiseFunction *PWF;
 private:
   vtkGeometryRepresentation(const vtkGeometryRepresentation&); // Not implemented
   void operator=(const vtkGeometryRepresentation&); // Not implemented

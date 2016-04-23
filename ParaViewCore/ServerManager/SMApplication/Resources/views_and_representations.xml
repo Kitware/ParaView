@@ -2390,6 +2390,90 @@
         <Documentation>Terminantes the render state where lighting contributions
         are encoded into RGB.</Documentation>
       </Property>
+      <IntVectorProperty name="EnableOSPRay"
+          command="SetEnableOSPRay"
+          default_values="0"
+          animateable="0"
+          number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Switches between rasterization and ray tracing.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty
+          name="Shadows"
+          command="SetShadows"
+          default_values="0"
+          animateable="0"
+          number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Controls whether OSPRay casts shadow rays
+        or not.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty
+          name="AmbientSamples"
+          command="SetAmbientOcclusionSamples"
+          default_values="0"
+          animateable="0"
+          number_of_elements="1">
+        <IntRangeDomain
+            min="0"
+            name="range"/>
+        <Documentation>Sets the number of occlusion query rays that
+        OSPRay sends at each intersection.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty
+          name="SamplesPerPixel"
+          command="SetSamplesPerPixel"
+          default_values="1"
+          animateable="0"
+          number_of_elements="1">
+        <IntRangeDomain
+            min="1"
+            name="range"/>
+        <Documentation>Set the number of primary rays that OSPRay
+        shoots per pixel.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty
+          name="MaxFrames"
+          command="SetMaxFrames"
+          default_values="1"
+          animateable="0"
+          number_of_elements="1">
+        <IntRangeDomain
+            min="1"
+            name="range"/>
+        <Documentation>Set the number of render passes OSPRay takes to
+        accumulate subsampled color results.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+        </Hints>
+      </IntVectorProperty>
+      <DoubleVectorProperty
+          name="LightScale"
+          command="SetLightScale"
+          default_values="0.5"
+          animateable="0"
+          number_of_elements="1">
+        <DoubleRangeDomain
+            min="0.0"
+            name="range"/>
+        <Documentation>Dimish or Amplify all lights in the scene.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+        </Hints>
+      </DoubleVectorProperty>
+
       <PropertyGroup label="Orientation Axes">
         <Property name="OrientationAxesVisibility"/>
         <Property name="OrientationAxesInteractivity"/>
@@ -2454,6 +2538,15 @@
         <Property name="StopCaptureValues" />
         <Property name="StartCaptureLuminance" />
         <Property name="StopCaptureLuminance" />
+      </PropertyGroup>
+      <PropertyGroup label="OSPRay Rendering"
+                     panel_visibility="advanced">
+        <Property name="EnableOSPRay"/>
+        <Property name="Shadows"/>
+        <Property name="AmbientSamples"/>
+        <Property name="SamplesPerPixel"/>
+        <Property name="MaxFrames"/>
+        <Property name="LightScale"/>
       </PropertyGroup>
     </RenderViewProxy>
 
@@ -3447,6 +3540,14 @@
             <Property name="BlockColorsDistinctValues"
                       panel_visibility="advanced" />
           </PropertyGroup>
+
+          <PropertyGroup panel_visibility="advanced"
+                         label="OSPRay" >
+            <Property name="OSPRayUseScaleArray" />
+            <Property name="OSPRayScaleArray" />
+            <Property name="OSPRayScaleFunction" />
+          </PropertyGroup>
+
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
@@ -8589,6 +8690,53 @@
                         property="BlockColorsDistinctValues"/>
         </Hints>
       </IntVectorProperty>
+      <IntVectorProperty command="SetEnableScaling"
+                         default_values="0"
+                         name="OSPRayUseScaleArray"
+                         number_of_elements="1">
+        <Documentation>
+          Allows OSPRay implicit points and lines to be sized by an array.
+        </Documentation>
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+        </Hints>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetScalingArrayName"
+                            default_values=""
+                            name="OSPRayScaleArray"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <ArrayListDomain input_domain_name="input_array_point"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          Choice of an array for OSPRay implicit points and lines sizes.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+        </Hints>
+      </StringVectorProperty>
+      <ProxyProperty command="SetScalingFunction"
+                     name="OSPRayScaleFunction"
+                     panel_visibility="advanced"
+                     panel_widget="transfer_function_editor">
+        <Documentation>Set the piecewise function used to map data array to sprite size.
+        ScaleTransferFunction is only used if ScaleByArray is set.</Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="piecewise_functions" />
+        </ProxyGroupDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="piecewise_functions"
+                 name="PiecewiseFunction" />
+        </ProxyListDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+        </Hints>
+      </ProxyProperty>
       <!-- End of SurfaceRepresentationBase -->
     </RepresentationProxy>
 

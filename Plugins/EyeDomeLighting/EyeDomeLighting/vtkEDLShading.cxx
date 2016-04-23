@@ -916,12 +916,11 @@ void vtkEDLShading::Render(const vtkRenderState *s)
   cout << "EDL: Compose to original fbo" << endl;
 #endif
 
-  vtkFrameBufferObject *fbo=vtkFrameBufferObject::SafeDownCast
-      (s->GetFrameBuffer());
-  if(fbo != NULL)
+  if(s->GetFrameBuffer() != NULL)
     {
-    fbo->Bind();
+    vtkFrameBufferObject::SafeDownCast(s->GetFrameBuffer())->Bind();
     }
+
   glDrawBuffer(savedDrawBuffer);
 
   if( ! this->EDLCompose(s))

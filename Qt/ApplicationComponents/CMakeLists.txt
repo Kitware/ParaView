@@ -198,6 +198,8 @@ set (Module_SRCS
   pqObjectPickingBehavior.h
   pqOpacityTableModel.cxx
   pqOpacityTableModel.h
+  pqOSPRayHidingDecorator.cxx
+  pqOSPRayHidingDecorator.h
   pqPVAnimationWidget.cxx
   pqPVAnimationWidget.h
   pqPVApplicationCore.cxx
@@ -397,6 +399,7 @@ set (Module_MOC_HDRS
   pqModelTransformSupportBehavior.h
   pqObjectPickingBehavior.h
   pqOpacityTableModel.h
+  pqOSPRayHidingDecorator.h
   pqPVAnimationWidget.h
   pqPVApplicationCore.h
   pqParaViewBehaviors.h

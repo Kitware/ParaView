@@ -121,6 +121,11 @@ if(PARAVIEW_USE_VISITBRIDGE)
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeSamrai.xml)
 endif()
 
+if(PARAVIEW_USE_OSPRAY)
+  list(APPEND TESTS_WITH_BASELINES
+    ${CMAKE_CURRENT_SOURCE_DIR}/OSPRay.xml)
+endif()
+
 # Catalyst-Live tests
 # ----------------------------------------------------------------------
 if(PARAVIEW_ENABLE_CATALYST AND PARAVIEW_ENABLE_PYTHON)

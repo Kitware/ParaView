@@ -33,8 +33,10 @@
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPointData.h"
 #include "vtkProperty.h"
 #include "vtkPVCacheKeeper.h"
+#include "vtkPVConfig.h"
 #include "vtkPVGeometryFilter.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVRenderView.h"
@@ -48,6 +50,10 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTransform.h"
 #include "vtkUnstructuredGrid.h"
+
+#ifdef PARAVIEW_USE_OSPRAY
+#include "vtkOSPRayActorNode.h"
+#endif
 
 #include <vtksys/SystemTools.hxx>
 
@@ -150,6 +156,8 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   vtkMath::UninitializeBounds(this->DataBounds);
 
   this->SetupDefaults();
+
+  this->PWF = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -1023,4 +1031,34 @@ void vtkGeometryRepresentation::RemoveBlockOpacities()
     {
     cpm->RemoveBlockOpacities();
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetEnableScaling(int val)
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  this->Actor->SetEnableScaling(val);
+#else
+  (void)val;
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetScalingArrayName(const char* val)
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  this->Actor->SetScalingArrayName(val);
+#else
+  (void)val;
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetScalingFunction(vtkPiecewiseFunction* pwf)
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  this->Actor->SetScalingFunction(pwf);
+#else
+  (void)pwf;
+#endif
 }

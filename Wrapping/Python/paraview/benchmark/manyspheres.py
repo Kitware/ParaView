@@ -81,7 +81,7 @@ def memtime_stamp():
 
 def run(output_basename='log', num_spheres=8, num_spheres_in_scene=None,
         resolution=725, view_size=(1920, 1080), num_frames=10, save_logs=True,
-        color=False):
+        color=False, OSPRay=False):
     if num_spheres_in_scene is None:
         num_spheres_in_scene = num_spheres
 
@@ -89,6 +89,8 @@ def run(output_basename='log', num_spheres=8, num_spheres_in_scene=None,
     controller = vtk.vtkMultiProcessController.GetGlobalController()
 
     view = get_render_view(view_size)
+    if OSPRay:
+        view.EnableOSPRay = 1
 
     import math
     edge = math.ceil(math.pow(num_spheres_in_scene, (1.0 / 3.0)))
@@ -249,6 +251,8 @@ def main(argv):
                         help='Number of frames')
     parser.add_argument('-c', '--color', action='store_true',
                         help='Enable color renderings')
+    parser.add_argument('-y', '--OSPRay', action='store_true',
+                        help='Use OSPRAY to render')
 
     args = parser.parse_args(argv)
 
@@ -264,7 +268,7 @@ def main(argv):
 
     run(output_basename=args.output_basename, num_spheres=args.spheres,
         num_spheres_in_scene=args.spheres_in_scene, resolution=args.resolution,
-        view_size=args.view_size, num_frames=args.frames, color=args.color)
+        view_size=args.view_size, num_frames=args.frames, color=args.color, OSPRay=args.OSPRay)
 
 if __name__ == "__main__":
     import sys

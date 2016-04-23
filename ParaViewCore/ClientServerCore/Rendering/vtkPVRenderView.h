@@ -638,6 +638,31 @@ public:
   void CaptureZBuffer();
   vtkFloatArray * GetCapturedZBuffer();
 
+  // Description:
+  // Switches between rasterization and ray tracing.
+  void SetEnableOSPRay(bool);
+  bool GetEnableOSPRay();
+  // Description:
+  // Controls whether OSPRay sends casts shadow rays or not.
+  void SetShadows(bool);
+  bool GetShadows();
+  // Description:
+  // Sets the number of occlusion query rays that OSPRay sends at each intersection.
+  void SetAmbientOcclusionSamples(int);
+  int GetAmbientOcclusionSamples();
+  // Description:
+  // Set the number of primary rays that OSPRay shoots per pixel.
+  void SetSamplesPerPixel(int);
+  int GetSamplesPerPixel();
+  // Description:
+  // Set the number of render passes OSPRay takes to accumulate subsampled color results.
+  void SetMaxFrames(int);
+  int GetMaxFrames();
+  // Description:
+  // Dimish or Amplify all lights in the scene.
+  void SetLightScale(double);
+  double GetLightScale();
+    
 //BTX
 protected:
   vtkPVRenderView();
