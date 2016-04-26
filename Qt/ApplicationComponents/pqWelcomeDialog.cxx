@@ -2,11 +2,13 @@
 #include "ui_pqWelcomeDialog.h"
 
 #include "pqApplicationCore.h"
+#include "pqDesktopServicesReaction.h"
 #include "pqServer.h"
 #include "pqSettings.h"
 
 #include <QCoreApplication>
 #include <QString>
+#include <QUrl>
 
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSessionProxyManager.h"
@@ -20,12 +22,39 @@ pqWelcomeDialog::pqWelcomeDialog(QWidget *parent)
 
     QObject::connect(this->ui->DoNotShowAgainButton, SIGNAL(stateChanged(int)),
                      this, SLOT(onDoNotShowAgainStateChanged(int)));
+    QObject::connect(this->ui->GettingStartedGuideButton, SIGNAL(clicked(bool)),
+                     this, SLOT(onGettingStartedGuideClicked()));
+    QObject::connect(this->ui->ExampleVisualizationsButton, SIGNAL(clicked(bool)),
+                     this, SLOT(onExampleVisualizationsClicked()));
 }
 
 //-----------------------------------------------------------------------------
 pqWelcomeDialog::~pqWelcomeDialog()
 {
     delete ui;
+}
+
+//-----------------------------------------------------------------------------
+void pqWelcomeDialog::onGettingStartedGuideClicked()
+{
+  #if defined (_WIN32)
+  QString paraViewGettingStartedFile =
+    QCoreApplication::applicationDirPath() + "/../doc/ParaViewGettingStarted.pdf";
+#elif defined(__APPLE__)
+  QString paraViewGettingStartedFile =
+    QCoreApplication::applicationDirPath() + "/../../../doc/ParaViewGettingStarted.pdf";
+#else
+  QString paraViewGettingStartedFile =
+    QCoreApplication::applicationDirPath() + "/../../doc/ParaViewGettingStarted.pdf";
+#endif
+
+  QUrl gettingStartedURL = QUrl::fromLocalFile(paraViewGettingStartedFile);
+  pqDesktopServicesReaction::openUrl(gettingStartedURL);
+}
+
+//-----------------------------------------------------------------------------
+void pqWelcomeDialog::onExampleVisualizationsClicked()
+{
 }
 
 //-----------------------------------------------------------------------------

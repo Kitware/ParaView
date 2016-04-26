@@ -18,7 +18,12 @@ class PQCOMPONENTS_EXPORT pqWelcomeDialog : public QDialog
 
 public:
   explicit pqWelcomeDialog(QWidget *parent = 0);
-  ~pqWelcomeDialog();
+  virtual ~pqWelcomeDialog();
+
+public slots:
+  virtual void onGettingStartedGuideClicked();
+
+  virtual void onExampleVisualizationsClicked();
 
 protected slots:
   /// React to checkbox events
