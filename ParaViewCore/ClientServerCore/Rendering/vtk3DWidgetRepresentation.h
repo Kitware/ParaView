@@ -28,7 +28,6 @@
 class vtkAbstractWidget;
 class vtkPVRenderView;
 class vtkWidgetRepresentation;
-class vtkTransform;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtk3DWidgetRepresentation : public vtkDataRepresentation
 {
@@ -59,11 +58,6 @@ public:
   void SetEnabled(bool);
   vtkGetMacro(Enabled, bool);
   vtkBooleanMacro(Enabled, bool);
-
-  // Description:
-  // Set a custom transform on the widget. Currently only
-  // the implicit plane widget handles this ability
-  void SetCustomWidgetTransform(vtkTransform *transform);
 
 protected:
   vtk3DWidgetRepresentation();
@@ -97,17 +91,12 @@ protected:
   // UpdateEnabled().
   void OnViewModified();
 
-  // Description:
-  // Forwards this->CustomTransform to the representation.
-  void UpdateTransform();
-
   bool Enabled;
   bool UseNonCompositedRenderer;
   vtkAbstractWidget* Widget;
   vtkWidgetRepresentation* Representation;
   vtkWeakPointer<vtkPVRenderView> View;
 
-  vtkTransform* CustomTransform;
 private:
   vtk3DWidgetRepresentation(const vtk3DWidgetRepresentation&); // Not implemented
   void operator=(const vtk3DWidgetRepresentation&); // Not implemented
