@@ -136,6 +136,8 @@ set (Module_SRCS
   pqEditScalarBarReaction.h
   pqEnableWidgetDecorator.cxx
   pqEnableWidgetDecorator.h
+  pqExampleVisualizationsDialog.cxx
+  pqExampleVisualizationsDialog.h
   pqExportReaction.cxx
   pqExportReaction.h
   pqFileNamePropertyWidget.cxx
@@ -368,6 +370,7 @@ set (Module_MOC_HDRS
   pqEditColorMapReaction.h
   pqEditScalarBarReaction.h
   pqEnableWidgetDecorator.h
+  pqExampleVisualizationsDialog.h
   pqExportReaction.h
   pqFileNamePropertyWidget.h
   pqFiltersMenuReaction.h
@@ -487,6 +490,7 @@ set (Module_UI_FILES
   Resources/UI/pqDefaultMainWindow.ui
   Resources/UI/pqDoubleRangeSliderPropertyWidget.ui
   Resources/UI/pqEditMenuBuilder.ui
+  Resources/UI/pqExampleVisualizationsDialog.ui
   Resources/UI/pqFileMenuBuilder.ui
   Resources/UI/pqFontPropertyWidget.ui
   Resources/UI/pqHandlePropertyWidget.ui

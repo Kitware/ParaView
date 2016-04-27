@@ -2,7 +2,7 @@
 #define PQWELCOMEDIALOG_H
 
 #include <QDialog>
-#include "pqComponentsModule.h"
+#include "pqApplicationComponentsModule.h"
 
 namespace Ui {
 class pqWelcomeDialog;
@@ -11,13 +11,13 @@ class pqWelcomeDialog;
 /// This class provides a welcome dialog screen that you see in many applications.
 /// The intent is to provide an on-ramp with a lower learning curve than the blank
 /// ParaView screen.
-class PQCOMPONENTS_EXPORT pqWelcomeDialog : public QDialog
+class PQAPPLICATIONCOMPONENTS_EXPORT pqWelcomeDialog : public QDialog
 {
  Q_OBJECT
  typedef QDialog Superclass;
 
 public:
-  explicit pqWelcomeDialog(QWidget *parent = 0);
+  explicit pqWelcomeDialog(QWidget* parent = 0);
   virtual ~pqWelcomeDialog();
 
 public slots:
@@ -30,7 +30,7 @@ protected slots:
   void onDoNotShowAgainStateChanged(int);
 
 private:
-    Ui::pqWelcomeDialog *ui;
+    Ui::pqWelcomeDialog* ui;
 };
 
 #endif // PQWELCOMEDIALOG_H

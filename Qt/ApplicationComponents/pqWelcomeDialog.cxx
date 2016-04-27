@@ -3,6 +3,7 @@
 
 #include "pqApplicationCore.h"
 #include "pqDesktopServicesReaction.h"
+#include "pqExampleVisualizationsDialog.h"
 #include "pqServer.h"
 #include "pqSettings.h"
 
@@ -37,7 +38,7 @@ pqWelcomeDialog::~pqWelcomeDialog()
 //-----------------------------------------------------------------------------
 void pqWelcomeDialog::onGettingStartedGuideClicked()
 {
-  #if defined (_WIN32)
+#if defined (_WIN32)
   QString paraViewGettingStartedFile =
     QCoreApplication::applicationDirPath() + "/../doc/ParaViewGettingStarted.pdf";
 #elif defined(__APPLE__)
@@ -55,6 +56,10 @@ void pqWelcomeDialog::onGettingStartedGuideClicked()
 //-----------------------------------------------------------------------------
 void pqWelcomeDialog::onExampleVisualizationsClicked()
 {
+  pqExampleVisualizationsDialog exampleDialog(this);
+  exampleDialog.setModal(true);
+  this->hide();
+  exampleDialog.exec();
 }
 
 //-----------------------------------------------------------------------------
