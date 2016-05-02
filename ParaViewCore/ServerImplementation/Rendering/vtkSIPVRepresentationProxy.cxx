@@ -17,7 +17,6 @@
 #include "vtkClientServerInterpreter.h"
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
-#include "vtkCubeAxesRepresentation.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVCompositeRepresentation.h"
 #include "vtkPVXMLElement.h"
@@ -64,13 +63,9 @@ bool vtkSIPVRepresentationProxy::ReadXMLAttributes(vtkPVXMLElement* element)
     vtkPVCompositeRepresentation::SafeDownCast(this->GetVTKObject());
 
   // Pass on the cube-axes and selection-represenations
-  vtkCubeAxesRepresentation* cubeAxes =
-    vtkCubeAxesRepresentation::SafeDownCast(
-      this->GetSubSIProxy("CubeAxesRepresentation")->GetVTKObject());
   vtkSelectionRepresentation* selection =
     vtkSelectionRepresentation::SafeDownCast(
       this->GetSubSIProxy("SelectionRepresentation")->GetVTKObject());
-  pvrepresentation->SetCubeAxesRepresentation(cubeAxes);
   pvrepresentation->SetSelectionRepresentation(selection);
 
   // Update internal data-structures for the types of representations provided

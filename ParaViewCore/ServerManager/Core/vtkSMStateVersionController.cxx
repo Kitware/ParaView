@@ -547,8 +547,26 @@ struct Process_4_1_to_4_2
 const char* const Process_4_1_to_4_2::NAME = "name";
 const char* const Process_4_1_to_4_2::VALUE = "value";
 
+//===========================================================================
+struct Process_4_2_to_5_1
+{
+  bool operator()(xml_document &document)
+    {
+    return RemoveCubeAxesColorLinks(document);
+    }
 
+  // Remove global property link state for "CubeAxesColor"
+  bool RemoveCubeAxesColorLinks(xml_document& document)
+    {
+    pugi::xpath_node_set links =
+      document.select_nodes(
+        "//GlobalPropertyLink[@property=\"CubeAxesColor\"]");
+    PurgeElements(links);
+    return true;
+    }
 };
+
+} // end of namespace
 
 vtkStandardNewMacro(vtkSMStateVersionController);
 //----------------------------------------------------------------------------
@@ -620,6 +638,12 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent)
     {
     status = Process_4_1_to_4_2()(document);
     version = vtkSMVersion(4, 2, 0);
+    }
+
+  if (status && (version < vtkSMVersion(5, 1, 0)))
+    {
+    status = Process_4_2_to_5_1()(document);
+    version = vtkSMVersion(5, 1, 0);
     }
 
   if (status)
