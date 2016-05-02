@@ -7,7 +7,16 @@ started tracking these (starting after version 4.2).
 Changes in 5.1
 --------------
 
-###Removing `pqWriterDialog`###
+###Removed Cube Axes###
+
+Cube axes, including support in UI, Python as well as the related ParaView
+specific classes e.g. `vtkCubeAxesRepresentation`, `pqCubeAxesEditorDialog`, and
+`pqCubeAxesPropertyWidget` have been removed. The cube
+axes was replaced by a generally preferred axes annotation implementation called
+**Axes Grid**. While the two are not compatible (API-wise or visually), using
+Axes Grid generates a more pleasing visualization.
+
+###Removed `pqWriterDialog`###
 
 `pqWriterDialog` was used by `pqSaveDataReaction` to show a dialog for the user to
 change the writer's properties. However, since the class was added, we have
