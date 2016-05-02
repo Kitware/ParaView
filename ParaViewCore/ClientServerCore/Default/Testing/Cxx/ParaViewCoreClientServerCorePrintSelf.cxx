@@ -6,7 +6,6 @@
 #include "vtkClientServerMoveData.h"
 #include "vtkCompleteArrays.h"
 #include "vtkCompositeRepresentation.h"
-#include "vtkCubeAxesRepresentation.h"
 #include "vtkDataLabelRepresentation.h"
 #include "vtkGeometryRepresentation.h"
 #include "vtkGeometryRepresentationWithFaces.h"
@@ -109,7 +108,6 @@ int ParaViewCoreClientServerCorePrintSelf(int, char*[])
   PRINT_SELF(vtkClientServerMoveData);
   PRINT_SELF(vtkCompleteArrays);
   PRINT_SELF(vtkCompositeRepresentation);
-  PRINT_SELF(vtkCubeAxesRepresentation);
   PRINT_SELF(vtkDataLabelRepresentation);
   PRINT_SELF(vtkGeometryRepresentation);
   PRINT_SELF(vtkGeometryRepresentationWithFaces);

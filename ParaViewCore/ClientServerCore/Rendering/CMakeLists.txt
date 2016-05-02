@@ -40,7 +40,6 @@ set (Module_SRCS
   vtkChartWarning.cxx
   vtkClientServerMoveData.cxx
   vtkCompositeRepresentation.cxx
-  vtkCubeAxesRepresentation.cxx
   vtkDataLabelRepresentation.cxx
   vtkGeometryRepresentation.cxx
   vtkGeometryRepresentationWithFaces.cxx
