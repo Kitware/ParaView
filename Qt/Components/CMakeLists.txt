@@ -320,8 +320,6 @@ set (Module_SRCS
   pqViewManager.h
   pqWidgetRangeDomain.cxx
   pqWidgetRangeDomain.h
-  pqWriterDialog.cxx
-  pqWriterDialog.h
 )
 
 set (Module_MOC_HDRS
@@ -460,7 +458,6 @@ set (Module_MOC_HDRS
   pqViewFrame.h
   pqViewManager.h
   pqWidgetRangeDomain.h
-  pqWriterDialog.h
 )
 
 set (Module_UI_FILES
@@ -521,7 +518,6 @@ set (Module_UI_FILES
   Resources/UI/pqSpreadSheetViewDecorator.ui
   Resources/UI/pqTimerLogDisplay.ui
   Resources/UI/pqViewFrame.ui
-  Resources/UI/pqWriterDialog.ui
 )
 
 if(PARAVIEW_ENABLE_PYTHON)
