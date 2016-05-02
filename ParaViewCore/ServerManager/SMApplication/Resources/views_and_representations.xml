@@ -7544,36 +7544,6 @@
           <Exception name="Visibility" />
         </ShareProperties>
       </SubProxy>
-
-      <SubProxy command="SetCubeAxesRepresentation0">
-        <Proxy name="CubeAxesRepresentationX"
-               proxygroup="representations"
-               proxyname="CubeAxesRepresentation"></Proxy>
-        <ShareProperties subproxy="CubeAxesRepresentation">
-          <Exception name="Input" />
-          <Exception name="Visibility" />
-        </ShareProperties>
-      </SubProxy>
-
-      <SubProxy command="SetCubeAxesRepresentation1">
-        <Proxy name="CubeAxesRepresentationY"
-               proxygroup="representations"
-               proxyname="CubeAxesRepresentation"></Proxy>
-        <ShareProperties subproxy="CubeAxesRepresentation">
-          <Exception name="Input" />
-          <Exception name="Visibility" />
-        </ShareProperties>
-      </SubProxy>
-
-      <SubProxy command="SetCubeAxesRepresentation2">
-        <Proxy name="CubeAxesRepresentationZ"
-               proxygroup="representations"
-               proxyname="CubeAxesRepresentation"></Proxy>
-        <ShareProperties subproxy="CubeAxesRepresentation">
-          <Exception name="Input" />
-          <Exception name="Visibility" />
-        </ShareProperties>
-      </SubProxy>
     </PVRepresentationProxy>
   </ProxyGroup>
 
