@@ -82,7 +82,6 @@ public:
   /// \li \c BackgroundEditor : pqBackgroundPropertyWidget
   /// \li \c ColorEditor : pqColorEditorPropertyWidget
   /// \li \c ColorOpacityEditor : pqColorOpacityEditorWidget
-  /// \li \c CubeAxes : pqCubeAxesPropertyWidget
   /// \li \c FontEditor : pqFontPropertyWidget
   /// \li \c LightsEditor : pqLightsPropertyGroup
   /// \li \c SeriesEditor : pqSeriesEditorPropertyWidget
