@@ -44,6 +44,7 @@ public:
   pqColorButtonEventPlayer(QObject* parent=0);
   ~pqColorButtonEventPlayer();
 
+  using Superclass::playEvent;
   bool playEvent(QObject* object, const QString& command, const QString&
     arguments, bool& error);
 

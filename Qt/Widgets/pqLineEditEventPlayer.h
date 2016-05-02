@@ -46,6 +46,7 @@ public:
   pqLineEditEventPlayer(QObject* parent=0);
   virtual ~pqLineEditEventPlayer();
 
+  using Superclass::playEvent;
   bool playEvent(QObject* Object, const QString& Command, const QString& Arguments, bool& Error);
 
 private:

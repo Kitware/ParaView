@@ -51,7 +51,7 @@ pqFlatTreeViewEventTranslator::pqFlatTreeViewEventTranslator(QObject* p)
 {
 }
 
-bool pqFlatTreeViewEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool& /*Error*/)
+bool pqFlatTreeViewEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool& Error)
 {
   pqFlatTreeView* object = qobject_cast<pqFlatTreeView*>(Object);
   if(!object)
@@ -122,11 +122,11 @@ bool pqFlatTreeViewEventTranslator::translateEvent(QObject* Object, QEvent* Even
           }
         emit recordEvent(object, "mouseRelease", info);
         }
+      return true;
       }
     default:
       break;
     }
-
-  return true;
+  return this->Superclass::translateEvent(Object, Event, Error);
 }
 

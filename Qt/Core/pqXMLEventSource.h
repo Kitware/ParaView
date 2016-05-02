@@ -50,10 +50,12 @@ public:
 
   virtual void setContent(const QString& path);
 
+  /// Get the next event from the event source
   virtual int getNextEvent(
     QString& object,
     QString& command,
-    QString& arguments);
+    QString& arguments,
+    int& eventType);                       
 
 private:
   class pqImplementation;

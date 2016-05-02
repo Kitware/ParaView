@@ -49,6 +49,7 @@ public:
   ~pqColorDialogEventTranslator();
 
   /// Overridden to handle events on QColorDialog.
+  using Superclass::translateEvent;
   virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);
 
 private slots:

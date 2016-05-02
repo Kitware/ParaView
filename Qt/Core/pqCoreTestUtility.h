@@ -65,6 +65,11 @@ public:
   /// temporary outputs, difference images etc.
   static QString TestDirectory();
 
+  /// Returns the baseline directory in which test recorder will write
+  /// baseline images.
+  static QString BaselineDirectory();
+
+
   /// Saves the contents of a render window to a file for later use as a
   /// reference image
   static bool SaveScreenshot(vtkRenderWindow* RenderWindow, const QString& File);
@@ -103,6 +108,8 @@ public:
   static bool CompareView(pqView* curView,
     const QString& referenceImage, double threshold, const QString& tempDirectory,
     const QSize& size=QSize());
+
+  static const char* PQ_COMPAREVIEW_PROPERTY_NAME;
 
 private:
   QStringList TestFilenames;

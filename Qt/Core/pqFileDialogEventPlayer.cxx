@@ -112,7 +112,10 @@ bool pqFileDialogEventPlayer::playEvent(QObject* Object, const QString& Command,
     return true;
     }
 
-  qCritical() << "Unknown pqFileDialog command: " << Object << " " << Command << " " << Arguments;
-  Error = true;
+  if (!this->Superclass::playEvent(Object, Command, Arguments, Error))
+    {
+    qCritical() << "Unknown pqFileDialog command: " << Object << " " << Command << " " << Arguments;
+    Error = true;
+    }
   return true;
 }

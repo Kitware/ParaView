@@ -32,6 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqXMLEventSource.h"
 
+#include <sstream>  
+#include <string>
+
 #include <QFile>
 #include <QtDebug>
 #include <QWidget>
@@ -103,7 +106,8 @@ void pqXMLEventSource::setContent(const QString& xmlfilename)
 int pqXMLEventSource::getNextEvent(
   QString& object,
   QString& command,
-  QString& arguments)
+  QString& arguments,
+  int& eventType)
 {
   if(this->Implementation->XML->GetNumberOfNestedElements() ==
     this->Implementation->CurrentEvent)
@@ -115,30 +119,34 @@ int pqXMLEventSource::getNextEvent(
   this->Implementation->CurrentEvent++;
 
   vtkPVXMLElement* elem = this->Implementation->XML->GetNestedElement(index);
-  if (elem->GetName() && strcmp(elem->GetName(), "pqevent") == 0)
-    {
-    object = elem->GetAttribute("object");
-    command = elem->GetAttribute("command");
-    arguments = elem->GetAttribute("arguments");
-    return SUCCESS;
-    }
-  else if (elem->GetName() && strcmp(elem->GetName(), "pqcompareview")==0 &&
-    elem->GetAttribute("object") && elem->GetAttribute("baseline"))
+
+  // First handle specific cases
+  if (elem->GetName() && strcmp(elem->GetName(), "pqcompareview")==0 &&
+      elem->GetAttribute("object") && elem->GetAttribute("baseline"))
     {
     // add support for elements of the form:
     // <pqcompareview object="../Viewport" 
     //                baseline="ExtractBlock.png"
     //                width="300" height="300" />
+
+    // Recover object name
     QString widgetName = elem->GetAttribute("object");
+
+    // Recover baseline file location
     QString baseline = elem->GetAttribute("baseline");
     baseline = baseline.replace("$PARAVIEW_TEST_ROOT",
-      pqCoreTestUtility::TestDirectory());
+                                pqCoreTestUtility::TestDirectory());
     baseline = baseline.replace("$PARAVIEW_DATA_ROOT",
-      pqCoreTestUtility::DataRoot());
+                                pqCoreTestUtility::DataRoot());
+    baseline = baseline.replace("$PARAVIEW_TEST_BASELINE_DIR",
+                                pqCoreTestUtility::BaselineDirectory());
 
+    // Recover optional width and height
     int width = 300, height = 300;
     elem->GetScalarAttribute("width", &width);
     elem->GetScalarAttribute("height", &height);
+
+    // Recover optional threshold
     int threshold = 0;
     if (elem->GetScalarAttribute("threshold", &threshold) && threshold >= 0)
       {
@@ -151,28 +159,62 @@ int pqXMLEventSource::getNextEvent(
       threshold = options->GetCurrentImageThreshold();
       }
 
+    // Find widget to screenshot with
     QWidget* widget =
       qobject_cast<QWidget*>(pqObjectNaming::GetObject(widgetName));
-
     if (!widget)
       {
       return FAILURE;
       }
+
+    // Resize widget
     QSize old_size = widget->maximumSize();
     widget->setMaximumSize(width, height);
     widget->resize(width, height);
 
+    // Recover test directory
+    QString testDir = pqCoreTestUtility::TestDirectory();
+
+    // If test directory is empty, try to create one along the xml test.
+    if (testDir.isEmpty())
+      {
+      testDir = pqCoreTestUtility::BaselineDirectory();
+      QString path("Testing/Temporary");
+      QDir testQDir(testDir);
+      testQDir.mkpath(path);
+      if (!testQDir.cd(path))
+        {
+        qCritical()<< "ERROR: The following event FAILED !!! Impossible to find or create a Test directory.";
+        qCritical()<< "Yet will continue with the rest of the test.";
+        qCritical()<< "----------------------------------------------------------------------------------";
+        std::stringstream ss;
+        elem->PrintXML(ss, vtkIndent());
+        std::string sstr(ss.str());
+        qCritical()<<sstr.c_str();
+        qCritical()<< "----------------------------------------------------------------------------------";
+        return this->getNextEvent(object, command, arguments, eventType);
+        }
+      else
+        {
+        testDir = testQDir.path();
+        }
+      }
+
+    // Compare image with widget
     bool retVal = pqCoreTestUtility::CompareImage(widget, baseline,
-      threshold, std::cerr, pqCoreTestUtility::TestDirectory());
+      threshold, std::cerr, testDir);
     widget->setMaximumSize(old_size);
     if (!retVal)
       {
-      cout << "ERROR: The following event FAILED !!! Yet will continue with the rest of the test." << endl;
-      cout << "----------------------------------------------------------------------------------" << endl;
-      elem->PrintXML(cout, vtkIndent());
-      cout << "----------------------------------------------------------------------------------" << endl;
+      qCritical()<< "ERROR: The following event FAILED !!! Yet will continue with the rest of the test.";
+      qCritical()<< "----------------------------------------------------------------------------------";
+      std::stringstream ss;
+      elem->PrintXML(ss, vtkIndent());
+      std::string sstr(ss.str());
+      qCritical()<<sstr.c_str();
+      qCritical()<< "----------------------------------------------------------------------------------";
       }
-    return this->getNextEvent(object, command, arguments);
+    return this->getNextEvent(object, command, arguments, eventType);
     }
   else if (elem->GetName() && strcmp(elem->GetName(), "pqcompareimage")==0 &&
     elem->GetAttribute("image") && elem->GetAttribute("baseline"))
@@ -201,16 +243,36 @@ int pqXMLEventSource::getNextEvent(
        options->GetCurrentImageThreshold(), std::cerr,
        pqCoreTestUtility::TestDirectory()))
       {
-      cout << "ERROR: The following event FAILED !!! Yet will continue with the rest of the test." << endl;
-      cout << "----------------------------------------------------------------------------------" << endl;
-      elem->PrintXML(cout, vtkIndent());
-      cout << "----------------------------------------------------------------------------------" << endl;
+      qCritical()<< "ERROR: The following event FAILED !!! Yet will continue with the rest of the test.";
+      qCritical()<< "----------------------------------------------------------------------------------";
+      std::stringstream ss;
+      elem->PrintXML(ss, vtkIndent());
+      std::string sstr(ss.str());
+      qCritical()<<sstr.c_str();
+      qCritical()<< "----------------------------------------------------------------------------------";
       }
-    return this->getNextEvent(object, command, arguments);
+    return this->getNextEvent(object, command, arguments, eventType);
+    }
+
+  // Then generic cases
+  else if (elem->GetName() && strcmp(elem->GetName(), "pqevent") == 0)
+    {
+    eventType = pqEventTypes::ACTION_EVENT;
+    object = elem->GetAttribute("object");
+    command = elem->GetAttribute("command");
+    arguments = elem->GetAttribute("arguments");
+    return SUCCESS;
+    }
+  else if (elem->GetName() && strcmp(elem->GetName(), "pqcheck") == 0)
+    {
+    eventType = pqEventTypes::CHECK_EVENT;
+    object = elem->GetAttribute("object");
+    command = elem->GetAttribute("property");
+    arguments = elem->GetAttribute("arguments");
+    return SUCCESS;
     }
 
   qCritical() << "Invalid xml element: " << elem->GetName();
-
   return FAILURE;
 }
 

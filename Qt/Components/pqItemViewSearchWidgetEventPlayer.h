@@ -45,6 +45,7 @@ public:
   pqItemViewSearchWidgetEventPlayer(QObject* parent=0);
   ~pqItemViewSearchWidgetEventPlayer();
 
+  using Superclass::playEvent;
   bool playEvent(QObject* object, const QString& command, const QString&
     arguments, bool& error);
 

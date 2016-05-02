@@ -50,6 +50,7 @@ public:
   void PrintSelf(ostream &os, vtkIndent indent);
 
   vtkGetStringMacro(TileImagePath);
+  vtkGetStringMacro(BaselineDirectory);
   vtkGetStringMacro(TestDirectory);
   vtkGetStringMacro(DataDirectory);
 
@@ -63,6 +64,7 @@ public:
   vtkGetStringMacro(ServerResourceName);
 
   vtkSetStringMacro(TileImagePath);
+  vtkSetStringMacro(BaselineDirectory);
   vtkSetStringMacro(TestDirectory);
   vtkSetStringMacro(DataDirectory);
 
@@ -104,6 +106,7 @@ protected:
   virtual void Initialize();
   virtual int PostProcess(int argc, const char * const *argv);
 
+  char* BaselineDirectory;
   char* TestDirectory;
   char* DataDirectory;
   char* ServerResourceName;

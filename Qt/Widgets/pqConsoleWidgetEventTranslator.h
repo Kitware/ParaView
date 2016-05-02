@@ -50,6 +50,7 @@ public:
   virtual ~pqConsoleWidgetEventTranslator();
 
   /// Translate the event, if possible.
+  using Superclass::translateEvent;
   virtual bool translateEvent(QObject* target, QEvent* qtevent, bool& errorFlag);
 
 protected slots:
