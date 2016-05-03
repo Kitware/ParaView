@@ -441,14 +441,6 @@
         <Documentation>Set the visibility for the selection, if
         any.</Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetCubeAxesVisibility"
-                         default_values="0"
-                         name="CubeAxesVisibility"
-                         number_of_elements="1"
-                         panel_visibility="never">
-        <BooleanDomain name="bool" />
-        <Documentation>Set the visibility for the cube axes.</Documentation>
-      </IntVectorProperty>
       <RepresentationType subproxy="SurfaceRepresentation"
                           subtype="Points"
                           text="Points" />
@@ -618,86 +610,6 @@
             <Property name="Nt" />
           </PropertyGroup>
         </ExposedProperties>
-      </SubProxy>
-      <SubProxy>
-        <Proxy name="CubeAxesRepresentation"
-               proxygroup="representations"
-               proxyname="CubeAxesRepresentation">
-        </Proxy>
-        <ExposedProperties>
-          <PropertyGroup label="Cube Axes"
-                         panel_visibility="never"
-                         panel_widget="CubeAxes">
-            <Property exposed_name="CubeAxesColor"
-                      name="Color" />
-            <Property exposed_name="CubeAxesCornerOffset"
-                      name="CornerOffset" />
-            <Property exposed_name="CubeAxesFlyMode"
-                      name="FlyMode" />
-            <Property exposed_name="CubeAxesInertia"
-                      name="Inertia" />
-            <Property exposed_name="CubeAxesTickLocation"
-                      name="TickLocation" />
-            <Property exposed_name="CubeAxesXAxisMinorTickVisibility"
-                      name="XAxisMinorTickVisibility" />
-            <Property exposed_name="CubeAxesXAxisTickVisibility"
-                      name="XAxisTickVisibility" />
-            <Property exposed_name="CubeAxesXAxisVisibility"
-                      name="XAxisVisibility" />
-            <Property exposed_name="CubeAxesXGridLines"
-                      name="XGridLines" />
-            <Property exposed_name="CubeAxesXTitle"
-                      name="XTitle" />
-            <Property exposed_name="CubeAxesUseDefaultXTitle"
-                      name="UseDefaultXTitle" />
-            <Property exposed_name="CubeAxesYAxisMinorTickVisibility"
-                      name="YAxisMinorTickVisibility" />
-            <Property exposed_name="CubeAxesYAxisTickVisibility"
-                      name="YAxisTickVisibility" />
-            <Property exposed_name="CubeAxesYAxisVisibility"
-                      name="YAxisVisibility" />
-            <Property exposed_name="CubeAxesYGridLines"
-                      name="YGridLines" />
-            <Property exposed_name="CubeAxesYTitle"
-                      name="YTitle" />
-            <Property exposed_name="CubeAxesUseDefaultYTitle"
-                      name="UseDefaultYTitle" />
-            <Property exposed_name="CubeAxesZAxisMinorTickVisibility"
-                      name="ZAxisMinorTickVisibility" />
-            <Property exposed_name="CubeAxesZAxisTickVisibility"
-                      name="ZAxisTickVisibility" />
-            <Property exposed_name="CubeAxesZAxisVisibility"
-                      name="ZAxisVisibility" />
-            <Property exposed_name="CubeAxesZGridLines"
-                      name="ZGridLines" />
-            <Property exposed_name="CubeAxesZTitle"
-                      name="ZTitle" />
-            <Property exposed_name="CubeAxesUseDefaultZTitle"
-                      name="UseDefaultZTitle" />
-            <Property exposed_name="CubeAxesGridLineLocation"
-                      name="GridLineLocation" />
-            <Property name="DataBounds" />
-            <Property name="CustomBounds" />
-            <Property name="CustomBoundsActive" />
-            <Property name="OriginalBoundsRangeActive" />
-            <Property name="CustomRange" />
-            <Property name="CustomRangeActive" />
-            <Property name="UseAxesOrigin" />
-            <Property name="AxesOrigin" />
-            <Property exposed_name="CubeAxesXLabelFormat"
-                      name="XLabelFormat" />
-            <Property exposed_name="CubeAxesYLabelFormat"
-                      name="YLabelFormat" />
-            <Property exposed_name="CubeAxesZLabelFormat"
-                      name="ZLabelFormat" />
-      <Property name="StickyAxes" />
-      <Property name="CenterStickyAxes" />
-          </PropertyGroup>
-        </ExposedProperties>
-        <ShareProperties subproxy="SurfaceRepresentation">
-          <Exception name="Input" />
-          <Exception name="Visibility" />
-        </ShareProperties>
       </SubProxy>
       <SubProxy>
         <Proxy name="SelectionRepresentation"
