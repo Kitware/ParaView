@@ -26,6 +26,7 @@
 # include "vtkSurfaceLICPainter.h"
 #else
 # include "vtkCompositeSurfaceLICMapper.h"
+# include "vtkSurfaceLICInterface.h"
 #endif
 
 // send LOD painter parameters that let it run faster.
@@ -99,8 +100,8 @@ void vtkSurfaceLICRepresentation::SetUseLICForLOD(bool val)
 #ifndef VTKGL2
   this->LODPainter->SetEnable(this->Painter->GetEnable() && this->UseLICForLOD);
 #else
-  this->SurfaceLICLODMapper->SetEnable(
-    (this->SurfaceLICMapper->GetEnable() && this->UseLICForLOD)? 1 : 0);
+  this->SurfaceLICLODMapper->GetLICInterface()->SetEnable(
+    (this->SurfaceLICMapper->GetLICInterface()->GetEnable() && this->UseLICForLOD)? 1 : 0);
 #endif
 }
 
@@ -141,9 +142,8 @@ void vtkSurfaceLICRepresentation::SetEnable(bool val)
   this->Painter->SetEnable(val);
   this->LODPainter->SetEnable(this->Painter->GetEnable() && this->UseLICForLOD);
 #else
-  // FIXME
-  this->SurfaceLICMapper->SetEnable(val? 1 : 0);
-  this->SurfaceLICLODMapper->SetEnable((val && this->UseLICForLOD)? 1: 0);
+  this->SurfaceLICMapper->GetLICInterface()->SetEnable(val? 1 : 0);
+  this->SurfaceLICLODMapper->GetLICInterface()->SetEnable((val && this->UseLICForLOD)? 1: 0);
 #endif
 }
 
@@ -154,12 +154,18 @@ void vtkSurfaceLICRepresentation::SetEnable(bool val)
 //----------------------------------------------------------------------------
 void vtkSurfaceLICRepresentation::SetStepSize(double val)
 {
-  this->SurfaceLICMapper->SetStepSize(val);
 
   // when interacting take half the number of steps at twice the
   // step size.
   double twiceVal=val*2.0;
-  this->SurfaceLICLODMapper->SetStepSize(twiceVal);
+
+#ifndef VTKGL2
+  this->Painter->SetStepSize(val);
+  this->LODPainter->SetStepSize(twiceVal);
+#else
+  this->SurfaceLICMapper->GetLICInterface()->SetStepSize(val);
+  this->SurfaceLICLODMapper->GetLICInterface()->SetStepSize(twiceVal);
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -176,9 +182,9 @@ void vtkSurfaceLICRepresentation::SetNumberOfSteps(int val)
   int halfVal=val/2;
   if (halfVal<1) { halfVal=1; }
 #ifndef VTKGL2
-  this->LODPainter->SetNumberOfSteps(halfVal);
+  this->LODPainter->GetLICInterface()->SetNumberOfSteps(halfVal);
 #else
-  this->SurfaceLICLODMapper->SetNumberOfSteps(halfVal);
+  this->SurfaceLICLODMapper->GetLICInterface()->SetNumberOfSteps(halfVal);
 #endif
 }
 
@@ -189,7 +195,7 @@ void vtkSurfaceLICRepresentation::Set##_name (_type val)                     \
 #ifndef VTKGL2                                                               \
   this->Painter->Set##_name (val);                                           \
 #else                                                                        \
-  this->SurfaceLICMapper->Set##_name (val);                                  \
+  this->SurfaceLICMapper->GetLICInterface()->Set##_name (val);                                  \
 #endif                                                                       \
 }
 vtkSurfaceLICRepresentationPassParameterMacro( EnhancedLIC, int)
@@ -213,8 +219,8 @@ void vtkSurfaceLICRepresentation::Set##_name (_type val)                     \
 #define vtkSurfaceLICRepresentationPassParameterWithLODMacro(_name, _type)   \
 void vtkSurfaceLICRepresentation::Set##_name (_type val)                     \
 {                                                                            \
-  this->SurfaceLICMapper->Set##_name (val);                                  \
-  this->SurfaceLICLODMapper->Set##_name (val);                               \
+  this->SurfaceLICMapper->GetLICInterface()->Set##_name (val);                                  \
+  this->SurfaceLICLODMapper->GetLICInterface()->Set##_name (val);                               \
 }
 #endif
 

@@ -14,7 +14,7 @@ rw = vtk.vtkRenderWindow()
 rw.Render()
 
 if opengl2:
-    mapper = vtk.vtkSurfaceLICMapper()
+    mapper = vtk.vtkCompositeSurfaceLICMapper()
     ok = mapper.IsSupported(rw)
     print
     print 'SurfaceLIC %s Supported by the OpenGL drivers\n'%\
