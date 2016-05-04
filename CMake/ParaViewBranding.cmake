@@ -156,34 +156,28 @@ FUNCTION(build_paraview_client BPC_NAME)
         ${BPC_BUNDLE_ICON}
         PROPERTIES
         MACOSX_PACKAGE_LOCATION Resources
-      )
+        )
+    ENDIF ()
+    IF (IS_DIRECTORY "${QT_QTGUI_LIBRARY_RELEASE}")
+      GET_FILENAME_COMPONENT(qt_menu_nib
+        "${QT_QTGUI_LIBRARY_RELEASE}/Resources/qt_menu.nib"
+        REALPATH)
+    ELSE ()
+      GET_FILENAME_COMPONENT(qt_menu_nib
+        "${QT_LIBRARY_DIR}/Resources/qt_menu.nib"
+        REALPATH)
     ENDIF ()
 
-    IF(QT_MAC_USE_COCOA)
-      IF (IS_DIRECTORY "${QT_QTGUI_LIBRARY_RELEASE}")
-            GET_FILENAME_COMPONENT(qt_menu_nib
-              "${QT_QTGUI_LIBRARY_RELEASE}/Resources/qt_menu.nib"
-              REALPATH)
-      ELSE ()
-        GET_FILENAME_COMPONENT(qt_menu_nib
-          "${QT_LIBRARY_DIR}/Resources/qt_menu.nib"
-          REALPATH)
-      ENDIF ()
-
-      set(qt_menu_nib_sources
-        "${qt_menu_nib}/classes.nib"
-        "${qt_menu_nib}/info.nib"
-        "${qt_menu_nib}/keyedobjects.nib"
-        )
-      SET_SOURCE_FILES_PROPERTIES(
-        ${qt_menu_nib_sources}
-        PROPERTIES
-        MACOSX_PACKAGE_LOCATION Resources/qt_menu.nib
+    set(qt_menu_nib_sources
+      "${qt_menu_nib}/classes.nib"
+      "${qt_menu_nib}/info.nib"
+      "${qt_menu_nib}/keyedobjects.nib"
       )
-    ELSE()
-      set(qt_menu_nib_sources)
-    ENDIF()
-
+    SET_SOURCE_FILES_PROPERTIES(
+      ${qt_menu_nib_sources}
+      PROPERTIES
+      MACOSX_PACKAGE_LOCATION Resources/qt_menu.nib
+      )
     SET(executable_flags MACOSX_BUNDLE)
   ENDIF ()
 
