@@ -19,6 +19,50 @@ class NotSupportedException(Exception):
 class Continue(Exception):
     pass
 
+class _CubeAxesHelper(object):
+    def __init__(self):
+        self.CubeAxesVisibility = 0
+        self.CubeAxesColor = [0, 0, 0]
+        self.CubeAxesCornerOffset = 0.0
+        self.CubeAxesFlyMode = 1
+        self.CubeAxesInertia = 1
+        self.CubeAxesTickLocation = 0
+        self.CubeAxesXAxisMinorTickVisibility = 0
+        self.CubeAxesXAxisTickVisibility = 0
+        self.CubeAxesXAxisVisibility = 0
+        self.CubeAxesXGridLines = 0
+        self.CubeAxesXTitle = ""
+        self.CubeAxesUseDefaultXTitle = 0
+        self.CubeAxesYAxisMinorTickVisibility = 0
+        self.CubeAxesYAxisTickVisibility = 0
+        self.CubeAxesYAxisVisibility = 0
+        self.CubeAxesYGridLines = 0
+        self.CubeAxesYTitle = ""
+        self.CubeAxesUseDefaultYTitle = 0
+        self.CubeAxesZAxisMinorTickVisibility = 0
+        self.CubeAxesZAxisTickVisibility = 0
+        self.CubeAxesZAxisVisibility = 0
+        self.CubeAxesZGridLines = 0
+        self.CubeAxesZTitle = ""
+        self.CubeAxesUseDefaultZTitle = 0
+        self.CubeAxesGridLineLocation = 0
+        self.DataBounds = [0, 1, 0, 1, 0, 1]
+        self.CustomBounds = [0, 1, 0, 1, 0, 1]
+        self.CustomBoundsActive = 0
+        self.OriginalBoundsRangeActive = 0
+        self.CustomRange = [0, 1, 0, 1, 0, 1]
+        self.CustomRangeActive = 0
+        self.UseAxesOrigin = 0
+        self.AxesOrigin = [0, 0, 0]
+        self.CubeAxesXLabelFormat = ""
+        self.CubeAxesYLabelFormat = ""
+        self.CubeAxesZLabelFormat = ""
+        self.StickyAxes = 0
+        self.CenterStickyAxes = 0
+_ACubeAxesHelper = _CubeAxesHelper()
+
+_fgetattr = getattr
+
 def getattr(proxy, pname):
     """
     Attempts to emulate getattr() when called using a deprecated property name
@@ -60,4 +104,14 @@ def getattr(proxy, pname):
             raise NotSupportedException(
                     'CameraClippingRange is obsolete. Please remove '\
                     'it from your script. You no longer need it.')
+
+    # In 5.1, we remove support for Cube Axes and related properties.
+    global _ACubeAxesHelper
+    if proxy.SMProxy.IsA("vtkSMPVRepresentationProxy") and hasattr(_ACubeAxesHelper, pname):
+        if version <= 5.0:
+            return _fgetattr(_ACubeAxesHelper, pname)
+        else:
+            raise NotSupportedException(
+                    'Cube Axes and related properties are now obsolete. Please '\
+                    'remove them from your script.')
     raise Continue()

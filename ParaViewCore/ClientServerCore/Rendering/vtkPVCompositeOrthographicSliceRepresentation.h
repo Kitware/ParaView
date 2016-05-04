@@ -15,8 +15,7 @@
 // .NAME vtkPVCompositeOrthographicSliceRepresentation
 // .SECTION Description
 // vtkPVCompositeOrthographicSliceRepresentation is designed for use with
-// vtkPVOrthographicSliceView. Similar to how we add cube-axes representation
-// etc. to vtkPVCompositeRepresentation, we add 3 vtkGeometrySliceRepresentation
+// vtkPVOrthographicSliceView. We add 3 vtkGeometrySliceRepresentation
 // instances to render the 3 slices in vtkPVOrthographicSliceView's orthographic
 // views.
 
@@ -26,7 +25,6 @@
 #include "vtkPVCompositeRepresentation.h"
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer.
 
-class vtkCubeAxesRepresentation;
 class vtkGeometrySliceRepresentation;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVCompositeOrthographicSliceRepresentation : public vtkPVCompositeRepresentation
@@ -44,23 +42,10 @@ public:
   void SetSliceRepresentation2(vtkGeometrySliceRepresentation* repr)
     { this->SetSliceRepresentation(2, repr); }
 
-  void SetCubeAxesRepresentation(int index, vtkCubeAxesRepresentation*);
-  void SetCubeAxesRepresentation0(vtkCubeAxesRepresentation* repr)
-    { this->SetCubeAxesRepresentation(0, repr); }
-  void SetCubeAxesRepresentation1(vtkCubeAxesRepresentation* repr)
-    { this->SetCubeAxesRepresentation(1, repr); }
-  void SetCubeAxesRepresentation2(vtkCubeAxesRepresentation* repr)
-    { this->SetCubeAxesRepresentation(2, repr); }
-
-
   // Description:
   // Set visibility of the representation.
   // Overridden to update the cube-axes and selection visibilities.
   virtual void SetVisibility(bool visible);
-
-  // Description:
-  // Overidden to pass to the orthographic representations.
-  virtual void SetCubeAxesVisibility(bool visible);
 
   // Description:
   // Overridden to simply pass the input to the internal representations. We
@@ -100,7 +85,6 @@ protected:
   virtual bool RemoveFromView(vtkView* view);
 
   vtkSmartPointer<vtkGeometrySliceRepresentation> SliceRepresentations[3];
-  vtkSmartPointer<vtkCubeAxesRepresentation> CubeAxesRepresentations[3];
 
 private:
   vtkPVCompositeOrthographicSliceRepresentation(const vtkPVCompositeOrthographicSliceRepresentation&); // Not implemented

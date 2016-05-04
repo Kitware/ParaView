@@ -531,7 +531,6 @@
         { "class": "vtkChartSelectionRepresentation" },
         { "class": "vtkClientServerMoveData" },
         { "class": "vtkCompositeRepresentation" },
-        { "class": "vtkCubeAxesRepresentation" },
         { "class": "vtkDataLabelRepresentation" },
         { "class": "vtkGeometryRepresentation" },
         { "class": "vtkGeometryRepresentationWithFaces" },
@@ -958,7 +957,6 @@
       "proxies":[
         "AMROutlineRepresentation",
         "AMRRepresentation",
-        "CubeAxesRepresentation",
         "DataLabelRepresentation",
         "GeometryRepresentation",
         "Glyph3DRepresentation",

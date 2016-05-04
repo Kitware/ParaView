@@ -112,8 +112,6 @@ set (Module_SRCS
   pqCrashRecoveryBehavior.h
   pqCreateCustomFilterReaction.cxx
   pqCreateCustomFilterReaction.h
-  pqCubeAxesPropertyWidget.cxx
-  pqCubeAxesPropertyWidget.h
   pqCylinderPropertyWidget.cxx
   pqCylinderPropertyWidget.h
   pqDataQueryReaction.cxx
@@ -356,7 +354,6 @@ set (Module_MOC_HDRS
   pqCopyReaction.h
   pqCrashRecoveryBehavior.h
   pqCreateCustomFilterReaction.h
-  pqCubeAxesPropertyWidget.h
   pqCylinderPropertyWidget.h
   pqDataQueryReaction.h
   pqDataTimeStepBehavior.h

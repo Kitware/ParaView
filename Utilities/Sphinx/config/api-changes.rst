@@ -4,6 +4,31 @@ API Changes between ParaView versions
 Changes in 5.1
 --------------
 
+Cube Axes no longer available
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Cube axes is no longer supported by ParaView. Hence all calls to display
+properties for the same should now be simply removed from your Python code. e.g.
+``display.CubeAxesVisibility = ..`` and other such properties that began with
+``CubeAxes`` are no longer available and should be removed.
+
+A complete list of display properties removed is as follows:
+``CubeAxesVisibility``,
+``CubeAxesColor``, ``CubeAxesCornerOffset``, ``CubeAxesFlyMode``,
+``CubeAxesInertia``, ``CubeAxesTickLocation``,
+``CubeAxesXAxisMinorTickVisibility``, ``CubeAxesXAxisTickVisibility``,
+``CubeAxesXAxisVisibility``, ``CubeAxesXGridLines``, ``CubeAxesXTitle``,
+``CubeAxesUseDefaultXTitle``, ``CubeAxesYAxisMinorTickVisibility``,
+``CubeAxesYAxisTickVisibility``, ``CubeAxesYAxisVisibility``,
+``CubeAxesYGridLines``, ``CubeAxesYTitle``, ``CubeAxesUseDefaultYTitle``,
+``CubeAxesZAxisMinorTickVisibility``, ``CubeAxesZAxisTickVisibility``,
+``CubeAxesZAxisVisibility``, ``CubeAxesZGridLines``, ``CubeAxesZTitle``,
+``CubeAxesUseDefaultZTitle``, ``CubeAxesGridLineLocation``, ``DataBounds``,
+``CustomBounds``, ``CustomBoundsActive``, ``OriginalBoundsRangeActive``,
+``CustomRange``, ``CustomRangeActive``, ``UseAxesOrigin``, ``AxesOrigin``,
+``CubeAxesXLabelFormat``, ``CubeAxesYLabelFormat``, ``CubeAxesZLabelFormat``,
+``StickyAxes``, ``CenterStickyAxes``.
+
+
 CameraClippingRange on render view
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 For a few releases, ``CameraClippingRange`` property would not have any effect on a render view.

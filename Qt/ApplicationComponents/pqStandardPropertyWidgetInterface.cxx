@@ -43,7 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCommandButtonPropertyWidget.h"
 #include "pqCylinderPropertyWidget.h"
 #include "pqCTHArraySelectionDecorator.h"
-#include "pqCubeAxesPropertyWidget.h"
 #include "pqDisplayRepresentationWidget.h"
 #include "pqDoubleRangeSliderPropertyWidget.h"
 #include "pqEnableWidgetDecorator.h"
@@ -199,7 +198,7 @@ pqStandardPropertyWidgetInterface::createWidgetForPropertyGroup(
     }
   else if(panelWidget == "CubeAxes")
     {
-    return new pqCubeAxesPropertyWidget(proxy);
+    qWarning("`CubeAxes` is no longer supported. Please update your ServerManager XML configuration.");
     }
   else if(panelWidget == "BackgroundEditor")
     {
