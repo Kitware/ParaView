@@ -198,7 +198,12 @@ class CoProcessor(object):
                     if dirname:
                         cinema_dirs.append(dirname)
                 else:
-                    simple.WriteImage(fname, view, Magnification=view.cpMagnification)
+                    # for png quality = 0 means no compression. compression can be a potentially
+                    # very costly serial operation on process 0
+                    if fname.endswith('png'):
+                        simple.SaveScreenshot(fname, view, magnification=view.cpMagnification, quality=0)
+                    else:
+                        simple.SaveScreenshot(fname, view, magnification=view.cpMagnification)
 
 
         if len(cinema_dirs) > 1:
