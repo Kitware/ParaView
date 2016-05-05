@@ -70,6 +70,9 @@ protected:
 private:
   vtkPVDisplayInformation(const vtkPVDisplayInformation&); // Not implemented
   void operator=(const vtkPVDisplayInformation&); // Not implemented
+
+  static int GlobalCanOpenDisplayLocally;
+  static int GlobalSupportsOpenGL;
 };
 
 #endif
