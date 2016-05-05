@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // It will be replaced next time you rebuild.
 
 #include <QApplication>
+#include <QStyleFactory>
+
 #include "pq@BPC_NAME@Initializer.h"
 #include "vtkPVConfig.h"
 // See Applications/ParaView/CMakeLists.txt for why this is necessary.
@@ -45,10 +47,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef BUILD_SHARED_LIBS
 #include "pvStaticPluginsInit.h"
 #endif
-#endif
-
-#ifdef Q_WS_X11
-#include <QPlastiqueStyle>
 #endif
 
 #include <vtksys/SystemTools.hxx>
@@ -74,11 +72,14 @@ static bool checkenv(const char* vname)
 
 int main(int argc, char* argv[])
 {
-#ifdef Q_WS_X11
+#if defined(Q_WS_X11) || defined(Q_OS_LINUX)
   // Using motif style gives us test failures (and its ugly).
   // Using cleanlooks style gives us errors when using valgrind (Trolltech's bug #179200)
   // let's just use plastique for now
-  QApplication::setStyle(new QPlastiqueStyle);
+
+  // "plastique" is only available on Qt4, but this works just fine with Qt5 too. Qt5 just uses the
+  // default style when QStyleFactory::create("plastique") return nullptr.
+  QApplication::setStyle(QStyleFactory::create("plastique"));
 #endif
 
   // When playing tests, disable all effects.

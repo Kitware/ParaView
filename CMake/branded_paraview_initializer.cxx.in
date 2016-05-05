@@ -49,9 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVConfig.h"
 #include "vtkPVPluginTracker.h"
 
-#ifdef Q_WS_X11
-#include <QPlastiqueStyle>
-#endif
+#include "vtkPVConfig.h"
 
 //-----------------------------------------------------------------------------
 pq@BPC_NAME@Initializer::pq@BPC_NAME@Initializer()

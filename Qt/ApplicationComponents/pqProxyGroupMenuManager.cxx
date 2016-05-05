@@ -403,7 +403,7 @@ void pqProxyGroupMenuManager::populateMenu()
     }
   _menu->clear();
 
-#ifdef Q_WS_MAC
+#if defined(Q_WS_MAC) || defined(Q_OS_MAC)
   this->Internal->SearchAction = _menu->addAction("Search...\tAlt+Space", this, SLOT(quickLaunch()));
 #else
   this->Internal->SearchAction = _menu->addAction("Search...\tCtrl+Space", this, SLOT(quickLaunch()));
