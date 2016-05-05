@@ -68,6 +68,7 @@ set (Module_SRCS
   vtkPVHistogramChartRepresentation.cxx
   vtkPVImageSliceMapper.cxx
   vtkPVImplicitPlaneRepresentation.cxx
+  vtkPVImplicitCylinderRepresentation.cxx
   vtkPVLastSelectionInformation.cxx
   vtkPVMultiSliceView.cxx
   vtkPVOpenGLInformation.cxx

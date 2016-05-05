@@ -769,27 +769,34 @@
           <Link name="Input" with_property="Input" />
         </ProxyList>
       </Hints>
+      <!-- End of Sphere -->
     </Proxy>
     <Proxy class="vtkPVCylinder" name="Cylinder">
       <InputProperty is_internal="1" name="Input" />
       <DoubleVectorProperty command="SetCenter"
-                            default_values="none"
+                            default_values="0 0 0"
                             name="Center"
                             number_of_elements="3">
-        <DoubleRangeDomain name="range" />
+        <BoundsDomain default_mode="mid" mode="normal" name="range">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetAxis"
                             default_values="0. 1. 0."
                             name="Axis"
                             number_of_elements="3">
-        <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetRadius"
                             default_values="0.5"
                             name="Radius"
                             number_of_elements="1">
-        <DoubleRangeDomain min="0"
-                           name="range" />
+        <BoundsDomain name="range" mode="scaled_extent" scale_factor="0.5" default_mode="max">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
       </DoubleVectorProperty>
       <PropertyGroup label="Cylinder Parameters" panel_widget="InteractiveCylinder">
         <Property function="Center" name="Center" />
@@ -802,6 +809,7 @@
           <Link name="Input" with_property="Input" />
         </ProxyList>
       </Hints>
+      <!-- End of Cylinder -->
     </Proxy>
   </ProxyGroup>
   <ProxyGroup name="transforms">

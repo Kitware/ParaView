@@ -38,6 +38,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDoubleValidator>
 
+
+namespace {
+
+// Scale the bounds by the given factor
+static void pqAdjustBounds(vtkBoundingBox& bbox, double scaleFactor)
+{
+  double min_point[3], max_point[3];
+  bbox.GetMinPoint(min_point[0], min_point[1], min_point[2]);
+  bbox.GetMaxPoint(max_point[0], max_point[1], max_point[2]);
+
+  for (int i = 0; i < 3; ++i)
+    {
+    double mid = (min_point[i] + max_point[i])/2.0;
+    min_point[i] = mid + scaleFactor * (min_point[i] - mid);
+    max_point[i] = mid + scaleFactor * (max_point[i] - mid);
+    }
+  bbox.SetMinPoint(min_point);
+  bbox.SetMaxPoint(max_point);
+}
+
+}
+
 //-----------------------------------------------------------------------------
 pqCylinderPropertyWidget::pqCylinderPropertyWidget(
   vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup, QWidget* parentObject)
@@ -109,10 +131,6 @@ pqCylinderPropertyWidget::pqCylinderPropertyWidget(
   // Let's link some of the UI elements that only affect the interactive widget
   // properties without affecting properties on the main proxy.
   vtkSMProxy* wdgProxy = this->widgetProxy();
-  this->WidgetLinks.addPropertyLink(ui.tubing, "checked", SIGNAL(toggled(bool)),
-    wdgProxy, wdgProxy->GetProperty("Tubing"));
-  this->WidgetLinks.addPropertyLink(ui.outsideBounds, "checked", SIGNAL(toggled(bool)),
-    wdgProxy, wdgProxy->GetProperty("OutsideBounds"));
   this->WidgetLinks.addPropertyLink(ui.scaling, "checked", SIGNAL(toggled(bool)),
     wdgProxy, wdgProxy->GetProperty("ScaleEnabled"));
   this->WidgetLinks.addPropertyLink(ui.outlineTranslation, "checked", SIGNAL(toggled(bool)),
@@ -144,9 +162,11 @@ void pqCylinderPropertyWidget::placeWidget()
   vtkSMNewWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
   Q_ASSERT(wdgProxy);
 
+  double scaleFactor = vtkSMPropertyHelper(wdgProxy, "PlaceFactor").GetAsDouble();
+  pqAdjustBounds(bbox, scaleFactor);
   double bds[6];
   bbox.GetBounds(bds);
-  vtkSMPropertyHelper(wdgProxy, "PlaceWidget").Set(bds, 6);
+  vtkSMPropertyHelper(wdgProxy, "WidgetBounds").Set(bds, 6);
   wdgProxy->UpdateVTKObjects();
 }
 
@@ -164,18 +184,17 @@ void pqCylinderPropertyWidget::resetBounds()
 
   if (wdgProxy)
     {
+    double scaleFactor = vtkSMPropertyHelper(wdgProxy, "PlaceFactor").GetAsDouble();
+    pqAdjustBounds(bbox, scaleFactor);
+
     double center[3];
     bbox.GetCenter(center);
-    const double bnds[6] = { 0., 1., 0., 1., 0., 1. };
-    vtkSMPropertyHelper(wdgProxy, "Center").Set(center, 3);
-    vtkSMPropertyHelper(wdgProxy, "Radius").Set(bbox.GetMaxLength()/10.0);
-    vtkSMPropertyHelper(wdgProxy, "PlaceWidget").Set(bnds, 6);
-    wdgProxy->UpdateProperty("PropertyWidget", true);
+    double bnds[6];
+    bbox.GetBounds(bnds);
 
-    double input_bounds[6];
-    bbox.GetBounds(input_bounds);
-    vtkSMPropertyHelper(wdgProxy, "PlaceWidget").Set(input_bounds, 6);
-    wdgProxy->UpdateVTKObjects();
+    vtkSMPropertyHelper(wdgProxy, "Center").Set(center, 3);
+    vtkSMPropertyHelper(wdgProxy, "WidgetBounds").Set(bnds, 6);
+    wdgProxy->UpdateProperty("WidgetBounds", true);
 
     emit this->changeAvailable();
     this->render();

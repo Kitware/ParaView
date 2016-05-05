@@ -89,16 +89,6 @@
       <number>2</number>
      </property>
      <item row="0" column="0">
-      <widget class="QCheckBox" name="tubing">
-       <property name="toolTip">
-        <string>Enable/disable tubing of the wire outline of the cylinder intersecton (against the bounding box). The tube thickens the line by wrapping with a vtkTubeFilter.</string>
-       </property>
-       <property name="text">
-        <string>Tubing</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
       <widget class="QCheckBox" name="outlineTranslation">
        <property name="toolTip">
         <string>Enable/disable the ability to translate the bounding box by moving it with the mouse</string>
@@ -108,17 +98,7 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
-      <widget class="QCheckBox" name="outsideBounds">
-       <property name="toolTip">
-        <string>Enable/disable the ability to move the widget outside of the bounds specified.</string>
-       </property>
-       <property name="text">
-        <string>Outside Bounds</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
+     <item row="0" column="1">
       <widget class="QCheckBox" name="scaling">
        <property name="toolTip">
         <string>Enable/disable the ability to scale the widget with the mouse.</string>
@@ -133,7 +113,7 @@
    <item row="7" column="0" colspan="2">
     <widget class="QPushButton" name="resetBounds">
      <property name="text">
-      <string>Reset Bounds</string>
+      <string>Reset To Data Bounds</string>
      </property>
     </widget>
    </item>
@@ -155,9 +135,7 @@
   <tabstop>axisY</tabstop>
   <tabstop>axisZ</tabstop>
   <tabstop>radius</tabstop>
-  <tabstop>tubing</tabstop>
   <tabstop>outlineTranslation</tabstop>
-  <tabstop>outsideBounds</tabstop>
   <tabstop>scaling</tabstop>
   <tabstop>resetBounds</tabstop>
  </tabstops>

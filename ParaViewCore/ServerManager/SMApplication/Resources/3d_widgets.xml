@@ -243,7 +243,9 @@
                proxyname="ImplicitCylinderRepresentation"></Proxy>
         <ExposedProperties>
           <Property name="Visibility" />
-          <Property name="PlaceWidget" />
+          <Property name="ConstrainToWidgetBounds" />
+          <Property name="WidgetBounds" />
+          <Property name="PlaceFactor" />
           <Property name="Center" />
           <Property name="CenterInfo" />
           <Property name="Axis" />
@@ -1012,7 +1014,7 @@
       <!-- End of BoxRepresentation -->
     </BoxRepresentationProxy>
     <!-- ================================================================== -->
-    <Proxy class="vtkImplicitCylinderRepresentation"
+    <Proxy class="vtkPVImplicitCylinderRepresentation"
            name="ImplicitCylinderRepresentation">
       <Documentation>Proxy for vtkImplicitCylinderWidget. Don't confuse this with
       the vtkSMRepresentation proxy for the cylinder widget (which is the
@@ -1024,15 +1026,21 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <IntVectorProperty command="SetConstrainToWidgetBounds"
+                         default_values="0"
+                         name="ConstrainToWidgetBounds"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <DoubleVectorProperty argument_is_array="1"
-                            command="PlaceWidget"
+                            command="SetWidgetBounds"
                             default_values="none"
-                            name="PlaceWidget"
+                            name="WidgetBounds"
                             number_of_elements="6">
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetPlaceFactor"
-                            default_values="1.0"
+                            default_values="1.2"
                             name="PlaceFactor"
                             number_of_elements="1">
         <DoubleRangeDomain min="0.01"
@@ -1113,7 +1121,7 @@
         line by wrapping with a vtkTubeFilter..</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetOutlineTranslation"
-                         default_values="1"
+                         default_values="0"
                          name="OutlineTranslation"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
