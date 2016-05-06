@@ -47,6 +47,11 @@ time = timesteps[5]
 # Merge blocks
 merge = MergeBlocks()
 
+# Add Python calculator
+# Using this expression tests that the time variables get defined by the
+# calculator, as expected.
+calculator = PythonCalculator(Expression="t_index*t_value*time_index*time_value")
+
 # Annotation filter
 annotation = PythonAnnotation()
 annotation.Expression = '"%f %f %f" % (XMOM[t_index], YMOM[t_index], ZMOM[t_index])'
