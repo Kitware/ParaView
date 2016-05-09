@@ -10,6 +10,7 @@ except ImportError:
     "this functionality to work. Please install numpy and try again."
 
 import paraview
+from paraview import vtk
 import vtk.numpy_interface.dataset_adapter as dsa
 from vtk.numpy_interface.algorithms import *
     # -- this will import vtkMultiProcessController and vtkMPI4PyCommunicator
@@ -74,6 +75,22 @@ def compute(inputs, expression, ns=None):
     retVal = eval(expression, globals(), mylocals)
     return retVal
 
+def get_data_time(self, do, ininfo):
+    dinfo = do.GetInformation()
+    if dinfo and dinfo.Has(do.DATA_TIME_STEP()):
+        t = dinfo.Get(do.DATA_TIME_STEP())
+    else: t = None
+
+    key = vtk.vtkStreamingDemandDrivenPipeline.TIME_STEPS()
+    t_index = None
+    if ininfo.Has(key):
+        tsteps = [ininfo.Get(key, x) for x in xrange(ininfo.Length(key))]
+        try:
+            t_index = tsteps.index(t)
+        except ValueError:
+            pass
+    return (t, t_index)
+
 def execute(self, expression):
     """
     **Internal Method**
@@ -87,7 +104,11 @@ def execute(self, expression):
 
     for index in range(self.GetNumberOfInputConnections(0)):
         # wrap all input data objects using vtk.numpy_interface.dataset_adapter
-        inputs.append(dsa.WrapDataObject(self.GetInputDataObject(0, index)))
+        wdo_input = dsa.WrapDataObject(self.GetInputDataObject(0, index))
+        t, t_index = get_data_time(self, wdo_input.VTKObject, self.GetInputInformation(0, index))
+        wdo_input.time_value = wdo_input.t_value = t
+        wdo_input.time_index = wdo_input.t_index = t_index
+        inputs.append(wdo_input)
 
     # Setup output.
     output = dsa.WrapDataObject(self.GetOutputDataObject(0))
@@ -99,6 +120,10 @@ def execute(self, expression):
     # get a dictionary for arrays in the dataset attributes. We pass that
     # as the variables in the eval namespace for compute.
     variables = get_arrays(inputs[0].GetAttributes(self.GetArrayAssociation()))
+    variables.update({ "time_value": inputs[0].time_value,
+                       "t_value": inputs[0].t_value,
+                       "time_index": inputs[0].time_index,
+                       "t_index": inputs[0].t_index })
     retVal = compute(inputs, expression, ns=variables)
     if retVal is not None:
         output.GetAttributes(self.GetArrayAssociation()).append(\
