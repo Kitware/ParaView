@@ -516,7 +516,6 @@ set (Module_UI_FILES
   Resources/UI/pqSpreadSheetViewDecorator.ui
   Resources/UI/pqTimerLogDisplay.ui
   Resources/UI/pqViewFrame.ui
-  Resources/UI/pqWriterDialog.ui
 )
 
 if(PARAVIEW_ENABLE_PYTHON)
