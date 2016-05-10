@@ -84,18 +84,18 @@ void SafeSetAxisTitle(vtkSMProxy* gridAxis, const char* pname, const char* value
 
   QString key = QString("MTSBAutoTitle.%1").arg(pname);
   if (prop->IsValueDefault() ||
-    (gridAxis->HasAnnotation(key.toLatin1().data()) &&
-        strcmp(gridAxis->GetAnnotation(key.toLatin1().data()), helper.GetAsString()) == 0))
+    (gridAxis->HasAnnotation(key.toLocal8Bit().data()) &&
+        strcmp(gridAxis->GetAnnotation(key.toLocal8Bit().data()), helper.GetAsString()) == 0))
   {
     if (value)
     {
       helper.Set(value);
-      gridAxis->SetAnnotation(key.toLatin1().data(), value);
+      gridAxis->SetAnnotation(key.toLocal8Bit().data(), value);
     }
     else
     {
       prop->ResetToDefault();
-      gridAxis->RemoveAnnotation(key.toLatin1().data());
+      gridAxis->RemoveAnnotation(key.toLocal8Bit().data());
     }
   }
 }

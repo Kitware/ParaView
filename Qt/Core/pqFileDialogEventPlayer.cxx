@@ -109,7 +109,7 @@ bool pqFileDialogEventPlayer::playEvent(
   if (Command == "remove")
   {
     // Delete the file.
-    vtksys::SystemTools::RemoveFile(fileString.toLatin1().data());
+    vtksys::SystemTools::RemoveFile(fileString.toLocal8Bit().data());
     return true;
   }
   if (Command == "copy")

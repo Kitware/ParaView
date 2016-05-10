@@ -411,7 +411,7 @@ bool pqTextureComboBox::loadTexture(const QString& filename)
   pqSMAdaptor::setEnumerationProperty(texture->GetProperty("SourceProcess"), "Client");
   texture->UpdateVTKObjects();
   pxm->RegisterProxy(TEXTURESGROUP,
-    vtksys::SystemTools::GetFilenameName(filename.toLatin1().data()).c_str(), texture);
+    vtksys::SystemTools::GetFilenameName(filename.toLocal8Bit().data()).c_str(), texture);
   texture->Delete();
 
   int index = this->findData(DATA(texture));

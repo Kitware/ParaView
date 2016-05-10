@@ -733,7 +733,7 @@ void pqTabbedMultiViewWidget::contextMenuRequested(const QPoint& point)
     {
       SM_SCOPED_TRACE(CallFunction)
         .arg("RenameLayout")
-        .arg(newName.toLatin1().data())
+        .arg(newName.toLocal8Bit().data())
         .arg((vtkObject*)proxy->getProxy());
 
       proxy->rename(newName);

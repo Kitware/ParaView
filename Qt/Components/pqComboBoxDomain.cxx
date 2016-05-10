@@ -79,7 +79,7 @@ pqComboBoxDomain::pqComboBoxDomain(QComboBox* p, vtkSMProperty* prop, const QStr
 
   if (!domainName.isEmpty())
   {
-    this->Internal->Domain = prop->GetDomain(domainName.toLatin1().data());
+    this->Internal->Domain = prop->GetDomain(domainName.toLocal8Bit().data());
   }
   else
   {

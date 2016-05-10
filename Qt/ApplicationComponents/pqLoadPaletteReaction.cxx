@@ -124,7 +124,7 @@ void pqLoadPaletteReaction::actionTriggered(QAction* actn)
     vtkSMProxy* paletteProxy = pxm->GetProxy("global_properties", "ColorPalette");
 
     vtkSMProxy* palettePrototype = pxm->GetPrototypeProxy(
-      "palettes", actn->property("PV_XML_NAME").toString().toLatin1().data());
+      "palettes", actn->property("PV_XML_NAME").toString().toLocal8Bit().data());
     Q_ASSERT(palettePrototype);
 
     BEGIN_UNDO_SET("Load color palette");

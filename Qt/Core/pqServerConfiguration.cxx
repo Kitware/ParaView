@@ -73,7 +73,7 @@ pqServerConfiguration::~pqServerConfiguration()
 //-----------------------------------------------------------------------------
 void pqServerConfiguration::setName(const QString& arg_name)
 {
-  this->XML->SetAttribute("name", arg_name.toLatin1().data());
+  this->XML->SetAttribute("name", arg_name.toLocal8Bit().data());
 }
 
 //-----------------------------------------------------------------------------
@@ -103,7 +103,7 @@ void pqServerConfiguration::setResource(const pqServerResource& arg_resource)
 //-----------------------------------------------------------------------------
 void pqServerConfiguration::setResource(const QString& str)
 {
-  this->XML->SetAttribute("resource", str.toLatin1().data());
+  this->XML->SetAttribute("resource", str.toLocal8Bit().data());
 }
 
 //-----------------------------------------------------------------------------
@@ -262,7 +262,7 @@ void pqServerConfiguration::setStartupToCommand(
   QStringList commandList = command_str.split(" ", QString::SkipEmptyParts);
   Q_ASSERT(commandList.size() >= 1);
 
-  xml_command->AddAttribute("exec", commandList[0].toLatin1().data());
+  xml_command->AddAttribute("exec", commandList[0].toLocal8Bit().data());
   xml_command->AddAttribute("timeout", timeout);
   xml_command->AddAttribute("delay", delay);
 
@@ -275,7 +275,7 @@ void pqServerConfiguration::setStartupToCommand(
     vtkNew<vtkPVXMLElement> xml_argument;
     xml_argument->SetName("Argument");
     xml_arguments->AddNestedElement(xml_argument.GetPointer());
-    xml_argument->AddAttribute("value", commandList[i].toLatin1().data());
+    xml_argument->AddAttribute("value", commandList[i].toLocal8Bit().data());
   }
 }
 

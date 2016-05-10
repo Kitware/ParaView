@@ -121,11 +121,11 @@ public:
 
   virtual QVariant get() const
   {
-    return this->Widget->property(this->PropertyName.toLatin1().data());
+    return this->Widget->property(this->PropertyName.toLocal8Bit().data());
   }
   virtual void set(const QVariant& value)
   {
-    this->Widget->setProperty(this->PropertyName.toLatin1().data(), value);
+    this->Widget->setProperty(this->PropertyName.toLocal8Bit().data(), value);
   }
 
 private:
@@ -361,7 +361,8 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
           if (QString(child->GetName()) == "Entry")
           {
             QString xml_value = child->GetAttribute("value");
-            QString xml_label = child->GetAttributeOrDefault("label", xml_value.toLatin1().data());
+            QString xml_label =
+              child->GetAttributeOrDefault("label", xml_value.toLocal8Bit().data());
             widget->addItem(xml_label, xml_value);
           }
         }

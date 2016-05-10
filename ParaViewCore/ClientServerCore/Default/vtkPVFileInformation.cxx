@@ -49,6 +49,7 @@
 #include <vector>
 #endif
 
+#include <algorithm>
 #include <set>
 #include <string>
 #include <time.h>
@@ -194,6 +195,42 @@ static bool getUncSharesOnServer(const std::string& server, std::vector<std::str
 }
 
 #endif
+
+// Transform utf8 string to local code page string
+static std::string utf8ToLocal(const std::string& path)
+{
+#if defined(_WIN32)
+  int wlen = static_cast<int>(path.length()) * 2 + 1;
+  WCHAR* wpath = new WCHAR[wlen];
+  char* lpath = new char[wlen];
+  MultiByteToWideChar(CP_UTF8, 0, path.c_str(), -1, wpath, wlen);
+  WideCharToMultiByte(CP_ACP, 0, wpath, -1, lpath, wlen, NULL, NULL);
+  std::string localPath(lpath);
+  delete wpath;
+  delete lpath;
+  return localPath;
+#else
+  return path;
+#endif
+}
+
+// Transform local code page string to UTF8 string
+static std::string localToUtf8(const std::string& path)
+{
+#if defined(_WIN32)
+  int wlen = static_cast<int>(path.length()) * 2 + 1;
+  WCHAR* wpath = new WCHAR[wlen];
+  char* lpath = new char[wlen];
+  int err = MultiByteToWideChar(CP_ACP, 0, path.c_str(), -1, wpath, wlen);
+  err = WideCharToMultiByte(CP_UTF8, 0, wpath, -1, lpath, wlen, NULL, NULL);
+  std::string utfPath(lpath);
+  delete wpath;
+  delete lpath;
+  return utfPath;
+#else
+  return path;
+#endif
+}
 
 static int vtkPVFileInformationGetType(const char* path)
 {
@@ -413,35 +450,42 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
   this->FastFileTypeDetection = helper->GetFastFileTypeDetection();
 
   std::string working_directory = vtksys::SystemTools::GetCurrentWorkingDirectory().c_str();
+  std::string lworking_directory = utf8ToLocal(working_directory);
   if (helper->GetWorkingDirectory() && helper->GetWorkingDirectory()[0])
   {
     working_directory = helper->GetWorkingDirectory();
   }
 
-  std::string path = MakeAbsolutePath(helper->GetPath(), working_directory);
+  std::string path = helper->GetPath();
+  std::string lpath = utf8ToLocal(path);
+  this->SetName(path.c_str());
+  
+  if (!vtksys::SystemTools::FileIsFullPath(path))
+  {
+    lpath = MakeAbsolutePath(lpath, lworking_directory);
+  }
 
-  this->SetName(helper->GetPath());
   bool isLink = false;
 
 #if defined(_WIN32)
   std::string::size_type idx;
-  for (idx = path.find('/', 0); idx != std::string::npos; idx = path.find('/', idx))
+  for (idx = lpath.find('/', 0); idx != std::string::npos; idx = lpath.find('/', idx))
   {
-    path.replace(idx, 1, 1, '\\');
+    lpath.replace(idx, 1, 1, '\\');
   }
 
-  int len = static_cast<int>(path.size());
-  if (len > 4 && path.compare(len - 4, 4, ".lnk") == 0)
+  int len = static_cast<int>(lpath.size());
+  if (len > 4 && lpath.compare(len - 4, 4, ".lnk") == 0)
   {
     WIN32_FIND_DATA data;
-    path = vtkPVFileInformationResolveLink(path, data);
+    lpath = vtkPVFileInformationResolveLink(lpath, data);
     isLink = true;
   }
 #endif
 
-  this->SetFullPath(path.c_str());
+  this->SetFullPath(localToUtf8(lpath).c_str());
 
-  this->Type = vtkPVFileInformationGetType(this->FullPath);
+  this->Type = vtkPVFileInformationGetType(lpath.c_str());//this->FullPath);
   if (isLink && this->Type == SINGLE_FILE)
   {
     this->Type = SINGLE_FILE_LINK;
@@ -640,7 +684,9 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
 #if defined(_WIN32)
   vtkPVFileInformationSet info_set;
 
-  if (IsNetworkPath(this->FullPath))
+  std::string lfullPath = utf8ToLocal(this->FullPath);
+
+  if (IsNetworkPath(lfullPath))
   {
     std::vector<std::string> shares;
     int type;
@@ -649,10 +695,10 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
       for (unsigned int i = 0; i < shares.size(); i++)
       {
         vtkPVFileInformation* info = vtkPVFileInformation::New();
-        info->SetName(shares[i].c_str());
+        info->SetName(localToUtf8(shares[i]).c_str());
         std::string fullpath =
-          vtksys::SystemTools::CollapseFullPath(shares[i].c_str(), this->FullPath);
-        info->SetFullPath(fullpath.c_str());
+          vtksys::SystemTools::CollapseFullPath(shares[i].c_str(), lfullPath);
+        info->SetFullPath(localToUtf8(fullpath).c_str());
         info->Type = type;
         info->FastFileTypeDetection = this->FastFileTypeDetection;
         info_set.insert(info);
@@ -668,7 +714,7 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
     return;
   }
 
-  if (IsUncPath(this->FullPath))
+  if (IsUncPath(lfullPath))
   {
     bool didListing = false;
     std::vector<vtksys::String> parts =
@@ -683,9 +729,9 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
         for (unsigned int i = 0; i < shares.size(); i++)
         {
           vtkPVFileInformation* info = vtkPVFileInformation::New();
-          info->SetName(shares[i].c_str());
+          info->SetName(localToUtf8(shares[i]).c_str());
           std::string fullpath = "\\\\" + parts[0] + "\\" + shares[i];
-          info->SetFullPath(fullpath.c_str());
+          info->SetFullPath(localToUtf8(fullpath).c_str());
           info->Type = NETWORK_SHARE;
           info->FastFileTypeDetection = this->FastFileTypeDetection;
           info_set.insert(info);
@@ -711,7 +757,7 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
   }
 
   // Search for all files in the given directory.
-  std::string prefix = this->FullPath;
+  std::string prefix = lfullPath;
   vtkPVFileInformationAddTerminatingSlash(prefix);
   std::string pattern = prefix;
   pattern += "*";
@@ -758,15 +804,15 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
     if (isdir || isfile)
     {
       vtkPVFileInformation* infoD = vtkPVFileInformation::New();
-      infoD->SetName(filename.c_str());
-      infoD->SetFullPath(fullpath.c_str());
+      infoD->SetName(localToUtf8(filename).c_str());
+      infoD->SetFullPath(localToUtf8(fullpath).c_str());
       infoD->Type = type;
       infoD->FastFileTypeDetection = this->FastFileTypeDetection;
       infoD->SetHiddenFlag(); // needs full path set first
 
       // Recover status info
       struct _stat64 status;
-      int res = _stat64(infoD->FullPath, &status);
+      int res = _stat64(fullpath.c_str(), &status);
       if (res != -1)
       {
         if (isfile)
@@ -936,8 +982,8 @@ void vtkPVFileInformation::SetHiddenFlag()
     this->Hidden = false;
     return;
   }
-  LPCSTR fp = this->FullPath;
-  DWORD flags = GetFileAttributes(fp);
+  //LPCSTR fp = this->FullPath;
+  DWORD flags = GetFileAttributes(utf8ToLocal(this->FullPath).c_str());
   this->Hidden = (flags & FILE_ATTRIBUTE_HIDDEN) ? true : false;
 #else
   if (!this->Name)

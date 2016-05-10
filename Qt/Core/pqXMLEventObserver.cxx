@@ -88,17 +88,17 @@ void pqXMLEventObserver::onRecordEvent(
       if (command == pqCoreTestUtility::PQ_COMPAREVIEW_PROPERTY_NAME)
       {
         *this->Stream << "  <pqcompareview "
-                      << "object=\"" << textToXML(widget).toLatin1().data() << "\" "
-                      << "baseline=\"" << textToXML(arguments).toLatin1().data() << "\" "
+                      << "object=\"" << textToXML(widget).toLocal8Bit().data() << "\" "
+                      << "baseline=\"" << textToXML(arguments).toLocal8Bit().data() << "\" "
                       << "threshold=\"5\" "
                       << "/>\n";
       }
       else
       {
         *this->Stream << "  <pqcheck "
-                      << "object=\"" << textToXML(widget).toLatin1().data() << "\" "
-                      << "property=\"" << textToXML(command).toLatin1().data() << "\" "
-                      << "arguments=\"" << textToXML(arguments).toLatin1().data() << "\" "
+                      << "object=\"" << textToXML(widget).toLocal8Bit().data() << "\" "
+                      << "property=\"" << textToXML(command).toLocal8Bit().data() << "\" "
+                      << "arguments=\"" << textToXML(arguments).toLocal8Bit().data() << "\" "
                       << "/>\n";
       }
     }
@@ -109,9 +109,9 @@ void pqXMLEventObserver::onRecordEvent(
     if (this->Stream)
     {
       *this->Stream << "  <pqevent "
-                    << "object=\"" << textToXML(widget).toLatin1().data() << "\" "
-                    << "command=\"" << textToXML(command).toLatin1().data() << "\" "
-                    << "arguments=\"" << textToXML(arguments).toLatin1().data() << "\" "
+                    << "object=\"" << textToXML(widget).toLocal8Bit().data() << "\" "
+                    << "command=\"" << textToXML(command).toLocal8Bit().data() << "\" "
+                    << "arguments=\"" << textToXML(arguments).toLocal8Bit().data() << "\" "
                     << "/>\n";
     }
   }

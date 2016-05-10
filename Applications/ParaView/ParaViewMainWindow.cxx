@@ -64,6 +64,7 @@ void vtkPVInitializePythonModules();
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QMimeData>
+#include <QTextCodec>
 #include <QUrl>
 
 #ifdef PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION
@@ -91,6 +92,12 @@ public:
 //-----------------------------------------------------------------------------
 ParaViewMainWindow::ParaViewMainWindow()
 {
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+  // force the use of UTF-8 text codec (Latin1 is default with Qt 4.8)
+  // this is important for support of accentuated paths.
+  QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
+#endif
+
   // the debug leaks view should be constructed as early as possible
   // so that it can monitor vtk objects created at application startup.
   if (getenv("PV_DEBUG_LEAKS_VIEW"))

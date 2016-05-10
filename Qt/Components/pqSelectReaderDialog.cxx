@@ -66,7 +66,8 @@ pqSelectReaderDialog::pqSelectReaderDialog(
   // populate the list view with readers
   QListWidget* lw = this->Internal->listWidget;
 
-  vtkStringList* readers = readerFactory->GetPossibleReaders(file.toLatin1().data(), s->session());
+  vtkStringList* readers =
+    readerFactory->GetPossibleReaders(file.toLocal8Bit().data(), s->session());
 
   for (int cc = 0; (cc + 2) < readers->GetNumberOfStrings(); cc += 3)
   {

@@ -134,7 +134,7 @@ void pqSaveScreenshotReaction::saveScreenshot()
     clone.TakeReference(pxm->NewProxy(colorPalette->GetXMLGroup(), colorPalette->GetXMLName()));
     clone->Copy(colorPalette);
 
-    vtkSMProxy* chosenPalette = pxm->NewProxy("palettes", palette.toLatin1().data());
+    vtkSMProxy* chosenPalette = pxm->NewProxy("palettes", palette.toLocal8Bit().data());
     colorPalette->Copy(chosenPalette);
     chosenPalette->Delete();
   }

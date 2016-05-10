@@ -117,7 +117,7 @@ QVariant pqFileDialogRecentDirsModel::data(const QModelIndex& idx, int role) con
         QString path = this->Directories[idx.row()];
         // We don't use QFileInfo here since it messes the paths up if the client and
         // the server are heterogeneous systems.
-        std::string unix_path = path.toLatin1().data();
+        std::string unix_path = path.toLocal8Bit().data();
         vtksys::SystemTools::ConvertToUnixSlashes(unix_path);
         std::string filename;
         std::string::size_type slashPos = unix_path.rfind("/");
@@ -187,7 +187,7 @@ void pqFileDialogRecentDirsModel::setChosenFiles(const QList<QStringList>& files
 
   // We don't use QFileInfo here since it messes the paths up if the client and
   // the server are heterogeneous systems.
-  std::string unix_path = filename.toLatin1().data();
+  std::string unix_path = filename.toLocal8Bit().data();
   vtksys::SystemTools::ConvertToUnixSlashes(unix_path);
 
   std::string dirname;

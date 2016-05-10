@@ -675,9 +675,9 @@ void pqLinksEditor::updateEnabledState()
     if (this->SelectedProxy1 && this->SelectedProxy2)
     {
       vtkSMProperty* p1 =
-        this->SelectedProxy1->GetProperty(this->SelectedProperty1.toLatin1().data());
+        this->SelectedProxy1->GetProperty(this->SelectedProperty1.toLocal8Bit().data());
       vtkSMProperty* p2 =
-        this->SelectedProxy2->GetProperty(this->SelectedProperty2.toLatin1().data());
+        this->SelectedProxy2->GetProperty(this->SelectedProperty2.toLocal8Bit().data());
       if (!p1 || !p2 || propertyType(p1) != propertyType(p2))
       {
         enabled = false;

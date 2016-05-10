@@ -202,9 +202,9 @@ public:
       : "SelectionPointLabelVisibility";
 
     QString cur_array;
-    if (vtkSMPropertyHelper(repr->getProxy(), vname.toLatin1().data(), true).GetAsInt() != 0)
+    if (vtkSMPropertyHelper(repr->getProxy(), vname.toLocal8Bit().data(), true).GetAsInt() != 0)
     {
-      cur_array = vtkSMPropertyHelper(repr->getProxy(), pname.toLatin1().data(), /*quiet=*/true)
+      cur_array = vtkSMPropertyHelper(repr->getProxy(), pname.toLocal8Bit().data(), /*quiet=*/true)
                     .GetAsString();
     }
 
@@ -253,13 +253,13 @@ public:
       // selection
       vtkSMPropertyHelper(selectionProxy, selectionVisibilityName, true).Set(1);
       vtkSMPropertyHelper(selectionProxy, selectionArrayName, true)
-        .Set(action->data().toString().toLatin1().data());
+        .Set(action->data().toString().toLocal8Bit().data());
       // interactive selection
       if (iSelectionProxy)
       {
         vtkSMPropertyHelper(iSelectionProxy, iSelectionVisibilityName, true).Set(1);
         vtkSMPropertyHelper(iSelectionProxy, iSelectionArrayName, true)
-          .Set(action->data().toString().toLatin1().data());
+          .Set(action->data().toString().toLocal8Bit().data());
       }
     }
     else

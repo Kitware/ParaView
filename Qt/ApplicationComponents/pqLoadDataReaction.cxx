@@ -179,7 +179,7 @@ pqPipelineSource* pqLoadDataReaction::loadData(
 bool pqLoadDataReaction::TestFileReadability(
   const QString& file, pqServer* server, vtkSMReaderFactory* vtkNotUsed(factory))
 {
-  return vtkSMReaderFactory::TestFileReadability(file.toLatin1().data(), server->session());
+  return vtkSMReaderFactory::TestFileReadability(file.toLocal8Bit().data(), server->session());
 }
 
 //-----------------------------------------------------------------------------
@@ -187,7 +187,7 @@ bool pqLoadDataReaction::DetermineFileReader(const QString& filename, pqServer* 
   vtkSMReaderFactory* factory, QPair<QString, QString>& readerInfo)
 {
   QString readerType, readerGroup;
-  vtkStringList* list = factory->GetReaders(filename.toLatin1().data(), server->session());
+  vtkStringList* list = factory->GetReaders(filename.toLocal8Bit().data(), server->session());
   if (list->GetLength() > 3)
   {
     // If more than one readers found.
@@ -203,7 +203,7 @@ bool pqLoadDataReaction::DetermineFileReader(const QString& filename, pqServer* 
       return false;
     }
   }
-  else if (factory->CanReadFile(filename.toLatin1().data(), server->session()))
+  else if (factory->CanReadFile(filename.toLocal8Bit().data(), server->session()))
   {
     // reader knows the type
     readerType = factory->GetReaderName();

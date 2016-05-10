@@ -137,7 +137,7 @@ void pqProxy::addHelperProxy(const QString& key, vtkSMProxy* proxy)
       QString("pq_helper_proxies.%1").arg(this->getProxy()->GetGlobalIDAsString());
 
     vtkSMSessionProxyManager* pxm = this->proxyManager();
-    pxm->RegisterProxy(groupname.toLatin1().data(), key.toLatin1().data(), proxy);
+    pxm->RegisterProxy(groupname.toLocal8Bit().data(), key.toLocal8Bit().data(), proxy);
   }
 }
 
@@ -158,10 +158,10 @@ void pqProxy::removeHelperProxy(const QString& key, vtkSMProxy* proxy)
     QString groupname =
       QString("pq_helper_proxies.%1").arg(this->getProxy()->GetGlobalIDAsString());
     vtkSMSessionProxyManager* pxm = this->proxyManager();
-    const char* name = pxm->GetProxyName(groupname.toLatin1().data(), proxy);
+    const char* name = pxm->GetProxyName(groupname.toLocal8Bit().data(), proxy);
     if (name)
     {
-      pxm->UnRegisterProxy(groupname.toLatin1().data(), name, proxy);
+      pxm->UnRegisterProxy(groupname.toLocal8Bit().data(), name, proxy);
     }
   }
 }
@@ -173,7 +173,7 @@ void pqProxy::updateHelperProxies() const
   vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
   iter->SetModeToOneGroup();
   iter->SetSession(this->getProxy()->GetSession());
-  for (iter->Begin(groupname.toLatin1().data()); !iter->IsAtEnd(); iter->Next())
+  for (iter->Begin(groupname.toLocal8Bit().data()); !iter->IsAtEnd(); iter->Next())
   {
     this->addInternalHelperProxy(QString(iter->GetKey()), iter->GetProxy());
   }
@@ -250,9 +250,9 @@ void pqProxy::rename(const QString& newname)
     SM_SCOPED_TRACE(RenameProxy).arg("proxy", this->getProxy());
     vtkSMSessionProxyManager* pxm = this->proxyManager();
     pxm->RegisterProxy(
-      this->getSMGroup().toLatin1().data(), newname.toLatin1().data(), this->getProxy());
-    pxm->UnRegisterProxy(
-      this->getSMGroup().toLatin1().data(), this->getSMName().toLatin1().data(), this->getProxy());
+      this->getSMGroup().toLocal8Bit().data(), newname.toLocal8Bit().data(), this->getProxy());
+    pxm->UnRegisterProxy(this->getSMGroup().toLocal8Bit().data(),
+      this->getSMName().toLocal8Bit().data(), this->getProxy());
     this->SMName = newname;
   }
 }

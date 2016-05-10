@@ -62,15 +62,15 @@ void pqRenameProxyReaction::onTriggered()
     {
       SM_SCOPED_TRACE(CallFunction)
         .arg("RenameView")
-        .arg(newName.toLatin1().data())
+        .arg(newName.toLocal8Bit().data())
         .arg((vtkObject*)this->Proxy->getProxy());
     }
     else
     {
       SM_SCOPED_TRACE(CallFunction)
         .arg("RenameProxy")
-        .arg(newName.toLatin1().data())
-        .arg(this->Proxy->getSMGroup().toLatin1().data())
+        .arg(newName.toLocal8Bit().data())
+        .arg(this->Proxy->getSMGroup().toLocal8Bit().data())
         .arg((vtkObject*)this->Proxy->getProxy());
     }
 

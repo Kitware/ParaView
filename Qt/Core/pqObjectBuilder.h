@@ -224,6 +224,12 @@ public:
   */
   bool waitingForConnection() const { return this->WaitingForConnection; }
 
+  /// Returns the file path to its long (human readable) version.
+  /// Under Windows, the file path can be in its short version (generally with
+  /// a tilde (~) char) if it uses non ASCII chars.
+  /// Under other plateforms, the filename is returned without change.
+  static QString getLongPath(const QString& filename);
+
 public slots:
   /**
   * Closes any open connections for reverse-connection.

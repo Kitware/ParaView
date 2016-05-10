@@ -137,7 +137,7 @@ bool pqSaveDataReaction::saveActiveData(const QString& filename)
 
   vtkSMWriterFactory* writerFactory = vtkSMProxyManager::GetProxyManager()->GetWriterFactory();
   vtkSmartPointer<vtkSMProxy> proxy;
-  proxy.TakeReference(writerFactory->CreateWriter(filename.toLatin1().data(),
+  proxy.TakeReference(writerFactory->CreateWriter(filename.toLocal8Bit().data(),
     vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy()), port->getPortNumber()));
   vtkSMSourceProxy* writer = vtkSMSourceProxy::SafeDownCast(proxy);
   if (!writer)
@@ -186,7 +186,7 @@ bool pqSaveDataReaction::saveActiveData(const QString& filename)
 
   SM_SCOPED_TRACE(SaveData)
     .arg("writer", writer)
-    .arg("filename", filename.toLatin1().data())
+    .arg("filename", filename.toLocal8Bit().data())
     .arg("source", port->getSource()->getProxy())
     .arg("port", port->getPortNumber());
   return true;

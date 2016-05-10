@@ -83,7 +83,7 @@ pqAnimationCue::~pqAnimationCue()
 void pqAnimationCue::addKeyFrameInternal(vtkSMProxy* keyframe)
 {
   this->proxyManager()->RegisterProxy("animation",
-    QString("KeyFrame%1").arg(keyframe->GetGlobalIDAsString()).toLatin1().data(), keyframe);
+    QString("KeyFrame%1").arg(keyframe->GetGlobalIDAsString()).toLocal8Bit().data(), keyframe);
 }
 
 //-----------------------------------------------------------------------------
@@ -111,7 +111,7 @@ vtkSMProperty* pqAnimationCue::getAnimatedProperty() const
       pqSMAdaptor::getElementProperty(selfProxy->GetProperty("AnimatedPropertyName")).toString();
     if (pname != "")
     {
-      return proxy->GetProperty(pname.toLatin1().data());
+      return proxy->GetProperty(pname.toLocal8Bit().data());
     }
   }
 
@@ -211,7 +211,7 @@ vtkSMProxy* pqAnimationCue::insertKeyFrame(int index)
   // Get the current keyframes.
   QList<vtkSMProxy*> keyframes = this->getKeyFrames();
 
-  vtkSMProxy* kf = pxm->NewProxy("animation_keyframes", this->KeyFrameType.toLatin1().data());
+  vtkSMProxy* kf = pxm->NewProxy("animation_keyframes", this->KeyFrameType.toLocal8Bit().data());
   if (!kf)
   {
     qDebug() << "Could not create new proxy " << this->KeyFrameType;

@@ -140,7 +140,7 @@ public:
       QStringList tmpNames = pythonObjectName.split('.');
       for (int i = 0; i < tmpNames.size() && object; ++i)
       {
-        QByteArray tmpName = tmpNames.at(i).toLatin1();
+        QByteArray tmpName = tmpNames.at(i).toLocal8Bit();
         PyObject* prevObj = object;
         if (PyDict_Check(object))
         {
@@ -355,7 +355,7 @@ void pqPythonShell::executeScript(const QString& script)
   QString command = script;
   command.replace("\r\n", "\n");
   command.replace("\r", "\n");
-  this->Interpreter->RunStringWithConsoleLocals(command.toLatin1().data());
+  this->Interpreter->RunStringWithConsoleLocals(command.toLocal8Bit().data());
   emit this->executing(false);
   CLEAR_UNDO_STACK();
 
@@ -375,7 +375,7 @@ void pqPythonShell::pushScript(const QString& script)
   emit this->executing(true);
   foreach (QString line, lines)
   {
-    bool isMultilineStatement = this->Interpreter->Push(line.toLatin1().data());
+    bool isMultilineStatement = this->Interpreter->Push(line.toLocal8Bit().data());
     this->Prompt = isMultilineStatement ? pqPythonShell::PS2() : pqPythonShell::PS1();
   }
   emit this->executing(false);
