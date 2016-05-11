@@ -53,6 +53,12 @@ void vtkSMPlotMatrixViewProxy::CreateVTKObjects()
     return;
   this->Superclass::CreateVTKObjects();
 
+#if 0 // Server-side animation has been deactivated for now, support
+      // for animation is broken in tiling mode, and this 
+      // prevent the plot matrix view usage in cs.
+      // This class may be removed alltogether if we decide not to support
+      // it again.
+      // see bug 16118
   vtkPVPlotMatrixView *matrix =
       vtkPVPlotMatrixView::SafeDownCast(this->GetClientSideObject());
   if (matrix)
@@ -64,6 +70,7 @@ void vtkSMPlotMatrixViewProxy::CreateVTKObjects()
     matrix->AddObserver(vtkCommand::AnimationCueTickEvent, this,
                         &vtkSMPlotMatrixViewProxy::AnimationTickEvent);
     }
+#endif
 }
 
 //----------------------------------------------------------------------------
