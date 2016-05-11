@@ -28,6 +28,13 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
+
+if (APPLE)
+  set (Mac_SRCS
+    vtkPVMacFileInformationHelper.mm
+  )
+endif()
+
 set (Module_SRCS
   vtkNetworkImageSource.cxx
   vtkPVEnsembleDataReaderInformation.cxx
@@ -37,7 +44,18 @@ set (Module_SRCS
   vtkPVFileInformationHelper.cxx
   vtkPVSingleOutputExtractSelection.cxx
   vtkSliceAlongPolyPlane.cxx
+  ${Mac_SRCS}
 )
+
+if (APPLE)
+  set_source_files_properties(
+    vtkPVMacFileInformationHelper
+    PROPERTIES
+      WRAP_EXCLUDE 1
+      WRAP_EXCLUDE_PYTHON 1
+      SKIP_HEADER_INSTALL 1
+  )
+endif()
 
 if (PARAVIEW_ENABLE_PYTHON)
   list(APPEND Module_SRCS
