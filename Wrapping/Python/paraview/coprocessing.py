@@ -365,6 +365,11 @@ class CoProcessor(object):
     def UpdateArraySelection(self, selection):
         self.__ArraySelection = selection
 
+    def UpdateValueSelection(self, selection):
+        self.__UserDefinedValues = selection
+
+    # TODO: Refactor to merge CinemaUpdate and CinemaCompositeUpdate interfaces
+    # (__CinemaTracksList will be deprecated.
     def RegisterCinemaTrack(self, name, proxy, smproperty, valrange):
         """
         Register a point of control (filter's property) that will be varied over in a cinema export.
@@ -372,7 +377,7 @@ class CoProcessor(object):
         if not isinstance(proxy, servermanager.Proxy):
             raise RuntimeError, "Invalid 'proxy' argument passed to RegisterCinemaTrack."
         self.__CinemaTracksList.append({"name":name, "proxy":proxy, "smproperty":smproperty, "valrange":valrange})
-        self.UpdateFilterValues(name, proxy, valrange)
+        #self.UpdateFilterValues(name, proxy, valrange)
 
         return proxy
 
