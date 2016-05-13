@@ -4595,41 +4595,9 @@
       </Hints>
       <!-- End pdbreader -->
     </SourceProxy>
-    <SourceProxy class="vtkXYZMolReader"
+    <SourceProxy class="vtkXYZMolReader2"
                  label="XYZ Reader"
                  name="xyzreader">
-      <Documentation long_help="Reads XYZ molecular data files into a polygonal dataset."
-                     short_help="Read XYZ molecular data files.">The XYZ reader
-                     reads XYZ molecular data files. The expected file
-                     extension is .xyz. The output of this reader is a
-                     polygonal dataset.</Documentation>
-      <StringVectorProperty animateable="0"
-                            command="SetFileName"
-                            name="FileName"
-                            number_of_elements="1"
-                            panel_visibility="never" >
-        <FileListDomain name="files" />
-        <Documentation>This property specifies the file name for the XYZ
-        reader.</Documentation>
-      </StringVectorProperty>
-      <IntVectorProperty animateable="1"
-                         command="SetTimeStep"
-                         default_values="0"
-                         name="TimeStep"
-                         number_of_elements="1">
-        <IntRangeDomain name="range" />
-        <Documentation>This property specifies the timestep the XYZ reader
-        should load.</Documentation>
-      </IntVectorProperty>
-      <Hints>
-        <ReaderFactory extensions="xyz"
-                       file_description="XMol Molecule Files" />
-      </Hints>
-      <!-- End xyzreader -->
-    </SourceProxy>
-    <SourceProxy class="vtkXYZMolReader2"
-                 label="XYZ Reader2"
-                 name="xyzreader2">
       <Documentation long_help="Reads XYZ molecular data files into a polygonal dataset."
                      short_help="Read XYZ molecular data files.">The XYZ reader
                      reads XYZ molecular data files. The expected file
@@ -4654,7 +4622,7 @@
         <ReaderFactory extensions="xyz"
                        file_description="XMol Molecule Files Version 2" />
       </Hints>
-      <!-- End xyzreader2 -->
+      <!-- End xyzreader -->
     </SourceProxy>
     <SourceProxy class="vtkPPhastaReader"
                  label="Phasta Reader"
@@ -4779,51 +4747,8 @@
       </Hints>
       <!-- End vtkOBJReader -->
     </SourceProxy>
-    <SourceProxy class="vtkGaussianCubeReader"
-                 label="Gaussian Cube Reader"
-                 name="gaussiancubereader">
-      <Documentation long_help="Produce polygonal data by reading a Gaussian Cube file."
-                     short_help="Read Gaussian Cube data files.">The Gaussian
-                     Cube reader produces polygonal data by reading data files
-                     produced by the Gaussian software package. The expected
-                     file extension is .cube.</Documentation>
-      <OutputPort index="0"
-                  name="Output" />
-      <OutputPort index="1"
-                  name="Gridded Data" />
-      <StringVectorProperty animateable="0"
-                            command="SetFileName"
-                            name="FileName"
-                            number_of_elements="1"
-                            panel_visibility="never" >
-        <FileListDomain name="files" />
-        <Documentation>This property specifies the file name for the Gaussian
-        Cube reader.</Documentation>
-      </StringVectorProperty>
-      <DoubleVectorProperty command="SetHBScale"
-                            default_values="1.0"
-                            name="HBScale"
-                            number_of_elements="1">
-        <DoubleRangeDomain name="range" />
-        <Documentation>A scaling factor to compute bonds with hydrogen
-        atoms.</Documentation>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetBScale"
-                            default_values="1.0"
-                            name="BScale"
-                            number_of_elements="1">
-        <DoubleRangeDomain name="range" />
-        <Documentation>A scaling factor to compute bonds between non-hydrogen
-        atoms</Documentation>
-      </DoubleVectorProperty>
-      <Hints>
-        <ReaderFactory extensions="cube"
-                       file_description="Gaussian Cube Files" />
-      </Hints>
-      <!-- End gaussiancubereader -->
-    </SourceProxy>
     <SourceProxy class="vtkGaussianCubeReader2"
-                 label="Gaussian Cube Reader2"
+                 label="Gaussian Cube Reader"
                  name="gaussiancubereader">
       <Documentation long_help="Produce a vtkMolecule by reading a Gaussian Cube file."
                      short_help="Read Gaussian Cube data files.">The Gaussian
@@ -4847,7 +4772,7 @@
         <ReaderFactory extensions="cube"
                        file_description="Gaussian Cube Files Version 2" />
       </Hints>
-      <!-- End gaussiancubereader2 -->
+      <!-- End gaussiancubereader -->
     </SourceProxy>
     <SourceProxy class="vtkPVEnSightMasterServerReader2"
                  label="EnSight Master Server Reader"
