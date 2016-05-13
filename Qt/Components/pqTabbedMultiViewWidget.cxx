@@ -109,6 +109,9 @@ int pqTabbedMultiViewWidget::pqTabWidget::addAsTab(pqMultiViewWidget* wdg, pqTab
     }
   int tab_index = this->insertTab(tab_count-1, wdg, item->getSMName());
 
+  SM_SCOPED_TRACE(CallFunction)
+    .arg("CreateLayout");
+
   this->connect(item, SIGNAL(nameChanged(pqServerManagerModelItem*)),
     self, SLOT(onLayoutNameChanged(pqServerManagerModelItem*)));
 
