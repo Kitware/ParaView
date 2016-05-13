@@ -264,6 +264,13 @@ class Trace(object):
                     "# get layout",
                     "%s = GetLayout()" % accessor])
                 return True
+            else:
+                varname = cls.get_varname(cls.get_registered_name(obj, "layouts"))
+                accessor = ProxyAccessor(varname, obj)
+                cls.Output.append_separated([\
+                    "# get layout",
+                    "%s = GetLayoutByName(\"%s\")" % (accessor, cls.get_registered_name(obj, "layouts"))])
+                return True
         if obj.SMProxy.IsA("vtkSMTimeKeeperProxy"):
             tkAccessor = ProxyAccessor(cls.get_varname(cls.get_registered_name(obj, "timekeeper")), obj)
             cls.Output.append_separated([\

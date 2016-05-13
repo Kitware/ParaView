@@ -329,14 +329,12 @@ def GetLayout(view=None):
     return None
 
 def GetLayoutByName(name):
-    """Return the first layout with the given name, if any.
-    """
+    """Return the first layout with the given name, if any."""
     layouts = GetLayouts()
     for key in layouts.keys():
-        if key[0] == name:
-            return layouts[key]
+      if key[0] == name:
+        return layouts.get(key)
     return None
-
 
 def GetViewsInLayout(layout=None):
     """Returns a list of views in the given layout. If not layout is specified,
