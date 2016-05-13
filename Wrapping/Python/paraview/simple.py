@@ -298,9 +298,12 @@ def ResetCamera(view=None):
 
 # -----------------------------------------------------------------------------
 
-def CreateLayout():
+def CreateLayout(name=None):
     """Create a new layout with no active view."""
-    return servermanager.misc.ViewLayout(registrationGroup="layouts")
+    layout = servermanager.misc.ViewLayout(registrationGroup="layouts")
+    if name:
+        RenameLayout(name, layout)
+    return layout
 
 # -----------------------------------------------------------------------------
 
@@ -323,6 +326,15 @@ def GetLayout(view=None):
     for layout in layouts.values():
         if layout.GetViewLocation(view) != -1:
             return layout
+    return None
+
+def GetLayoutByName(name):
+    """Return the first layout with the given name, if any.
+    """
+    layouts = GetLayouts()
+    for key in layouts.keys():
+        if key[0] == name:
+            return layouts[key]
     return None
 
 
