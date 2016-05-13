@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkSMTrace.h"
 #include "vtkSpreadSheetView.h"
 #include "vtkStdString.h"
 #include "vtkTable.h"
@@ -524,6 +525,7 @@ void pqSpreadSheetViewModel::sortSection (int section, Qt::SortOrder order)
   if (view->GetNumberOfColumns() > section)
     {
     this->beginResetModel();
+    SM_SCOPED_TRACE(PropertiesModified).arg("proxy", this->ViewProxy);
     vtkSMPropertyHelper(this->ViewProxy, "ColumnToSort").Set(
       view->GetColumnName(section));
     switch(order)
