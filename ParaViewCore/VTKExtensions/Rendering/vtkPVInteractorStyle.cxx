@@ -22,6 +22,7 @@
 #include "vtkLightCollection.h"
 #include "vtkObjectFactory.h"
 #include "vtkCameraManipulator.h"
+#include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
@@ -254,6 +255,113 @@ void vtkPVInteractorStyle::OnKeyUp()
     {
     manipulator->OnKeyUp(this->Interactor);
     }
+}
+
+void vtkPVInteractorStyle::Dolly(double fact)
+{
+  if(this->Interactor->GetControlKey())
+    {
+  vtkPVInteractorStyle::DollyToPosition(fact, 
+    this->Interactor->GetEventPosition(), this->CurrentRenderer); 
+    }
+  else
+    {
+    this->Superclass::Dolly(fact);
+    }
+}
+
+//-------------------------------------------------------------------------
+void vtkPVInteractorStyle::DollyToPosition(double fact, int* position, vtkRenderer* renderer)
+{
+  vtkCamera *cam = renderer->GetActiveCamera();
+  if (cam->GetParallelProjection())
+    {
+    int x0 = 0, y0 = 0, x1 = 0, y1 = 0;
+    // Zoom relatively to the cursor
+    int* aSize = renderer->GetRenderWindow()->GetSize();
+    int w = aSize[0];
+    int h = aSize[1];
+    x0 = w / 2;
+    y0 = h / 2;
+    x1 = position[0];
+    y1 = position[1];
+    vtkPVInteractorStyle::TranslateCamera(renderer ,x0, y0, x1, y1);
+    cam->SetParallelScale(cam->GetParallelScale() / fact);
+    vtkPVInteractorStyle::TranslateCamera(renderer, x1, y1, x0, y0);
+    }
+  else
+    {
+    // Zoom relatively to the cursor position
+    double viewFocus[4], newCameraPos[3];
+    double newFocalPoint[4], norm[3];
+
+    // Move focal point to cursor position
+    cam->GetFocalPoint(viewFocus);
+    cam->GetViewPlaneNormal(norm);
+
+    vtkPVInteractorStyle::ComputeWorldToDisplay(renderer,
+      viewFocus[0], viewFocus[1], viewFocus[2], viewFocus);
+
+    vtkPVInteractorStyle::ComputeDisplayToWorld(renderer,
+      double(position[0]), double(position[1]),
+      viewFocus[2], newFocalPoint);
+
+    cam->SetFocalPoint(newFocalPoint);
+
+    // Move camera in/out along projection direction
+    cam->Dolly(fact);
+    renderer->ResetCameraClippingRange();
+
+    // Find new focal point
+    cam->GetPosition(newCameraPos);
+    cam->GetFocalPoint(viewFocus);
+    double newPoint[3];
+    double t = norm[0] * (viewFocus[0] - newCameraPos[0])
+      + norm[1] * (viewFocus[1] - newCameraPos[1])
+      + norm[2] * (viewFocus[2] - newCameraPos[2]);
+    t = t / (pow(norm[0], 2)  + pow(norm[1], 2) + pow(norm[2], 2));
+    newPoint[0] = newCameraPos[0] + norm[0] * t;
+    newPoint[1] = newCameraPos[1] + norm[1] * t;
+    newPoint[2] = newCameraPos[2] + norm[2] * t;
+
+    cam->SetFocalPoint(newPoint);
+    renderer->ResetCameraClippingRange();
+    }
+}
+
+//-------------------------------------------------------------------------
+void vtkPVInteractorStyle::TranslateCamera(vtkRenderer* renderer, int toX, int toY, int fromX, int fromY)
+{
+  vtkCamera *cam = renderer->GetActiveCamera();
+  double viewFocus[4], focalDepth, viewPoint[3];
+  double newPickPoint[4], oldPickPoint[4], motionVector[3];
+  cam->GetFocalPoint(viewFocus);
+
+  vtkPVInteractorStyle::ComputeWorldToDisplay(renderer, viewFocus[0], viewFocus[1],
+    viewFocus[2], viewFocus);
+  focalDepth = viewFocus[2];
+
+  vtkPVInteractorStyle::ComputeDisplayToWorld(renderer, double(toX), double(toY),
+    focalDepth, newPickPoint);
+  vtkPVInteractorStyle::ComputeDisplayToWorld(renderer, double(fromX), double(fromY),
+    focalDepth, oldPickPoint);
+
+  // camera motion is reversed
+  motionVector[0] = oldPickPoint[0] - newPickPoint[0];
+  motionVector[1] = oldPickPoint[1] - newPickPoint[1];
+  motionVector[2] = oldPickPoint[2] - newPickPoint[2];
+
+  cam->GetFocalPoint(viewFocus);
+  cam->GetPosition(viewPoint);
+  cam->SetFocalPoint(
+    motionVector[0] + viewFocus[0],
+    motionVector[1] + viewFocus[1],
+    motionVector[2] + viewFocus[2]);
+
+  cam->SetPosition(
+    motionVector[0] + viewPoint[0],
+    motionVector[1] + viewPoint[1],
+    motionVector[2] + viewPoint[2]);
 }
 
 //-------------------------------------------------------------------------
