@@ -28,6 +28,7 @@ vtkCinemaExporter::vtkCinemaExporter()
 , FileName(NULL)
 , ViewSelection(NULL)
 , TrackSelection(NULL)
+, ArraySelection(NULL)
 {
 }
 
@@ -36,6 +37,7 @@ vtkCinemaExporter::~vtkCinemaExporter()
   delete[] this->FileName;
   delete[] this->ViewSelection;
   delete[] this->TrackSelection;
+  delete[] this->ArraySelection;
 }
 
 void vtkCinemaExporter::WriteData()
@@ -104,6 +106,8 @@ const vtkStdString vtkCinemaExporter::GetPythonScript()
   script += this->ViewSelection ? this->ViewSelection : "";
   script += "}, trackSelection={";
   script += this->TrackSelection ? this->TrackSelection : "";
+  script += "}, arraySelection={";
+  script += this->ArraySelection ? this->ArraySelection : "";
   script += "})\n";
 
   return script;
@@ -121,6 +125,9 @@ void vtkCinemaExporter::PrintSelf(ostream& os, vtkIndent indent)
 
   char const * ts = this->TrackSelection ? this->TrackSelection : "(null)";
   os << indent << "TrackSelection: " << ts << '\n';
+
+  char const * arr = this->ArraySelection ? this->ArraySelection : "(null)";
+  os << indent << "ArraySelection: " << arr << '\n';
 
   os << indent << "PythonScript: " << this->GetPythonScript().c_str() << "\n";
 }

@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqCinemaTrackSelection_h
 #define pqCinemaTrackSelection_h
 
+#include <map>
+
 #include "pqComponentsModule.h"
 #include <QWidget>
 
@@ -41,8 +43,14 @@ namespace Ui
   class CinemaTrackSelection;
 }
 
+class QModelIndex;
+
 class pqPipelineFilter;
 class pqCinemaTrack;
+class pqPipelineModel;
+class pqPipelineAnnotationFilterModel;
+class pqPipelineSource;
+class pqArraySelectionModel;
 
 /// @brief Widget to select among supported Cinema Tracks (filters).
 ///
@@ -55,11 +63,11 @@ class PQCOMPONENTS_EXPORT pqCinemaTrackSelection : public QWidget
 
 public:
 
+  typedef std::pair<pqArraySelectionModel*, pqCinemaTrack*> ItemValues;
+  typedef std::map<QString, ItemValues> ItemValuesMap;
+
   pqCinemaTrackSelection(QWidget* parent_ = NULL);
   ~pqCinemaTrackSelection();
-
-  /// @note Only some filters are currently supported by Cinema.
-  void populateTracks(QList<pqPipelineFilter*> tracks);
 
   QList<pqCinemaTrack*> getTracks();
 
@@ -68,20 +76,37 @@ public:
   /// Order of track values:
   /// 1. Track Name
   /// 2. Value tuple
-  /// 
+  ///
   /// Example: Format as defined in pqCinemaConfiguration
   /// format = "'%1' : 2%"
   /// returns -> 'name1' : [a, b, c], 'name2' : [d, e, f], ... (for N tracks)
-  QString getSelectionAsPythonScript(QString const & format);
+  QString getTrackSelectionAsString(QString const & format);
+
+  QString getArraySelectionAsString(QString const & format);
+
+  /// Creates a PipelineModel which gets populated using the current
+  /// ServerManagerModel and passes it to the View object.
+  void initializePipelineBrowser();
 
 private slots:
 
-  void onPreviousClicked();
-  void onNextClicked();
+  /// Selection change handler.
+  void onPipelineItemChanged(QModelIndex const & current, QModelIndex const & previous);
 
 private:
 
+  /// Creates cinema track widgets (for value customization) and value
+  /// array selection models.
+  /// @note Only some filters are currently supported by Cinema.
+  void initializePipelineItemValues(QList<pqPipelineSource*> const & items);
+
+  pqPipelineSource* getPipelineSource(QModelIndex const & index) const;
+
+  /////////////////////////////////////////////////////////////////////////////
+
   Ui::CinemaTrackSelection* Ui;
+
+  ItemValuesMap PipelineItemValues;
 };
 
 #endif

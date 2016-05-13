@@ -150,7 +150,7 @@ bool pqTPExportStateWizard::getCommandString(QString& command)
   else // we are creating an image so we need to get the proper information from there
     {
     QString itemFormat = " '%1' : ['%2', '%5', '%6', '%7']";
-    rendering_info = this->Internals->wViewSelection->getSelectionAsPythonScript(itemFormat, false);
+    rendering_info = this->Internals->wViewSelection->getSelectionAsString(itemFormat, false);
     }
 
   QString filters ="ParaView Python State Files (*.py);;All files (*)";

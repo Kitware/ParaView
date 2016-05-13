@@ -41,6 +41,7 @@ class CoProcessor(object):
         self.__LiveVisualizationFrequency = 1;
         self.__LiveVisualizationLink = None
         self.__CinemaTracksList = []
+        self.__ArraySelection = {}
         self.__UserDefinedValues = {}
         self.__InitialFrequencies = {}
 
@@ -366,6 +367,14 @@ class CoProcessor(object):
             isinstance(proxy, simple.servermanager.filters.Contour)):
             self.__UserDefinedValues[name] = values
 
+    def UpdateArraySelection(self, selection):
+        self.__ArraySelection = selection
+
+    def UpdateValueSelection(self, selection):
+        self.__UserDefinedValues = selection
+
+    # TODO: Refactor to merge CinemaUpdate and CinemaCompositeUpdate interfaces
+    # (__CinemaTracksList will be deprecated.
     def RegisterCinemaTrack(self, name, proxy, smproperty, valrange):
         """
         Register a point of control (filter's property) that will be varied over in a cinema export.
@@ -373,7 +382,7 @@ class CoProcessor(object):
         if not isinstance(proxy, servermanager.Proxy):
             raise RuntimeError, "Invalid 'proxy' argument passed to RegisterCinemaTrack."
         self.__CinemaTracksList.append({"name":name, "proxy":proxy, "smproperty":smproperty, "valrange":valrange})
-        self.UpdateFilterValues(name, proxy, valrange)
+        #self.UpdateFilterValues(name, proxy, valrange)
 
         return proxy
 
@@ -702,6 +711,7 @@ class CoProcessor(object):
         #make sure depth rasters are consistent
         view.LockBounds = 1
 
+        self.__UserDefinedValues.update(self.__ArraySelection)
         p = pv_introspect.inspect()
         fs = pv_introspect.make_cinema_store(p, fname,
                                             forcetime=formatted_time,
@@ -711,7 +721,7 @@ class CoProcessor(object):
         pm = servermanager.vtkProcessModule.GetProcessModule()
         pid = pm.GetPartitionId()
 
-        pv_introspect.explore(fs, p, iSave=(pid==0), currentTime={'time':formatted_time})
+        pv_introspect.explore(fs, p, iSave=(pid==0), currentTime={'time':formatted_time}, arrayNames = self.__UserDefinedValues['arraySelection'] if ('arraySelection' in self.__UserDefinedValues) else {})
         if pid == 0:
             fs.save()
 

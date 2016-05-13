@@ -318,6 +318,7 @@ set (Module_SRCS
   pqViewManager.h
   pqWidgetRangeDomain.cxx
   pqWidgetRangeDomain.h
+  pqAbstractItemSelectionModel.cxx
 )
 
 set (Module_MOC_HDRS
@@ -455,6 +456,7 @@ set (Module_MOC_HDRS
   pqViewFrame.h
   pqViewManager.h
   pqWidgetRangeDomain.h
+  pqAbstractItemSelectionModel.h
 )
 
 set (Module_UI_FILES

@@ -60,41 +60,60 @@ pqCinemaConfiguration::pqCinemaConfiguration(vtkSMProxy* proxy_,  vtkSMPropertyG
   this->addPropertyLink(this, "trackSelection", SIGNAL(trackSelectionChanged()),
     proxy_->GetProperty("TrackSelection"));
 
+  this->addPropertyLink(this, "arraySelection", SIGNAL(arraySelectionChanged()),
+    proxy_->GetProperty("ArraySelection"));
+
   // update ui with current views and filters and connect signals
   this->populateElements();
   this->Ui->wViewSelection->setCinemaVisible(true, false);
 }
 
+// ----------------------------------------------------------------------------
 pqCinemaConfiguration::~pqCinemaConfiguration()
 {
   delete Ui;
 }
 
+// ----------------------------------------------------------------------------
 void pqCinemaConfiguration::updateWidget(bool showing_advanced_properties)
 {
   Superclass::updateWidget(showing_advanced_properties);
 }
 
+// ----------------------------------------------------------------------------
 QString pqCinemaConfiguration::viewSelection()
 {
   // Parameter format pv_introspect.export_scene expects for each view.
   // (see pv_introspect.py and pqExportViewSelection for more details.
   QString format("'%1' : ['%2', %3, %4, %5, %6, %7, %8]");
-  QString script = this->Ui->wViewSelection->getSelectionAsPythonScript(format, true);
+  QString script = this->Ui->wViewSelection->getSelectionAsString(format, true);
 
   return script;
 }
 
+// ----------------------------------------------------------------------------
 QString pqCinemaConfiguration::trackSelection()
 {
   // Parameter format pv_introspect.export_scene expects for each cinema track.
   // (see pv_introspect.py and pqCinemaTrackSelection for more details.
   QString format("'%1' : %2");
-  QString script = this->Ui->wTrackSelection->getSelectionAsPythonScript(format);
+  QString script = this->Ui->wTrackSelection->getTrackSelectionAsString(format);
 
   return script;
 }
 
+// ----------------------------------------------------------------------------
+QString pqCinemaConfiguration::arraySelection()
+{
+  // Parameter format pv_introspect.export_scene expects for user selected arrays.
+  // (see pv_introspect.py and pqCinemaTrackSelection for more details.
+  QString format("'%1' : %2");
+  QString script = this->Ui->wTrackSelection->getArraySelectionAsString(format);
+
+  return script;
+}
+
+// ----------------------------------------------------------------------------
 void pqCinemaConfiguration::populateElements()
 {
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
@@ -103,10 +122,10 @@ void pqCinemaConfiguration::populateElements()
   QList<pqContextView*> cViews = smModel->findItems<pqContextView*>();
   this->Ui->wViewSelection->populateViews(rViews, cViews);
 
-  QList<pqPipelineFilter*> filters = smModel->findItems<pqPipelineFilter*>();
-  this->Ui->wTrackSelection->populateTracks(filters);
+  this->Ui->wTrackSelection->initializePipelineBrowser();
 }
 
+// ----------------------------------------------------------------------------
 void pqCinemaConfiguration::hideEvent(QHideEvent* event_)
 {
   emit changeFinished();

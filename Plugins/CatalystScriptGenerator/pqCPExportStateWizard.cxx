@@ -64,6 +64,7 @@ namespace
     "   enable_live_viz=%5,\n"
     "   live_viz_frequency=%6,\n"
     "   cinema_tracks={%7},\n"
+    "   array_selection = {%9},\n"
     "   filename='%8')\n";
 }
 
@@ -150,16 +151,18 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
     {
     // Format as defined in cpstate.py
     QString format("'%1' : ['%2', %3, '%4', '%5', '%6', '%7', '%8']");
-    rendering_info = this->Internals->wViewSelection->getSelectionAsPythonScript(format,
+    rendering_info = this->Internals->wViewSelection->getSelectionAsString(format,
       this->Internals->chbComposite->isChecked());
     }
 
   QString cinema_tracks;
+  QString array_selection;
   if(this->Internals->outputCinema->isChecked())
     {
     // Format as defined in pv_introspect.make_cinema_store.make_cinema_store (_userDefinedValues)
     QString format("'%1' : %2");
-    cinema_tracks = this->Internals->wCinemaTrackSelection->getSelectionAsPythonScript(format);
+    cinema_tracks = this->Internals->wCinemaTrackSelection->getTrackSelectionAsString(format);
+    array_selection = this->Internals->wCinemaTrackSelection->getArraySelectionAsString(format);
     }
 
   QString filters ="ParaView Python State Files (*.py);;All files (*)";
@@ -211,7 +214,8 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
                    .arg(live_visualization)
                    .arg(live_visualization_frequency)
                    .arg(cinema_tracks)
-                   .arg(filename);
+                   .arg(filename)
+                   .arg(array_selection);
 
   return true;
 }

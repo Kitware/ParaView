@@ -62,6 +62,12 @@ def DoCoProcessing(datadescription):
     # If the pipeline hasn't been setup yet, this will setup the pipeline.
     coprocessor.UpdateProducers(datadescription)
 
+    # Update the user-defined array selection
+    coprocessor.UpdateArraySelection(%s)
+
+    # Update the user-defined value selection
+    coprocessor.UpdateValueSelection(%s)
+
     # Write output data, if appropriate.
     coprocessor.WriteData(datadescription);
 
@@ -76,8 +82,7 @@ from paraview import cpstate
 
 def DumpCoProcessingScript(export_rendering, simulation_input_map, screenshot_info,
     rescale_data_range, enable_live_viz, live_viz_frequency,
-    cinema_tracks,
-    filename=None):
+    cinema_tracks, array_selection, filename=None):
     """Returns a string with the generated CoProcessing script based on the
         options specified.
 
@@ -90,13 +95,16 @@ def DumpCoProcessingScript(export_rendering, simulation_input_map, screenshot_in
                               handle live-visualization.
         live_viz_frequency :- integer specifying how often should
                               the coprocessor send the live data
-        cinema_tracks        :- cinema offline visualizer parameters
+        cinema_tracks      :- cinema offline visualizer parameters
+        array_selection    :- selected value arrays for cinema
         filename           :- if specified, the script is written to the file.
     """
     pipeline_script = cpstate.DumpPipeline(\
-        export_rendering, simulation_input_map, screenshot_info, cinema_tracks)
+        export_rendering, simulation_input_map, screenshot_info, cinema_tracks) # cinema_tracks for SPEC A
     script = __output_contents % (pipeline_script,
                                   enable_live_viz, live_viz_frequency,
+                                  array_selection,
+                                  cinema_tracks,  # cinema_tracks for SPEC B (bypasses any Accessor logic)
                                   rescale_data_range)
     if filename:
         outFile = open(filename, "w")
@@ -118,6 +126,7 @@ def run(filename=None):
         enable_live_viz=True,
         live_viz_frequency=1,
         cinema_tracks={},
+        array_selection = {},
         filename=filename)
     if not filename:
         print "# *** Generated Script Begin ***"
