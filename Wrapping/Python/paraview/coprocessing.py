@@ -30,7 +30,22 @@ class CoProcessor(object):
     """Base class for co-processing Pipelines. paraview.cpstate Module can
        be used to dump out ParaView states as co-processing pipelines. Those are
        typically subclasses of this. The subclasses must provide an
-       implementation for the CreatePipeline() method."""
+       implementation for the CreatePipeline() method.
+
+	   Cinema Tracks
+	   =============
+	   CoProcessor maintains user-defined information for the Cinema generation in
+       __CinemaTracks. This information includes track parameter values, data array
+       names, etc. __CinemaTracks holds this information in the following structure:
+
+        { proxy_reference : { 'ControlName' : [value_1, value_2, ..., value_n],
+                              'arraySelection' : ['ArrayName_1', ..., 'ArrayName_n'] } }
+
+		__CinemaTracks is populated when defining the co-processing pipline through
+		paraview.cpstate. paraview.cpstate uses accessor instances to set values and
+		array names through the RegisterCinemaTrack and AddArraysToCinemaTrack methods
+        of this class.
+    """
 
     def __init__(self):
         self.__PipelineCreated = False
@@ -40,9 +55,10 @@ class CoProcessor(object):
         self.__EnableLiveVisualization = False
         self.__LiveVisualizationFrequency = 1;
         self.__LiveVisualizationLink = None
+        # __CinemaTracksList is just for Spec-A compatibility (will be deprecated
+        # when porting Spec-A to pv_introspect. Use __CinemaTracks instead.
         self.__CinemaTracksList = []
-        self.__ArraySelection = {}
-        self.__UserDefinedValues = {}
+        self.__CinemaTracks = {}
         self.__InitialFrequencies = {}
 
     def SetUpdateFrequencies(self, frequencies):
@@ -361,20 +377,6 @@ class CoProcessor(object):
         controller.RegisterPipelineProxy(proxy)
         return proxy
 
-    def UpdateFilterValues(self, name, proxy, values):
-        if (isinstance(proxy, simple.servermanager.filters.Slice) or
-            isinstance(proxy, simple.servermanager.filters.Clip)  or
-            isinstance(proxy, simple.servermanager.filters.Contour)):
-            self.__UserDefinedValues[name] = values
-
-    def UpdateArraySelection(self, selection):
-        self.__ArraySelection = selection
-
-    def UpdateValueSelection(self, selection):
-        self.__UserDefinedValues = selection
-
-    # TODO: Refactor to merge CinemaUpdate and CinemaCompositeUpdate interfaces
-    # (__CinemaTracksList will be deprecated.
     def RegisterCinemaTrack(self, name, proxy, smproperty, valrange):
         """
         Register a point of control (filter's property) that will be varied over in a cinema export.
@@ -382,8 +384,19 @@ class CoProcessor(object):
         if not isinstance(proxy, servermanager.Proxy):
             raise RuntimeError, "Invalid 'proxy' argument passed to RegisterCinemaTrack."
         self.__CinemaTracksList.append({"name":name, "proxy":proxy, "smproperty":smproperty, "valrange":valrange})
-        #self.UpdateFilterValues(name, proxy, valrange)
+        proxyDefinitions = self.__CinemaTracks[proxy] if (proxy in self.__CinemaTracks) else {}
+        proxyDefinitions[smproperty] = valrange
+        self.__CinemaTracks[proxy] = proxyDefinitions
+        return proxy
 
+    def AddArraysToCinemaTrack(self, proxy, propertyName, arrayNames):
+        ''' Register user-defined target arrays by name. '''
+        if not isinstance(proxy, servermanager.Proxy):
+            raise RuntimeError, "Invalid 'proxy' argument passed to AddArraysToCinemaTrack."
+
+        proxyDefinitions = self.__CinemaTracks[proxy] if (proxy in self.__CinemaTracks) else {}
+        proxyDefinitions[propertyName] = arrayNames
+        self.__CinemaTracks[proxy] = proxyDefinitions
         return proxy
 
     def RegisterView(self, view, filename, freq, fittoscreen, magnification, width, height, cinema=None):
@@ -696,12 +709,13 @@ class CoProcessor(object):
         view.ViewTime = time
         formatted_time = float_limiter(time)
 
-        #pass down user provided parameters
+        # Include camera information in the user defined parameters.
+		# pv_introspect uses __CinemaTracks to customize the exploration.
         co = view.cpCinemaOptions
         if "phi" in co:
-            self.__UserDefinedValues["phi"] = co["phi"]
+            self.__CinemaTracks["phi"] = co["phi"]
         if "theta" in co:
-            self.__UserDefinedValues["theta"] = co["theta"]
+            self.__CinemaTracks["theta"] = co["theta"]
 
         simple.Render(view)
 
@@ -711,17 +725,16 @@ class CoProcessor(object):
         #make sure depth rasters are consistent
         view.LockBounds = 1
 
-        self.__UserDefinedValues.update(self.__ArraySelection)
         p = pv_introspect.inspect()
-        fs = pv_introspect.make_cinema_store(p, fname,
-                                            forcetime=formatted_time,
-                                            _userDefinedValues = self.__UserDefinedValues)
+        fs = pv_introspect.make_cinema_store(p, fname, forcetime = formatted_time,\
+          userDefined = self.__CinemaTracks)
 
         #all nodes participate, but only root can writes out the files
         pm = servermanager.vtkProcessModule.GetProcessModule()
         pid = pm.GetPartitionId()
 
-        pv_introspect.explore(fs, p, iSave=(pid==0), currentTime={'time':formatted_time}, arrayNames = self.__UserDefinedValues['arraySelection'] if ('arraySelection' in self.__UserDefinedValues) else {})
+        pv_introspect.explore(fs, p, iSave = (pid == 0), currentTime = {'time':formatted_time},\
+          userDefined = self.__CinemaTracks)
         if pid == 0:
             fs.save()
 

@@ -304,7 +304,7 @@ QList<pqCinemaTrack*> pqCinemaTrackSelection::getTracks()
 {
   QList<pqCinemaTrack*> tracks;
 
-  ItemValuesMap const & valuesMap = this->PipelineItemValues;  
+  ItemValuesMap const & valuesMap = this->PipelineItemValues;
   for (ItemValuesMap::const_iterator it = valuesMap.begin(); it != valuesMap.end(); it++)
     {
     if (pqCinemaTrack* track = qobject_cast<pqCinemaTrack*>((*it).second.second))
@@ -341,11 +341,24 @@ QString pqCinemaTrackSelection::getTrackSelectionAsString(QString const & format
     QVariantList vals = p->scalars();
     for (int j = 0; j < vals.count(); j++)
       {
-      values += QString::number(vals.value(j).toDouble());
+      bool ok = true;
+      QString valueStr = QString::number(vals.value(j).toDouble(&ok));
+      if (!ok)
+        {
+        continue;
+        }
+
+      values += valueStr;
       values += ",";
       }
     values.chop(1);
     values += "]";
+
+    // Following the smtrace.py convention, the first letter of the UI name is changed
+    // to lower-case to facilitate passing these values to a CoProcessing pipeline.
+    // When exporting through menu->export the actual UI name is resolved in pv_introspect. 
+    name = name.left(1).toLower() + name.mid(1);
+
     QString info = format.arg(name).arg(values);
     cinema_tracks+= info;
 
@@ -363,18 +376,18 @@ QString pqCinemaTrackSelection::getArraySelectionAsString(QString const & format
   if (!this->Ui->gbTrackSelection->isChecked())
     {
     // Defaults to empty selection.
-    return QString("'arraySelection' : {}");
+    return QString("");
     }
 
   bool allArraysUnchecked = true;
-  QString array_selection("'arraySelection' : {");
+  QString array_selection("");
   ItemValuesMap const & valuesMap = this->PipelineItemValues;
   for (ItemValuesMap::const_iterator it = valuesMap.begin(); it != valuesMap.end(); it++)
     {
     pqArraySelectionModel* model = (*it).second.first;
     if (model)
       {
-      QString const & pipelineItemName = (*it).first;
+      QString itemName = (*it).first;
       QStringList arrayNames = model->getCheckedItemNames();
 
       // append to the selection string
@@ -388,7 +401,13 @@ QString pqCinemaTrackSelection::getArraySelectionAsString(QString const & format
             values += ", ";
           }
         values += "]";
-        QString info = format.arg(pipelineItemName).arg(values);
+
+        // Following the smtrace.py convention, the first letter of the UI name is changed
+        // to lower-case to facilitate passing these values to a CoProcessing pipeline.
+        // When exporting through menu->export the actual UI name is resolved in pv_introspect. 
+        itemName = itemName.left(1).toLower() + itemName.mid(1);
+
+        QString info = format.arg(itemName).arg(values);
         array_selection += info;
         array_selection += ", ";
         allArraysUnchecked = false;
@@ -401,7 +420,6 @@ QString pqCinemaTrackSelection::getArraySelectionAsString(QString const & format
     // chop off the last ", "
     array_selection.chop(2);
     }
-  array_selection += "}";
 
   return array_selection;
 }
