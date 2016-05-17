@@ -4620,7 +4620,7 @@
       </DoubleVectorProperty>
       <Hints>
         <ReaderFactory extensions="xyz"
-                       file_description="XMol Molecule Files Version 2" />
+                       file_description="XMol Molecule Files" />
       </Hints>
       <!-- End xyzreader -->
     </SourceProxy>
@@ -4770,7 +4770,7 @@
       </StringVectorProperty>
       <Hints>
         <ReaderFactory extensions="cube"
-                       file_description="Gaussian Cube Files Version 2" />
+                       file_description="Gaussian Cube Files" />
       </Hints>
       <!-- End gaussiancubereader -->
     </SourceProxy>
