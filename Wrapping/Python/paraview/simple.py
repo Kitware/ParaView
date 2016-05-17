@@ -298,6 +298,15 @@ def ResetCamera(view=None):
 
 # -----------------------------------------------------------------------------
 
+def CreateLayout(name=None):
+    """Create a new layout with no active view."""
+    layout = servermanager.misc.ViewLayout(registrationGroup="layouts")
+    if name:
+        RenameLayout(name, layout)
+    return layout
+
+# -----------------------------------------------------------------------------
+
 def GetLayouts():
     """Returns the layout proxies on the active session.
     Layout proxies are used to place views in a grid."""
@@ -319,6 +328,13 @@ def GetLayout(view=None):
             return layout
     return None
 
+def GetLayoutByName(name):
+    """Return the first layout with the given name, if any."""
+    layouts = GetLayouts()
+    for key in layouts.keys():
+      if key[0] == name:
+        return layouts.get(key)
+    return None
 
 def GetViewsInLayout(layout=None):
     """Returns a list of views in the given layout. If not layout is specified,

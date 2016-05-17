@@ -103,11 +103,16 @@ int pqTabbedMultiViewWidget::pqTabWidget::addAsTab(pqMultiViewWidget* wdg, pqTab
   pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
   pqProxy* item = smmodel->findItem<pqProxy*>(proxy);
+  QString name = QString("Layout #%1").arg(tab_count);
   if (item->getSMName().startsWith("ViewLayout"))
     {
-    item->rename(QString("Layout #%1").arg(tab_count));
+    item->rename(name);
     }
   int tab_index = this->insertTab(tab_count-1, wdg, item->getSMName());
+
+  SM_SCOPED_TRACE(CallFunction)
+    .arg("CreateLayout")
+    .arg(name.toUtf8().data());
 
   this->connect(item, SIGNAL(nameChanged(pqServerManagerModelItem*)),
     self, SLOT(onLayoutNameChanged(pqServerManagerModelItem*)));
