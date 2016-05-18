@@ -101,9 +101,19 @@ public:
   // Returns the chosen manipulator based on the modifiers.
   virtual vtkCameraManipulator* FindManipulator(int button, int shift, int control);
 
+  // Description
+  // Dolly the renderer's camera to a specific point
+  static void DollyToPosition(double fact, int* position, vtkRenderer* renderer);
+
+  // Description
+  // Translate the renderer's camera
+  static void TranslateCamera(vtkRenderer* renderer, int toX, int toY, int fromX, int fromY);
+
 protected:
   vtkPVInteractorStyle();
   ~vtkPVInteractorStyle();
+
+  virtual void Dolly(double factor);
 
   vtkCameraManipulator *CurrentManipulator;
   double CenterOfRotation[3];
