@@ -6961,6 +6961,79 @@
       </SubProxy>
       <!-- End of TextSourceRepresentation -->
     </RepresentationProxy>
+    <!-- =================================================================== -->
+    <RepresentationProxy class="vtkProgressBarSourceRepresentation"
+                         name="ProgressBarSourceRepresentation"
+                         processes="client|dataserver|renderserver"
+                         si_class="vtkSIProxy">
+      <Documentation>Representation proxy used to show ProgressBar.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <Documentation>Data input for the representation.</Documentation>
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkTable" />
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetForceUseCache"
+                         default_values="0"
+                         is_internal="1"
+                         name="ForceUseCache"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetForcedCacheKey"
+                            default_values="none"
+                            is_internal="1"
+                            name="ForcedCacheKey"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetInteractivity"
+                         default_values="1"
+                         name="Interactivity"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether user should be able to interactively place the progressBar in the view.
+        </Documentation>
+      </IntVectorProperty>
+      <SubProxy command="SetProgressBarWidgetRepresentation">
+        <Proxy name="ProgressBarWidgetRepresentation"
+               proxygroup="representations"
+               proxyname="ProgressBarWidgetRepresentation"></Proxy>
+        <ExposedProperties>
+          <Property name="Position" />
+          <Property name="Position2" panel_visibility="never"/>
+          <Property name="PositionInfo" />
+          <Property name="Position2Info" />
+          <Property name="ProgressBarColor"/>
+          <Property name="SecondaryProgressBarColor"/>
+          <Property name="DrawBackground"/>
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of ProgressBarSourceRepresentation -->
+    </RepresentationProxy>
+    <!-- =================================================================== -->
     <Proxy class="vtkPVFrustumActor"
            name="FrustumWidget"
            processes="client|dataserver|renderserver">

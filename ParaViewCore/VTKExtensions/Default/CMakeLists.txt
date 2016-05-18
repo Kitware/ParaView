@@ -142,6 +142,7 @@ set(Module_SRCS
   vtkSpyPlotReaderMap.cxx
   vtkSpyPlotUniReader.cxx
   vtkSurfaceVectors.cxx
+  vtkTimeStepProgressFilter.cxx
   vtkTimeToTextConvertor.cxx
   vtkUnstructuredPOPReader.cxx
   vtkVRMLSource.cxx

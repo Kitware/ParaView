@@ -11635,6 +11635,32 @@ source.</Documentation>
       <!-- End of TimeToTextConvertor -->
     </SourceProxy>
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkTimeStepProgressFilter"
+                 label="Time Step Progress Bar"
+                 name="TimeStepProgressFilter">
+      <Documentation long_help="Shows input data time as progress bar in the view."
+                     short_help="Show data time step as progress bar.">The Time Step Progress Bar
+                     filter can be used to show the relative position of the actual time step/value
+                     relatively to the number of timesteps/data time range in a progress bar.
+                     </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <Documentation>This property specifies the input dataset for which to
+        display the time step.</Documentation>
+      </InputProperty>
+      <Hints>
+        <Visibility replace_input="0" />
+        <OutputPort index="0"
+                    name="Output-0"
+                    type="progress" />
+      </Hints>
+      <!-- End of TimeToTextConvertor -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkCellDerivatives"
                  label="Compute Derivatives"
                  name="CellDerivatives">
