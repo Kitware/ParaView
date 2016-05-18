@@ -1,9 +1,5 @@
-
-try: paraview.simple
-except: from paraview.simple import *
-
+from paraview.simple import *
 from paraview import coprocessing
-
 
 #--------------------------------------------------------------
 # Code generated from cpstate.py to create the CoProcessor.
@@ -21,7 +17,13 @@ def CreateCoProcessor():
       Slice1.SliceType.Origin = [1.9627925694422252, 50.0, 50.0]
       Slice1.SliceType.Normal = [1.0, 0.0, 0.0]
 
-      ParallelMultiBlockDataSetWriter1 = coprocessor.CreateWriter( XMLMultiBlockDataWriter, "filename_%t.vtm", 10 )
+      # create a new 'Parallel MultiBlock Writer'
+      sliceWriter = servermanager.writers.XMLMultiBlockDataWriter(Input=Slice1)
+
+      # register the writer with coprocessor
+      # and provide it with information such as the filename to use,
+      # how frequently to write the data, etc.
+      coprocessor.RegisterWriter(sliceWriter, filename='slice_%t.vtm', freq=10)
 
     return Pipeline()
 
