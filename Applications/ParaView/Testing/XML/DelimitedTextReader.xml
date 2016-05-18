@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/vehicle_data.csv" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="0.1,12" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/FieldDelimiterCharacters/FieldDelimiterCharacters" command="set_string" arguments=";" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="0.1,8,307,130,3504,70,12,18" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/FieldDelimiterCharacters/FieldDelimiterCharacters" property="text" arguments=";" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/FieldDelimiterCharacters/FieldDelimiterCharacters" command="set_string" arguments="," />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/FieldDelimiterCharacters/FieldDelimiterCharacters" property="text" arguments="," />
+  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="0.1,12" />
+</pqevents>
