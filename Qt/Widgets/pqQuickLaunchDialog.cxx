@@ -41,6 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QPushButton>
 #include <QStringList>
+#include <algorithm>
+#include <QtDebug>
 
 class pqQuickLaunchDialog::pqInternal : public Ui::QuickLaunchDialog
 {
@@ -50,6 +52,20 @@ public:
   QString SearchString;
   QPointer<QAction> ActiveAction;
 };
+
+namespace
+{
+  void fillPermutations(QList<QStringList>& list, QStringList words)
+    {
+    list.push_back(words);
+    words.sort();
+    do
+      {
+      list.push_back(words);
+      }
+    while (std::next_permutation(words.begin(), words.end()));
+    }
+}
 
 //-----------------------------------------------------------------------------
 pqQuickLaunchDialog::pqQuickLaunchDialog(QWidget* p):
@@ -163,16 +179,27 @@ void pqQuickLaunchDialog::updateSearch()
     return;
     }
 
-  QStringList searchComponents = this->Internal->SearchString.split(" ",
-    QString::SkipEmptyParts);
+  const QStringList keys = this->Internal->Items.keys();
+  const QStringList searchComponents = this->Internal->SearchString.split(" ", QString::SkipEmptyParts);
+  QList<QStringList> searchExpressions;
+  fillPermutations(searchExpressions, searchComponents);
 
-  QString regExpStr = searchComponents.join(".*");
-  QRegExp regExp("^" + regExpStr, Qt::CaseInsensitive);
-  QRegExp regExp2(".*" + regExpStr, Qt::CaseInsensitive);
-  QStringList searchSpace = this->Internal->Items.keys();
-  QStringList searchSpace2 = searchSpace;
-  searchSpace = searchSpace.filter(regExp);
-  searchSpace += searchSpace2.filter(regExp2);
+  QStringList searchSpace;
+  foreach (const QStringList& exp, searchExpressions)
+    {
+    QString part = exp.join("\\w*\\W+");
+    QRegExp regExp("^" + part, Qt::CaseInsensitive);
+    searchSpace += keys.filter(regExp);
+    }
+
+  // Now build up the list of fuzzy matches to the parts of text user entered
+  // (BUG #0016116).
+  QStringList fuzzySearchSpace = keys;
+  foreach (QString component, searchComponents)
+    {
+    fuzzySearchSpace = fuzzySearchSpace.filter(component, Qt::CaseInsensitive);
+    }
+  searchSpace += fuzzySearchSpace;
   searchSpace.removeDuplicates();
 
   int currentRow = -1;
