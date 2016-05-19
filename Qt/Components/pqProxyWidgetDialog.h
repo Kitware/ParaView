@@ -55,11 +55,16 @@ public:
   /// Returns whether that dialog has any visible widgets.
   bool hasVisibleWidgets() const;
 
+  /// Returns true if the proxy has any advanced properties.
+  /// This may be useful to determine if the search bar should be enabled or
+  /// not.
+  bool hasAdvancedProperties() const;
+
   /// Returns the proxy.
   vtkSMProxy* proxy() const;
 
   /// Get/set whether the search-bar should be shown on the dialog.
-  /// Default is false. If search-bar is not show, the dialog cannot support
+  /// Default is false. If search-bar is not enabled, the dialog cannot support
   /// default/advanced viewing modes either and hence it will simply show all
   /// property widgets.
   void setEnableSearchBar(bool val);

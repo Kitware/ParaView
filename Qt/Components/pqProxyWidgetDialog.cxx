@@ -36,6 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqProxyWidget.h"
 #include "pqSettings.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkWeakPointer.h"
 
@@ -66,10 +69,32 @@ class pqProxyWidgetDialog::pqInternals
     Q_ASSERT(!this->SettingsKey.isEmpty());
     return QString("%1.SearchBox").arg(this->SettingsKey);
     }
+
+  /// Returns true if the proxy has any advanced properties.
+  static bool hasAdvancedProperties(vtkSMProxy* proxy)
+    {
+    if (!proxy) { return false; }
+    vtkSmartPointer<vtkSMPropertyIterator> iter;
+    iter.TakeReference(proxy->NewPropertyIterator());
+    for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+      {
+      if (vtkSMProperty* prop = iter->GetProperty())
+        {
+        if (prop->GetPanelVisibility() &&
+          strcmp(prop->GetPanelVisibility(), "advanced") == 0)
+          {
+          return true;
+          }
+        }
+      }
+    return false;
+    }
+
 public:
   Ui::ProxyWidgetDialog Ui;
   vtkWeakPointer<vtkSMProxy> Proxy;
   bool HasVisibleWidgets;
+  bool HasAdvancedProperties;
 
   pqInternals(vtkSMProxy* proxy, pqProxyWidgetDialog* self,
     const QStringList& properties = QStringList()) :
@@ -77,7 +102,8 @@ public:
     Resized(false),
     GeometryLoaded(false),
     Proxy(proxy),
-    HasVisibleWidgets(false)
+    HasVisibleWidgets(false),
+    HasAdvancedProperties(hasAdvancedProperties(proxy))
     {
     Q_ASSERT(proxy != NULL);
 
@@ -309,6 +335,12 @@ void pqProxyWidgetDialog::setEnableSearchBar(bool val)
 bool pqProxyWidgetDialog::enableSearchBar() const
 {
   return this->Internals->enableSearchBar();
+}
+
+//-----------------------------------------------------------------------------
+bool pqProxyWidgetDialog::hasAdvancedProperties() const
+{
+  return this->Internals->HasAdvancedProperties;
 }
 
 //-----------------------------------------------------------------------------
