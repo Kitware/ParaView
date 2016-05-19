@@ -3281,6 +3281,7 @@
       </IntVectorProperty>
       <StringVectorProperty command="SetColumnNameToSort"
                             name="ColumnToSort"
+                            number_of_elements="1"
                             panel_visibility="never">
       </StringVectorProperty>
       <IntVectorProperty command="SetComponentToSort"
