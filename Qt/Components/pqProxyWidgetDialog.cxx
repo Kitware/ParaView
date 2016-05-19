@@ -117,9 +117,6 @@ public:
     self->connect(ui.SearchBox, SIGNAL(advancedSearchActivated(bool)), SLOT(filterWidgets()));
     self->connect(ui.SearchBox, SIGNAL(textChanged(const QString&)), SLOT(filterWidgets()));
 
-    // There should be no changes initially, so disable the Apply button
-    this->updateButtons(/*dirty*/false);
-
     QWidget *container = new QWidget(self);
     container->setObjectName("Container");
     QVBoxLayout* vbox = new QVBoxLayout(container);
@@ -162,6 +159,9 @@ public:
     QSpacerItem* spacer = new QSpacerItem(0, 6, QSizePolicy::Fixed,
       QSizePolicy::MinimumExpanding);
     vbox->addItem(spacer);
+
+    // There should be no changes initially, so disable the Apply button
+    this->updateButtons(/*dirty*/false);
     }
 
   void resize(QWidget* self)
@@ -272,6 +272,10 @@ public:
   void updateButtons(bool dirty)
     {
     Ui::ProxyWidgetDialog &ui = this->Ui;
+
+    // if applying changes immediately, then we're really not dirty.
+    dirty = this->applyChangesImmediately()? false: dirty;
+
     ui.ApplyButton->setEnabled(dirty);
     ui.ResetButton->setEnabled(dirty);
 
@@ -310,6 +314,19 @@ public:
   void saveAsDefaults()
     {
     this->ProxyWidget->saveAsDefaults();
+    }
+
+  void setApplyChangesImmediately(bool val)
+    {
+    this->ProxyWidget->setApplyChangesImmediately(val);
+    Ui::ProxyWidgetDialog &ui = this->Ui;
+    ui.ApplyButton->setVisible(!val);
+    ui.ResetButton->setVisible(!val);
+    }
+
+  bool applyChangesImmediately() const
+    {
+    return this->ProxyWidget->applyChangesImmediately();
     }
 };
 
@@ -441,6 +458,18 @@ void pqProxyWidgetDialog::setHideAdvancedProperties(bool val)
 bool pqProxyWidgetDialog::hideAdvancedProperties() const
 {
   return this->Internals->hideAdvancedProperties();
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyWidgetDialog::setApplyChangesImmediately(bool val)
+{
+  this->Internals->setApplyChangesImmediately(val);
+}
+
+//-----------------------------------------------------------------------------
+bool pqProxyWidgetDialog::applyChangesImmediately() const
+{
+  return this->Internals->applyChangesImmediately();
 }
 
 //-----------------------------------------------------------------------------

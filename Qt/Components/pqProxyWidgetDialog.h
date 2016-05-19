@@ -81,6 +81,14 @@ public:
   void setHideAdvancedProperties(bool val);
   bool hideAdvancedProperties() const;
 
+  /// When set to true (default is false), pqProxyWidgetDialog will not show the
+  /// 'Apply' and 'Reset' buttons. This has one major implication, however.
+  /// Whenever the user changes a widget in the UI, the corresponding property
+  /// on the proxy will immediately be changed. Thus, even if the user hits
+  /// 'Cancel', the proxy will be left in modified state.
+  void setApplyChangesImmediately(bool val);
+  bool applyChangesImmediately() const;
+
   /// Set the new setting key that will be used to restore/save the advanced
   /// button check state. If the given key is valid (i.e. not empty), the
   /// button state will be restored from the key value.

@@ -136,6 +136,7 @@ void pqSaveStateReaction::savePythonState(const QString& filename)
   pqProxyWidgetDialog dialog(options);
   dialog.setWindowTitle("Python State Options");
   dialog.setObjectName("StateOptionsDialog");
+  dialog.setApplyChangesImmediately(true);
   if (dialog.exec() != QDialog::Accepted)
     {
     return;
