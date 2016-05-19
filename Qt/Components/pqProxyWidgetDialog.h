@@ -70,6 +70,17 @@ public:
   void setEnableSearchBar(bool val);
   bool enableSearchBar() const;
 
+  /// By default, the pqProxyWidgetDialog will show advanced properties on the
+  /// proxy either by default (if EnableSearchBar is false), or based on the
+  /// ui-element in search bar (if EnableSearchBar is true). However, there may
+  /// be cases when an application doesn't want to show the advanced properties.
+  /// In that case, you can use this method to hide all advanced properties.
+  /// If EnableSearchBar is true and HideAdvancedProperties is false, then the
+  /// gear-icon shown next to search bar to allow user to toggle the advanced
+  /// properties is not shown.
+  void setHideAdvancedProperties(bool val);
+  bool hideAdvancedProperties() const;
+
   /// Set the new setting key that will be used to restore/save the advanced
   /// button check state. If the given key is valid (i.e. not empty), the
   /// button state will be restored from the key value.

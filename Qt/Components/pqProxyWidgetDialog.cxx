@@ -53,6 +53,7 @@ class pqProxyWidgetDialog::pqInternals
   bool SearchEnabled;
   bool Resized;
   bool GeometryLoaded;
+  bool HideAdvancedProperties;
 
   QString KEY_VALID()
     {
@@ -101,6 +102,7 @@ public:
     SearchEnabled(false),
     Resized(false),
     GeometryLoaded(false),
+    HideAdvancedProperties(false),
     Proxy(proxy),
     HasVisibleWidgets(false),
     HasAdvancedProperties(hasAdvancedProperties(proxy))
@@ -110,7 +112,7 @@ public:
     Ui::ProxyWidgetDialog& ui = this->Ui;
     ui.setupUi(self);
     ui.SearchBox->setVisible(this->SearchEnabled);
-    ui.SearchBox->setAdvancedSearchEnabled(true);
+    ui.SearchBox->setAdvancedSearchEnabled(this->HideAdvancedProperties);
     ui.SearchBox->setAdvancedSearchActive(false);
     self->connect(ui.SearchBox, SIGNAL(advancedSearchActivated(bool)), SLOT(filterWidgets()));
     self->connect(ui.SearchBox, SIGNAL(textChanged(const QString&)), SLOT(filterWidgets()));
@@ -206,18 +208,33 @@ public:
     return this->SearchEnabled;
     }
 
+  void setHideAdvancedProperties(bool val)
+    {
+    if (val != this->HideAdvancedProperties)
+      {
+      this->HideAdvancedProperties = val;
+      Ui::ProxyWidgetDialog& ui = this->Ui;
+      ui.SearchBox->setAdvancedSearchEnabled(!val);
+      this->filterWidgets();
+      }
+    }
+  bool hideAdvancedProperties() const
+    {
+    return this->HideAdvancedProperties;
+    }
+
   void filterWidgets()
     {
     Ui::ProxyWidgetDialog& ui = this->Ui;
     if (this->SearchEnabled)
       {
       this->ProxyWidget->filterWidgets(
-        ui.SearchBox->isAdvancedSearchActive(),
+        ui.SearchBox->isAdvancedSearchActive() && ui.SearchBox->isAdvancedSearchEnabled(),
         ui.SearchBox->text());
       }
     else
       {
-      this->ProxyWidget->filterWidgets(true);
+      this->ProxyWidget->filterWidgets(!this->HideAdvancedProperties);
       }
     }
 
@@ -412,6 +429,18 @@ void pqProxyWidgetDialog::onRestoreDefaults()
 void pqProxyWidgetDialog::onSaveAsDefaults()
 {
   this->Internals->saveAsDefaults();
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyWidgetDialog::setHideAdvancedProperties(bool val)
+{
+  this->Internals->setHideAdvancedProperties(val);
+}
+
+//-----------------------------------------------------------------------------
+bool pqProxyWidgetDialog::hideAdvancedProperties() const
+{
+  return this->Internals->hideAdvancedProperties();
 }
 
 //-----------------------------------------------------------------------------
