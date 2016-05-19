@@ -1000,12 +1000,6 @@ class SaveData(TraceItem):
         del writer
         Trace.Output.append_separated(trace.raw_data())
 
-class EnsureLayout(TraceItem):
-    def __init__(self, layout):
-        TraceItem.__init__(self)
-        layout = sm._getPyProxy(layout)
-        accessor = Trace.get_accessor(layout)
-
 class RegisterLayoutProxy(TraceItem):
     def __init__(self, layout):
         TraceItem.__init__(self)

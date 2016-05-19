@@ -307,6 +307,21 @@ def CreateLayout(name=None):
 
 # -----------------------------------------------------------------------------
 
+def RemoveLayout(proxy=None):
+    """Remove the provided layout, if none is provided,
+    remove the layout containing the active view.
+    If it is the last layout it will create a new
+    one with the same name as the removed one."""
+    pxm = servermanager.ProxyManager()
+    if not proxy:
+        proxy = GetLayout()
+    name = pxm.GetProxyName('layouts', proxy)
+    pxm.UnRegisterProxy('layouts', name, proxy)
+    if len(GetLayouts()) == 0:
+      CreateLayout(name)
+
+# -----------------------------------------------------------------------------
+
 def GetLayouts():
     """Returns the layout proxies on the active session.
     Layout proxies are used to place views in a grid."""

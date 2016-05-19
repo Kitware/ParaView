@@ -662,15 +662,6 @@ bool vtkSMParaViewPipelineControllerWithRendering::RegisterViewProxy(
       activeLayout->FastDelete();
       }
     }
-  if (activeLayout)
-    {
-    // ensure that we "access" the layout, before the view is created, other the
-    // trace ends up incorrect (this is needed since RegisterViewProxy() results
-    // in the Qt client assigning a frame for the view, if the Qt client didn't
-    // do that, this code will get a lot simpler.
-    SM_SCOPED_TRACE(EnsureLayout).arg(activeLayout);
-    }
-
   bool retval = this->Superclass::RegisterViewProxy(proxy, proxyname);
   if (activeLayout)
     {
