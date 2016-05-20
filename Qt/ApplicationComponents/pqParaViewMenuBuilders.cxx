@@ -316,10 +316,8 @@ void pqParaViewMenuBuilders::buildMacrosMenu
 //-----------------------------------------------------------------------------
 void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
 {
-#if defined (_WIN32)
+#if defined(_WIN32) || defined(__APPLE__)
   QString filePath = QCoreApplication::applicationDirPath() + "/../doc/ParaViewGuide-CE.pdf";
-#elif defined(__APPLE__)
-  QString filePath = QCoreApplication::applicationDirPath() + "/../../../doc/ParaViewGuide-CE.pdf";
 #else
   QString filePath = QCoreApplication::applicationDirPath() + "/../../doc/ParaViewGuide-CE.pdf";
 #endif
