@@ -65,6 +65,28 @@ namespace
       }
     while (std::next_permutation(words.begin(), words.end()));
     }
+
+  void fillSearchSpace(QStringList& searchSpace,
+    const QStringList& searchComponents,
+    const QList<QStringList>& searchExpressions, const QStringList& keys)
+    {
+    foreach (const QStringList& exp, searchExpressions)
+      {
+      QString part = exp.join("\\w*\\W+");
+      QRegExp regExp("^" + part, Qt::CaseInsensitive);
+      searchSpace += keys.filter(regExp);
+      }
+
+    // Now build up the list of matches to the search components disregarding
+    // word order and proximity entirely.
+    // (BUG #0016116).
+    QStringList filteredkeys = keys;
+    foreach (const QString &component, searchComponents)
+      {
+      filteredkeys = filteredkeys.filter(QRegExp(component, Qt::CaseInsensitive));
+      }
+    searchSpace += filteredkeys;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -181,25 +203,29 @@ void pqQuickLaunchDialog::updateSearch()
 
   const QStringList keys = this->Internal->Items.keys();
   const QStringList searchComponents = this->Internal->SearchString.split(" ", QString::SkipEmptyParts);
+
   QList<QStringList> searchExpressions;
   fillPermutations(searchExpressions, searchComponents);
 
   QStringList searchSpace;
-  foreach (const QStringList& exp, searchExpressions)
+  fillSearchSpace(searchSpace, searchComponents, searchExpressions, keys);
+
+  QStringList fuzzySearchComponents;
+  foreach (const QString& word, searchComponents)
     {
-    QString part = exp.join("\\w*\\W+");
-    QRegExp regExp("^" + part, Qt::CaseInsensitive);
-    searchSpace += keys.filter(regExp);
+    QString newword;
+    for (int cc=0; cc < word.size(); cc++)
+      {
+      newword += word[cc];
+      newword += "\\w*";
+      }
+    fuzzySearchComponents.push_back(newword);
     }
 
-  // Now build up the list of fuzzy matches to the parts of text user entered
-  // (BUG #0016116).
-  QStringList fuzzySearchSpace = keys;
-  foreach (QString component, searchComponents)
-    {
-    fuzzySearchSpace = fuzzySearchSpace.filter(component, Qt::CaseInsensitive);
-    }
-  searchSpace += fuzzySearchSpace;
+  searchExpressions.clear();
+  fillPermutations(searchExpressions, fuzzySearchComponents);
+  fillSearchSpace(searchSpace, fuzzySearchComponents, searchExpressions, keys);
+
   searchSpace.removeDuplicates();
 
   int currentRow = -1;
