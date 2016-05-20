@@ -8262,7 +8262,7 @@ source.</Documentation>
                  name="ImageResampling">
       <Documentation long_help="Sample data attributes using a 3D image as probing mesh."
                      short_help="Sample data values using a 3D image."/>
-
+      <Deprecated deprecated_in="5.1" to_remove_in="5.2">Please use "Resample To Image" instead instead of "ImageResampling" filter.</Deprecated>
       <InputProperty command="SetInputConnection" name="Input">
         <ProxyGroupDomain name="groups">
           <Group name="sources" />
