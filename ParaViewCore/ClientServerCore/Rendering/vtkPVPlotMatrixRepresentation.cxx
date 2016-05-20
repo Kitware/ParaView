@@ -77,6 +77,18 @@ public:
 
     return result;
     }
+
+  bool GetSeriesVisibility(const std::string& name)
+    {
+    for (size_t cc=0; cc < this->SeriesVisibilities.size(); ++cc)
+      {
+      if (this->SeriesVisibilities[cc].first == name)
+        {
+        return this->SeriesVisibilities[cc].second;
+        }
+      }
+    return false;
+    }
 };
 
 //----------------------------------------------------------------------------
@@ -167,6 +179,14 @@ void vtkPVPlotMatrixRepresentation::PrepareForRendering()
     {
     plotMatrix->SetInput(table);
 
+    // Set column visibilities
+    vtkIdType numCols = table->GetNumberOfColumns();
+    for (vtkIdType cc=0; cc < numCols; cc++)
+      {
+      const char* name = table->GetColumnName(cc);
+      plotMatrix->SetColumnVisibility(name, this->Internals->GetSeriesVisibility(name));
+      }
+
     vtkSmartPointer<vtkStringArray> orderedVisibleColumns =
       this->Internals->GetOrderedVisibleColumnNames(table);
 
@@ -175,6 +195,8 @@ void vtkPVPlotMatrixRepresentation::PrepareForRendering()
     plotMatrix->SetSize(vtkVector2i(
         orderedVisibleColumns->GetNumberOfTuples(),
         orderedVisibleColumns->GetNumberOfTuples()));
+
+    // Set column order
     plotMatrix->SetVisibleColumns(orderedVisibleColumns.GetPointer());
     }
 }
