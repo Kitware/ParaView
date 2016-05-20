@@ -767,7 +767,9 @@ int vtkFileSeriesReader::ReadMetaDataFile(const char *metafilename,
     if (fname.empty()) continue;
     for (size_t cc=0; cc < fname.size(); cc++)
       {
-      if (!isprint(fname.c_str()[cc]))
+      int ch = fname[cc];
+      // to avoid assert() in debug MSVC, we need to ensure 0 <= ch < 256.
+      if (static_cast<unsigned int>(ch) >= 256  || !isprint(ch))
         {
         // must not be an ASCII file.
         return 0;
