@@ -109,6 +109,8 @@ public:
   // Translate the renderer's camera
   static void TranslateCamera(vtkRenderer* renderer, int toX, int toY, int fromX, int fromY);
 
+  using vtkInteractorStyleTrackballCamera::Dolly;
+
 protected:
   vtkPVInteractorStyle();
   ~vtkPVInteractorStyle();

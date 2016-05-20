@@ -66,7 +66,7 @@
 #include "vtkPVTrackballRotate.h"
 #include "vtkPVTrackballRotate.h"
 #include "vtkPVTrackballZoom.h"
-#include "vtkPVTrackballZoomMouse.h"
+#include "vtkPVTrackballZoomToMouse.h"
 #include "vtkRenderer.h"
 #include "vtkRenderViewBase.h"
 #include "vtkRenderWindow.h"
@@ -2451,7 +2451,7 @@ void vtkPVRenderView::SetCameraManipulators(vtkPVInteractorStyle* style, const i
     ROLL=3,
     ROTATE=4,
     MULTI_ROTATE=5,
-    ZOOM_MOUSE=6
+    ZOOM_TO_MOUSE=6
     };
 
   for (int manip=NONE; manip <=CTRL; manip++)
@@ -2477,8 +2477,8 @@ void vtkPVRenderView::SetCameraManipulators(vtkPVInteractorStyle* style, const i
       case MULTI_ROTATE:
         cameraManipulator = vtkSmartPointer<vtkPVTrackballMultiRotate>::New();
         break;
-      case ZOOM_MOUSE:
-        cameraManipulator = vtkSmartPointer<vtkPVTrackballZoomMouse>::New();
+      case ZOOM_TO_MOUSE:
+        cameraManipulator = vtkSmartPointer<vtkPVTrackballZoomToMouse>::New();
         break;
         }
       if (cameraManipulator)
