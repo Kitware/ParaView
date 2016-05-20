@@ -175,7 +175,8 @@ bool pqSaveDataReaction::saveActiveData(const QString& filename)
 
   pqProxyWidgetDialog dialog(writer, pqCoreUtilities::mainWidget());
   dialog.setObjectName("WriterSettingsDialog");
-  dialog.setEnableSearchBar(true);
+  dialog.setEnableSearchBar(dialog.hasAdvancedProperties());
+  dialog.setApplyChangesImmediately(true);
   dialog.setWindowTitle(
     QString("Configure Writer (%1)").arg(writer->GetXMLLabel()));
 

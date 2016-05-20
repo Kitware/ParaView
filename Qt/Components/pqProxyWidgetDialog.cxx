@@ -36,6 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqProxyWidget.h"
 #include "pqSettings.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkWeakPointer.h"
 
@@ -50,6 +53,7 @@ class pqProxyWidgetDialog::pqInternals
   bool SearchEnabled;
   bool Resized;
   bool GeometryLoaded;
+  bool HideAdvancedProperties;
 
   QString KEY_VALID()
     {
@@ -66,31 +70,52 @@ class pqProxyWidgetDialog::pqInternals
     Q_ASSERT(!this->SettingsKey.isEmpty());
     return QString("%1.SearchBox").arg(this->SettingsKey);
     }
+
+  /// Returns true if the proxy has any advanced properties.
+  static bool hasAdvancedProperties(vtkSMProxy* proxy)
+    {
+    if (!proxy) { return false; }
+    vtkSmartPointer<vtkSMPropertyIterator> iter;
+    iter.TakeReference(proxy->NewPropertyIterator());
+    for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+      {
+      if (vtkSMProperty* prop = iter->GetProperty())
+        {
+        if (prop->GetPanelVisibility() &&
+          strcmp(prop->GetPanelVisibility(), "advanced") == 0)
+          {
+          return true;
+          }
+        }
+      }
+    return false;
+    }
+
 public:
   Ui::ProxyWidgetDialog Ui;
   vtkWeakPointer<vtkSMProxy> Proxy;
   bool HasVisibleWidgets;
+  bool HasAdvancedProperties;
 
   pqInternals(vtkSMProxy* proxy, pqProxyWidgetDialog* self,
     const QStringList& properties = QStringList()) :
     SearchEnabled(false),
     Resized(false),
     GeometryLoaded(false),
+    HideAdvancedProperties(false),
     Proxy(proxy),
-    HasVisibleWidgets(false)
+    HasVisibleWidgets(false),
+    HasAdvancedProperties(hasAdvancedProperties(proxy))
     {
     Q_ASSERT(proxy != NULL);
 
     Ui::ProxyWidgetDialog& ui = this->Ui;
     ui.setupUi(self);
     ui.SearchBox->setVisible(this->SearchEnabled);
-    ui.SearchBox->setAdvancedSearchEnabled(true);
+    ui.SearchBox->setAdvancedSearchEnabled(this->HideAdvancedProperties);
     ui.SearchBox->setAdvancedSearchActive(false);
     self->connect(ui.SearchBox, SIGNAL(advancedSearchActivated(bool)), SLOT(filterWidgets()));
     self->connect(ui.SearchBox, SIGNAL(textChanged(const QString&)), SLOT(filterWidgets()));
-
-    // There should be no changes initially, so disable the Apply button
-    this->updateButtons(/*dirty*/false);
 
     QWidget *container = new QWidget(self);
     container->setObjectName("Container");
@@ -134,6 +159,9 @@ public:
     QSpacerItem* spacer = new QSpacerItem(0, 6, QSizePolicy::Fixed,
       QSizePolicy::MinimumExpanding);
     vbox->addItem(spacer);
+
+    // There should be no changes initially, so disable the Apply button
+    this->updateButtons(/*dirty*/false);
     }
 
   void resize(QWidget* self)
@@ -180,18 +208,33 @@ public:
     return this->SearchEnabled;
     }
 
+  void setHideAdvancedProperties(bool val)
+    {
+    if (val != this->HideAdvancedProperties)
+      {
+      this->HideAdvancedProperties = val;
+      Ui::ProxyWidgetDialog& ui = this->Ui;
+      ui.SearchBox->setAdvancedSearchEnabled(!val);
+      this->filterWidgets();
+      }
+    }
+  bool hideAdvancedProperties() const
+    {
+    return this->HideAdvancedProperties;
+    }
+
   void filterWidgets()
     {
     Ui::ProxyWidgetDialog& ui = this->Ui;
     if (this->SearchEnabled)
       {
       this->ProxyWidget->filterWidgets(
-        ui.SearchBox->isAdvancedSearchActive(),
+        ui.SearchBox->isAdvancedSearchActive() && ui.SearchBox->isAdvancedSearchEnabled(),
         ui.SearchBox->text());
       }
     else
       {
-      this->ProxyWidget->filterWidgets(true);
+      this->ProxyWidget->filterWidgets(!this->HideAdvancedProperties);
       }
     }
 
@@ -229,6 +272,10 @@ public:
   void updateButtons(bool dirty)
     {
     Ui::ProxyWidgetDialog &ui = this->Ui;
+
+    // if applying changes immediately, then we're really not dirty.
+    dirty = this->applyChangesImmediately()? false: dirty;
+
     ui.ApplyButton->setEnabled(dirty);
     ui.ResetButton->setEnabled(dirty);
 
@@ -267,6 +314,19 @@ public:
   void saveAsDefaults()
     {
     this->ProxyWidget->saveAsDefaults();
+    }
+
+  void setApplyChangesImmediately(bool val)
+    {
+    this->ProxyWidget->setApplyChangesImmediately(val);
+    Ui::ProxyWidgetDialog &ui = this->Ui;
+    ui.ApplyButton->setVisible(!val);
+    ui.ResetButton->setVisible(!val);
+    }
+
+  bool applyChangesImmediately() const
+    {
+    return this->ProxyWidget->applyChangesImmediately();
     }
 };
 
@@ -309,6 +369,12 @@ void pqProxyWidgetDialog::setEnableSearchBar(bool val)
 bool pqProxyWidgetDialog::enableSearchBar() const
 {
   return this->Internals->enableSearchBar();
+}
+
+//-----------------------------------------------------------------------------
+bool pqProxyWidgetDialog::hasAdvancedProperties() const
+{
+  return this->Internals->HasAdvancedProperties;
 }
 
 //-----------------------------------------------------------------------------
@@ -380,6 +446,30 @@ void pqProxyWidgetDialog::onRestoreDefaults()
 void pqProxyWidgetDialog::onSaveAsDefaults()
 {
   this->Internals->saveAsDefaults();
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyWidgetDialog::setHideAdvancedProperties(bool val)
+{
+  this->Internals->setHideAdvancedProperties(val);
+}
+
+//-----------------------------------------------------------------------------
+bool pqProxyWidgetDialog::hideAdvancedProperties() const
+{
+  return this->Internals->hideAdvancedProperties();
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyWidgetDialog::setApplyChangesImmediately(bool val)
+{
+  this->Internals->setApplyChangesImmediately(val);
+}
+
+//-----------------------------------------------------------------------------
+bool pqProxyWidgetDialog::applyChangesImmediately() const
+{
+  return this->Internals->applyChangesImmediately();
 }
 
 //-----------------------------------------------------------------------------

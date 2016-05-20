@@ -111,6 +111,7 @@ void pqTraceReaction::start()
     pqProxyWidgetDialog dialog(proxy);
     dialog.setWindowTitle("Trace Options");
     dialog.setObjectName("TraceOptionsDialog");
+    dialog.setApplyChangesImmediately(true);
     if (dialog.exec() != QDialog::Accepted)
       {
       return;

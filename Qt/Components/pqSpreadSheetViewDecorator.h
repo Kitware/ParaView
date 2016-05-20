@@ -47,9 +47,17 @@ class PQCOMPONENTS_EXPORT pqSpreadSheetViewDecorator : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+  Q_PROPERTY(bool allowChangeOfSource READ allowChangeOfSource WRITE setAllowChangeOfSource)
 public:
   pqSpreadSheetViewDecorator(pqSpreadSheetView* view);
   ~pqSpreadSheetViewDecorator();
+
+  /// Returns whether the user should allowed to interactive change the source.
+  /// being shown in the view. `true` by default.
+  bool allowChangeOfSource() const;
+
+  /// Set whether the user should be allowed to change the source interactively.
+  void setAllowChangeOfSource(bool val);
 
 protected slots:
   void currentIndexChanged(pqOutputPort*);
@@ -58,7 +66,7 @@ protected slots:
   void showToggleColumnPopupMenu();
   void updateColumnVisibility();
   void toggleCellConnectivity();
-  
+
 protected:
   pqSpreadSheetView* Spreadsheet;
 

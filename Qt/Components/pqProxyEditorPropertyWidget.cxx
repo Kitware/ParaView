@@ -144,7 +144,7 @@ void pqProxyEditorPropertyWidget::buttonClicked()
   if (this->Editor == NULL)
     {
     this->Editor = new pqProxyWidgetDialog(this->ProxyToEdit.GetPointer(), this);
-    this->Editor->setEnableSearchBar(true);
+    this->Editor->setEnableSearchBar(this->Editor->hasAdvancedProperties());
     this->Editor->setSettingsKey(
       QString("pqProxyEditorPropertyWidget.%1.%2")
         .arg(this->proxy()->GetXMLName())

@@ -262,3 +262,18 @@ void pqSpreadSheetViewDecorator::toggleCellConnectivity()
     this->Spreadsheet->render();
     }
 }
+
+
+//-----------------------------------------------------------------------------
+bool pqSpreadSheetViewDecorator::allowChangeOfSource() const
+{
+  return this->Internal->Source->isEnabled();
+}
+
+//-----------------------------------------------------------------------------
+void pqSpreadSheetViewDecorator::setAllowChangeOfSource(bool val)
+{
+  this->Internal->Source->setEnabled(val);
+  this->Internal->Source->setVisible(val);
+  this->Internal->label->setVisible(val);
+}

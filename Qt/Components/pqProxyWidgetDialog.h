@@ -55,15 +55,39 @@ public:
   /// Returns whether that dialog has any visible widgets.
   bool hasVisibleWidgets() const;
 
+  /// Returns true if the proxy has any advanced properties.
+  /// This may be useful to determine if the search bar should be enabled or
+  /// not.
+  bool hasAdvancedProperties() const;
+
   /// Returns the proxy.
   vtkSMProxy* proxy() const;
 
   /// Get/set whether the search-bar should be shown on the dialog.
-  /// Default is false. If search-bar is not show, the dialog cannot support
+  /// Default is false. If search-bar is not enabled, the dialog cannot support
   /// default/advanced viewing modes either and hence it will simply show all
   /// property widgets.
   void setEnableSearchBar(bool val);
   bool enableSearchBar() const;
+
+  /// By default, the pqProxyWidgetDialog will show advanced properties on the
+  /// proxy either by default (if EnableSearchBar is false), or based on the
+  /// ui-element in search bar (if EnableSearchBar is true). However, there may
+  /// be cases when an application doesn't want to show the advanced properties.
+  /// In that case, you can use this method to hide all advanced properties.
+  /// If EnableSearchBar is true and HideAdvancedProperties is false, then the
+  /// gear-icon shown next to search bar to allow user to toggle the advanced
+  /// properties is not shown.
+  void setHideAdvancedProperties(bool val);
+  bool hideAdvancedProperties() const;
+
+  /// When set to true (default is false), pqProxyWidgetDialog will not show the
+  /// 'Apply' and 'Reset' buttons. This has one major implication, however.
+  /// Whenever the user changes a widget in the UI, the corresponding property
+  /// on the proxy will immediately be changed. Thus, even if the user hits
+  /// 'Cancel', the proxy will be left in modified state.
+  void setApplyChangesImmediately(bool val);
+  bool applyChangesImmediately() const;
 
   /// Set the new setting key that will be used to restore/save the advanced
   /// button check state. If the given key is valid (i.e. not empty), the
