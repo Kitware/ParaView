@@ -1425,6 +1425,7 @@ vtkSortedTableStreamer::vtkSortedTableStreamer()
   this->Controller = 0;
   this->SetNumberOfInputPorts(1);
   this->ColumnToSort = 0;
+  this->SetColumnToSort("");
   this->Block = 0;
   this->BlockSize = 1024;
   this->Internal = 0;
