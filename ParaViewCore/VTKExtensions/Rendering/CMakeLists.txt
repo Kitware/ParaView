@@ -70,7 +70,7 @@ set(Module_SRCS
   vtkPVTrackballRoll.cxx
   vtkPVTrackballRotate.cxx
   vtkPVTrackballZoom.cxx
-  vtkPVTrackballZoomMouse.cxx
+  vtkPVTrackballZoomToMouse.cxx
   vtkPVUpdateSuppressor.cxx
   vtkReductionFilter.cxx
   vtkResampledAMRImageSource.cxx

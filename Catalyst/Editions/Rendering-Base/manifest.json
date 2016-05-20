@@ -146,6 +146,7 @@
         { "class": "vtkPVTrackballRoll" },
         { "class": "vtkPVTrackballRotate" },
         { "class": "vtkPVTrackballZoom" },
+        { "class": "vtkPVTrackballZoomToMouse" },
         { "class": "vtkPVUpdateSuppressor" },
         { "class": "vtkRedistributePolyData" },
         { "class": "vtkResampledAMRImageSource" },

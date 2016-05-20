@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVTrackballZoomMouse.cxx
+  Module:    vtkPVTrackballZoomToMouse.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,7 +12,7 @@
     PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPVTrackballZoomMouse.h"
+#include "vtkPVTrackballZoomToMouse.h"
 
 #include "vtkCamera.h"
 #include "vtkObjectFactory.h"
@@ -21,22 +21,22 @@
 #include "vtkRenderWindow.h"
 #include "vtkPVInteractorStyle.h"
 
-vtkStandardNewMacro(vtkPVTrackballZoomMouse);
+vtkStandardNewMacro(vtkPVTrackballZoomToMouse);
 
 //-------------------------------------------------------------------------
-vtkPVTrackballZoomMouse::vtkPVTrackballZoomMouse()
+vtkPVTrackballZoomToMouse::vtkPVTrackballZoomToMouse()
 {
   this->ZoomPosition[0] = 0;
   this->ZoomPosition[1] = 0;
 }
 
 //-------------------------------------------------------------------------
-vtkPVTrackballZoomMouse::~vtkPVTrackballZoomMouse()
+vtkPVTrackballZoomToMouse::~vtkPVTrackballZoomToMouse()
 {
 }
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballZoomMouse::OnButtonDown(int x, int y, vtkRenderer *ren,
+void vtkPVTrackballZoomToMouse::OnButtonDown(int x, int y, vtkRenderer *ren,
   vtkRenderWindowInteractor * rwi)
 {
   this->Superclass::OnButtonDown(x, y, ren, rwi);
@@ -44,7 +44,7 @@ void vtkPVTrackballZoomMouse::OnButtonDown(int x, int y, vtkRenderer *ren,
 }
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballZoomMouse::OnMouseMove(int x, int y,
+void vtkPVTrackballZoomToMouse::OnMouseMove(int vtkNotUsed(x), int y,
   vtkRenderer *ren,
   vtkRenderWindowInteractor *rwi)
 {
@@ -55,7 +55,7 @@ void vtkPVTrackballZoomMouse::OnMouseMove(int x, int y,
 }
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballZoomMouse::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVTrackballZoomToMouse::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 

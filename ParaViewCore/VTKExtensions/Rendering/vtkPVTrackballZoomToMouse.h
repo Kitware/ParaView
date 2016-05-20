@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVTrackballZoomMouse.h
+  Module:    vtkPVTrackballZoomToMouse.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,22 +12,22 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVTrackballZoomMouse - Zooms camera with vertical mouse movement to mouse position.
+// .NAME vtkPVTrackballZoomToMouse - Zooms camera with vertical mouse movement to mouse position.
 // .SECTION Description
-// vtkPVTrackballZoomMouse is a redifinition of a vtkPVTrackballZoom
-// allowing the user to zoom on mouse position
+// vtkPVTrackballZoomToMouse is a redifinition of a vtkPVTrackballZoom
+// allowing the user to zoom at the point projected under the mouse position.
 
-#ifndef vtkPVTrackballZoomMouse_h
-#define vtkPVTrackballZoomMouse_h
+#ifndef vtkPVTrackballZoomToMouse_h
+#define vtkPVTrackballZoomToMouse_h
 
 #include "vtkPVTrackballZoom.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
-class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVTrackballZoomMouse : public vtkPVTrackballZoom
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVTrackballZoomToMouse : public vtkPVTrackballZoom
 {
 public:
-  static vtkPVTrackballZoomMouse *New();
-  vtkTypeMacro(vtkPVTrackballZoomMouse, vtkPVTrackballZoom);
+  static vtkPVTrackballZoomToMouse *New();
+  vtkTypeMacro(vtkPVTrackballZoomToMouse, vtkPVTrackballZoom);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
@@ -39,13 +39,13 @@ public:
                             vtkRenderWindowInteractor *rwi);
 
 protected:
-  vtkPVTrackballZoomMouse();
-  ~vtkPVTrackballZoomMouse();
+  vtkPVTrackballZoomToMouse();
+  ~vtkPVTrackballZoomToMouse();
 
   int ZoomPosition[2];
 
-  vtkPVTrackballZoomMouse(const vtkPVTrackballZoomMouse&); // Not implemented
-  void operator=(const vtkPVTrackballZoomMouse&); // Not implemented
+  vtkPVTrackballZoomToMouse(const vtkPVTrackballZoomToMouse&); // Not implemented
+  void operator=(const vtkPVTrackballZoomToMouse&); // Not implemented
 };
 
 #endif
