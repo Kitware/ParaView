@@ -1,5 +1,4 @@
 from paraview.simple import *
-
 from paraview import coprocessing
 
 # --------------------- Cinema exporter definition ---------------------
@@ -123,10 +122,22 @@ def CreateCoProcessor():
       Slice1.SliceType.Origin = [34.5, 32.45, 27.95]
       Slice1.SliceType.Normal = [1.0, 0.0, 0.0]
 
-      ParallelPolyDataWriter1 = coprocessor.CreateWriter( XMLPPolyDataWriter, "slice_%t.pvtp", 10 )
+      # create a new 'Parallel PolyData Writer'
+      parallelPolyDataWriter1 = servermanager.writers.XMLPPolyDataWriter(Input=Slice1)
 
-      # Add cinema exploration
-      # coprocessor.RegisterExporter(CreateCinemaExporter(filename_3_pvtu, 2)) acbauer -- this should be the one to use
+      # register the writer with coprocessor
+      # and provide it with information such as the filename to use,
+      # how frequently to write the data, etc.
+      coprocessor.RegisterWriter(parallelPolyDataWriter1, filename='slice_%t.pvtp', freq=10)
+
+      # create a new 'Parallel UnstructuredGrid Writer'
+      unstructuredGridWriter1 = servermanager.writers.XMLPUnstructuredGridWriter(Input=filename_3_pvtu)
+
+      # register the writer with coprocessor
+      # and provide it with information such as the filename to use,
+      # how frequently to write the data, etc.
+      coprocessor.RegisterWriter(unstructuredGridWriter1, filename='fullgrid_%t.pvtu', freq=100)
+
       CreateCinemaExporter(filename_3_pvtu, 2)
 
     return Pipeline()

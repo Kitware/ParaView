@@ -1,8 +1,5 @@
-try: paraview.simple
-except: from paraview.simple import *
-
+from paraview.simple import *
 from paraview import coprocessing
-
 
 #--------------------------------------------------------------
 # Code generated from cpstate.py to create the CoProcessor.
@@ -15,15 +12,26 @@ def CreateCoProcessor():
     class Pipeline:
       filename_18_vtm = coprocessor.CreateProducer( datadescription, "input" )
 
-      ParallelMultiBlockDataSetWriter1 = coprocessor.CreateWriter( XMLMultiBlockDataWriter, "fullgrid_%t.vtm", 100 )
+      # create a new 'Parallel MultiBlock Writer'
+      gridWriter = servermanager.writers.XMLMultiBlockDataWriter(Input=filename_18_vtm)
 
-      SetActiveSource(filename_18_vtm)
-      Slice1 = Slice( guiName="Slice1", Crinkleslice=0, SliceOffsetValues=[0.0], Triangulatetheslice=1, SliceType="Plane" )
+      # register the writer with coprocessor
+      # and provide it with information such as the filename to use,
+      # how frequently to write the data, etc.
+      coprocessor.RegisterWriter(gridWriter, filename='fullgrid_%t.vtm', freq=10)
+
+      Slice1 = Slice( Input=filename_18_vtm, guiName="Slice1", Crinkleslice=0, SliceOffsetValues=[0.0], Triangulatetheslice=1, SliceType="Plane" )
       Slice1.SliceType.Offset = 0.0
       Slice1.SliceType.Origin = [35.0, 33.0, 28.6]
       Slice1.SliceType.Normal = [1.0, 0.0, 0.0]
 
-      ParallelMultiBlockDataSetWriter2 = coprocessor.CreateWriter( XMLMultiBlockDataWriter, "slice_%t.vtm", 10 )
+      # create a new 'Parallel MultiBlock Writer'
+      sliceWriter = servermanager.writers.XMLMultiBlockDataWriter(Input=Slice1)
+
+      # register the writer with coprocessor
+      # and provide it with information such as the filename to use,
+      # how frequently to write the data, etc.
+      coprocessor.RegisterWriter(sliceWriter, filename='slice_%t.vtm', freq=10)
 
     return Pipeline()
 

@@ -2,6 +2,8 @@ from paraview.simple import *
 
 from paraview import coprocessing
 
+# the frequency to output everything
+outputfrequency = 5
 
 #--------------------------------------------------------------
 # Code generated from cpstate.py to create the CoProcessor.
@@ -14,22 +16,33 @@ def CreateCoProcessor():
     class Pipeline:
       adaptorinput = coprocessor.CreateProducer( datadescription, "input" )
       grid = adaptorinput.GetClientSideObject().GetOutputDataObject(0)
+      filename = None
       if  grid.IsA('vtkImageData') or grid.IsA('vtkUniformGrid'):
-        writer = coprocessor.CreateWriter( XMLPImageDataWriter, "filename_%t.pvti", 1 )
+        writer = servermanager.writers.XMLPImageDataWriter(Input=adaptorinput)
+        filename = 'filename_%t.pvti'
       elif  grid.IsA('vtkRectilinearGrid'):
-        writer = coprocessor.CreateWriter( XMLPRectilinearGridWriter, "filename_%t.pvtr", 1 )
+        writer = servermanager.writers.XMLPRectilinearGridWriter(Input=adaptorinput)
+        filename = 'filename_%t.pvtr'
       elif  grid.IsA('vtkStructuredGrid'):
-        writer = coprocessor.CreateWriter( XMLPStructuredGridWriter, "filename_%t.pvts", 1 )
+        writer = servermanager.writers.XMLPStructuredGridWriter(Input=adaptorinput)
+        filename = 'filename_%t.pvts'
       elif  grid.IsA('vtkPolyData'):
-        writer = coprocessor.CreateWriter( XMLPPolyDataWriter, "filename_%t.pvtp", 1 )
+        writer = servermanager.writers.XMLPPolyDataWriter(Input=adaptorinput)
+        filename = 'filename_%t.pvtp'
       elif  grid.IsA('vtkUnstructuredGrid'):
-        writer = coprocessor.CreateWriter( XMLPUnstructuredGridWriter, "filename_%t.pvtu", 1 )
+        writer = servermanager.writers.XMLPUnstructuredGridWriter(Input=adaptorinput)
+        filename = 'filename_%t.pvtu'
       elif  grid.IsA('vtkUniformGridAMR'):
-        writer = coprocessor.CreateWriter( XMLHierarchicalBoxDataWriter, "filename_%t.vthb", 1 )
+        writer = servermanager.writers.XMLHierarchicalBoxDataWriter(Input=adaptorinput)
+        filename = 'filename_%t.vthb'
       elif  grid.IsA('vtkMultiBlockDataSet'):
-        writer = coprocessor.CreateWriter( XMLMultiBlockDataWriter, "filename_%t.vtm", 1 )
+        writer = servermanager.writers.XMLMultiBlockDataWriter(Input=adaptorinput)
+        filename = 'filename_%t.vtm'
       else:
         print "Don't know how to create a writer for a ", grid.GetClassName()
+
+      if filename:
+        coprocessor.RegisterWriter(writer, filename, freq=outputfrequency)
 
     return Pipeline()
 
@@ -38,7 +51,7 @@ def CreateCoProcessor():
       self.Pipeline = _CreatePipeline(self, datadescription)
 
   coprocessor = CoProcessor()
-  freqs = {'input': [1]}
+  freqs = {'input': [outputfrequency]}
   coprocessor.SetUpdateFrequencies(freqs)
   return coprocessor
 

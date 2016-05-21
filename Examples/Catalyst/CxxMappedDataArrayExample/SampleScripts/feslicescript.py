@@ -1,9 +1,5 @@
-
-try: paraview.simple
-except: from paraview.simple import *
-
+from paraview.simple import *
 from paraview import coprocessing
-
 
 #--------------------------------------------------------------
 # Code generated from cpstate.py to create the CoProcessor.
@@ -21,10 +17,21 @@ def CreateCoProcessor():
       Slice1.SliceType.Origin = [34.5, 32.45, 27.95]
       Slice1.SliceType.Normal = [1.0, 0.0, 0.0]
 
-      ParallelPolyDataWriter1 = coprocessor.CreateWriter( XMLPPolyDataWriter, "slice_%t.pvtp", 10 )
+      # create a new 'Parallel PolyData Writer'
+      parallelPolyDataWriter1 = servermanager.writers.XMLPPolyDataWriter(Input=Slice1)
 
-      SetActiveSource(filename_3_pvtu)
-      ParallelUnstructuredGridWriter1 = coprocessor.CreateWriter( XMLPUnstructuredGridWriter, "fullgrid_%t.pvtu", 100 )
+      # register the writer with coprocessor
+      # and provide it with information such as the filename to use,
+      # how frequently to write the data, etc.
+      coprocessor.RegisterWriter(parallelPolyDataWriter1, filename='slice_%t.pvtp', freq=10)
+
+      # create a new 'Parallel UnstructuredGrid Writer'
+      unstructuredGridWriter1 = servermanager.writers.XMLPUnstructuredGridWriter(Input=filename_3_pvtu)
+
+      # register the writer with coprocessor
+      # and provide it with information such as the filename to use,
+      # how frequently to write the data, etc.
+      coprocessor.RegisterWriter(unstructuredGridWriter1, filename='fullgrid_%t.pvtu', freq=100)
 
     return Pipeline()
 

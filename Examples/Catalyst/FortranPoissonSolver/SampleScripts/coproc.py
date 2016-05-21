@@ -1,9 +1,5 @@
-
-try: paraview.simple
-except: from paraview.simple import *
-
+from paraview.simple import *
 from paraview import coprocessing
-
 
 #--------------------------------------------------------------
 # Code generated from cpstate.py to create the CoProcessor.
@@ -21,7 +17,13 @@ def CreateCoProcessor():
       Slice1.SliceType.Origin = [49.5, 49.5, 49.5]
       Slice1.SliceType.Normal = [1.0, 0.0, 0.0]
 
-      ParallelPolyDataWriter1 = coprocessor.CreateWriter( XMLPPolyDataWriter, "slice_%t.pvtp", 10 )
+      # create a new 'Parallel PolyData Writer'
+      parallelPolyDataWriter1 = servermanager.writers.XMLPPolyDataWriter(Input=Slice1)
+
+      # register the writer with coprocessor
+      # and provide it with information such as the filename to use,
+      # how frequently to write the data, etc.
+      coprocessor.RegisterWriter(parallelPolyDataWriter1, filename='slice_%t.pvtp', freq=10)
 
     return Pipeline()
 

@@ -18,22 +18,34 @@ def CreateCoProcessor():
         inputdescription = datadescription.GetInputDescriptionByName(name)
         adaptorinput = coprocessor.CreateProducer( datadescription, name )
         grid = adaptorinput.GetClientSideObject().GetOutputDataObject(0)
+        extension = None
         if  grid.IsA('vtkImageData') or grid.IsA('vtkUniformGrid'):
-          writer = coprocessor.CreateWriter( XMLPImageDataWriter, name+"_%t.pvti", outputfrequency )
+          writer = servermanager.writers.XMLPImageDataWriter(Input=adaptorinput)
+          extension = '.pvti'
         elif  grid.IsA('vtkRectilinearGrid'):
-          writer = coprocessor.CreateWriter( XMLPRectilinearGridWriter, name+"_%t.pvtr", outputfrequency )
+          writer = servermanager.writers.XMLPRectilinearGridWriter(Input=adaptorinput)
+          extension = '.pvtr'
         elif  grid.IsA('vtkStructuredGrid'):
-          writer = coprocessor.CreateWriter( XMLPStructuredGridWriter, name+"_%t.pvts", outputfrequency )
+          writer = servermanager.writers.XMLPStructuredGridWriter(Input=adaptorinput)
+          extension = '.pvts'
         elif  grid.IsA('vtkPolyData'):
-          writer = coprocessor.CreateWriter( XMLPPolyDataWriter, name+"_%t.pvtp", outputfrequency )
+          writer = servermanager.writers.XMLPPolyDataWriter(Input=adaptorinput)
+          extension = '.pvtp'
         elif  grid.IsA('vtkUnstructuredGrid'):
-          writer = coprocessor.CreateWriter( XMLPUnstructuredGridWriter, name+"_%t.pvtu", outputfrequency )
+          writer = servermanager.writers.XMLPUnstructuredGridWriter(Input=adaptorinput)
+          extension = '.pvtu'
         elif  grid.IsA('vtkUniformGridAMR'):
-          writer = coprocessor.CreateWriter( XMLHierarchicalBoxDataWriter, name+"_%t.vthb", outputfrequency )
+          writer = servermanager.writers.XMLHierarchicalBoxDataWriter(Input=adaptorinput)
+          extension = '.vthb'
         elif  grid.IsA('vtkMultiBlockDataSet'):
-          writer = coprocessor.CreateWriter( XMLMultiBlockDataWriter, name+"_%t.vtm", outputfrequency )
+          writer = servermanager.writers.XMLMultiBlockDataWriter(Input=adaptorinput)
+          extension = '.vtm'
         else:
           print "Don't know how to create a writer for a ", grid.GetClassName()
+
+        if extension:
+          coprocessor.RegisterWriter(writer, filename=name+'_%t'+extension, freq=outputfrequency)
+
 
     return Pipeline()
 
