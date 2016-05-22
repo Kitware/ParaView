@@ -112,10 +112,11 @@ void @PLUGIN_NAME@_Plugin::GetBinaryResources(
 vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
 @PLUGIN_NAME@_Plugin::GetInitializeInterpreterCallback()
 {
-# if defined(INITIALIZE_WRAPPING) || defined(INITIALIZE_EXTRA_CS_MODULES)
+#if defined(INITIALIZE_WRAPPING) || defined(INITIALIZE_EXTRA_CS_MODULES)
   return @PLUGIN_NAME@_CombinedInitialize;
-# endif
+#else
   return NULL;
+#endif
 }
 
 //-----------------------------------------------------------------------------
