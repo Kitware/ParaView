@@ -41,6 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QPushButton>
 #include <QStringList>
+#include <algorithm>
+#include <QtDebug>
 
 class pqQuickLaunchDialog::pqInternal : public Ui::QuickLaunchDialog
 {
@@ -50,6 +52,42 @@ public:
   QString SearchString;
   QPointer<QAction> ActiveAction;
 };
+
+namespace
+{
+  void fillPermutations(QList<QStringList>& list, QStringList words)
+    {
+    list.push_back(words);
+    words.sort();
+    do
+      {
+      list.push_back(words);
+      }
+    while (std::next_permutation(words.begin(), words.end()));
+    }
+
+  void fillSearchSpace(QStringList& searchSpace,
+    const QStringList& searchComponents,
+    const QList<QStringList>& searchExpressions, const QStringList& keys)
+    {
+    foreach (const QStringList& exp, searchExpressions)
+      {
+      QString part = exp.join("\\w*\\W+");
+      QRegExp regExp("^" + part, Qt::CaseInsensitive);
+      searchSpace += keys.filter(regExp);
+      }
+
+    // Now build up the list of matches to the search components disregarding
+    // word order and proximity entirely.
+    // (BUG #0016116).
+    QStringList filteredkeys = keys;
+    foreach (const QString &component, searchComponents)
+      {
+      filteredkeys = filteredkeys.filter(QRegExp(component, Qt::CaseInsensitive));
+      }
+    searchSpace += filteredkeys;
+    }
+}
 
 //-----------------------------------------------------------------------------
 pqQuickLaunchDialog::pqQuickLaunchDialog(QWidget* p):
@@ -163,16 +201,31 @@ void pqQuickLaunchDialog::updateSearch()
     return;
     }
 
-  QStringList searchComponents = this->Internal->SearchString.split(" ",
-    QString::SkipEmptyParts);
+  const QStringList keys = this->Internal->Items.keys();
+  const QStringList searchComponents = this->Internal->SearchString.split(" ", QString::SkipEmptyParts);
 
-  QString regExpStr = searchComponents.join(".*");
-  QRegExp regExp("^" + regExpStr, Qt::CaseInsensitive);
-  QRegExp regExp2(".*" + regExpStr, Qt::CaseInsensitive);
-  QStringList searchSpace = this->Internal->Items.keys();
-  QStringList searchSpace2 = searchSpace;
-  searchSpace = searchSpace.filter(regExp);
-  searchSpace += searchSpace2.filter(regExp2);
+  QList<QStringList> searchExpressions;
+  fillPermutations(searchExpressions, searchComponents);
+
+  QStringList searchSpace;
+  fillSearchSpace(searchSpace, searchComponents, searchExpressions, keys);
+
+  QStringList fuzzySearchComponents;
+  foreach (const QString& word, searchComponents)
+    {
+    QString newword;
+    for (int cc=0; cc < word.size(); cc++)
+      {
+      newword += word[cc];
+      newword += "\\w*";
+      }
+    fuzzySearchComponents.push_back(newword);
+    }
+
+  searchExpressions.clear();
+  fillPermutations(searchExpressions, fuzzySearchComponents);
+  fillSearchSpace(searchSpace, fuzzySearchComponents, searchExpressions, keys);
+
   searchSpace.removeDuplicates();
 
   int currentRow = -1;
