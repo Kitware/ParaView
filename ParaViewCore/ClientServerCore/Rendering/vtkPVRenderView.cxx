@@ -326,6 +326,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->UseDistributedRenderingForStillRender = false;
   this->UseDistributedRenderingForInteractiveRender = false;
   this->MakingSelection = false;
+  this->PreviousSwapBuffers = 0;
   this->StillRenderImageReductionFactor = 1;
   this->InteractiveRenderImageReductionFactor = 2;
   this->RemoteRenderingThreshold = 0;
@@ -855,6 +856,10 @@ bool vtkPVRenderView::PrepareSelect(int fieldAssociation)
     }
 
   this->MakingSelection = true;
+  // disable buffer swapping during selection to avoid clobbering the users
+  // view (BUG #16042).
+  this->PreviousSwapBuffers = this->GetRenderWindow()->GetSwapBuffers();
+  this->GetRenderWindow()->SwapBuffersOff();
 
   // Make sure that the representations are up-to-date. This is required since
   // due to delayed-swicth-back-from-lod, the most recent render maybe a LOD
@@ -904,6 +909,7 @@ void vtkPVRenderView::PostSelect(vtkSelection* sel)
   this->SynchronizedRenderers->SetEnabled(false);
 
   this->MakingSelection = false;
+  this->GetRenderWindow()->SetSwapBuffers(this->PreviousSwapBuffers);
 }
 
 //----------------------------------------------------------------------------
