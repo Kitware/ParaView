@@ -38,17 +38,11 @@ pqWelcomeDialog::~pqWelcomeDialog()
 //-----------------------------------------------------------------------------
 void pqWelcomeDialog::onGettingStartedGuideClicked()
 {
-#if defined (_WIN32)
-  QString paraViewGettingStartedFile =
-    QCoreApplication::applicationDirPath() + "/../doc/ParaViewGettingStartedGuide.pdf";
-#elif defined(__APPLE__)
-  QString paraViewGettingStartedFile =
-    QCoreApplication::applicationDirPath() + "/../../../doc/ParaViewGettingStartedGuide.pdf";
+#if defined(_WIN32) || defined(__APPLE__)
+  QString paraViewGettingStartedFile = QCoreApplication::applicationDirPath() + "/../doc/GettingStarted.pdf";
 #else
-  QString paraViewGettingStartedFile =
-    QCoreApplication::applicationDirPath() + "/../../doc/ParaViewGettingStartedGuide.pdf";
+  QString paraViewGettingStartedFile = QCoreApplication::applicationDirPath() + "/../../doc/GettingStarted.pdf";
 #endif
-
   QUrl gettingStartedURL = QUrl::fromLocalFile(paraViewGettingStartedFile);
   pqDesktopServicesReaction::openUrl(gettingStartedURL);
 }

@@ -6,18 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>574</width>
-    <height>550</height>
+    <width>651</width>
+    <height>534</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
-  </property>
-  <property name="autoFillBackground">
-   <bool>false</bool>
-  </property>
-  <property name="styleSheet">
-   <string notr="true"/>
+   <string>Startup Screen</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>

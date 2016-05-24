@@ -317,11 +317,13 @@ void pqParaViewMenuBuilders::buildMacrosMenu
 void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
 {
 #if defined(_WIN32) || defined(__APPLE__)
-  QString paraViewGuideFile = QCoreApplication::applicationDirPath() + "/../doc/ParaViewGuide-CE.pdf";
-  QString paraViewGettingStartedFile = QCoreApplication::applicationDirPath() + "/../doc/ParaViewGettingStarted.pdf";
+  QString paraViewGuideFile = QCoreApplication::applicationDirPath() + "/../doc/Guide.pdf";
+  QString paraViewGettingStartedFile = QCoreApplication::applicationDirPath() + "/../doc/GettingStarted.pdf";
+  QString paraViewTutorialFile = QCoreApplication::applicationDirPath() + "/../doc/Tutorial.pdf";
 #else
-  QString paraViewGuideFile = QCoreApplication::applicationDirPath() + "/../../doc/ParaViewGuide-CE.pdf";
-  QString paraViewGettingStartedFile = QCoreApplication::applicationDirPath() + "/../../doc/ParaViewGettingStarted.pdf";
+  QString paraViewGuideFile = QCoreApplication::applicationDirPath() + "/../../doc/Guide.pdf";
+  QString paraViewGettingStartedFile = QCoreApplication::applicationDirPath() + "/../../doc/GettingStarted.pdf";
+  QString paraViewTutorialFile = QCoreApplication::applicationDirPath() + "/../../doc/Tutorial.pdf";
 #endif
 
   // Getting Started with ParaView
@@ -330,25 +332,26 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
     (menu.addAction(QIcon(":/pqWidgets/Icons/pdf.png"),
                     "Getting Started with ParaView") << pqSetName("actionGettingStarted")));
 
-  // Help
-  QAction * help = menu.addAction("Reader, Filter, and Writer Reference") <<
-    pqSetName("actionHelp");
-  help->setShortcut(QKeySequence::HelpContents);
-  new pqHelpReaction(help);
-
   // ParaView Guide
   new pqDesktopServicesReaction(
     QUrl::fromLocalFile(paraViewGuideFile),
     (menu.addAction(QIcon(":/pqWidgets/Icons/pdf.png"),
                     "ParaView Guide") << pqSetName("actionGuide")));
 
+  // Help
+  QAction * help = menu.addAction("Reader, Filter, and Writer Reference") <<
+    pqSetName("actionHelp");
+  help->setShortcut(QKeySequence::HelpContents);
+  new pqHelpReaction(help);
+
   // -----------------
   menu.addSeparator();
 
-  // ParaView Tutorial
+  // ParaView Tutorial notes
   new pqDesktopServicesReaction(
-    QUrl("http://www.paraview.org/Wiki/The_ParaView_Tutorial"),
-    (menu.addAction("ParaView Tutorial") << pqSetName("actionTutorial")));
+    QUrl::fromLocalFile(paraViewTutorialFile),
+    (menu.addAction(QIcon(":/pqWidgets/Icons/pdf.png"),
+                    "ParaView Tutorial") << pqSetName("actionTutorialNotes")));
 
   // Sandia National Labs Tutorials
   new pqDesktopServicesReaction(
