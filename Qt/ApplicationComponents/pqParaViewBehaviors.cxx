@@ -65,31 +65,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QShortcut>
 #include <QMainWindow>
 
-#define PQ_BEHAVIOR_DEFINE_FLAG(_name) bool pqParaViewBehaviors:: _name = true;
-PQ_BEHAVIOR_DEFINE_FLAG(StandardPropertyWidgets);
-PQ_BEHAVIOR_DEFINE_FLAG(StandardViewFrameActions);
-PQ_BEHAVIOR_DEFINE_FLAG(QtMessageHandlerBehavior);
-PQ_BEHAVIOR_DEFINE_FLAG(DataTimeStepBehavior);
-PQ_BEHAVIOR_DEFINE_FLAG(SpreadSheetVisibilityBehavior);
-PQ_BEHAVIOR_DEFINE_FLAG(PipelineContextMenuBehavior);
-PQ_BEHAVIOR_DEFINE_FLAG(ObjectPickingBehavior);
-PQ_BEHAVIOR_DEFINE_FLAG(DefaultViewBehavior);
-PQ_BEHAVIOR_DEFINE_FLAG(UndoRedoBehavior);
-PQ_BEHAVIOR_DEFINE_FLAG(AlwaysConnectedBehavior);
-PQ_BEHAVIOR_DEFINE_FLAG(CrashRecoveryBehavior);
-PQ_BEHAVIOR_DEFINE_FLAG(AutoLoadPluginXMLBehavior);
-PQ_BEHAVIOR_DEFINE_FLAG(PluginDockWidgetsBehavior);
-PQ_BEHAVIOR_DEFINE_FLAG(VerifyRequiredPluginBehavior);
-PQ_BEHAVIOR_DEFINE_FLAG(PluginActionGroupBehavior);
-PQ_BEHAVIOR_DEFINE_FLAG(FixPathsInStateFilesBehavior);
-PQ_BEHAVIOR_DEFINE_FLAG(CommandLineOptionsBehavior);
-PQ_BEHAVIOR_DEFINE_FLAG(PersistentMainWindowStateBehavior);
-PQ_BEHAVIOR_DEFINE_FLAG(CollaborationBehavior);
-PQ_BEHAVIOR_DEFINE_FLAG(StandardArrayColorMapsBehavior);
-PQ_BEHAVIOR_DEFINE_FLAG(ViewStreamingBehavior);
-PQ_BEHAVIOR_DEFINE_FLAG(PluginSettingsBehavior);
-PQ_BEHAVIOR_DEFINE_FLAG(ApplyBehavior);
-PQ_BEHAVIOR_DEFINE_FLAG(QuickLaunchShortcuts);
+#define PQ_BEHAVIOR_DEFINE_FLAG(_name,_default) bool pqParaViewBehaviors:: _name = _default;
+PQ_BEHAVIOR_DEFINE_FLAG(StandardPropertyWidgets, true);
+PQ_BEHAVIOR_DEFINE_FLAG(StandardViewFrameActions, true);
+PQ_BEHAVIOR_DEFINE_FLAG(QtMessageHandlerBehavior, true);
+PQ_BEHAVIOR_DEFINE_FLAG(DataTimeStepBehavior, true);
+PQ_BEHAVIOR_DEFINE_FLAG(SpreadSheetVisibilityBehavior, true);
+PQ_BEHAVIOR_DEFINE_FLAG(PipelineContextMenuBehavior, true);
+PQ_BEHAVIOR_DEFINE_FLAG(ObjectPickingBehavior, false);
+PQ_BEHAVIOR_DEFINE_FLAG(DefaultViewBehavior, true);
+PQ_BEHAVIOR_DEFINE_FLAG(UndoRedoBehavior, true);
+PQ_BEHAVIOR_DEFINE_FLAG(AlwaysConnectedBehavior, true);
+PQ_BEHAVIOR_DEFINE_FLAG(CrashRecoveryBehavior, true);
+PQ_BEHAVIOR_DEFINE_FLAG(AutoLoadPluginXMLBehavior, true);
+PQ_BEHAVIOR_DEFINE_FLAG(PluginDockWidgetsBehavior, true);
+PQ_BEHAVIOR_DEFINE_FLAG(VerifyRequiredPluginBehavior, true);
+PQ_BEHAVIOR_DEFINE_FLAG(PluginActionGroupBehavior, true);
+PQ_BEHAVIOR_DEFINE_FLAG(FixPathsInStateFilesBehavior, true);
+PQ_BEHAVIOR_DEFINE_FLAG(CommandLineOptionsBehavior, true);
+PQ_BEHAVIOR_DEFINE_FLAG(PersistentMainWindowStateBehavior, true);
+PQ_BEHAVIOR_DEFINE_FLAG(CollaborationBehavior, true);
+PQ_BEHAVIOR_DEFINE_FLAG(StandardArrayColorMapsBehavior, true);
+PQ_BEHAVIOR_DEFINE_FLAG(ViewStreamingBehavior, true);
+PQ_BEHAVIOR_DEFINE_FLAG(PluginSettingsBehavior, true);
+PQ_BEHAVIOR_DEFINE_FLAG(ApplyBehavior, true);
+PQ_BEHAVIOR_DEFINE_FLAG(QuickLaunchShortcuts, true);
 #undef PQ_BEHAVIOR_DEFINE_FLAG
 
 #define PQ_IS_BEHAVIOR_ENABLED(_name) enable##_name()
