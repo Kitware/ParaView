@@ -827,6 +827,7 @@ private:
   void operator=(const vtkPVRenderView&); // Not implemented
 
   bool MakingSelection;
+  int PreviousSwapBuffers;
   void OnSelectionChangedEvent();
   void OnPolygonSelectionEvent();
   void FinishSelection(vtkSelection*);

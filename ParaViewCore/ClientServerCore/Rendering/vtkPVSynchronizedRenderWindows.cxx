@@ -632,8 +632,13 @@ vtkRenderWindow* vtkPVSynchronizedRenderWindows::NewRenderWindow()
       int not_used[2];
       swap_buffers |= this->GetTileDisplayParameters(not_used, not_used);
       swap_buffers |= this->GetIsInCave();
+      if (vtksys::SystemTools::GetEnv("PV_DEBUG_REMOTE_RENDERING"))
+        {
+        // if defined, we swap buffers on server renders to simplify debugging
+        // remote rendering.
+        swap_buffers = true;
+        }
       window->SetSwapBuffers(swap_buffers? 1 : 0);
-      //window->SetSwapBuffers(1); // for debugging FIXME.
       this->Internals->SharedRenderWindow.TakeReference(window);
       this->Internals->SharedRenderWindow->SetSize(400, 400); // set some default size for the window.
       }
