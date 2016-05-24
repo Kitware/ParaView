@@ -578,6 +578,7 @@ void pqServerManagerModel::updateSettingsFromQSettings(pqServer* server)
         }
       }
     }
+  iter->Delete();
 }
 
 //-----------------------------------------------------------------------------
