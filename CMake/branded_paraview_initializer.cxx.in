@@ -177,19 +177,21 @@ pq@BPC_NAME@Initializer::Status pq@BPC_NAME@Initializer::Initialize(int argc, ch
     this->Splash->finish(this->MainWindow);
     }
 
-  bool show_welcome_dialog = false;
-  if (!this->PVApp->getOptions()->GetDisableRegistry())
-    {
-    show_welcome_dialog = settings->value(
-      "GeneralSettings.ShowWelcomeDialog", true).toBool();
-    }
-
-  if (show_welcome_dialog)
-    {
-    pqWelcomeDialog dialog(this->MainWindow);
-    dialog.setModal(false);
-    dialog.exec();
-    }
+// temporarily disabling welcome dialog till we
+// have a chance to get it fully functional.
+//  bool show_welcome_dialog = false;
+//  if (!this->PVApp->getOptions()->GetDisableRegistry())
+//    {
+//    show_welcome_dialog = settings->value(
+//      "GeneralSettings.ShowWelcomeDialog", true).toBool();
+//    }
+//
+//  if (show_welcome_dialog)
+//    {
+//    pqWelcomeDialog dialog(this->MainWindow);
+//    dialog.setModal(false);
+//    dialog.exec();
+//    }
 
   return RunApplication;
 }
