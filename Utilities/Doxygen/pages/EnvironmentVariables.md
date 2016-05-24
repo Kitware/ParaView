@@ -12,6 +12,7 @@ PV_DEBUG_PANELS | When set, debugging text will be printed out explaining the re
 PV_DEBUG_SKIP_OPENGL_VERSION_CHECK | Skip test to validate OpenGL support at launch.
 PV_DEBUG_TEST | Prints debugging information about the testing framework during playback to cout.
 PV_ICET_WINDOW_BORDERS | Force render windows to be 400x400 instead of fullscreen.
+PV_DEBUG_REMOTE_RENDERING | Forces server-side render windows to swap buffers in order to see what is being rendered on the server ranks.
 PV_MACRO_PATH | Additional directories defined by the user to store macros.
 PV_NO_OFFSCREEN_SCREENSHOTS | Disable the use of offsceen screenshots.
 PV_PLUGIN_CONFIG_FILE | XML Plugin Configuration Files to specify which plugin to load on startup.
