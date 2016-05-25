@@ -64,7 +64,7 @@ class PQCOMPONENTS_EXPORT pqCinemaTrackSelection : public QWidget
 public:
 
   typedef std::pair<pqArraySelectionModel*, pqCinemaTrack*> ItemValues;
-  typedef std::map<QString, ItemValues> ItemValuesMap;
+  typedef std::map<pqPipelineSource*, ItemValues> ItemValuesMap;
 
   pqCinemaTrackSelection(QWidget* parent_ = NULL);
   ~pqCinemaTrackSelection();

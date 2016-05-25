@@ -193,7 +193,7 @@ void pqCinemaTrackSelection::initializePipelineItemValues(QList<pqPipelineSource
       continue;
       }
 
-    ItemValues & values = this->PipelineItemValues[QString(plItem->getSMName())];
+    ItemValues & values = this->PipelineItemValues[plItem];
     values.first = new pqArraySelectionModel(this);
     values.first->populateModel(proxy);
     values.second = NULL;
@@ -233,7 +233,7 @@ void pqCinemaTrackSelection::onPipelineItemChanged(QModelIndex const & current,
     }
 
   //set current item's pipeline model
-  ItemValuesMap::iterator valuesIt = this->PipelineItemValues.find(QString(source->getSMName()));
+  ItemValuesMap::iterator valuesIt = this->PipelineItemValues.find(source);
   if (valuesIt == this->PipelineItemValues.end())
     {
     return;
@@ -265,7 +265,7 @@ void pqCinemaTrackSelection::onPipelineItemChanged(QModelIndex const & current,
       return;
     }
 
-  ItemValuesMap::iterator prevValuesIt = this->PipelineItemValues.find(QString(prevItem->getSMName()));
+  ItemValuesMap::iterator prevValuesIt = this->PipelineItemValues.find(prevItem);
   if (prevValuesIt != this->PipelineItemValues.end())
     {
     pqCinemaTrack* prevTrack = prevValuesIt->second.second;
@@ -309,6 +309,9 @@ QList<pqCinemaTrack*> pqCinemaTrackSelection::getTracks()
     {
     if (pqCinemaTrack* track = qobject_cast<pqCinemaTrack*>((*it).second.second))
       {
+      // Update names as they might be out of sync (e.g. if the user renamed a filter).
+      // TODO: Update the name right away when it changes with an ss connection.
+      track->setFilterName(QString((*it).first->getSMName()));
       tracks.append(track);
       }
     }
@@ -387,7 +390,7 @@ QString pqCinemaTrackSelection::getArraySelectionAsString(QString const & format
     pqArraySelectionModel* model = (*it).second.first;
     if (model)
       {
-      QString itemName = (*it).first;
+      QString itemName = QString((*it).first->getSMName());
       QStringList arrayNames = model->getCheckedItemNames();
 
       // append to the selection string
