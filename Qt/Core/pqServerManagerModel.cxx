@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqInterfaceTracker.h"
+#include "pqOptions.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqProxy.h"
@@ -40,12 +41,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerManagerModelInterface.h"
 #include "pqServerManagerObserver.h"
+#include "pqSettings.h"
 #include "pqView.h"
+
 #include "vtkNew.h"
 #include "vtkProcessModule.h"
+#include "vtkPVProxyDefinitionIterator.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMParaViewPipelineController.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMPropertyIterator.h"
+#include "vtkSMProxyDefinitionManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSessionClient.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
@@ -507,6 +517,68 @@ void pqServerManagerModel::onConnectionCreated(vtkIdType id)
   emit this->serverReady(server);
   emit this->itemAdded(server);
   emit this->serverAdded(server);
+
+  this->updateSettingsFromQSettings(server);
+}
+
+//-----------------------------------------------------------------------------
+void pqServerManagerModel::updateSettingsFromQSettings(pqServer* server)
+{
+  if (!server)
+    {
+    return;
+    }
+
+  vtkSMSessionProxyManager* pxm = server->proxyManager();
+  if (!pxm)
+    {
+    return;
+    }
+
+  pqApplicationCore* applicationCore = pqApplicationCore::instance();
+  pqSettings* settings = applicationCore->settings();
+
+  vtkSMProxyDefinitionManager* pdm = pxm->GetProxyDefinitionManager();
+  vtkPVProxyDefinitionIterator* iter = pdm->NewSingleGroupIterator( "settings" );
+  for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+    vtkSMProxy* proxy = pxm->GetProxy(iter->GetGroupName(), iter->GetProxyName());
+    if (!proxy)
+      {
+      continue;
+      }
+
+    vtkSmartPointer<vtkSMPropertyIterator> propIter;
+    propIter.TakeReference(proxy->NewPropertyIterator());
+    for (propIter->Begin(); !propIter->IsAtEnd(); propIter->Next())
+      {
+      vtkSMProperty* prop = propIter->GetProperty();
+      const char* propName = propIter->GetKey();
+      QString qsettingsName(proxy->GetXMLName());
+      qsettingsName.append(".");
+      qsettingsName.append(propName);
+
+      if (!settings->contains(qsettingsName))
+        {
+        continue;
+        }
+
+      if (vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(prop))
+        {
+        QVariant value = settings->value(qsettingsName);
+        if (value.isValid())
+          {
+          ivp->SetElement(0, value.toInt());
+          }
+        }
+      else
+        {
+        qWarning() << "Could not set settings proxy property for property '" << propName << "' of type "
+                   << prop->GetClassName();
+        }
+      }
+    }
+  iter->Delete();
 }
 
 //-----------------------------------------------------------------------------

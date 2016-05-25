@@ -136,6 +136,8 @@ set (Module_SRCS
   pqEditScalarBarReaction.h
   pqEnableWidgetDecorator.cxx
   pqEnableWidgetDecorator.h
+  pqExampleVisualizationsDialog.cxx
+  pqExampleVisualizationsDialog.h
   pqExportReaction.cxx
   pqExportReaction.h
   pqFileNamePropertyWidget.cxx
@@ -308,6 +310,8 @@ set (Module_SRCS
   pqViewStreamingBehavior.h
   pqViewTypePropertyWidget.cxx
   pqViewTypePropertyWidget.h
+  pqWelcomeDialog.cxx
+  pqWelcomeDialog.h
   pqYoungsMaterialPropertyWidget.cxx
   pqYoungsMaterialPropertyWidget.h
 )
@@ -366,6 +370,7 @@ set (Module_MOC_HDRS
   pqEditColorMapReaction.h
   pqEditScalarBarReaction.h
   pqEnableWidgetDecorator.h
+  pqExampleVisualizationsDialog.h
   pqExportReaction.h
   pqFileNamePropertyWidget.h
   pqFiltersMenuReaction.h
@@ -451,6 +456,7 @@ set (Module_MOC_HDRS
   pqViewMenuManager.h
   pqViewStreamingBehavior.h
   pqViewTypePropertyWidget.h
+  pqWelcomeDialog.h
   pqYoungsMaterialPropertyWidget.h
 )
 
@@ -484,6 +490,7 @@ set (Module_UI_FILES
   Resources/UI/pqDefaultMainWindow.ui
   Resources/UI/pqDoubleRangeSliderPropertyWidget.ui
   Resources/UI/pqEditMenuBuilder.ui
+  Resources/UI/pqExampleVisualizationsDialog.ui
   Resources/UI/pqFileMenuBuilder.ui
   Resources/UI/pqFontPropertyWidget.ui
   Resources/UI/pqHandlePropertyWidget.ui
@@ -501,6 +508,7 @@ set (Module_UI_FILES
   Resources/UI/pqTimeInspectorWidget.ui
   Resources/UI/pqTransferFunctionWidgetPropertyWidgetDialog.ui
   Resources/UI/pqVCRToolbar.ui
+  Resources/UI/pqWelcomeDialog.ui
   Resources/UI/pqYoungsMaterialPropertyWidget.ui
 )
 

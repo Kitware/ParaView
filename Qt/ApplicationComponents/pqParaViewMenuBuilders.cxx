@@ -317,28 +317,110 @@ void pqParaViewMenuBuilders::buildMacrosMenu
 void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
 {
 #if defined(_WIN32) || defined(__APPLE__)
-  QString filePath = QCoreApplication::applicationDirPath() + "/../doc/ParaViewGuide-CE.pdf";
+  QString paraViewGuideFile = QCoreApplication::applicationDirPath() + "/../doc/Guide.pdf";
+  QString paraViewGettingStartedFile = QCoreApplication::applicationDirPath() + "/../doc/GettingStarted.pdf";
+  QString paraViewTutorialFile = QCoreApplication::applicationDirPath() + "/../doc/Tutorial.pdf";
 #else
-  QString filePath = QCoreApplication::applicationDirPath() + "/../../doc/ParaViewGuide-CE.pdf";
+  QString paraViewGuideFile = QCoreApplication::applicationDirPath() + "/../../doc/Guide.pdf";
+  QString paraViewGettingStartedFile = QCoreApplication::applicationDirPath() + "/../../doc/GettingStarted.pdf";
+  QString paraViewTutorialFile = QCoreApplication::applicationDirPath() + "/../../doc/Tutorial.pdf";
 #endif
 
+  // Getting Started with ParaView
   new pqDesktopServicesReaction(
-    QUrl::fromLocalFile(filePath),
-    (menu.addAction(QIcon(":/pqWidgets/Icons/pdf.png"), "ParaView Guide") << pqSetName("actionGuide")));
-  QAction * help = menu.addAction("Help") <<
+    QUrl::fromLocalFile(paraViewGettingStartedFile),
+    (menu.addAction(QIcon(":/pqWidgets/Icons/pdf.png"),
+                    "Getting Started with ParaView") << pqSetName("actionGettingStarted")));
+
+  // ParaView Guide
+  new pqDesktopServicesReaction(
+    QUrl::fromLocalFile(paraViewGuideFile),
+    (menu.addAction(QIcon(":/pqWidgets/Icons/pdf.png"),
+                    "ParaView Guide") << pqSetName("actionGuide")));
+
+  // Help
+  QAction * help = menu.addAction("Reader, Filter, and Writer Reference") <<
     pqSetName("actionHelp");
   help->setShortcut(QKeySequence::HelpContents);
   new pqHelpReaction(help);
 
+  // -----------------
   menu.addSeparator();
+
+  // ParaView Tutorial notes
+  new pqDesktopServicesReaction(
+    QUrl::fromLocalFile(paraViewTutorialFile),
+    (menu.addAction(QIcon(":/pqWidgets/Icons/pdf.png"),
+                    "ParaView Tutorial") << pqSetName("actionTutorialNotes")));
+
+  // Sandia National Labs Tutorials
+  new pqDesktopServicesReaction(
+    QUrl("http://www.paraview.org/Wiki/SNL_ParaView_4_Tutorials"),
+    (menu.addAction("Sandia National Labs Tutorials") << pqSetName("actionSNLTutorial")));
+
+  // Example Data Sets
+
+  // Example Visualizations
+
+  // -----------------
+  menu.addSeparator();
+
+  // ParaView Web Site
+  new pqDesktopServicesReaction(
+    QUrl("http://www.paraview.org"),
+    (menu.addAction("ParaView Web Site") << pqSetName("actionWebSite")));
+
+  // ParaView Wiki
+  new pqDesktopServicesReaction(
+    QUrl("http://www.paraview.org/Wiki/ParaView"),
+    (menu.addAction("ParaView Wiki") << pqSetName("actionWiki")));
+
+  // ParaView Mailing Lists
+  new pqDesktopServicesReaction(
+    QUrl("http://www.paraview.org/mailing-lists/"),
+    (menu.addAction("ParaView Mailing Lists") << pqSetName("actionMailingLists")));
+
+  // ParaView Release Notes
+  QString versionString(PARAVIEW_VERSION_FULL);
+  int indexOfHyphen = versionString.indexOf('-');
+  if (indexOfHyphen > -1)
+    {
+    versionString = versionString.left(indexOfHyphen);
+    }
+  versionString.replace('.', '-');
+  new pqDesktopServicesReaction(
+    QUrl("https://blog.kitware.com/paraview-" + versionString + "-release-notes/"),
+    (menu.addAction("Release Notes") << pqSetName("actionReleaseNotes")));
+
+  // -----------------
+  menu.addSeparator();
+
+  // Professional Support
+  new pqDesktopServicesReaction(
+    QUrl("http://www.kitware.com/products/paraviewpro.html"),
+    (menu.addAction("Professional Support") << pqSetName("actionProfessionalSupport")));
+
+  // Professional Training
+  new pqDesktopServicesReaction(
+    QUrl("http://www.kitware.com/products/protraining.php"),
+    (menu.addAction("Professional Training") << pqSetName("actionTraining")));
+
+  // Online Tutorials
   new pqDesktopServicesReaction(
     QUrl("http://www.paraview.org/tutorials/"),
     (menu.addAction("Online Tutorials") << pqSetName("actionTutorials")));
+
+  // Online Blogs
   new pqDesktopServicesReaction(
-    QUrl("http://www.kitware.com/blog/home/browse/topic/13"),
+    QUrl("https://blog.kitware.com/tag/ParaView/"),
     (menu.addAction("Online Blogs") << pqSetName("actionBlogs")));
 
+#if !defined(__APPLE__)
+  // -----------------
   menu.addSeparator();
+#endif
+
+  // About
   new pqAboutDialogReaction(
     menu.addAction("About...")
     << pqSetName("actionAbout"));

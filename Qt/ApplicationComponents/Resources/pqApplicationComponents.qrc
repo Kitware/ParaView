@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="/pqApplicationComponents">
+    <file>Thumbnails/CanExample.png</file>
+    <file>Thumbnails/DiskOutRefExample.png</file>
     <file>StandardArrayColorMaps.json</file>
   </qresource>
 </RCC>
