@@ -15,8 +15,8 @@
 #include "vtkSMSessionProxyManager.h"
 
 //-----------------------------------------------------------------------------
-pqWelcomeDialog::pqWelcomeDialog(QWidget *parent)
-  : Superclass (parent),
+pqWelcomeDialog::pqWelcomeDialog(QWidget *parentObject)
+  : Superclass(parentObject),
     ui(new Ui::pqWelcomeDialog)
 {
     ui->setupUi(this);
@@ -59,10 +59,10 @@ void pqWelcomeDialog::onExampleVisualizationsClicked()
 //-----------------------------------------------------------------------------
 void pqWelcomeDialog::onDoNotShowAgainStateChanged(int state)
 {
-  bool show = (state != Qt::Checked);
+  bool showDialog = (state != Qt::Checked);
 
   pqSettings* settings = pqApplicationCore::instance()->settings();
-  settings->setValue("GeneralSettings.ShowWelcomeDialog", show ? 1 : 0);
+  settings->setValue("GeneralSettings.ShowWelcomeDialog", showDialog ? 1 : 0);
 
   pqServer* server = pqApplicationCore::instance()->getActiveServer();
   if (!server)
@@ -81,6 +81,6 @@ void pqWelcomeDialog::onDoNotShowAgainStateChanged(int state)
   vtkSMProxy* proxy = pxm->GetProxy("settings", "GeneralSettings");
   if (proxy)
     {
-    vtkSMPropertyHelper(proxy, "ShowWelcomeDialog").Set(show ? 1 : 0);
+    vtkSMPropertyHelper(proxy, "ShowWelcomeDialog").Set(showDialog ? 1 : 0);
     }
 }

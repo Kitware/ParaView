@@ -5,8 +5,8 @@
 #include "pqLoadStateReaction.h"
 
 //-----------------------------------------------------------------------------
-pqExampleVisualizationsDialog::pqExampleVisualizationsDialog(QWidget* parent)
-  : Superclass(parent),
+pqExampleVisualizationsDialog::pqExampleVisualizationsDialog(QWidget* parentObject)
+  : Superclass(parentObject),
     ui(new Ui::pqExampleVisualizationsDialog)
 {
   ui->setupUi(this);
@@ -54,5 +54,5 @@ void pqExampleVisualizationsDialog::onButtonPressed()
       {
       qCritical("No example file for button");
       }
-    } 
+    }
 }
