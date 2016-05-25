@@ -47,6 +47,9 @@ extern "C" {
 #include "pqOptions.h"
 #include "pqParaViewBehaviors.h"
 #include "pqParaViewMenuBuilders.h"
+#include "pqSettings.h"
+#include "pqTimer.h"
+#include "pqWelcomeDialog.h"
 #include "vtkProcessModule.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkPVPlugin.h"
@@ -76,6 +79,11 @@ extern "C" {
 
 class ParaViewMainWindow::pqInternals : public Ui::pqClientMainWindow
 {
+public:
+  bool FirstShow;
+  pqInternals() : FirstShow(true)
+  {
+  }
 };
 
 //-----------------------------------------------------------------------------
@@ -292,4 +300,29 @@ void ParaViewMainWindow::dropEvent(QDropEvent *evt)
     return;
     }
   pqLoadDataReaction::loadData(files);
+}
+
+//-----------------------------------------------------------------------------
+void ParaViewMainWindow::showEvent(QShowEvent * evt)
+{
+  this->Superclass::showEvent(evt);
+  if (this->Internals->FirstShow)
+    {
+    this->Internals->FirstShow = false;
+    pqApplicationCore* core = pqApplicationCore::instance();
+    if (!core->getOptions()->GetDisableRegistry())
+      {
+      if (core->settings()->value("GeneralSettings.ShowWelcomeDialog", true).toBool())
+        {
+        pqTimer::singleShot(100, this, SLOT(showWelcomeDialog()));
+        }
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void ParaViewMainWindow::showWelcomeDialog()
+{
+  pqWelcomeDialog dialog(this);
+  dialog.exec();
 }
