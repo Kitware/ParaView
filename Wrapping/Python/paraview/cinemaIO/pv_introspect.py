@@ -377,7 +377,11 @@ def make_cinema_store(proxies, ocsfname, forcetime=False, _userDefinedValues = {
                 repeat = True
         dependency_list = [proxy['name'] for proxy in proxies if proxy['id'] in dependency_set]
         cs.assign_parameter_dependence(proxy_name,'vis',dependency_list)
-        arrNames = _userDefinedValues['arraySelection'] if ('arraySelection' in _userDefinedValues) else {None} #{None} triggers a legacy array selection (all except Normals).
+
+        arrNames = set([None])
+        if ('arraySelection' in _userDefinedValues):
+            arrNames = _userDefinedValues['arraySelection']
+
         add_control_and_colors(proxy_name, cs, arrNames)
         cs.assign_parameter_dependence("color"+proxy_name,'vis',[proxy_name])
 
@@ -431,7 +435,7 @@ def testexplore(cs):
     e.explore()
 
 
-def explore(cs, proxies, iSave=True, currentTime=None, arrayNames = {None}):
+def explore(cs, proxies, iSave=True, currentTime=None, arrayNames = set([None])):
     """
     Takes in the store, which contains only the list of parameters,
     """
@@ -672,7 +676,7 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
           _userDefinedValues = userDefValues)
 
         explore(cs, p, arrayNames = userDefValues['arraySelection'] if
-          ('arraySelection' in userDefValues) else {None})
+          ('arraySelection' in userDefValues) else set([None]))
 
         view.LockBounds = 0
         cs.save()
