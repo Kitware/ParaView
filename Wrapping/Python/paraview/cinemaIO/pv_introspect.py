@@ -208,8 +208,13 @@ def add_filter_value(name, cs, userDefinedValues):
     # generate values depending on the type of filter
     if isinstance(source, paraview.simple.servermanager.filters.Clip):
         # grab values from ui or generate defaults
-        values = userDefinedValues[name] if (name in userDefinedValues) else generate_offset_values()
-        if len(values) == 0: values = generate_offset_values()
+        values = []
+        if (source in userDefinedValues):
+            if ("OffsetValues" in userDefinedValues[source]):
+                values = userDefinedValues[source]["OffsetValues"]
+
+        if len(values) == 0:
+             values = generate_offset_values()
 
         # add sublayer and create the appropriate track
         cs.add_control(name, cinema_store.make_parameter(name, values, typechoice='hidden'))
@@ -217,8 +222,13 @@ def add_filter_value(name, cs, userDefinedValues):
 
     elif isinstance(source, paraview.simple.servermanager.filters.Slice):
         # grab values from ui or generate defaults
-        values = userDefinedValues[name] if (name in userDefinedValues) else generate_offset_values()
-        if len(values) == 0: values = generate_offset_values()
+        values = []
+        if (source in userDefinedValues):
+            if ("SliceOffsetValues" in userDefinedValues[source]):
+                values = userDefinedValues[source]["SliceOffsetValues"]
+
+        if len(values) == 0:
+            values = generate_offset_values()
 
         # add sublayer and create the appropriate track
         cs.add_control(name, cinema_store.make_parameter(name, values, typechoice='hidden'))
@@ -231,8 +241,14 @@ def add_filter_value(name, cs, userDefinedValues):
             vRange = source.Input.GetDataInformation().DataInformation.GetPointDataInformation().GetArrayInformation(0).GetComponentRange(0)
             return np.linspace(vRange[0], vRange[1], 5).tolist() # generate 5 contour values
 
-        values = userDefinedValues[name] if (name in userDefinedValues) else generate_contour_values()
-        if len(values) == 0: values = generate_contour_values()
+        # grab values from ui or generate defaults
+        values = []
+        if (source in userDefinedValues):
+            if ("Isosurfaces" in userDefinedValues[source]):
+                values = userDefinedValues[source]["Isosurfaces"]
+
+        if len(values) == 0:
+             values = generate_contour_values()
 
         # add sublayer and create the appropriate track
         cs.add_control(name, cinema_store.make_parameter(name, values, typechoice='hidden'))
@@ -245,7 +261,7 @@ def filter_has_parameters(name):
                      paraview.simple.servermanager.filters.Slice,
                      paraview.simple.servermanager.filters.Contour]))
 
-def add_control_and_colors(name, cs, arrayNames):
+def add_control_and_colors(name, cs, userDefined):
     source = paraview.simple.FindSource(name)
     #make up list of color options
     fields = {'depth':'depth','luminance':'luminance'}
@@ -256,10 +272,7 @@ def add_control_and_colors(name, cs, arrayNames):
 
     # select value arrays
     if rep.Representation != 'Outline':
-        if None in arrayNames:
-            defaultName = add_legacy_array_selection(source, fields, ranges)
-        else:
-            defaultName = add_customized_array_selection(name, source, fields, ranges, arrayNames)
+            defaultName = add_customized_array_selection(name, source, fields, ranges, userDefined)
 
     if defaultName == None:
         fields['white']='rgb'
@@ -268,18 +281,25 @@ def add_control_and_colors(name, cs, arrayNames):
     cparam = cinema_store.make_field("color"+name, fields, default=defaultName, valueRanges=ranges)
     cs.add_field("color"+name,cparam,'vis',[name])
 
-def add_customized_array_selection(sourceName, source, fields, ranges, arrayNames):
+def add_customized_array_selection(sourceName, source, fields, ranges, userDefined):
+    isArrayNotSelected = lambda aName, arrays: (aName not in arrays)
 
-    isArrayNotSelected = lambda sName, aName, arrays: (sName not in arrays) or \
-      (aName not in arrays[sName])
     defaultName = None
     cda = source.GetCellDataInformation()
+
+    if (source not in userDefined):
+        return defaultName
+
+    if ("arraySelection" not in userDefined[source]):
+        return defaultName
+
+    arrayNames = userDefined[source]["arraySelection"]
 
     for a in range(0, cda.GetNumberOfArrays()):
         arr = cda.GetArray(a)
         arrName = arr.GetName()
 
-        if isArrayNotSelected(sourceName, arrName, arrayNames): continue
+        if isArrayNotSelected(arrName, arrayNames): continue
         for i in range(0, arr.GetNumberOfComponents()):
             fName = arrName+"_"+str(i)
             fields[fName] = 'value'
@@ -291,7 +311,7 @@ def add_customized_array_selection(sourceName, source, fields, ranges, arrayName
         arr = pda.GetArray(a)
         arrName = arr.GetName()
 
-        if isArrayNotSelected(sourceName, arrName, arrayNames): continue
+        if isArrayNotSelected(arrName, arrayNames): continue
         for i in range(0, arr.GetNumberOfComponents()):
             fName = arrName+"_"+str(i)
             fields[fName] = 'value'
@@ -300,46 +320,20 @@ def add_customized_array_selection(sourceName, source, fields, ranges, arrayName
                 defaultName = fName
     return defaultName
 
-def add_legacy_array_selection(source, fields, ranges):
-    defaultName = None
-    cda = source.GetCellDataInformation()
-    for a in range(0, cda.GetNumberOfArrays()):
-        arr = cda.GetArray(a)
-        arrName = arr.GetName()
-        if not arrName == "Normals":
-            for i in range(0, arr.GetNumberOfComponents()):
-                fName = arrName+"_"+str(i)
-                fields[fName] = 'value'
-                ranges[fName] = arr.GetRange(i)
-                if defaultName == None:
-                    defaultName = fName
-    pda = source.GetPointDataInformation()
-    for a in range(0, pda.GetNumberOfArrays()):
-        arr = pda.GetArray(a)
-        arrName = arr.GetName()
-        if not arrName == "Normals":
-            for i in range(0, arr.GetNumberOfComponents()):
-                fName = arrName+"_"+str(i)
-                fields[fName] = 'value'
-                ranges[fName] = arr.GetRange(i)
-                if defaultName == None:
-                    defaultName = fName
-    return defaultName
-
-def make_cinema_store(proxies, ocsfname, forcetime=False, _userDefinedValues = {}):
+def make_cinema_store(proxies, ocsfname, forcetime=False, userDefined = {}):
     """
     Takes in the pipeline, structured as a tree, and makes a cinema store definition
     containing all the parameters we might will vary.
     """
 
-    if "phi" in _userDefinedValues:
-        phis = _userDefinedValues["phi"]
+    if "phi" in userDefined:
+        phis = userDefined["phi"]
     else:
         #phis = [0,45,90,135,180,225,270,315,360]
         phis = [0,180,360]
 
-    if "theta" in _userDefinedValues:
-        thetas = _userDefinedValues["theta"]
+    if "theta" in userDefined:
+        thetas = userDefined["theta"]
     else:
         #thetas = [0,20,40,60,80,100,120,140,160,180]
         thetas = [0,90,180]
@@ -366,7 +360,7 @@ def make_cinema_store(proxies, ocsfname, forcetime=False, _userDefinedValues = {
 
     for proxy in proxies:
         proxy_name = proxy['name']
-        add_filter_value(proxy_name,cs,_userDefinedValues)
+        add_filter_value(proxy_name, cs, userDefined)
         dependency_set = set([proxy['id']])
         repeat = True
         while repeat:
@@ -377,12 +371,7 @@ def make_cinema_store(proxies, ocsfname, forcetime=False, _userDefinedValues = {
                 repeat = True
         dependency_list = [proxy['name'] for proxy in proxies if proxy['id'] in dependency_set]
         cs.assign_parameter_dependence(proxy_name,'vis',dependency_list)
-
-        arrNames = set([None])
-        if ('arraySelection' in _userDefinedValues):
-            arrNames = _userDefinedValues['arraySelection']
-
-        add_control_and_colors(proxy_name, cs, arrNames)
+        add_control_and_colors(proxy_name, cs, userDefined)
         cs.assign_parameter_dependence("color"+proxy_name,'vis',[proxy_name])
 
     fnp = ""
@@ -435,7 +424,7 @@ def testexplore(cs):
     e.explore()
 
 
-def explore(cs, proxies, iSave=True, currentTime=None, arrayNames = set([None])):
+def explore(cs, proxies, iSave=True, currentTime=None, userDefined = {}):
     """
     Takes in the store, which contains only the list of parameters,
     """
@@ -494,10 +483,7 @@ def explore(cs, proxies, iSave=True, currentTime=None, arrayNames = set([None]))
 
                 numVals = 0
                 if rep.Representation != 'Outline':
-                    if None in arrayNames:
-                        numVals = explore_legacy_array_selection(sp, cC)
-                    else:
-                        numVals = explore_customized_array_selection(name, sp, cC, arrayNames)
+                        numVals = explore_customized_array_selection(name, sp, cC, userDefined)
 
                 if numVals == 0:
                     cC.AddSolidColor('white', [1,1,1])
@@ -521,43 +507,25 @@ def explore(cs, proxies, iSave=True, currentTime=None, arrayNames = set([None]))
             view_proxy.ViewTime=t
             e.explore({'time':float_limiter(t)})
 
-def explore_legacy_array_selection(source, colorList):
-    numVals = 0
-    cda = source.GetCellDataInformation()
-    for a in range(0, cda.GetNumberOfArrays()):
-        arr = cda.GetArray(a)
-        arrName = arr.GetName()
-        if not arrName == "Normals":
-            for i in range(0,arr.GetNumberOfComponents()):
-                numVals+=1
-                colorList.AddValueRender(arrName+"_"+str(i),
-                                True,
-                                arrName,
-                                i, arr.GetRange(i))
-    pda = source.GetPointDataInformation()
-    for a in range(0, pda.GetNumberOfArrays()):
-        arr = pda.GetArray(a)
-        arrName = arr.GetName()
-        if not arrName == "Normals":
-            for i in range(0,arr.GetNumberOfComponents()):
-                numVals+=1
-                colorList.AddValueRender(arrName+"_"+str(i),
-                                False,
-                                arrName,
-                                i, arr.GetRange(i))
-    return numVals
+def explore_customized_array_selection(sourceName, source, colorList, userDefined):
+    isArrayNotSelected = lambda aName, arrays: (aName not in arrays)
 
-def explore_customized_array_selection(sourceName, source, colorList, arrayNames):
-    isArrayNotSelected = lambda sName, aName, arrays: (sName not in arrays) or \
-      (aName not in arrays[sName])
     numVals = 0
     cda = source.GetCellDataInformation()
+
+    if (source not in userDefined):
+        return numVals
+
+    if ("arraySelection" not in userDefined[source]):
+        return numVals
+
+    arrayNames = userDefined[source]["arraySelection"]
 
     for a in range(0, cda.GetNumberOfArrays()):
         arr = cda.GetArray(a)
         arrName = arr.GetName()
 
-        if isArrayNotSelected(sourceName, arrName, arrayNames): continue
+        if isArrayNotSelected(arrName, arrayNames): continue
         for i in range(0,arr.GetNumberOfComponents()):
             numVals+=1
             colorList.AddValueRender(arrName+"_"+str(i),
@@ -569,7 +537,7 @@ def explore_customized_array_selection(sourceName, source, colorList, arrayNames
         arr = pda.GetArray(a)
         arrName = arr.GetName()
 
-        if isArrayNotSelected(sourceName, arrName, arrayNames): continue
+        if isArrayNotSelected(arrName, arrayNames): continue
         for i in range(0,arr.GetNumberOfComponents()):
             numVals+=1
             colorList.AddValueRender(arrName+"_"+str(i),
@@ -577,27 +545,6 @@ def explore_customized_array_selection(sourceName, source, colorList, arrayNames
                             arrName,
                             i, arr.GetRange(i))
     return numVals
-
-def record(csname="/tmp/test_pv/info.json"):
-    paraview.simple.Render()
-    view = paraview.simple.GetActiveView()
-    camera = view.GetActiveCamera()
-
-    pxystate = record_visibility()
-
-    view.LockBounds = 1
-
-    p = inspect()
-    cs = make_cinema_store(p, csname)
-    #if test:
-    #    testexplore(cs)
-    #else:
-    explore(cs, p)
-
-    view.LockBounds = 0
-
-    restore_visibility(pxystate)
-    cs.save()
 
 def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
     '''This explores a set of user-defined views and tracks. export_scene is
@@ -614,15 +561,13 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
 
     - arraySelection:
 
-    Directory of the form {'arraySelection' : {'FilterName' : ['arrayName1', 'arrayName2', ...], ... } }
+    Directory of the form {'FilterName' : ['arrayName1', 'arrayName2', ...], ... }
 
     Note:  baseDirName is used as the parent directory of the database generated for
     each view in viewSelection. 'Image filename' is used as the database directory name.
     '''
-    import paraview.simple as pvs
-
     # save initial state
-    initialView = pvs.GetActiveView()
+    initialView = paraview.simple.GetActiveView()
     pvstate = record_visibility()
 
     atLeastOneViewExported = False
@@ -635,10 +580,10 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
             continue
 
         # get the view and save the initial status
-        view = pvs.FindView(viewName)
-        pvs.SetActiveView(view)
+        view = paraview.simple.FindView(viewName)
+        paraview.simple.SetActiveView(view)
         view.ViewSize = [viewParams[4], viewParams[5]]
-        pvs.Render() # fully renders the scene (if not, some faces might be culled)
+        paraview.simple.Render() # fully renders the scene (if not, some faces might be culled)
         view.LockBounds = 1
 
         #writeFreq = viewParams[1] # TODO where to get the timestamp in this case?
@@ -655,15 +600,12 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
             else:
                 print ' do not know what to do with a ', view.GetClassName()
 
-        userDefValues = {}
+        userDefValues = prepare_selection(trackSelection, arraySelection)
         if "theta" in cinemaParams:
             userDefValues["theta"] = cinemaParams["theta"]
 
         if "phi" in cinemaParams:
             userDefValues["phi"] = cinemaParams["phi"]
-
-        userDefValues.update(trackSelection)
-        userDefValues.update(arraySelection)
 
         # generate file path
         import os.path
@@ -672,11 +614,10 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
         filePath = os.path.join(baseDirName, viewDirName, "info.json")
 
         p = inspect()
-        cs = make_cinema_store(p, filePath, forcetime = False,
-          _userDefinedValues = userDefValues)
+        cs = make_cinema_store(p, filePath, forcetime = False,\
+          userDefined = userDefValues)
 
-        explore(cs, p, arrayNames = userDefValues['arraySelection'] if
-          ('arraySelection' in userDefValues) else set([None]))
+        explore(cs, p, userDefined = userDefValues)
 
         view.LockBounds = 0
         cs.save()
@@ -687,5 +628,66 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
         return
 
     # restore initial state
-    pvs.SetActiveView(initialView)
+    paraview.simple.SetActiveView(initialView)
     restore_visibility(pvstate)
+    print "Finished exporting Cinema database!"
+
+def prepare_selection(trackSelection, arraySelection):
+    '''The rest of pv_introspect expects to receive user-defined values in the
+    structure:
+
+    { proxy_reference : { 'ControlName' : [value_1, value_2, ..., value_n],
+                          'arraySelection' : ['ArrayName_1', ..., 'ArrayName_n'] } }
+
+    This structure is necessary for catalyst to correctly reference the created
+    proxies.  Although this is not necessary in the menu->export case (proxies could
+    be accessed by name directly), we comply for compatibility.'''
+    userDef = {}
+    for name, values in trackSelection.iteritems():
+        source = paraview.simple.FindSource(name)
+        if (source is None):
+              # Following the smtrace.py convention pqCinemaTrackSelection passes
+              # lower-case-initial names, here the method tries to resolve the
+              # upper-case-initial version of the name. Caveat: breaks if the
+              # user re-names two items such that the only difference is the
+              # first letter's capitalization (which would be confusing anyway).
+              name_upper = name[0].upper() + name[1:]
+              source = paraview.simple.FindSource(name_upper)
+
+        if (source):
+            options = userDef[source] if (source in userDef) else {}
+
+            # Assumption: only a single 'ControlName' is supported per filter.
+            # (the control name will need to be included in the ui query when giving
+            # support to more parameters).
+            controlName = ""
+            if ("servermanager.Slice" in source.__class__().__str__() and
+                "Plane object" in source.__getattribute__("SliceType").__str__()):
+                controlName = "SliceOffsetValues"
+            elif ("servermanager.Clip" in source.__class__().__str__() and
+                "Plane object" in source.__getattribute__("ClipType").__str__()):
+                controlName = "OffsetValues"
+            elif ("servermanager.Contour" in source.__class__().__str__()):
+                controlName = "Isosurfaces"
+
+            if len(controlName) > 0:
+                options[controlName] = values
+                userDef[source] = options
+
+    for name, arrayNames in arraySelection.iteritems():
+        source = paraview.simple.FindSource(name)
+        if (source is None):
+              # Following the smtrace.py convention pqCinemaTrackSelection passes
+              # lower-case-initial names, here the method tries to resolve the
+              # upper-case-initial version of the name. Caveat: breaks if the
+              # user re-names two items such that the only difference is the
+              # first letter's capitalization (which would be confusing anyway).
+              name_upper = name[0].upper() + name[1:]
+              source = paraview.simple.FindSource(name_upper)
+
+        if (source):
+            options = userDef[source] if (source in userDef) else {}
+            options["arraySelection"] = arrayNames
+            userDef[source] = options
+
+    return userDef

@@ -64,15 +64,15 @@ class PQCOMPONENTS_EXPORT pqCinemaTrackSelection : public QWidget
 public:
 
   typedef std::pair<pqArraySelectionModel*, pqCinemaTrack*> ItemValues;
-  typedef std::map<QString, ItemValues> ItemValuesMap;
+  typedef std::map<pqPipelineSource*, ItemValues> ItemValuesMap;
 
   pqCinemaTrackSelection(QWidget* parent_ = NULL);
   ~pqCinemaTrackSelection();
 
   QList<pqCinemaTrack*> getTracks();
 
-  /// Returns a string containing a comma separated set of cinema tracks with each
-  /// track defined as in 'format'.
+  /// Returns a string containing a comma separated set of cinema tracks each with
+  /// a set of user selected values. Each track is defined as in 'format'.
   /// Order of track values:
   /// 1. Track Name
   /// 2. Value tuple
@@ -82,6 +82,14 @@ public:
   /// returns -> 'name1' : [a, b, c], 'name2' : [d, e, f], ... (for N tracks)
   QString getTrackSelectionAsString(QString const & format);
 
+  /// Returns a string containing a comma separated set of cinema tracks each with
+  /// a set of user selected arrays. Each track is defined as in 'format'.
+  /// Order of track array names:
+  /// 1. Track Name
+  /// 2. Array names tuple
+  /// Example: Format as defined in pqCinemaConfiguration
+  /// format = "'%1' : %2"
+  /// returns -> 'nameTrack1' : ['array1', 'array2', ...], 'nameTrack1' : ['array1', ...], ...
   QString getArraySelectionAsString(QString const & format);
 
   /// Creates a PipelineModel which gets populated using the current

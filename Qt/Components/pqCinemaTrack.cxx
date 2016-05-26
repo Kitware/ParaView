@@ -134,3 +134,9 @@ QString pqCinemaTrack::filterName() const
 {
   return this->Track->label->text();
 }
+
+//-----------------------------------------------------------------------------
+void pqCinemaTrack::setFilterName(QString const & name)
+{
+  this->Track->label->setText(name);
+}

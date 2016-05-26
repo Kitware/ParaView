@@ -21,6 +21,7 @@ def reset_cpstate_globals():
     cpstate_globals.screenshot_info = {}
     cpstate_globals.export_rendering = False
     cpstate_globals.cinema_tracks = {}
+    cpstate_globals.cinema_arrays = {}
 
 reset_cpstate_globals()
 
@@ -69,15 +70,17 @@ class ProducerAccessor(smtrace.RealProxyAccessor):
         smtrace.RealProxyAccessor.__init__(self, varname, proxy)
         # this cpSimulationInput attribute is used to locate the proxy later on.
         proxy.SMProxy.cpSimulationInput = simname
+        self.varname = varname
 
     def trace_ctor(self, ctor, filter, ctor_args=None, skip_assignment=False):
         trace = smtrace.TraceOutput()
         trace.append("# create a producer from a simulation input")
         trace.append("%s = coprocessor.CreateProducer(datadescription, '%s')" % \
             (self, self.SimulationInputName))
+
+        # TODO, review whether this Accessor should also export arrays.
         return trace.raw_data()
 
-# TODO: Make Slice, Contour & Clip Accessors to share an interface to reduce code duplication
 # -----------------------------------------------------------------------------
 class SliceAccessor(smtrace.RealProxyAccessor):
     """
@@ -96,6 +99,11 @@ class SliceAccessor(smtrace.RealProxyAccessor):
             valrange = cpstate_globals.cinema_tracks[self.varname]
             trace.append_separated(["# register the filter with the coprocessor's cinema generator"])
             trace.append(["coprocessor.RegisterCinemaTrack('slice', %s, 'SliceOffsetValues', %s)" % (self, valrange)])
+
+        if self.varname in cpstate_globals.cinema_arrays:
+            arrays = cpstate_globals.cinema_arrays[self.varname]
+            trace.append_separated(["# define target arrays of filters."])
+            trace.append(["coprocessor.AddArraysToCinemaTrack(%s, 'arraySelection', %s)" % (self, arrays)])
             trace.append_separator()
         return trace.raw_data()
 
@@ -117,6 +125,11 @@ class ContourAccessor(smtrace.RealProxyAccessor):
             valrange = cpstate_globals.cinema_tracks[self.varname]
             trace.append_separated(["# register the filter with the coprocessor's cinema generator"])
             trace.append(["coprocessor.RegisterCinemaTrack('contour', %s, 'Isosurfaces', %s)" % (self, valrange)])
+
+        if self.varname in cpstate_globals.cinema_arrays:
+            arrays = cpstate_globals.cinema_arrays[self.varname]
+            trace.append_separated(["# define target arrays of filters."])
+            trace.append(["coprocessor.AddArraysToCinemaTrack(%s, 'arraySelection', %s)" % (self, arrays)])
             trace.append_separator()
         return trace.raw_data()
 
@@ -133,14 +146,38 @@ class ClipAccessor(smtrace.RealProxyAccessor):
     def trace_ctor(self, ctor, filter, ctor_args = None, skip_assignment = False):
         original_trace = smtrace.RealProxyAccessor.trace_ctor( \
             self, ctor, filter, ctor_args, skip_assignment)
-
         trace = smtrace.TraceOutput(original_trace)
-        if cpstate_globals.cinema_tracks and self.varname in cpstate_globals.cinema_tracks:
+        if cpstate_globals.cinema_tracks and self.varname  in cpstate_globals.cinema_tracks:
             valrange = cpstate_globals.cinema_tracks[self.varname]
             trace.append_separated(["# register the filter with the coprocessor's cinema generator"])
             trace.append(["coprocessor.RegisterCinemaTrack('clip', %s, 'OffsetValues', %s)" % (self, valrange)])
-            trace.append_separator()
 
+        if self.varname in cpstate_globals.cinema_arrays:
+            arrays = cpstate_globals.cinema_arrays[self.varname]
+            trace.append_separated(["# define target arrays of filters."])
+            trace.append(["coprocessor.AddArraysToCinemaTrack(%s, 'arraySelection', %s)" % (self, arrays)])
+            trace.append_separator()
+        return trace.raw_data()
+
+# TODO: Make Slice, Contour & Clip Accessors to share an interface to reduce code
+# duplication. ArrayAccessor could be used as this interface.
+# -----------------------------------------------------------------------------
+class ArrayAccessor(smtrace.RealProxyAccessor):
+    ''' Augments traces of filters by defining names of arrays to be explored.'''
+    def __init__(self, varname, proxy):
+        smtrace.RealProxyAccessor.__init__(self, varname, proxy)
+        self.varname = varname
+
+    def trace_ctor(self, ctor, filter, ctor_args = None, skip_assignment = False):
+        original_trace = smtrace.RealProxyAccessor.trace_ctor( \
+            self, ctor, filter, ctor_args, skip_assignment)
+
+        trace = smtrace.TraceOutput(original_trace)
+        if self.varname in cpstate_globals.cinema_arrays:
+            arrays = cpstate_globals.cinema_arrays[self.varname]
+            trace.append_separated(["# define target arrays of filters."])
+            trace.append(["coprocessor.AddArraysToCinemaTrack(%s, 'arraySelection', %s)" % (self, arrays)])
+            trace.append_separator()
         return trace.raw_data()
 
 # -----------------------------------------------------------------------------
@@ -242,16 +279,19 @@ def cp_hook(varname, proxy):
     if pname:
         if pname in cpstate_globals.simulation_input_map:
             return ProducerAccessor(varname, proxy, cpstate_globals.simulation_input_map[pname])
-        if proxy.GetHints() and proxy.GetHints().FindNestedElementByName("WriterProxy"):
+        elif proxy.GetHints() and proxy.GetHints().FindNestedElementByName("WriterProxy"):
             return WriterAccessor(varname, proxy)
-        if ("servermanager.Slice" in proxy.__class__().__str__() and
+        elif ("servermanager.Slice" in proxy.__class__().__str__() and
             "Plane object" in proxy.__getattribute__("SliceType").__str__()):
             return SliceAccessor(varname, proxy)
-        if ("servermanager.Clip" in proxy.__class__().__str__() and
+        elif ("servermanager.Clip" in proxy.__class__().__str__() and
             "Plane object" in proxy.__getattribute__("ClipType").__str__()):
             return ClipAccessor(varname, proxy)
-        if "servermanager.Contour" in proxy.__class__().__str__():
+        elif "servermanager.Contour" in proxy.__class__().__str__():
             return ContourAccessor(varname, proxy)
+        else:
+            return ArrayAccessor(varname, proxy)
+
     pname = smtrace.Trace.get_registered_name(proxy, "views")
     if pname:
         cpstate_globals.view_proxies.append(proxy)
@@ -268,7 +308,8 @@ class cpstate_filter_proxies_to_serialize(object):
         return True
 
 # -----------------------------------------------------------------------------
-def DumpPipeline(export_rendering, simulation_input_map, screenshot_info, cinema_tracks):
+def DumpPipeline(export_rendering, simulation_input_map, screenshot_info,
+    cinema_tracks, cinema_arrays):
     """
         Method that will dump the current pipeline and return it as a string trace
         - export_rendering    : boolean telling if we want to export rendering
@@ -282,6 +323,9 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info, cinema
         - cinema_tracks       : map with information about cinema tracks to record
                                 key -> proxy name
                                 value -> argument ranges
+        - cinema_arrays       : map with information about value arrays to be exported
+                                key -> proxy name
+                                value -> list of array names
     """
 
     # reset the global variables.
@@ -291,6 +335,7 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info, cinema
     cpstate_globals.simulation_input_map = simulation_input_map
     cpstate_globals.screenshot_info = screenshot_info
     cpstate_globals.cinema_tracks = cinema_tracks
+    cpstate_globals.cinema_arrays = cinema_arrays
 
     # Initialize the write frequency map
     for key in cpstate_globals.simulation_input_map.values():
@@ -367,7 +412,8 @@ def run(filename=None):
     script = DumpPipeline(export_rendering=True,
         simulation_input_map={"Wavelet1" : "input"},
         screenshot_info={viewname : [ 'image.png', '1', '1', '2', '400', '400']},
-        cinema_tracks={})
+        cinema_tracks = {},
+        cinema_arrays = {})
     if filename:
         f = open(filename, "w")
         f.write(script)
