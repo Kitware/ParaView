@@ -3,5 +3,7 @@
     <file>Thumbnails/CanExample.png</file>
     <file>Thumbnails/DiskOutRefExample.png</file>
     <file>StandardArrayColorMaps.json</file>
+    <file>ExampleVisualizations/CanExample.pvsm</file>
+    <file>ExampleVisualizations/DiskOutRefExample.pvsm</file>
   </qresource>
 </RCC>

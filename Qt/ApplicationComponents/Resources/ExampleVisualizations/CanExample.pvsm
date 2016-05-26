@@ -4972,11 +4972,14 @@
     </Proxy>
     <Proxy group="sources" type="ExodusIIReader" id="5039" servers="1">
       <Property name="FileName" id="5039.FileName" number_of_elements="1">
-        <Element index="0" value="/Users/cory.quammen/bin/paraview-debug/ExternalData/Testing/Data/can.ex2"/>
+        <Element index="0" value="$PARAVIEW_EXAMPLES_DATA/can.ex2"/>
         <Domain name="files" id="5039.FileName.files"/>
       </Property>
-      <Property name="FileNameInfo" id="5039.FileNameInfo" number_of_elements="1">
-        <Element index="0" value="/Users/cory.quammen/bin/paraview-debug/ExternalData/Testing/Data/can.ex2"/>
+      <Property name="FilePrefix" id="5039.FilePrefix" number_of_elements="1">
+        <Element index="0" value="$PARAVIEW_EXAMPLES_DATA/can.ex2"/>
+        <Domain name="default_value" id="5039.FilePrefix.default_value">
+          <String text="$PARAVIEW_EXAMPLES_DATA/can.ex2"/>
+        </Domain>
       </Property>
       <Property name="TimestepValues" id="5039.TimestepValues" number_of_elements="44">
         <Element index="0" value="0"/>
@@ -5121,15 +5124,6 @@
       </Property>
       <Property name="FilePatternInfo" id="5039.FilePatternInfo" number_of_elements="1">
         <Element index="0" value="%s"/>
-      </Property>
-      <Property name="FilePrefix" id="5039.FilePrefix" number_of_elements="1">
-        <Element index="0" value="/Users/cory.quammen/bin/paraview-debug/ExternalData/Testing/Data/can.ex2"/>
-        <Domain name="default_value" id="5039.FilePrefix.default_value">
-          <String text="/Users/cory.quammen/bin/paraview-debug/ExternalData/Testing/Data/can.ex2"/>
-        </Domain>
-      </Property>
-      <Property name="FilePrefixInfo" id="5039.FilePrefixInfo" number_of_elements="1">
-        <Element index="0" value="/Users/cory.quammen/bin/paraview-debug/ExternalData/Testing/Data/can.ex2"/>
       </Property>
       <Property name="FileRange" id="5039.FileRange" number_of_elements="2">
         <Element index="0" value="0"/>

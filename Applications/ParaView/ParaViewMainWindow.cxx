@@ -314,7 +314,7 @@ void ParaViewMainWindow::showEvent(QShowEvent * evt)
       {
       if (core->settings()->value("GeneralSettings.ShowWelcomeDialog", true).toBool())
         {
-        pqTimer::singleShot(100, this, SLOT(showWelcomeDialog()));
+        pqTimer::singleShot(1000, this, SLOT(showWelcomeDialog()));
         }
       }
     }
