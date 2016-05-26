@@ -376,15 +376,28 @@ void pqApplicationCore::loadState(
 {
   if (!server || !filename)
     {
-    return ;
+    return;
     }
 
+  QFile qfile(filename);
+  if (qfile.open(QIODevice::ReadOnly|QIODevice::Text))
+    {
+    this->loadStateFromString(qfile.readAll().data(), server, loader);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::loadStateFromString(
+  const char* xmlcontents, pqServer* server, vtkSMStateLoader* loader)
+{
   vtkPVXMLParser* parser = vtkPVXMLParser::New();
-  parser->SetFileName(filename);
-  parser->Parse();
-  this->loadState(parser->GetRootElement(), server, loader);
+  if (xmlcontents && parser->Parse(xmlcontents))
+    {
+    this->loadState(parser->GetRootElement(), server, loader);
+    }
   parser->Delete();
 }
+
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::loadState(
