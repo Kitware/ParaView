@@ -317,14 +317,15 @@ void pqParaViewMenuBuilders::buildMacrosMenu
 void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
 {
 #if defined(_WIN32) || defined(__APPLE__)
-  QString paraViewGuideFile = QCoreApplication::applicationDirPath() + "/../doc/Guide.pdf";
-  QString paraViewGettingStartedFile = QCoreApplication::applicationDirPath() + "/../doc/GettingStarted.pdf";
-  QString paraViewTutorialFile = QCoreApplication::applicationDirPath() + "/../doc/Tutorial.pdf";
+  QString documentationPath = QCoreApplication::applicationDirPath() + "/../doc";
 #else
-  QString paraViewGuideFile = QCoreApplication::applicationDirPath() + "/../../doc/Guide.pdf";
-  QString paraViewGettingStartedFile = QCoreApplication::applicationDirPath() + "/../../doc/GettingStarted.pdf";
-  QString paraViewTutorialFile = QCoreApplication::applicationDirPath() + "/../../doc/Tutorial.pdf";
+  QString documentationPath = QCoreApplication::applicationDirPath()
+    + "/../../share/paraview-" PARAVIEW_VERSION + "/doc";
 #endif
+
+  QString paraViewGuideFile = documentationPath + "/Guide.pdf";
+  QString paraViewGettingStartedFile = documentationPath + "/GettingStarted.pdf";
+  QString paraViewTutorialFile = documentationPath + "/Tutorial.pdf";
 
   // Getting Started with ParaView
   new pqDesktopServicesReaction(
