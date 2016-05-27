@@ -97,6 +97,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include <QDockWidget>
+#include <QFileInfo>
 #include <QKeySequence>
 #include <QLayout>
 #include <QMainWindow>
@@ -320,8 +321,10 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
 #if defined(_WIN32) || defined(__APPLE__)
   QString documentationPath = QCoreApplication::applicationDirPath() + "/../doc";
 #else
-  QString documentationPath = QCoreApplication::applicationDirPath()
-    + "/../../share/paraview-" PARAVIEW_VERSION + "/doc";
+  QString appdir = QCoreApplication::applicationDirPath();
+  QString documentationPath = QFileInfo(appdir).fileName() == "bin" ?
+    /* w/o shared forwarding */ appdir + "/../share/paraview-" PARAVIEW_VERSION "/doc"  :
+    /* w/ shared forwarding  */ appdir + "/../../share/paraview-" PARAVIEW_VERSION "/doc";
 #endif
 
   QString paraViewGuideFile = documentationPath + "/Guide.pdf";
