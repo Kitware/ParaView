@@ -27,6 +27,11 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #==============================================================================
+"""
+Module that looks at a ParaView pipeline and automatically creates a cinema
+store that ranges over all of the variables that we know how to control and later
+show.
+"""
 import cinema_store
 import paraview
 import pv_explorers
@@ -35,6 +40,7 @@ from itertools import imap
 import numpy as np
 
 def record_visibility():
+    """at start of run, record the current paraview state so we can return to it"""
     proxies = []
 
     view_info = {}
@@ -71,6 +77,7 @@ def record_visibility():
     return proxies
 
 def restore_visibility(proxies):
+    """at end of run, return to a previously recorded paraview state"""
     view_proxy = paraview.simple.GetActiveView()
 
     for listElt in proxies:
@@ -152,6 +159,7 @@ def inspect(skip_invisible=True):
     return pxies
 
 def get_pipeline():
+    """sanitizes the pipeline graph"""
     proxies = inspect(skip_invisible=False)
     for proxy in proxies:
         source = paraview.simple.FindSource(proxy['name'])
@@ -171,7 +179,9 @@ def get_pipeline():
     return proxies
 
 def float_limiter(x):
-    #a shame, but needed to make sure python, java and (directory/file)name agree
+    """a shame, but needed to make sure python, javascript and
+    (directory/file)name agree. TODO: This can go away now that
+    we use name=index instead of name=value filenames."""
     if isinstance(x, (float)):
         #return '%6f' % x #arbitrarily chose 6 decimal places
         return '%.6e' % x #arbitrarily chose 6 significant digits
@@ -183,6 +193,7 @@ def float_limiter(x):
 explorerDir = {}
 
 def add_filter_value(name, cs, userDefinedValues):
+    """creates controls for the filters that we know how to manipulate"""
     source = paraview.simple.FindSource(name)
 
     # plane offset generator (for Slice or Clip)
@@ -255,6 +266,7 @@ def add_filter_value(name, cs, userDefinedValues):
         explorerDir[name] = pv_explorers.Contour(name, source)
 
 def filter_has_parameters(name):
+    """see if this proxy is one we know how to make controls for"""
     source = paraview.simple.FindSource(name)
     return any(imap(lambda filter: isinstance(source, filter),
                     [paraview.simple.servermanager.filters.Clip,
@@ -262,6 +274,7 @@ def filter_has_parameters(name):
                      paraview.simple.servermanager.filters.Contour]))
 
 def add_control_and_colors(name, cs, userDefined):
+    """add parameters that change the settings and color of a filter"""
     source = paraview.simple.FindSource(name)
     #make up list of color options
     fields = {'depth':'depth','luminance':'luminance'}
@@ -351,7 +364,7 @@ def make_cinema_store(proxies, ocsfname, forcetime=False, userDefined = {}):
 
     cs.add_metadata({'type':'composite-image-stack'})
     cs.add_metadata({'store_type':'FS'})
-    cs.add_metadata({'version':'0.0'})
+    cs.add_metadata({'version':'0.1'})
     pipeline = get_pipeline()
     cs.add_metadata({'pipeline':pipeline})
 
@@ -426,7 +439,8 @@ def testexplore(cs):
 
 def explore(cs, proxies, iSave=True, currentTime=None, userDefined = {}):
     """
-    Takes in the store, which contains only the list of parameters,
+    Runs a pipeline through all the changes we know how to make and saves off
+    images into the store for each one.
     """
 #    import pv_explorers
     import explorers

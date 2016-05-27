@@ -49,8 +49,8 @@ class Document(object):
     value for that particular parameter.
     TODO:
     A document can have arbitrary data (as 'data') and meta-data (as
-    'attributes') associated with it. At the moment we are assuming
-    stored images and are ignoring the attributes.
+    'attributes') associated with it. At the moment we are ignoring the
+    attributes.
     """
     def __init__(self, descriptor, data=None):
         self.__descriptor = descriptor
@@ -113,7 +113,6 @@ class Store(object):
         self.__parameter_list = {}
         self.__loaded = False
         self.__parameter_associations = {}
-        self.__view_associations = {}
         self.__type_specs = {}
         self.cached_searches = {}
         self.raster_wrangler = raster_wrangler.RasterWrangler()
@@ -180,6 +179,7 @@ class Store(object):
         #    raise RuntimeError("Updating parameters after loading/creating a store is not supported.")
         # TODO: Err, except when it is, in the important case of adding new time steps to a collection.
         # I postulate it is always OK to add safely to outermost parameter (loop).
+        self.cached_searches = {}
         self.__parameter_list[name] = properties
         self._parse_parameter_type(name, properties)
 
@@ -204,6 +204,12 @@ class Store(object):
         return "RGB"
 
     def determine_type(self, desc):
+        """
+        Given a descriptor this figures out what type of data it holds.
+        It works by first looking into the __type_specs for registered
+        relationships and if that fails returning the registered default
+        type for the store.
+        """
         #try any assigned mappings (for example color='depth' then 'Z')
         for typename, checks in self.__type_specs.items():
             for check in checks:
@@ -218,19 +224,13 @@ class Store(object):
 
     @property
     def parameter_associations(self):
+        """ paremeter associations establish a dependency relationship between
+        different parameters. """
         return self.__parameter_associations
 
     def _set_parameter_associations(self, val):
         """For use by subclasses alone"""
         self.__parameter_associations = val
-
-    @property
-    def view_associations(self):
-        return self.__view_associations
-
-    def _set_view_associations(self, val):
-        """For use by subclasses alone"""
-        self.__view_associations = val
 
     @property
     def metadata(self):
@@ -248,6 +248,27 @@ class Store(object):
         if not self.__metadata:
             self.__metadata = {}
         self.__metadata.update(keyval)
+
+    def get_version_major(self):
+        """ major version information corresponds with store type """
+        if self.metadata == None or not 'type' in self.metadata:
+            return -1
+        if self.metadata['type'] == 'parametric-image-stack':
+            return 0
+        elif self.metadata['type'] == 'composite-image-stack':
+            return 1
+
+    def get_version_minor(self):
+        """ minor version information corresponds to larger changes in a store type """
+        if self.metadata == None or not 'version' in self.metadata:
+            return 0
+        return int(self.metadata['version'].split('.')[0])
+
+    def get_version_patch(self):
+        """ patch version information corresponds to slight changes in a store type """
+        if self.metadata == None or not 'version' in self.metadata:
+            return 0
+        return int(self.metadata['version'].split('.')[1])
 
     def create(self):
         """
@@ -297,21 +318,8 @@ class Store(object):
         for 'layers' and 'fields' in composite rendering of objects in a scene
         and the color settings that each object is allowed to take.
         """
+        self.cached_searches = {}
         self.__parameter_associations.setdefault(dep_param, {}).update(
-        {param: on_values})
-
-    def assign_view_dependence(self, dep_param, param, on_values):
-        """
-        mark a particular parameter as being explorable only for a subset
-        of the possible values of another.
-
-        For example given parameter 'appendage type' which might have
-        value 'foot' or 'flipper', a dependent parameter might be 'shoe type'
-        which only makes sense for 'feet'. More to the point we use this
-        for 'layers' and 'fields' in composite rendering of objects in a scene
-        and the color settings that each object is allowed to take.
-        """
-        self.__view_associations.setdefault(dep_param, {}).update(
         {param: on_values})
 
     def isdepender(self, name):
@@ -335,19 +343,6 @@ class Store(object):
             raise KeyError("Invalid dependency! ", depender, ", ", dependee)
 
         return value
-
-    def isviewdepender(self, name):
-        """ check if the named parameter depends on any others """
-        if name in self.view_associations.keys():
-            return True
-        return False
-
-    def isviewdependee(self, name):
-        """ check if the named parameter has others that depend on it """
-        for depender, dependees in self.view_associations.iteritems():
-            if name in dependees:
-                return True
-        return False
 
     def getdependers(self, name):
         """ return a list of all the parameters that depend on the given one """
@@ -381,14 +376,6 @@ class Store(object):
         paramName = self.parameter_associations[fieldName]["vis"][0]
         return  (paramName in self.parameter_list)
 
-    def getviewdependers(self, name):
-        """ return a list of all the parameters that depend on the given one """
-        result = []
-        for depender, dependees in self.view_associations.iteritems():
-            if name in dependees:
-                result.append(depender)
-        return result
-
     def dependencies_satisfied(self, dep_param, descriptor):
         """
         Check if the values in decriptor satisfy all of the dependencies
@@ -410,27 +397,6 @@ class Store(object):
                 return False
         return True
 
-    def view_dependencies_satisfied(self, dep_param, descriptor):
-        """
-        Check if the values in decriptor satisfy all of the dependencies
-        of dep_param.
-        Return true if no dependencies to satisfy.
-        Return false if dependency of dependency fails.
-        """
-        if not dep_param in self.__view_associations:
-            return True
-        for dep in self.__view_associations[dep_param]:
-            if not dep in descriptor:
-                #something dep_param needs is not in the descriptor at all
-                return False
-            if not descriptor[dep] in self.__view_associations[dep_param][dep]:# and not ('layer' in dep_param and 'layer' in dep):
-                #something dep_param needs doesn't have an accepted value in the descriptor
-                return False
-            if not self.view_dependencies_satisfied(dep, descriptor):
-                #recurse to check deps of dep_param themselves
-                return False
-        return True
-
     def add_layer(self, name, properties):
         """
         A Layer boils down to an image of something in the scene, and only
@@ -444,13 +410,16 @@ class Store(object):
     def islayer(self, name):
         return (self.parameter_list[name]['role'] == 'layer') if (name in self.parameter_list and 'role' in self.parameter_list[name]) else False
 
-    def add_sublayer(self, name, properties, parent_layer, parents_value):
+    def add_control(self, name, properties):
         """
-        An example of a layer is an isocontour display. An example of a sublayer
-        is the particular isovalues for the isocontour.
+        A control is a togglable parameter for a filter. Examples include:
+        isovalue, offset.
         """
-        self.add_layer(name, properties)
-        self.assign_parameter_dependence(name, parent_layer, parents_value)
+        properties['role'] = 'control'
+        self.add_parameter(name, properties)
+
+    def iscontrol(self, name):
+        return (self.parameter_list[name]['role'] == 'control') if (name in self.parameter_list and 'role' in self.parameter_list[name]) else False
 
     def add_field(self, name, properties, parent_layer, parents_values):
         """
@@ -464,17 +433,6 @@ class Store(object):
 
     def isfield(self, name):
         return (self.parameter_list[name]['role'] == 'field') if (name in self.parameter_list and 'role' in self.parameter_list[name]) else False
-
-    def add_control(self, name, properties):
-        """
-        A control is a togglable parameter for a filter. Examples include:
-        isovalue, offset.
-        """
-        properties['role'] = 'control'
-        self.add_parameter(name, properties)
-
-    def iscontrol(self, name):
-        return (self.parameter_list[name]['role'] == 'control') if (name in self.parameter_list and 'role' in self.parameter_list[name]) else False
 
     def parameters_for_object(self, obj):
         """
@@ -498,7 +456,7 @@ class Store(object):
 
         return (independent_parameters,field,controls)
 
-    def iterate(self, parameters=None, fixedargs=None, forGUI=False):
+    def iterate(self, parameters=None, fixedargs=None):
         """
         Run through all combinations of parameter/value pairs without visiting
         any combinations that do not satisfy dependencies among them.
@@ -508,8 +466,7 @@ class Store(object):
         """
 
         #optimization - cache and reuse to avoid expensive search
-        argstr = json.dumps((parameters,fixedargs,forGUI), sort_keys=True)
-        #todo: good for viewer but breaks exploration
+        argstr = json.dumps((parameters,fixedargs), sort_keys=True)
         if argstr in self.cached_searches:
             for x in self.cached_searches[argstr]:
                 yield x
@@ -545,12 +502,8 @@ class Store(object):
 
             ok_desc = {}
             for param, value in descriptor.iteritems():
-                if forGUI:
-                    if self.view_dependencies_satisfied(param, descriptor):
-                        ok_desc.update({param:value})
-                else:
-                    if self.dependencies_satisfied(param, descriptor):
-                        ok_desc.update({param:value})
+                if self.dependencies_satisfied(param, descriptor):
+                    ok_desc.update({param:value})
 
             OK = True
             if fixedargs:
@@ -594,32 +547,41 @@ class FileStore(Store):
         super(FileStore, self).load()
         with open(self.__dbfilename, mode="rb") as file:
             info_json = json.load(file)
-            #for legacy reasons, the parameters are called
-            #arguments" in the files
-            self._set_parameter_list(info_json['arguments'])
+            if 'arguments' in info_json:
+                self._set_parameter_list(info_json['arguments'])
+            elif 'parameter_list' in info_json:
+                self._set_parameter_list(info_json['parameter_list'])
+            else:
+                print "Error I can't read that file"
+                exit()
             self.metadata = info_json['metadata']
             self.filename_pattern = info_json['name_pattern']
             a = {}
             if 'associations' in info_json:
                 a = info_json['associations']
+            elif 'constraints' in info_json:
+                a = info_json['constraints']
             self._set_parameter_associations(a)
-            va = {}
-            if 'view_associations' in info_json:
-                va = info_json['view_associations']
-            if va == {} or va == None:
-                va = copy.deepcopy(a)
-            self._set_view_associations(va)
 
     def save(self):
         """ writes out a modified file store """
-
-        info_json = dict(
+        info_json = None
+        if (self.get_version_major()<1 or
+            (self.get_version_minor()==0 and self.get_version_patch()==0)):
+            info_json = dict(
                 arguments = self.parameter_list,
                 name_pattern = self.filename_pattern,
                 metadata = self.metadata,
-                associations = self.parameter_associations,
-                view_associations = self.view_associations
-                )
+                associations = self.parameter_associations
+            )
+        else:
+            info_json = dict(
+                parameter_list = self.parameter_list,
+                name_pattern = self.filename_pattern,
+                metadata = self.metadata,
+                constraints = self.parameter_associations
+            )
+
         dirname = os.path.dirname(self.__dbfilename)
         if not os.path.exists(dirname):
             os.makedirs(dirname)
@@ -635,6 +597,9 @@ class FileStore(Store):
         consisting of parameter names enclosed in '{' and '}' and
         separated by spacers. "/" spacer characters produce sub
         directories.
+
+        Composite type stores ignore the file name pattern other than
+        the extension.
         """
         return self.__filename_pattern
 
@@ -653,13 +618,14 @@ class FileStore(Store):
 
     def _get_filename(self, desc):
         dirname = os.path.dirname(self.__dbfilename)
-        #print self.__dbfilename
-        #print desc
-        #print self.filename_pattern
 
         #find filename modulo any dependent parameters
         fixed = self.filename_pattern.format(**desc)
         base, ext = os.path.splitext(fixed)
+
+        if (self.get_version_major()>0 and
+            (self.get_version_minor()>0 or self.get_version_patch()>0)):
+            base = ""
 
 #        #add any dependent parameters
 #        for dep in sorted(self.parameter_associations.keys()):
@@ -670,13 +636,14 @@ class FileStore(Store):
         #this one follows the graph and thus keeps related things, like
         #all the rasters (fields) for a particular object (layer), close
         #to one another
-        #TODO: optimize this
         keys = [k for k in sorted(desc)]
         ordered_keys = []
         while len(keys):
             k = keys.pop(0)
-            if not self.isdepender(k) and not self.isdependee(k):
-                continue
+            if (self.get_version_major()<1 or
+                (self.get_version_minor()==0 and self.get_version_patch()==0)):
+                if not self.isdepender(k) and not self.isdependee(k):
+                    continue
             parents = self.getdependees(k)
             ready = True
             for p in parents:
@@ -687,8 +654,16 @@ class FileStore(Store):
                     break
             if ready:
                 ordered_keys.append(k)
-        for k in ordered_keys:
-            base = base + "/" + k + "=" + str(desc[k])
+        if (self.get_version_major()<1 or
+            (self.get_version_minor()==0 and self.get_version_patch()==0)):
+            for k in ordered_keys:
+                base = base + "/" + k + "=" + str(desc[k])
+        else:
+            sep = ""
+            for k in ordered_keys:
+                index = self.get_parameter(k)['values'].index(desc[k])
+                base = base + sep + k + "=" + str(index)
+                sep = "/"
 
         #determine file type for this document
         doctype = self.determine_type(desc)
@@ -699,6 +674,8 @@ class FileStore(Store):
         return fullpath
 
     def insert(self, document):
+        """overridden to write file for the document after parent
+        makes a record of it in the store"""
         super(FileStore, self).insert(document)
 
         fname = self._get_filename(document.descriptor)
@@ -736,15 +713,14 @@ class FileStore(Store):
         doc.attributes = None
         return doc
 
-    def find(self, q=None, forGUI=False):
+    def find(self, q=None):
+        """ overridden to implement parent API with files"""
         q = q if q else dict()
         target_desc = q
 
-        #print "->>> store::find():  target_desc->  ", target_desc
-        for possible_desc in self.iterate(fixedargs=target_desc, forGUI=forGUI):
+        for possible_desc in self.iterate(fixedargs=target_desc):
             if possible_desc == {}:
                 yield None
-            #print "->>> store::find() possible_desc: ", possible_desc
             filename = self._get_filename(possible_desc)
             #optimization - cache and reuse to avoid file load
             if filename in self.cached_files:
@@ -755,9 +731,23 @@ class FileStore(Store):
             self.cached_files[filename] = fcontent
             yield fcontent
 
+    def get(self, q):
+        """ optimization of find()[0] for an important case where caller
+        knows exactly what to retrieve."""
+        filename = self._get_filename(q)
+        #optimization - cache and reuse to avoid file load
+        if filename in self.cached_files:
+            return self.cached_files[filename]
+        fcontent = self._load_data(filename, q)
+        #todo: shouldn't be unbounded size
+        self.cached_files[filename] = fcontent
+        return fcontent
+
 
 class SingleFileStore(Store):
-    """Implementation of a store based on a single volume file (image stack)."""
+    """Implementation of a store based on a single volume file (image stack).
+    NOTE: This class is limited to parametric-image-stack type stores,
+    currently unmaintained and may go away in the near future."""
 
     def __init__(self, dbfilename=None):
         super(SingleFileStore, self).__init__()
@@ -810,9 +800,9 @@ class SingleFileStore(Store):
                 slices = slices * numvals
         return slices
 
-    def compute_sliceindex(self, descriptor):
-        #find position of descriptor within the set of slices
-        #TODO: algorithm is dumb, but consisent with find (which is also dumb)
+    def _compute_sliceindex(self, descriptor):
+        """find position of descriptor within the set of slices
+        TODO: algorithm is dumb, but consisent with find (which is also dumb)"""
         args = []
         values = []
         ordered = sorted(self.parameter_list.keys())
@@ -832,8 +822,9 @@ class SingleFileStore(Store):
             index = index + 1
 
     def get_sliceindex(self, document):
+        """ returns the location of one document within the stack"""
         desc = self.get_complete_descriptor(document.descriptor)
-        index = self.compute_sliceindex(desc)
+        index = self._compute_sliceindex(desc)
         return index
 
     def _insertslice(self, vol_file, index, document):
@@ -861,6 +852,7 @@ class SingleFileStore(Store):
         self._needWrite = True
 
     def insert(self, document):
+        """overridden to store data within a volume after parent makes a note of it"""
         super(SingleFileStore, self).insert(document)
 
         index = self.get_sliceindex(document)
@@ -873,7 +865,6 @@ class SingleFileStore(Store):
             self._insertslice(vol_file, index, document)
 
     def _load_slice(self, q, index, desc):
-
         if not self._volume:
             import vtk
             dirname = os.path.dirname(self.__dbfilename)
@@ -903,7 +894,9 @@ class SingleFileStore(Store):
         return doc
 
     def find(self, q=None):
-        #TODO: algorithm is dumb, but consisent with compute_sliceindex (which is also dumb)
+        """Overridden to search for documentts withing the stack.
+        TODO: algorithm is dumb, but consisent with compute_sliceindex
+        (which is also dumb)"""
         q = q if q else dict()
         args = []
         values = []
@@ -926,6 +919,13 @@ class SingleFileStore(Store):
 
 
 def make_parameter(name, values, **kwargs):
+    """ define a new parameter that will be added to a store.
+    Primarily takes a name and an array of potential values.
+    May also be given a default value from inside the array.
+    May also be given a typechoice to help the UI which is required to be one of
+    'list', 'range', 'option' or 'hidden'.
+    May also bve given a user friendly label.
+    """
     default = kwargs['default'] if 'default' in kwargs else values[0]
     if not default in values:
         raise RuntimeError, "Invalid default, must be one of %s" % str(values)
@@ -945,8 +945,13 @@ def make_parameter(name, values, **kwargs):
     return properties
 
 def make_field(name, _values, **kwargs):
-    #specialization of make_parameters for parameters that define fields
-    #in this case the values is a list of name, type pairs
+    """specialization of make_parameters for parameters that define
+    fields(aka color inputs).
+    In this case the values is a list of name, type pairs where types must be one
+    of 'rgb', 'depth', 'value', or 'luminance'
+    May also be given an set of valueRanges, which have min and max values for named
+    'value' type color selections.
+    """
 
     values = _values.keys()
     img_types = _values.values()
@@ -960,9 +965,6 @@ def make_field(name, _values, **kwargs):
         raise RuntimeError, "Invalid default, must be one of %s" % str(values)
 
     typechoice = 'hidden'
-    valid_types = ['list','range','option','hidden']
-    if not typechoice in valid_types:
-        raise RuntimeError, "Invalid typechoice, must be one of %s" % str(valid_types)
 
     label = kwargs['label'] if 'label' in kwargs else name
 

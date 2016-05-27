@@ -73,7 +73,7 @@ class Explorer(object):
             e.execute(doc)
         self.insert(doc)
 
-    def explore(self, fixedargs=None, forGUI=False):
+    def explore(self, fixedargs=None):
         """
         Explore the problem space to populate the store being careful not to hit combinations
         where dependencies are not satisfied.
@@ -81,7 +81,7 @@ class Explorer(object):
         """
         self.prepare()
 
-        for descriptor in self.cinema_store.iterate(self.list_parameters(), fixedargs, forGUI):
+        for descriptor in self.cinema_store.iterate(self.list_parameters(), fixedargs):
             self.execute(descriptor)
 
         self.finish()

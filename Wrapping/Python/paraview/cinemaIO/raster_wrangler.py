@@ -105,18 +105,21 @@ class RasterWrangler(object):
             self.backends.add("VTK")
 
     def enableOpenEXR(self):
+        """Try to turn on OpenEXR file IO support"""
         if exrEnabled:
             self.backends.add("OpenEXR")
         else:
             warnings.warn("OpenEXR module not found", ImportWarning)
 
     def enablePIL(self):
+        """Try to turn on PIL file IO support"""
         if pilEnabled:
             self.backends.add("PIL")
         else:
             warnings.warn("PIL module not found", ImportWarning)
 
     def enableVTK(self):
+        """Try to turn on VTK file IO support"""
         if vtkEnabled:
             self.backends.add("VTK")
         else:
@@ -171,14 +174,17 @@ class RasterWrangler(object):
             raise RuntimeError, "Cannot infer filetype from extension:", extension
 
     def genericreader(self, fname):
+        """read generic binary data dump"""
         with open(fname, "r") as file:
             return file.read()
 
     def genericwriter(self, imageslice, fname):
+        """write generic binary data dump"""
         with open(fname, "w") as file:
             file.write(imageslice)
 
     def rgbreader(self, fname):
+        """opens a color image file and returns it as a color buffer"""
         if "VTK" in self.backends:
             height = imageslice.shape[1]
             width = imageslice.shape[0]
@@ -194,13 +200,19 @@ class RasterWrangler(object):
             writer.Write()
 
         elif "PIL" in self.backends:
-            im = PIL.Image.open(fname)
-            return numpy.array(im, numpy.uint8).reshape(im.size[1],im.size[0],3)
+            try:
+                im = PIL.Image.open(fname)
+                #print "read", fname
+                return numpy.array(im, numpy.uint8).reshape(im.size[1],im.size[0],3)
+            except:
+                #print "no such file", fname
+                return None
 
         else:
             print "Warning: need PIL or VTK to read from " + fname
 
     def rgbwriter(self, imageslice, fname):
+        """takes in a color buffer and writes it as an image file"""
         if "VTK" in self.backends:
             height = imageslice.shape[1]
             width = imageslice.shape[0]
@@ -224,6 +236,7 @@ class RasterWrangler(object):
             print "Warning: need PIL or VTK to write to " + fname
 
     def zfileextension(self):
+        """determine file extension for depth images"""
         if "OpenEXR" in self.backends:
             return ".exr"
 
@@ -231,17 +244,23 @@ class RasterWrangler(object):
             return ".im"
 
     def zreader(self, fname):
+        """reads a depth file to make a depth buffer"""
         if "OpenEXR" in self.backends:
             return exr.load_depth(fname)
 
         elif "PIL" in self.backends:
-            im = PIL.Image.open(fname)
-            return numpy.array(im, numpy.float32).reshape(im.size[1],im.size[0])
-
+            try:
+                im = PIL.Image.open(fname)
+                #print "read", fname
+                return numpy.array(im, numpy.float32).reshape(im.size[1],im.size[0])
+            except:
+                #print "no such file", fname
+                return None
         else:
             print "Warning: need OpenEXR or PIL to read from " + fname
 
     def zwriter(self, imageslice, fname):
+        """takes in a depth buffer and writes it as a depth file"""
         if "OpenEXR" in self.backends:
             imageslice = numpy.flipud(imageslice)
             exr.save_depth(imageslice, fname)
@@ -271,7 +290,7 @@ class RasterWrangler(object):
             print "Warning: need OpenEXR or PIL or VTK to write to " + fname
 
     def assertvalidimage(self, filename):
-
+        """tests that a given file is syntactically correct"""
         if not os.path.isfile(filename):
             raise IOError(filename + " does not exist.")
 

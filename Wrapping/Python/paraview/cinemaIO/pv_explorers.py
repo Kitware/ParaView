@@ -40,8 +40,9 @@ from paraview import numpy_support as numpy_support
 
 class ImageExplorer(explorers.Explorer):
     """
-    An explorer that connects a paraview script's views to a store
-    and makes it save new images into the store.
+    An Explorer that connects a ParaView script's views to a store.
+    Basically it iterates over the parameters and for each unique combination
+    it tells ParaView to make an image and saved the result into the store.
     """
     def __init__(self,
                 cinema_store, parameters, tracks,
@@ -74,12 +75,14 @@ class ImageExplorer(explorers.Explorer):
             self.rgb2grey = rgb2grey
 
     def insert(self, document):
+        """overridden to use paraview to generate an image and create a
+        the document for it"""
         if not self.view:
             return
         if self.CaptureDepth:
             simple.Render()
             image = self.view.CaptureDepthBuffer()
-            idata = numpy_support.vtk_to_numpy(image)
+            idata = numpy_support.vtk_to_numpy(image) * 256
             rw = self.view.GetRenderWindow()
             width,height = rw.GetSize()
             try:
@@ -135,6 +138,8 @@ class ImageExplorer(explorers.Explorer):
             super(ImageExplorer, self).insert(document)
 
     def setDrawMode(self, choice, **kwargs):
+        """ helper for Color tracks so that they can cause ParaView to
+        render in the right mode."""
         if choice == 'color':
             self.view.StopCaptureValues()
             if self.UsingGL2:
@@ -179,7 +184,7 @@ class ImageExplorer(explorers.Explorer):
 
 class Camera(explorers.Track):
     """
-    A track that connects a paraview script's camera to the phi and theta tracks.
+    A track that connects a ParaView script's camera to the phi and theta tracks.
     This allows the creation of spherical camera stores where the user can
     view the data from many points around it.
     """
@@ -195,6 +200,7 @@ class Camera(explorers.Track):
         self.view = view
 
     def execute(self, document):
+        """moves camera into position for the current phi, theta value"""
         import math
         theta = document.descriptor['theta']
         phi = document.descriptor['phi']
@@ -234,9 +240,8 @@ class Camera(explorers.Track):
 
 class Slice(explorers.Track):
     """
-    A track that connects slice filters to a scalar valued parameter.
+    A track that connects a slice filter to a scalar valued parameter.
     """
-
     def __init__(self, parameter, filt):
         super(Slice, self).__init__()
 
@@ -253,9 +258,8 @@ class Slice(explorers.Track):
 
 class Contour(explorers.Track):
     """
-    A track that connects contour filters to a scalar valued parameter.
+    A track that connects a contour filter to a scalar valued parameter.
     """
-
     def __init__(self, parameter, filt):
         super(Contour, self).__init__()
         self.parameter = parameter
@@ -272,9 +276,8 @@ class Contour(explorers.Track):
 
 class Clip(explorers.Track):
     """
-    A track that connects clip filters to a scalar valued parameter.
+    A track that connects a clip filter to a scalar valued parameter.
     """
-
     def __init__(self, argument, clip):
         super(Clip, self).__init__()
         self.argument = argument
@@ -292,25 +295,26 @@ class Clip(explorers.Track):
 class Templated(explorers.Track):
     """
     A track that connects any type of filter to a scalar valued
-    'control' parameter.
+    parameter. To use pass in a source proxy (aka filter)
+    and the name of method (aka property) to be called on it.
     """
-
-    def __init__(self, parameter, filt, control):
+    def __init__(self, parameter, filt, methodName):
         explorers.Track.__init__(self)
 
         self.parameter = parameter
         self.filt = filt
-        self.control = control
+        self.methodName = methodName
 
     def execute(self, doc):
         o = doc.descriptor[self.parameter]
-        self.filt.SetPropertyWithName(self.control,[o])
+        self.filt.SetPropertyWithName(self.methodName,[o])
 
 class ColorList():
     """
-    A helper that creates a dictionary of color controls for ParaView. The Color track takes in
-    a color name from the Explorer and looks up into a ColorList to determine exactly what
-    needs to be set to apply the color.
+    A helper that creates a dictionary of color controls for ParaView.
+    The Color track takes in a color name from the Explorer and looks
+    up into a ColorList to determine exactly what needs to be set to
+    apply the color.
     """
     def __init__(self):
         self._dict = {}
@@ -339,7 +343,7 @@ class ColorList():
 
 class Color(explorers.Track):
     """
-    A track that connects a parameter to a choice of surface rendered color maps.
+    A track that connects a parameter to color controls.
     """
     def __init__(self, parameter, colorlist, rep):
         super(Color, self).__init__()
@@ -349,6 +353,9 @@ class Color(explorers.Track):
         self.imageExplorer = None
 
     def execute(self, doc):
+        """tells ParaView to color the object we've been assigned
+        using the color definition we've been given that corresponds
+        to the value we've been assigned to watch in the doc.descriptor"""
         if not self.parameter in doc.descriptor:
             return
         if self.rep == None:
