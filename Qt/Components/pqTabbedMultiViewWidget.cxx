@@ -480,6 +480,10 @@ void pqTabbedMultiViewWidget::closeTab(int index)
     // first remove each of the views in the tab layout.
     widget->destroyAllViews();
 
+    SM_SCOPED_TRACE(CallFunction)
+      .arg("RemoveLayout")
+      .arg(vlayout);
+
     builder->destroy(smmodel->findItem<pqProxy*>(vlayout));
     END_UNDO_SET();
     }
