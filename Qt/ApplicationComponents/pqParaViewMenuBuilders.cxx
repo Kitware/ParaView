@@ -57,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataQueryReaction.h"
 #include "pqDeleteReaction.h"
 #include "pqDesktopServicesReaction.h"
+#include "pqExampleVisualizationsDialogReaction.h"
 #include "pqExportReaction.h"
 #include "pqFiltersMenuReaction.h"
 #include "pqHelpReaction.h"
@@ -362,6 +363,8 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
   // Example Data Sets
 
   // Example Visualizations
+  new pqExampleVisualizationsDialogReaction(
+    menu.addAction("Example Visualizations") << pqSetName("ExampleVisualizations"));
 
   // -----------------
   menu.addSeparator();

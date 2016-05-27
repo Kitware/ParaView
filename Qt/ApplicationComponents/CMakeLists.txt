@@ -138,6 +138,8 @@ set (Module_SRCS
   pqEnableWidgetDecorator.h
   pqExampleVisualizationsDialog.cxx
   pqExampleVisualizationsDialog.h
+  pqExampleVisualizationsDialogReaction.cxx
+  pqExampleVisualizationsDialogReaction.h
   pqExportReaction.cxx
   pqExportReaction.h
   pqFileNamePropertyWidget.cxx
@@ -371,6 +373,7 @@ set (Module_MOC_HDRS
   pqEditScalarBarReaction.h
   pqEnableWidgetDecorator.h
   pqExampleVisualizationsDialog.h
+  pqExampleVisualizationsDialogReaction.h
   pqExportReaction.h
   pqFileNamePropertyWidget.h
   pqFiltersMenuReaction.h
