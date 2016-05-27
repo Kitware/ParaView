@@ -299,6 +299,7 @@
 
       <PropertyGroup label="General Options">
         <Property name="ShowSplashScreen" />
+        <Property name="ShowWelcomeDialog" />
         <Property name="CrashRecovery" />
       </PropertyGroup>
 
@@ -362,7 +363,8 @@
         default_values="1">
         <BooleanDomain name="bool" />
         <Documentation>
-          Enable use of display lists when rendering surface meshes.
+          Enable use of display lists when rendering surface meshes
+          (only applicable for builds with legacy rendering backend).
         </Documentation>
         <Hints>
           <RestartRequired />
