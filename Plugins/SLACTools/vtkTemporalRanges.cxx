@@ -28,6 +28,7 @@
 #include "vtkDoubleArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
@@ -42,22 +43,6 @@
 #include <algorithm>
 #include <vector>
 #include <sstream>
-
-#include <math.h>
-
-//=============================================================================
-// This is not super portable.  We really should be using vtkMath::IsNan.  The
-// only reason we are not is so that we can copy this code to the 3.6 branch of
-// ParaView where that method does not yet exist.  Once we move past that, this
-// section should go away and all instances of isnan should be replaced with
-// vtkMath::IsNan.
-#ifndef isnan
-// This is compiler specific not platform specific: MinGW doesn't need that.
-# if defined(_MSC_VER) || defined(__BORLANDC__)
-#  include <float.h>
-#  define isnan(x) _isnan(x)
-# endif
-#endif
 
 //=============================================================================
 namespace vtkTemporalRangesNamespace{
@@ -80,7 +65,7 @@ namespace vtkTemporalRangesNamespace{
 
   inline void AccumulateValue(double value, vtkDoubleArray *column)
   {
-    if (!isnan(value))
+    if (!vtkMath::IsNan(value))
       {
       column->SetValue(AVERAGE_ROW, value + column->GetValue(AVERAGE_ROW));
       column->SetValue(MINIMUM_ROW, std::min(column->GetValue(MINIMUM_ROW),
