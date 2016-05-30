@@ -57,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataQueryReaction.h"
 #include "pqDeleteReaction.h"
 #include "pqDesktopServicesReaction.h"
+#include "pqExampleVisualizationsDialogReaction.h"
 #include "pqExportReaction.h"
 #include "pqFiltersMenuReaction.h"
 #include "pqHelpReaction.h"
@@ -96,6 +97,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include <QDockWidget>
+#include <QFileInfo>
 #include <QKeySequence>
 #include <QLayout>
 #include <QMainWindow>
@@ -317,14 +319,17 @@ void pqParaViewMenuBuilders::buildMacrosMenu
 void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
 {
 #if defined(_WIN32) || defined(__APPLE__)
-  QString paraViewGuideFile = QCoreApplication::applicationDirPath() + "/../doc/Guide.pdf";
-  QString paraViewGettingStartedFile = QCoreApplication::applicationDirPath() + "/../doc/GettingStarted.pdf";
-  QString paraViewTutorialFile = QCoreApplication::applicationDirPath() + "/../doc/Tutorial.pdf";
+  QString documentationPath = QCoreApplication::applicationDirPath() + "/../doc";
 #else
-  QString paraViewGuideFile = QCoreApplication::applicationDirPath() + "/../../doc/Guide.pdf";
-  QString paraViewGettingStartedFile = QCoreApplication::applicationDirPath() + "/../../doc/GettingStarted.pdf";
-  QString paraViewTutorialFile = QCoreApplication::applicationDirPath() + "/../../doc/Tutorial.pdf";
+  QString appdir = QCoreApplication::applicationDirPath();
+  QString documentationPath = QFileInfo(appdir).fileName() == "bin" ?
+    /* w/o shared forwarding */ appdir + "/../share/paraview-" PARAVIEW_VERSION "/doc"  :
+    /* w/ shared forwarding  */ appdir + "/../../share/paraview-" PARAVIEW_VERSION "/doc";
 #endif
+
+  QString paraViewGuideFile = documentationPath + "/Guide.pdf";
+  QString paraViewGettingStartedFile = documentationPath + "/GettingStarted.pdf";
+  QString paraViewTutorialFile = documentationPath + "/Tutorial.pdf";
 
   // Getting Started with ParaView
   new pqDesktopServicesReaction(
@@ -361,6 +366,8 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
   // Example Data Sets
 
   // Example Visualizations
+  new pqExampleVisualizationsDialogReaction(
+    menu.addAction("Example Visualizations") << pqSetName("ExampleVisualizations"));
 
   // -----------------
   menu.addSeparator();

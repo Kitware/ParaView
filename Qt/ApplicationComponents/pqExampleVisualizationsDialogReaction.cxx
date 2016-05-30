@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    ParaViewMainWindow.h
+   Module:  pqExampleVisualizationsDialogReaction.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,37 +29,25 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef ParaViewMainWindow_h
-#define ParaViewMainWindow_h
+#include "pqExampleVisualizationsDialogReaction.h"
 
-#include <QMainWindow>
+#include "pqExampleVisualizationsDialog.h"
+#include "pqCoreUtilities.h"
 
-/// MainWindow for the default ParaView application.
-class ParaViewMainWindow : public QMainWindow
+//-----------------------------------------------------------------------------
+pqExampleVisualizationsDialogReaction::pqExampleVisualizationsDialogReaction(
+  QAction* parentObject) : Superclass(parentObject)
 {
-  Q_OBJECT
-  typedef QMainWindow Superclass;
-public:
-  ParaViewMainWindow();
-  ~ParaViewMainWindow();
+}
 
-protected:
-  void dragEnterEvent(QDragEnterEvent *evt);
-  void dropEvent(QDropEvent *evt);
-  void showEvent(QShowEvent * evt);
+//-----------------------------------------------------------------------------
+pqExampleVisualizationsDialogReaction::~pqExampleVisualizationsDialogReaction()
+{
+}
 
-protected slots:
-  void showHelpForProxy(const QString& proxyname, const QString& groupname);
-  void showWelcomeDialog();
-
-private:
-  ParaViewMainWindow(const ParaViewMainWindow&); // Not implemented.
-  void operator=(const ParaViewMainWindow&); // Not implemented.
-
-  class pqInternals;
-  pqInternals* Internals;
-};
-
-#endif
-
-
+//-----------------------------------------------------------------------------
+void pqExampleVisualizationsDialogReaction::showExampleVisualizationsDialog()
+{
+  pqExampleVisualizationsDialog dialog(pqCoreUtilities::mainWidget());
+  dialog.exec();
+}

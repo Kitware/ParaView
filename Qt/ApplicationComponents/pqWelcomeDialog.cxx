@@ -6,13 +6,14 @@
 #include "pqExampleVisualizationsDialog.h"
 #include "pqServer.h"
 #include "pqSettings.h"
-
-#include <QCoreApplication>
-#include <QString>
-#include <QUrl>
-
+#include "vtkPVConfig.h" // for PARAVIEW_VERSION
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSessionProxyManager.h"
+
+#include <QCoreApplication>
+#include <QFileInfo>
+#include <QString>
+#include <QUrl>
 
 //-----------------------------------------------------------------------------
 pqWelcomeDialog::pqWelcomeDialog(QWidget *parentObject)
@@ -39,10 +40,14 @@ pqWelcomeDialog::~pqWelcomeDialog()
 void pqWelcomeDialog::onGettingStartedGuideClicked()
 {
 #if defined(_WIN32) || defined(__APPLE__)
-  QString paraViewGettingStartedFile = QCoreApplication::applicationDirPath() + "/../doc/GettingStarted.pdf";
+  QString documentationPath = QCoreApplication::applicationDirPath() + "/../doc";
 #else
-  QString paraViewGettingStartedFile = QCoreApplication::applicationDirPath() + "/../../doc/GettingStarted.pdf";
+  QString appdir = QCoreApplication::applicationDirPath();
+  QString documentationPath = QFileInfo(appdir).fileName() == "bin" ?
+    /* w/o shared forwarding */ appdir + "/../share/paraview-" PARAVIEW_VERSION "/doc"  :
+    /* w/ shared forwarding  */ appdir + "/../../share/paraview-" PARAVIEW_VERSION "/doc";
 #endif
+  QString paraViewGettingStartedFile = documentationPath + "/GettingStarted.pdf";
   QUrl gettingStartedURL = QUrl::fromLocalFile(paraViewGettingStartedFile);
   pqDesktopServicesReaction::openUrl(gettingStartedURL);
 }

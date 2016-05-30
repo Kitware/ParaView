@@ -206,7 +206,14 @@ public:
   /// Loads the ServerManager state. Emits the signal
   /// stateLoaded() on loading state successfully.
   void loadState(vtkPVXMLElement* root, pqServer* server, vtkSMStateLoader* loader=NULL);
+
+  /// Load state xml from a file. The filename can be a Qt resource file,
+  /// besides regular filesystem files (refer to QFile documentation for more
+  /// information on Qt resource system).
   void loadState(const char* filename, pqServer* server, vtkSMStateLoader* loader=NULL);
+
+  /// Loads state from an in-memory buffer.
+  void loadStateFromString(const char* xmlcontents, pqServer* server, vtkSMStateLoader* loader=NULL);
 
   /// Same as loadState() except that it doesn't clear the current visualization
   /// state.

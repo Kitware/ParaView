@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>650</width>
-    <height>359</height>
+    <width>1004</width>
+    <height>377</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,44 +34,7 @@
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="1" column="1">
-      <widget class="QLabel" name="DiskOutRefExampleDescription">
-       <property name="text">
-        <string>Exodus II file, Clip filter, Stream Tracer filter, Tube filter, Glyph filter</string>
-       </property>
-       <property name="wordWrap">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QPushButton" name="DiskOutRefExampleButton">
-       <property name="minimumSize">
-        <size>
-         <width>300</width>
-         <height>225</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normalon>:/pqApplicationComponents/Thumbnails/DiskOutRefExample.png</normalon>
-        </iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>300</width>
-         <height>225</height>
-        </size>
-       </property>
-       <property name="flat">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
+     <item row="0" column="0" rowspan="2">
       <widget class="QPushButton" name="CanExampleButton">
        <property name="enabled">
         <bool>true</bool>
@@ -128,10 +91,83 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
+     <item row="0" column="1" rowspan="2">
+      <widget class="QPushButton" name="DiskOutRefExampleButton">
+       <property name="minimumSize">
+        <size>
+         <width>300</width>
+         <height>225</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normalon>:/pqApplicationComponents/Thumbnails/DiskOutRefExample.png</normalon>
+        </iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>300</width>
+         <height>225</height>
+        </size>
+       </property>
+       <property name="flat">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QPushButton" name="WaveletExampleButton">
+       <property name="minimumSize">
+        <size>
+         <width>300</width>
+         <height>225</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../pqApplicationComponents.qrc">
+         <normaloff>:/pqApplicationComponents/Thumbnails/WaveletExample.png</normaloff>:/pqApplicationComponents/Thumbnails/WaveletExample.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>300</width>
+         <height>225</height>
+        </size>
+       </property>
+       <property name="flat">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2" rowspan="2">
+      <widget class="QLabel" name="WaveletExampleDescription">
+       <property name="text">
+        <string>Wavelet  with volume rendering and contours</string>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
       <widget class="QLabel" name="CanExampleDescription">
        <property name="text">
         <string>Exodus II file with timesteps, Clip filter</string>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLabel" name="DiskOutRefExampleDescription">
+       <property name="text">
+        <string>Exodus II file, Clip filter, Stream Tracer filter, Tube filter, Glyph filter</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>
@@ -148,7 +184,7 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>40</height>
+       <height>0</height>
       </size>
      </property>
     </spacer>

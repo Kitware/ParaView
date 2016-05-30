@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    ParaViewMainWindow.h
+   Module:  pqExampleVisualizationsDialogReaction.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,37 +29,33 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef ParaViewMainWindow_h
-#define ParaViewMainWindow_h
+#ifndef pqExampleVisualizationsDialogReaction_h
+#define pqExampleVisualizationsDialogReaction_h
 
-#include <QMainWindow>
+#include "pqReaction.h"
 
-/// MainWindow for the default ParaView application.
-class ParaViewMainWindow : public QMainWindow
+/// @ingroup Reactions
+///
+/// pqExampleVisualizationsDialogReaction is used to show the
+/// pqExampleVisualizationsDialog when the action is triggered.
+class PQAPPLICATIONCOMPONENTS_EXPORT pqExampleVisualizationsDialogReaction : public pqReaction
 {
   Q_OBJECT
-  typedef QMainWindow Superclass;
+  typedef pqReaction Superclass;
 public:
-  ParaViewMainWindow();
-  ~ParaViewMainWindow();
+  pqExampleVisualizationsDialogReaction(QAction* parent);
+  virtual ~pqExampleVisualizationsDialogReaction();
+
+  /// Shows the example visualizations dialog.
+  static void showExampleVisualizationsDialog();
 
 protected:
-  void dragEnterEvent(QDragEnterEvent *evt);
-  void dropEvent(QDropEvent *evt);
-  void showEvent(QShowEvent * evt);
-
-protected slots:
-  void showHelpForProxy(const QString& proxyname, const QString& groupname);
-  void showWelcomeDialog();
+  /// Called when the action is triggered.
+  virtual void onTriggered()
+    { pqExampleVisualizationsDialogReaction::showExampleVisualizationsDialog(); }
 
 private:
-  ParaViewMainWindow(const ParaViewMainWindow&); // Not implemented.
-  void operator=(const ParaViewMainWindow&); // Not implemented.
-
-  class pqInternals;
-  pqInternals* Internals;
+  Q_DISABLE_COPY(pqExampleVisualizationsDialogReaction)
 };
 
 #endif
-
-
