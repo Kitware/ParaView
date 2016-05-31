@@ -30,37 +30,119 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "pqProgressWidget.h"
-#include "pqProgressBar.h"
 
 #include <QApplication>
-#include <QGridLayout>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QList>
+#include <QPainter>
+#include <QPair>
+#include <QPointer>
+#include <QStyle>
+#include <QStyleFactory>
+#include <QStyleOptionProgressBar>
+#include <QTimerEvent>
 #include <QToolButton>
+#include <QtDebug>
+
+class pqProgressWidgetLabel : public QLabel
+{
+  int ProgressPercentage;
+  bool ShowProgress;
+  QStyle* Style;
+
+public:
+  pqProgressWidgetLabel(QWidget* parentObj)
+    : QLabel(parentObj)
+    , ProgressPercentage(0)
+    , ShowProgress(false)
+    , Style(NULL)
+  {
+    this->setFrameShape(QFrame::Panel);
+    this->setFrameShadow(QFrame::Sunken);
+    this->setLineWidth(1);
+
+#ifdef __APPLE__
+    // We don't use mac style on apple since it render horrible progress bars.
+    this->Style = QStyleFactory::create("fusion");
+    if (!this->Style)
+    {
+      this->Style = QStyleFactory::create("cleanlooks");
+    }
+#endif
+  }
+  ~pqProgressWidgetLabel() { delete this->Style; }
+  // returns true if value changed.
+  bool setProgressPercentage(int val)
+  {
+    val = std::min(std::max(0, val), 100);
+    if (this->ProgressPercentage != val)
+    {
+      this->ProgressPercentage = val;
+      return true;
+    }
+    return false;
+  }
+  int progressPercentage() const { return this->ProgressPercentage; }
+  void setShowProgress(bool val) { this->ShowProgress = val; }
+  bool showProgress() const { return this->ShowProgress; }
+protected:
+  QStyle* astyle() { return this->Style ? this->Style : this->style(); }
+  void paintEvent(QPaintEvent* evt)
+  {
+    this->QLabel::paintEvent(evt);
+
+    QStyleOptionProgressBar pbstyle;
+    pbstyle.initFrom(this);
+    pbstyle.minimum = 0;
+    pbstyle.progress = this->ShowProgress ? this->ProgressPercentage : 0;
+    pbstyle.maximum = 100;
+    pbstyle.text = this->ShowProgress
+      ? QString("%1 (%2\%)").arg(this->text()).arg(this->ProgressPercentage)
+      : this->text();
+    pbstyle.textAlignment = this->alignment();
+    pbstyle.rect = this->rect();
+
+    QPainter painter(this);
+    if (this->ShowProgress && this->ProgressPercentage > 0)
+    {
+      // we deliberately don't draw the progress bar groove to avoid a dramatic
+      // change in the progress bar.
+      pbstyle.textVisible = false;
+      this->astyle()->drawControl(QStyle::CE_ProgressBarContents, &pbstyle, &painter, this);
+      pbstyle.textVisible = true;
+      this->astyle()->drawControl(QStyle::CE_ProgressBarLabel, &pbstyle, &painter, this);
+    }
+  }
+
+private:
+  Q_DISABLE_COPY(pqProgressWidgetLabel);
+};
 
 //-----------------------------------------------------------------------------
 pqProgressWidget::pqProgressWidget(QWidget* _parent /*=0*/)
-  : QWidget(_parent, Qt::FramelessWindowHint)
+  : Superclass(_parent, Qt::FramelessWindowHint)
+  , ReadyText()
+  , BusyText("Busy")
 {
-  QGridLayout* gridLayout = new QGridLayout(this);
-  gridLayout->setSpacing(0);
-  gridLayout->setMargin(0);
-  gridLayout->setObjectName("gridLayout");
-
-  this->ProgressBar = new pqProgressBar(this);
-  this->ProgressBar->setObjectName("ProgressBar");
-  gridLayout->addWidget(this->ProgressBar, 0, 1, 1, 1);
+  QHBoxLayout* hbox = new QHBoxLayout(this);
+  hbox->setSpacing(2);
+  hbox->setMargin(0);
 
   this->AbortButton = new QToolButton(this);
   this->AbortButton->setObjectName("AbortButton");
   this->AbortButton->setIcon(QIcon(QString::fromUtf8(":/QtWidgets/Icons/pqDelete16.png")));
   this->AbortButton->setIconSize(QSize(12, 12));
-  this->AbortButton->setToolTip(QApplication::translate("Form", "Abort", 0));
-
+  this->AbortButton->setToolTip(tr("Abort"));
   this->AbortButton->setEnabled(false);
   QObject::connect(this->AbortButton, SIGNAL(pressed()), this, SIGNAL(abortPressed()));
+  hbox->addWidget(this->AbortButton);
 
-  gridLayout->addWidget(this->AbortButton, 0, 0, 1, 1);
-
-  this->PendingEnableProgress = true;
+  this->ProgressBar = new pqProgressWidgetLabel(this);
+  this->ProgressBar->setObjectName("ProgressBar");
+  this->ProgressBar->setAlignment(Qt::AlignCenter);
+  this->ProgressBar->setText(this->readyText());
+  hbox->addWidget(this->ProgressBar, 1);
 }
 
 //-----------------------------------------------------------------------------
@@ -71,36 +153,59 @@ pqProgressWidget::~pqProgressWidget()
 }
 
 //-----------------------------------------------------------------------------
+void pqProgressWidget::setReadyText(const QString& txt)
+{
+  this->ReadyText = txt;
+  if (!this->ProgressBar->showProgress())
+  {
+    this->ProgressBar->setText(txt);
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqProgressWidget::setBusyText(const QString& txt)
+{
+  this->BusyText = txt;
+  if (this->ProgressBar->showProgress())
+  {
+    this->ProgressBar->setText(txt);
+  }
+}
+
+//-----------------------------------------------------------------------------
 void pqProgressWidget::setProgress(const QString& message, int value)
 {
-  if (this->PendingEnableProgress && this->EnableTime.elapsed() >= 100)
+  if (this->ProgressBar->showProgress() &&
+    (this->ProgressBar->progressPercentage() != value || this->ProgressBar->text() != message))
   {
-    this->PendingEnableProgress = false;
-  }
-  if (!this->PendingEnableProgress && value > 0)
-  {
-    this->ProgressBar->setEnabled((value < 100));
-    this->ProgressBar->setProgress(message, value);
+    this->ProgressBar->setText(message);
+    if (this->ProgressBar->setProgressPercentage(value))
+    {
+      this->updateUI();
+    }
   }
 }
 
 //-----------------------------------------------------------------------------
 void pqProgressWidget::enableProgress(bool enabled)
 {
-  if (enabled)
+  if (this->ProgressBar->showProgress() != enabled)
   {
-    if (!this->PendingEnableProgress)
+    this->ProgressBar->setShowProgress(enabled);
+    bool changed = this->ProgressBar->setProgressPercentage(0);
+    this->ProgressBar->setText(enabled ? this->busyText() : this->readyText());
+    if (changed)
     {
-      this->PendingEnableProgress = true;
-      this->EnableTime.start();
+      this->updateUI();
     }
   }
-  else
-  {
-    this->ProgressBar->setEnabled(false);
-    this->ProgressBar->reset();
-    this->PendingEnableProgress = false;
-  }
+}
+
+//-----------------------------------------------------------------------------
+void pqProgressWidget::updateUI()
+{
+  this->ProgressBar->repaint();
+  this->AbortButton->repaint();
 }
 
 //-----------------------------------------------------------------------------

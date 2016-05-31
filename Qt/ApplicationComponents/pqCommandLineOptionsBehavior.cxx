@@ -67,11 +67,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStringList>
 #include <QTimer>
 
+#include "pqTimer.h"
+
 //-----------------------------------------------------------------------------
 pqCommandLineOptionsBehavior::pqCommandLineOptionsBehavior(QObject* parentObject)
   : Superclass(parentObject)
 {
-  QTimer::singleShot(100, this, SLOT(processCommandLineOptions()));
+  pqTimer::singleShot(100, this, SLOT(processCommandLineOptions()));
 }
 
 //-----------------------------------------------------------------------------

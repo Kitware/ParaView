@@ -166,7 +166,6 @@ protected:
   int ProgressCount;
   bool InUpdate; // used to avoid recursive updates.
 
-  double LastProgressTime;
   bool EnableProgress;
   bool ReadyEnableProgress;
   bool UnblockEvents;
