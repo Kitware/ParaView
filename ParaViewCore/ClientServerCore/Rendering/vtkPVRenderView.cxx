@@ -361,6 +361,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->NonDistributedRenderingRequiredLOD = false;
   this->ParallelProjection = 0;
   this->Culler = vtkSmartPointer<vtkPVRendererCuller>::New();
+  this->ForceDataDistributionMode = -1;
 
   this->SynchronizedRenderers = vtkPVSynchronizedRenderer::New();
 
@@ -1211,6 +1212,7 @@ void vtkPVRenderView::Update()
   // reset flags that representations set in REQUEST_UPDATE() pass.
   this->DistributedRenderingRequired = false;
   this->NonDistributedRenderingRequired = false;
+  this->ForceDataDistributionMode = -1;
 
   this->Superclass::Update();
 
@@ -1540,6 +1542,12 @@ void vtkPVRenderView::Deliver(int use_lod,
 //----------------------------------------------------------------------------
 int vtkPVRenderView::GetDataDistributionMode(bool use_remote_rendering)
 {
+  if (this->ForceDataDistributionMode >= 0)
+    {
+    // data-distribution mode is being overridden (experimental)
+    return this->ForceDataDistributionMode;
+    }
+
   bool in_tile_display_mode = this->InTileDisplayMode();
   bool in_cave_mode = this->InCaveDisplayMode();
   if (in_cave_mode)
@@ -1791,6 +1799,19 @@ void vtkPVRenderView::SetRequiresDistributedRendering(
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::SetForceDataDistributionMode(
+  vtkInformation* info, int flag)
+{
+  vtkPVRenderView* self = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!self)
+    {
+    vtkGenericWarningMacro("Missing VIEW().");
+    return;
+    }
+  self->ForceDataDistributionMode = flag < 0? -1 : flag;
+}
+
+//----------------------------------------------------------------------------
 bool vtkPVRenderView::ShouldUseDistributedRendering(
   double geometry_size, bool using_lod)
 {
@@ -1909,6 +1930,14 @@ bool vtkPVRenderView::GetUseOrderedCompositing()
 
   if (!this->NeedsOrderedCompositing || this->MakingSelection)
     {
+    return false;
+    }
+
+  if (this->ForceDataDistributionMode >= 0 &&
+    this->ForceDataDistributionMode != vtkMPIMoveData::PASS_THROUGH)
+    {
+    // for any mode where data is getting collected or cloned, we assume
+    // ordered compositing is not needed.
     return false;
     }
 
