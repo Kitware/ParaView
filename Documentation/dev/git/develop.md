@@ -351,12 +351,10 @@ convention, do not request a merge if any `-1` or `Rejected-by:`
 review comments have not been resolved and superseded by at least
 `+1` or `Acked-by:` review comments from the same user.
 
-Caveats:
-* Currently, developers authorized to do a merge request will be limited to those
-who have **Master** privileges on the ParaView Gitlab repository. This preserves the
-spirit of **Gatekeeper Review** in the previous development workflow. This decision
-may be reevaluated in the future and lifted to encourage a more open development
-community.
+Developers are encouraged to merge their own merge requests on review. However,
+please do not merge unless you are available to address any dashboard issues that may
+arise. Developers who repeatedly ignore dashboard issues following their merges may
+loose developer privileges to the repository temporarily (or permanently)!
 
 ### Merge Success ###
 
