@@ -282,7 +282,6 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/ReadXMLPolyDataFileSeries.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RectilinearFractal.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RepresentationSelector.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/RestoreBlockColorDefaultTransferFunction.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RotateCamera90.xml
 #  ${CMAKE_CURRENT_SOURCE_DIR}/SaveAnimationGeometry.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SaveColorMap.xml
@@ -340,6 +339,7 @@ if(VTK_USE_LARGE_DATA)
   )
   list(APPEND TESTS_WITH_BASELINES
     ${CMAKE_CURRENT_SOURCE_DIR}/CheckSelectedBlocks.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/RestoreBlockColorDefaultTransferFunction.xml
     )
 endif()
 
