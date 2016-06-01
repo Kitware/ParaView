@@ -19,6 +19,25 @@
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 
+//---------------------------------------------------------------------------
+vtkSMSessionObject::vtkScopedMonitorProgress::vtkScopedMonitorProgress(vtkSMSessionObject* parent)
+  : Parent(parent)
+{
+  if (this->Parent && this->Parent->GetSession())
+  {
+    this->Parent->GetSession()->PrepareProgress();
+  }
+}
+
+//---------------------------------------------------------------------------
+vtkSMSessionObject::vtkScopedMonitorProgress::~vtkScopedMonitorProgress()
+{
+  if (this->Parent && this->Parent->GetSession())
+  {
+    this->Parent->GetSession()->CleanupPendingProgress();
+  }
+}
+
 vtkStandardNewMacro(vtkSMSessionObject);
 //---------------------------------------------------------------------------
 vtkSMSessionObject::vtkSMSessionObject()

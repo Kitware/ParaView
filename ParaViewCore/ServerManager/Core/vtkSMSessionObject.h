@@ -55,8 +55,33 @@ protected:
   vtkSMSessionObject();
   ~vtkSMSessionObject();
 
-  // Identifies the session id to which this object is related.
+  /**
+   * Identifies the session id to which this object is related.
+   */
   vtkWeakPointer<vtkSMSession> Session;
+
+  /**
+   *
+   * Helper class designed to call session->PrepareProgress() in constructor and
+   * session->CleanupPendingProgress() in destructor. To use this class, simply
+   * create this class on the stack with the vtkSMObject instance as the
+   * argument to the constructor.
+   * @code
+   * {
+   *    ...
+   *    vtkScopedMonitorProgress(this);
+   *    ...
+   * }
+   * @endcode
+   */
+  class VTKPVSERVERMANAGERCORE_EXPORT vtkScopedMonitorProgress
+  {
+    vtkSMSessionObject* Parent;
+
+  public:
+    vtkScopedMonitorProgress(vtkSMSessionObject* parent);
+    ~vtkScopedMonitorProgress();
+  };
 
 private:
   vtkSMSessionObject(const vtkSMSessionObject&) VTK_DELETE_FUNCTION;
