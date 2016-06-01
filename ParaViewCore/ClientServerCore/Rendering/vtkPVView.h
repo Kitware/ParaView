@@ -169,7 +169,6 @@ public:
   // vtkPVAxesWidget has been cleaned up.
   bool GetLocalProcessSupportsInteraction();
 
-//BTX
   vtkGetMacro(Identifier, unsigned int);
 
 protected:
@@ -230,7 +229,7 @@ private:
   bool LastRenderOneViewAtATime;
 
   static bool EnableStreaming;
-//ETX
+
 };
 
 #endif

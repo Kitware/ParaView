@@ -208,7 +208,6 @@ public:
   static void GetMultiViewImageBorderColor(double rgb[3]);
   static int GetMultiViewImageBorderWidth();
 
-//BTX
 protected:
   vtkSMViewLayoutProxy();
   ~vtkSMViewLayoutProxy();
@@ -254,7 +253,6 @@ private:
   static double MultiViewImageBorderColor[3];
   static int MultiViewImageBorderWidth;
 
-//ETX
 };
 
 #endif

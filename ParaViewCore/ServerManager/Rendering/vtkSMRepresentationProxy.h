@@ -94,7 +94,6 @@ public:
     return self? self->SetRepresentationType(type) : false;
     }
 
-//BTX
 protected:
   vtkSMRepresentationProxy();
   ~vtkSMRepresentationProxy();
@@ -148,7 +147,7 @@ private:
   void ClearMarkedModified() { this->MarkedModified = false; }
   bool MarkedModified;
   bool VTKRepresentationUpdated;
-//ETX
+
 };
 
 #endif

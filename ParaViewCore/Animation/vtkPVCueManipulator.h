@@ -45,7 +45,6 @@ public:
   vtkTypeMacro(vtkPVCueManipulator, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-//BTX
   // Description:
   // StateModifiedEvent - This event is fired when the manipulator modifies the animated proxy.
   // vtkCommand::Modified - is fired when the keyframes are changed i.e. added/removed/modified.
@@ -86,7 +85,7 @@ protected:
 private:
   vtkPVCueManipulator(const vtkPVCueManipulator&); // Not implemented.
   void operator=(const vtkPVCueManipulator&); // Not implemented.
-//ETX
+
 };
 
 #endif

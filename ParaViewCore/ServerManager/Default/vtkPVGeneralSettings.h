@@ -148,7 +148,6 @@ public:
   // Forwarded to vtkSMViewProxy.
   void SetTransparentBackground(bool val);
 
-//BTX
 protected:
   vtkPVGeneralSettings();
   ~vtkPVGeneralSettings();
@@ -168,7 +167,7 @@ private:
   void operator=(const vtkPVGeneralSettings&); // Not implemented
 
   static vtkSmartPointer<vtkPVGeneralSettings> Instance;
-//ETX
+
 };
 
 #endif

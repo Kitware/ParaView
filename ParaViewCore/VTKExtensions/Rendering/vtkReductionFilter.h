@@ -78,7 +78,6 @@ public:
   vtkSetMacro(GenerateProcessIds, int);
   vtkGetMacro(GenerateProcessIds, int);
 
-//BTX
   enum Tags {
     TRANSMIT_DATA_OBJECT = 23484
   };
@@ -126,7 +125,7 @@ protected:
 private:
   vtkReductionFilter(const vtkReductionFilter&); // Not implemented.
   void operator=(const vtkReductionFilter&); // Not implemented.
-//ETX
+
 };
 
 #endif

@@ -36,7 +36,6 @@ public:
   void SetController(vtkMultiProcessController*);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
 
-//BTX
 protected:
   vtkPConvertSelection();
   ~vtkPConvertSelection();
@@ -50,7 +49,7 @@ protected:
 private:
   vtkPConvertSelection(const vtkPConvertSelection&); // Not implemented
   void operator=(const vtkPConvertSelection&); // Not implemented
-//ETX
+
 };
 
 #endif // vtkPConvertSelection_h

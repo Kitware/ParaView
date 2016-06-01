@@ -59,10 +59,9 @@ private:
   vtkPTemporalRanges(const vtkPTemporalRanges &);       // Not implemented
   void operator=(const vtkPTemporalRanges &);           // Not implemented
 
-//BTX
   class vtkRangeTableReduction;
   friend class vtkRangeTableReduction;
-//ETX
+
 };
 
 #endif //vtkPTemporalRanges_h

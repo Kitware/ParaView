@@ -75,7 +75,6 @@ public:
   // Given the rank, returns the tile location.
   void GetTileIndex(int rank, int* tileX, int* tileY);
 
-//BTX
 protected:
   vtkTilesHelper();
   ~vtkTilesHelper();
@@ -87,7 +86,7 @@ protected:
 private:
   vtkTilesHelper(const vtkTilesHelper&); // Not implemented
   void operator=(const vtkTilesHelper&); // Not implemented
-//ETX
+
 };
 
 #endif

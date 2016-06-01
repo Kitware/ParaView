@@ -29,7 +29,6 @@ public:
   vtkTypeMacro(vtkSIDataArrayProperty, vtkSIProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-//BTX
 protected:
   vtkSIDataArrayProperty();
   ~vtkSIDataArrayProperty();
@@ -43,7 +42,7 @@ protected:
 private:
   vtkSIDataArrayProperty(const vtkSIDataArrayProperty&); // Not implemented
   void operator=(const vtkSIDataArrayProperty&); // Not implemented
-//ETX
+
 };
 
 #endif

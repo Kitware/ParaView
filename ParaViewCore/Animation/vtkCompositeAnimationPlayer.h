@@ -61,7 +61,6 @@ public:
   void RemoveAllTimeSteps();
   void SetFramesPerTimestep(int val);
 
-//BTX
 protected:
   vtkCompositeAnimationPlayer();
   ~vtkCompositeAnimationPlayer();
@@ -90,7 +89,6 @@ private:
   class vtkInternal;
   vtkInternal* Internal;
 
-//ETX
 };
 
 #endif

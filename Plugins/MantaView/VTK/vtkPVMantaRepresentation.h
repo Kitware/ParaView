@@ -99,7 +99,6 @@ public:
   void SetAllowDataMaterial(bool);
   bool GetAllowDataMaterial();
 
-//BTX
 protected:
   vtkPVMantaRepresentation();
   ~vtkPVMantaRepresentation();
@@ -109,7 +108,6 @@ private:
   vtkPVMantaRepresentation(const vtkPVMantaRepresentation&); // Not implemented.
   void operator=(const vtkPVMantaRepresentation&); // Not implemented.
 
-//ETX
 };
 
 

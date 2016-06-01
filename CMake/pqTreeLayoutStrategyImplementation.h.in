@@ -55,9 +55,7 @@ public:
   vtkAreaLayoutStrategy* getTreeLayoutStrategy(const QString& layoutStrategy);
   
 protected:
-//BTX
   vtkSmartPointer<vtk@ARG_STRATEGY_TYPE@> @ARG_STRATEGY_TYPE@;
-//ETX
 };
 
 #endif

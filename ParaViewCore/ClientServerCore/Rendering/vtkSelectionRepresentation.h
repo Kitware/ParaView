@@ -99,7 +99,6 @@ public:
   // initilized as well.
   virtual unsigned int Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable);
 
-//BTX
 protected:
   vtkSelectionRepresentation();
   ~vtkSelectionRepresentation();
@@ -128,7 +127,7 @@ protected:
 private:
   vtkSelectionRepresentation(const vtkSelectionRepresentation&); // Not implemented
   void operator=(const vtkSelectionRepresentation&); // Not implemented
-//ETX
+
 };
 
 #endif

@@ -84,7 +84,6 @@ public:
   // Temporary storage for most recent message text.
   vtkGetStringMacro(LastMessage);
 
-//BTX
 protected:
   vtkPVProgressHandler();
   ~vtkPVProgressHandler();
@@ -128,7 +127,7 @@ private:
 
   vtkSetStringMacro(LastMessage);
   char* LastMessage;
-//ETX
+
 };
 
 #endif

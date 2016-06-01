@@ -36,7 +36,6 @@ public:
   vtkSetMacro(EnableThickening, bool);
   vtkGetMacro(EnableThickening, bool);
 
-//BTX
 protected:
   vtkThickenLayeredCells();
   ~vtkThickenLayeredCells();
@@ -49,7 +48,7 @@ protected:
 private:
   vtkThickenLayeredCells(const vtkThickenLayeredCells&); // Not implemented.
   void operator=(const vtkThickenLayeredCells&); // Not implemented.
-//ETX
+
 };
 
 #endif

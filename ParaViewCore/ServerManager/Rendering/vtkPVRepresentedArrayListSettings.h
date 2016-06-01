@@ -50,7 +50,6 @@ public:
   virtual void SetFilterExpression(int i, const char* expression);
   virtual const char* GetFilterExpression(int i);
 
-//BTX
 protected:
   vtkPVRepresentedArrayListSettings();
   ~vtkPVRepresentedArrayListSettings();
@@ -63,7 +62,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-//ETX
+
 };
 
 #endif

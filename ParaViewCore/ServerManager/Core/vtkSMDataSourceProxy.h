@@ -39,7 +39,6 @@ public:
   // source proxy object.
   void CopyData(vtkSMSourceProxy *sourceProxy);
 
-//BTX
 protected:
   vtkSMDataSourceProxy();
   ~vtkSMDataSourceProxy();
@@ -47,7 +46,7 @@ protected:
 private:
   vtkSMDataSourceProxy(const vtkSMDataSourceProxy&); // Not implemented
   void operator=(const vtkSMDataSourceProxy&); // Not implemented
-//ETX
+
 };
 
 #endif

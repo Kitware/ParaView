@@ -49,15 +49,12 @@ public:
   vtkGetMacro(VolumeFractionSurfaceValue, double);
   vtkSetMacro(VolumeFractionSurfaceValue, double);
 
-  //BTX
   virtual int RequestData(vtkInformation*, vtkInformationVector**,
                           vtkInformationVector*);
 
 private:
   vtkPVAMRDualContour(const vtkPVAMRDualContour&);  // Not implemented.
   void operator=(const vtkPVAMRDualContour&);    // Not implemented.
-
-  //ETX
 
 protected:
   double VolumeFractionSurfaceValue;

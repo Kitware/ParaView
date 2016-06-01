@@ -283,10 +283,8 @@ protected:
   vtkDataArraySelection* PointDataArraySelection;
   vtkCallbackCommand* SelectionObserver;
 
-// BTX
   gio::GenericIOReader* Reader;
   vtkGenericIOMetaData* MetaData;
-// ETX
 
   int RequestInfoCounter;
   int RequestDataCounter;

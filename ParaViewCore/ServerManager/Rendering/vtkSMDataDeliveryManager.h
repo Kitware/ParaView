@@ -56,7 +56,6 @@ public:
   // implies that there is no more data to stream or streaming is not enabled.
   bool DeliverStreamedPieces();
 
-//BTX
 protected:
   vtkSMDataDeliveryManager();
   ~vtkSMDataDeliveryManager();
@@ -75,7 +74,7 @@ protected:
 private:
   vtkSMDataDeliveryManager(const vtkSMDataDeliveryManager&); // Not implemented
   void operator=(const vtkSMDataDeliveryManager&); // Not implemented
-//ETX
+
 };
 
 #endif

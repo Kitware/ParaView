@@ -216,7 +216,6 @@ public:
   virtual void SetScalingArrayName(const char*);
   virtual void SetScalingFunction(vtkPiecewiseFunction *pwf);
 
-//BTX
 protected:
   vtkGeometryRepresentation();
   ~vtkGeometryRepresentation();
@@ -305,7 +304,7 @@ private:
   friend class vtkSelectionRepresentation;
   char* DebugString;
   vtkSetStringMacro(DebugString);
-//ETX
+
 };
 
 #endif

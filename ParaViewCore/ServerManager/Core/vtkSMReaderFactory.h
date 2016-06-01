@@ -147,7 +147,7 @@ public:
   // the begining of the application's execution before any sessions are
   // created.
   static void AddReaderToWhitelist(const char* readerxmlgroup, const char* readerxmlname);
-//BTX
+
 protected:
   vtkSMReaderFactory();
   ~vtkSMReaderFactory();
@@ -171,7 +171,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-//ETX
+
 };
 
 #endif

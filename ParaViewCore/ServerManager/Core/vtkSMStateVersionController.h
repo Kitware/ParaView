@@ -46,7 +46,7 @@ protected:
 private:
   vtkSMStateVersionController(const vtkSMStateVersionController&); // Not implemented
   void operator=(const vtkSMStateVersionController&); // Not implemented
-//ETX
+
 };
 
 #endif

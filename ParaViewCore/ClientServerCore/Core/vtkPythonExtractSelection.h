@@ -39,7 +39,6 @@ public:
   bool ExtractElements(int attributeType, vtkDataObject* input, vtkDataObject* output);
   bool ExtractElements(int attributeType, vtkCompositeDataSet* input, vtkCompositeDataSet* output);
 
-//BTX
 protected:
   vtkPythonExtractSelection();
   ~vtkPythonExtractSelection();
@@ -60,7 +59,6 @@ private:
   vtkPythonExtractSelection(const vtkPythonExtractSelection&); // Not implemented
   void operator=(const vtkPythonExtractSelection&); // Not implemented
 
-//ETX
 };
 
 #endif

@@ -43,7 +43,6 @@ public:
   // details about the configuration xml.
   void LoadPluginConfigurationXMLFromString(const char* xmlcontents);
 
-//BTX
 protected:
   vtkSMPluginLoaderProxy();
   ~vtkSMPluginLoaderProxy();
@@ -51,7 +50,7 @@ protected:
 private:
   vtkSMPluginLoaderProxy(const vtkSMPluginLoaderProxy&); // Not implemented
   void operator=(const vtkSMPluginLoaderProxy&); // Not implemented
-//ETX
+
 };
 
 #endif

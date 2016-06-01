@@ -45,7 +45,6 @@ public:
   // representation of false, all view passes are ignored.
   virtual void SetVisibility(bool val);
 
-//BTX
 protected:
   vtkPistonRepresentation();
   ~vtkPistonRepresentation();
@@ -99,7 +98,7 @@ private:
 
   char* DebugString;
   vtkSetStringMacro(DebugString);
-//ETX
+
 };
 
 #endif

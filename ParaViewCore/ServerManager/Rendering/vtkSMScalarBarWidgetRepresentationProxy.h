@@ -55,7 +55,6 @@ public:
     return self? self->PlaceInView(view) : false;
     }
 
-//BTX
 protected:
   vtkSMScalarBarWidgetRepresentationProxy();
   ~vtkSMScalarBarWidgetRepresentationProxy();
@@ -73,7 +72,7 @@ protected:
 private:
   vtkSMScalarBarWidgetRepresentationProxy(const vtkSMScalarBarWidgetRepresentationProxy&); // Not implemented
   void operator=(const vtkSMScalarBarWidgetRepresentationProxy&); // Not implemented
-//ETX
+
 };
 
 #endif

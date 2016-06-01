@@ -87,7 +87,6 @@ public:
   // Overridden to load links state.
   virtual int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator);
 
-//BTX
 protected:
   vtkSMGlobalPropertiesProxy();
   ~vtkSMGlobalPropertiesProxy();
@@ -106,7 +105,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-//ETX
+
 };
 
 #endif

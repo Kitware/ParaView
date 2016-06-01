@@ -34,13 +34,11 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkSurfaceVectors *New();
 
-//BTX
   enum ConstraintMode {
     Parallel = 0,
     Perpendicular,
     PerpendicularScale
   };
-//ETX
 
   // Description:
   // This mode determines whether this filter projects vectors to be 

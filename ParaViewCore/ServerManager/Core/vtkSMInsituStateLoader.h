@@ -29,7 +29,6 @@ public:
   vtkTypeMacro(vtkSMInsituStateLoader, vtkSMStateLoader);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-//BTX
 protected:
   vtkSMInsituStateLoader();
   ~vtkSMInsituStateLoader();
@@ -41,7 +40,7 @@ protected:
 private:
   vtkSMInsituStateLoader(const vtkSMInsituStateLoader&); // Not implemented
   void operator=(const vtkSMInsituStateLoader&); // Not implemented
-//ETX
+
 };
 
 #endif

@@ -78,7 +78,6 @@ public:
   // CLIENT -> SERVER(s) direction.
   //---------------------------------------------------------------------------
 
-//BTX
   // Description:
   // Push the state message.
   virtual void PushState(vtkSMMessage* msg);
@@ -100,7 +99,6 @@ public:
   // location refers to multiple processes, then the reply is only fetched from
   // the "closest" process.
   virtual const vtkClientServerStream& GetLastResult(vtkTypeUInt32 location);
-//ETX
 
   // Description:
   // Gather information about an object referred by the \c globalid.
@@ -117,7 +115,6 @@ public:
   // processed on that process immediately, as appropriate.
   //---------------------------------------------------------------------------
 
-//BTX
   // Description:
   // Sends the message to all clients.
   virtual void NotifyAllClients(const vtkSMMessage*)=0;
@@ -125,7 +122,6 @@ public:
   // Description:
   // Sends the message to all but the active client-session.
   virtual void NotifyOtherClients(const vtkSMMessage*)=0;
-//ETX
 
   //---------------------------------------------------------------------------
   // API dealing with/forwarded to vtkPVSessionCore dealing with SIObjects and
@@ -144,7 +140,6 @@ public:
   // Returns a vtkSIObject or subclass given its global id, if any.
   vtkSIObject* GetSIObject(vtkTypeUInt32 globalid);
 
-//BTX
   // Description:
   // Unregister server side object. (SIObject)
   virtual void UnRegisterSIObject(vtkSMMessage* msg);
@@ -152,7 +147,6 @@ public:
   // Description:
   // Register server side object. (SIObject)
   virtual void RegisterSIObject(vtkSMMessage* msg);
-//ETX
 
   // Description:
   // Return a vtkSMRemoteObject given its global id if any otherwise return NULL;
@@ -193,7 +187,6 @@ public:
   // Update internal session core in order to use the one used in another session
   virtual void UseSessionCoreOf(vtkPVSessionBase* other);
 
-//BTX
 protected:
   vtkPVSessionBase();
   vtkPVSessionBase(vtkPVSessionCore* coreToUse);
@@ -244,7 +237,7 @@ private:
   vtkPVServerInformation* LocalServerInformation;
   unsigned long ActivateObserverTag;
   unsigned long DesactivateObserverTag;
-//ETX
+
 };
 
 #endif

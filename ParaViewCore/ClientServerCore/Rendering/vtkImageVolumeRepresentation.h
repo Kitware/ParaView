@@ -104,7 +104,6 @@ public:
     static void PassOrderedCompositingInformation(
       vtkPVDataRepresentation* self, vtkInformation* inInfo));
 
-//BTX
 protected:
   vtkImageVolumeRepresentation();
   ~vtkImageVolumeRepresentation();
@@ -159,7 +158,6 @@ private:
   vtkImageVolumeRepresentation(const vtkImageVolumeRepresentation&); // Not implemented
   void operator=(const vtkImageVolumeRepresentation&); // Not implemented
 
-//ETX
 };
 
 #endif

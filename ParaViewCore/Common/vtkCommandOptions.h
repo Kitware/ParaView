@@ -35,7 +35,6 @@ public:
   vtkTypeMacro(vtkCommandOptions,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-//BTX
   int Parse(int argc, const char* const argv[]);
   void GetRemainingArguments(int* argc, char** argv[]);
 
@@ -44,7 +43,6 @@ public:
     EVERYBODY = 0,
     XMLONLY = 0x1
   };
-//ETX
 
   const char* GetHelp();
 
@@ -85,7 +83,7 @@ public:
   virtual int ParseExtraXMLTag(const char* , const char** ) {return 1;}
 
 protected:
-//BTX
+
   // Description:
   // Default constructor.
   vtkCommandOptions();
@@ -176,7 +174,7 @@ private:
 
   static int UnknownArgumentHandler(const char* argument, void* call_data);
   static int DeprecatedArgumentHandler(const char* argument, const char* value, void* call_data);
-//ETX
+
 };
 
 #endif

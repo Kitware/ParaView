@@ -40,7 +40,6 @@ public:
   // Default implementation return true if the view is a render view.
   virtual bool CanExport(vtkSMProxy*);
 
-//BTX
 protected:
   vtkSMRenderViewExporterProxy();
   ~vtkSMRenderViewExporterProxy();
@@ -48,7 +47,7 @@ protected:
 private:
   vtkSMRenderViewExporterProxy(const vtkSMRenderViewExporterProxy&); // Not implemented
   void operator=(const vtkSMRenderViewExporterProxy&); // Not implemented
-//ETX
+
 };
 
 #endif

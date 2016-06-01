@@ -28,9 +28,7 @@
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDomain.h"
 
-//BTX
 struct vtkSMEnumerationDomainInternals;
-//ETX
 
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMEnumerationDomain : public vtkSMDomain
 {
@@ -75,13 +73,12 @@ public:
   // Get the value for an enumeration text. The return value is valid only is
   // HasEntryText() returns 1.
   int GetEntryValueForText(const char* text);
-//BTX
+
   // Description:
   // Given an entry text, return the integer value.
   // Valid is set to 1 if text is defined, otherwise 0.
   // If valid=0, return value is undefined.
   int GetEntryValue(const char* text, int& valid);
-//ETX
 
   // Description:
   // Add a new enumeration entry. text cannot be null.

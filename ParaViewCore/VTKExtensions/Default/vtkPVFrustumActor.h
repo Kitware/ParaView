@@ -42,7 +42,6 @@ public:
   void SetColor(double r, double g, double b);
   void SetLineWidth(double r);
 
-//BTX
 protected:
   vtkPVFrustumActor();
   ~vtkPVFrustumActor();
@@ -53,7 +52,7 @@ protected:
 private:
   vtkPVFrustumActor(const vtkPVFrustumActor&); // Not implemented
   void operator=(const vtkPVFrustumActor&); // Not implemented
-//ETX
+
 };
 
 #endif

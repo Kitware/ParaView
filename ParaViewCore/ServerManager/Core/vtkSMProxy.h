@@ -124,9 +124,8 @@
 #include "vtkSMRemoteObject.h"
 #include "vtkClientServerID.h" // needed for vtkClientServerID
 
-//BTX
 struct vtkSMProxyInternals;
-//ETX
+
 class vtkClientServerStream;
 class vtkPVInformation;
 class vtkSMLoadStateContext;
@@ -341,7 +340,6 @@ public:
   // default value is DEFAULT.
   virtual void ResetPropertiesToDefault(ResetPropertiesMode mode = DEFAULT);
 
-//BTX
   // Description:
   // Flags used for the proxyPropertyCopyFlag argument to the Copy method.
   enum
@@ -350,7 +348,6 @@ public:
 
     COPY_PROXY_PROPERTY_VALUES_BY_CLONING // < No longer supported!!!
     };
-//ETX
 
   // Description:
   // Copies values of all the properties and sub-proxies from src.
@@ -478,8 +475,6 @@ public:
   // Enable the given remote object to communicate its state normaly to the
   // server location.
   virtual void DisableLocalPushOnly();
-
-//BTX
 
   // Description:
   // This method return the full object state that can be used to create that
@@ -802,10 +797,7 @@ private:
   vtkSMProperty* SetupExposedProperty(vtkPVXMLElement* propertyElement,
                                       const char* subproxy_name);
 
-//ETX
 };
-
-//BTX
 
 /// This defines a stream manipulator for the vtkClientServerStream that can be used
 /// to indicate to the interpreter that the placeholder is to be replaced by
@@ -851,5 +843,4 @@ public:
 VTKPVSERVERMANAGERCORE_EXPORT vtkClientServerStream& operator<<(
   vtkClientServerStream& stream, const VTKOBJECT& manipulator);
 
-//ETX
 #endif

@@ -38,7 +38,6 @@ public:
   vtkGetMacro(MoleculeRenderMode, int)
   void SetMoleculeRenderMode(int mode);
 
-//BTX
 protected:
   vtkMoleculeRepresentation();
   ~vtkMoleculeRepresentation();
@@ -56,7 +55,7 @@ protected:
 private:
   vtkMoleculeRepresentation(const vtkMoleculeRepresentation&); // Not implemented
   void operator=(const vtkMoleculeRepresentation&); // Not implemented
-//ETX
+
 };
 
 #endif // vtkMoleculeRepresentation_h

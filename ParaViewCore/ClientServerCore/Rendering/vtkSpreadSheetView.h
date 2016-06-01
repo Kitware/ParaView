@@ -125,7 +125,6 @@ public:
   // Allow user to clear the cache if he needs to.
   void ClearCache();
 
-//BTX
   // INTERNAL METHOD. Don't call directly.
   void FetchBlockCallback(vtkIdType blockindex);
 
@@ -168,7 +167,7 @@ private:
   bool SomethingUpdated;
 
   unsigned long RMICallbackTag;
-//ETX
+
 };
 
 #endif

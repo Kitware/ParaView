@@ -38,7 +38,6 @@ public:
   // This uses vtkClientServerInterpreter::NewInstance() to create the class.
   static vtkObject* CreateInstance(const char* className);
 
-//BTX
 protected:
   vtkPVInstantiator();
   ~vtkPVInstantiator();
@@ -46,7 +45,7 @@ protected:
 private:
   vtkPVInstantiator(const vtkPVInstantiator&); // Not implemented
   void operator=(const vtkPVInstantiator&); // Not implemented
-//ETX
+
 };
 
 #endif

@@ -68,7 +68,6 @@ public:
   vtkSetMacro(NumberOfSimulationProcesses, int);
   vtkGetMacro(NumberOfSimulationProcesses, int);
 
-//BTX
 protected:
   vtkExtractsDeliveryHelper();
   ~vtkExtractsDeliveryHelper();
@@ -97,7 +96,7 @@ protected:
 private:
   vtkExtractsDeliveryHelper(const vtkExtractsDeliveryHelper&); // Not implemented
   void operator=(const vtkExtractsDeliveryHelper&); // Not implemented
-//ETX
+
 };
 
 #endif

@@ -21,7 +21,6 @@
 
 vtkStandardNewMacro(vtkPEnSightGoldReader);
 
-//BTX
 class UndefPartialInternal
 {
 public:
@@ -32,7 +31,6 @@ public:
   std::vector<vtkIdType> PartialBlock;
   std::vector<vtkIdType> PartialElementTypes;
 };
-//ETX
 
 //----------------------------------------------------------------------------
 vtkPEnSightGoldReader::vtkPEnSightGoldReader()

@@ -67,8 +67,6 @@ public:
   void Clear()
     { this->Copy(NULL); }
 
-
-//BTX
 protected:
   vtkSMProxyClipboard();
   ~vtkSMProxyClipboard();
@@ -80,7 +78,7 @@ private:
   void operator=(const vtkSMProxyClipboard&); // Not implemented
 
   vtkSMProxyClipboardInternals* Internals;
-//ETX
+
 };
 
 #endif

@@ -42,7 +42,6 @@ public:
   // @endverbatim
   vtkGetMacro(ArgumentIsArray, bool);
 
-//BTX
 protected:
   vtkSIVectorPropertyTemplate();
   ~vtkSIVectorPropertyTemplate();
@@ -68,7 +67,7 @@ protected:
 private:
   vtkSIVectorPropertyTemplate(const vtkSIVectorPropertyTemplate&); // Not implemented
   void operator=(const vtkSIVectorPropertyTemplate&); // Not implemented
-//ETX
+
 };
 
 #endif

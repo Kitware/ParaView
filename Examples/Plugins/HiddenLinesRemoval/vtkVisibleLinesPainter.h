@@ -37,7 +37,6 @@ public:
   // resources to release. In this case, releases the display lists.
   virtual void ReleaseGraphicsResources(vtkWindow *);
 
-//BTX
 protected:
   vtkVisibleLinesPainter();
   ~vtkVisibleLinesPainter();
@@ -65,7 +64,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-//ETX
+
 };
 
 #endif

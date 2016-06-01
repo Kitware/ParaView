@@ -175,7 +175,6 @@ public:
     return self? self->HideOtherRepresentationsIfNeeded(repr) : false;
     }
 
-//BTX
 protected:
   vtkSMViewProxy();
   ~vtkSMViewProxy();
@@ -234,7 +233,7 @@ private:
   class vtkRendererSaveInfo;
   vtkRendererSaveInfo* PrepareRendererBackground(vtkRenderer*, double, double, double, bool);
   void RestoreRendererBackground(vtkRenderer*, vtkRendererSaveInfo*);
-//ETX
+
 };
 
 #endif

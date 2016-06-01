@@ -52,7 +52,6 @@ public:
   // value.
   vtkGetMacro(UseTrueParentForRepresentatedDataInformation, bool);
 
-//BTX
 protected:
   vtkSMRepresentedArrayListDomain();
   ~vtkSMRepresentedArrayListDomain();
@@ -88,7 +87,7 @@ protected:
 private:
   vtkSMRepresentedArrayListDomain(const vtkSMRepresentedArrayListDomain&); // Not implemented
   void operator=(const vtkSMRepresentedArrayListDomain&); // Not implemented
-//ETX
+
 };
 
 #endif

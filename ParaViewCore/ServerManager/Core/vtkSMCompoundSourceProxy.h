@@ -126,7 +126,6 @@ public:
   // the returned element will be a top level element.
   vtkPVXMLElement* SaveDefinition(vtkPVXMLElement* root);
 
-//BTX
 protected:
   vtkSMCompoundSourceProxy();
   ~vtkSMCompoundSourceProxy();
@@ -153,7 +152,7 @@ private:
 
   class vtkInternals;
   vtkInternals* CSInternals;
-//ETX
+
 };
 
 #endif

@@ -30,7 +30,6 @@ public:
   vtkTypeMacro(vtkPVCacheKeeperPipeline, vtkCompositeDataPipeline);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-//BTX
 protected:
   vtkPVCacheKeeperPipeline();
   ~vtkPVCacheKeeperPipeline();
@@ -40,7 +39,7 @@ protected:
 private:
   vtkPVCacheKeeperPipeline(const vtkPVCacheKeeperPipeline&); // Not implemented
   void operator=(const vtkPVCacheKeeperPipeline&); // Not implemented
-//ETX
+
 };
 
 #endif

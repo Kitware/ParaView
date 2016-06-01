@@ -74,7 +74,6 @@ public:
   // superclass.
   virtual double *GetBounds();
 
-//BTX
 protected:
   vtkPVGridAxes3DActor();
   ~vtkPVGridAxes3DActor();
@@ -97,7 +96,7 @@ private:
   void operator=(const vtkPVGridAxes3DActor&); // Not implemented
 
   vtkTimeStamp BoundsUpdateTime;
-//ETX
+
 };
 
 #endif

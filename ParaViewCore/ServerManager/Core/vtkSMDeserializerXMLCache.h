@@ -39,7 +39,6 @@ public:
   // Allow to register a given XML state for a given proxy GlobalId
   virtual void CacheXMLProxyState(vtkTypeUInt32 id, vtkPVXMLElement* xml);
 
-//BTX
 protected:
   vtkSMDeserializerXMLCache();
   ~vtkSMDeserializerXMLCache();
@@ -57,7 +56,7 @@ private:
 
   class vtkInternal;
   vtkInternal* Internals;
-//ETX
+
 };
 
 #endif

@@ -63,7 +63,6 @@ public:
   // communicate between all active processes.
   void SetSynchronizedWindows(vtkPVSynchronizedRenderWindows*);
 
-//BTX
 protected:
   vtkPVHardwareSelector();
   ~vtkPVHardwareSelector();
@@ -95,7 +94,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-//ETX
+
 };
 
 #endif

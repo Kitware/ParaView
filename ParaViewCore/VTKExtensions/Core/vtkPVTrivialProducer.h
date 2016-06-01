@@ -50,7 +50,7 @@ public:
   virtual int ProcessRequest(vtkInformation*,
                              vtkInformationVector**,
                              vtkInformationVector*);
-//BTX
+
 protected:
   vtkPVTrivialProducer();
   ~vtkPVTrivialProducer();
@@ -63,7 +63,7 @@ protected:
 private:
   vtkPVTrivialProducer(const vtkPVTrivialProducer&); // Not implemented
   void operator=(const vtkPVTrivialProducer&); // Not implemented
-//ETX
+
 };
 
 #endif

@@ -78,7 +78,6 @@ public:
   // Provides access to the source proxy to which the output port belongs.
   vtkSMSourceProxy* GetSourceProxy();
 
-//BTX
 protected:
   vtkSMOutputPort();
   ~vtkSMOutputPort();
@@ -133,7 +132,7 @@ private:
 
   // Update Pipeline with the given timestep request.
   void UpdatePipeline(double time);
-//ETX
+
 };
 
 #endif

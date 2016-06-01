@@ -157,7 +157,6 @@ public:
   // Provides access to the view.
   vtkView* GetView() const;
 
-//BTX
 protected:
   vtkPVDataRepresentation();
   ~vtkPVDataRepresentation();
@@ -200,7 +199,7 @@ private:
   class Internals;
   Internals* Implementation;
   vtkWeakPointer<vtkView> View;
-//ETX
+
 };
 
 #endif

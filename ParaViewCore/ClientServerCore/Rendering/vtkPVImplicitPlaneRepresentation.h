@@ -46,7 +46,7 @@ public:
 
   void Reset();
   
-//BTX
+
 protected:
   vtkPVImplicitPlaneRepresentation();
   ~vtkPVImplicitPlaneRepresentation();
@@ -60,7 +60,7 @@ protected:
 private:
   vtkPVImplicitPlaneRepresentation(const vtkPVImplicitPlaneRepresentation&); // Not implemented
   void operator=(const vtkPVImplicitPlaneRepresentation&); // Not implemented
-//ETX
+
 };
 
 #endif

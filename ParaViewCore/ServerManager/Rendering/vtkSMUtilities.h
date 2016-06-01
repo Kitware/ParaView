@@ -88,7 +88,6 @@ public:
   // component with 0xff.
   static void FillImage(vtkImageData* image, const int extent[6], const unsigned char rgb[3]);
 
-//BTX
 protected:
   vtkSMUtilities() {}
   ~vtkSMUtilities(){}
@@ -96,7 +95,7 @@ protected:
 private:
   vtkSMUtilities(const vtkSMUtilities&); // Not implemented
   void operator=(const vtkSMUtilities&); // Not implemented
-//ETX
+
 };
 
 #endif

@@ -29,7 +29,6 @@ public:
   vtkTypeMacro(vtkSITimeRangeProperty, vtkSIProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-//BTX
 protected:
   vtkSITimeRangeProperty();
   ~vtkSITimeRangeProperty();
@@ -43,7 +42,7 @@ protected:
 private:
   vtkSITimeRangeProperty(const vtkSITimeRangeProperty&); // Not implemented
   void operator=(const vtkSITimeRangeProperty&); // Not implemented
-//ETX
+
 };
 
 #endif

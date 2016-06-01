@@ -106,7 +106,7 @@ public:
   int ProcessViewRequest(
     vtkInformationRequestKey* request_type,
     vtkInformation* inInfo, vtkInformation* outInfo);
-//BTX
+
 protected:
   vtkDataLabelRepresentation();
   ~vtkDataLabelRepresentation();
@@ -172,7 +172,7 @@ protected:
 private:
   vtkDataLabelRepresentation(const vtkDataLabelRepresentation&); // Not implemented
   void operator=(const vtkDataLabelRepresentation&); // Not implemented
-//ETX
+
 };
 
 #endif

@@ -99,7 +99,6 @@ public:
   // Provides access to the actor used by this representation.
   vtkPVLODVolume* GetActor() { return this->Actor; }
 
-//BTX
 protected:
   vtkUnstructuredGridVolumeRepresentation();
   ~vtkUnstructuredGridVolumeRepresentation();
@@ -148,7 +147,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-//ETX
+
 };
 
 #endif

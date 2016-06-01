@@ -69,15 +69,11 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTexture.h"
 #include "Interface/Texture.h"
 
-//BTX
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
-//ETX
 
-//BTX
 namespace Manta {
 //class ImageTexture<Color>;
 }
-//ETX
 
 class vtkRenderWindow;
 class vtkMantaManager;
@@ -99,12 +95,10 @@ public:
   // resources to release. Using the same texture object in multiple
   // render windows is NOT currently supported.
   void ReleaseGraphicsResources(vtkWindow *);
-  //BTX
+
   vtkSetMacro(MantaTexture, Manta::Texture<Manta::Color>*);
   vtkGetMacro(MantaTexture, Manta::Texture<Manta::Color>*);
-  //ETX
 
-  //BTX
 protected:
   vtkMantaTexture();
   ~vtkMantaTexture();
@@ -118,7 +112,6 @@ private:
   void DeleteMantaTexture();
 
   Manta::Texture<Manta::Color> *MantaTexture;
-  //ETX
 
   vtkMantaManager *MantaManager;
 };

@@ -94,7 +94,6 @@ public:
 
   void SelectInputVectors(int, int, int, int attributeMode, const char* name);
 
-//BTX
 protected:
   vtkSurfaceLICRepresentation();
   ~vtkSurfaceLICRepresentation();
@@ -115,7 +114,7 @@ protected:
 private:
   vtkSurfaceLICRepresentation(const vtkSurfaceLICRepresentation&); // Not implemented
   void operator=(const vtkSurfaceLICRepresentation&); // Not implemented
-//ETX
+
 };
 
 #endif

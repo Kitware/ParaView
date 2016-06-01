@@ -69,7 +69,6 @@ public:
     return retVal;
     }
 
-//BTX
 protected:
   vtkSMCoreUtilities();
   ~vtkSMCoreUtilities();
@@ -77,7 +76,7 @@ protected:
 private:
   vtkSMCoreUtilities(const vtkSMCoreUtilities&); // Not implemented
   void operator=(const vtkSMCoreUtilities&); // Not implemented
-//ETX
+
 };
 
 #endif

@@ -102,7 +102,6 @@ public:
   // CleanupPendingProgress() block.
   bool GetPendingProgress();
 
-//BTX
 protected:
   vtkPVSession();
   ~vtkPVSession();
@@ -132,7 +131,7 @@ private:
   // This flags ensures that while we are waiting for an previous progress-pair
   // to finish, we don't start new progress-pairs.
   bool InCleanupPendingProgress;
-//ETX
+
 };
 
 #endif

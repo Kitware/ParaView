@@ -82,7 +82,6 @@ public:
   vtkGetObjectMacro(CurrentInputDataObject, vtkDataObject);
   void SetComputedAnnotationValue(const char* value);
 
-//BTX
 protected:
   vtkPythonAnnotationFilter();
   ~vtkPythonAnnotationFilter();
@@ -111,7 +110,6 @@ private:
   double TimeRange[2];
   vtkDataObject* CurrentInputDataObject;
 
-//ETX
 };
 
 #endif

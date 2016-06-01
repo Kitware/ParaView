@@ -131,7 +131,6 @@ public:
 
   void SetActiveRepresentationForComposite(vtkPVDataRepresentation* r);
 
-//BTX
 protected:
   vtkPVRenderViewForAssembly();
   ~vtkPVRenderViewForAssembly();
@@ -159,7 +158,7 @@ private:
 
   struct vtkInternals;
   vtkInternals* Internal;
-//ETX
+
 };
 
 #endif

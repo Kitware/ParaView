@@ -95,7 +95,6 @@ public:
   vtkSetVector6Macro(WholeExtent, int);
   vtkGetVector6Macro(WholeExtent, int);
 
-//BTX
 protected:
   vtkCPInputDataDescription();
   ~vtkCPInputDataDescription();
@@ -129,7 +128,7 @@ private:
   class vtkInternals;
   vtkInternals* Internals;
   int WholeExtent[6];
-//ETX
+
 };
 
 #endif

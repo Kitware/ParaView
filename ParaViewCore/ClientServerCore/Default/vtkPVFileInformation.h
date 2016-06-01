@@ -43,7 +43,6 @@ public:
   // The object must be a vtkPVFileInformationHelper.
   virtual void CopyFromObject(vtkObject* object);
 
-  //BTX
   // Description:
   // Manage a serialized version of the information.
   virtual void CopyToStream(vtkClientServerStream*);
@@ -69,8 +68,6 @@ public:
   // directory (DIRECTORY, DRIVE, NETWORK_ROOT, etc...)
   // Or in other words, a type that we can do a DirectoryListing on.
   static bool IsDirectory(int t);
-
-  //ETX
 
   // Description:
   // Initializes the information object.
@@ -100,7 +97,7 @@ public:
   // for the contents of this directory if Type = DIRECTORY
   // or the contents of this file group if Type ==FILE_GROUP.
   vtkGetObjectMacro(Contents, vtkCollection);
-//BTX
+
 protected:
   vtkPVFileInformation();
   ~vtkPVFileInformation();
@@ -132,7 +129,7 @@ private:
   void operator=(const vtkPVFileInformation&); // Not implemented.
 
   struct vtkInfo;
-//ETX
+
 };
 
 #endif

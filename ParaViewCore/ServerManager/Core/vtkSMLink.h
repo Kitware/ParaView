@@ -24,12 +24,11 @@
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMRemoteObject.h"
 #include "vtkSMMessageMinimal.h" // Needed
-//BTX
+
 class vtkCommand;
 class vtkPVXMLElement;
 class vtkSMProxy;
 class vtkSMProxyLocator;
-//ETX
 
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMLink : public vtkSMRemoteObject
 {
@@ -37,14 +36,12 @@ public:
   vtkTypeMacro(vtkSMLink, vtkSMRemoteObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-//BTX
   enum UpdateDirections
     {
     NONE = 0,
     INPUT = 1,
     OUTPUT = 2
     };
-//ETX
 
   // Description:
   // This flag determines if UpdateVTKObjects calls are to be propagated.
@@ -62,8 +59,6 @@ public:
   // Description:
   // Remove all links.
   virtual void RemoveAllLinks() = 0;
-
-//BTX
 
   // Description:
   // This method returns the full object state that can be used to create the
@@ -138,7 +133,7 @@ protected:
   friend class vtkSMLinkObserver;
   friend class vtkSMStateLoader;
   friend class vtkSMSessionProxyManager;
-//ETX
+
   vtkCommand* Observer;
   // Set by default. In a link P1->P2, if this flag is set, when ever Proxy with P1
   // is updated i.e. UpdateVTKObjects() is called, this class calls
@@ -153,7 +148,6 @@ private:
   vtkSMLink(const vtkSMLink&); // Not implemented.
   void operator=(const vtkSMLink&); // Not implemented.
 
-//ETX
 };
 
 #endif

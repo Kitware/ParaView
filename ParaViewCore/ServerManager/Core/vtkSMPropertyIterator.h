@@ -25,9 +25,7 @@
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"
 
-//BTX
 struct vtkSMPropertyIteratorInternals;
-//ETX
 
 class vtkSMProperty;
 class vtkSMProxy;

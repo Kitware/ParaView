@@ -128,8 +128,6 @@ private:
   vtkAMRDualGridHelper();
   ~vtkAMRDualGridHelper();
 
-//BTX
-
   char* ArrayName;
   int DataTypeSize;
   vtkSetStringMacro(ArrayName);
@@ -223,11 +221,7 @@ private:
   vtkAMRDualGridHelper(const vtkAMRDualGridHelper&);  // Not implemented.
   void operator=(const vtkAMRDualGridHelper&);  // Not implemented.
 
-//ETX
 };
-
-
-//BTX
 
 // I need to define this small object in the namespace of this class.
 
@@ -348,8 +342,6 @@ public:
 
 private:
 };
-
-//ETX
 
 #endif
 

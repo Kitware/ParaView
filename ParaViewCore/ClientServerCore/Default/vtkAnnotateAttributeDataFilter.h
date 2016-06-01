@@ -52,7 +52,7 @@ public:
   // Set the text prefix to display in front of the Field value
   vtkSetStringMacro(Prefix);
   vtkGetStringMacro(Prefix);
-//BTX
+
 protected:
   vtkAnnotateAttributeDataFilter();
   ~vtkAnnotateAttributeDataFilter();
@@ -67,7 +67,7 @@ protected:
 private:
   vtkAnnotateAttributeDataFilter(const vtkAnnotateAttributeDataFilter&); // Not implemented
   void operator=(const vtkAnnotateAttributeDataFilter&); // Not implemented
-//ETX
+
 };
 
 #endif

@@ -29,7 +29,6 @@ public:
   vtkTypeMacro(vtkSIArraySelectionProperty, vtkSIProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-//BTX
 protected:
   vtkSIArraySelectionProperty();
   ~vtkSIArraySelectionProperty();
@@ -43,7 +42,7 @@ protected:
 private:
   vtkSIArraySelectionProperty(const vtkSIArraySelectionProperty&); // Not implemented
   void operator=(const vtkSIArraySelectionProperty&); // Not implemented
-//ETX
+
 };
 
 #endif

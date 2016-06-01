@@ -130,7 +130,7 @@ public:
   // Provides access to the internal vtkIceTCompositePass. Only use this if you
   // know what you're doing.
   vtkGetObjectMacro(IceTCompositePass, vtkIceTCompositePass);
-//BTX
+
 protected:
   vtkIceTSynchronizedRenderers();
   ~vtkIceTSynchronizedRenderers();
@@ -155,7 +155,7 @@ protected:
 private:
   vtkIceTSynchronizedRenderers(const vtkIceTSynchronizedRenderers&); // Not implemented
   void operator=(const vtkIceTSynchronizedRenderers&); // Not implemented
-//ETX
+
 };
 
 #endif

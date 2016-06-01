@@ -39,7 +39,6 @@ public:
   // "setter" properties.
   int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element);
 
-//BTX
  protected:
   vtkSMSettingsProxy();
   ~vtkSMSettingsProxy();
@@ -59,7 +58,7 @@ public:
 private:
   vtkSMSettingsProxy(const vtkSMSettingsProxy&); // Not implemented
   void operator=(const vtkSMSettingsProxy&); // Not implemented
-//ETX
+
 };
 
 #endif

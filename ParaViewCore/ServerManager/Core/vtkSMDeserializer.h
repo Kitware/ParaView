@@ -54,7 +54,6 @@ public:
   // this->GetSessionProxyManager()->GetSession() (with NULL checks).
   vtkSMSession* GetSession();
 
-//BTX
 protected:
   vtkSMDeserializer();
   ~vtkSMDeserializer();
@@ -77,7 +76,7 @@ protected:
 private:
   vtkSMDeserializer(const vtkSMDeserializer&); // Not implemented
   void operator=(const vtkSMDeserializer&); // Not implemented
-//ETX
+
 };
 
 #endif

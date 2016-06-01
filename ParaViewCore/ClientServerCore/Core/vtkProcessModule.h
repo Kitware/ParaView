@@ -226,7 +226,6 @@ public:
     return this->SelfDir;
   }
 
-//BTX
 protected:
   vtkProcessModule();
   ~vtkProcessModule();
@@ -295,7 +294,7 @@ private:
 
   std::string ProgramPath;
   std::string SelfDir;
-//ETX
+
 };
 
 #endif //vtkProcessModule_h

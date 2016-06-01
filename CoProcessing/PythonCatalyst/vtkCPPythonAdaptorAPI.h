@@ -31,7 +31,6 @@ public:
   /// interpretor will not be initialized and hence unavailable.
   static void CoProcessorInitialize(const char* pythonFileName);
 
-//BTX
 protected:
   vtkCPPythonAdaptorAPI();
   ~vtkCPPythonAdaptorAPI();
@@ -39,7 +38,7 @@ protected:
 private:
   vtkCPPythonAdaptorAPI(const vtkCPPythonAdaptorAPI&); // Not implemented
   void operator=(const vtkCPPythonAdaptorAPI&); // Not implemented
-//ETX
+
 };
 
 #endif

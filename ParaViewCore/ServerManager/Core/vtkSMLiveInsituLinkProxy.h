@@ -61,7 +61,6 @@ public:
     return this->TimeStep;
   }
 
-//BTX
   // Description:
   // Overridden to handle server-notification messages.
   virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator);
@@ -100,7 +99,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-//ETX
+
 };
 
 #endif

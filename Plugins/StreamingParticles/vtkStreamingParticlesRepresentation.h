@@ -117,7 +117,7 @@ public:
   void SetLookupTable(vtkScalarsToColors*);
   void SetPointSize(double val);
     
-//BTX
+
 protected:
   vtkStreamingParticlesRepresentation();
   ~vtkStreamingParticlesRepresentation();
@@ -240,7 +240,7 @@ private:
   // and we need to clear our streaming buffers since the streamed data is no
   // longer valid.
   bool InStreamingUpdate;
-//ETX
+
 };
 
 #endif

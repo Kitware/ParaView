@@ -140,9 +140,8 @@ public:
 
   // Description:
   // Events invoked by the filter
-  //BTX
+
   enum { IterationEvent = 10590 };
-  //ETX
 
 protected:
   vtkFastMarchingGeodesicDistance();
@@ -196,11 +195,9 @@ protected:
   // Propagation, ie speed function weights
   vtkDataArray * PropagationWeights;
 
-  //BTX
   friend class vtkFastMarchingGeodesicPath;
   friend class vtkGeodesicMeshInternals;
   void *GetGeodesicMesh();
-  //ETX
 
   // Counter to invoke iteration events every N fast marching steps
   unsigned long FastMarchingIterationEventResolution;

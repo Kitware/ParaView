@@ -31,7 +31,6 @@ public:
   vtkTypeMacro(vtkSISILProperty, vtkSIProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-//BTX
 protected:
   vtkSISILProperty();
   ~vtkSISILProperty();
@@ -62,7 +61,6 @@ private:
   char* SubTree;
   int OutputPort;
 
-//ETX
 };
 
 #endif

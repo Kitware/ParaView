@@ -126,7 +126,6 @@ public:
   vtkPVXMLElement* AppendCommandInfo(vtkPVXMLElement* proxyElem);
   int LoadCommandInfo(vtkPVXMLElement* proxyElement);
 
-//BTX
 protected:
   vtkPVComparativeAnimationCue();
   ~vtkPVComparativeAnimationCue();
@@ -151,7 +150,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-//ETX
+
 };
 
 #endif

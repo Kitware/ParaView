@@ -114,7 +114,6 @@ public:
   // to abort and raise an error. Default implementation simply returns false.
   virtual bool Export(vtkCSVExporter* exporter);
 
-//BTX
 protected:
   vtkXYChartRepresentation();
   ~vtkXYChartRepresentation();
@@ -142,7 +141,7 @@ private:
   bool PlotDataHasChanged;
   double SelectionColor[3];
   char* SeriesLabelPrefix;
-//ETX
+
 };
 
 #endif

@@ -118,7 +118,6 @@ public:
   // Request an update of the user list from the server. (A pull request is done)
   void UpdateUserInformations();
 
-//BTX
   enum EventType
     {
     CollaborationNotification = 12345,
@@ -157,6 +156,6 @@ private:
 
   vtkSMCollaborationManager(const vtkSMCollaborationManager&); // Not implemented
   void operator=(const vtkSMCollaborationManager&);       // Not implemented
-//ETX
+
 };
 #endif // #ifndef vtkSMCollaborationManager_h

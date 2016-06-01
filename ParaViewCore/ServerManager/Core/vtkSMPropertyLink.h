@@ -24,11 +24,9 @@
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMLink.h"
 
-//BTX
 class vtkSMProperty;
 class vtkSMPropertyLinkInternals;
 class vtkSMPropertyLinkObserver;
-//ETX
 
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMPropertyLink : public vtkSMLink
 {
@@ -77,8 +75,6 @@ public:
   // Remove all links.
   virtual void RemoveAllLinks();
 
-//BTX
-
   // Description:
   // This method is used to initialize the object to the given state
   // If the definitionOnly Flag is set to True the proxy won't load the
@@ -121,7 +117,7 @@ private:
 
   vtkSMPropertyLink(const vtkSMPropertyLink&); // Not implemented.
   void operator=(const vtkSMPropertyLink&); // Not implemented.
-//ETX
+
 };
 
 

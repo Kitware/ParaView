@@ -136,7 +136,6 @@ public:
   // Forwarded to vtkSmartVolumeMapper.
   void SetRequestedRenderMode(int);
 
-//BTX
 protected:
   vtkAMRStreamingVolumeRepresentation();
   ~vtkAMRStreamingVolumeRepresentation();
@@ -254,7 +253,6 @@ private:
   // longer valid.
   bool InStreamingUpdate;
 
-//ETX
 };
 
 #endif

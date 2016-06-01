@@ -57,7 +57,6 @@ public:
   vtkSetMacro(MedianVisibility, bool);
   vtkGetMacro(MedianVisibility, bool);
 
-//BTX
 protected:
   vtkQuartileChartRepresentation();
   ~vtkQuartileChartRepresentation();
@@ -73,7 +72,7 @@ private:
 
   class vtkQCRInternals;
   friend class vtkQCRInternals;
-//ETX
+
 };
 
 #endif

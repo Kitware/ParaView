@@ -56,7 +56,6 @@ public:
   virtual void GetBounds(double bounds[4])
   { bounds[0] = bounds[2] = 1.0; bounds[1] = bounds[3] = -1.0;}
 
-//BTX
 protected:
   vtkPVPlotTime();
   ~vtkPVPlotTime();
@@ -66,7 +65,7 @@ protected:
 private:
   vtkPVPlotTime(const vtkPVPlotTime&); // Not implemented
   void operator=(const vtkPVPlotTime&); // Not implemented
-//ETX
+
 };
 
 #endif

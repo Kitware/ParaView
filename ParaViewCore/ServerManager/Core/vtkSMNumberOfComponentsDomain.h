@@ -45,7 +45,6 @@ public:
   // only the first component of the array.
   virtual void Update(vtkSMProperty* prop);
 
-//BTX
 protected:
   vtkSMNumberOfComponentsDomain();
   ~vtkSMNumberOfComponentsDomain();
@@ -59,7 +58,7 @@ protected:
 private:
   vtkSMNumberOfComponentsDomain(const vtkSMNumberOfComponentsDomain&); // Not implemented
   void operator=(const vtkSMNumberOfComponentsDomain&); // Not implemented
-//ETX
+
 };
 
 #endif

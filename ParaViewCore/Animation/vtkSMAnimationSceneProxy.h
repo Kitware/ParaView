@@ -53,7 +53,6 @@ public:
     return self? self->FindAnimationCue(animatedProxy, animatedPropertyName) : NULL;
     }
 
-//BTX
 protected:
   vtkSMAnimationSceneProxy();
   ~vtkSMAnimationSceneProxy();
@@ -75,7 +74,7 @@ private:
 
   // Called when vtkSMAnimationScene::UpdateStartEndTimesEvent is fired.
   void OnUpdateStartEndTimesEvent(vtkObject*, unsigned long, void*);
-//ETX
+
 };
 
 #endif

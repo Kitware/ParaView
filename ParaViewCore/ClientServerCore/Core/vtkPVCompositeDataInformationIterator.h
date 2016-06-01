@@ -65,7 +65,7 @@ public:
   // Returns the current flat index/composite index.
   // This is only valid is IsDoneWithTraversal() returns false.
   vtkGetMacro(CurrentFlatIndex, unsigned int);
-//BTX
+
 protected:
   vtkPVCompositeDataInformationIterator();
   ~vtkPVCompositeDataInformationIterator();
@@ -79,7 +79,7 @@ private:
 
   class vtkInternal;
   vtkInternal* Internal;
-//ETX
+
 };
 
 #endif

@@ -86,7 +86,6 @@ public:
   vtkSetClampMacro(TrainingFraction,double,0.0,1.0);
   vtkGetMacro(TrainingFraction,double);
 
-  //BTX
   /**\brief Possible tasks the filter can perform.
     *
     * The MODEL_AND_ASSESS task is not recommended;
@@ -102,7 +101,6 @@ public:
     ASSESS_INPUT,     //!< Assess the input dataset using a statistical model from input port 1
     MODEL_AND_ASSESS  //!< Create a statistical model of the input dataset and use it to assess the dataset. This is a bad idea.
     };
-  //ETX
 
   // Description:
   // Set/get whether this filter should create a model of the input or assess the input or both.

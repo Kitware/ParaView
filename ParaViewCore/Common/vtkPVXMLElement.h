@@ -26,9 +26,7 @@
 class vtkCollection;
 class vtkPVXMLParser;
 
-//BTX
 struct vtkPVXMLElementInternals;
-//ETX
 
 class VTKPVCOMMON_EXPORT vtkPVXMLElement : public vtkObject
 {
@@ -232,9 +230,7 @@ protected:
   vtkPVXMLElement* LookupElementUpScope(const char* id);
   void SetParent(vtkPVXMLElement* parent);
 
-  //BTX
   friend class vtkPVXMLParser;
-  //ETX
 
 private:
   vtkPVXMLElement(const vtkPVXMLElement&);  // Not implemented.

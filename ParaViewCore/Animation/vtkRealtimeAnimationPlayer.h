@@ -36,7 +36,6 @@ public:
   vtkGetMacro(Duration, unsigned long);
   vtkSetMacro(Duration, unsigned long);
 
-//BTX
 protected:
   vtkRealtimeAnimationPlayer();
   ~vtkRealtimeAnimationPlayer();
@@ -60,7 +59,7 @@ protected:
 private:
   vtkRealtimeAnimationPlayer(const vtkRealtimeAnimationPlayer&); // Not implemented
   void operator=(const vtkRealtimeAnimationPlayer&); // Not implemented
-//ETX
+
 };
 
 #endif

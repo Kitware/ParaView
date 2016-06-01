@@ -50,7 +50,6 @@ public:
   // representation of false, all view passes are ignored.
   virtual void SetVisibility(bool val);
 
-//BTX
 protected:
   vtkAMROutlineRepresentation();
   ~vtkAMROutlineRepresentation();
@@ -164,7 +163,6 @@ private:
   // longer valid.
   bool InStreamingUpdate;
 
-//ETX
 };
 
 #endif

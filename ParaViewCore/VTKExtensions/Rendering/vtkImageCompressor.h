@@ -64,7 +64,6 @@ public:
   // Input must be compressed data.
   virtual int Decompress()=0;
 
-  //BTX
   // Description:
   // Serialize compressor configuration (but not the data) into the stream.
   virtual void SaveConfiguration(vtkMultiProcessStream *stream);
@@ -73,7 +72,6 @@ public:
   // Restore state from the stream. The stream format for all image compressor
   // is: [ClassName, LossLessMode, [Derived Class Stream]].
   virtual bool RestoreConfiguration(vtkMultiProcessStream* stream);
-  //ETX
 
   // Description:
   // Serialize compressor configuration (but not the data) into the stream.

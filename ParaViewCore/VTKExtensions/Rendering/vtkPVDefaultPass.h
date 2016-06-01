@@ -31,7 +31,6 @@ public:
   vtkTypeMacro(vtkPVDefaultPass, vtkRenderPass);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-//BTX
   // Description:
   // Actual rendering code.
   virtual void Render(const vtkRenderState* render_state);
@@ -43,7 +42,7 @@ protected:
 private:
   vtkPVDefaultPass(const vtkPVDefaultPass&); // Not implemented
   void operator=(const vtkPVDefaultPass&); // Not implemented
-//ETX
+
 };
 
 #endif

@@ -53,7 +53,6 @@ public:
   // ids selection.
   void Convert(vtkSelection* input, vtkSelection* output, int global_ids);
 
-//BTX
 protected:
   vtkSelectionConverter();
   ~vtkSelectionConverter();
@@ -67,7 +66,7 @@ private:
   void operator=(const vtkSelectionConverter&);  // Not implemented.
 
   class vtkKeyType;
-//ETX
+
 };
 
 #endif

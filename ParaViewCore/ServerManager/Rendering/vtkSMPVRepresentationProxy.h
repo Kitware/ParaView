@@ -279,7 +279,7 @@ private:
   bool InReadXMLAttributes;
   class vtkStringSet;
   vtkStringSet* RepresentationSubProxies;
-//ETX
+
 };
 
 #endif

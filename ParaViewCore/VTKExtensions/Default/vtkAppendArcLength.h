@@ -36,7 +36,6 @@ public:
   vtkTypeMacro(vtkAppendArcLength, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-//BTX
 protected:
   vtkAppendArcLength();
   ~vtkAppendArcLength();
@@ -50,7 +49,7 @@ protected:
 private:
   vtkAppendArcLength(const vtkAppendArcLength&); // Not implemented
   void operator=(const vtkAppendArcLength&); // Not implemented
-//ETX
+
 };
 
 #endif

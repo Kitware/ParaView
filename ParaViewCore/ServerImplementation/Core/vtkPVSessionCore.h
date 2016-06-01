@@ -44,7 +44,6 @@ public:
   vtkTypeMacro(vtkPVSessionCore, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  //BTX
   // Description:
   // Provides access to the interpreter.
   vtkGetObjectMacro(Interpreter, vtkClientServerInterpreter);
@@ -86,8 +85,6 @@ public:
   // Notify that the given SIObject is used.
   // It only increase its reference count.
   virtual void RegisterSIObject(vtkSMMessage* message);
-
-  //ETX
 
   // Description:
   // Returns a vtkSIObject or subclass given its global id, if any otherwise
@@ -138,8 +135,6 @@ public:
   // 11 = ReverveNextIdChunk(10);| Reserved ids [11,12,13,14,15,16,17,18,19,20]
   // b = a + 10;
   virtual vtkTypeUInt32 GetNextChunkGlobalUniqueIdentifier(vtkTypeUInt32 chunkSize);
-
-//BTX
 
   enum MessageTypes
     {
@@ -230,7 +225,7 @@ private:
   vtkTypeUInt32 LocalGlobalID;
 
   ostream *LogStream;
-//ETX
+
 };
 
 #endif

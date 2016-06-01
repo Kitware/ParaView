@@ -66,11 +66,9 @@ public:
   // Returns an ArrayIterator over doubles, this will end up with a deep copy
   vtkArrayIterator* NewIterator ();
 
-  //BTX
   vtkIdType LookupValue (vtkVariant value);
   void LookupValue (vtkVariant value, vtkIdList* ids);
   void SetVariantValue (vtkIdType vtkNotUsed(index), vtkVariant vtkNotUsed(value)) { /* TODO */ }
-  //ETX
 
   // Description:
   // Get the address of a particular data index. Performs no checks
@@ -173,13 +171,11 @@ public:
     return ret;
   }
 
-  //BTX
   void InsertVariantValue (vtkIdType idx, vtkVariant value)
   {
     this->BuildFallback ();
     return this->Fallback->InsertVariantValue (idx, value);
   }
-  //ETX
 
   void RemoveTuple (vtkIdType id)
   {

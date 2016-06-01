@@ -96,7 +96,6 @@ public:
   /// adaptor to the coprocessing pipelines.
   vtkGetObjectMacro(UserData, vtkFieldData);
 
-//BTX
 protected:
   vtkCPDataDescription();
   virtual ~vtkCPDataDescription();
@@ -127,7 +126,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-//ETX
+
 };
 
 #endif

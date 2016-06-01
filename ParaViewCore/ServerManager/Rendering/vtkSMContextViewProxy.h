@@ -39,7 +39,6 @@ public:
   vtkTypeMacro(vtkSMContextViewProxy, vtkSMViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-//BTX
   // Description:
   // Provides access to the vtk chart view.
   vtkContextView* GetContextView();
@@ -47,7 +46,6 @@ public:
   // Description:
   // Provides access to the vtk chart.
   virtual vtkAbstractContextItem* GetContextItem();
-//ETX
 
   // Description:
   // Return the render window from which offscreen rendering and interactor can
@@ -79,8 +77,6 @@ public:
 
   vtkSelection* GetCurrentSelection();
 
-
-//BTX
 protected:
   vtkSMContextViewProxy();
   ~vtkSMContextViewProxy();
@@ -133,7 +129,7 @@ private:
   void CopyAxisRangesFromChart();
 
   vtkNew<vtkSMViewProxyInteractorHelper> InteractorHelper;
-//ETX
+
 };
 
 #endif

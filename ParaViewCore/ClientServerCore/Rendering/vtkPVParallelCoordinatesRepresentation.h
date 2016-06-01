@@ -70,7 +70,6 @@ public:
   // to abort and raise an error. Default implementation simply returns false.
   virtual bool Export(vtkCSVExporter* exporter);
 
-//BTX
 protected:
   vtkPVParallelCoordinatesRepresentation();
   ~vtkPVParallelCoordinatesRepresentation();
@@ -99,7 +98,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-//ETX
+
 };
 
 #endif

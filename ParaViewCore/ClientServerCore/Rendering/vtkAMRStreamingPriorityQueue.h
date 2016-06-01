@@ -77,7 +77,6 @@ public:
   // Test if the queue is empty before calling this method.
   unsigned int Pop();
 
-//BTX
 protected:
   vtkAMRStreamingPriorityQueue();
   ~vtkAMRStreamingPriorityQueue();
@@ -90,7 +89,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-//ETX
+
 };
 
 #endif

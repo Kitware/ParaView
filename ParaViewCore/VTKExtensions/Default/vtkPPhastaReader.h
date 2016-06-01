@@ -122,9 +122,7 @@
 class vtkPVXMLParser;
 class vtkPhastaReader;
 
-//BTX
 struct vtkPPhastaReaderInternal;
-//ETX
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPPhastaReader : public vtkMultiBlockDataSetAlgorithm
 {

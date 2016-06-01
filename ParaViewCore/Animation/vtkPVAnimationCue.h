@@ -90,9 +90,7 @@ protected:
     double clocktime);
   virtual void EndCueInternal();
 
-//BTX
   friend class vtkSMAnimationSceneProxy;
-//ETX
 
   unsigned long ObserverID;
   bool UseAnimationTime;

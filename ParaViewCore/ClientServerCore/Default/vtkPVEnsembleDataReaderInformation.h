@@ -35,12 +35,10 @@ public:
   // Transfer information about a single object into this object.
   virtual void CopyFromObject(vtkObject*);
 
-  //BTX
   // Description:
   // Manage a serialized version of the information.
   virtual void CopyToStream(vtkClientServerStream*);
   virtual void CopyFromStream(const vtkClientServerStream*);
-  //ETX
 
   // Description:
   // Get number of files contained in the ensemble.

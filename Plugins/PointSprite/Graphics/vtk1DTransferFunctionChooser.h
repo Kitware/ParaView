@@ -46,12 +46,11 @@ public:
   vtkTypeMacro(vtk1DTransferFunctionChooser, vtk1DTransferFunction);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  //BTX
   enum
   {
   LookupTable = 0, Gaussian = 1
   };
-  //ETX
+
   // 0 : LookupTable
   // 1 : Gaussian
   vtkSetMacro(TransferFunctionMode, int);

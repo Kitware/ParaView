@@ -38,14 +38,12 @@ public:
   vtkTypeMacro(vtkPVCameraCueManipulator, vtkPVKeyFrameCueManipulator);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  //BTX
   enum Modes
     {
     CAMERA,
     PATH,
     FOLLOW_DATA
     };
-  //ETX
 
   // Description:
   // This manipulator has three modes:

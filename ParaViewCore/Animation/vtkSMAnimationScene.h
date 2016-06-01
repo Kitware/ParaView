@@ -150,7 +150,6 @@ public:
   vtkSetMacro(ForceDisableCaching, bool);
   vtkGetMacro(ForceDisableCaching, bool);
 
-//BTX
 protected:
   vtkSMAnimationScene();
   ~vtkSMAnimationScene();
@@ -189,7 +188,7 @@ private:
   vtkInternals* Internals;
   unsigned long TimeRangeObserverID;
   unsigned long TimestepValuesObserverID;
-//ETX
+
 };
 
 #endif

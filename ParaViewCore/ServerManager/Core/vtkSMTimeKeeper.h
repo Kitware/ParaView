@@ -76,7 +76,6 @@ public:
   void AddSuppressedTimeSource(vtkSMSourceProxy*);
   void RemoveSuppressedTimeSource(vtkSMSourceProxy*);
 
-//BTX
 protected:
   vtkSMTimeKeeper();
   ~vtkSMTimeKeeper();
@@ -99,7 +98,7 @@ private:
 
   class vtkInternal;
   vtkInternal* Internal;
-//ETX
+
 };
 
 #endif

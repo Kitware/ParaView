@@ -59,7 +59,6 @@ public:
   virtual void SetDisablePipelineExecution(bool value)
   { this->DisablePipelineExecution = value; }
 
-//BTX
 protected:
   vtkSISourceProxy();
   ~vtkSISourceProxy();
@@ -106,7 +105,7 @@ private:
   class vtkInternals;
   vtkInternals* Internals;
   bool PortsCreated;
-  //ETX
+
 };
 
 #endif

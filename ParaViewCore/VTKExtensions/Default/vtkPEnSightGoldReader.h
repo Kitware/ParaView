@@ -35,9 +35,7 @@
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPEnSightReader.h"
 
-//BTX
 class UndefPartialInternal;
-//ETX
 
 class vtkMultiBlockDataSet;
 class vtkPoints;

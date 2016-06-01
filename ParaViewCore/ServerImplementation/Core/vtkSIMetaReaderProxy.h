@@ -35,8 +35,6 @@ public:
   vtkTypeMacro(vtkSIMetaReaderProxy, vtkSISourceProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-//BTX
-
 protected:
   vtkSIMetaReaderProxy();
   ~vtkSIMetaReaderProxy();
@@ -60,7 +58,6 @@ private:
   vtkSIMetaReaderProxy(const vtkSIMetaReaderProxy&); // Not implemented
   void operator=(const vtkSIMetaReaderProxy&); // Not implemented
 
-//ETX
 };
 
 #endif

@@ -49,7 +49,6 @@
 // define this for cerr status.
 // #define vtkSQBOVWriterDEBUG
 
-//BTX
 class BOVWriter;
 class vtkPVXMLElement;
 class vtkInformationStringKey;
@@ -57,7 +56,6 @@ class vtkInformationDoubleKey;
 class vtkInformationDoubleVectorKey;
 class vtkInformationIntegerKey;
 class vtkInformationIntegerVectorKey;
-//ETX
 
 class VTKSCIBERQUEST_EXPORT vtkSQBOVWriter : public vtkDataSetAlgorithm
 {
@@ -95,7 +93,6 @@ public:
   double GetTimeStep(int i);
   void GetTimeSteps(double *times);
 
-  //BTX
   enum
     {
     HINT_DEFAULT=0,
@@ -103,7 +100,7 @@ public:
     HINT_DISABLED=1,
     HINT_ENABLED=2
     };
-  //ETX
+
   // Description:
   // Set/Get MPI file hints.
   vtkSetMacro(UseCollectiveIO,int);

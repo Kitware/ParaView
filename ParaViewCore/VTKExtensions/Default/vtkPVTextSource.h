@@ -35,7 +35,7 @@ public:
   vtkSetStringMacro(Text);
   vtkGetStringMacro(Text);
   
-// BTX
+
 protected:
   vtkPVTextSource();
   ~vtkPVTextSource();
@@ -51,7 +51,7 @@ protected:
 private:
   vtkPVTextSource(const vtkPVTextSource&); // Not implemented
   void operator=(const vtkPVTextSource&); // Not implemented
-//ETX
+
 };
 
 #endif

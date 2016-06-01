@@ -53,7 +53,6 @@ public:
   vtkSetMacro(FieldAssociation, int);
   vtkGetMacro(FieldAssociation, int);
 
-//BTX
 protected:
   vtkMarkSelectedRows();
   ~vtkMarkSelectedRows();
@@ -80,7 +79,7 @@ protected:
 private:
   vtkMarkSelectedRows(const vtkMarkSelectedRows&); // Not implemented
   void operator=(const vtkMarkSelectedRows&); // Not implemented
-//ETX
+
 };
 
 #endif

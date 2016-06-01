@@ -52,9 +52,7 @@
 
 class vtkStringArray;
 
-//BTX
 struct vtkFileSeriesReaderInternals;
-//ETX
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkFileSeriesReader : public vtkMetaReader
 {

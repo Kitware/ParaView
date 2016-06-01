@@ -76,7 +76,6 @@ public:
   vtkSetStringMacro(InterfaceIDsName);
   vtkGetStringMacro(InterfaceIDsName);
 
-//BTX
 protected:
   vtkDataSetRegionSurfaceFilter();
   ~vtkDataSetRegionSurfaceFilter();
@@ -109,7 +108,6 @@ protected:
 private:
   vtkDataSetRegionSurfaceFilter(const vtkDataSetRegionSurfaceFilter&); // Not implemented.
   void operator=(const vtkDataSetRegionSurfaceFilter&); // Not implemented.
-//ETX
 
   char *RegionArrayName;
   vtkIntArray    *RegionArray;

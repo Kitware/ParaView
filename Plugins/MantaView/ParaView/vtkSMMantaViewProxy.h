@@ -101,7 +101,6 @@ public:
   // Call to make an different light active so the user can control it.
   void NextLight();
 
-//BTX
 protected:
   vtkSMMantaViewProxy();
   ~vtkSMMantaViewProxy();
@@ -115,7 +114,7 @@ private:
 
   class Internal;
   Internal *Internals;
-//ETX
+
 };
 
 

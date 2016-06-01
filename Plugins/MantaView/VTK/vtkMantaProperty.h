@@ -72,13 +72,11 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string>
 
-//BTX
 namespace Manta {
   class Material;
 //TODO: what should we do to deal with template+namespace?
 //class Texture<Color>;
 }
-//ETX
 
 class vtkMantaRenderer;
 class vtkMantaManager;
@@ -117,14 +115,13 @@ public:
   vtkGetMacro(N, float);
   vtkSetMacro(Nt, float);
   vtkGetMacro(Nt, float);
-  //BTX
+
   vtkSetMacro(MantaMaterial, Manta::Material*);
   vtkGetMacro(MantaMaterial, Manta::Material*);
   vtkSetMacro(DiffuseTexture, Manta::Texture<Manta::Color>*);
   vtkGetMacro(DiffuseTexture, Manta::Texture<Manta::Color>*);
   vtkSetMacro(SpecularTexture, Manta::Texture<Manta::Color>*);
   vtkGetMacro(SpecularTexture, Manta::Texture<Manta::Color>*);
-  //ETX
 
   //Description:
   //Internal callbacks for manta thread use.
@@ -163,11 +160,9 @@ private:
   // the last time MantaMaterial is modified
   vtkTimeStamp MantaMaterialMTime;
 
-  //BTX
   Manta::Material *MantaMaterial;
   Manta::Texture<Manta::Color> *DiffuseTexture;
   Manta::Texture<Manta::Color> *SpecularTexture;
-  //ETX
 
   // type of material to use. possible values are: "lambertian", "phong",
   // "transparent", "thindielectric", "dielectric", "metal", "orennayer"

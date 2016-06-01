@@ -46,14 +46,14 @@ public:
   //Description:
   //Selects the operation to perform on the data.
   //min/max, sum...
-  //BTX
+
   enum Operations
     {
       MIN = 0,
       MAX = 1,
       SUM = 2
     };
-  //ETX
+
   vtkSetClampMacro(Operation, int, MIN, SUM);
   vtkGetMacro(Operation, int);
   void SetOperation(const char *op);

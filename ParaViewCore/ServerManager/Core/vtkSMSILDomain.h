@@ -56,7 +56,6 @@ public:
   // Overridden to leave defaults unchanged.
   virtual int SetDefaultValues(vtkSMProperty*, bool){ return 1; }
 
-//BTX
 protected:
 
   // Description:
@@ -77,7 +76,7 @@ protected:
 private:
   vtkSMSILDomain(const vtkSMSILDomain&); // Not implemented
   void operator=(const vtkSMSILDomain&); // Not implemented
-//ETX
+
 };
 
 #endif

@@ -113,13 +113,13 @@ private:
   void operator=(const vtkPVLegacyGlyphFilter&);  // Not implemented.
 
 public:
-//BTX
+
   enum CommunicationIds
    {
      GlyphNPointsGather=1000,
      GlyphNPointsScatter
    };
-//ETX
+
 };
 
 #endif

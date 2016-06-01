@@ -74,7 +74,6 @@ public:
   // reader.
   virtual int CanReadFile(const char* name);
 
-//BTX
 protected:
   vtkAdiosPixieReader();
   ~vtkAdiosPixieReader();
@@ -96,7 +95,7 @@ private:
 
   class Internals;
   Internals* Internal;
-//ETX
+
 };
 
 #endif

@@ -47,7 +47,6 @@
 #include "vtkSciberQuestModule.h" // for export macro
 #include "vtkObject.h"
 
-//BTX
 #include "LogBuffer.h" // for LogBuffer
 
 #include <vector> // for vector
@@ -57,13 +56,10 @@
 #if vtkSQLogDEBUG > 0
 #include <iostream> // for cerr
 #endif
-//ETX
-
 
 class vtkPVXMLElement;
 class vtkSQLog;
 
-//BTX
 /**
 A class responsible for delete'ing the global instance of the log.
 */
@@ -98,7 +94,6 @@ class VTKSCIBERQUEST_EXPORT LogBodyType
 public:
   template<typename T> LogBodyType &operator<<(const T& s);
 };
-//ETX
 
 //=============================================================================
 class VTKSCIBERQUEST_EXPORT vtkSQLog : public vtkObject
@@ -123,9 +118,8 @@ public:
   // ROOT_RANKS_PID.log
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
-  //BTX
+
   void SetFileName(const std::string &fileName){ this->SetFileName(fileName.c_str()); }
-  //ETX
 
   // Description:
   // The log works as an event stack. EventStart pushes the
@@ -141,7 +135,6 @@ public:
   void EndEventSynch(const char *event);
   void EndEventSynch(int rank, const char *event);
 
-  //BTX
   // Description:
   // Insert text into the log header on the writer rank.
   template<typename T>
@@ -154,7 +147,6 @@ public:
   // Description:
   // stream output to log body(all ranks).
   LogBodyType GetBody(){ return LogBodyType(); }
-  //ETX
 
   // Description:
   // Clear the log.
@@ -228,7 +220,6 @@ private:
   friend class LogBodyType;
 };
 
-//BTX
  //-----------------------------------------------------------------------------
 template<typename T>
 vtkSQLog &vtkSQLog::operator<<(const T& s)
@@ -273,6 +264,5 @@ LogBodyType &LogBodyType::operator<<(const T& s)
 
   return *this;
 }
-//ETX
 
 #endif

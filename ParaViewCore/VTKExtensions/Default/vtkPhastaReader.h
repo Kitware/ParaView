@@ -30,9 +30,7 @@ class vtkPoints;
 class vtkDataSetAttributes;
 class vtkInformationVector;
 
-//BTX
 struct vtkPhastaReaderInternal;
-//ETX
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPhastaReader : public vtkUnstructuredGridAlgorithm
 {

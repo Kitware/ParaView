@@ -77,9 +77,7 @@ class vtkSMProxyProperty;
 class vtkSMSourceProxy;
 class vtkPVArrayInformation;
 
-//BTX
 class vtkSMArrayListDomainInternals;
-//ETX
 
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMArrayListDomain : public vtkSMStringListDomain
 {
@@ -146,7 +144,6 @@ public:
   // Returns 1 if the domain updated the property.
   virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values);
 
-  //BTX
   // This enum represents the possible strategies associated
   // with a given InformationKey :
   // NEED_KEY means that if the array will be in the domain only if
@@ -158,7 +155,6 @@ public:
     NEED_KEY,
     REJECT_KEY
   };
-  //ETX
 
   // Description:
   // Adds a new InformationKey to the domain.

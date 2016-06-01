@@ -189,20 +189,16 @@ public:
   int GetHasPolygons();
   int GetHasProbtimeKeyword();
 
-//BTX
 #ifdef PARAVIEW_USE_MPI
-//ETX
-//BTX
+
     // Description:
     // Set the controller use in compositing (set to
     // the global controller by default)
     // If not using the default, this must be called before any
     // other methods.
     virtual void SetController(vtkMultiProcessController* controller);
-//ETX
-//BTX
+
 #endif
-//ETX
 
 protected:
   vtkGMVReader();
@@ -245,13 +241,11 @@ protected:
   static void SelectionModifiedCallback(vtkObject* caller, unsigned long eid,
                                         void* clientdata, void* calldata);
 
-//BTX
 #ifdef PARAVIEW_USE_MPI
-//ETX
+
   vtkMultiProcessController* Controller;
-//BTX
+
 #endif
-//ETX
 
 private:
   vtkGMVReader(const vtkGMVReader&);  // Not implemented.
@@ -265,7 +259,6 @@ private:
   vtkPolyData *Tracers;
   vtkPolyData *Polygons;
 
-//BTX
   // filename -> #polygons and filename -> #tracers mappings
   typedef std::map< std::string, unsigned long > stringToULongMap;
   stringToULongMap NumberOfPolygonsMap;
@@ -305,7 +298,6 @@ private:
   DataInfo<float> *NodeDataInfo;  // type float because Get{Node,Cell}DataRange
   DataInfo<float> *CellDataInfo;  // takes floats for min/max
 #endif
-//ETX
 
   // Toggle whether GMV node numbers needs to decremented by 1 for VTK
   bool DecrementNodeIds;

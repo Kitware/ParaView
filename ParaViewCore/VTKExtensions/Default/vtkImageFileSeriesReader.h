@@ -43,8 +43,6 @@ public:
   // correct filenames when ReadAsImageStack is true.
   virtual int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
-
-//BTX
 protected:
   vtkImageFileSeriesReader();
   ~vtkImageFileSeriesReader();
@@ -55,7 +53,7 @@ protected:
 private:
   vtkImageFileSeriesReader(const vtkImageFileSeriesReader&); // Not implemented
   void operator=(const vtkImageFileSeriesReader&); // Not implemented
-//ETX
+
 };
 
 #endif

@@ -31,9 +31,7 @@ class vtkPVXMLElement;
 class vtkSMProxy;
 class vtkSMProxyLocator;
 
-//BTX
 struct vtkSMStateLoaderInternals;
-//ETX
 
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMStateLoader : public vtkSMDeserializerXML
 {

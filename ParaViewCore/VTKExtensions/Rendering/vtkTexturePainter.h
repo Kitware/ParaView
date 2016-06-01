@@ -123,20 +123,17 @@ public:
   vtkBooleanMacro(UseXYPlane, int);
   vtkGetMacro(UseXYPlane, int);
 
-  //BTX
   enum
     {
     YZ_PLANE = 0,
     XZ_PLANE = 1,
     XY_PLANE = 2,
     };
-  //ETX
 
   virtual void ReleaseGraphicsResources (vtkWindow *);
 
   vtkSetVector6Macro(WholeExtent, int);
 
-//BTX
 protected:
   vtkTexturePainter();
   ~vtkTexturePainter();
@@ -183,7 +180,7 @@ protected:
 private:
   vtkTexturePainter(const vtkTexturePainter&); // Not implemented.
   void operator=(const vtkTexturePainter&); // Not implemented.
-//ETX
+
 };
 
 #endif

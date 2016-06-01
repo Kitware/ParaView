@@ -71,7 +71,6 @@ public:
   // Rebuilds the KdTree.
   void GenerateKdTree();
 
-//BTX
 protected:
   vtkKdTreeManager();
   ~vtkKdTreeManager();
@@ -99,7 +98,6 @@ private:
   class vtkDataObjectSet;
   vtkDataObjectSet* DataObjects;
 
-//ETX
 };
 
 #endif

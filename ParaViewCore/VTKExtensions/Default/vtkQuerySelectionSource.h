@@ -71,7 +71,6 @@ public:
   vtkSetMacro(Inverse, int);
   vtkGetMacro(Inverse, int);
 
-//BTX
 protected:
   vtkQuerySelectionSource();
   ~vtkQuerySelectionSource();
@@ -101,7 +100,7 @@ private:
   vtkInternals* Internals;
 
   int Inverse;
-//ETX
+
 };
 
 #endif

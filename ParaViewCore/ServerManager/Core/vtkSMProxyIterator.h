@@ -25,9 +25,7 @@
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"
 
-//BTX
 struct vtkSMProxyIteratorInternals;
-//ETX
 
 class vtkSMProxy;
 class vtkSMSession;
@@ -94,14 +92,12 @@ public:
   vtkGetMacro(SkipPrototypes, bool);
   vtkBooleanMacro(SkipPrototypes, bool);
 
-//BTX
   enum TraversalMode
   {
     GROUPS_ONLY=0,
     ONE_GROUP=1,
     ALL=2
   };
-//ETX
 
 protected:
   vtkSMProxyIterator();

@@ -135,7 +135,6 @@ public:
   unsigned long AddRMICallback(vtkRMIFunctionType, void* localArg, int tag);
   bool RemoveRMICallback(unsigned long id);
 
-//BTX
   enum
     {
     SYNC_MULTI_RENDER_WINDOW_TAG = 15002,
@@ -282,7 +281,7 @@ private:
 
   template <class T>
   bool ReduceTemplate(T &size, StandardOperations operation);
-//ETX
+
 };
 
 #endif

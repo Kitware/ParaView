@@ -103,7 +103,7 @@ public:
   virtual vtkCommunicator* GetCommunicator();
 
   //  --------------- RMIs Overloaded API -------------------
-//BTX
+
   // Description:
   // These methods are a part of the newer API to add multiple rmi callbacks.
   // When the RMI is triggered, all the callbacks are called
@@ -139,7 +139,7 @@ private:
   class vtkCompositeInternals;
   vtkCompositeInternals* Internal;
   friend class vtkCompositeInternals;
-//ETX
+
 };
 
 #endif

@@ -232,7 +232,7 @@ public:
   virtual int RenderOverlay(vtkViewport* viewport);
   virtual int HasTranslucentPolygonalGeometry();
   virtual void ReleaseGraphicsResources(vtkWindow *);
-//BTX
+
 protected:
   vtkGridAxes3DActor();
   ~vtkGridAxes3DActor();
@@ -253,7 +253,7 @@ private:
   void operator=(const vtkGridAxes3DActor&); // Not implemented.
 
   unsigned long GetBoundsMTime;
-//ETX
+
 };
 
 

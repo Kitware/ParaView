@@ -104,8 +104,6 @@ public:
   vtkSetMacro(IgnoreAllChanges, bool);
   vtkGetMacro(IgnoreAllChanges, bool);
 
-//BTX
-
   // Record a state change on a RemoteObject
   virtual void OnStateChange( vtkSMSession* session,
                               vtkTypeUInt32 globalId,
@@ -145,7 +143,7 @@ protected:
 private:
   vtkSMUndoStackBuilder(const vtkSMUndoStackBuilder&); // Not implemented.
   void operator=(const vtkSMUndoStackBuilder&); // Not implemented.
-//ETX
+
 };
 
 #endif

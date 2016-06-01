@@ -55,8 +55,6 @@ public:
   // vtkClientServerInterpreterInitializer the first time it is called.
   static vtkClientServerInterpreterInitializer* GetInitializer();
 
-
-//BTX
   typedef void (*InterpreterInitializationCallback)(vtkClientServerInterpreter*);
 
   // Description:
@@ -84,7 +82,7 @@ private:
 
   class vtkInternals;
   vtkInternals *Internals;
-//ETX
+
 };
 
 #endif

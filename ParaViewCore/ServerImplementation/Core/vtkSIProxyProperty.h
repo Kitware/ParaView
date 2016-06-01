@@ -51,7 +51,6 @@ public:
   // set. Default is false.
   vtkGetMacro(NullOnEmpty, bool);
 
-//BTX
 protected:
   vtkSIProxyProperty();
   ~vtkSIProxyProperty();
@@ -110,7 +109,7 @@ private:
 
   class vtkObjectCache;
   vtkObjectCache* ObjectCache;
-//ETX
+
 };
 
 #endif

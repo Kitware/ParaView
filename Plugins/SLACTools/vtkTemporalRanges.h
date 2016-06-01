@@ -49,7 +49,6 @@ public:
   static vtkTemporalRanges *New();
   virtual void PrintSelf(ostream &os, vtkIndent indent);
 
-//BTX
   enum {
     AVERAGE_ROW,
     MINIMUM_ROW,
@@ -57,7 +56,6 @@ public:
     COUNT_ROW,
     NUMBER_OF_ROWS
   };
-//ETX
 
 protected:
   vtkTemporalRanges();

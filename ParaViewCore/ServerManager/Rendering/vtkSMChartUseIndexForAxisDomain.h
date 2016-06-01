@@ -52,7 +52,6 @@ public:
   // property has been reset to default.
   virtual void Update(vtkSMProperty* requestingProperty);
 
-//BTX
 protected:
   vtkSMChartUseIndexForAxisDomain();
   ~vtkSMChartUseIndexForAxisDomain();
@@ -60,7 +59,7 @@ protected:
 private:
   vtkSMChartUseIndexForAxisDomain(const vtkSMChartUseIndexForAxisDomain&); // Not implemented
   void operator=(const vtkSMChartUseIndexForAxisDomain&); // Not implemented
-//ETX
+
 };
 
 #endif

@@ -48,7 +48,6 @@
 
 // #define vtkSQBOVReaderDEBUG
 
-//BTX
 class BOVReader;
 class vtkPVXMLElement;
 class vtkInformationStringKey;
@@ -56,7 +55,6 @@ class vtkInformationDoubleKey;
 class vtkInformationDoubleVectorKey;
 class vtkInformationIntegerKey;
 class vtkInformationIntegerVectorKey;
-//ETX
 
 class VTKSCIBERQUEST_EXPORT vtkSQBOVReaderBase : public vtkDataSetAlgorithm
 {
@@ -69,12 +67,11 @@ public:
   // Iitialize the reader from an XML document. You also need to
   // pass in the bov file name so that subsetting and array selection
   // can be applied which has to occur after the file has been opened.
-  //BTX
+
   virtual int Initialize(
         vtkPVXMLElement *root,
         const char *fileName,
         std::vector<std::string> &arrays);
-  //ETX
 
   // Description:
   // Get/Set the file to read. Setting the file name opens
@@ -132,7 +129,6 @@ public:
   virtual int GetNumberOfTimeSteps();
   virtual void GetTimeSteps(double *times);
 
-  //BTX
   enum
     {
     HINT_DEFAULT=0,
@@ -140,7 +136,7 @@ public:
     HINT_DISABLED=1,
     HINT_ENABLED=2
     };
-  //ETX
+
   // Description:
   // Set/Get MPI file hints.
   vtkSetMacro(UseCollectiveIO,int);

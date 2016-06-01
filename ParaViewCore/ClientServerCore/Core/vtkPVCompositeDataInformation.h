@@ -28,9 +28,8 @@
 
 class vtkPVDataInformation;
 class vtkUniformGridAMR;
-//BTX
+
 struct vtkPVCompositeDataInformationInternals;
-//ETX
 
 class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVCompositeDataInformation : public vtkPVInformation
 {
@@ -86,7 +85,6 @@ public:
   // TODO:
   // Add API to obtain meta data information for each of the children. 
 
-//BTX
 protected:
   vtkPVCompositeDataInformation();
   ~vtkPVCompositeDataInformation();
@@ -110,7 +108,7 @@ private:
 
   vtkPVCompositeDataInformation(const vtkPVCompositeDataInformation&); // Not implemented
   void operator=(const vtkPVCompositeDataInformation&); // Not implemented
-//ETX
+
 };
 
 #endif

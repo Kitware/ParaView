@@ -45,7 +45,6 @@ public:
   // List server side directory
   void List(const char* dir);
 
-//BTX
 protected:
   vtkSMDirectoryProxy();
   ~vtkSMDirectoryProxy();
@@ -53,7 +52,7 @@ protected:
 private:
   vtkSMDirectoryProxy(const vtkSMDirectoryProxy&); // Not implemented
   void operator=(const vtkSMDirectoryProxy&); // Not implemented
-//ETX
+
 };
 
 #endif

@@ -91,7 +91,6 @@ public:
   // Inverse of MapSelectionToInput().
   virtual bool MapSelectionToView(vtkSelection* sel);
 
-//BTX
 protected:
   vtkPVHistogramChartRepresentation();
   ~vtkPVHistogramChartRepresentation();
@@ -107,7 +106,7 @@ private:
 
   std::string ArrayName;
   int AttributeType;
-//ETX
+
 };
 
 #endif

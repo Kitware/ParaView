@@ -41,7 +41,6 @@ public:
   // Method that need to be called when the data has changed and need to be updated...
   virtual void FetchData(vtkDataObject* dataObjectToFill);
 
-//BTX
 protected:
   vtkPVMultiServerDataSource();
   ~vtkPVMultiServerDataSource();
@@ -72,7 +71,7 @@ private:
 
   struct vtkInternal;
   vtkInternal* Internal;
-//ETX
+
 };
 
 #endif

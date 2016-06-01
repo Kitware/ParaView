@@ -71,7 +71,6 @@ public:
   // initilized as well.
   virtual unsigned int Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable);
 
-//BTX
 protected:
   vtkPVCompositeRepresentation();
   ~vtkPVCompositeRepresentation();
@@ -94,7 +93,7 @@ protected:
 private:
   vtkPVCompositeRepresentation(const vtkPVCompositeRepresentation&); // Not implemented
   void operator=(const vtkPVCompositeRepresentation&); // Not implemented
-//ETX
+
 };
 
 #endif

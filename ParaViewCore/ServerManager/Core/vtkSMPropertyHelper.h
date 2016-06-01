@@ -231,7 +231,6 @@ public:
 protected:
   void setUseUnchecked(bool useUnchecked) { this->UseUnchecked = useUnchecked; }
 
-//BTX
 private:
   vtkSMPropertyHelper(const vtkSMPropertyHelper&); // Not implemented
   void operator=(const vtkSMPropertyHelper&); // Not implemented
@@ -271,7 +270,7 @@ private:
     vtkSMProxyProperty *ProxyProperty;
     vtkSMInputProperty *InputProperty;
     };
-//ETX
+
 };
 
 

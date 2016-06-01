@@ -25,9 +25,7 @@
 class vtkSMProperty;
 class vtkSMDomain;
 
-//BTX
 struct vtkSMDomainIteratorInternals;
-//ETX
 
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMDomainIterator : public vtkSMObject
 {

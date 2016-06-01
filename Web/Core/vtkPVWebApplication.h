@@ -98,7 +98,6 @@ public:
   // Return the size of the last image exported.
   vtkGetVector2Macro(LastStillRenderImageSize, int);
 
-//BTX
 protected:
   vtkPVWebApplication();
   ~vtkPVWebApplication();
@@ -115,7 +114,6 @@ private:
   class vtkInternals;
   vtkInternals* Internals;
 
-//ETX
 };
 
 #endif

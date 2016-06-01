@@ -91,10 +91,10 @@ protected:
 
   vtkEquivalenceSet *EquivalenceSet;
   vtkDoubleArray* FragmentVolumes;
-//BTX
+
   std::vector<vtkSmartPointer<vtkDoubleArray> > CellAttributesIntegration;
   std::vector<vtkSmartPointer<vtkDoubleArray> > PointAttributesIntegration;
-//ETX
+
   // Temporary structures to help integration.
   vtkPoints* CellPoints;
   vtkIdList* CellPointIds;

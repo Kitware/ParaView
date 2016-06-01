@@ -30,7 +30,6 @@ public:
   vtkTypeMacro(vtkPVSingleOutputExtractSelection, vtkPVExtractSelection);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-//BTX
 protected:
   vtkPVSingleOutputExtractSelection();
   ~vtkPVSingleOutputExtractSelection();
@@ -38,7 +37,7 @@ protected:
 private:
   vtkPVSingleOutputExtractSelection(const vtkPVSingleOutputExtractSelection&); // Not implemented
   void operator=(const vtkPVSingleOutputExtractSelection&); // Not implemented
-//ETX
+
 };
 
 #endif

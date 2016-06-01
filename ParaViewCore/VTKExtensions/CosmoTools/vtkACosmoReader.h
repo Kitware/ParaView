@@ -177,15 +177,12 @@ protected:
 
   vtkMultiBlockDataSet *MetaData;
 
-
-// BTX
   struct block_t; // defined in the implementation
 
   std::vector< int > NBlocks; // Number of blocks at level "i"
   std::vector< block_t > ParticleBlocks; // stores block info for each block
   std::vector< int > RequestedBlocks; // list of blocks to load
   std::set<std::string> FileNames;
-// ETX
 
 private:
   vtkACosmoReader(const vtkACosmoReader&);  // Not implemented.

@@ -176,7 +176,6 @@ public:
     vtkPVXMLElement* StateChangeElement;
     };
 
-//BTX
 protected:
   vtkSMProxyManager();
   ~vtkSMProxyManager();
@@ -203,7 +202,7 @@ private:
 
   vtkSMProxyManager(const vtkSMProxyManager&); // Not implemented
   void operator=(const vtkSMProxyManager&); // Not implemented
-//ETX
+
 };
 
 #endif

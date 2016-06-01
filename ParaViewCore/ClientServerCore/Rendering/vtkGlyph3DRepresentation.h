@@ -73,7 +73,6 @@ public:
   virtual void SetMapScalars(int val);
   virtual void SetStatic(int val);
 
-//BTX
 protected:
   vtkGlyph3DRepresentation();
   ~vtkGlyph3DRepresentation();
@@ -118,7 +117,7 @@ protected:
 private:
   vtkGlyph3DRepresentation(const vtkGlyph3DRepresentation&); // Not implemented
   void operator=(const vtkGlyph3DRepresentation&); // Not implemented
-//ETX
+
 };
 
 #endif
