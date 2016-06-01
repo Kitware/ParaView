@@ -137,12 +137,6 @@ endif()
 #set_source_files_properties(
 #  WRAP_EXCLUDE
 #  )
-if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  include_directories(${Qt5Core_INCLUDE_DIRS})
-else ()
-  include_directories(${QT_INCLUDE_DIR})
-endif ()
-
 set_source_files_properties(
   vtkCameraManipulatorGUIHelper
   vtkImageCompressor
