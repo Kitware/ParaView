@@ -339,6 +339,7 @@ if(VTK_USE_LARGE_DATA)
   )
   list(APPEND TESTS_WITH_BASELINES
     ${CMAKE_CURRENT_SOURCE_DIR}/CheckSelectedBlocks.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/RestoreBlockColorDefaultTransferFunction.xml
     )
 endif()
 

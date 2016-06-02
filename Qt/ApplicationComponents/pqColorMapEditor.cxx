@@ -372,13 +372,33 @@ void pqColorMapEditor::saveAsArrayDefault()
 void pqColorMapEditor::restoreDefaults()
 {
   vtkSMProxy* proxy = this->Internals->ActiveRepresentation->getProxy();
+
+  vtkSMPropertyHelper colorArrayHelper(proxy, "ColorArrayName");
+  std::string arrayName =
+    vtkSMCoreUtilities::SanitizeName(colorArrayHelper.GetInputArrayNameToProcess());
+
   BEGIN_UNDO_SET("Reset color map to defaults");
   if (vtkSMProxy* lutProxy = vtkSMPropertyHelper(proxy, "LookupTable").GetAsProxy())
     {
-    vtkSMTransferFunctionProxy::ResetPropertiesToXMLDefaults(lutProxy, true);
-    if (vtkSMProxy* sofProxy = vtkSMPropertyHelper(lutProxy, "ScalarOpacityFunction").GetAsProxy())
+    // Load array-specific preset, if specified.
+    vtkSMSettings* settings = vtkSMSettings::GetInstance();
+    std::string stdPresetsKey = ".standard_presets.";
+    stdPresetsKey += arrayName;
+    if (settings->HasSetting(stdPresetsKey.c_str()))
       {
-      vtkSMTransferFunctionProxy::ResetPropertiesToXMLDefaults(sofProxy, true);
+      vtkSMTransferFunctionProxy::ApplyPreset(lutProxy,
+        settings->GetSettingAsString(stdPresetsKey.c_str(), 0, "").c_str(),
+        /*rescale=*/false);
+
+      // Should probably support setting a standard preset for opacity function at some point. */
+      }
+    else
+      {
+      vtkSMTransferFunctionProxy::ResetPropertiesToXMLDefaults(lutProxy, true);
+      if (vtkSMProxy* sofProxy = vtkSMPropertyHelper(lutProxy, "ScalarOpacityFunction").GetAsProxy())
+        {
+        vtkSMTransferFunctionProxy::ResetPropertiesToXMLDefaults(sofProxy, true);
+        }
       }
     }
   END_UNDO_SET();
