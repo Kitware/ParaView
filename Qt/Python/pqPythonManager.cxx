@@ -62,7 +62,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSplitter>
 #include <QStatusBar>
 #include <QTextStream>
-#include <QTimer>
 
 //-----------------------------------------------------------------------------
 class pqPythonManager::pqInternal
@@ -129,10 +128,8 @@ public:
   }
   ~pqInternal() { this->DummyInterpreter->RemoveObservers(vtkCommand::AnyEvent); }
 
-  QTimer StatusBarUpdateTimer;
   QPointer<pqPythonDialog> PythonDialog;
   QPointer<pqPythonMacroSupervisor> MacroSupervisor;
-  bool IsPythonTracing;
   QPointer<pqPythonScriptEditor> Editor;
 };
 
@@ -157,14 +154,7 @@ pqPythonManager::pqPythonManager(QObject* _parent /*=null*/)
   this->connect(core->getServerManagerModel(), SIGNAL(aboutToRemoveServer(pqServer*)), this,
     SLOT(onRemovingServer(pqServer*)));
 
-  // Init Python tracing ivar
-  this->Internal->IsPythonTracing = false;
   this->Internal->Editor = NULL;
-
-  // Start StatusBar message update timer
-  connect(
-    &this->Internal->StatusBarUpdateTimer, SIGNAL(timeout()), this, SLOT(updateStatusMessage()));
-  this->Internal->StatusBarUpdateTimer.start(5000); // 5 second
 }
 
 //-----------------------------------------------------------------------------
@@ -319,16 +309,4 @@ void pqPythonManager::editMacro(const QString& fileName)
   this->Internal->Editor->raise();
   this->Internal->Editor->activateWindow();
   this->Internal->Editor->open(fileName);
-}
-//----------------------------------------------------------------------------
-void pqPythonManager::updateStatusMessage()
-{
-  if (this->Internal->IsPythonTracing)
-  {
-    QMainWindow* mainWindow = qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget());
-    if (mainWindow)
-    {
-      mainWindow->statusBar()->showMessage("Recording python trace...");
-    }
-  }
 }

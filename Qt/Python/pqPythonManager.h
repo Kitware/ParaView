@@ -124,11 +124,6 @@ public slots:
    */
   void editMacro(const QString& fileName);
 
-  /**
-   * Print on the status bar "Python Trace is currently ON" if currently tracing...
-   */
-  void updateStatusMessage();
-
 protected slots:
   /**
    * Whenever we are about to disconnect from a server, we "reset" the Python

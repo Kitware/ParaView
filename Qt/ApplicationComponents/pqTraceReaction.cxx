@@ -49,6 +49,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef PARAVIEW_ENABLE_PYTHON
 #include "pqPythonManager.h"
 #endif
+
+#include <QMainWindow>
+#include <QStatusBar>
+
 //-----------------------------------------------------------------------------
 pqTraceReaction::pqTraceReaction(
   QAction* parentObject, const char* start_trace_label, const char* stop_trace_label)
@@ -115,6 +119,10 @@ void pqTraceReaction::start()
     }
   }
   vtkSMTrace* trace = vtkSMTrace::StartTrace();
+  if (QMainWindow* mainWindow = qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget()))
+  {
+    mainWindow->statusBar()->showMessage("Recording python trace...");
+  }
   if (proxy)
   {
     trace->SetPropertiesToTraceOnCreate(
@@ -131,6 +139,10 @@ void pqTraceReaction::start()
 //-----------------------------------------------------------------------------
 void pqTraceReaction::stop()
 {
+  if (QMainWindow* mainWindow = qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget()))
+  {
+    mainWindow->statusBar()->clearMessage();
+  }
   QString tracetxt(vtkSMTrace::StopTrace().c_str());
 #ifdef PARAVIEW_ENABLE_PYTHON
   pqPythonManager* pythonManager = pqPVApplicationCore::instance()->pythonManager();
