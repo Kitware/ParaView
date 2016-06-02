@@ -134,7 +134,6 @@ public:
   // determined using the range is controlled by DefaultMode.
   virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values);
 
-//BTX
 protected:
   vtkSMRangeDomainTemplate();
   ~vtkSMRangeDomainTemplate();
@@ -195,7 +194,7 @@ private:
   bool GetComputedDefaultValue(unsigned int index, T& value);
 
   std::vector<vtkEntry> Entries;
-//ETX
+
 };
 
 #if !defined(VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION)

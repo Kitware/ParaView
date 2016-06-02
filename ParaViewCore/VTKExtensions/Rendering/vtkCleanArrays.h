@@ -47,7 +47,6 @@ public:
   vtkGetMacro(FillPartialArrays, bool);
   vtkBooleanMacro(FillPartialArrays, bool);
 
-//BTX
 protected:
   vtkCleanArrays();
   ~vtkCleanArrays();
@@ -66,7 +65,7 @@ private:
 public:
   class vtkArrayData;
   class vtkArraySet;
-//ETX
+
 };
 
 #endif

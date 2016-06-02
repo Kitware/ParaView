@@ -90,14 +90,12 @@ public:
   virtual void SetSlice(unsigned int);
   vtkGetMacro(Slice, unsigned int);
 
-  //BTX
   enum
     {
     XY_PLANE = VTK_XY_PLANE,
     YZ_PLANE = VTK_YZ_PLANE,
     XZ_PLANE = VTK_XZ_PLANE
     };
-  //ETX
 
   // Description:
   // Get/Set the direction in which to slice a 3D input data.
@@ -126,7 +124,6 @@ public:
   // Provides access to the actor used by this representation.
   vtkPVLODActor* GetActor() { return this->Actor; }
 
-//BTX
 protected:
   vtkImageSliceRepresentation();
   ~vtkImageSliceRepresentation();
@@ -182,7 +179,7 @@ protected:
 private:
   vtkImageSliceRepresentation(const vtkImageSliceRepresentation&); // Not implemented
   void operator=(const vtkImageSliceRepresentation&); // Not implemented
-//ETX
+
 };
 
 #endif

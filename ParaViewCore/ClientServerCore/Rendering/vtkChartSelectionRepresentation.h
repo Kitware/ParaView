@@ -50,7 +50,6 @@ public:
   // representation. This is not reference counted.
   void SetChartRepresentation(vtkChartRepresentation* repr);
 
-//BTX
 protected:
   vtkChartSelectionRepresentation();
   ~vtkChartSelectionRepresentation();
@@ -81,7 +80,7 @@ protected:
 private:
   vtkChartSelectionRepresentation(const vtkChartSelectionRepresentation&); // Not implemented
   void operator=(const vtkChartSelectionRepresentation&); // Not implemented
-//ETX
+
 };
 
 #endif

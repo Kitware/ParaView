@@ -36,11 +36,11 @@ public:
   void AddString(const char* str);
   void AddUniqueString(const char* str);
   
-  //BTX
+
   // Description:
   // Add a command and format it any way you like.
   void AddFormattedString(const char* EventString, ...);
-  //ETX
+
   
   // Description:
   // Initialize to empty.

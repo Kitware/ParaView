@@ -68,11 +68,9 @@ public:
   // Removes all manipulators.
   void RemoveAllManipulators();
 
-  //BTX
   // Description:
   // Accessor for the collection of camera manipulators.
   vtkGetObjectMacro(CameraManipulators, vtkCollection);
-  //ETX
 
   // Description:
   // Propagates the center to the manipulators.

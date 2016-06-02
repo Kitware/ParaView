@@ -153,7 +153,6 @@ public:
   virtual int HasTranslucentPolygonalGeometry();
   virtual void ReleaseGraphicsResources(vtkWindow *);
 
-//BTX
 protected:
   vtkGridAxesPlane2DActor(vtkGridAxesHelper* helper=NULL);
   ~vtkGridAxesPlane2DActor();
@@ -206,7 +205,6 @@ private:
   typedef std::pair<vtkVector3d, vtkVector3d> LineSegmentType;
   std::deque<LineSegmentType> LineSegments;
 
-//ETX
 };
 
 #endif

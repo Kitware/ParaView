@@ -42,8 +42,6 @@ public:
   // Return the proxy that is currently binded if any otherwise return NULL;
   virtual vtkSMSourceProxy* GetExternalProxy();
 
-//BTX
-
   // Description:
   // Marks the selection proxies dirty as well as chain to superclass.
   virtual void MarkDirty(vtkSMProxy* modifiedProxy);
@@ -69,7 +67,7 @@ protected:
 private:
   vtkSMMultiServerSourceProxy(const vtkSMMultiServerSourceProxy&); // Not implemented
   void operator=(const vtkSMMultiServerSourceProxy&); // Not implemented
-//ETX
+
 };
 
 #endif

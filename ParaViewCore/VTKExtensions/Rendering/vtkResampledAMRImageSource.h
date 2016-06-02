@@ -78,7 +78,6 @@ public:
   bool NeedsInitialization() const
     { return (this->MTime > this->InitializationTime); }
 
-//BTX
 protected:
   vtkResampledAMRImageSource();
   ~vtkResampledAMRImageSource();
@@ -100,7 +99,7 @@ private:
   void operator=(const vtkResampledAMRImageSource&); // Not implemented
 
   vtkTimeStamp InitializationTime;
-//ETX
+
 };
 
 #endif

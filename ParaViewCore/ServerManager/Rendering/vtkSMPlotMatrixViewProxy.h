@@ -33,7 +33,7 @@ public:
   // Description:
   // Provides access to the vtk plot matrix.
   virtual vtkAbstractContextItem* GetContextItem();
-//BTX
+
 protected:
   virtual void CreateVTKObjects();
   void ActivePlotChanged();
@@ -50,7 +50,7 @@ protected:
 private:
   vtkSMPlotMatrixViewProxy(const vtkSMPlotMatrixViewProxy&); // Not implemented
   void operator=(const vtkSMPlotMatrixViewProxy&); // Not implemented
-//ETX
+
 };
 
 #endif

@@ -91,7 +91,6 @@ public:
   virtual void SetForceUseCache(bool val);
   virtual void SetForcedCacheKey(double val);
 
-//BTX
 protected:
   vtkCompositeRepresentation();
   ~vtkCompositeRepresentation();
@@ -121,7 +120,7 @@ private:
   class vtkInternals;
   vtkInternals* Internals;
   vtkCommand* Observer;
-//ETX
+
 };
 
 #endif

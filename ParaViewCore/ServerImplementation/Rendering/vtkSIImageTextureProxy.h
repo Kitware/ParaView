@@ -33,7 +33,6 @@ public:
   vtkTypeMacro(vtkSIImageTextureProxy, vtkSISourceProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-//BTX
 protected:
   vtkSIImageTextureProxy();
   ~vtkSIImageTextureProxy();
@@ -45,7 +44,7 @@ protected:
 private:
   vtkSIImageTextureProxy(const vtkSIImageTextureProxy&); // Not implemented
   void operator=(const vtkSIImageTextureProxy&); // Not implemented
-//ETX
+
 };
 
 #endif

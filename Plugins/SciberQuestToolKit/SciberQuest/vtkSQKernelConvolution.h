@@ -67,26 +67,24 @@ public:
   void AddArrayToCopy(const char *name);
   void ClearArraysToCopy();
 
-  //BTX
   enum {
     MODE_3D=0,
     MODE_2D_XY,
     MODE_2D_XZ,
     MODE_2D_YZ
     };
-  //ETX
+
   // Description:
   // Set the mode to 2 or 3D.
   void SetMode(int mode);
   vtkGetMacro(Mode,int);
 
-  //BTX
   enum {
     KERNEL_TYPE_GAUSSIAN=0,
     KERNEL_TYPE_LOG=1,
     KERNEL_TYPE_CONSTANT=2
     };
-  //ETX
+
   // Description:
   // Select a kernel for the convolution.
   void SetKernelType(int type);

@@ -47,13 +47,11 @@ class vtkMultiProcessController;
 class vtkInitialValueProblemSolver;
 class vtkPointSet;
 class vtkPVXMLElement;
-//BTX
+
 class IdBlock;
 class FieldLine;
 class FieldTraceData;
 class TerminationCondition;
-//ETX
-
 
 class VTKSCIBERQUEST_EXPORT vtkSQFieldTracer : public vtkDataSetAlgorithm
 {
@@ -92,7 +90,7 @@ public:
   // PV gets confused if you try to change Mode later.
   vtkSetMacro(Mode,int);
   vtkGetMacro(Mode,int);
-  //BTX
+
   enum
     {
     MODE_STREAM=1,
@@ -100,7 +98,6 @@ public:
     MODE_POINCARE=3,
     MODE_DISPLACEMENT=4
     };
-  //ETX
 
   // Description:
   // If set then only forward traces is carried out.
@@ -111,7 +108,7 @@ public:
   // Set integrator type. RK2=1, RK4=2, RK45=3
   void SetIntegratorType(int type);
   int GetIntegratorType(){ return this->IntegratorType; }
-  //BTX
+
   enum
     {
     INTEGRATOR_NONE=0,
@@ -119,7 +116,6 @@ public:
     INTEGRATOR_RK4=2,
     INTEGRATOR_RK45=3
     };
-  //ETX
 
   // Description:
   // Specify a uniform integration step unit for MinimumIntegrationStep,
@@ -229,7 +225,7 @@ protected:
   int RequestDataObject(vtkInformation *info,vtkInformationVector** input,vtkInformationVector* output);
 
 private:
-  //BTX
+
   // Description:
   // Integrate over all local cells. This assumes that each process has a unique
   // subset of the work (i.e. seed source cells are statically distributed),
@@ -274,7 +270,6 @@ private:
         const char *fieldName,
         FieldLine *line,
         TerminationCondition *tcon);
-  //ETX
 
   // Description:
   // Determine the start id of the cells in data relative
@@ -334,14 +329,13 @@ private:
 
   int LogLevel;
 
-  //BTX
   // units
   enum
     {
     ARC_LENGTH=1,
     CELL_FRACTION=2
     };
- //ETX
+
 };
 
 #endif

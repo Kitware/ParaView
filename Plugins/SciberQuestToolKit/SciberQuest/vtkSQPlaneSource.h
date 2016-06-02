@@ -98,12 +98,12 @@ public:
   // Mode controls how data is generated. Demand mode generates
   // minimal pseudo dataset and places an object in the pipeline
   // that can be accessed downstream and generate data as needed.
-  //BTX
+
   enum {
     MODE_IMMEDIATE=0,
     MODE_DEMAND=1,
     };
-  //ETX
+
   vtkSetMacro(ImmediateMode,int);
   vtkGetMacro(ImmediateMode,int);
 
@@ -125,12 +125,11 @@ public:
   void GetResolution(int& xR,int& yR) {
     xR=this->XResolution; yR=this->YResolution; }
 
-  //BTX
   enum {
     DECOMP_TYPE_PATCHES=0,
     DECOMP_TYPE_STRIPS=1
     };
-  //ETX
+
   // Description:
   // Specify the somain decomposition.
   vtkSetMacro(DecompType,int);

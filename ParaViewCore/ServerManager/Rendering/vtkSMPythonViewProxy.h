@@ -45,7 +45,6 @@ public:
   // Returns true if the most recent render indeed employed low-res rendering.
   virtual bool LastRenderWasInteractive();
 
-//BTX
 protected:
   vtkSMPythonViewProxy();
   ~vtkSMPythonViewProxy();
@@ -57,7 +56,6 @@ protected:
 private:
   vtkSMPythonViewProxy(const vtkSMPythonViewProxy&); // Not implemented
   void operator=(const vtkSMPythonViewProxy&); // Not implemented
-//ETX
 
 };
 

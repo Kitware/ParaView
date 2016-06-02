@@ -61,7 +61,6 @@ protected:
   vtkRedistributePolyData();
   ~vtkRedistributePolyData();
 
-//BTX
   enum {
     CELL_ID_TAG        = 10,
     POINT_COORDS_TAG   = 20,
@@ -103,8 +102,6 @@ protected:
     vtkCommSched(const vtkCommSched&); // Not implemented
     void operator=(const vtkCommSched&); // Not implemented
   };
-
-//ETX
 
   virtual void MakeSchedule (vtkPolyData* input, vtkCommSched*);
   void OrderSchedule (vtkCommSched*);

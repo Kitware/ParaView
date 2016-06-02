@@ -115,7 +115,6 @@ protected:
   int TriangulateCap;
   int SkipGhostCopy;
 
-  //BTX
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 
   // Description:
@@ -203,7 +202,7 @@ protected:
 private:
   vtkAMRDualContour(const vtkAMRDualContour&);  // Not implemented.
   void operator=(const vtkAMRDualContour&);  // Not implemented.
-  //ETX
+
 };
 
 #endif

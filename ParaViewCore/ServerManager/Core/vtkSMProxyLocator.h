@@ -75,7 +75,6 @@ public:
   // session.
   virtual void AssignProxy(vtkTypeUInt32 id, vtkSMProxy* proxy);
 
-//BTX
 protected:
   vtkSMProxyLocator();
   ~vtkSMProxyLocator();
@@ -95,7 +94,7 @@ private:
 
   class vtkInternal;
   vtkInternal* Internal;
-//ETX
+
 };
 
 #endif

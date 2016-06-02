@@ -46,7 +46,6 @@ public:
   vtkSetVector3Macro(Resolution, int);
   vtkGetVector3Macro(Resolution, int);
 
-//BTX
 protected:
   vtkBoundedVolumeSource();
   ~vtkBoundedVolumeSource();
@@ -63,7 +62,7 @@ protected:
 private:
   vtkBoundedVolumeSource(const vtkBoundedVolumeSource&); // Not implemented
   void operator=(const vtkBoundedVolumeSource&); // Not implemented
-//ETX
+
 };
 
 #endif

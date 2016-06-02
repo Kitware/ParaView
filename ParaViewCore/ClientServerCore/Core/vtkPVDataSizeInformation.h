@@ -54,7 +54,6 @@ public:
   // Access to memory size information.
   vtkGetMacro(MemorySize, int);
 
-//BTX
 protected:
   vtkPVDataSizeInformation();
   ~vtkPVDataSizeInformation();
@@ -63,7 +62,7 @@ protected:
 private:
   vtkPVDataSizeInformation(const vtkPVDataSizeInformation&); // Not implemented
   void operator=(const vtkPVDataSizeInformation&); // Not implemented
-//ETX
+
 };
 
 #endif

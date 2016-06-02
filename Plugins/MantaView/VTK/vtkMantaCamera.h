@@ -69,11 +69,9 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMantaModule.h"
 #include "vtkCamera.h"
 
-//BTX
 namespace Manta {
 class Camera;
 }
-//ETX
 
 class vtkTimeStamp;
 class vtkMantaManager;
@@ -97,10 +95,9 @@ private:
   void OrientMantaCamera(vtkRenderer *);
   
   vtkTimeStamp LastRenderTime;
-  //BTX
+
   // a singleton, created and deleted by vtkMantaRenderer
   Manta::Camera *MantaCamera;
-  //ETX
 
   vtkMantaManager *MantaManager;
 };

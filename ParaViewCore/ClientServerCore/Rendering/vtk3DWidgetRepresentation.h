@@ -65,7 +65,6 @@ public:
   // the implicit plane widget handles this ability
   void SetCustomWidgetTransform(vtkTransform *transform);
 
-//BTX
 protected:
   vtk3DWidgetRepresentation();
   ~vtk3DWidgetRepresentation();
@@ -114,7 +113,7 @@ private:
   void operator=(const vtk3DWidgetRepresentation&); // Not implemented
   unsigned long RepresentationObserverTag;
   unsigned long ViewObserverTag;
-//ETX
+
 };
 
 #endif

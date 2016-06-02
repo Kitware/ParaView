@@ -50,7 +50,6 @@ public:
   void SetAbsoluteScale(double x, double y, double z);
   vtkGetVector3Macro(AbsoluteScale, double);
 
-//BTX
 protected:
   vtkPVTransform();
   ~vtkPVTransform();
@@ -66,7 +65,6 @@ private:
   vtkPVTransform(const vtkPVTransform&); // Not implemented
   void operator=(const vtkPVTransform&); // Not implemented
 
-//ETX
 };
 
 #endif

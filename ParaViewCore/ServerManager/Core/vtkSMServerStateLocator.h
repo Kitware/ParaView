@@ -40,7 +40,6 @@ public:
   vtkSMSession* GetSession();
   void SetSession(vtkSMSession* session);
 
-//BTX
   // Description:
   // Fill the provided State message with the state found inside the current
   // locator or one of its parent. The method return true if the state was
@@ -58,7 +57,6 @@ private:
   vtkSMServerStateLocator(const vtkSMServerStateLocator&); // Not implemented
   void operator=(const vtkSMServerStateLocator&); // Not implemented
 
-//ETX
 };
 
 #endif

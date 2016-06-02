@@ -56,7 +56,6 @@ public:
   vtkSetMacro(DisplayDate, bool);
   vtkGetMacro(DisplayDate, bool);
 
-//BTX
 protected:
   vtkEnvironmentAnnotationFilter();
   ~vtkEnvironmentAnnotationFilter();
@@ -80,7 +79,6 @@ private:
   bool DisplayFileName;
   bool DisplayDate;
 
-//ETX
 };
 
 #endif

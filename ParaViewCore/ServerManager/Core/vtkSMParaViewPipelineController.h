@@ -210,7 +210,6 @@ public:
   // For a given proxy returns the name of the group used for helper proxies.
   static vtkStdString GetHelperProxyGroupName(vtkSMProxy*);
 
-//BTX
 protected:
   vtkSMParaViewPipelineController();
   ~vtkSMParaViewPipelineController();
@@ -266,7 +265,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-//ETX
+
 };
 
 #endif

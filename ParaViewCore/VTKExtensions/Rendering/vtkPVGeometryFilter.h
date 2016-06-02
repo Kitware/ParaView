@@ -162,7 +162,7 @@ public:
   static vtkInformationIntegerVectorKey* LINES_OFFSETS();
   static vtkInformationIntegerVectorKey* POLYS_OFFSETS();
   static vtkInformationIntegerVectorKey* STRIPS_OFFSETS();
-//BTX
+
 protected:
   vtkPVGeometryFilter();
   ~vtkPVGeometryFilter();
@@ -322,7 +322,7 @@ private:
   void AddBlockColors(vtkPolyData* pd, unsigned int index);
   void AddHierarchicalIndex(vtkPolyData* pd, unsigned int level, unsigned int index);
   class BoundsReductionOperation;
-//ETX
+
 };
 
 #endif

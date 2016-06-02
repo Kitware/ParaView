@@ -45,7 +45,6 @@ public:
   // singleton the first time this method is called.
   static vtkPVPluginTracker* GetInstance();
 
-  //BTX
   // Description:
   // Called by vtkPVPluginLoader after a plugin is loaded on the process. This
   // registers the plugin instance with the manager. It fires an event
@@ -56,7 +55,6 @@ public:
   // Note there's no call to unregister a plugin. Once a plugin has been loaded,
   // it cannot be unloaded for the lifetime of the process.
   void RegisterPlugin(vtkPVPlugin*);
-  //ETX
 
   // Description:
   // This API is used to register available plugins without actually loading
@@ -86,13 +84,11 @@ public:
   // Methods to iterate over registered plugins.
   unsigned int GetNumberOfPlugins();
 
-  //BTX
   // Description:
   // Returns the plugin instance. This is non-null only for loaded plugins. If
   // a plugin was merely registered as a "available" plugin, then one can only
   // use the methods to query some primitive information about that plugin.
   vtkPVPlugin* GetPlugin(unsigned int index);
-  //ETX
 
   // Description:
   // This is provided for wrapped languages since they can't directly access the
@@ -106,7 +102,6 @@ public:
   // Sets the function used to load static plugins.
   static void SetStaticPluginSearchFunction(vtkPluginSearchFunction function);
 
-//BTX
 protected:
   vtkPVPluginTracker();
   ~vtkPVPluginTracker();
@@ -119,7 +114,7 @@ private:
   vtkPluginsList* PluginsList;
 
   static vtkPluginSearchFunction StaticPluginSearchFunction;
-//ETX
+
 };
 
 #endif

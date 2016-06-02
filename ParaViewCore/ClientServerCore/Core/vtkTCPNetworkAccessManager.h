@@ -89,7 +89,6 @@ public:
   // Returns true is the manager is currently waiting for any connections.
   virtual bool GetPendingConnectionsPresent();
 
-//BTX
 protected:
   vtkTCPNetworkAccessManager();
   ~vtkTCPNetworkAccessManager();
@@ -117,7 +116,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-//ETX
+
 };
 
 #endif

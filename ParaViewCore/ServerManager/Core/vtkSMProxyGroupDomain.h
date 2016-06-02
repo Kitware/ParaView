@@ -31,9 +31,8 @@
 
 class vtkSMProperty;
 class vtkSMProxy;
-//BTX
+
 struct vtkSMProxyGroupDomainInternals;
-//ETX
 
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMProxyGroupDomain : public vtkSMDomain
 {

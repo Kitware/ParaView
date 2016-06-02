@@ -93,7 +93,6 @@ public:
   // The final output will have empty cells for missing values.
   void AddColumn(vtkAbstractArray* yarray, const char* yarrayname=NULL, vtkDataArray* xarray=NULL);
 
-//BTX
 protected:
   vtkCSVExporter();
   ~vtkCSVExporter();
@@ -109,7 +108,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-//ETX
+
 };
 
 #endif

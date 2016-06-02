@@ -29,7 +29,6 @@ public:
   vtkTypeMacro(vtkSITimeLabelProperty, vtkSIProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-//BTX
 protected:
   vtkSITimeLabelProperty();
   ~vtkSITimeLabelProperty();
@@ -43,7 +42,7 @@ protected:
 private:
   vtkSITimeLabelProperty(const vtkSITimeLabelProperty&); // Not implemented
   void operator=(const vtkSITimeLabelProperty&); // Not implemented
-//ETX
+
 };
 
 #endif

@@ -62,8 +62,6 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPEnSightReader : public vtkPGenericEnS
   vtkTypeMacro(vtkPEnSightReader, vtkPGenericEnSightReader);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  //BTX
-
   //----------------------------------------------------------------------------
   // PointIds and CellIds must be stored in a different way:
   // std::vector in non distributed mode
@@ -569,7 +567,6 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPEnSightReader : public vtkPGenericEnS
     BLOCK       = 1,
     ELEMENT     = 2
   };
-  //ETX
 
   // Description:
   // Get the Measured file name. Made public to allow access from
@@ -863,9 +860,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPEnSightReader : public vtkPGenericEnS
 
   int GhostLevels;
 
-//BTX
   std::map<std::string, std::map<int, long> > FileOffsets;
-//ETX
 
  private:
   vtkPEnSightReader(const vtkPEnSightReader&);  // Not implemented.

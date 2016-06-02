@@ -29,8 +29,6 @@ public:
   vtkTypeMacro(vtkSIStringVectorProperty, vtkSIVectorProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-
-//BTX
 protected:
   vtkSIStringVectorProperty();
   ~vtkSIStringVectorProperty();
@@ -58,7 +56,7 @@ private:
 
   bool Push(const vtkVectorOfStrings &values);
   vtkVectorOfInts* ElementTypes;
-//ETX
+
 };
 
 #endif

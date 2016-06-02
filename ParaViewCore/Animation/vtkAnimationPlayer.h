@@ -71,7 +71,6 @@ public:
   // Take animation scene to last frame.
   void GoToLast();
 
-//BTX
 protected:
   vtkAnimationPlayer();
   ~vtkAnimationPlayer();
@@ -97,7 +96,6 @@ private:
   bool Loop;
   double CurrentTime;
 
-//ETX
 };
 
 #endif

@@ -45,7 +45,6 @@ public:
 
   void PrintSelf(ostream& os, vtkIndent indent);
 
-//BTX
 protected:
   vtkPVMergeTablesMultiBlock();
   ~vtkPVMergeTablesMultiBlock();
@@ -62,7 +61,7 @@ protected:
 private:
   vtkPVMergeTablesMultiBlock(const vtkPVMergeTablesMultiBlock&); // Not implemented
   void operator=(const vtkPVMergeTablesMultiBlock&); // Not implemented
-//ETX
+
 };
 
 #endif

@@ -277,11 +277,9 @@ class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPLANLHaloFinder :
   int MinFOFSize;         // Minimum FOF size for SOD (1000)
   float MinFOFMass;       // Minimum FOF mass for SOD (5.0e12)
 
-// BTX
   HaloFinderInternals::ParticleData *Particles;
   HaloFinderInternals::HaloData *Halos;
   cosmotk::CosmoHaloFinderP *HaloFinder;
-// ETX
 
  private:
   vtkPLANLHaloFinder(const vtkPLANLHaloFinder&);  // Not implemented.

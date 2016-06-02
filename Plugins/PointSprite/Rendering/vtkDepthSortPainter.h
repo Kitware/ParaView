@@ -58,14 +58,12 @@ public:
   virtual void PrintSelf(ostream &os, vtkIndent indent);
   static vtkDepthSortPainter *New();
 
-  //BTX
   // Description:
   // Enable or Disable depth sort.
   // 0 : ENABLE_SORT_ALWAYS forces the depth sort.
   // 1 : ENABLE_SORT_IF_NO_DEPTH_PEELING does the depth sort only if the renderer is not using depth peeling
   // 2 : ENABLE_SORT_NEVER only shallow copy  the input to the output, no sorting.
   enum { ENABLE_SORT_ALWAYS=0, ENABLE_SORT_IF_NO_DEPTH_PEELING=1, ENABLE_SORT_NEVER=2 };
-  //ETX
 
   // Description:
   // Enable or Disable depth sort.
@@ -142,11 +140,9 @@ protected:
   int                   CachedIsColorSemiTranslucent;
   vtkDepthSortPolyData* DepthSortPolyData;
 
-  //BTX
   vtkWeakPointer<vtkDataObject> PrevInput;
   vtkWeakPointer<vtkTexture> CachedTexture;
   vtkWeakPointer<vtkUnsignedCharArray> CachedColors;
-  //ETX
 
 private:
   vtkDepthSortPainter(const vtkDepthSortPainter &);  // Not implemented.

@@ -122,7 +122,6 @@ public:
   bool ImportPresets(const char* filename);
   bool ImportPresets(const Json::Value& presets);
 
-//BTX
 protected:
   vtkSMTransferFunctionPresets();
   ~vtkSMTransferFunctionPresets();
@@ -133,7 +132,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-//ETX
+
 };
 
 #endif

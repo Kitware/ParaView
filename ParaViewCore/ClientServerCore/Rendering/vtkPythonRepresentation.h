@@ -85,7 +85,6 @@ public:
   // Disable all arrays. When called, all arrays will be marked as disabled.
   void DisableAllAttributeArrays();
 
-//BTX
 protected:
   vtkPythonRepresentation();
   ~vtkPythonRepresentation();
@@ -101,7 +100,6 @@ protected:
 private:
   vtkPythonRepresentation(const vtkPythonRepresentation&); // Not implemented
   void operator=(const vtkPythonRepresentation&); // Not implemented
-//ETX
 
   // Description:
   // Local input for each processor.
@@ -116,7 +114,6 @@ private:
   class vtkPythonRepresentationInternal;
   vtkPythonRepresentationInternal* Internal;
 
-//BTX
   // Description:
   // Sets the pre-gather helper on the reduction filter based on the
   // data object
@@ -147,7 +144,6 @@ private:
   // Transfers local data from the server nodes to the client.
   void TransferLocalDataToClient();
 
-//ETX
 };
 
 #endif // vtkPythonRepresentation_h

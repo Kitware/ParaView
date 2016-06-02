@@ -102,7 +102,6 @@ public:
   // the returned element will be a top level element.
   vtkPVXMLElement* SaveDefinition(vtkPVXMLElement* root);
 
-//BTX
 protected:
   vtkSMCompoundSourceProxyDefinitionBuilder();
   ~vtkSMCompoundSourceProxyDefinitionBuilder();
@@ -121,7 +120,6 @@ private:
   void TraverseForProperties(vtkPVXMLElement* root);
   void StripValues(vtkPVXMLElement* propertyElem);
 
-//ETX
 };
 
 #endif

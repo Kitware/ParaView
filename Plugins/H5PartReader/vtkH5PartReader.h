@@ -151,10 +151,8 @@ public:
   int         GetCoordinateArrayStatus(const char* name);
   void        SetCoordinateArrayStatus(const char* name, int status);
 
-//BTX
   #ifdef PARAVIEW_USE_MPI
-//ETX
-//BTX
+
     // Description:
     // Set/Get the controller use in compositing (set to
     // the global controller by default)
@@ -162,10 +160,8 @@ public:
     // other methods.
     virtual void SetController(vtkMultiProcessController* controller);
     vtkGetObjectMacro(Controller, vtkMultiProcessController);
-//ETX
-//BTX
+
   #endif
-//ETX
 
 protected:
    vtkH5PartReader();
@@ -182,9 +178,9 @@ protected:
   // if CombineVectorComponents is false, then 
   // velocity_0 returns 0, velocity_1 returns 0 etc
   int             IndexOfVectorComponent(const char *name);
-//BTX
+
   std::string  NameOfVectorComponent(const char *name);
-//ETX
+
   //
   // Internal Variables
   //
@@ -206,11 +202,10 @@ protected:
   char         *Xarray;
   char         *Yarray;
   char         *Zarray;
-  //BTX
+
   std::vector<double>                  TimeStepValues;
   typedef std::vector<std::string>  stringlist;
   std::vector<stringlist>              FieldArrays;
-  //ETX
 
   // To allow paraview gui to enable/disable scalar reading
   vtkDataArraySelection* PointDataArraySelection;
@@ -218,13 +213,11 @@ protected:
   // To allow paraview gui to enable/disable scalar reading
   vtkDataArraySelection* CoordinateSelection;
 
-  //BTX
     #ifdef PARAVIEW_USE_MPI
-  //ETX
+
       vtkMultiProcessController* Controller;
-  //BTX
+
     #endif
-  //ETX
 
 private:
   vtkH5PartReader(const vtkH5PartReader&);  // Not implemented.

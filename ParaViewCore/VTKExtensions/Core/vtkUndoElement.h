@@ -78,7 +78,6 @@ public:
     this->UndoSetWorkingContext = workCTX;
     }
 
-//BTX
 protected:
   vtkUndoElement();
   ~vtkUndoElement();
@@ -93,7 +92,7 @@ protected:
 private:
   vtkUndoElement(const vtkUndoElement&); // Not implemented.
   void operator=(const vtkUndoElement&); // Not implemented.
-//ETX
+
 };
 
 #endif

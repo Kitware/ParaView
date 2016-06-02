@@ -51,7 +51,6 @@ class vtkSMProxy;
 class vtkSMProxyLocator;
 class vtkSMSession;
 
-//BTX
 class pqServerManagerModel;
 
 template <class T> inline QList<T> pqFindItems(
@@ -68,7 +67,6 @@ template <class T> inline int pqGetNumberOfItems(
   const pqServerManagerModel* const model);
 template <class T> inline T pqGetItemAtIndex(
   const pqServerManagerModel* const model, int index);
-//ETX
 
 /// pqServerManagerModel is the model for the Server Manager.
 /// All the pipelines in the Server Manager need a GUI representation

@@ -117,7 +117,6 @@ public:
   vtkGetMacro(DetailLevelToLoad,double)
   vtkSetMacro(DetailLevelToLoad,double)
 
-//BTX
 protected:
   vtkStreamingParticlesPriorityQueue();
   ~vtkStreamingParticlesPriorityQueue();
@@ -138,7 +137,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-//ETX
+
 };
 
 #endif

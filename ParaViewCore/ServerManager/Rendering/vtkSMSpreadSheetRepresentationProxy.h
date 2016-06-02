@@ -32,7 +32,6 @@ public:
     vtkSMRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-//BTX
 protected:
   vtkSMSpreadSheetRepresentationProxy();
   ~vtkSMSpreadSheetRepresentationProxy();
@@ -46,7 +45,7 @@ protected:
 private:
   vtkSMSpreadSheetRepresentationProxy(const vtkSMSpreadSheetRepresentationProxy&); // Not implemented
   void operator=(const vtkSMSpreadSheetRepresentationProxy&); // Not implemented
-//ETX
+
 };
 
 #endif

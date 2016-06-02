@@ -32,7 +32,6 @@ public:
   vtkTypeMacro(vtkMySpecialPolyDataMapper, vtkCompositePolyDataMapper2);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-//BTX
 protected:
   vtkMySpecialPolyDataMapper();
   ~vtkMySpecialPolyDataMapper();
@@ -40,7 +39,7 @@ protected:
 private:
   vtkMySpecialPolyDataMapper(const vtkMySpecialPolyDataMapper&); // Not implemented
   void operator=(const vtkMySpecialPolyDataMapper&); // Not implemented
-//ETX
+
 };
 
 #endif

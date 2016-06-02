@@ -160,7 +160,6 @@ public:
   // Return true if something has been removed
   static bool FilterXMLState(vtkPVXMLElement* xmlState);
 
-//BTX
   // ***************************************************************
   // Internal methods, public for callbacks.
   void InsituConnect(vtkMultiProcessController* controller);
@@ -232,7 +231,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-//ETX
+
 };
 
 #endif

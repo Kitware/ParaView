@@ -61,7 +61,6 @@ public:
     vtkInformationRequestKey* request_type,
     vtkInformation* inInfo, vtkInformation* outInfo);
 
-//BTX
 protected:
   vtkTextSourceRepresentation();
   ~vtkTextSourceRepresentation();
@@ -98,7 +97,7 @@ protected:
 private:
   vtkTextSourceRepresentation(const vtkTextSourceRepresentation&); // Not implemented
   void operator=(const vtkTextSourceRepresentation&); // Not implemented
-//ETX
+
 };
 
 #endif

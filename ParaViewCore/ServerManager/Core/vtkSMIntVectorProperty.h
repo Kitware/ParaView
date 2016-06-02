@@ -141,7 +141,6 @@ public:
   // XML.
   virtual void ResetToXMLDefaults();
 
-//BTX
 protected:
   vtkSMIntVectorProperty();
   ~vtkSMIntVectorProperty();
@@ -179,7 +178,7 @@ protected:
 private:
   vtkSMIntVectorProperty(const vtkSMIntVectorProperty&); // Not implemented
   void operator=(const vtkSMIntVectorProperty&); // Not implemented
-//ETX
+
 };
 
 #endif

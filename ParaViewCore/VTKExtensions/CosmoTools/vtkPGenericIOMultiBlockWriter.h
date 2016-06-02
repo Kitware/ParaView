@@ -33,8 +33,6 @@ public:
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
 
-
-//BTX
 protected:
   vtkPGenericIOMultiBlockWriter();
   ~vtkPGenericIOMultiBlockWriter();
@@ -49,7 +47,7 @@ private:
   vtkMultiProcessController* Controller;
   vtkPGenericIOMultiBlockWriter(const vtkPGenericIOMultiBlockWriter&); // Not implemented.
   void operator=(const vtkPGenericIOMultiBlockWriter&); // Not implemented.
-//ETX
+
 };
 
 #endif

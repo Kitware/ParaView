@@ -19,12 +19,10 @@
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkTableAlgorithm.h"
 
-//BTX
 class vtkDoubleArray;
 class vtkFieldData;
 class vtkIntArray;
 struct vtkEHInternals;
-//ETX
 
 // .NAME vtkExtractHistogram - Extract histogram data (binned values) from any 
 // dataset

@@ -95,8 +95,6 @@ public:
   virtual void SetGradientBackground(int val);
   virtual void SetTexturedBackground(int val);
 
-
-//BTX
 protected:
   vtkPVOrthographicSliceView();
   ~vtkPVOrthographicSliceView();
@@ -156,7 +154,7 @@ private:
   bool GridAxes3DActorsNeedShallowCopy;
   unsigned long GridAxes3DActorObserverId;
   void OnGridAxes3DActorModified();
-//ETX
+
 };
 
 #endif

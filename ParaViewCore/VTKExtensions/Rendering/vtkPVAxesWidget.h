@@ -51,7 +51,6 @@ public:
   // Enable the 3D widget.
   virtual void SetEnabled(int);
 
-  //BTX
   // Description:
   // Set the renderer this 3D widget will be contained in.
   void SetParentRenderer(vtkRenderer *ren);
@@ -60,8 +59,6 @@ public:
   // Description:
   // Get the renderer.
   vtkGetObjectMacro(Renderer, vtkRenderer);
-
-  //ETX
 
   // Description:
   // Callback to keep the camera for the axes actor up to date with the
@@ -90,7 +87,6 @@ public:
   void SetViewport(double minX, double minY, double maxX, double maxY);
   double* GetViewport();
 
-//BTX
 protected:
   vtkPVAxesWidget();
   ~vtkPVAxesWidget();
@@ -145,7 +141,7 @@ protected:
 private:
   vtkPVAxesWidget(const vtkPVAxesWidget&);  // Not implemented
   void operator=(const vtkPVAxesWidget&);  // Not implemented
-//ETX
+
 };
 
 #endif

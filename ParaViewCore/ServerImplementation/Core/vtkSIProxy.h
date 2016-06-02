@@ -43,7 +43,6 @@ public:
   // remaining SIObjects.
   virtual void AboutToDelete();
 
-//BTX
   // Description:
   // Push a new state to the underneath implementation
   virtual void Push(vtkSMMessage* msg);
@@ -51,7 +50,6 @@ public:
   // Description:
   // Pull the current state of the underneath implementation
   virtual void Pull(vtkSMMessage* msg);
-//ETX
 
   // Description:
   // Returns access to the VTKObject pointer, if any.
@@ -99,7 +97,6 @@ public:
   // Default implementation does pretty much nothing.
   virtual void UpdatePipelineInformation() { }
 
-//BTX
 protected:
   vtkSIProxy();
   ~vtkSIProxy();
@@ -165,7 +162,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-//ETX
+
 };
 
 #endif

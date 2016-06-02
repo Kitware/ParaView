@@ -69,7 +69,6 @@ public:
   vtkSetMacro(PointPickingRadius, int);
   vtkGetMacro(PointPickingRadius, int);
 
-//BTX
 protected:
   vtkPVRenderViewSettings();
   ~vtkPVRenderViewSettings();
@@ -81,7 +80,7 @@ private:
   void operator=(const vtkPVRenderViewSettings&); // Not implemented
 
   static vtkSmartPointer<vtkPVRenderViewSettings> Instance;
-//ETX
+
 };
 
 #endif

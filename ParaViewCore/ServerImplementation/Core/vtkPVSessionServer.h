@@ -93,7 +93,6 @@ public:
   vtkSetMacro(MultipleConnection, bool);
   vtkGetMacro(MultipleConnection, bool);
 
-//BTX
   void OnClientServerMessageRMI(void* message, int message_length);
   void OnCloseSessionRMI();
 
@@ -130,7 +129,7 @@ protected:
 private:
   vtkPVSessionServer(const vtkPVSessionServer&); // Not implemented
   void operator=(const vtkPVSessionServer&); // Not implemented
-//ETX
+
 };
 
 #endif

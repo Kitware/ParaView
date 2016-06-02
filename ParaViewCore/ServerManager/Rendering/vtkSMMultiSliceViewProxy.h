@@ -63,7 +63,7 @@ public:
   // HACK: Get source's input data bounds (or BoundingBoxInModelCoordinates if
   // present).
   static bool GetDataBounds(vtkSMSourceProxy* source, int opport, double bounds[6]);
-//BTX
+
 protected:
   vtkSMMultiSliceViewProxy();
   ~vtkSMMultiSliceViewProxy();
@@ -80,7 +80,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-//ETX
+
 };
 
 #endif

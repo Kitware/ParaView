@@ -62,7 +62,6 @@ public:
   // the last entry in this array will be NULL.
   static const char** GetKnownSeriesNames();
 
-//BTX
 protected:
   vtkSMChartSeriesListDomain();
   ~vtkSMChartSeriesListDomain();
@@ -80,7 +79,7 @@ protected:
 private:
   vtkSMChartSeriesListDomain(const vtkSMChartSeriesListDomain&); // Not implemented
   void operator=(const vtkSMChartSeriesListDomain&); // Not implemented
-//ETX
+
 };
 
 #endif

@@ -123,7 +123,6 @@ public:
   // Thus all data is expected to available on the local process.
   virtual bool Export(vtkCSVExporter* exporter);
 
-//BTX
 protected:
   vtkPVContextView();
   ~vtkPVContextView();
@@ -167,7 +166,7 @@ private:
 
   template <class T>
   vtkSelection* GetSelectionImplementation(T* chart);
-//ETX
+
 };
 
 #endif

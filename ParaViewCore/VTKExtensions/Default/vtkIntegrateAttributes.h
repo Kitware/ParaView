@@ -44,7 +44,6 @@ public:
 
   void SetController(vtkMultiProcessController *controller);
 
-//BTX
 protected:
   vtkIntegrateAttributes();
   ~vtkIntegrateAttributes();
@@ -153,7 +152,7 @@ public:
      IntegrateAttrInfo=2000,
      IntegrateAttrData
    };
-//ETX
+
 };
 
 #endif

@@ -30,9 +30,8 @@
 #include "vtkSMDomain.h"
 #include <vector> //  needed for vector.
 class vtkStdString;
-//BTX
+
 struct vtkSMStringListDomainInternals;
-//ETX
 
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMStringListDomain : public vtkSMDomain
 {

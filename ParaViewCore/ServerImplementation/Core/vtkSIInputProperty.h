@@ -36,7 +36,6 @@ public:
   // By default, this is 0.
   vtkGetMacro(PortIndex, int);
 
-//BTX
 protected:
   vtkSIInputProperty();
   ~vtkSIInputProperty();
@@ -54,7 +53,7 @@ protected:
 private:
   vtkSIInputProperty(const vtkSIInputProperty&); // Not implemented
   void operator=(const vtkSIInputProperty&); // Not implemented
-//ETX
+
 };
 
 #endif

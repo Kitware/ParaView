@@ -84,7 +84,7 @@ public:
     LocalPluginLoadedEvent,
     RemotePluginLoadedEvent
   };
-//BTX
+
 protected:
   vtkSMPluginManager();
   ~vtkSMPluginManager();
@@ -100,7 +100,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-//ETX
+
 };
 
 #endif

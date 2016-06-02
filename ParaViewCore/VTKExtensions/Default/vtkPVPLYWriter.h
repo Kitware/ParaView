@@ -58,7 +58,6 @@ public:
   // RGBA colors.
   void SetLookupTable(vtkScalarsToColors* lut);
 
-//BTX
 protected:
   vtkPVPLYWriter();
   ~vtkPVPLYWriter();
@@ -72,7 +71,7 @@ protected:
 private:
   vtkPVPLYWriter(const vtkPVPLYWriter&); // Not implemented
   void operator=(const vtkPVPLYWriter&); // Not implemented
-//ETX
+
 };
 
 #endif

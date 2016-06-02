@@ -55,7 +55,6 @@ public:
   virtual const char *SaveConfiguration();
   virtual const char *RestoreConfiguration(const char *stream);
 
-//BTX
 protected:
   vtkLZ4Compressor();
   ~vtkLZ4Compressor();
@@ -67,7 +66,7 @@ private:
 
   // Used when Quality > 1.
   vtkNew<vtkUnsignedCharArray> TemporaryBuffer;
-//ETX
+
 };
 
 #endif

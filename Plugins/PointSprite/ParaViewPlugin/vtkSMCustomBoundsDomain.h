@@ -38,7 +38,6 @@ public:
   // property.
   virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values);
 
-//BTX
 protected:
   vtkSMCustomBoundsDomain();
   ~vtkSMCustomBoundsDomain();
@@ -48,7 +47,7 @@ protected:
 private:
   vtkSMCustomBoundsDomain(const vtkSMCustomBoundsDomain&); // Not implemented
   void operator=(const vtkSMCustomBoundsDomain&); // Not implemented
-//ETX
+
 };
 
 #endif

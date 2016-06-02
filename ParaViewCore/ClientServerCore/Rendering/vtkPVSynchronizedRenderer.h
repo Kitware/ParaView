@@ -113,7 +113,6 @@ public:
   // Enable/Disable empty images optimization.
   void SetRenderEmptyImages(bool);
 
-//BTX
   // Description:
   // Not for the faint hearted. This internal vtkSynchronizedRenderers instances
   // are exposed for advanced users that want to do advanced tricks with
@@ -163,7 +162,7 @@ protected:
 private:
   vtkPVSynchronizedRenderer(const vtkPVSynchronizedRenderer&); // Not implemented
   void operator=(const vtkPVSynchronizedRenderer&); // Not implemented
-//ETX
+
 };
 
 #endif

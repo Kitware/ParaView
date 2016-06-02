@@ -97,7 +97,6 @@ public:
   vtkSetMacro(WriteAllTimeSteps, int);
   vtkBooleanMacro(WriteAllTimeSteps, int);
 
-//BTX
   // Description:
   // Get/Set the interpreter to use to call methods on the writer.
   void SetInterpreter(vtkClientServerInterpreter* interp)
@@ -144,7 +143,7 @@ private:
   char* FileName;
 
   vtkClientServerInterpreter* Interpreter;
-//ETX
+
 };
 
 #endif

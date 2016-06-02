@@ -44,7 +44,6 @@ public:
   vtkGetMacro(UseAMRDualClipForAMR, bool);
   vtkBooleanMacro(UseAMRDualClipForAMR, bool);
 
-//BTX
 protected:
   vtkPVClipDataSet(vtkImplicitFunction *cf=NULL);
   ~vtkPVClipDataSet();
@@ -75,7 +74,7 @@ protected:
 private:
   vtkPVClipDataSet(const vtkPVClipDataSet&);  // Not implemented.
   void operator=(const vtkPVClipDataSet&);  // Not implemented.
-//ETX
+
 };
 
 #endif

@@ -150,9 +150,8 @@ private:
   // and removed at the end of that method.
   vtkInformation* Request;
 
-//BTX
   vtkPythonProgrammableFilterImplementation* const Implementation;
-//ETX
+
 };
 
 #endif

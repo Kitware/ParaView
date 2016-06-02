@@ -66,7 +66,6 @@ public:
   vtkSetMacro(IsInternal, bool);
   vtkGetMacro(IsInternal, bool);
 
-//BTX
 protected:
   vtkSIProperty();
   ~vtkSIProperty();
@@ -115,7 +114,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-//ETX
+
 };
 
 #endif

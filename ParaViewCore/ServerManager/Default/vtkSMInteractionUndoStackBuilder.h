@@ -70,7 +70,6 @@ public:
   // programatically.
   void EndInteraction();
 
-//BTX
 protected:
   vtkSMInteractionUndoStackBuilder();
   ~vtkSMInteractionUndoStackBuilder();
@@ -94,7 +93,7 @@ private:
 
 
   vtkSMInteractionUndoStackBuilderObserver* Observer;
-//ETX
+
 };
 
 

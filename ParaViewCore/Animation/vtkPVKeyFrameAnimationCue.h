@@ -38,7 +38,6 @@ public:
   void RemoveKeyFrame(vtkPVKeyFrame*);
   void RemoveAllKeyFrames();
 
-//BTX
 protected:
   vtkPVKeyFrameAnimationCue();
   ~vtkPVKeyFrameAnimationCue();
@@ -48,7 +47,7 @@ protected:
 private:
   vtkPVKeyFrameAnimationCue(const vtkPVKeyFrameAnimationCue&); // Not implemented
   void operator=(const vtkPVKeyFrameAnimationCue&); // Not implemented
-//ETX
+
 };
 
 #endif

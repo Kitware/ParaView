@@ -53,7 +53,6 @@ public:
   /// UNINITIALIZED.
   void MadeUninitialized(pqProxy*);
 
-//BTX
 protected:
   pqProxyModifiedStateUndoElement();
   ~pqProxyModifiedStateUndoElement();
@@ -64,7 +63,6 @@ protected:
 private:
   pqProxyModifiedStateUndoElement(const pqProxyModifiedStateUndoElement&); // Not implemented
   void operator=(const pqProxyModifiedStateUndoElement&); // Not implemented
-//ETX
 };
 
 #endif

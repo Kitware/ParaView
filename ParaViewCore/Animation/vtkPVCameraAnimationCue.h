@@ -53,7 +53,7 @@ public:
   virtual void EndUpdateAnimationValues();
 
   void SetDataSourceProxy(vtkSMProxy *dataSourceProxy);
-//BTX
+
 protected:
   vtkPVCameraAnimationCue();
   ~vtkPVCameraAnimationCue();
@@ -63,7 +63,7 @@ protected:
 private:
   vtkPVCameraAnimationCue(const vtkPVCameraAnimationCue&); // Not implemented
   void operator=(const vtkPVCameraAnimationCue&); // Not implemented
-//ETX
+
 };
 
 #endif

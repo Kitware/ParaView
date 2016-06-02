@@ -30,7 +30,6 @@ public:
   vtkTypeMacro(vtkSICollaborationManager, vtkSIObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-//BTX
   // Description:
   // Push a new state to the underneath implementation
   // The provided implementation just store the message
@@ -56,7 +55,7 @@ private:
 
   class vtkInternal;
   vtkInternal* Internal;
-//ETX
+
 };
 
 #endif // #ifndef vtkSICollaborationManager_h

@@ -91,8 +91,6 @@ public:
     return self? self->GetLowerBoundTimeStepIndex(value) : 0;
     }
 
-
-//BTX
 protected:
   vtkSMTimeKeeperProxy();
   ~vtkSMTimeKeeperProxy();
@@ -102,7 +100,7 @@ protected:
 private:
   vtkSMTimeKeeperProxy(const vtkSMTimeKeeperProxy&); // Not implemented
   void operator=(const vtkSMTimeKeeperProxy&); // Not implemented
-//ETX
+
 };
 
 #endif

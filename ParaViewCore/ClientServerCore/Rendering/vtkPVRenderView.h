@@ -663,7 +663,7 @@ public:
   void SetLightScale(double);
   double GetLightScale();
     
-//BTX
+
 protected:
   vtkPVRenderView();
   ~vtkPVRenderView();
@@ -858,7 +858,7 @@ private:
   void UpdateStereoProperties();
   vtkSmartPointer<vtkCuller> Culler;
   vtkNew<vtkTimerLog> Timer;
-//ETX
+
 };
 
 #endif

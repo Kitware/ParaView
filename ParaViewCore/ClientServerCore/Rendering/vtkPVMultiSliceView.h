@@ -69,7 +69,6 @@ public:
 
   void SetModelTransformationMatrix(vtkMatrix4x4*);
 
-//BTX
 protected:
   vtkPVMultiSliceView();
   ~vtkPVMultiSliceView();
@@ -89,7 +88,7 @@ private:
 
   class vtkSliceInternal;
   vtkSliceInternal* Internal;
-//ETX
+
 };
 
 #endif

@@ -75,7 +75,6 @@ public:
   // unchanged.
   virtual int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator);
 
-//BTX
 protected:
   vtkSMComparativeAnimationCueProxy();
   ~vtkSMComparativeAnimationCueProxy();
@@ -96,7 +95,7 @@ private:
 
   class vtkInternal;
   vtkInternal* Internals;
-//ETX
+
 };
 
 #endif

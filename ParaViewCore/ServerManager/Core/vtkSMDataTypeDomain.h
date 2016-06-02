@@ -33,9 +33,8 @@
 #include "vtkSMDomain.h"
 
 class vtkSMSourceProxy;
-//BTX
+
 struct vtkSMDataTypeDomainInternals;
-//ETX
 
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMDataTypeDomain : public vtkSMDomain
 {
@@ -63,7 +62,6 @@ public:
   // Returns a data type.
   const char* GetDataType(unsigned int idx);
 
-//BTX
 protected:
   vtkSMDataTypeDomain();
   ~vtkSMDataTypeDomain();
@@ -82,7 +80,7 @@ protected:
 private:
   vtkSMDataTypeDomain(const vtkSMDataTypeDomain&); // Not implemented
   void operator=(const vtkSMDataTypeDomain&); // Not implemented
-//ETX
+
 };
 
 #endif

@@ -44,7 +44,6 @@ public:
   // ports to do this on.
   virtual void UpdatePipelineTime(double time);
 
-//BTX
 protected:
   vtkSIWriterProxy();
   ~vtkSIWriterProxy();
@@ -63,7 +62,7 @@ protected:
 private:
   vtkSIWriterProxy(const vtkSIWriterProxy&); // Not implemented
   void operator=(const vtkSIWriterProxy&); // Not implemented
-//ETX
+
 };
 
 #endif

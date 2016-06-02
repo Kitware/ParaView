@@ -26,7 +26,6 @@
 #include "vtkObject.h"
 #include "vtkMantaModule.h"
 
-//BTX
 namespace Manta {
 class Camera;
 class Factory;
@@ -36,7 +35,6 @@ class MantaInterface;
 class Scene;
 class SyncDisplay;
 };
-//ETX
 
 class VTKMANTA_EXPORT vtkMantaManager : public vtkObject
 {
@@ -53,7 +51,6 @@ public:
                    bool IsStereo,
                    int *ViewPortsize);
 
-//BTX
   Manta::MantaInterface* GetMantaEngine()    
   { 
   return this->MantaEngine;
@@ -86,7 +83,6 @@ public:
   {
     return this->ChannelId;
   }
-//ETX    
 
  protected:
   vtkMantaManager();
@@ -96,7 +92,6 @@ public:
   vtkMantaManager(const vtkMantaManager&);  // Not implemented.
   void operator=(const vtkMantaManager&);  // Not implemented.
 
-//BTX    
   Manta::MantaInterface * MantaEngine;
   Manta::Factory * MantaFactory;
   Manta::Scene * MantaScene;
@@ -104,7 +99,7 @@ public:
   Manta::LightSet * MantaLightSet;
   Manta::Camera * MantaCamera;
   Manta::SyncDisplay * SyncDisplay;
-//ETX
+
   int ChannelId;
   bool Started;
 };

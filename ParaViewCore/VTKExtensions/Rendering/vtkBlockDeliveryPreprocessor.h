@@ -69,7 +69,6 @@ public:
   vtkSetMacro(GenerateOriginalIds, bool);
   vtkGetMacro(GenerateOriginalIds, bool);
 
-//BTX
 protected:
   vtkBlockDeliveryPreprocessor();
   ~vtkBlockDeliveryPreprocessor();
@@ -97,7 +96,7 @@ private:
 
   class CompositeDataSetIndicesType;
   CompositeDataSetIndicesType *CompositeDataSetIndices;
-//ETX
+
 };
 
 #endif

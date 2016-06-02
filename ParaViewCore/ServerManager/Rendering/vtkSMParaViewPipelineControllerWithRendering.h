@@ -130,7 +130,6 @@ public:
   // Register layout proxy.
   virtual bool RegisterLayoutProxy(vtkSMProxy* proxy, const char* proxyname=NULL);
 
-//BTX
 protected:
   vtkSMParaViewPipelineControllerWithRendering();
   ~vtkSMParaViewPipelineControllerWithRendering();
@@ -143,7 +142,7 @@ private:
   void operator=(const vtkSMParaViewPipelineControllerWithRendering&); // Not implemented
   static bool HideScalarBarOnHide;
   static bool InheritRepresentationProperties;
-//ETX
+
 };
 
 #endif

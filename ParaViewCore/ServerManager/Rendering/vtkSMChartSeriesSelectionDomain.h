@@ -77,7 +77,6 @@ public:
   // Add/Remove series names to hide by default. These are regular expressions.
   static void AddSeriesVisibilityDefault(const char* regex, bool value);
 
-//BTX
 protected:
   vtkSMChartSeriesSelectionDomain();
   ~vtkSMChartSeriesSelectionDomain();
@@ -148,7 +147,6 @@ private:
   void OnDomainModified();
   void UpdateDefaultValues(vtkSMProperty*, bool preserve_previous_values);
 
-//ETX
 };
 
 #endif

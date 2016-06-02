@@ -146,23 +146,19 @@ protected:
   double* Ranges;
 
   // this array is used to store existing information keys (location/name pairs)
-  //BTX
+
   class vtkInternalInformationKeys;
   vtkInternalInformationKeys* InformationKeys;
-  //ETX
 
   //this is used by GetComponentName, so that it always return a valid component name
-  //BTX
+
   vtkStdString* DefaultComponentName;
-  //ETX
 
   /// assigns to a string to DefaultComponentName for this component
   void DetermineDefaultComponentName( const int &component_no, const int &numComps);
 
-  //BTX
   class vtkInternalComponentNames;
   vtkInternalComponentNames* ComponentNames;
-  //ETX
 
   vtkPVArrayInformation(const vtkPVArrayInformation&); // Not implemented
   void operator=(const vtkPVArrayInformation&); // Not implemented

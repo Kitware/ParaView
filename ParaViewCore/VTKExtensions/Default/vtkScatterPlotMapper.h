@@ -42,7 +42,6 @@ public:
   vtkTypeMacro(vtkScatterPlotMapper, vtkCompositePolyDataMapper2);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  //BTX
   enum ArrayIndex
     {
     X_COORDS = 0,
@@ -98,7 +97,7 @@ public:
     DIRECTION = 0,
     ROTATION  = 1,
   };
-  //ETX
+
   static vtkInformationIntegerKey *FIELD_ACTIVE_COMPONENT();
 
   // Description:
@@ -263,7 +262,6 @@ public:
   // a prepare for rendering (the rendering already started).
   virtual void Render(vtkRenderer* renderer, vtkActor* actor);
 
-  //BTX
  protected:
   vtkScatterPlotMapper();
   virtual ~vtkScatterPlotMapper();
@@ -315,7 +313,7 @@ public:
  private:
   vtkScatterPlotMapper(const vtkScatterPlotMapper&); // Not implemented.
   void operator=(const vtkScatterPlotMapper&); // Not implemented.
-  //ETX
+
 };
 
 #endif

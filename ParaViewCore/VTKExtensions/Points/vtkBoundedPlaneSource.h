@@ -51,7 +51,6 @@ public:
   vtkSetClampMacro(Resolution, int, 1, VTK_INT_MAX);
   vtkGetMacro(Resolution, int);
 
-//BTX
 protected:
   vtkBoundedPlaneSource();
   ~vtkBoundedPlaneSource();
@@ -65,7 +64,7 @@ protected:
 private:
   vtkBoundedPlaneSource(const vtkBoundedPlaneSource&); // Not implemented
   void operator=(const vtkBoundedPlaneSource&); // Not implemented
-//ETX
+
 };
 
 #endif

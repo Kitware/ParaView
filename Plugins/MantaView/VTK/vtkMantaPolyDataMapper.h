@@ -80,13 +80,12 @@ class vtkTubeFilter;
 class vtkAppendPolyData;
 class vtkIntArray;
 
-//BTX
 namespace Manta {
 class Mesh;
 class Group;
 class Material;
 }
-//ETX
+
 class vtkCellArray;
 class vtkPoints;
 class vtkProperty;
@@ -119,14 +118,12 @@ protected:
   vtkMantaPolyDataMapper();
   ~vtkMantaPolyDataMapper();
 
-  //BTX
   void DrawPolygons(vtkPolyData *, vtkPoints *,
                     Manta::Mesh *, Manta::Group *, Manta::Group *,
                     vtkMantaTexture *);
   void DrawTStrips(vtkPolyData *, vtkPoints *,
                    Manta::Mesh *, Manta::Group *, Manta::Group *,
                    vtkMantaTexture *);
-  //ETX
 
 private:
   vtkMantaPolyDataMapper(const vtkMantaPolyDataMapper&); // Not implemented.
@@ -140,10 +137,8 @@ private:
   double LineWidth;
   bool CellScalarColor;
 
-//BTX
   class Helper;
   Helper *MyHelper;
-//ETX
 
   // manufacture manta properties declared in the dataset
   void MakeMantaProperties(vtkPolyData *, bool allow);

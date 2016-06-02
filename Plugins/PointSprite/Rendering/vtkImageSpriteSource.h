@@ -68,9 +68,8 @@ public:
   // is inferior or superior to the given threhold.
   vtkSetMacro(AlphaMethod, int);
   vtkGetMacro(AlphaMethod, int);
-  //BTX
+
   enum {NONE = 0, PROPORTIONAL=1, CLAMP=2};
-  //ETX
 
   // Description:
   // Set/Get the alpha threshold used if the AlphaMethod is CLAMP.

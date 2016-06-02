@@ -32,9 +32,7 @@ class vtkSMProxySelectionModelInternal;
 class vtkCollection;
 class vtkSMProxy;
 
-//BTX
 #include <set> // needed for vtkset::set.
-//ETX
 
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMProxySelectionModel : public vtkSMRemoteObject
 {
@@ -54,7 +52,7 @@ public:
   void SetFollowingMaster(bool following);
   bool IsFollowingMaster();
  
-//BTX
+
   // Description:
   // Type for selection.
   typedef std::set<vtkSmartPointer<vtkSMProxy> > SelectionType;
@@ -67,7 +65,6 @@ public:
     DESELECT         = 4,
     CLEAR_AND_SELECT = CLEAR | SELECT
   };
-//ETX
 
   // Description:
   // Returns the proxy that is current, NULL if there is no current.
@@ -94,11 +91,9 @@ public:
   // Returns the selected proxy at the given index.
   vtkSMProxy* GetSelectedProxy(unsigned int  index);
 
-  //BTX
   // Description:
   // Returns the selection set. 
   const SelectionType& GetSelection() { return this->Selection; }
-  //ETX
 
   // Description:
   // Update the selected set of proxies. \c command affects how the selection is
@@ -109,9 +104,9 @@ public:
   // \li DESELECT: deselect the proxies
   // \li CLEAR_AND_SELECT: clear selection and then add the specified proxies as
   // the selection.
-  //BTX
+
   void Select(const SelectionType &proxies,  int command);
-  //ETX
+
   void Select(vtkSMProxy* proxy,  int command);
  
   // Description:
@@ -131,8 +126,6 @@ public:
   // output-port proxies.
   // Returns true is the bounds are valid.
   bool GetSelectionDataBounds(double bounds[6]);
-
-//BTX 
 
   // Description:
   // This method return the full object state that can be used to create that
@@ -174,7 +167,7 @@ private:
   class vtkInternal;
   friend class vtkInternal;
   vtkInternal* Internal;
-//ETX
+
 };
 
 #endif

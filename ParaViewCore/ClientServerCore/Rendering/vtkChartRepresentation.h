@@ -140,7 +140,6 @@ public:
   virtual bool Export(vtkCSVExporter* vtkNotUsed(exporter))
     { return false; }
 
-//BTX
 protected:
   vtkChartRepresentation();
   ~vtkChartRepresentation();
@@ -220,7 +219,7 @@ private:
 
   vtkTimeStamp PrepareForRenderingTime;
   vtkSmartPointer<vtkChartSelectionRepresentation> DummyRepresentation;
-//ETX
+
 };
 
 #endif

@@ -115,7 +115,6 @@ public:
   vtkSetStringMacro(QueryString);
   vtkGetStringMacro(QueryString);
 
-//BTX
 protected:
   vtkPVSelectionSource();
   ~vtkPVSelectionSource();
@@ -156,7 +155,7 @@ private:
 
   class vtkInternal;
   vtkInternal* Internal;
-//ETX
+
 };
 
 #endif

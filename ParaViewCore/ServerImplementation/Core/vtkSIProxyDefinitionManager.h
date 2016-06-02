@@ -182,7 +182,6 @@ public:
   // remote server and not plugin loaded on the client.
   void EnableXMLProxyDefnitionUpdate(bool);
 
-//BTX
   // Description:
   // Push a new state to the underneath implementation
   // The provided implementation just store the message
@@ -291,7 +290,7 @@ private:
   class vtkInternals;
   vtkInternals* Internals;
   vtkInternals* InternalsFlatten;
-//ETX
+
 };
 
 #endif

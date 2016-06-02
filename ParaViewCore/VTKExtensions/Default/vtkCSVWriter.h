@@ -64,7 +64,6 @@ public:
   vtkGetMacro(UseScientificNotation, bool);
   vtkBooleanMacro(UseScientificNotation, bool);
 
-//BTX
   // Description:
   // Internal method: decortes the "string" with the "StringDelimiter" if 
   // UseStringDelimiter is true.
@@ -93,7 +92,7 @@ protected:
 private:
   vtkCSVWriter(const vtkCSVWriter&); // Not implemented.
   void operator=(const vtkCSVWriter&); // Not implemented.
-//ETX
+
 };
 
 

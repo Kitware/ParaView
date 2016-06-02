@@ -108,7 +108,6 @@ public:
   vtkPVArrayInformation* GetArrayInformation(
     const char* arrayname, int fieldAssociation);
 
-//BTX
 protected:
   vtkPVTemporalDataInformation();
   ~vtkPVTemporalDataInformation();
@@ -126,7 +125,7 @@ protected:
 private:
   vtkPVTemporalDataInformation(const vtkPVTemporalDataInformation&); // Not implemented
   void operator=(const vtkPVTemporalDataInformation&); // Not implemented
-//ETX
+
 };
 
 #endif

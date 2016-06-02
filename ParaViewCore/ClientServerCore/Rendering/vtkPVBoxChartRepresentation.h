@@ -65,7 +65,6 @@ public:
   // Set the visibility of the legend (plot labels)
   vtkSetMacro(Legend, bool);
 
-//BTX
 protected:
   vtkPVBoxChartRepresentation();
   ~vtkPVBoxChartRepresentation();
@@ -94,7 +93,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-//ETX
+
 };
 
 #endif

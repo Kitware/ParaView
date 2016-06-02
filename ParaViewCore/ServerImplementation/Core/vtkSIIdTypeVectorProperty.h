@@ -36,7 +36,6 @@ public:
   vtkTypeMacro(vtkSIIdTypeVectorProperty, vtkSIVectorProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-//BTX
 protected:
   vtkSIIdTypeVectorProperty();
   ~vtkSIIdTypeVectorProperty();
@@ -44,7 +43,7 @@ protected:
 private:
   vtkSIIdTypeVectorProperty(const vtkSIIdTypeVectorProperty&); // Not implemented
   void operator=(const vtkSIIdTypeVectorProperty&); // Not implemented
-//ETX
+
 };
 
 #endif

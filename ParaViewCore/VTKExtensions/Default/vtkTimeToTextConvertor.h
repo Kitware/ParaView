@@ -50,7 +50,6 @@ public:
   vtkSetMacro(Scale, double);
   vtkGetMacro(Scale, double);
 
-// BTX
 protected:
   vtkTimeToTextConvertor();
   ~vtkTimeToTextConvertor();
@@ -71,7 +70,7 @@ protected:
 private:
   vtkTimeToTextConvertor(const vtkTimeToTextConvertor&); // Not implemented
   void operator=(const vtkTimeToTextConvertor&); // Not implemented
-//ETX
+
 };
 
 #endif

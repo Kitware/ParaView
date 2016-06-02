@@ -68,7 +68,6 @@ public:
 
   vtkGetStringMacro(InitialString);
 
-//BTX
 protected:
   vtkSIVectorProperty();
   ~vtkSIVectorProperty();
@@ -90,7 +89,7 @@ protected:
 private:
   vtkSIVectorProperty(const vtkSIVectorProperty&); // Not implemented
   void operator=(const vtkSIVectorProperty&); // Not implemented
-//ETX
+
 };
 
 #endif

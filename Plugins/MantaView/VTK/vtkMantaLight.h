@@ -69,11 +69,9 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMantaModule.h"
 #include "vtkLight.h"
 
-//BTX
 namespace Manta {
 class Light;
 }
-//ETX
 
 class vtkMantaRenderer;
 class vtkTimeStamp;
@@ -111,9 +109,8 @@ private:
 
   void CreateMantaLight(vtkRenderer *);
   void UpdateMantaLight(vtkRenderer *ren);
-  //BTX
+
   Manta::Light *MantaLight;
-  //ETX
 
   vtkMantaManager *MantaManager;
 

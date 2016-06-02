@@ -71,8 +71,6 @@ public:
   // \returns the status of the operation.
   virtual int Redo();
 
-//BTX
-
   enum EventIds
     {
     PushUndoSetEvent = 1987,
@@ -101,7 +99,7 @@ private:
   vtkInternal* Internal;
   
   vtkSMUndoStackObserver* Observer;
-//ETX
+
 };
 
 

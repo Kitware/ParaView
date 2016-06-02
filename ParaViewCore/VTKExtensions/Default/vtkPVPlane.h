@@ -60,7 +60,6 @@ public:
   // any derived class.
   virtual void EvaluateGradient(double x[3], double g[3]);
 
-//BTX
 protected:
   vtkPVPlane();
   ~vtkPVPlane();
@@ -71,7 +70,7 @@ protected:
 private:
   vtkPVPlane(const vtkPVPlane&); // Not implemented
   void operator=(const vtkPVPlane&); // Not implemented
-//ETX
+
 };
 
 #endif

@@ -36,9 +36,7 @@ class vtkPKdTree;
 class vtkPVDataRepresentation;
 class vtkPVRenderView;
 
-//BTX
 #include <vector>
-//ETX
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVDataDeliveryManager : public vtkObject
 {
@@ -138,7 +136,6 @@ public:
     vtkPVDataRepresentation* repr, vtkExtentTranslator* translator,
     const int whole_extents[6], const double origin[3], const double spacing[3]);
 
-//BTX
   // Description:
   // Internal method used to determine the list of representations that need
   // their geometry delivered. This is done on the "client" side, with the
@@ -146,7 +143,6 @@ public:
   // server-sides using Deliver().
   bool NeedsDelivery(unsigned long timestamp,
     std::vector<unsigned int>& keys_to_deliver, bool use_low_res);
-//ETX
 
   // Description:
   // Triggers delivery for the geometries of indicated representations.
@@ -175,16 +171,13 @@ public:
   // are delivered to them.
   void DeliverStreamedPieces(unsigned int size, unsigned int *keys);
 
-//BTX
   // Description:
   // Fills up the vector with the keys for representations that have non-null
   // streaming pieces.
   bool GetRepresentationsReadyToStreamPieces(std::vector<unsigned int>& keys);
-//ETX
 
   // *******************************************************************
 
-//BTX
 protected:
   vtkPVDataDeliveryManager();
   ~vtkPVDataDeliveryManager();
@@ -199,7 +192,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-//ETX
+
 };
 
 #endif

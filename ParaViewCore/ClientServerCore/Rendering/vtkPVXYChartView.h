@@ -384,7 +384,6 @@ public:
   // Overridden to rescale axes range on every update.
   virtual void Update();
 
-//BTX
 protected:
   vtkPVXYChartView();
   ~vtkPVXYChartView();
@@ -420,7 +419,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-//ETX
+
 };
 
 #endif

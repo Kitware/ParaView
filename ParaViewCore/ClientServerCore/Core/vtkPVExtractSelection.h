@@ -64,7 +64,6 @@ public:
   void RemoveAllSelectionsInputs()
     { this->SetInputConnection(1, 0); }
 
-//BTX
 protected:
   vtkPVExtractSelection();
   ~vtkPVExtractSelection();
@@ -96,7 +95,7 @@ private:
 
   // Returns the combined content type for the selection.
   int GetContentType(vtkSelection* sel);
-//ETX
+
 };
 
 #endif

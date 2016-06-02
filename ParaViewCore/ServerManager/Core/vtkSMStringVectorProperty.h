@@ -113,9 +113,7 @@ public:
   // before a domain check is performed.
   virtual unsigned int GetNumberOfUncheckedElements();
 
-  //BTX
   enum ElementTypes{ INT, DOUBLE, STRING };
-  //ETX
 
   // Description: 
   // Copy all property values.

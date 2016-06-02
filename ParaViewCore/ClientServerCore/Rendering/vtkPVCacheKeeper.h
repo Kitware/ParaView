@@ -70,7 +70,6 @@ public:
   static int GetCacheMisses();
   static int GetCacheSkips();
 
-//BTX
 protected:
   vtkPVCacheKeeper();
   ~vtkPVCacheKeeper();
@@ -106,7 +105,7 @@ private:
   static int CacheHit;
   static int CacheMiss;
   static int CacheSkips;
-//ETX
+
 };
 
 #endif

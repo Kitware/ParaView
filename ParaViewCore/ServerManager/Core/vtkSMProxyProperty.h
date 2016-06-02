@@ -158,7 +158,6 @@ public:
   // Simply clears the property.
   virtual void ResetToXMLDefaults();
 
-//BTX
 protected:
   vtkSMProxyProperty();
   ~vtkSMProxyProperty();
@@ -213,7 +212,7 @@ protected:
 private:
   vtkSMProxyProperty(const vtkSMProxyProperty&); // Not implemented
   void operator=(const vtkSMProxyProperty&); // Not implemented
-//ETX
+
 };
 
 #endif

@@ -31,7 +31,6 @@ public:
   vtkTypeMacro(vtkPVNullSource, vtkLineSource);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-//BTX
 protected:
   vtkPVNullSource();
   ~vtkPVNullSource();
@@ -39,7 +38,7 @@ protected:
 private:
   vtkPVNullSource(const vtkPVNullSource&); // Not implemented
   void operator=(const vtkPVNullSource&); // Not implemented
-//ETX
+
 };
 
 #endif

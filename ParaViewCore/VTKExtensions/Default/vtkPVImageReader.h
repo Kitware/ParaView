@@ -49,7 +49,6 @@ public:
 
   void PrintSelf(ostream& os, vtkIndent indent);
 
-//BTX
 protected:
   vtkPVImageReader();
   ~vtkPVImageReader();
@@ -57,7 +56,7 @@ protected:
 private:
   vtkPVImageReader(const vtkPVImageReader&); // Not implemented.
   void operator=(const vtkPVImageReader&); // Not implemented.
-//ETX
+
 };
 
 #endif

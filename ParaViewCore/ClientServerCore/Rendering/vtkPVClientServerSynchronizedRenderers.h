@@ -47,7 +47,6 @@ public:
   // user settings.
   virtual void ConfigureCompressor(const char *stream);
 
-//BTX
 protected:
   vtkPVClientServerSynchronizedRenderers();
   ~vtkPVClientServerSynchronizedRenderers();
@@ -75,7 +74,7 @@ protected:
 private:
   vtkPVClientServerSynchronizedRenderers(const vtkPVClientServerSynchronizedRenderers&); // Not implemented
   void operator=(const vtkPVClientServerSynchronizedRenderers&); // Not implemented
-//ETX
+
 };
 
 #endif

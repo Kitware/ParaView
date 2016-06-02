@@ -50,7 +50,6 @@ public:
   vtkSetMacro(ShowOutline, bool);
   vtkGetMacro(ShowOutline, bool);
 
-//BTX
 protected:
   vtkGeometrySliceRepresentation();
   ~vtkGeometrySliceRepresentation();
@@ -69,7 +68,7 @@ private:
   vtkInternals* Internals;
   int Mode;
   bool ShowOutline;
-//ETX
+
 };
 
 #endif

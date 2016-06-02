@@ -41,7 +41,6 @@ public:
   // that each process knows the subextent of every process.
   void GatherExtents(vtkDataSet* dataset);
 
-//BTX
 protected:
   vtkPExtentTranslator();
   ~vtkPExtentTranslator();
@@ -57,7 +56,7 @@ private:
   void operator=(const vtkPExtentTranslator&); // Not implemented
 
   vtkPExtentTranslatorInternals* Internals;
-//ETX
+
 };
 
 #endif

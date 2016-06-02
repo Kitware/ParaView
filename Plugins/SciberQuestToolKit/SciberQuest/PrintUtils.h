@@ -30,7 +30,6 @@
 #ifndef PrintUtils_h
 #define PrintUtils_h
 
-//BTX
 #include <iostream> // for ostream
 #include <map> // for map
 #include <vector> // for vector
@@ -45,7 +44,6 @@ std::ostream &operator<<(std::ostream &os, const std::vector<double> &v);
 std::ostream &operator<<(std::ostream &os, const std::vector<float> &v);
 std::ostream &operator<<(std::ostream &os, const std::vector<int> &v);
 
-//ETX
 #endif
 
 // VTK-HeaderTest-Exclude: PrintUtils.h

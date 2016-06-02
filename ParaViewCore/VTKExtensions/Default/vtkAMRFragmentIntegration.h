@@ -44,7 +44,6 @@ protected:
   vtkAMRFragmentIntegration();
   virtual ~vtkAMRFragmentIntegration();
 
-  //BTX
   virtual int FillInputPortInformation(int port, vtkInformation *info);
   virtual int FillOutputPortInformation(int port, vtkInformation *info);
 
@@ -61,7 +60,7 @@ protected:
 private:
   vtkAMRFragmentIntegration(const vtkAMRFragmentIntegration&);  // Not implemented.
   void operator=(const vtkAMRFragmentIntegration&);  // Not implemented.
-  //ETX
+
 };
 
 #endif /* vtkAMRFragmentIntegration_h */

@@ -156,9 +156,7 @@ protected:
   vtkSMDoubleVectorProperty();
   ~vtkSMDoubleVectorProperty();
 
-  //BTX
   friend class vtkSMRenderViewProxy;
-  //ETX
 
   // Description:
   // Let the property write its content into the stream

@@ -40,7 +40,6 @@ public:
   void SetOpacity(double);
   void SetSourceProxy(vtkSMProxy* proxy);
 
-//BTX
 protected:
   vtkPVRepresentationAnimationHelper();
   ~vtkPVRepresentationAnimationHelper();
@@ -49,7 +48,7 @@ protected:
 private:
   vtkPVRepresentationAnimationHelper(const vtkPVRepresentationAnimationHelper&); // Not implemented
   void operator=(const vtkPVRepresentationAnimationHelper&); // Not implemented
-//ETX
+
 };
 
 #endif

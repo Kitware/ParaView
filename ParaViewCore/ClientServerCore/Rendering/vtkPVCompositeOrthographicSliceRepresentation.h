@@ -67,7 +67,6 @@ public:
   // initilized as well.
   virtual unsigned int Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable);
 
-//BTX
 protected:
   vtkPVCompositeOrthographicSliceRepresentation();
   ~vtkPVCompositeOrthographicSliceRepresentation();
@@ -89,7 +88,7 @@ protected:
 private:
   vtkPVCompositeOrthographicSliceRepresentation(const vtkPVCompositeOrthographicSliceRepresentation&); // Not implemented
   void operator=(const vtkPVCompositeOrthographicSliceRepresentation&); // Not implemented
-//ETX
+
 };
 
 #endif

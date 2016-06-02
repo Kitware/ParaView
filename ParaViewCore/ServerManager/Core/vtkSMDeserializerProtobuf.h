@@ -41,7 +41,6 @@ public:
   vtkGetObjectMacro(StateLocator, vtkSMStateLocator);
   virtual void SetStateLocator(vtkSMStateLocator*);
 
-//BTX
 protected:
   vtkSMDeserializerProtobuf();
   ~vtkSMDeserializerProtobuf();
@@ -58,7 +57,7 @@ protected:
 private:
   vtkSMDeserializerProtobuf(const vtkSMDeserializerProtobuf&); // Not implemented
   void operator=(const vtkSMDeserializerProtobuf&); // Not implemented
-//ETX
+
 };
 
 #endif

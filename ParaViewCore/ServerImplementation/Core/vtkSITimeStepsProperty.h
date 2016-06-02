@@ -29,7 +29,6 @@ public:
   vtkTypeMacro(vtkSITimeStepsProperty, vtkSIProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-//BTX
 protected:
   vtkSITimeStepsProperty();
   ~vtkSITimeStepsProperty();
@@ -43,7 +42,7 @@ protected:
 private:
   vtkSITimeStepsProperty(const vtkSITimeStepsProperty&); // Not implemented
   void operator=(const vtkSITimeStepsProperty&); // Not implemented
-//ETX
+
 };
 
 #endif

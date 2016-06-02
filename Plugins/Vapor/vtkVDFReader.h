@@ -212,11 +212,9 @@ protected:
   int TimeStep;
   int RefinementRange[2];
 
-//BTX
   std::map<std::string,int> data;
   std::vector<double> uExt;
   std::vector<std::string> current_var_list;
-//ETX
 
 private:
   vtkVDFReader(const vtkVDFReader&);

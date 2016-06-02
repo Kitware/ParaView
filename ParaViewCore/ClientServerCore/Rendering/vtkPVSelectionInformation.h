@@ -44,12 +44,10 @@ public:
   // Merge another information object.
   virtual void AddInformation(vtkPVInformation*);
 
-  //BTX
   // Description:
   // Manage a serialized version of the information.
   virtual void CopyToStream(vtkClientServerStream*);
   virtual void CopyFromStream(const vtkClientServerStream*);
-  //ETX
 
   // Description:
   // Returns the selection. Selection is created and populated

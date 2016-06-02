@@ -24,11 +24,9 @@
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMLink.h"
 
-//BTX
 class vtkSMSourceProxy;
 class vtkSMSelectionLinkInternals;
 class vtkSMSelectionLinkObserver;
-//ETX
 
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMSelectionLink : public vtkSMLink
 {

@@ -39,7 +39,6 @@ public:
   vtkTypeMacro(vtkPVMergeTables, vtkTableAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-//BTX
 protected:
   vtkPVMergeTables();
   ~vtkPVMergeTables();
@@ -55,7 +54,7 @@ protected:
 private:
   vtkPVMergeTables(const vtkPVMergeTables&); // Not implemented
   void operator=(const vtkPVMergeTables&); // Not implemented
-//ETX
+
 };
 
 #endif

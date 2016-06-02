@@ -160,10 +160,10 @@ protected:
 
   /// Information results
   //@{
-  //BTX
+
   class vtkInternalDistinctValues;
   vtkInternalDistinctValues* DistinctValues;
-  //ETX
+
   //@}
 
   vtkPVProminentValuesInformation(const vtkPVProminentValuesInformation&); // Not implemented

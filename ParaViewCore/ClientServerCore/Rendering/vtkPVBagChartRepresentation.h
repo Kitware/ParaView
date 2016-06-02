@@ -128,7 +128,6 @@ public:
   vtkSetStringMacro(YAxisSeriesName);
   vtkGetStringMacro(YAxisSeriesName);
 
-//BTX
 protected:
   vtkPVBagChartRepresentation();
   ~vtkPVBagChartRepresentation();
@@ -173,7 +172,7 @@ private:
   bool UseIndexForXAxis;
   vtkSmartPointer<vtkImageData> LocalGrid;
   vtkSmartPointer<vtkTable> LocalThreshold;
-//ETX
+
 };
 
 #endif

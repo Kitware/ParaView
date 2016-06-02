@@ -191,7 +191,6 @@ public:
   // Access to the Z buffer.
   vtkFloatArray* CaptureDepthBuffer();
 
-//BTX
 protected:
   vtkSMRenderViewProxy();
   ~vtkSMRenderViewProxy();
@@ -258,7 +257,7 @@ private:
   void operator=(const vtkSMRenderViewProxy&); // Not implemented
 
   vtkNew<vtkSMViewProxyInteractorHelper> InteractorHelper;
-//ETX
+
 };
 
 #endif

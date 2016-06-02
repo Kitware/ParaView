@@ -55,7 +55,6 @@ public:
   // Returns the current session id.
   vtkIdType GetCurrentSessionId();
 
-//BTX
 protected:
   vtkSessionIterator();
   ~vtkSessionIterator();
@@ -65,7 +64,7 @@ protected:
 private:
   vtkSessionIterator(const vtkSessionIterator&); // Not implemented
   void operator=(const vtkSessionIterator&); // Not implemented
-//ETX
+
 };
 
 #endif

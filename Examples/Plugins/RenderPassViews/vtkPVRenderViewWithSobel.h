@@ -36,7 +36,6 @@ public:
   // @CallOnAllProcessess
   virtual void Initialize(unsigned int id);
 
-//BTX
 protected:
   vtkPVRenderViewWithSobel();
   ~vtkPVRenderViewWithSobel();
@@ -44,7 +43,7 @@ protected:
 private:
   vtkPVRenderViewWithSobel(const vtkPVRenderViewWithSobel&); // Not implemented
   void operator=(const vtkPVRenderViewWithSobel&); // Not implemented
-//ETX
+
 };
 
 #endif

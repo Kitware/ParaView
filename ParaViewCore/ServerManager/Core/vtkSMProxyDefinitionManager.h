@@ -177,8 +177,6 @@ public:
   bool LoadConfigurationXML(vtkPVXMLElement* root);
   bool LoadConfigurationXMLFromString(const char* xmlContent);
 
-//BTX
-
   // Description:
   // This method is used to initialise the object to the given state
   // If the definitionOnly Flag is set to True the proxy won't load the
@@ -197,7 +195,7 @@ protected:
 private:
   vtkSMProxyDefinitionManager(const vtkSMProxyDefinitionManager&); // Not implemented
   void operator=(const vtkSMProxyDefinitionManager&); // Not implemented
-//ETX
+
 };
 
 #endif

@@ -68,7 +68,6 @@ public:
   //Make a particular light the active one. Add it to the renderer if new.
   void SetCurrentLight(vtkMantaLight*);
 
-//BTX
 protected:
   vtkPVMantaView();
   ~vtkPVMantaView();
@@ -81,7 +80,7 @@ protected:
 private:
   vtkPVMantaView(const vtkPVMantaView&); // Not implemented
   void operator=(const vtkPVMantaView&); // Not implemented
-//ETX
+
 };
 
 #endif

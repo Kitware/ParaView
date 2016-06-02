@@ -31,7 +31,6 @@ public:
 
   virtual void AboutToDelete();
 
-//BTX
 protected:
   vtkSIPVRepresentationProxy();
   ~vtkSIPVRepresentationProxy();
@@ -49,7 +48,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-//ETX
+
 };
 
 #endif

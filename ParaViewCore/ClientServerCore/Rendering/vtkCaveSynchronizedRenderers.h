@@ -37,7 +37,6 @@ public:
   vtkTypeMacro(vtkCaveSynchronizedRenderers, vtkSynchronizedRenderers);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-//BTX
 protected:
   vtkCaveSynchronizedRenderers();
   ~vtkCaveSynchronizedRenderers();
@@ -79,7 +78,7 @@ protected:
 private:
   vtkCaveSynchronizedRenderers(const vtkCaveSynchronizedRenderers&); // Not implemented
   void operator=(const vtkCaveSynchronizedRenderers&); // Not implemented
-//ETX
+
 };
 
 #endif

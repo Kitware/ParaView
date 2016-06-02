@@ -73,7 +73,6 @@ public:
   // Switch from 0:vtkErrorMacro to 1:vtkWarningMacro
   vtkSetMacro(LogLevel, int);
 
-//BTX
 protected:
   vtkPVSessionCoreInterpreterHelper();
   ~vtkPVSessionCoreInterpreterHelper();
@@ -83,7 +82,7 @@ protected:
 private:
   vtkPVSessionCoreInterpreterHelper(const vtkPVSessionCoreInterpreterHelper&); // Not implemented
   void operator=(const vtkPVSessionCoreInterpreterHelper&); // Not implemented
-//ETX
+
 };
 
 #endif

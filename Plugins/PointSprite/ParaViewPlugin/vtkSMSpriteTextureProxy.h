@@ -48,7 +48,6 @@ public:
   // Returns the client side image if one has been loaded successfully.
   vtkImageData* GetLoadedImage();
 
-//BTX
 protected:
   vtkSMSpriteTextureProxy();
   ~vtkSMSpriteTextureProxy();
@@ -56,7 +55,7 @@ protected:
 private:
   vtkSMSpriteTextureProxy(const vtkSMSpriteTextureProxy&); // Not implemented
   void operator=(const vtkSMSpriteTextureProxy&); // Not implemented
-//ETX
+
 };
 
 #endif

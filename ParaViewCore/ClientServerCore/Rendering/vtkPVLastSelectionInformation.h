@@ -32,7 +32,6 @@ public:
 
   virtual void CopyFromObject(vtkObject*);
 
-//BTX
 protected:
   vtkPVLastSelectionInformation();
   ~vtkPVLastSelectionInformation();
@@ -40,7 +39,7 @@ protected:
 private:
   vtkPVLastSelectionInformation(const vtkPVLastSelectionInformation&); // Not implemented
   void operator=(const vtkPVLastSelectionInformation&); // Not implemented
-//ETX
+
 };
 
 #endif

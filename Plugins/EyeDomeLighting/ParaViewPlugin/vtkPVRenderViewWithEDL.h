@@ -59,7 +59,6 @@ public:
   // @CallOnAllProcessess
   virtual void Initialize(unsigned int id);
 
-//BTX
 protected:
   vtkPVRenderViewWithEDL();
   ~vtkPVRenderViewWithEDL();
@@ -67,7 +66,7 @@ protected:
 private:
   vtkPVRenderViewWithEDL(const vtkPVRenderViewWithEDL&); // Not implemented
   void operator=(const vtkPVRenderViewWithEDL&); // Not implemented
-//ETX
+
 };
 
 #endif
