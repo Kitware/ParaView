@@ -17,6 +17,7 @@
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkPSystemTools.h"
 
 #include <vtksys/CommandLineArguments.hxx>
 #include <vtksys/SystemTools.hxx>
@@ -57,7 +58,7 @@ int vtkPVPythonOptions::PostProcess(int argc, const char* const* argv)
 //----------------------------------------------------------------------------
 int vtkPVPythonOptions::WrongArgument(const char* argument)
 {
-  if ( vtksys::SystemTools::FileExists(argument) &&
+  if ( vtkPSystemTools::FileExists(argument) &&
     vtksys::SystemTools::GetFilenameLastExtension(argument) == ".py")
     {
     this->SetPythonScriptName(argument);

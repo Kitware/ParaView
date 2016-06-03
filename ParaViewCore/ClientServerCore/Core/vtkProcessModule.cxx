@@ -25,6 +25,7 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
+#include "vtkPSystemTools.h"
 #include "vtkPVConfig.h"
 #include "vtkPVConfig.h"
 #include "vtkPVOptions.h"
@@ -555,17 +556,17 @@ void vtkProcessModule::DetermineExecutablePath(int argc, char* argv[])
   if (argc > 0)
     {
     std::string errMsg;
-    if (!vtksys::SystemTools::FindProgramPath(argv[0], this->ProgramPath, errMsg))
+    if (!vtkPSystemTools::FindProgramPath(argv[0], this->ProgramPath, errMsg))
       {
       // if FindProgramPath fails. We really don't have much of an alternative
       // here. Python module importing is going to fail.
-      this->ProgramPath = vtksys::SystemTools::CollapseFullPath(argv[0]);
+      this->ProgramPath = vtkPSystemTools::CollapseFullPath(argv[0]);
       }
     this->SelfDir = vtksys::SystemTools::GetFilenamePath(this->ProgramPath);
     }
   else
     {
-    this->SelfDir = vtksys::SystemTools::GetCurrentWorkingDirectory(/*collapse=*/true);
+    this->SelfDir = vtkPSystemTools::GetCurrentWorkingDirectory(/*collapse=*/true);
     this->ProgramPath = this->SelfDir + "/unknown_exe";
     }
 }
@@ -573,7 +574,7 @@ void vtkProcessModule::DetermineExecutablePath(int argc, char* argv[])
 //----------------------------------------------------------------------------
 void vtkProcessModule::SetExecutablePath(const std::string& path)
 {
-  this->ProgramPath = vtksys::SystemTools::CollapseFullPath(path);
+  this->ProgramPath = vtkPSystemTools::CollapseFullPath(path);
   this->SelfDir = vtksys::SystemTools::GetFilenamePath(this->ProgramPath);
 }
 
