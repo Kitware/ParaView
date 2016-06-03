@@ -110,8 +110,6 @@ protected:
    */
   void CopyProperties(vtkSMProxy* caller);
 
-  void StartInteraction(vtkObject* caller);
-  void EndInteraction(vtkObject* caller);
   void ResetCamera(vtkObject* caller);
 
   int SynchronizeInteractiveRenders;
