@@ -199,7 +199,7 @@ int vtkPCosmoReader::RequestData(
       return 0;
     }
 
-   if (this->FileName == NULL || this->FileName == '\0')
+   if (this->FileName == NULL || this->FileName[0] == '\0')
     {
     vtkErrorMacro(<< "No FileName specified!");
     return 0;
