@@ -49,7 +49,10 @@ void pqWelcomeDialog::onGettingStartedGuideClicked()
 #endif
   QString paraViewGettingStartedFile = documentationPath + "/GettingStarted.pdf";
   QUrl gettingStartedURL = QUrl::fromLocalFile(paraViewGettingStartedFile);
-  pqDesktopServicesReaction::openUrl(gettingStartedURL);
+  if (pqDesktopServicesReaction::openUrl(gettingStartedURL))
+    {
+    this->hide();
+    }
 }
 
 //-----------------------------------------------------------------------------

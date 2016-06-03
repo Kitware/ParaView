@@ -53,7 +53,9 @@ public:
   pqDesktopServicesReaction(const QUrl& url, QAction* parent);
   virtual ~pqDesktopServicesReaction();
 
-  static void openUrl(const QUrl& url);
+  /// Attempt to open a file (local or on the Web) using QDesktopServices.
+  /// Returns false if failed to open for some reason, other returns true.
+  static bool openUrl(const QUrl& url);
 
 protected:
   virtual void onTriggered()

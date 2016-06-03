@@ -53,7 +53,7 @@ pqDesktopServicesReaction::~pqDesktopServicesReaction()
 }
 
 //-----------------------------------------------------------------------------
-void pqDesktopServicesReaction::openUrl(const QUrl& url)
+bool pqDesktopServicesReaction::openUrl(const QUrl& url)
 {
   if (url.isLocalFile() && !QFileInfo(url.toLocalFile()).exists())
     {
@@ -64,9 +64,12 @@ void pqDesktopServicesReaction::openUrl(const QUrl& url)
     // dump to cout for easy copy/paste.
     std::cout << msg.toUtf8().data() << std::endl;
     QMessageBox::warning(pqCoreUtilities::mainWidget(), "Missing file", msg, QMessageBox::Ok);
+    return false;
     }
-  else if (!QDesktopServices::openUrl(url))
+  if (!QDesktopServices::openUrl(url))
     {
     qCritical() << "Failed to open '" << url << "'";
+    return false;
     }
+  return true;
 }
