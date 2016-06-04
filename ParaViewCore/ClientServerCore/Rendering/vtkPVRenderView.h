@@ -432,6 +432,18 @@ public:
     }
 
   // Description:
+  // This is an temporary/experimental option and may be removed without notice.
+  // This is intended to be used within some experimental representations that
+  // require that all data being moved around uses a specific mode rather than
+  // the one automatically determined based on the process type.
+  // Set \c flag to -1 to clear. The flag is cleared in every
+  // vtkPVRenderView::Update() call, hence a representation must set it in
+  // vtkPVView::REQUEST_UPDATE() pass if needed each time.
+  // Also note, if the value it set to non-negative and is not equal to vtkMPIMoveData::PASS_THROUGH,
+  // ordered compositing will also be disabled.
+  static void SetForceDataDistributionMode(vtkInformation* info, int flag);
+
+  // Description:
   // Representations that support hardware (render-buffer based) selection,
   // should register the prop that they use for selection rendering. They can do
   // that in the vtkPVDataRepresentation::AddToView() implementation.
@@ -856,9 +868,11 @@ private:
   int StereoType;
   int ServerStereoType;
   void UpdateStereoProperties();
+
   vtkSmartPointer<vtkCuller> Culler;
   vtkNew<vtkTimerLog> Timer;
 
+  int ForceDataDistributionMode;
 };
 
 #endif
