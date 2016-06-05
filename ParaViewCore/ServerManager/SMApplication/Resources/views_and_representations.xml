@@ -8251,6 +8251,7 @@
       <IntVectorProperty command="SetEnableScaling"
                          default_values="0"
                          name="OSPRayUseScaleArray"
+                         label="OSPRay Use Scale Array"
                          number_of_elements="1">
         <Documentation>
           Allows OSPRay implicit points and lines to be sized by an array.
@@ -8263,6 +8264,7 @@
       <StringVectorProperty command="SetScalingArrayName"
                             default_values=""
                             name="OSPRayScaleArray"
+                            label="OSPRay Scale Array"
                             number_of_elements="1"
                             panel_visibility="advanced">
         <ArrayListDomain input_domain_name="input_array_point"
@@ -8280,6 +8282,7 @@
       </StringVectorProperty>
       <ProxyProperty command="SetScalingFunction"
                      name="OSPRayScaleFunction"
+                     label="OSPRay Scale Function"
                      panel_visibility="advanced"
                      panel_widget="transfer_function_editor">
         <Documentation>Set the piecewise function used to map data array to sprite size.
