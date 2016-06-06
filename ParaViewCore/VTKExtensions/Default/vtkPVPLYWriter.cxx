@@ -77,7 +77,7 @@ void vtkPVPLYWriter::SetLookupTable(vtkScalarsToColors* lut)
 //----------------------------------------------------------------------------
 void vtkPVPLYWriter::WriteData()
 {
-  int fieldAssociation;
+  int fieldAssociation = 0;
   vtkPolyData* input = vtkPolyData::SafeDownCast(this->GetInputDataObject(0, 0));
   if (vtkAbstractArray* scalars = (this->EnableColoring && this->LookupTable != NULL)?
     this->GetInputAbstractArrayToProcess(0, input, fieldAssociation) : NULL)
