@@ -42,6 +42,7 @@ public:
   // Description:
   // Set this flag to true before calling Initialize() to disable using
   // vtkIceTSynchronizedRenderers for parallel rendering.
+  // Default value is setup using vtkPVRenderViewSettings::GetDisableIceT.
   vtkSetMacro(DisableIceT, bool);
   vtkGetMacro(DisableIceT, bool);
 

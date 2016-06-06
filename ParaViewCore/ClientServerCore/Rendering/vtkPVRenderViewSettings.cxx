@@ -46,7 +46,8 @@ vtkPVRenderViewSettings* vtkPVRenderViewSettings::GetInstance()
 //----------------------------------------------------------------------------
 vtkPVRenderViewSettings::vtkPVRenderViewSettings()
   : OutlineThreshold(250),
-  PointPickingRadius(0)
+  PointPickingRadius(0),
+  DisableIceT(false)
 {
 }
 

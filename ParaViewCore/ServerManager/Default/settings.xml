@@ -596,6 +596,22 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="DisableIceT"
+                         label="Disable IceT"
+                         command="SetDisableIceT"
+                         default_values="0"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set to disable IceT (default is unchecked). This is not common and only provided
+          for special rendering modes/mappers.
+        </Documentation>
+        <Hints>
+          <RestartRequired />
+        </Hints>
+      </IntVectorProperty>
+
       <PropertyGroup label="Geometry Mapper Options">
         <Property name="UseDisplayLists" />
         <Property name="ResolveCoincidentTopology" />
@@ -629,6 +645,7 @@
         <Property name="OutlineThreshold" />
         <Property name="UseOffscreenRenderingForScreenshots" />
         <Property name="ShowAnnotation" />
+        <Property name="DisableIceT" />
       </PropertyGroup>
       <Hints>
         <UseDocumentationForLabels />
