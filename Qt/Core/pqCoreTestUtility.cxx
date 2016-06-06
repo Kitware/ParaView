@@ -357,9 +357,9 @@ bool pqCoreTestUtility::CompareImage(QWidget* widget,
   // for generic QWidget's, let's paint the widget into our QPixmap,
   // put it in a vtkImageData and compare the image with a baseline
   QFont oldFont = widget->font();
-#if defined(Q_WS_WIN)
+#if defined(Q_WS_WIN) || defined(Q_OS_WIN)
   QFont newFont("Courier", 10, QFont::Normal, false);
-#elif defined(Q_WS_X11)
+#elif defined(Q_WS_X11) || defined(Q_OS_LINUX)
   QFont newFont("Courier", 10, QFont::Normal, false);
 #else
   QFont newFont("Courier Regular", 10, QFont::Normal, false);

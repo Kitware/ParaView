@@ -58,7 +58,7 @@ pqExpanderButton::pqExpanderButton(QWidget* parentObject)
   this->Internals->setupUi(this);
   this->Internals->icon->setPixmap(this->Internals->UncheckedPixmap);
 
-#ifdef Q_WS_WIN
+#if defined(Q_WS_WIN) || defined(Q_OS_WIN)
   this->setFrameShadow(QFrame::Sunken);
 #endif
 }

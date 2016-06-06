@@ -30,6 +30,9 @@
 #include <vtksys/SystemTools.hxx>
 vtkStandardNewMacro(vtkPVDisplayInformation);
 
+int vtkPVDisplayInformation::GlobalCanOpenDisplayLocally = -1;
+int vtkPVDisplayInformation::GlobalSupportsOpenGL = -1;
+
 //----------------------------------------------------------------------------
 vtkPVDisplayInformation::vtkPVDisplayInformation()
 {
@@ -54,6 +57,11 @@ void vtkPVDisplayInformation::PrintSelf(ostream& os, vtkIndent indent)
 bool vtkPVDisplayInformation::CanOpenDisplayLocally()
 {
 #if defined(VTK_USE_X)
+  if (vtkPVDisplayInformation::GlobalCanOpenDisplayLocally != -1)
+    {
+    return vtkPVDisplayInformation::GlobalCanOpenDisplayLocally == 1;
+    }
+  vtkPVDisplayInformation::GlobalCanOpenDisplayLocally = 0;
   vtkPVOptions* options = vtkProcessModule::GetProcessModule()?
     vtkProcessModule::GetProcessModule()->GetOptions() : NULL;
   if (options && options->GetDisableXDisplayTests() == 0)
@@ -62,6 +70,7 @@ bool vtkPVDisplayInformation::CanOpenDisplayLocally()
     if (dId)
       {
       XCloseDisplay(dId);
+      vtkPVDisplayInformation::GlobalCanOpenDisplayLocally = 1;
       return true;
       }
     return false;
@@ -82,6 +91,11 @@ bool vtkPVDisplayInformation::SupportsOpenGLLocally()
     {
     return false;
     }
+  if (vtkPVDisplayInformation::GlobalSupportsOpenGL != -1)
+    {
+    return vtkPVDisplayInformation::GlobalSupportsOpenGL == 1;
+    }
+
   // We're going to skip OpenGL version checks too  if DisableXDisplayTests
   // command line option is set.
   vtkPVOptions* options = vtkProcessModule::GetProcessModule()?
@@ -89,7 +103,8 @@ bool vtkPVDisplayInformation::SupportsOpenGLLocally()
   if (options && options->GetDisableXDisplayTests() == 0)
     {
     vtkNew<vtkRenderWindow> window;
-    return window->SupportsOpenGL() == 1;
+    vtkPVDisplayInformation::GlobalSupportsOpenGL = window->SupportsOpenGL();
+    return vtkPVDisplayInformation::GlobalSupportsOpenGL  == 1;
     }
   return true;
 #else

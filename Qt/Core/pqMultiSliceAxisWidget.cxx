@@ -82,7 +82,7 @@ public:
     {
     this->ContextView->SetInteractor(this->View->GetInteractor());
     this->View->SetRenderWindow(this->ContextView->GetRenderWindow());
-#ifdef Q_WS_WIN
+#if defined(Q_WS_WIN) || defined(Q_OS_WIN)
     this->ContextView->GetRenderWindow()->SetLineSmoothing(true);
 #endif
     this->View->setAutomaticImageCacheEnabled(true);
