@@ -13,12 +13,15 @@
 
 =========================================================================*/
 #include "vtkPVFileInformation.h"
+#include "vtkPVConfig.h"
 
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkFileSequenceParser.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVFileInformationHelper.h"
 #include "vtkSmartPointer.h"
 
@@ -42,7 +45,6 @@
 # define vtkPVServerFileListingGetCWD getcwd
 #endif
 #if defined (__APPLE__)
-#include "vtkNew.h"
 #include "vtkPVMacFileInformationHelper.h"
 #include <vector>
 #endif
@@ -480,8 +482,30 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
 //-----------------------------------------------------------------------------
 void vtkPVFileInformation::GetSpecialDirectories()
 {
-#if defined (_WIN32)
+  // FIXME: Use vtkPVLibraryInfo (see paraview/paraview!798) once it's available
+  // to get such paths. Hardcoding it for now.
+  if (vtkProcessModule* pm = vtkProcessModule::GetProcessModule())
+    {
+#if defined(_WIN32) || defined(__APPLE__)
+    std::string dataPath = pm->GetSelfDir() + "/../data";
+#else
+    std::string appdir = pm->GetSelfDir();;
+    std::string dataPath = vtksys::SystemTools::GetFilenameName(appdir) == "bin" ?
+      /* w/o shared forwarding */ appdir + "/../share/paraview-" PARAVIEW_VERSION "/data"  :
+      /* w/ shared forwarding  */ appdir + "/../../share/paraview-" PARAVIEW_VERSION "/data";
+#endif
+    dataPath = vtksys::SystemTools::CollapseFullPath(dataPath);
+    if (vtksys::SystemTools::FileIsDirectory(dataPath))
+      {
+      vtkNew<vtkPVFileInformation> info;
+      info->SetFullPath(dataPath.c_str());
+      info->SetName("Examples");
+      info->Type = DIRECTORY;
+      this->Contents->AddItem(info.Get());
+      }
+    }
 
+#if defined (_WIN32)
   // Return favorite directories ...
 
   TCHAR szPath[MAX_PATH];

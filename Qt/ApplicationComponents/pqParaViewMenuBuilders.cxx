@@ -338,15 +338,16 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
                     "Getting Started with ParaView") << pqSetName("actionGettingStarted")));
 
   // ParaView Guide
-  new pqDesktopServicesReaction(
-    QUrl::fromLocalFile(paraViewGuideFile),
-    (menu.addAction(QIcon(":/pqWidgets/Icons/pdf.png"),
-                    "ParaView Guide") << pqSetName("actionGuide")));
+  QAction* guide = menu.addAction(
+    QIcon(":/pqWidgets/Icons/pdf.png"), "ParaView Guide");
+  guide->setObjectName("actionGuide");
+  guide->setShortcut(QKeySequence::HelpContents);
+  new pqDesktopServicesReaction(QUrl::fromLocalFile(paraViewGuideFile), guide);
+
 
   // Help
   QAction * help = menu.addAction("Reader, Filter, and Writer Reference") <<
     pqSetName("actionHelp");
-  help->setShortcut(QKeySequence::HelpContents);
   new pqHelpReaction(help);
 
   // -----------------
