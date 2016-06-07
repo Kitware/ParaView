@@ -169,6 +169,12 @@ bool vtkSMSessionClient::Connect(const char* url)
     {
     handshake << ".connect_id." << options->GetConnectID();
     }
+  // Add rendering backend information.
+#ifdef VTKGL2
+  handshake << ".renderingbackend.opengl2";
+#else
+  handshake << ".renderingbackend.opengl";
+#endif
 
   std::string data_server_url;
   std::string render_server_url;
