@@ -16,7 +16,9 @@
 
 #include "vtkClientServerInterpreterInitializer.h"
 #include "vtkCommand.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPSystemTools.h"
 #include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
 #include "vtkPVOptions.h"
@@ -67,7 +69,7 @@ namespace
       }
     };
 
-  std::string vtkLocatePlugin(const char* plugin, bool add_extensions, vtkPluginSearchFunction searchFunction)
+  std::string vtkLocatePluginSerial(const char* plugin, bool add_extensions, vtkPluginSearchFunction searchFunction)
     {
     (void)searchFunction;
     // Make sure we can get the options before going further
@@ -136,6 +138,21 @@ namespace
         (path + "/" + filename).c_str() << "-- not found");
       }
     return std::string();
+    }
+
+  std::string vtkLocatePlugin(const char* plugin, bool add_extensions, vtkPluginSearchFunction searchFunction)
+    {
+    if(vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController())
+      {
+      std::string pluginLocation;
+      if(controller->GetLocalProcessId() == 0)
+        {
+        pluginLocation = vtkLocatePluginSerial(plugin, add_extensions, searchFunction);
+        }
+      vtkPSystemTools::BroadcastString(pluginLocation, 0);
+      return pluginLocation;
+      }
+    return vtkLocatePluginSerial(plugin, add_extensions, searchFunction);
     }
 
   std::string vtkGetPluginNameFromFileName(const std::string& filename)
@@ -238,7 +255,7 @@ void vtkPVPluginTracker::LoadPluginConfigurationXML(const char* filename, bool f
 {
   bool debug_plugin = vtksys::SystemTools::GetEnv("PV_PLUGIN_DEBUG") != NULL;
   vtkPVPluginTrackerDebugMacro("Loading plugin configuration xml: " << filename);
-  if (!vtksys::SystemTools::FileExists(filename, true))
+  if (!vtkPSystemTools::FileExists(filename, true))
     {
     vtkPVPluginTrackerDebugMacro("Failed to located configuration xml. "
       "Could not populate the list of plugins distributed with application.");
@@ -305,7 +322,7 @@ void vtkPVPluginTracker::LoadPluginConfigurationXML(vtkPVXMLElement* root, bool 
       vtkPVPluginTrackerDebugMacro("Trying to locate plugin with name: " << name.c_str());
       std::string plugin_filename;
       if (child->GetAttribute("filename") &&
-        vtksys::SystemTools::FileExists(child->GetAttribute("filename"), true))
+        vtkPSystemTools::FileExists(child->GetAttribute("filename"), true))
         {
         plugin_filename = child->GetAttribute("filename");
         }

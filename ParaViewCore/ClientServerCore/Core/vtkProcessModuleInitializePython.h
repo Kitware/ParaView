@@ -15,6 +15,7 @@
 #ifndef vtkProcessModulePythonInitializePython_h
 #define vtkProcessModulePythonInitializePython_h
 
+#include "vtkPSystemTools.h"
 #include "vtkPythonInterpreter.h"
 #include <string>
 #include <vtksys/SystemTools.hxx>
@@ -40,8 +41,8 @@ namespace
     if (dir != "")
       {
       std::string collapsed_dir =
-        vtksys::SystemTools::CollapseFullPath(dir.c_str());
-      if (vtksys::SystemTools::FileIsDirectory(collapsed_dir.c_str()))
+        vtkPSystemTools::CollapseFullPath(dir.c_str());
+      if (vtkPSystemTools::FileIsDirectory(collapsed_dir.c_str()))
         {
         vtkPythonInterpreter::PrependPythonPath(collapsed_dir.c_str());
         }
@@ -142,7 +143,7 @@ namespace
     build_dir_site_packages = SELF_DIR + "/../lib/site-packages";
 #endif
     bool is_build_dir =
-      vtksys::SystemTools::FileExists(build_dir_site_packages.c_str());
+      vtkPSystemTools::FileExists(build_dir_site_packages.c_str());
     if (is_build_dir)
       {
       vtkPythonAppInitPrependPythonPath(SELF_DIR);
@@ -206,24 +207,24 @@ namespace
     bool is_app = false;
       {
       // if SELF_DIR/../ is named "Contents", we are in an App.
-      std::string contents_dir = vtksys::SystemTools::CollapseFullPath(
+      std::string contents_dir = vtkPSystemTools::CollapseFullPath(
         (SELF_DIR + "/..").c_str());
       is_app = (vtksys::SystemTools::GetFilenameName(contents_dir) == "Contents");
       }
 
     std::string lib_dir = (is_app==false)? (SELF_DIR + "/../lib") :
                                            (SELF_DIR + "/../../../../lib");
-    lib_dir = vtksys::SystemTools::CollapseFullPath(lib_dir.c_str());
+    lib_dir = vtkPSystemTools::CollapseFullPath(lib_dir.c_str());
 
     std::string cmakeconfig = (is_app==false)? (SELF_DIR + "/../ParaViewConfig.cmake") :
                                                (SELF_DIR + "/../../../../ParaViewConfig.cmake");
-    cmakeconfig = vtksys::SystemTools::CollapseFullPath(cmakeconfig.c_str());
+    cmakeconfig = vtkPSystemTools::CollapseFullPath(cmakeconfig.c_str());
 
-    bool is_build_dir = vtksys::SystemTools::FileExists(cmakeconfig.c_str());
+    bool is_build_dir = vtkPSystemTools::FileExists(cmakeconfig.c_str());
 
     // when we install on OsX using unix-style the test for is_build_dir is
     // valid for install dir too. So we do an extra check.
-    bool is_unix_style_install = vtksys::SystemTools::FileExists(
+    bool is_unix_style_install = vtkPSystemTools::FileExists(
       (lib_dir + "/paraview-" PARAVIEW_VERSION).c_str());
     if (is_build_dir)
       {
@@ -248,7 +249,7 @@ namespace
       if(is_app)
         {
         std::string app_root = SELF_DIR + "/../..";
-        app_root = vtksys::SystemTools::CollapseFullPath(app_root.c_str());
+        app_root = vtkPSystemTools::CollapseFullPath(app_root.c_str());
         vtkPythonAppInitPrependPythonPath(app_root + "/Contents/Libraries");
         vtkPythonAppInitPrependPythonPath(app_root + "/Contents/Python");
         }
@@ -291,7 +292,7 @@ namespace
     // Determine if running from build or install dir.
     //    If SELF_DIR/../ParaViewConfig.cmake, it must be running from the build
     //    directory.
-    bool is_build_dir = vtksys::SystemTools::FileExists(
+    bool is_build_dir = vtkPSystemTools::FileExists(
       (SELF_DIR + "/../ParaViewConfig.cmake").c_str());
     if (is_build_dir)
       {

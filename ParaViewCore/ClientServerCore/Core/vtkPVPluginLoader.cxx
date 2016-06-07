@@ -17,6 +17,7 @@
 #include "vtkDynamicLoader.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPDirectory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
 #include "vtkPVOptions.h"
@@ -28,7 +29,6 @@
 
 #include <string>
 #include <vtksys/SystemTools.hxx>
-#include <vtksys/Directory.hxx>
 #include <sstream>
 
 #include <cstdlib>
@@ -247,8 +247,7 @@ vtkPVPluginLoader::vtkPVPluginLoader()
   vtkPVOptions* opt = pm ? pm->GetOptions() : NULL;
   if(opt)
     {
-    const char* path = opt->GetApplicationPath();
-    vtksys::String appDir = vtksys::SystemTools::GetProgramPath(path);
+    std::string appDir = vtkProcessModule::GetProcessModule()->GetSelfDir();
     if(appDir.size())
       {
       appDir += "/plugins";
@@ -335,23 +334,23 @@ void vtkPVPluginLoader::LoadPluginsFromPluginConfigFile()
 void vtkPVPluginLoader::LoadPluginsFromPath(const char* path)
 {
   vtkPVPluginLoaderDebugMacro("Loading plugins in Path: " << path);
-  vtksys::Directory dir;
-  if (dir.Load(path) == false)
+  vtkNew<vtkPDirectory> dir;
+  if (dir->Load(path) == false)
     {
     vtkPVPluginLoaderDebugMacro("Invalid directory: " << path);
     return;
     }
 
-  for (unsigned int cc=0; cc < dir.GetNumberOfFiles(); cc++)
+  for (vtkIdType cc=0; cc < dir->GetNumberOfFiles(); cc++)
     {
     std::string ext =
-      vtksys::SystemTools::GetFilenameLastExtension(dir.GetFile(cc));
+      vtksys::SystemTools::GetFilenameLastExtension(dir->GetFile(cc));
     if (ext == ".so" || ext == ".dll" || ext == ".xml" || ext == ".dylib" ||
         ext == ".xml" || ext == ".sl")
       {
-      std::string file = dir.GetPath();
+      std::string file = dir->GetPath();
       file += "/";
-      file += dir.GetFile(cc);
+      file += dir->GetFile(cc);
       this->LoadPluginSilently(file.c_str());
       }
     }
