@@ -81,13 +81,10 @@ include(CMakeDependentOption)
 # Setup ParaView Environment
 #------------------------------------------------------------------------------
 # Determine ParaView Source Version
-set (PARAVIEW_VERSION_MAJOR 5)
-set (PARAVIEW_VERSION_MINOR 0)
-set (PARAVIEW_VERSION_PATCH 1)
-set (PARAVIEW_VERSION_PATCH_EXTRA)
-set (PARAVIEW_VERSION "5.0")
-set (PARAVIEW_VERSION_FULL "5.0.1")
-
+# Hardcoded version variables are readin from a separate file. This makes it
+# easier to have a script to update version numbers automatically.
+file(STRINGS version.txt version_txt)
+extract_version_components("${version_txt}" "PARAVIEW")
 determine_version(${ParaView_SOURCE_DIR} ${GIT_EXECUTABLE} "PARAVIEW")
 
 # Setup some cross compiling related things.
