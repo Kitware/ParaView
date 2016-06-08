@@ -137,18 +137,7 @@ pqSpherePropertyWidget::~pqSpherePropertyWidget()
 //-----------------------------------------------------------------------------
 void pqSpherePropertyWidget::placeWidget()
 {
-  vtkBoundingBox bbox = this->dataBounds();
-  if (!bbox.IsValid())
-    {
-    return;
-    }
-
-  vtkSMProxy* wdgProxy = this->widgetProxy();
-
-  double bds[6];
-  bbox.GetBounds(bds);
-  vtkSMPropertyHelper(wdgProxy, "PlaceWidget").Set(bds, 6);
-  wdgProxy->UpdateVTKObjects();
+  // nothing to do.
 }
 
 //-----------------------------------------------------------------------------

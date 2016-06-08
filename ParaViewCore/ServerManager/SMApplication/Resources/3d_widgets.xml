@@ -211,6 +211,7 @@
           <Property name="RadiusInfo" />
           <Property name="HandleVisibility" />
           <Property name="RadialLine" />
+          <Property name="CenterCursor" />
           <Property name="HandleDirection" />
         </ExposedProperties>
       </SubProxy>
@@ -948,6 +949,14 @@
         <BooleanDomain name="bool" />
         <Documentation>Enable/disable a radial line segment that joins the
         center of the outer sphere and the handle.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetCenterCursor"
+                         default_values="1"
+                         name="CenterCursor"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/disable a cursor that is shown at the
+        center of the sphere.</Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty default_values="0 0 1"
                             name="HandleDirection"
