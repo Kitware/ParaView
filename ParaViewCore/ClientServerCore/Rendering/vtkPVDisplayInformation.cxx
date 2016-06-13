@@ -61,7 +61,6 @@ bool vtkPVDisplayInformation::CanOpenDisplayLocally()
     {
     return vtkPVDisplayInformation::GlobalCanOpenDisplayLocally == 1;
     }
-  vtkPVDisplayInformation::GlobalCanOpenDisplayLocally = 0;
   vtkPVOptions* options = vtkProcessModule::GetProcessModule()?
     vtkProcessModule::GetProcessModule()->GetOptions() : NULL;
   if (options && options->GetDisableXDisplayTests() == 0)
@@ -73,6 +72,7 @@ bool vtkPVDisplayInformation::CanOpenDisplayLocally()
       vtkPVDisplayInformation::GlobalCanOpenDisplayLocally = 1;
       return true;
       }
+    vtkPVDisplayInformation::GlobalCanOpenDisplayLocally = 0;
     return false;
     }
 #endif
