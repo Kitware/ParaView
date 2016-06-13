@@ -44,6 +44,10 @@ public:
   // Get the location of the application bundle.
   std::string GetBundleDirectory();
 
+  // Description:
+  // Get the location of the current user's Downloads directory.
+  std::string GetDownloadsDirectory();
+
 protected:
   vtkPVMacFileInformationHelper();
   virtual ~vtkPVMacFileInformationHelper();

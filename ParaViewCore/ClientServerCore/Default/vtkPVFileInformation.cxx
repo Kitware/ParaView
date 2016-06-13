@@ -597,6 +597,14 @@ void vtkPVFileInformation::GetSpecialDirectories()
     info->SetName("Documents");
     info->Type = DIRECTORY;
     this->Contents->AddItem(info);
+
+    // Downloads directory
+    std::string downloads = helper->GetDownloadsDirectory();
+    info = vtkSmartPointer<vtkPVFileInformation>::New();
+    info->SetFullPath(downloads.c_str());
+    info->SetName("Downloads");
+    info->Type = DIRECTORY;
+    this->Contents->AddItem(info);
     }
 
     // Get the mounted volumes

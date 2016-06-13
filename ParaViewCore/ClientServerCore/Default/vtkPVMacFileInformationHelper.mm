@@ -72,6 +72,22 @@ std::string vtkPVMacFileInformationHelper::GetBundleDirectory()
 }
 
 //-----------------------------------------------------------------------------
+std::string vtkPVMacFileInformationHelper::GetDownloadsDirectory()
+{
+  std::string downloadsDirectory;
+  NSArray* urls = [[NSFileManager defaultManager]
+                    URLsForDirectory:NSDownloadsDirectory
+                    inDomains:NSUserDomainMask];
+  for (NSURL *url in urls)
+    {
+    NSString* path = [url path];
+    downloadsDirectory = [path UTF8String];
+    }
+
+  return downloadsDirectory;
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVMacFileInformationHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
