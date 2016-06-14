@@ -182,21 +182,19 @@ void pqProgressManager::setEnableProgress(bool enable)
 
   if (enable)
   {
-    if (this->ProgressCount == 0)
+    if (this->ProgressCount++ == 0)
     {
       this->EnableProgress = true;
       emit this->enableProgress(true);
     }
-    this->ProgressCount++;
   }
   else
   {
-    if (this->ProgressCount == 1)
+    if (--this->ProgressCount == 0)
     {
       this->EnableProgress = false;
       emit this->enableProgress(false);
     }
-    this->ProgressCount--;
   }
 }
 
