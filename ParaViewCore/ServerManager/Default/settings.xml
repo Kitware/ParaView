@@ -423,6 +423,18 @@
           Internal setting: automatically color by **vtkBlockColors** if array is present.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty name="IgnoreNegativeLogAxisWarning"
+        command="SetIgnoreNegativeLogAxisWarning"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When plotting data with nonpositive values using logarithmic axes, ignore the
+	  standard warning and draw only the data with positive values. Changes will take
+	  effect for all charts created after this option is changed.
+        </Documentation>
+      </IntVectorProperty>
 
       <PropertyGroup label="General Options">
         <Property name="ShowWelcomeDialog" />
@@ -480,6 +492,7 @@
         <Property name="InheritRepresentationProperties" />
         <Property name="DefaultTimeStep" />
         <Property name="MaximumNumberOfDataRepresentationLabels" />
+        <Property name="IgnoreNegativeLogAxisWarning" />
       </PropertyGroup>
       <Hints>
         <UseDocumentationForLabels />

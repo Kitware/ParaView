@@ -38,6 +38,8 @@
 #include <sstream>
 #include <string>
 
+bool vtkPVXYChartView::IgnoreNegativeLogAxisWarning = false;
+
 class vtkPVXYChartView::vtkInternals
 {
 public:
@@ -164,17 +166,31 @@ void vtkPVXYChartView::SetChartType(const char* type)
       this->Chart->SetAnnotationLink(annLink.GetPointer());
     }
 
-    // Set up a warning for when log-scaling is requested on negative values
-    this->LogScaleWarningLabel = vtkChartWarning::New();
-    this->LogScaleWarningLabel->SetLabel("WARNING!\n"
-                                         "One or more plot series crosses or contains\n"
-                                         "an axis origin. Use the View Options menu to\n"
-                                         "turn off log-scaling or specify a valid axis\n"
-                                         "range; or scroll the view; or remove the line\n"
-                                         "series from the chart in the Properties Tab.");
-    this->LogScaleWarningLabel->SetVisible(1);
-    this->LogScaleWarningLabel->SetDimensions(150, 150, 150, 150);
-    this->Chart->AddItem(this->LogScaleWarningLabel);
+    bool warning = true;
+    if (vtkPVXYChartView::IgnoreNegativeLogAxisWarning == true)
+    {
+      vtkChartXY* chartXY = vtkChartXY::SafeDownCast(this->Chart);
+      if (chartXY)
+      {
+        warning = false;
+        chartXY->AdjustLowerBoundForLogPlotOn();
+      }
+    }
+
+    if (warning)
+    {
+      // Set up a warning for when log-scaling is requested on negative values
+      this->LogScaleWarningLabel = vtkChartWarning::New();
+      this->LogScaleWarningLabel->SetLabel("WARNING!\n"
+                                           "One or more plot series crosses or contains\n"
+                                           "an axis origin. Use the View Options menu to\n"
+                                           "turn off log-scaling or specify a valid axis\n"
+                                           "range; or scroll the view; or remove the line\n"
+                                           "series from the chart in the Properties Tab.");
+      this->LogScaleWarningLabel->SetVisible(1);
+      this->LogScaleWarningLabel->SetDimensions(150, 150, 150, 150);
+      this->Chart->AddItem(this->LogScaleWarningLabel);
+    }
 
     // setup default mouse actions
     this->Chart->SetActionToButton(vtkChart::PAN, vtkContextMouseEvent::LEFT_BUTTON);

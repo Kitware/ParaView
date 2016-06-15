@@ -7,6 +7,7 @@ vtk_module(vtkPVServerManagerDefault
     vtkRenderingVolumeOpenGL2
     vtkTestingRendering
     vtkPVClientServerCoreDefault
+    vtkPVClientServerCoreRendering
   TEST_DEPENDS
     vtkPVServerManagerApplication
     vtkTestingRendering

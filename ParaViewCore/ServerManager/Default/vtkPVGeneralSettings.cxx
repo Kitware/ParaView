@@ -16,6 +16,7 @@
 
 #include "vtkCacheSizeKeeper.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVXYChartView.h"
 #include "vtkProcessModuleAutoMPI.h"
 #include "vtkSISourceProxy.h"
 #include "vtkSMArraySelectionDomain.h"
@@ -148,6 +149,22 @@ void vtkPVGeneralSettings::SetAnimationGeometryCacheLimit(unsigned long val)
     this->AnimationGeometryCacheLimit = val;
     this->Modified();
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeneralSettings::SetIgnoreNegativeLogAxisWarning(bool val)
+{
+  if (vtkPVXYChartView::GetIgnoreNegativeLogAxisWarning() != val)
+  {
+    vtkPVXYChartView::SetIgnoreNegativeLogAxisWarning(val);
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVGeneralSettings::GetIgnoreNegativeLogAxisWarning()
+{
+  return vtkPVXYChartView::GetIgnoreNegativeLogAxisWarning();
 }
 
 //----------------------------------------------------------------------------

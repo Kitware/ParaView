@@ -200,6 +200,12 @@ public:
    */
   void SetInheritRepresentationProperties(bool val);
 
+  // Description:
+  // When plotting data with nonpositive values, ignore the standard warning
+  // and draw only the data with positive values.
+  void SetIgnoreNegativeLogAxisWarning(bool val);
+  bool GetIgnoreNegativeLogAxisWarning();
+
   enum
   {
     ALL_IN_ONE = 0,
