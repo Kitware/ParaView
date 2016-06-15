@@ -2465,7 +2465,7 @@
       <DoubleVectorProperty
           name="LightScale"
           command="SetLightScale"
-          default_values="0.5"
+          default_values="1.0"
           animateable="0"
           number_of_elements="1">
         <DoubleRangeDomain
