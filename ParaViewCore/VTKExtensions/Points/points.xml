@@ -382,7 +382,7 @@
   <ProxyGroup name="filters">
 
     <!-- =================================================================== -->
-    <SourceProxy name="SPHInterpolator" class="vtkSPHInterpolator"
+    <SourceProxy name="SPHInterpolatorBase" class="vtkSPHInterpolator"
                  label="SPH Interpolator"
                  multiprocess_support="single_process">
       <Documentation>
@@ -487,24 +487,6 @@
         <Property name="ExcludedArrays" />
         <Property name="DerivativeArrays" />
       </PropertyGroup>
-
-      <InputProperty command="SetInputConnection"
-                     name="Source"
-                     port_index="0">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkDataSet" />
-        </DataTypeDomain>
-        <ProxyListDomain name="proxy_list">
-          <Proxy group="extended_sources" name="BoundedPlaneSource" />
-          <Proxy group="extended_sources" name="BoundedVolumeSource" />
-          <Proxy group="extended_sources" name="HighResLineSource" />
-        </ProxyListDomain>
-        <Documentation>The data source that provides the structure to be interpolated on.</Documentation>
-      </InputProperty>
 
       <ProxyProperty name="Kernel" command="SetKernel">
         Specify an interpolation kernel. The interpolation kernel changes the basis of the
@@ -640,7 +622,103 @@
     </SourceProxy>
 
     <!-- =================================================================== -->
-    <SourceProxy name="PointInterpolator" class="vtkPointInterpolator"
+    <SourceProxy name="SPHLineInterpolator" class="vtkSPHInterpolator"
+                 label="SPH Line Interpolator"
+                 multiprocess_support="single_process"
+                 base_proxygroup="filters"
+                 base_proxyname="SPHInterpolatorBase">
+      <Documentation>
+        This filter uses SPH (smooth particle hydrodynamics) kernels to
+        interpolate a data source onto an input structure. For example, while the
+        data source is a set of particles, the data from these particles can be
+        interpolated onto an input line. Then
+        the output (which consists of the input structure plus interpolated data)
+        can then be visualized using classical visualization techniques such as
+        isocontouring, slicing, heat maps and so on.
+      </Documentation>
+      <InputProperty command="SetInputConnection" name="Source" port_index="0">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="extended_sources" name="HighResLineSource" />
+        </ProxyListDomain>
+        <Documentation>The data source that provides the structure to be interpolated on.</Documentation>
+      </InputProperty>
+      <Hints>
+        <View type="XYChartView" />
+        <Plotable />
+      </Hints>
+    </SourceProxy>
+
+    <!-- =================================================================== -->
+    <SourceProxy name="SPHPlaneInterpolator" class="vtkSPHInterpolator"
+                 label="SPH Plane Interpolator"
+                 multiprocess_support="single_process"
+                 base_proxygroup="filters"
+                 base_proxyname="SPHInterpolatorBase">
+      <Documentation>
+        This filter uses SPH (smooth particle hydrodynamics) kernels to
+        interpolate a data source onto an input structure. For example, while the
+        data source is a set of particles, the data from these particles can be
+        interpolated onto an input plane. Then
+        the output (which consists of the input structure plus interpolated data)
+        can then be visualized using classical visualization techniques such as
+        isocontouring, slicing, heat maps and so on.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection" name="Source" port_index="0">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="extended_sources" name="BoundedPlaneSource" />
+        </ProxyListDomain>
+        <Documentation>The data source that provides the structure to be interpolated on.</Documentation>
+      </InputProperty>
+    </SourceProxy>
+
+    <!-- =================================================================== -->
+    <SourceProxy name="SPHVolumeInterpolator" class="vtkSPHInterpolator"
+                 label="SPH Volume Interpolator"
+                 multiprocess_support="single_process"
+                 base_proxygroup="filters"
+                 base_proxyname="SPHInterpolatorBase">
+      <Documentation>
+        This filter uses SPH (smooth particle hydrodynamics) kernels to
+        interpolate a data source onto an input structure. For example, while the
+        data source is a set of particles, the data from these particles can be
+        interpolated onto an input volume. Then
+        the output (which consists of the input structure plus interpolated data)
+        can then be visualized using classical visualization techniques such as
+        isocontouring, slicing, heat maps and so on.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection" name="Source" port_index="0">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="extended_sources" name="BoundedVolumeSource" />
+        </ProxyListDomain>
+        <Documentation>The data source that provides the structure to be interpolated on.</Documentation>
+      </InputProperty>
+    </SourceProxy>
+
+    <!-- =================================================================== -->
+    <SourceProxy name="PointInterpolatorBase" class="vtkPointInterpolator"
       label="Point Interpolator"
       multiprocess_support="single_process">
       <Documentation>
@@ -666,24 +744,6 @@
         <InputArrayDomain attribute_type="point" name="point_scalars" number_of_components="1" />
         <InputArrayDomain attribute_type="point" name="point_arrays" />
         <Documentation>The data source to be interpolated onto the *Source*.</Documentation>
-      </InputProperty>
-
-      <InputProperty command="SetInputConnection"
-                     name="Source"
-                     port_index="0">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkDataSet" />
-        </DataTypeDomain>
-        <ProxyListDomain name="proxy_list">
-          <Proxy group="extended_sources" name="BoundedPlaneSource" />
-          <Proxy group="extended_sources" name="BoundedVolumeSource" />
-          <Proxy group="extended_sources" name="HighResLineSource" />
-        </ProxyListDomain>
-        <Documentation>The data source that provides the structure to be interpolated on.</Documentation>
       </InputProperty>
 
       <ProxyProperty name="Kernel" command="SetKernel">
@@ -797,6 +857,101 @@
           <Proxy group="point_locators" name="StaticPointLocator" />
         </ProxyListDomain>
       </ProxyProperty>
+    </SourceProxy>
+
+    <!-- =================================================================== -->
+    <SourceProxy name="PointLineInterpolator" class="vtkPointInterpolator"
+                 label="Point Line Interpolator"
+                 multiprocess_support="single_process"
+                 base_proxygroup="filters"
+                 base_proxyname="PointInterpolatorBase">
+      <Documentation>
+        This probes a point cloud `PC` on the *Input* with a
+        set of points `P` (the filter *Source*), interpolating the data values from `PC`
+        onto `P`. Note however that the descriptive phrase "point cloud" is a
+        misnomer: PC can be represented by any dataset type, with the points of
+        the dataset forming PC. Similary, the output P can also be represented by
+        any vtkDataSet type; and the topology/geometry structure of P is passed
+        through to the output along with the newly interpolated arrays.
+      </Documentation>
+      <InputProperty command="SetInputConnection" name="Source" port_index="0">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="extended_sources" name="HighResLineSource" />
+        </ProxyListDomain>
+        <Documentation>The data source that provides the structure to be interpolated on.</Documentation>
+      </InputProperty>
+      <Hints>
+        <View type="XYChartView" />
+        <Plotable />
+      </Hints>
+    </SourceProxy>
+
+    <!-- =================================================================== -->
+    <SourceProxy name="PointPlaneInterpolator" class="vtkPointInterpolator"
+                 label="Point Plane Interpolator"
+                 multiprocess_support="single_process"
+                 base_proxygroup="filters"
+                 base_proxyname="PointInterpolatorBase">
+      <Documentation>
+        This probes a point cloud `PC` on the *Input* with a
+        set of points `P` (the filter *Source*), interpolating the data values from `PC`
+        onto `P`. Note however that the descriptive phrase "point cloud" is a
+        misnomer: PC can be represented by any dataset type, with the points of
+        the dataset forming PC. Similary, the output P can also be represented by
+        any vtkDataSet type; and the topology/geometry structure of P is passed
+        through to the output along with the newly interpolated arrays.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection" name="Source" port_index="0">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="extended_sources" name="BoundedPlaneSource" />
+        </ProxyListDomain>
+        <Documentation>The data source that provides the structure to be interpolated on.</Documentation>
+      </InputProperty>
+    </SourceProxy>
+
+    <!-- =================================================================== -->
+    <SourceProxy name="PointVolumeInterpolator" class="vtkPointInterpolator"
+                 label="Point Volume Interpolator"
+                 multiprocess_support="single_process"
+                 base_proxygroup="filters"
+                 base_proxyname="PointInterpolatorBase">
+      <Documentation>
+        This probes a point cloud `PC` on the *Input* with a
+        set of points `P` (the filter *Source*), interpolating the data values from `PC`
+        onto `P`. Note however that the descriptive phrase "point cloud" is a
+        misnomer: PC can be represented by any dataset type, with the points of
+        the dataset forming PC. Similary, the output P can also be represented by
+        any vtkDataSet type; and the topology/geometry structure of P is passed
+        through to the output along with the newly interpolated arrays.
+      </Documentation>
+      <InputProperty command="SetInputConnection" name="Source" port_index="0">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="extended_sources" name="BoundedVolumeSource" />
+        </ProxyListDomain>
+        <Documentation>The data source that provides the structure to be interpolated on.</Documentation>
+      </InputProperty>
     </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

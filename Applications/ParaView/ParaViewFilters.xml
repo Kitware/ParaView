@@ -119,8 +119,12 @@
   </Category>
 
   <Category name="Point Interpolation" menu_label="Point Interpolation">
-    <Proxy group="filters" name="PointInterpolator" />
-    <Proxy group="filters" name="SPHInterpolator" />
+    <Proxy group="filters" name="PointLineInterpolator" />
+    <Proxy group="filters" name="PointPlaneInterpolator" />
+    <Proxy group="filters" name="PointVolumeInterpolator" />
+    <Proxy group="filters" name="SPHLineInterpolator" />
+    <Proxy group="filters" name="SPHPlaneInterpolator" />
+    <Proxy group="filters" name="SPHVolumeInterpolator" />
   </Category>
 
   <Proxy group="filters" name="AddFieldArrays" />
