@@ -48,14 +48,15 @@ std::vector< vtkPVMacFileInformationHelper::NamePath > vtkPVMacFileInformationHe
   NSArray *urls = [[NSFileManager defaultManager]
                     mountedVolumeURLsIncludingResourceValuesForKeys:@[NSURLVolumeNameKey]
                     options:0];
-  for (NSURL *url in urls) {
+  for (NSURL *url in urls)
+    {
     NSString* path = [url path];
     std::string pathStr([path UTF8String]);
     NSString *name = nil;
     [url getResourceValue:&name forKey:NSURLLocalizedNameKey error:NULL];
     std::string nameStr([name UTF8String]);
     volumes.push_back(std::make_pair(nameStr, pathStr));
-  }
+    }
 
   return volumes;
 }
