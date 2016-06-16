@@ -584,27 +584,36 @@ void vtkPVFileInformation::GetSpecialDirectories()
 
     // Desktop directory
     std::string desktop = helper->GetDesktopDirectory();
-    info = vtkSmartPointer<vtkPVFileInformation>::New();
-    info->SetFullPath(desktop.c_str());
-    info->SetName("Desktop");
-    info->Type = DIRECTORY;
-    this->Contents->AddItem(info);
+    if (desktop.size() > 0)
+      {
+      info = vtkSmartPointer<vtkPVFileInformation>::New();
+      info->SetFullPath(desktop.c_str());
+      info->SetName("Desktop");
+      info->Type = DIRECTORY;
+      this->Contents->AddItem(info);
+      }
 
     // Documents directory
     std::string documents = helper->GetDocumentsDirectory();
-    info = vtkSmartPointer<vtkPVFileInformation>::New();
-    info->SetFullPath(documents.c_str());
-    info->SetName("Documents");
-    info->Type = DIRECTORY;
-    this->Contents->AddItem(info);
+    if (documents.size() > 0)
+      {
+      info = vtkSmartPointer<vtkPVFileInformation>::New();
+      info->SetFullPath(documents.c_str());
+      info->SetName("Documents");
+      info->Type = DIRECTORY;
+      this->Contents->AddItem(info);
+      }
 
     // Downloads directory
     std::string downloads = helper->GetDownloadsDirectory();
-    info = vtkSmartPointer<vtkPVFileInformation>::New();
-    info->SetFullPath(downloads.c_str());
-    info->SetName("Downloads");
-    info->Type = DIRECTORY;
-    this->Contents->AddItem(info);
+    if (downloads.size() > 0)
+      {
+      info = vtkSmartPointer<vtkPVFileInformation>::New();
+      info->SetFullPath(downloads.c_str());
+      info->SetName("Downloads");
+      info->Type = DIRECTORY;
+      this->Contents->AddItem(info);
+      }
     }
 
     // Get the mounted volumes

@@ -45,15 +45,18 @@ public:
   std::string GetBundleDirectory();
 
   // Description:
-  // Get the location of the user's Desktop directory
+  // Get the location of the user's Desktop directory.
+  // Empty return string means the directory does not exist.
   std::string GetDesktopDirectory();
 
   // Description:
-  // Get the location of the user's Documents directory
+  // Get the location of the user's Documents directory.
+  // Empty return string means the directory does not exist.
   std::string GetDocumentsDirectory();
 
   // Description:
   // Get the location of the current user's Downloads directory.
+ // Empty return string means the directory does not exist.
   std::string GetDownloadsDirectory();
 
 protected:

@@ -82,10 +82,20 @@ std::string GetUserDomainDirectory(NSSearchPathDirectory userDirectory)
   for (NSURL *url in urls)
     {
     NSString* path = [url path];
-    directory = [path UTF8String];
 
-    // There should be at most one such user directory, so exit early
-    break;
+    // Double check that directory exists
+    BOOL isDirectory = false;
+    BOOL exists = [[NSFileManager defaultManager]
+                    fileExistsAtPath:path
+                    isDirectory:&isDirectory];
+
+    if (exists && isDirectory)
+      {
+      directory = [path UTF8String];\
+
+      // There should be at most one such user directory, so exit early
+      break;
+      }
     }
 
   return directory;
