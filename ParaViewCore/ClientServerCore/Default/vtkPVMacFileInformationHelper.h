@@ -45,6 +45,14 @@ public:
   std::string GetBundleDirectory();
 
   // Description:
+  // Get the location of the user's Desktop directory
+  std::string GetDesktopDirectory();
+
+  // Description:
+  // Get the location of the user's Documents directory
+  std::string GetDocumentsDirectory();
+
+  // Description:
   // Get the location of the current user's Downloads directory.
   std::string GetDownloadsDirectory();
 

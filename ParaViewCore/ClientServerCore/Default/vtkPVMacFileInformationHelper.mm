@@ -72,19 +72,43 @@ std::string vtkPVMacFileInformationHelper::GetBundleDirectory()
 }
 
 //-----------------------------------------------------------------------------
-std::string vtkPVMacFileInformationHelper::GetDownloadsDirectory()
+namespace {
+std::string GetUserDomainDirectory(NSSearchPathDirectory userDirectory)
 {
-  std::string downloadsDirectory;
+  std::string directory;
   NSArray* urls = [[NSFileManager defaultManager]
-                    URLsForDirectory:NSDownloadsDirectory
+                    URLsForDirectory:userDirectory
                     inDomains:NSUserDomainMask];
   for (NSURL *url in urls)
     {
     NSString* path = [url path];
-    downloadsDirectory = [path UTF8String];
+    directory = [path UTF8String];
+
+    // There should be at most one such user directory, so exit early
+    break;
     }
 
-  return downloadsDirectory;
+  return directory;
+}
+
+} // end anonymous namespace
+
+//-----------------------------------------------------------------------------
+std::string vtkPVMacFileInformationHelper::GetDesktopDirectory()
+{
+  return GetUserDomainDirectory(NSDesktopDirectory);
+}
+
+//-----------------------------------------------------------------------------
+std::string vtkPVMacFileInformationHelper::GetDocumentsDirectory()
+{
+  return GetUserDomainDirectory(NSDocumentDirectory);
+}
+
+//-----------------------------------------------------------------------------
+std::string vtkPVMacFileInformationHelper::GetDownloadsDirectory()
+{
+  return GetUserDomainDirectory(NSDownloadsDirectory);
 }
 
 //-----------------------------------------------------------------------------

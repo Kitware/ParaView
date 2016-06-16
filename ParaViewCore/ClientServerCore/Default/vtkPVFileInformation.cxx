@@ -583,7 +583,7 @@ void vtkPVFileInformation::GetSpecialDirectories()
     this->Contents->AddItem(info);
 
     // Desktop directory
-    std::string desktop = homeDirectory + "/Desktop";
+    std::string desktop = helper->GetDesktopDirectory();
     info = vtkSmartPointer<vtkPVFileInformation>::New();
     info->SetFullPath(desktop.c_str());
     info->SetName("Desktop");
@@ -591,7 +591,7 @@ void vtkPVFileInformation::GetSpecialDirectories()
     this->Contents->AddItem(info);
 
     // Documents directory
-    std::string documents = homeDirectory + "/Documents";
+    std::string documents = helper->GetDocumentsDirectory();
     info = vtkSmartPointer<vtkPVFileInformation>::New();
     info->SetFullPath(documents.c_str());
     info->SetName("Documents");
