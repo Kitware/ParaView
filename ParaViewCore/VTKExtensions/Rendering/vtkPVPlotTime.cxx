@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPVPlotTime.h"
 
+#include "vtkAxis.h"
 #include "vtkContext2D.h"
 #include "vtkObjectFactory.h"
 #include "vtkPen.h"
@@ -44,20 +45,21 @@ bool vtkPVPlotTime::Paint(vtkContext2D *painter)
   painter->ApplyPen(this->GetPen());
   if (this->TimeAxisMode == X_AXIS)
     {
-    // using float max and min for some reason ends up with nothing showing for
-    // small scaled plots.
-    // BUG #13311: Drawing a single line from -1e30 to +1e30 causes the line
-    // segment to end up missing sections. Drawing as segments overcomes the
-    // problem.
-    painter->DrawLine(this->Time, -1.0e+30f, this->Time, -100);
-    painter->DrawLine(this->Time, -100, this->Time, 100);
-    painter->DrawLine(this->Time, 100, this->Time, 1.0e+30f);
+    if (vtkAxis* axis = this->GetYAxis())
+      {
+      double range[2];
+      axis->GetRange(range);
+      painter->DrawLine(this->Time, range[0], this->Time, range[1]);
+      }
     }
   else
     {
-    painter->DrawLine(-1.0e+30f, this->Time, -100, this->Time);
-    painter->DrawLine(-100, this->Time, 100, this->Time);
-    painter->DrawLine(100, this->Time, 1.0e+30f, this->Time);
+    if (vtkAxis* axis = this->GetXAxis())
+      {
+      double range[2];
+      axis->GetRange(range);
+      painter->DrawLine(range[0], this->Time, range[1], this->Time);
+      }
     }
   return true;
 }
