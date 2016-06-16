@@ -14,21 +14,21 @@
 =========================================================================*/
 #include "vtkPVSynchronizedRenderer.h"
 
-#include "vtkCameraPass.h"
-#include "vtkImageProcessingPass.h"
-
 #include "vtkBoundingBox.h"
+#include "vtkCameraPass.h"
 #include "vtkCaveSynchronizedRenderers.h"
+#include "vtkImageProcessingPass.h"
 #include "vtkObjectFactory.h"
+#include "vtkOpenGLRenderer.h"
 #include "vtkProcessModule.h"
 #include "vtkPVClientServerSynchronizedRenderers.h"
 #include "vtkPVConfig.h"
 #include "vtkPVDefaultPass.h"
 #include "vtkPVOptions.h"
+#include "vtkPVRenderViewSettings.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVSession.h"
 #include "vtkRenderer.h"
-#include "vtkOpenGLRenderer.h"
 #include "vtkSocketController.h"
 
 #if defined PARAVIEW_USE_ICE_T && defined PARAVIEW_USE_MPI
@@ -51,7 +51,7 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
   this->Mode = INVALID;
   this->CSSynchronizer = 0;
   this->ParallelSynchronizer = 0;
-  this->DisableIceT = false;
+  this->DisableIceT = vtkPVRenderViewSettings::GetInstance()->GetDisableIceT();
   this->DataReplicatedOnAllProcesses = false;
 }
 
