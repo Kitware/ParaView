@@ -1214,7 +1214,9 @@ bool pqProxyWidget::filterWidgets(bool show_advanced, const QString& filterText)
     show_advanced = true;
     }
 
-  this->hide();
+  // disable updates to avoid flicker
+  bool prevUE = this->updatesEnabled();
+  this->setUpdatesEnabled(false);
 
   delete this->layout();
   QVBoxLayout* vboxLayout = NULL;
@@ -1275,8 +1277,7 @@ bool pqProxyWidget::filterWidgets(bool show_advanced, const QString& filterText)
       item->hide();
       }
     }
-
-  this->show();
+  this->setUpdatesEnabled(prevUE);
   return (prevItem != NULL);
 }
 
