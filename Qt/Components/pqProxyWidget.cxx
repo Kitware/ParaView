@@ -744,6 +744,7 @@ vtkSMProxy* pqProxyWidget::proxy() const
 //-----------------------------------------------------------------------------
 void pqProxyWidget::showEvent(QShowEvent *sevent)
 {
+  this->Superclass::showEvent(sevent);
   if (sevent ==NULL || !sevent->spontaneous())
     {
     foreach (const pqProxyWidgetItem* item, this->Internals->Items)
@@ -759,10 +760,11 @@ void pqProxyWidget::hideEvent(QHideEvent *hevent)
   if (hevent == NULL || !hevent->spontaneous())
     {
     foreach (const pqProxyWidgetItem* item, this->Internals->Items)
-  {
+      {
       item->deselect();
       }
     }
+  this->Superclass::hideEvent(hevent);
 }
 
 //-----------------------------------------------------------------------------
