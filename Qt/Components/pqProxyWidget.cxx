@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqStandardLegacyCustomPanels.h"
 #include "pqStringVectorPropertyWidget.h"
+#include "pqTimer.h"
 
 #include "vtkCollection.h"
 #include "vtkNew.h"
@@ -539,6 +540,7 @@ public:
   QString CachedFilterText;
   vtkStringList* Properties;
   QPointer<QLabel> ProxyDocumentationLabel; // used when showProxyDocumentationInPanel is true.
+  pqTimer RequestUpdatePanel;
 
   pqInternals(vtkSMProxy* smproxy, QStringList properties):
     Proxy(smproxy), CachedShowAdvanced(false)
@@ -584,10 +586,8 @@ public:
     foreach (pqPropertyWidgetDecorator* decorator,
       item->propertyWidget()->decorators())
       {
-      QObject::connect(decorator, SIGNAL(visibilityChanged()),
-        self, SLOT(updatePanel()));
-      QObject::connect(decorator, SIGNAL(enableStateChanged()),
-        self, SLOT(updatePanel()));
+      this->RequestUpdatePanel.connect(decorator, SIGNAL(visibilityChanged()), SLOT(start()));
+      this->RequestUpdatePanel.connect(decorator, SIGNAL(enableStateChanged()), SLOT(start()));
       }
     }
 };
@@ -625,6 +625,9 @@ void pqProxyWidget::constructor(
   this->Internals->ProxyDocumentationLabel = new QLabel(this);
   this->Internals->ProxyDocumentationLabel->hide();
   this->Internals->ProxyDocumentationLabel->setWordWrap(true);
+  this->Internals->RequestUpdatePanel.setInterval(0);
+  this->Internals->RequestUpdatePanel.setSingleShot(true);
+  this->connect(&this->Internals->RequestUpdatePanel, SIGNAL(timeout()), SLOT(updatePanel()));
 
   QGridLayout* gridLayout = new QGridLayout(this);
   gridLayout->setMargin(pqPropertiesPanel::suggestedMargin());
