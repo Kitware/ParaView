@@ -1,3 +1,19 @@
+#=============================================================================
+# Copyright 2015-2016 Kitware, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#=============================================================================
+
 ########################################################################
 # Script for updating third party packages.
 #
@@ -32,7 +48,7 @@
 # Utility functions
 ########################################################################
 git_archive () {
-    git archive --prefix="$name-reduced/" HEAD -- $paths | \
+    git archive --worktree-attributes --prefix="$name-reduced/" HEAD -- $paths | \
         tar -C "$extractdir" -x
 }
 
@@ -85,6 +101,7 @@ if [ -n "$basehash" ]; then
     # Clear out the working tree
     pushd "$extractdir"
     git ls-files | xargs rm -v
+    find . -type d -empty -delete
     popd
 else
     # Create a repo to hold this package's history
@@ -138,8 +155,14 @@ popd
 if [ -n "$basehash" ]; then
     git merge --log -s recursive "-Xsubtree=$subtree/" --no-commit "upstream-$name"
 else
+    unrelated_histories_flag=""
+    if git merge --help | grep -q -e allow-unrelated-histories; then
+        unrelated_histories_flag="--allow-unrelated-histories "
+    fi
+    readonly unrelated_histories_flag
+
     git fetch "$extractdir" "upstream-$name:upstream-$name"
-    git merge --log -s ours --no-commit "upstream-$name"
+    git merge --log -s ours --no-commit $unrelated_histories_flag "upstream-$name"
     git read-tree -u --prefix="$subtree/" "upstream-$name"
 fi
 git commit --no-edit
