@@ -268,7 +268,6 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/Plot3DReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PlotEdges2.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PlotEdges.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/PlotMatrixViewArraySelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PlotOverTimeAutoApply.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PolygonCellSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PolygonPointSelection.xml
@@ -352,10 +351,13 @@ if(NOT APPLE)
     )
 endif()
 
-# This test makes use of "Point Gaussian" representation, only available with OpenGL2
 if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
   list(APPEND TESTS_WITH_BASELINES
+    # This test makes use of "Point Gaussian" representation, only available with OpenGL2
     ${CMAKE_CURRENT_SOURCE_DIR}/BackgroundColorCheck.xml
+
+    # PlotMatrixView is bugging in OpenGL1
+    ${CMAKE_CURRENT_SOURCE_DIR}/PlotMatrixViewArraySelection.xml
     )
 endif()
 
