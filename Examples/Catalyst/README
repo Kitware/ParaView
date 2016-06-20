@@ -44,9 +44,14 @@ correctness of outputs. A description of the examples are:
 * CxxMappedDataArrayExample -- An example of an adaptor where we use VTK mapped
                                arrays to map simulation data structures to
                                VTK data arrays to save on memory use by Catalyst.
+                               Note that this example is deprecated as of
+                               ParaView 5.1 in favor of the CxxSOADataArrayExample.
 * MPISubCommunicatorExample -- An example where only a subset of the MPI
                                processes are used for the simulation and Catalyst.
 * CxxParticlePathExample -- An example for computing particle paths in situ.
+* CxxSOADataArrayExample -- An example of an adaptor where we use
+                            vtkSOADataArrayTemplate to reuse simulation memory
+                            for VTK field arrays.
 
 Other objects of interest:
 * LICENSE.md -- The license of this software.
