@@ -8,12 +8,12 @@ Show()
 clip = Clip()
 clip.ClipType = "Cylinder"
 clip.InsideOut = True
-Show()
 
 cylinder = clip.ClipType
 cylinder.Axis = [-1, 1, -1]
 cylinder.Center = [8, 4, -3]
 cylinder.Radius = 3
+Show()
 
 Render()
 
