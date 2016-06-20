@@ -27,7 +27,6 @@
 #include "vtkPVInformation.h"
 #include "vtkDataSetAttributes.h" // needed for NUM_ATTRIBUTES
 
-class vtkCollection;
 class vtkDataSetAttributes;
 class vtkFieldData;
 class vtkPVArrayInformation;
@@ -58,13 +57,13 @@ public:
 
   void CopyFromGenericAttributesOnPoints(vtkGenericAttributeCollection *data);
   void CopyFromGenericAttributesOnCells(vtkGenericAttributeCollection *data);
-  
-  
+  void CopyFromGenericAttributes(vtkGenericAttributeCollection *data, int centering);
+
+
   // Description:
   // Intersect information of argument with information currently
   // in this object.  Arrays must be in both
   // (same name and number of components)to be in final.
-  void AddInformation(vtkDataSetAttributes* da);
   void AddInformation(vtkPVDataSetAttributesInformation* info);
   virtual void AddInformation(vtkPVInformation* info);
 
@@ -105,17 +104,16 @@ protected:
   vtkPVDataSetAttributesInformation();
   ~vtkPVDataSetAttributesInformation();
 
-  // Data information collected from remote processes.
-  vtkCollection* ArrayInformation;
   // Standard cell attributes.
-  short          AttributeIndices[vtkDataSetAttributes::NUM_ATTRIBUTES];
   int FieldAssociation;
 
 private:
   bool SortArrays;
-
   vtkPVDataSetAttributesInformation(const vtkPVDataSetAttributesInformation&); // Not implemented
   void operator=(const vtkPVDataSetAttributesInformation&); // Not implemented
+
+  class vtkInternals;
+  vtkInternals* Internals;
 };
 
 #endif
