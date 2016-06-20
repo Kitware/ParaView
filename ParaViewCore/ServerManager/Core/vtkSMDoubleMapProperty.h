@@ -82,6 +82,7 @@ public:
 
   // Description:
   // Returns a new iterator for the map.
+  VTK_NEWINSTANCE
   vtkSMDoubleMapPropertyIterator* NewIterator();
 
   void* GetMapPointer();

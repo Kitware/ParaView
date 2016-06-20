@@ -128,11 +128,13 @@ public:
   // ALL_DEFINITIONS=0 / CORE_DEFINITIONS=1 / CUSTOM_DEFINITIONS=2
   // Some extra restriction can be set directly on the iterator itself
   // by setting a set of GroupName...
+  VTK_NEWINSTANCE
   vtkPVProxyDefinitionIterator* NewIterator()
     {
     return this->ProxyDefinitionManager?
       this->ProxyDefinitionManager->NewIterator() : NULL;
     }
+  VTK_NEWINSTANCE
   vtkPVProxyDefinitionIterator* NewIterator(int scope)
     {
     return this->ProxyDefinitionManager?
