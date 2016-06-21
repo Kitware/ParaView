@@ -14,35 +14,115 @@
 =========================================================================*/
 #include "vtkCompleteArrays.h"
 
+#include "vtkAbstractArray.h"
 #include "vtkCellData.h"
-#include "vtkCharArray.h"
 #include "vtkClientServerStream.h"
-#include "vtkDataArray.h"
-#include "vtkDataSet.h"
-#include "vtkDoubleArray.h"
-#include "vtkFloatArray.h"
-#include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkIntArray.h"
-#include "vtkLongArray.h"
 #include "vtkMultiProcessController.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVArrayInformation.h"
-#include "vtkPVDataInformation.h"
-#include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPointData.h"
 #include "vtkPointSet.h"
-#include "vtkShortArray.h"
-#include "vtkUnsignedCharArray.h"
-#include "vtkUnsignedIntArray.h"
-#include "vtkUnsignedLongArray.h"
-#include "vtkUnsignedShortArray.h"
+#include "vtkPVArrayInformation.h"
+
+
+// this doesn't directly use vtkPVDataSetAttributesInformation since
+// vtkPVDataSetAttributesInformation sorts arrays. We instead explicitly use
+// vtkPVArrayInformation to serialize information about arrays.
+namespace
+{
+  vtkAbstractArray* vtkNewArray(vtkPVArrayInformation* aInfo)
+    {
+    if (vtkAbstractArray* array = vtkAbstractArray::CreateArray(aInfo->GetDataType()))
+      {
+      array->SetNumberOfComponents(aInfo->GetNumberOfComponents());
+      array->SetName(aInfo->GetName());
+      return array;
+      }
+    return NULL;
+    }
+
+  void vtkSerialize(vtkClientServerStream& css, vtkDataSetAttributes* dsa)
+    {
+    int attributeIndices[vtkDataSetAttributes::NUM_ATTRIBUTES];
+    dsa->GetAttributeIndices(attributeIndices);
+
+    css << vtkClientServerStream::Reply
+        << vtkClientServerStream::InsertArray(attributeIndices, vtkDataSetAttributes::NUM_ATTRIBUTES)
+        << dsa->GetNumberOfArrays();
+
+    for (int cc=0, max=dsa->GetNumberOfArrays(); cc < max; ++cc)
+      {
+      vtkNew<vtkPVArrayInformation> arrayInfo;
+      arrayInfo->CopyFromObject(dsa->GetAbstractArray(cc));
+
+      vtkClientServerStream acss;
+      arrayInfo->CopyToStream(&acss);
+
+      const unsigned char* data;
+      size_t length;
+      acss.GetData(&data, &length);
+      css << vtkClientServerStream::InsertArray(data, static_cast<int>(length));
+      }
+
+    css << vtkClientServerStream::End;
+    }
+
+  bool vtkDeserialize(vtkClientServerStream& css, int msgIdx, vtkDataSetAttributes* dsa)
+    {
+    dsa->Initialize();
+
+    int idx=0;
+    int numArrays;
+    int attributeIndices[vtkDataSetAttributes::NUM_ATTRIBUTES];
+
+    if (!css.GetArgument(msgIdx, idx++, attributeIndices, vtkDataSetAttributes::NUM_ATTRIBUTES))
+      {
+      return false;
+      }
+    if (!css.GetArgument(msgIdx, idx++, &numArrays))
+      {
+      return false;
+      }
+    for (int cc=0; cc < numArrays; ++cc)
+      {
+      vtkTypeUInt32 length;
+      if (!css.GetArgumentLength(msgIdx, idx++, &length))
+        {
+        return false;
+        }
+      std::vector<unsigned char> data (length);
+      if (!css.GetArgument(msgIdx, idx++, &data[0], length))
+        {
+        return false;
+        }
+
+      vtkClientServerStream acss;
+      acss.SetData(&*data.begin(), length);
+
+      vtkNew<vtkPVArrayInformation> ai;
+      ai->CopyFromStream(&acss);
+
+      if (vtkAbstractArray* aa = vtkNewArray(ai.Get()))
+        {
+        dsa->AddArray(aa);
+        aa->Delete();
+        }
+      }
+    for (int cc=0; cc < vtkDataSetAttributes::NUM_ATTRIBUTES; ++cc)
+      {
+      if (attributeIndices[cc] != -1)
+        {
+        dsa->SetActiveAttribute(attributeIndices[cc], cc);
+        }
+      }
+    return true;
+    }
+}
 
 vtkStandardNewMacro(vtkCompleteArrays);
-
 vtkCxxSetObjectMacro(vtkCompleteArrays,Controller,vtkMultiProcessController);
-
 //-----------------------------------------------------------------------------
 vtkCompleteArrays::vtkCompleteArrays()
 {
@@ -136,164 +216,57 @@ int vtkCompleteArrays::RequestData(
   if (myProcId == 0)
     {
     // Receive and collected information from the remote processes.
-    vtkPVDataInformation* dataInfo = vtkPVDataInformation::New();
-    vtkPVDataInformation* tmpInfo = vtkPVDataInformation::New();
 
     int length = 0;
     this->Controller->Receive(&length, 1, infoProc, 389002);
-    unsigned char* data = new unsigned char[length];
-    this->Controller->Receive(data, length, infoProc, 389003);
-    vtkClientServerStream css;
-    css.SetData(data, length);
-    tmpInfo->CopyFromStream(&css);
-    delete [] data;
-    dataInfo->AddInformation(tmpInfo);
 
-    this->FillArrays(
-      output->GetPointData(), dataInfo->GetPointDataInformation());
-    this->FillArrays(
-      output->GetCellData(), dataInfo->GetCellDataInformation());
+    std::vector<unsigned char> data(length);
+    this->Controller->Receive(&data[0], length, infoProc, 389003);
+
+    vtkClientServerStream css;
+    css.SetData(&data[0], length);
+
+    vtkDeserialize(css, 0, output->GetPointData());
+    vtkDeserialize(css, 1, output->GetPointData());
     vtkPointSet* ps = vtkPointSet::SafeDownCast(output);
     if (ps)
       {
-      vtkDataArray* pointArray = this->CreateArray(
-        dataInfo->GetPointArrayInformation());
-      if (!pointArray)
+      vtkNew<vtkPoints> pts;
+      int dataType;
+      if (css.GetArgument(2, 0, &dataType))
         {
-        vtkErrorMacro("Could not create point array. "
-                      "The output will not contain points.");
+        pts->SetDataType(dataType);
         }
-      else
-        {
-        vtkPoints* pts = vtkPoints::New();
-        pts->SetData(pointArray);
-        pointArray->Delete();
-        ps->SetPoints(pts);
-        pts->Delete();
-        }
+      ps->SetPoints(pts.Get());
       }
-    dataInfo->Delete();
-    tmpInfo->Delete();
     }
   else if(myProcId == infoProc)
     {
     vtkClientServerStream css;
-    vtkPVDataInformation* dataInfo = vtkPVDataInformation::New();
-    dataInfo->SetSortArrays(0);
-    dataInfo->CopyFromObject(output);
-    dataInfo->CopyToStream(&css);
+    vtkSerialize(css, input->GetPointData());
+    vtkSerialize(css, input->GetCellData());
+
+    if (vtkPointSet* ps = vtkPointSet::SafeDownCast(input))
+      {
+      css << vtkClientServerStream::Reply
+          << ps->GetPoints()->GetDataType()
+          << vtkClientServerStream::End;
+      }
+
     size_t length;
     const unsigned char* data;
     css.GetData(&data, &length);
     int len = static_cast<int>(length);
     this->Controller->Send(&len, 1, 0, 389002);
     this->Controller->Send(const_cast<unsigned char*>(data), len, 0, 389003);
-    dataInfo->Delete();
     }
-
   return 1;
 }
-
-//-----------------------------------------------------------------------------
-vtkDataArray* vtkCompleteArrays::CreateArray(vtkPVArrayInformation* aInfo)
-{
-  vtkDataArray* array = 0;
-  switch (aInfo->GetDataType())
-    {
-    case VTK_FLOAT:
-      array = vtkFloatArray::New();
-      break;
-    case VTK_DOUBLE:
-      array = vtkDoubleArray::New();
-      break;
-    case VTK_INT:
-      array = vtkIntArray::New();
-      break;
-    case VTK_CHAR:
-      array = vtkCharArray::New();
-      break;
-    case VTK_ID_TYPE:
-      array = vtkIdTypeArray::New();
-      break;
-    case VTK_LONG:
-      array = vtkLongArray::New();
-      break;
-    case VTK_SHORT:
-      array = vtkShortArray::New();
-      break;
-    case VTK_UNSIGNED_CHAR:
-      array = vtkUnsignedCharArray::New();
-      break;
-    case VTK_UNSIGNED_INT:
-      array = vtkUnsignedIntArray::New();
-      break;
-    case VTK_UNSIGNED_LONG:
-      array = vtkUnsignedLongArray::New();
-      break;
-    case VTK_UNSIGNED_SHORT:
-      array = vtkUnsignedShortArray::New();
-      break;
-    default:
-      array = NULL;
-    }
-  if (array)
-    {
-    array->SetNumberOfComponents(aInfo->GetNumberOfComponents());
-    array->SetName(aInfo->GetName());
-    }
-
-  return array;
-
-}
-
-//-----------------------------------------------------------------------------
-void vtkCompleteArrays::FillArrays(vtkDataSetAttributes* da, 
-                                   vtkPVDataSetAttributesInformation* attrInfo)
-{
-  int num, idx;
-  vtkPVArrayInformation* arrayInfo;
-  vtkDataArray* array;
-
-  da->Initialize();
-  num = attrInfo->GetNumberOfArrays();
-  for (idx = 0; idx < num; ++idx)
-    {
-    arrayInfo = attrInfo->GetArrayInformation(idx);
-    array = this->CreateArray(arrayInfo);
-    if (array)
-      {
-      switch (attrInfo->IsArrayAnAttribute(idx))
-        {
-        case vtkDataSetAttributes::SCALARS:
-          da->SetScalars(array);
-          break;
-        case vtkDataSetAttributes::VECTORS:
-          da->SetVectors(array);
-          break;
-        case vtkDataSetAttributes::NORMALS:
-          da->SetNormals(array);
-          break;
-        case vtkDataSetAttributes::TENSORS:
-          da->SetTensors(array);
-          break;
-        case vtkDataSetAttributes::TCOORDS:
-          da->SetTCoords(array);
-          break;
-        default:
-          da->AddArray(array);
-        }
-      array->Delete();
-      array = NULL;
-      }
-    }
-}
-
 
 //-----------------------------------------------------------------------------
 void vtkCompleteArrays::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-
   if (this->Controller)
     {
     os << indent << "Controller: " << this->Controller << endl;

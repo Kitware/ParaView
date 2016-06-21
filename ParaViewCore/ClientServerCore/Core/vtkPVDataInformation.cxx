@@ -94,7 +94,6 @@ vtkPVDataInformation::vtkPVDataInformation()
   this->TimeLabel = NULL;
 
   this->PortNumber = -1;
-  this->SortArrays = true;
 
   // Update field association information on the all the
   // vtkPVDataSetAttributesInformation instances.
@@ -1498,14 +1497,6 @@ void vtkPVDataInformation::RegisterHelper(const char *classname,
                                           const char *helper)
 {
   helpers[classname] = helper;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDataInformation::SetSortArrays(bool sort)
-{
-  this->PointDataInformation->SetSortArrays(sort);
-  this->CellDataInformation->SetSortArrays(sort);
-  this->FieldDataInformation->SetSortArrays(sort);
 }
 
 //----------------------------------------------------------------------------
