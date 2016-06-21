@@ -2115,7 +2115,7 @@ void vtknifti1_io::nifti_mat44_to_orientation( mat44 R , int *icod, int *jcod, i
 *//*--------------------------------------------------------------------*/
 void vtknifti1_io::nifti_swap_2bytes( size_t n , void *ar )    /* 2 bytes at a time */
 {
-   register size_t ii ;
+   size_t ii ;
    unsigned char * cp1 = (unsigned char *)ar, * cp2 ;
    unsigned char   tval;
 
@@ -2132,9 +2132,9 @@ void vtknifti1_io::nifti_swap_2bytes( size_t n , void *ar )    /* 2 bytes at a t
 *//*--------------------------------------------------------------------*/
 void vtknifti1_io::nifti_swap_4bytes( size_t n , void *ar )    /* 4 bytes at a time */
 {
-   register size_t ii ;
+   size_t ii ;
    unsigned char * cp0 = (unsigned char *)ar, * cp1, * cp2 ;
-   register unsigned char tval ;
+   unsigned char tval ;
 
    for( ii=0 ; ii < n ; ii++ ){
        cp1 = cp0; cp2 = cp0+3;
@@ -2153,9 +2153,9 @@ void vtknifti1_io::nifti_swap_4bytes( size_t n , void *ar )    /* 4 bytes at a t
 *//*--------------------------------------------------------------------*/
 void vtknifti1_io::nifti_swap_8bytes( size_t n , void *ar )    /* 8 bytes at a time */
 {
-   register size_t ii ;
+   size_t ii ;
    unsigned char * cp0 = (unsigned char *)ar, * cp1, * cp2 ;
-   register unsigned char tval ;
+   unsigned char tval ;
 
    for( ii=0 ; ii < n ; ii++ ){
        cp1 = cp0;  cp2 = cp0+7;
@@ -2174,9 +2174,9 @@ void vtknifti1_io::nifti_swap_8bytes( size_t n , void *ar )    /* 8 bytes at a t
 *//*--------------------------------------------------------------------*/
 void vtknifti1_io::nifti_swap_16bytes( size_t n , void *ar )    /* 16 bytes at a time */
 {
-   register size_t ii ;
+   size_t ii ;
    unsigned char * cp0 = (unsigned char *)ar, * cp1, * cp2 ;
-   register unsigned char tval ;
+   unsigned char tval ;
 
    for( ii=0 ; ii < n ; ii++ ){
        cp1 = cp0;  cp2 = cp0+15;
@@ -2197,9 +2197,9 @@ void vtknifti1_io::nifti_swap_16bytes( size_t n , void *ar )    /* 16 bytes at a
 *//*--------------------------------------------------------------------*/
 void vtknifti1_io::nifti_swap_bytes( size_t n , int siz , void *ar )
 {
-   register size_t ii ;
+   size_t ii ;
    unsigned char * cp0 = (unsigned char *)ar, * cp1, * cp2 ;
-   register unsigned char tval ;
+   unsigned char tval ;
 
    for( ii=0 ; ii < n ; ii++ ){
        cp1 = cp0;  cp2 = cp0+(siz-1);
@@ -4964,7 +4964,7 @@ size_t vtknifti1_io::nifti_read_buffer(znzFile fp, void* dataptr, size_t ntot,
     
     case NIFTI_TYPE_FLOAT32:
     case NIFTI_TYPE_COMPLEX64:{
-        register float *far = (float *)dataptr ; register size_t jj,nj ;
+        float *far = (float *)dataptr ; size_t jj,nj ;
         nj = ntot / sizeof(float) ;
         for( jj=0 ; jj < nj ; jj++ )   /* count fixes 30 Nov 2004 [rickr] */
            if( !IS_GOOD_FLOAT(far[jj]) ){
@@ -4976,7 +4976,7 @@ size_t vtknifti1_io::nifti_read_buffer(znzFile fp, void* dataptr, size_t ntot,
     
     case NIFTI_TYPE_FLOAT64:
     case NIFTI_TYPE_COMPLEX128:{
-        register double *far = (double *)dataptr ; register size_t jj,nj ;
+        double *far = (double *)dataptr ; size_t jj,nj ;
         nj = ntot / sizeof(double) ;
         for( jj=0 ; jj < nj ; jj++ )   /* count fixes 30 Nov 2004 [rickr] */
            if( !IS_GOOD_FLOAT(far[jj]) ){
