@@ -399,11 +399,6 @@ void vtkPVPluginTracker::RegisterPlugin(vtkPVPlugin* plugin)
 
   vtkPluginsList::iterator iter = this->PluginsList->LocateUsingPluginName(
     plugin->GetPluginName());
-  // use filename for matching is present, that's a better test.
-  if (plugin->GetFileName())
-    {
-    iter = this->PluginsList->LocateUsingFileName(plugin->GetFileName());
-    }
   if (iter == this->PluginsList->end())
     {
     vtkItem item;
