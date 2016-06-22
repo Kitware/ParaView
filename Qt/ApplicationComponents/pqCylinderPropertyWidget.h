@@ -34,6 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqInteractivePropertyWidget.h"
 
+
+class QWidget;
+
 /// pqCylinderPropertyWidget is a custom property widget that uses
 /// "ImplicitCylinderWidgetRepresentation" to help users interactively set the center, radius
 /// and axis for a cylinder. To use this widget for a property group
@@ -57,6 +60,22 @@ public:
     vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent=0);
   virtual ~pqCylinderPropertyWidget();
 
+public slots:
+  /// Set the cylinder axis to be along the X axis.
+  void useXAxis() { this->setAxis(1, 0, 0); }
+
+  /// Set the cylinder axis to be along the Y axis.
+  void useYAxis() { this->setAxis(0, 1, 0); }
+
+  /// Set the cylinder axis to be along the Z axis.
+  void useZAxis() { this->setAxis(0, 0, 1); }
+
+  /// Reset the camera to be down the cylinder axis.
+  void resetCameraToAxis();
+
+  /// Set the cylinder axis to be along the camera view direction.
+  void useCameraAxis();
+
 protected slots:
   /// Places the interactive widget using current data source information.
   virtual void placeWidget();
@@ -65,7 +84,12 @@ protected slots:
 
 private:
   Q_DISABLE_COPY(pqCylinderPropertyWidget);
+
+  void setAxis(double x, double y, double z);
+  void updateWidget(bool showing_advanced_properties);
+
   pqPropertyLinks WidgetLinks;
+  QWidget *AdvancedPropertyWidgets[2];
 };
 
 #endif
