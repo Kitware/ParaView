@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqLightsEditor.h"
 
 #include "pqApplicationCore.h"
-#include "pqNamedWidgets.h"
 #include "pqPropertyGroupWidget.h"
 #include "pqUndoStack.h"
 #include "vtkSMPVRepresentationProxy.h"

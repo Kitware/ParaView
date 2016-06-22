@@ -5,7 +5,17 @@ This page documents major API/design changes between different versions since we
 started tracking these (starting after version 4.2).
 
 Changes in 5.3
------------------
+--------------
+
+###Dropped support for pqProxyPanel and subclasses (Legacy Panels)###
+
+`pqProxyPanel` and its subclasses that formed the default mechanism for providing
+custom panels for filters, displays, views, etc. before ParaView 3.98 has now
+been removed. Refer to the
+[wiki](http://www.paraview.org/Wiki/ParaView/Properties_Panel) for getting
+oriented with the currently supported way for customizing the properties panel.
+This also removes plugin macros `ADD_PARAVIEW_OBJECT_PANEL()`, and
+`ADD_PARAVIEW_DISPLAY_PANEL()`.
 
 ###Qt 5 Support (replacing QVTKWidget)###
 
