@@ -14,11 +14,13 @@
 =========================================================================*/
 #include "vtkSMBoundsDomain.h"
 
+#include "vtkBoundingBox.h"
+#include "vtkMath.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
-#include "vtkMath.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMArrayRangeDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMUncheckedPropertyHelper.h"
@@ -29,11 +31,16 @@ vtkSMBoundsDomain::vtkSMBoundsDomain()
 {
   this->Mode = vtkSMBoundsDomain::NORMAL;
   this->ScaleFactor = 0.1;
+  this->ArrayRangeDomain = NULL;
 }
 
 //---------------------------------------------------------------------------
 vtkSMBoundsDomain::~vtkSMBoundsDomain()
 {
+  if (this->ArrayRangeDomain != NULL)
+    {
+    this->ArrayRangeDomain->Delete();
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -213,9 +220,8 @@ void vtkSMBoundsDomain::SetDomainValues(double bounds[6])
     }
   else if (this->Mode == vtkSMBoundsDomain::SCALED_EXTENT)
     {
-    double maxbounds = bounds[1] - bounds[0];
-    maxbounds = (bounds[3] - bounds[2] > maxbounds) ? (bounds[3] - bounds[2]) : maxbounds;
-    maxbounds = (bounds[5] - bounds[4] > maxbounds) ? (bounds[5] - bounds[4]) : maxbounds;
+    vtkBoundingBox box(bounds);
+    double maxbounds = box.GetMaxLength();
     maxbounds *= this->ScaleFactor;
     // Never use 0 maxbounds.
     if (maxbounds == 0)
@@ -226,6 +232,27 @@ void vtkSMBoundsDomain::SetDomainValues(double bounds[6])
     entries.push_back(vtkEntry(0, maxbounds));
     this->SetEntries(entries);
     }
+  else if (this->Mode == vtkSMBoundsDomain::ARRAY_SCALED_EXTENT)
+    {
+    this->ArrayRangeDomain->Update(NULL);
+    double arrayScaleFactor = this->ArrayRangeDomain->GetMaximum(this->ArrayRangeDomain->GetNumberOfEntries() - 1);
+    if (arrayScaleFactor == 0)
+      {
+      arrayScaleFactor = 1;
+      }
+    vtkBoundingBox box(bounds);
+    double maxbounds = box.GetMaxLength();
+    maxbounds *= (this->ScaleFactor / arrayScaleFactor);
+    // Never use 0 maxbounds.
+    if (maxbounds == 0)
+      {
+      maxbounds = this->ScaleFactor;
+      }
+    std::vector<vtkEntry> entries;
+    entries.push_back(vtkEntry(0, maxbounds));
+    this->SetEntries(entries);
+    }
+
   else if (this->Mode == vtkSMBoundsDomain::APPROXIMATE_CELL_LENGTH)
     {
     double diameter =
@@ -330,6 +357,19 @@ int vtkSMBoundsDomain::ReadXMLAttributes(
     else if (strcmp(mode, "approximate_cell_length") == 0)
       {
       this->Mode = vtkSMBoundsDomain::APPROXIMATE_CELL_LENGTH;
+      }
+    else if (strcmp(mode, "array_scaled_extent") == 0)
+      {
+      this->Mode = vtkSMBoundsDomain::ARRAY_SCALED_EXTENT;
+      if (this->ArrayRangeDomain != NULL)
+        {
+        this->ArrayRangeDomain->Delete();
+        }
+      this->ArrayRangeDomain = vtkSMArrayRangeDomain::New();
+      if (!this->ArrayRangeDomain->ReadXMLAttributes(prop, element))
+        {
+        return 0;
+        }
       }
     else
       {
