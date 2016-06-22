@@ -43,8 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqProxyPropertyWidget::pqProxyPropertyWidget(vtkSMProperty *smProperty,
                                              vtkSMProxy *smProxy,
                                              QWidget *parentObject)
-  : pqPropertyWidget(smProxy, parentObject),
-  HideWidgetsInDefaultView(false)
+  : pqPropertyWidget(smProxy, parentObject)
 {
   QVBoxLayout *vbox = new QVBoxLayout;
   vbox->setMargin(0);
@@ -96,12 +95,6 @@ pqProxyPropertyWidget::pqProxyPropertyWidget(vtkSMProperty *smProperty,
 
     // don't show label for the proxy selection widget
     this->setShowLabel(false);
-    // If selected_proxy_panel_visibility="advanced" hint is specified, we
-    // only show the widgets for the selected proxy in advanced mode.
-    vtkPVXMLElement* hints = smProperty->GetHints()?
-      smProperty->GetHints()->FindNestedElementByName("ProxyPropertyWidget") : NULL;
-    this->HideWidgetsInDefaultView = (hints &&
-      strcmp(hints->GetAttributeOrDefault("selected_proxy_panel_visibility", ""), "advanced") == 0);
     }
 
   this->setLayout(vbox);
@@ -159,7 +152,7 @@ void pqProxyPropertyWidget::deselect()
 //-----------------------------------------------------------------------------
 void pqProxyPropertyWidget::updateWidget(bool showing_advanced_properties)
 {
-  if (this->ProxySelectionWidget && this->HideWidgetsInDefaultView)
+  if (this->ProxySelectionWidget)
     {
     this->ProxySelectionWidget->updateWidget(showing_advanced_properties);
     }

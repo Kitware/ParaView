@@ -67,7 +67,6 @@ public:
 private:
   QPointer<pqSelectionInputWidget> SelectionInputWidget;
   QPointer<pqProxySelectionWidget> ProxySelectionWidget;
-  bool HideWidgetsInDefaultView;
 };
 
 #endif // _pqProxyPropertyWidget_h

@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComboBoxDomain.h"
 #include "pqPropertiesPanel.h"
 #include "pqProxyWidget.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyListDomain.h"
@@ -51,7 +52,9 @@ public:
   Ui::ProxySelectionWidget Ui;
   QPointer<pqProxyWidget> ProxyWidget;
   bool ShowingAdvancedProperties;
-  pqInternal(pqProxySelectionWidget* self) : ShowingAdvancedProperties(false)
+  bool HideProxyWidgetsInDefaultView;
+  pqInternal(pqProxySelectionWidget* self) : ShowingAdvancedProperties(false),
+    HideProxyWidgetsInDefaultView(false)
     {
     this->Ui.setupUi(self);
     this->Ui.verticalLayout->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
@@ -71,12 +74,29 @@ public:
       this->ProxyWidget->setObjectName("ChosenProxyWidget");
       this->ProxyWidget->setApplyChangesImmediately(false);
       this->Ui.frameLayout->insertWidget(0, this->ProxyWidget);
-      this->ProxyWidget->filterWidgets(this->ShowingAdvancedProperties);
+      this->updateWidget(this->ShowingAdvancedProperties);
       this->ProxyWidget->setView(self->view());
 
       // Propagate signals from the internal ProxyWidget out from `self`.
       self->connect(this->ProxyWidget, SIGNAL(changeAvailable()), SIGNAL(changeAvailable()));
       self->connect(this->ProxyWidget, SIGNAL(changeFinished()), SIGNAL(changeFinished()));
+      }
+    }
+
+  void updateWidget(bool showing_advanced_properties)
+    {
+    this->ShowingAdvancedProperties = showing_advanced_properties;
+    if (this->ProxyWidget)
+      {
+      if (!showing_advanced_properties && this->HideProxyWidgetsInDefaultView)
+        {
+        this->ProxyWidget->hide();
+        }
+      else
+        {
+        this->ProxyWidget->show();
+        this->ProxyWidget->filterWidgets(showing_advanced_properties);
+        }
       }
     }
 };
@@ -100,6 +120,13 @@ pqProxySelectionWidget::pqProxySelectionWidget(
   this->addPropertyLink(
     this, "chosenProxy", SIGNAL(chosenProxyChanged()),
     smproperty);
+
+    // If selected_proxy_panel_visibility="advanced" hint is specified, we
+    // only show the widgets for the selected proxy in advanced mode.
+    vtkPVXMLElement* hints = smproperty->GetHints()?
+      smproperty->GetHints()->FindNestedElementByName("ProxyPropertyWidget") : NULL;
+    this->Internal->HideProxyWidgetsInDefaultView = (hints &&
+      strcmp(hints->GetAttributeOrDefault("selected_proxy_panel_visibility", ""), "advanced") == 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -173,11 +200,7 @@ void pqProxySelectionWidget::deselect()
 //-----------------------------------------------------------------------------
 void pqProxySelectionWidget::updateWidget(bool showing_advanced_properties)
 {
-  this->Internal->ShowingAdvancedProperties = showing_advanced_properties;
-  if (this->Internal->ProxyWidget)
-    {
-    this->Internal->ProxyWidget->filterWidgets(showing_advanced_properties);
-    }
+  this->Internal->updateWidget(showing_advanced_properties);
   this->Superclass::updateWidget(showing_advanced_properties);
 }
 
