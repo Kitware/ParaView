@@ -35,6 +35,9 @@
 // __cdecl gives an unmangled name
 # define C_DECL __cdecl
 # define C_EXPORT extern "C" __declspec(dllexport)
+#elif defined(__GNUC__)
+# define C_DECL
+# define C_EXPORT extern "C" __attribute__ ((visibility ("default")))
 #else
 # define C_DECL
 # define C_EXPORT extern "C"
