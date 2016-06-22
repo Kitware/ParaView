@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqStandardLegacyCustomPanels.h"
 #include "pqStringVectorPropertyWidget.h"
+#include "pqTimer.h"
 
 #include "vtkCollection.h"
 #include "vtkNew.h"
@@ -194,7 +195,6 @@ namespace
         labelWdg->setAlignment(Qt::AlignLeft|Qt::AlignTop);
         item->LabelWidget = labelWdg;
         }
-      item->hide();
       return item;
       }
 
@@ -212,7 +212,6 @@ namespace
           label, widget->parentWidget());
         item->GroupFooter = newGroupSeparator(widget->parentWidget());
         }
-      item->hide();
       return item;
       }
 
@@ -225,14 +224,12 @@ namespace
       pqProxyWidgetItem* item = newItem(widget, widget_label, parentObj);
       item->Group = true;
       item->GroupTag = group_id;
-
       if (!group_label.isEmpty())
         {
         item->GroupHeader = pqProxyWidget::newGroupLabelWidget(
           group_label, widget->parentWidget());
         item->GroupFooter = newGroupSeparator(widget->parentWidget());
         }
-      item->hide();
       return item;
       }
 
@@ -336,120 +333,88 @@ namespace
       return this->Advanced;
       }
 
-    void show(QGridLayout* layout, int &row_index,
-              const pqProxyWidgetItem* prevItem,
-              bool enabled=true,
-              bool show_advanced=false) const
+    void show(const pqProxyWidgetItem* prevVisibleItem, bool enabled=true, bool show_advanced=false) const
       {
-      if (this->GroupFooter)
+      // If `this` is not a group, but previous item was, we need to ensure the
+      // previous items group footer is visible.
+      if (!this->Group && prevVisibleItem && prevVisibleItem->Group && prevVisibleItem->GroupFooter)
         {
-        this->GroupFooter->hide();
-        }
-      if (this->GroupHeader)
-        {
-        this->GroupHeader->hide();
+        prevVisibleItem->GroupFooter->show();
         }
 
-      if (!this->Group && prevItem && prevItem->Group && prevItem->GroupFooter)
-        {
-        // show the previous item's group-footer if the current item is not a
-        // group. This avoid showing unnecessary group-separators.
-        layout->addWidget(prevItem->GroupFooter, row_index++, 0, 1, -1);
-        prevItem->GroupFooter->show();
-        }
-
+      // If `this` is a group, and belongs to different group than
+      // prevVisibleItem then we need to show `this`'s header.
       if (this->GroupHeader)
         {
-        if (prevItem == NULL ||
-          this->GroupTag == -1 || prevItem->GroupTag != this->GroupTag)
-          {
-          layout->addWidget(this->GroupHeader, row_index++, 0, 1, -1);
-          this->GroupHeader->show();
-          }
+        this->GroupHeader->setVisible(
+          this->GroupTag == -1 || prevVisibleItem == NULL || this->GroupTag != prevVisibleItem->GroupTag);
         }
 
       if (this->LabelWidget)
         {
-        layout->addWidget(this->LabelWidget, row_index, 0,
-          Qt::AlignLeft | Qt::AlignTop);
         this->LabelWidget->show();
-        layout->addWidget(this->PropertyWidget, row_index, 1);
         }
-      else
-        {
-        layout->addWidget(this->PropertyWidget, row_index, 0, 1, -1);
-        }
+
       this->PropertyWidget->updateWidget(show_advanced);
       this->PropertyWidget->setEnabled(enabled);
       this->PropertyWidget->show();
-      row_index++;
-      }
 
-    void show(QVBoxLayout* layout, int &row_index,
-              const pqProxyWidgetItem* prevItem,
-              bool enabled=true,
-              bool show_advanced=false) const
-      {
       if (this->GroupFooter)
         {
+        // I know what you're thinking: "Typo!!!", it's not. It's deliberate. A
+        // footer should only be shown by a next item. It's only needed if a
+        // following item wants it.
         this->GroupFooter->hide();
         }
-      if (this->GroupHeader)
-        {
-        this->GroupHeader->hide();
-        }
-
-      if (!this->Group && prevItem && prevItem->Group && prevItem->GroupFooter)
-        {
-        // show the previous item's group-footer if the current item is not a
-        // group. This avoid showing unnecessary group-separators.
-        layout->addWidget(prevItem->GroupFooter);
-        row_index++;
-
-        prevItem->GroupFooter->show();
-        }
-
-      if (this->GroupHeader)
-        {
-        if (prevItem == NULL ||
-          this->GroupTag == -1 || prevItem->GroupTag != this->GroupTag)
-          {
-          layout->addWidget(this->GroupHeader);
-          row_index++;
-          this->GroupHeader->show();
-          }
-        }
-
-      if (this->LabelWidget)
-        {
-        layout->addWidget(this->LabelWidget);
-        this->LabelWidget->show();
-        layout->addWidget(this->PropertyWidget);
-        }
-      else
-        {
-        layout->addWidget(this->PropertyWidget);
-        }
-      this->PropertyWidget->updateWidget(show_advanced);
-      this->PropertyWidget->setEnabled(enabled);
-      this->PropertyWidget->show();
-      row_index++;
       }
 
     void hide() const
       {
-      this->PropertyWidget->hide();
-      if (this->LabelWidget)
-        {
-        this->LabelWidget->hide();
-        }
       if (this->GroupHeader)
         {
         this->GroupHeader->hide();
         }
+      if (this->LabelWidget)
+        {
+        this->LabelWidget->hide();
+        }
+      this->PropertyWidget->hide();
       if (this->GroupFooter)
         {
         this->GroupFooter->hide();
+        }
+      }
+
+    /// Adds widgets to the layout. This is a little greedy. It adds everything
+    /// that could be potentially shown to the layout. We control visibilities
+    /// of things like headers and footers dynamically in show()/hide().
+    void appendToLayout(QGridLayout* glayout, bool singleColumn)
+      {
+      if (this->GroupHeader)
+        {
+        glayout->addWidget(this->GroupHeader, glayout->rowCount(), 0, 1, -1);
+        }
+      if (this->LabelWidget)
+        {
+        const int row = glayout->rowCount();
+        if (singleColumn)
+          {
+          glayout->addWidget(this->LabelWidget, row, 0, 1, -1);
+          glayout->addWidget(this->PropertyWidget, (row + 1), 0, 1, -1);
+          }
+        else
+          {
+          glayout->addWidget(this->LabelWidget, row, 0, Qt::AlignTop|Qt::AlignLeft);
+          glayout->addWidget(this->PropertyWidget, row, 1);
+          }
+        }
+      else
+        {
+        glayout->addWidget(this->PropertyWidget, glayout->rowCount(), 0, 1, -1);
+        }
+      if (this->GroupFooter)
+        {
+        glayout->addWidget(this->GroupFooter, glayout->rowCount(), 0, 1, -1);
         }
       }
   private:
@@ -539,6 +504,7 @@ public:
   QString CachedFilterText;
   vtkStringList* Properties;
   QPointer<QLabel> ProxyDocumentationLabel; // used when showProxyDocumentationInPanel is true.
+  pqTimer RequestUpdatePanel;
 
   pqInternals(vtkSMProxy* smproxy, QStringList properties):
     Proxy(smproxy), CachedShowAdvanced(false)
@@ -581,13 +547,16 @@ public:
     {
     this->Items.append(item);
 
+    // Add widget to the layout.
+    QGridLayout* gridLayout = qobject_cast<QGridLayout*>(self->layout());
+    Q_ASSERT(gridLayout);
+    item->appendToLayout(gridLayout, self->useDocumentationForLabels());
+
     foreach (pqPropertyWidgetDecorator* decorator,
       item->propertyWidget()->decorators())
       {
-      QObject::connect(decorator, SIGNAL(visibilityChanged()),
-        self, SLOT(updatePanel()));
-      QObject::connect(decorator, SIGNAL(enableStateChanged()),
-        self, SLOT(updatePanel()));
+      this->RequestUpdatePanel.connect(decorator, SIGNAL(visibilityChanged()), SLOT(start()));
+      this->RequestUpdatePanel.connect(decorator, SIGNAL(enableStateChanged()), SLOT(start()));
       }
     }
 };
@@ -625,13 +594,25 @@ void pqProxyWidget::constructor(
   this->Internals->ProxyDocumentationLabel = new QLabel(this);
   this->Internals->ProxyDocumentationLabel->hide();
   this->Internals->ProxyDocumentationLabel->setWordWrap(true);
+  this->Internals->RequestUpdatePanel.setInterval(0);
+  this->Internals->RequestUpdatePanel.setSingleShot(true);
+  this->connect(&this->Internals->RequestUpdatePanel, SIGNAL(timeout()), SLOT(updatePanel()));
 
   QGridLayout* gridLayout = new QGridLayout(this);
   gridLayout->setMargin(pqPropertiesPanel::suggestedMargin());
   gridLayout->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
   gridLayout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
-  gridLayout->setColumnStretch(0, 0);
-  gridLayout->setColumnStretch(1, 1);
+
+  // Update stretch factors.
+  if (this->UseDocumentationForLabels)
+    {
+    // nothing to do, QGridLayout will just have 1 column.
+    }
+  else
+    {
+    gridLayout->setColumnStretch(0, 0);
+    gridLayout->setColumnStretch(1, 1);
+    }
 
   this->createWidgets(properties);
 
@@ -741,6 +722,7 @@ vtkSMProxy* pqProxyWidget::proxy() const
 //-----------------------------------------------------------------------------
 void pqProxyWidget::showEvent(QShowEvent *sevent)
 {
+  this->Superclass::showEvent(sevent);
   if (sevent ==NULL || !sevent->spontaneous())
     {
     foreach (const pqProxyWidgetItem* item, this->Internals->Items)
@@ -756,10 +738,11 @@ void pqProxyWidget::hideEvent(QHideEvent *hevent)
   if (hevent == NULL || !hevent->spontaneous())
     {
     foreach (const pqProxyWidgetItem* item, this->Internals->Items)
-  {
+      {
       item->deselect();
       }
     }
+  this->Superclass::hideEvent(hevent);
 }
 
 //-----------------------------------------------------------------------------
@@ -808,6 +791,23 @@ void pqProxyWidget::createWidgets(const QStringList &properties)
     << ")";
   PV_DEBUG_PANELS() << "------------------------------------------------------";
 
+  QGridLayout* gridLayout = qobject_cast<QGridLayout*>(this->layout());
+  Q_ASSERT(gridLayout);
+
+  DocumentationType dtype = this->showProxyDocumentationInPanel(smproxy);
+  if (dtype != NONE)
+    {
+    QString doc = this->documentationText(smproxy, dtype);
+    this->Internals->ProxyDocumentationLabel->setText("<p>" + doc + "</p>");
+    this->Internals->ProxyDocumentationLabel->setVisible(!doc.isEmpty());
+    gridLayout->addWidget(this->Internals->ProxyDocumentationLabel,
+      gridLayout->rowCount(), 0, /*row_stretch*/ 1, /*column_stretch*/ -1);
+    }
+  else
+    {
+    this->Internals->ProxyDocumentationLabel->hide();
+    }
+
   // Determine if a legacy custom panel is to be created for this proxy.
   // For legacy panels, we need pqProxy subclasses. Try to see if can find
   // them.
@@ -816,12 +816,9 @@ void pqProxyWidget::createWidgets(const QStringList &properties)
   pqObjectPanel* legacyObjectPanel = CreateLegacyPanel(pqproxy);
   if (legacyObjectPanel)
     {
-    pqObjectPanelPropertyWidget* wdg = new pqObjectPanelPropertyWidget(
-      legacyObjectPanel, this);
-    pqProxyWidgetItem *item = pqProxyWidgetItem::newItem(
-      wdg, QString(), this);
+    pqObjectPanelPropertyWidget* wdg = new pqObjectPanelPropertyWidget(legacyObjectPanel, this);
+    pqProxyWidgetItem *item = pqProxyWidgetItem::newItem(wdg, QString(), this);
     this->Internals->appendToItems(item, this);
-
     PV_DEBUG_PANELS() << "Using custom (legacy) object panel:"
                       << legacyObjectPanel->metaObject()->className();
     }
@@ -832,11 +829,8 @@ void pqProxyWidget::createWidgets(const QStringList &properties)
   if (legacyDisplayPanel)
     {
     legacyDisplayPanel->dataUpdated();
-
-    pqDisplayPanelPropertyWidget* wdg = new pqDisplayPanelPropertyWidget(
-      legacyDisplayPanel, this);
-    pqProxyWidgetItem *item =
-      pqProxyWidgetItem::newItem(wdg, QString(), this);
+    pqDisplayPanelPropertyWidget* wdg = new pqDisplayPanelPropertyWidget(legacyDisplayPanel, this);
+    pqProxyWidgetItem *item = pqProxyWidgetItem::newItem(wdg, QString(), this);
     this->Internals->appendToItems(item, this);
     PV_DEBUG_PANELS() << "Using custom display panel:"
                       << legacyDisplayPanel->metaObject()->className();
@@ -862,7 +856,6 @@ void pqProxyWidget::createWidgets(const QStringList &properties)
       "(pqPropertyWidget subclasses) instead. "
       "Contact the mailing list if you need assistance.";
     }
-
   foreach (const pqProxyWidgetItem* item, this->Internals->Items)
     {
     QObject::connect(item->propertyWidget(), SIGNAL(changeAvailable()),
@@ -1218,58 +1211,14 @@ bool pqProxyWidget::filterWidgets(bool show_advanced, const QString& filterText)
   bool prevUE = this->updatesEnabled();
   this->setUpdatesEnabled(false);
 
-  delete this->layout();
-  QVBoxLayout* vboxLayout = NULL;
-  QGridLayout* gridLayout = NULL;
-
-  if (this->UseDocumentationForLabels)
-    {
-    vboxLayout = new QVBoxLayout(this);
-    vboxLayout->setMargin(pqPropertiesPanel::suggestedMargin());
-    vboxLayout->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
-    }
-  else
-    {
-    gridLayout = new QGridLayout(this);
-    gridLayout->setMargin(pqPropertiesPanel::suggestedMargin());
-    gridLayout->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
-    gridLayout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
-    gridLayout->setColumnStretch(0, 0);
-    gridLayout->setColumnStretch(1, 1);
-    }
-
-  int row_index = 0;
   const pqProxyWidgetItem* prevItem = NULL;
   vtkSMProxy* smProxy = this->Internals->Proxy;
-
-  DocumentationType dtype = this->showProxyDocumentationInPanel(smProxy);
-  if (dtype != NONE)
-    {
-    QString doc = this->documentationText(smProxy, dtype);
-    this->Internals->ProxyDocumentationLabel->setText("<p>" + doc + "</p>");
-    this->Internals->ProxyDocumentationLabel->setVisible(!doc.isEmpty());
-    gridLayout->addWidget(this->Internals->ProxyDocumentationLabel, row_index, 0, 1, 2);
-    row_index++;
-    }
-  else
-    {
-    this->Internals->ProxyDocumentationLabel->hide();
-    }
-
   foreach (const pqProxyWidgetItem* item, this->Internals->Items)
     {
     bool visible = item->canShowWidget(show_advanced, filterText, smProxy);
     if (visible)
       {
-      bool enabled = item->enableWidget();
-      if (this->UseDocumentationForLabels)
-        {
-        item->show(vboxLayout, row_index, prevItem, enabled, show_advanced);
-        }
-      else
-        {
-        item->show(gridLayout, row_index, prevItem, enabled, show_advanced);
-        }
+      item->show(prevItem, item->enableWidget(), show_advanced);
       prevItem = item;
       }
     else
