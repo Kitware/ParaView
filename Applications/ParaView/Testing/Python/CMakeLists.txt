@@ -43,10 +43,11 @@ endif()
 
 paraview_add_test_python(
   NO_DATA NO_RT
-  TestPythonViewScript.py
-  TestColorHistogram.py
+  PartialArrayIndication.py
   TestClipCylinder.py
+  TestColorHistogram.py
   TestLineChartLabelPrefix.py
+  TestPythonViewScript.py
 )
 
 paraview_add_test_pvbatch(

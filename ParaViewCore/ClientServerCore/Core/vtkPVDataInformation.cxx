@@ -507,10 +507,16 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
     }
 
   // Copy Point Data information
-  this->PointDataInformation->CopyFromDataSetAttributes(data->GetPointData());
+  if (this->NumberOfPoints > 0)
+    {
+    this->PointDataInformation->CopyFromDataSetAttributes(data->GetPointData());
+    }
 
   // Copy Cell Data information
-  this->CellDataInformation->CopyFromDataSetAttributes(data->GetCellData());
+  if (this->NumberOfCells > 0)
+    {
+    this->CellDataInformation->CopyFromDataSetAttributes(data->GetCellData());
+    }
 
   // Copy Field Data information, if any
   vtkFieldData *fd = data->GetFieldData();
@@ -555,12 +561,18 @@ void vtkPVDataInformation::CopyFromGenericDataSet(vtkGenericDataSet *data)
     }
 
   // Copy Point Data information
-  this->PointDataInformation->CopyFromGenericAttributesOnPoints(
-    data->GetAttributes());
+  if (this->NumberOfPoints > 0)
+    {
+    this->PointDataInformation->CopyFromGenericAttributesOnPoints(
+      data->GetAttributes());
+    }
 
   // Copy Cell Data information
-  this->CellDataInformation->CopyFromGenericAttributesOnCells(
-    data->GetAttributes());
+  if (this->NumberOfCells > 0)
+    {
+    this->CellDataInformation->CopyFromGenericAttributesOnCells(
+      data->GetAttributes());
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -577,8 +589,7 @@ void vtkPVDataInformation::CopyFromSelection(vtkSelection* data)
   this->NumberOfCells = 0;
   this->NumberOfPoints = 0;
 
-  // Copy Point Data information
-  this->PointDataInformation->CopyFromFieldData(data->GetFieldData());
+  this->FieldDataInformation->CopyFromFieldData(data->GetFieldData());
 }
 
 //----------------------------------------------------------------------------
@@ -599,8 +610,16 @@ void vtkPVDataInformation::CopyFromGraph(vtkGraph* data)
   this->NumberOfPoints = data->GetNumberOfVertices();
   this->NumberOfRows = 0;
 
-  this->VertexDataInformation->CopyFromFieldData(data->GetVertexData());
-  this->EdgeDataInformation->CopyFromFieldData(data->GetEdgeData());
+  // For whatever reason, the code above maps edges to cells and vertices to
+  // points. We should just add new ivars to track vertices and edges.
+  if (this->NumberOfPoints > 0)
+    {
+    this->VertexDataInformation->CopyFromFieldData(data->GetVertexData());
+    }
+  if (this->NumberOfCells > 0)
+    {
+    this->EdgeDataInformation->CopyFromFieldData(data->GetEdgeData());
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -618,7 +637,10 @@ void vtkPVDataInformation::CopyFromTable(vtkTable* data)
   this->NumberOfPoints = 0;
   this->NumberOfRows = data->GetNumberOfRows();
 
-  this->RowDataInformation->CopyFromFieldData(data->GetRowData());
+  if (this->NumberOfRows > 0)
+    {
+    this->RowDataInformation->CopyFromFieldData(data->GetRowData());
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -822,12 +844,6 @@ void vtkPVDataInformation::AddInformation(
     return;
     }
 
-  // First the easy stuff.
-  this->NumberOfPoints += info->GetNumberOfPoints();
-  this->NumberOfCells += info->GetNumberOfCells();
-  this->MemorySize += info->GetMemorySize();
-  this->NumberOfRows += info->GetNumberOfRows();
-
   switch ( this->DataSetType )
     {
     case VTK_POLY_DATA:
@@ -904,14 +920,56 @@ void vtkPVDataInformation::AddInformation(
 
 
   // Now for the messy part, all of the arrays.
-  this->PointArrayInformation->AddInformation(info->GetPointArrayInformation());
-  this->PointDataInformation->AddInformation(info->GetPointDataInformation());
-  this->CellDataInformation->AddInformation(info->GetCellDataInformation());
-  this->VertexDataInformation->AddInformation(info->GetVertexDataInformation());
-  this->EdgeDataInformation->AddInformation(info->GetEdgeDataInformation());
-  this->RowDataInformation->AddInformation(info->GetRowDataInformation());
+  if (this->NumberOfPoints > 0 && info->GetNumberOfPoints() > 0)
+    {
+    this->PointArrayInformation->AddInformation(info->GetPointArrayInformation());
+    this->PointDataInformation->AddInformation(info->GetPointDataInformation());
+    }
+  else if (info->GetNumberOfPoints() > 0)
+    {
+    this->PointArrayInformation->DeepCopy(info->GetPointArrayInformation());
+    this->PointDataInformation->DeepCopy(info->GetPointDataInformation());
+    }
+  if (this->NumberOfCells > 0 && info->GetNumberOfCells() > 0)
+    {
+    this->CellDataInformation->AddInformation(info->GetCellDataInformation());
+    }
+  else if (info->GetNumberOfCells() > 0)
+    {
+    this->CellDataInformation->DeepCopy(info->GetCellDataInformation());
+    }
+  if (this->NumberOfPoints > 0 && info->GetNumberOfPoints() > 0)
+    {
+    this->VertexDataInformation->AddInformation(info->GetVertexDataInformation());
+    }
+  else if (info->GetNumberOfPoints() > 0)
+    {
+    this->VertexDataInformation->DeepCopy(info->GetVertexDataInformation());
+    }
+  if (this->NumberOfCells > 0 && info->GetNumberOfCells() > 0)
+    {
+    this->EdgeDataInformation->AddInformation(info->GetEdgeDataInformation());
+    }
+  else if (info->GetNumberOfCells() > 0)
+    {
+    this->EdgeDataInformation->DeepCopy(info->GetEdgeDataInformation());
+    }
+  if (this->NumberOfRows > 0 && info->GetNumberOfRows() > 0)
+    {
+    this->RowDataInformation->AddInformation(info->GetRowDataInformation());
+    }
+  else if (info->GetNumberOfRows() > 0)
+    {
+    this->RowDataInformation->DeepCopy(info->GetRowDataInformation());
+    }
   this->FieldDataInformation->AddInformation(info->GetFieldDataInformation());
 //  this->GenericAttributesInformation->AddInformation(info->GetGenericAttributesInformation());
+
+  this->NumberOfPoints += info->GetNumberOfPoints();
+  this->NumberOfCells += info->GetNumberOfCells();
+  this->MemorySize += info->GetMemorySize();
+  this->NumberOfRows += info->GetNumberOfRows();
+
 
   double *times = info->GetTimeSpan();
   if (times[0] < this->TimeSpan[0])
