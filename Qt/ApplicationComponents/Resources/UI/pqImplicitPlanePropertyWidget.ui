@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>346</width>
-    <height>240</height>
+    <width>611</width>
+    <height>395</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -94,23 +94,9 @@
       <number>0</number>
      </property>
      <property name="spacing">
-      <number>0</number>
+      <number>2</number>
      </property>
-     <item row="4" column="0" colspan="2">
-      <widget class="QPushButton" name="resetCameraToNormal">
-       <property name="text">
-        <string>Reset Camera to Normal</string>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="1">
-      <widget class="QPushButton" name="resetBounds">
-       <property name="text">
-        <string>Reset Bounds</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
       <widget class="QPushButton" name="useCameraNormal">
        <property name="text">
         <string>Camera Normal</string>
@@ -138,10 +124,17 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QPushButton" name="useCenterBounds">
+     <item row="6" column="0" colspan="2">
+      <widget class="QPushButton" name="resetToDataBounds">
        <property name="text">
-        <string>Center on Bounds</string>
+        <string>Reset to Data Bounds</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0" colspan="2">
+      <widget class="QPushButton" name="resetCameraToNormal">
+       <property name="text">
+        <string>Reset Camera to Normal</string>
        </property>
       </widget>
      </item>
@@ -167,9 +160,6 @@
   <tabstop>useXNormal</tabstop>
   <tabstop>useYNormal</tabstop>
   <tabstop>useZNormal</tabstop>
-  <tabstop>useCameraNormal</tabstop>
-  <tabstop>resetBounds</tabstop>
-  <tabstop>resetCameraToNormal</tabstop>
  </tabstops>
  <resources/>
  <connections/>

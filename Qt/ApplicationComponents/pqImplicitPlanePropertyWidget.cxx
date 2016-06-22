@@ -44,9 +44,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace
 {
-  // implicit plane widget does not like it when any of the dimensions is 0. So
-  // we ensure that each dimension has some thickness.
-  static void pqFixBounds(vtkBoundingBox& bbox)
+  // Implicit plane widget does not like it when any of the dimensions is 0. So
+  // we ensure that each dimension has some thickness. Then we scale the bounds
+  // by the given factor
+  static void pqAdjustBounds(vtkBoundingBox& bbox, double scaleFactor)
     {
     double max_length = bbox.GetMaxLength();
     max_length = max_length > 0? max_length * 0.05 : 1;
@@ -60,6 +61,10 @@ namespace
         min_point[cc] -= max_length;
         max_point[cc] += max_length;
         }
+
+      double mid = (min_point[cc] + max_point[cc])/2.0;
+      min_point[cc] = mid + scaleFactor * (min_point[cc] - mid);
+      max_point[cc] = mid + scaleFactor * (max_point[cc] - mid);
       }
     bbox.SetMinPoint(min_point);
     bbox.SetMaxPoint(max_point);
@@ -119,9 +124,8 @@ pqImplicitPlanePropertyWidget::pqImplicitPlanePropertyWidget(
   this->connect(ui.useYNormal, SIGNAL(clicked()), SLOT(useYNormal()));
   this->connect(ui.useZNormal, SIGNAL(clicked()), SLOT(useZNormal()));
   this->connect(ui.useCameraNormal, SIGNAL(clicked()), SLOT(useCameraNormal()));
-  this->connect(ui.resetBounds, SIGNAL(clicked()), SLOT(resetBounds()));
-  this->connect(ui.useCenterBounds, SIGNAL(clicked()), SLOT(centerOnBounds()));
   this->connect(ui.resetCameraToNormal, SIGNAL(clicked()), SLOT(resetCameraToNormal()));
+  this->connect(ui.resetToDataBounds, SIGNAL(clicked()), SLOT(resetToDataBounds()));
 
   // link show3DWidget checkbox
   this->connect(ui.show3DWidget, SIGNAL(toggled(bool)), SLOT(setWidgetVisible(bool)));
@@ -159,17 +163,14 @@ void pqImplicitPlanePropertyWidget::placeWidget()
     }
 
   vtkSMNewWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
-
-  double origin[3];
-  vtkSMPropertyHelper(wdgProxy, "Origin").Get(origin, 3);
-  bbox.AddPoint(origin);
-  pqFixBounds(bbox);
-
+  double scaleFactor = vtkSMPropertyHelper(wdgProxy, "PlaceFactor").GetAsDouble();
+  pqAdjustBounds(bbox, scaleFactor);
   double bds[6];
   bbox.GetBounds(bds);
-  vtkSMPropertyHelper(wdgProxy, "PlaceWidget").Set(bds, 6);
+  vtkSMPropertyHelper(wdgProxy, "WidgetBounds").Set(bds, 6);
   wdgProxy->UpdateVTKObjects();
 }
+
 
 //-----------------------------------------------------------------------------
 void pqImplicitPlanePropertyWidget::setDrawPlane(bool val)
@@ -195,40 +196,21 @@ void pqImplicitPlanePropertyWidget::reset()
 }
 
 //-----------------------------------------------------------------------------
-void pqImplicitPlanePropertyWidget::resetBounds()
+void pqImplicitPlanePropertyWidget::resetToDataBounds()
 {
   vtkBoundingBox bbox = this->dataBounds();
-  if (bbox.IsValid())
-    {
-    vtkSMProxy* wdgProxy = this->widgetProxy();
-    pqFixBounds(bbox);
 
-    double input_origin[3];
-    bbox.GetCenter(input_origin);
-
-    double bounds[6];
-    bbox.GetBounds(bounds);
-
-    wdgProxy->InvokeCommand("Reset"); // FIXME: not sure this is still needed.
-    vtkSMPropertyHelper(wdgProxy, "PlaceWidget").Set(bounds, 6);
-    vtkSMPropertyHelper(wdgProxy, "Origin").Set(input_origin, 3);
-    wdgProxy->UpdateVTKObjects();
-    emit this->changeAvailable();
-    this->render();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqImplicitPlanePropertyWidget::centerOnBounds()
-{
-  vtkBoundingBox bbox = this->dataBounds();
   if (bbox.IsValid())
     {
     vtkSMNewWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
-    pqFixBounds(bbox);
-    double origin[3];
+    double scaleFactor = vtkSMPropertyHelper(wdgProxy, "PlaceFactor").GetAsDouble();
+    pqAdjustBounds(bbox, scaleFactor);
+    double origin[3], bounds[6];
     bbox.GetCenter(origin);
+    bbox.GetBounds(bounds);
     vtkSMPropertyHelper(wdgProxy, "Origin").Set(origin, 3);
+    vtkSMPropertyHelper(wdgProxy, "WidgetBounds").Set(bounds, 6);
+    wdgProxy->UpdateProperty("WidgetBounds", true);
     wdgProxy->UpdateVTKObjects();
     emit this->changeAvailable();
     this->render();

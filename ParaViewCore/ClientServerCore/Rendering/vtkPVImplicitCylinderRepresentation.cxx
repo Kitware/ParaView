@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVImplicitPlaneRepresentation.cxx
+  Module:    vtkPVImplicitCylinderRepresentation.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,17 +12,17 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPVImplicitPlaneRepresentation.h"
+#include "vtkPVImplicitCylinderRepresentation.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkMultiProcessController.h"
 #include "vtkProperty.h"
 
 
-vtkStandardNewMacro(vtkPVImplicitPlaneRepresentation);
+vtkStandardNewMacro(vtkPVImplicitCylinderRepresentation);
 
 //----------------------------------------------------------------------------
-vtkPVImplicitPlaneRepresentation::vtkPVImplicitPlaneRepresentation()
+vtkPVImplicitCylinderRepresentation::vtkPVImplicitCylinderRepresentation()
 {
   vtkMultiProcessController * ctrl = NULL;
   ctrl = vtkMultiProcessController::GetGlobalController();
@@ -32,17 +32,17 @@ vtkPVImplicitPlaneRepresentation::vtkPVImplicitPlaneRepresentation()
     opacity = 0.25;
     }
 
-  this->GetPlaneProperty()->SetOpacity(opacity);
-  this->GetSelectedPlaneProperty()->SetOpacity(opacity);
+  this->GetCylinderProperty()->SetOpacity(opacity);
+  this->GetSelectedCylinderProperty()->SetOpacity(opacity);
 }
 
 //----------------------------------------------------------------------------
-vtkPVImplicitPlaneRepresentation::~vtkPVImplicitPlaneRepresentation()
+vtkPVImplicitCylinderRepresentation::~vtkPVImplicitCylinderRepresentation()
 {
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImplicitPlaneRepresentation::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVImplicitCylinderRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
