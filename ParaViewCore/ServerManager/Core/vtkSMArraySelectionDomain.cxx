@@ -15,9 +15,13 @@
 #include "vtkSMArraySelectionDomain.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMArraySelectionDomain);
+
+//---------------------------------------------------------------------------
+bool vtkSMArraySelectionDomain::LoadAllVariables = false;
 
 //---------------------------------------------------------------------------
 vtkSMArraySelectionDomain::vtkSMArraySelectionDomain()
@@ -40,7 +44,17 @@ int vtkSMArraySelectionDomain::SetDefaultValues(vtkSMProperty* prop, bool use_un
       {
       vtkWarningMacro("Developer Warnings: missing unchecked implementation.");
       }
+
     vprop->Copy(infoProp);
+
+    if (vtkSMArraySelectionDomain::LoadAllVariables == true)
+      {
+      vtkSMPropertyHelper helper(vprop);
+      for (vtkIdType i=0;i<this->GetNumberOfStrings();i++)
+        {
+        helper.SetStatus(this->GetString(i),1);
+        }
+      }
     return 1;
     }
   return this->Superclass::SetDefaultValues(prop, use_unchecked_values);

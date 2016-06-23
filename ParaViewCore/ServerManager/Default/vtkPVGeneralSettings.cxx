@@ -18,6 +18,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModuleAutoMPI.h"
 #include "vtkSISourceProxy.h"
+#include "vtkSMArraySelectionDomain.h"
 #include "vtkSMInputArrayDomain.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMTrace.h"
@@ -169,8 +170,11 @@ void vtkPVGeneralSettings::SetScalarBarMode(int val)
 //----------------------------------------------------------------------------
 void vtkPVGeneralSettings::SetInheritRepresentationProperties(bool val)
 {
-  vtkSMParaViewPipelineControllerWithRendering::SetInheritRepresentationProperties(val);
-  this->Modified();
+  if (val != vtkSMParaViewPipelineControllerWithRendering::GetInheritRepresentationProperties())
+    {
+    vtkSMParaViewPipelineControllerWithRendering::SetInheritRepresentationProperties(val);
+    this->Modified();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -183,15 +187,37 @@ void vtkPVGeneralSettings::SetMultiViewImageBorderColor(double r, double g, doub
 //----------------------------------------------------------------------------
 void vtkPVGeneralSettings::SetMultiViewImageBorderWidth(int width)
 {
-  vtkSMViewLayoutProxy::SetMultiViewImageBorderWidth(width);
-  this->Modified();
+  if (width != vtkSMViewLayoutProxy::GetMultiViewImageBorderWidth())
+    {
+    vtkSMViewLayoutProxy::SetMultiViewImageBorderWidth(width);
+    this->Modified();
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVGeneralSettings::SetTransparentBackground(bool val)
 {
-  vtkSMViewProxy::SetTransparentBackground(val);
-  this->Modified();
+  if (val != vtkSMViewProxy::GetTransparentBackground())
+    {
+    vtkSMViewProxy::SetTransparentBackground(val);
+    this->Modified();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeneralSettings::SetLoadAllVariables(bool val)
+{
+  if (val != vtkSMArraySelectionDomain::GetLoadAllVariables())
+    {
+    vtkSMArraySelectionDomain::SetLoadAllVariables(val);
+    this->Modified();
+    }
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVGeneralSettings::GetLoadAllVariables()
+{
+  return vtkSMArraySelectionDomain::GetLoadAllVariables();
 }
 
 //----------------------------------------------------------------------------

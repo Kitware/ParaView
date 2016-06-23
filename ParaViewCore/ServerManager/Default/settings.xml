@@ -87,6 +87,17 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
+      <IntVectorProperty name="LoadAllVariables"
+        number_of_elements="1"
+        default_values="0"
+        command="SetLoadAllVariables"
+        panel_visibility="advanced">
+        <Documentation>
+          Load all variables when loading a data set.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
       <IntVectorProperty name="PropertiesPanelMode"
         command="SetPropertiesPanelMode"
         number_of_elements="1"
@@ -310,6 +321,7 @@
       <PropertyGroup label="Properties Panel Options">
         <Property name="AutoApply" />
         <Property name="AutoApplyActiveOnly" />
+        <Property name="LoadAllVariables" />
       </PropertyGroup>
 
       <PropertyGroup label="Color/Opacity Map Range Options">
