@@ -176,7 +176,7 @@ QString pqExportViewSelection::getSelectionAsString(QString const & scriptFormat
     //cinema camera parameters
     QString cinemaCam = "{}";
     QString camType = viewInfo->getCameraType();
-    if (rvp && (camType != "None"))
+    if (rvp && (camType != "none"))
       {
       cinemaCam = QString("{");
 
@@ -191,25 +191,60 @@ QString pqExportViewSelection::getSelectionAsString(QString const & scriptFormat
       cinemaCam += "\"camera\":\"";
       cinemaCam += camType;
       cinemaCam += "\"";
-      if (camType != "Static")
+      if (camType != "static")
         {
         cinemaCam += ", ";
 
         cinemaCam += "\"phi\":[";
         int j;
-        for (j = -180; j < 180; j+= (360/viewInfo->getPhi()))
+        double v = viewInfo->getPhi();
+        if (camType != "phi-theta")
           {
-          cinemaCam += QString::number(j) + ",";
+          cinemaCam += QString::number(v);
           }
-        cinemaCam.chop(1);
+        else
+          {
+          if (v < 2)
+            {
+            cinemaCam += "0,";
+            }
+          else
+            {
+            for (j = -180; j < 180; j+= (360/v))
+              {
+              cinemaCam += QString::number(j) + ",";
+              }
+            }
+          cinemaCam.chop(1);
+          }
         cinemaCam += "],";
 
         cinemaCam += "\"theta\":[";
-        for (j = -180; j < 180; j+= (360/viewInfo->getTheta()))
+        v = viewInfo->getTheta();
+        if (camType != "phi-theta")
           {
-          cinemaCam += QString::number(j) + ",";
+          cinemaCam += QString::number(v);
           }
-        cinemaCam.chop(1);
+        else
+          {
+          if (v < 2)
+            {
+            cinemaCam += "0,";
+            }
+          else
+            {
+            for (j = -90; j < 90; j+= (180/v))
+              {
+              cinemaCam += QString::number(j) + ",";
+              }
+            }
+          cinemaCam.chop(1);
+          }
+        cinemaCam += "], ";
+
+        cinemaCam += "\"roll\":[";
+        v = viewInfo->getRoll();
+        cinemaCam += QString::number(v);
         cinemaCam += "], ";
 
         vtkCamera *cam = rvp->GetActiveCamera();
@@ -226,7 +261,13 @@ QString pqExportViewSelection::getSelectionAsString(QString const & scriptFormat
           QString::number(at[0]) + "," + QString::number(at[1]) + "," + QString::number(at[2]) + "], ";
         cinemaCam += "\"up\": [" +
           QString::number(up[0]) + "," + QString::number(up[1]) + "," + QString::number(up[2]) + "] ";
-        cinemaCam += "} ";
+        cinemaCam += "}, ";
+
+        //Animation definition and parameters
+        cinemaCam += "\"tracking\":{ ";
+        cinemaCam += "\"object\":\"";
+        cinemaCam += viewInfo->getTrackObjectName();
+        cinemaCam += "\" } ";
         }
       cinemaCam += "}";
       }

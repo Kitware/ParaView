@@ -238,6 +238,54 @@ class Camera(explorers.Track):
                 phis.append(phi)
         return thetas, phis
 
+class PoseCamera(explorers.Track):
+    """
+    A track that connects a ParaView script's pose track which has 3x3
+    camera orientations in it. Also takes in camera_eye, _at and _up
+    arrays, which designate the initial position at each timestep, about
+    which the camera rotated by each pose.
+    """
+    def __init__(self, view, camType, store):
+        super(PoseCamera, self).__init__()
+        self.view = view
+        self.camType = camType
+        self.cstore = store
+
+    def execute(self, document):
+        """moves camera into position for the current phi, theta value"""
+        def VecAdd( V1, V2):
+            return [V1[0]+V2[0], V1[1]+V2[1], V1[2]+V2[2]]
+        def VecSub( V1, V2):
+            return [V1[0]-V2[0], V1[1]-V2[1], V1[2]-V2[2]]
+        def MatrixMul( V, M):
+            return [
+                V[0]*M[0][0] + V[1]*M[0][1] + V[2]*M[0][2],
+                V[0]*M[1][0] + V[1]*M[1][1] + V[2]*M[1][2],
+                V[0]*M[2][0] + V[1]*M[2][1] + V[2]*M[2][2]
+                ]
+        pose = document.descriptor['pose']
+        #at every timestep paraview records camera location
+        #use that as point to spin around
+        iPosition = self.cstore.metadata['camera_eye'][-1]
+        iFocalPoint = self.cstore.metadata['camera_at'][-1]
+        iViewUp = self.cstore.metadata['camera_up'][-1]
+        if self.camType == "azimuth-elevation-roll":
+            pi = VecSub(iPosition, iFocalPoint)
+            pr = MatrixMul(pi,pose)
+            pf = VecAdd(pr, iFocalPoint)
+            self.view.GetActiveCamera().SetPosition(pf)
+            self.view.GetActiveCamera().SetFocalPoint(iFocalPoint)
+        elif self.camType == "yaw-pitch-roll":
+            pi = VecSub(iFocalPoint, iPosition)
+            pr = MatrixMul(pi,pose)
+            pf = VecAdd(pr, iPosition)
+            self.view.GetActiveCamera().SetFocalPoint(pf)
+            self.view.GetActiveCamera().SetPosition(iPosition)
+        else:
+            print "ERROR unexpected camera type"
+        newUp = MatrixMul(iViewUp, pose)
+        self.view.GetActiveCamera().SetViewUp(newUp)
+
 class Slice(explorers.Track):
     """
     A track that connects a slice filter to a scalar valued parameter.

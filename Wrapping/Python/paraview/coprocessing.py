@@ -544,37 +544,45 @@ class CoProcessor(object):
         # Include camera information in the user defined parameters.
         # pv_introspect uses __CinemaTracks to customize the exploration.
         co = view.cpCinemaOptions
-        camType = "Static"
+        camType = co["camera"]
         if "phi" in co:
             self.__CinemaTracks["phi"] = co["phi"]
-            camType = "Spherical"
         if "theta" in co:
             self.__CinemaTracks["theta"] = co["theta"]
-            camType = "Spherical"
+        if "roll" in co:
+            self.__CinemaTracks["roll"] = co["roll"]
+
+        tracking_def = {}
+        if "tracking" in co:
+            tracking_def = co['tracking']
 
         #figure out what we show now
         pxystate= pv_introspect.record_visibility()
+        # a conservative global bounds for consistent z scaling
+        minbds, maxbds  = max_bounds()
 
         #make sure depth rasters are consistent
+        view.MaxClipBounds = [minbds, maxbds, minbds, maxbds, minbds, maxbds]
         view.LockBounds = 1
 
         if specLevel=="B":
             p = pv_introspect.inspect(skip_invisible=True)
         else:
             p = pv_introspect.inspect(skip_invisible=False)
-        fs = pv_introspect.make_cinema_store(p, fname, forcetime = formatted_time,\
+        fs = pv_introspect.make_cinema_store(p, fname, forcetime = formatted_time,
                                              userDefined = self.__CinemaTracks,
-                                             specLevel=specLevel,
-                                             camType=camType)
+                                             specLevel = specLevel,
+                                             camType = camType)
 
         #all nodes participate, but only root can writes out the files
         pm = servermanager.vtkProcessModule.GetProcessModule()
         pid = pm.GetPartitionId()
 
-        pv_introspect.explore(fs, p, iSave = (pid == 0), currentTime = {'time':formatted_time},\
+        pv_introspect.explore(fs, p, iSave = (pid == 0), currentTime = {'time':formatted_time},
                               userDefined = self.__CinemaTracks,
-                              specLevel=specLevel,
-                              camType=camType)
+                              specLevel = specLevel,
+                              camType = camType,
+                              tracking = tracking_def)
         if pid == 0:
             fs.save()
 

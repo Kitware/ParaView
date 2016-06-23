@@ -270,6 +270,29 @@ class Store(object):
             return 0
         return int(self.metadata['version'].split('.')[1])
 
+    def get_camera_model(self):
+        """ return the camera model that the raster images in the store correspond to """
+        if self.metadata == None or not 'camera_model' in self.metadata:
+            #figure out something appropriate for pre-spec C stores
+            if 'phi' in self.parameter_list and 'theta' in self.parameter_list:
+                #camera is represented by phi aka 'azimuth' and theta aka 'elevation' tracks)
+                return 'phi-theta'
+            #camera does not vary
+            return 'static'
+        if self.metadata['camera_model'] == 'static':
+            #camera does not vary
+            return self.metadata['camera_model']
+        elif self.metadata['camera_model'] == 'phi-theta':
+            #camera is represented by phi aka 'azimuth' and theta aka 'elevation' tracks)
+            return self.metadata['camera_model']
+        elif self.metadata['camera_model'] == 'azimuth-elevation-roll':
+            #camera is represented by a pose (Matrix) track, azimuth, elevation and roll vary
+            return self.metadata['camera_model']
+        elif self.metadata['camera_model'] == 'yaw-pitch-roll':
+            #camera is represented by a pose (Matrix) track, yaw, pitch and roll vary
+            return self.metadata['camera_model']
+        return 'static'
+
     def create(self):
         """
         Creates an empty store.

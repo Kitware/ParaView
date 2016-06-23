@@ -76,6 +76,30 @@ def record_visibility():
         proxies.append(listElt)
     return proxies
 
+def max_bounds():
+    """ returns conservative min and max (over x y and z) bounds """
+    source_proxies = paraview.servermanager.ProxyManager().GetProxiesInGroup(
+        "sources")
+
+    minb = 0
+    maxb = -1
+    for key in source_proxies:
+        proxy = source_proxies[key]
+        bounds = proxy.GetDataInformation().GetBounds()
+        if bounds[0] < minb:
+            minb = bounds[0]
+        if bounds[2] < minb:
+            minb = bounds[2]
+        if bounds[4] < minb:
+            minb = bounds[4]
+        if bounds[1] > maxb:
+            maxb = bounds[1]
+        if bounds[3] > maxb:
+            maxb = bounds[3]
+        if bounds[5] > maxb:
+            maxb = bounds[5]
+    return minb, maxb
+
 def restore_visibility(proxies):
     """at end of run, return to a previously recorded paraview state"""
     view_proxy = paraview.simple.GetActiveView()
@@ -316,8 +340,13 @@ def add_customized_array_selection(sourceName, source, fields, ranges, userDefin
                 defaultName = fName
     return defaultName
 
-def make_cinema_store(proxies, ocsfname, forcetime=False, userDefined = {},
-                      specLevel = "A", camType = "Spherical"):
+def make_cinema_store(proxies,
+                      ocsfname,
+                      view,
+                      forcetime=False,
+                      userDefined = {},
+                      specLevel = "A",
+                      camType='phi-theta'):
     """
     Takes in the pipeline, structured as a tree, and makes a cinema store definition
     containing all the parameters we will vary.
@@ -335,26 +364,44 @@ def make_cinema_store(proxies, ocsfname, forcetime=False, userDefined = {},
         #thetas = [0,20,40,60,80,100,120,140,160,180]
         thetas = [0,90,180]
 
+    if "roll" in userDefined:
+        rolls = userDefined["roll"]
+    else:
+        rolls = [0,45,90,135,180,225,270,315]
+    if camType == 'static' or camType == 'phi-theta':
+        rolls = [0]
+
     tvalues = []
+    eye_values = []
+    at_values = []
+    up_values = []
     cs = cinema_store.FileStore(ocsfname)
     try:
         cs.load()
         tprop = cs.get_parameter('time')
         tvalues = tprop['values']
+        eye_values = cs.metadata['camera_eye']
+        at_values = cs.metadata['camera_at']
+        up_values = cs.metadata['camera_up']
+
         #start with clean slate, other than time
         cs = cinema_store.FileStore(ocsfname)
     except IOError, KeyError:
         pass
 
+    cs.add_metadata({'store_type':'FS'})
     if specLevel == "A":
         cs.add_metadata({'type':'parametric-image-stack'})
         cs.add_metadata({'version':'0.0'})
     if specLevel == "B":
         cs.add_metadata({'type':'composite-image-stack'})
         cs.add_metadata({'version':'0.1'})
-    cs.add_metadata({'store_type':'FS'})
     pipeline = get_pipeline()
     cs.add_metadata({'pipeline':pipeline})
+    cs.add_metadata({'camera_model':camType})
+    cs.add_metadata({'camera_eye':eye_values})
+    cs.add_metadata({'camera_at':at_values})
+    cs.add_metadata({'camera_up':up_values})
 
     vis = [proxy['name'] for proxy in proxies]
     if specLevel == "A":
@@ -401,13 +448,95 @@ def make_cinema_store(proxies, ocsfname, forcetime=False, userDefined = {},
             cs.add_parameter("time", cinema_store.make_parameter('time', prettytimes))
             fnp = "{time}"
 
-    if camType == "Spherical":
+    if camType == "static":
+        pass
+
+    elif camType == "phi-theta":
         cs.add_parameter("phi", cinema_store.make_parameter('phi', phis))
         cs.add_parameter("theta", cinema_store.make_parameter('theta', thetas))
         if fnp == "":
             fnp = "{phi}/{theta}"
         else:
             fnp = fnp + "/{phi}/{theta}"
+
+    else:
+        #for AER and YPR, make up a set of view matrices corresponding
+        #to the requested number of samples in each axis
+        def MatrixMul( mtx_a, mtx_b):
+            tpos_b = zip( *mtx_b)
+            rtn = [[ sum( ea*eb for ea,eb in zip(a,b)) for b in tpos_b] for a in mtx_a]
+            return rtn
+
+        cam = view.GetActiveCamera()
+        poses = [] #holds phi, theta and roll angle tuples
+        matrices = [] #holds corresponding transform matrices
+
+        v = rolls[0]
+        rolls = []
+        if v < 2:
+            rolls.append(0);
+        else:
+            j = -180
+            while j<180:
+                rolls.append(j)
+                j = j+360/v
+
+        v = thetas[0]
+        thetas = []
+        if v < 2:
+            thetas.append(0);
+        else:
+            j = -90
+            while j<=90:
+                thetas.append(j)
+                j = j+180/v
+
+        for r in rolls:
+            for t in thetas:
+                v = phis[0]
+                if v < 2:
+                    poses.append((0,t,r))
+                else:
+                    #sample less frequently toward the pole
+                    increment_Scale = math.cos(math.pi*t/180.0)
+                    if increment_Scale == 0:
+                        increment_Scale = 1
+                    #increment_Scale = 1 #for easy comparison
+                    j = -180
+                    while j<180:
+                        poses.append((j,t,r))
+                        j = j+360/(v*increment_Scale)
+
+        #default is one closest to 0,0,0
+        dist = math.sqrt((poses[0][0]*poses[0][0]) +
+                         (poses[0][1]*poses[0][1]) +
+                         (poses[0][2]*poses[0][2]))
+        default_mat = 0
+        for i in poses:
+            p,t,r = i
+            cP = math.cos(-math.pi*(p/180.0)) #phi is right to left
+            sP = math.sin(-math.pi*(p/180.0))
+            cT = math.cos(-math.pi*(t/180.0)) #theta is up down
+            sT = math.sin(-math.pi*(t/180.0))
+            cR = math.cos(-math.pi*(r/180.0)) #roll is around gaze direction
+            sR = math.sin(-math.pi*(r/180.0))
+            rX = [ [1,0,0], [0,cT,-sT], [0,sT,cT] ]
+            rY = [ [cP,0,sP], [0,1,0], [-sP,0,cP] ]
+            rZ = [ [cR,-sR,0], [sR,cR,0], [0,0,1] ]
+            m1 = [ [1,0,0],  [0,1,0],  [0,0,1] ]
+            m2 = MatrixMul(m1,rX)
+            m3 = MatrixMul(m2,rY)
+            m4 = MatrixMul(m3,rZ)
+            matrices.append(m4)
+            newdist = math.sqrt(p*p+t*t+r*r)
+            if newdist < dist:
+                default_mat = m4
+                dist = newdist
+
+        cs.add_parameter("pose",
+                         cinema_store.make_parameter('pose', matrices,
+                                                     default=default_mat))
+        fnp = fnp+"{pose}.png"
 
     if specLevel == "A":
         for pname in pnames:
@@ -424,8 +553,47 @@ def make_cinema_store(proxies, ocsfname, forcetime=False, userDefined = {},
     cs.filename_pattern = fnp
     return cs
 
+def track_source(proxy, eye, at, up):
+    """ an animation mode that follows a specific object
+    input camera position is in eye, at, up
+    returns same, moved to follow the input proxy
+    """
+    #code duplicated from vtkPVCameraCueManipulator
+    if proxy is None:
+        return eye, at, up
+
+    info = proxy.GetDataInformation()
+    bounds = info.GetBounds();
+
+    center = [(bounds[0] + bounds[1]) * 0.5,
+              (bounds[2] + bounds[3]) * 0.5,
+              (bounds[4] + bounds[5]) * 0.5]
+
+    ret_eye = [center[0] + (eye[0] - at[0]),
+               center[1] + (eye[1] - at[1]),
+               center[2] + (eye[2] - at[2])]
+
+    ret_at = [center[0], center[1], center[2]]
+    return ret_eye, ret_at, up
+
+def project_to_at(eye, fp, cr):
+    """project center of rotation onto focal point to keep gaze direction the same
+    while allowing both translate and zoom in and out to work"""
+    d_fp = [fp[0]-eye[0], fp[1]-eye[1], fp[2]-eye[2]]
+    d_cr = [cr[0]-eye[0], cr[1]-eye[1], cr[2]-eye[2]]
+    num = (d_fp[0]*d_cr[0] + d_fp[1]*d_cr[1] + d_fp[2]*d_cr[2])
+    den = (d_fp[0]*d_fp[0] + d_fp[1]*d_fp[1] + d_fp[2]*d_fp[2])
+    if den == 0:
+        return cr
+    rat = num/den
+    p_fp = [rat*d_fp[0], rat*d_fp[1], rat*d_fp[2]]
+    at = [p_fp[0]+eye[0], p_fp[1]+eye[1], p_fp[2]+eye[2]]
+    return at
+
 def explore(cs, proxies, iSave=True, currentTime=None, userDefined = {},
-            specLevel = "A", camType = "Spherical"):
+            specLevel = "A",
+            camType = 'phi-theta',
+            tracking={}):
     """
     Runs a pipeline through all the changes we know how to make and saves off
     images into the store for each one.
@@ -436,11 +604,12 @@ def explore(cs, proxies, iSave=True, currentTime=None, userDefined = {},
     view_proxy = paraview.simple.GetActiveView()
     dist = paraview.simple.GetActiveCamera().GetDistance()
 
-    #associate control points wlth parameters of the data store
+    #associate control points with parameters of the data store
     params = cs.parameter_list.keys()
-    cols = []
     tracks = []
-    if camType == "Spherical":
+    if camType=='static':
+        pass
+    elif camType == "phi-theta":
         up = [math.fabs(x) for x in view_proxy.CameraViewUp]
         uppest = 0
         if up[1]>up[uppest]: uppest = 1
@@ -449,7 +618,11 @@ def explore(cs, proxies, iSave=True, currentTime=None, userDefined = {},
         cinup[uppest]=1
         cam = pv_explorers.Camera(view_proxy.CameraFocalPoint, cinup, dist, view_proxy)
         tracks.append(cam)
+    else:
+        cam = pv_explorers.PoseCamera(view_proxy, camType, cs)
+        tracks.append(cam)
 
+    cols = []
 
     ctime_float=None
     if currentTime:
@@ -509,16 +682,52 @@ def explore(cs, proxies, iSave=True, currentTime=None, userDefined = {},
                                    tracks,
                                    view_proxy,
                                    iSave)
-
     for c in cols:
         c.imageExplorer = e
 
+    eye_values = cs.metadata['camera_eye']
+    at_values = cs.metadata['camera_at']
+    up_values = cs.metadata['camera_up']
+
+    eye = [x for x in view_proxy.CameraPosition]
+    _fp = [x for x in view_proxy.CameraFocalPoint]
+    _cr = [x for x in view_proxy.CenterOfRotation]
+    at = project_to_at(eye, _fp, _cr)
+    up = [x for x in view_proxy.CameraViewUp]
     times = paraview.simple.GetAnimationScene().TimeKeeper.TimestepValues
+
+    #if tracking is turned on, find out how to move
+    tracked_source = None
+    if 'object' in tracking:
+        #for now, just emulate animation's best mode with a mode that follows
+        #an object
+        objname = tracking['object']
+        tracked_source = paraview.simple.FindSource(objname)
+        if tracked_source is None:
+            name_upper = objname[0].upper() + objname[1:]
+            tracked_source = paraview.simple.FindSource(name_upper)
+
     if not times:
+        eye, at, up = track_source(tracked_source, eye, at, up)
+        eye_values.append([x for x in eye])
+        at_values.append([x for x in at])
+        up_values.append([x for x in up])
+        cs.add_metadata({'camera_eye':eye_values})
+        cs.add_metadata({'camera_at':at_values})
+        cs.add_metadata({'camera_up':up_values})
         e.explore(currentTime)
     else:
         for t in times:
             view_proxy.ViewTime=t
+            minbds, maxbds  = max_bounds()
+            view_proxy.MaxClipBounds = [minbds, maxbds, minbds, maxbds, minbds, maxbds]
+            eye, at, up = track_source(tracked_source, eye, at, up)
+            eye_values.append([x for x in eye])
+            at_values.append([x for x in at])
+            up_values.append([x for x in up])
+            cs.add_metadata({'camera_eye':eye_values})
+            cs.add_metadata({'camera_at':at_values})
+            cs.add_metadata({'camera_up':up_values})
             e.explore({'time':float_limiter(t)})
 
 def explore_customized_array_selection(sourceName, source, colorList, userDefined):
@@ -584,22 +793,22 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
     initialView = paraview.simple.GetActiveView()
     pvstate = record_visibility()
 
+    # a conservative global bounds for consistent z scaling
+    minbds, maxbds  = max_bounds()
+
     atLeastOneViewExported = False
     for viewName, viewParams in viewSelection.iteritems():
 
         # check if this view was selected to export as spec b
         cinemaParams = viewParams[6]
         if len(cinemaParams) == 0:
-            print "Skipping view: Not selected to export to cinema."
+            print "Skipping view: Not selected to export to cinema"
             continue
 
-        camType = "None"
-        if "camera" in cinemaParams and cinemaParams["camera"] != "None":
-            if cinemaParams["camera"] == "Static":
-                camType = "Static"
-            if cinemaParams["camera"] == "Spherical":
-                camType = "Spherical"
-        if camType == "None":
+        camType = "none"
+        if "camera" in cinemaParams and cinemaParams["camera"] != "none":
+            camType =  cinemaParams["camera"]
+        if camType == "none":
             print "Skipping view: Not selected to export to cinema."
             continue
 
@@ -611,7 +820,9 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
         view = paraview.simple.FindView(viewName)
         paraview.simple.SetActiveView(view)
         view.ViewSize = [viewParams[4], viewParams[5]]
-        paraview.simple.Render() # fully renders the scene (if not, some faces might be culled)
+        #paraview.simple.Render() # fully renders the scene (if not, some faces might be culled)
+
+        view.MaxClipBounds = [minbds, maxbds, minbds, maxbds, minbds, maxbds]
         view.LockBounds = 1
 
         #writeFreq = viewParams[1] # TODO where to get the timestamp in this case?
@@ -622,7 +833,8 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
         fitToScreen = viewParams[2]
         if fitToScreen != 0:
             if view.IsA("vtkSMRenderViewProxy") == True:
-                view.ResetCamera()
+                pass
+                #view.ResetCamera()
             elif view.IsA("vtkSMContextViewProxy") == True:
                 view.ResetDisplay()
             else:
@@ -635,6 +847,13 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
         if "phi" in cinemaParams:
             userDefValues["phi"] = cinemaParams["phi"]
 
+        if "roll" in cinemaParams:
+            userDefValues["roll"] = cinemaParams["roll"]
+
+        tracking_def = {}
+        if "tracking" in cinemaParams:
+            tracking_def = cinemaParams['tracking']
+
         # generate file path
         import os.path
         viewFileName = viewParams[0]
@@ -642,14 +861,16 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
         filePath = os.path.join(baseDirName, viewDirName, "info.json")
 
         p = inspect()
-        cs = make_cinema_store(p, filePath, forcetime = False,\
+
+        cs = make_cinema_store(p, filePath, view, forcetime = False,
                                userDefined = userDefValues,
                                specLevel = specLevel,
                                camType = camType)
 
         explore(cs, p, userDefined = userDefValues,
                 specLevel = specLevel,
-                camType = camType)
+                camType = camType,
+                tracking = tracking_def)
 
         view.LockBounds = 0
         cs.save()
