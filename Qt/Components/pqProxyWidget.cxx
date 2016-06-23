@@ -1208,8 +1208,14 @@ bool pqProxyWidget::filterWidgets(bool show_advanced, const QString& filterText)
     }
 
   // disable updates to avoid flicker
+  // only if needed to avoid bug 
+  // with setUpdatesEnabled
+  // https://bugreports.qt.io/browse/QTBUG-8459
   bool prevUE = this->updatesEnabled();
-  this->setUpdatesEnabled(false);
+  if (prevUE)
+    {
+    this->setUpdatesEnabled(false);
+    }
 
   const pqProxyWidgetItem* prevItem = NULL;
   vtkSMProxy* smProxy = this->Internals->Proxy;
@@ -1226,7 +1232,10 @@ bool pqProxyWidget::filterWidgets(bool show_advanced, const QString& filterText)
       item->hide();
       }
     }
-  this->setUpdatesEnabled(prevUE);
+  if (prevUE)
+    {
+    this->setUpdatesEnabled(prevUE);
+    }
   return (prevItem != NULL);
 }
 
