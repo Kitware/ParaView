@@ -48,10 +48,12 @@ public:
   void* AnimationSceneVoidPtr;
   pqPropertyLinks Links;
   int CachedTimestepCount;
+  int Precision;
 
   pqInternals(pqAnimationTimeWidget* self) :
     AnimationSceneVoidPtr(NULL),
-    CachedTimestepCount(-1)
+    CachedTimestepCount(-1),
+    Precision(17)
     {
     this->Ui.setupUi(self);
     this->Ui.timeValue->setValidator(new QDoubleValidator(self));
@@ -170,7 +172,8 @@ vtkSMProxy* pqAnimationTimeWidget::timeKeeper() const
 void pqAnimationTimeWidget::setTimeValue(double time)
 {
   Ui::AnimationTimeWidget &ui = this->Internals->Ui;
-  ui.timeValue->setTextAndResetCursor(QString::number(time, 'g', 17));
+  ui.timeValue->setTextAndResetCursor(
+    QString::number(time, 'g', this->Internals->Precision));
   bool prev = ui.timestepValue->blockSignals(true);
   int index = vtkSMTimeKeeperProxy::GetLowerBoundTimeStepIndex(this->timeKeeper(), time);
   ui.timestepValue->setValue(index);
@@ -182,6 +185,18 @@ double pqAnimationTimeWidget::timeValue() const
 {
   Ui::AnimationTimeWidget &ui = this->Internals->Ui;
   return ui.timeValue->text().toDouble();
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationTimeWidget::setTimePrecision(int val)
+{
+  this->Internals->Precision = val;
+}
+
+//-----------------------------------------------------------------------------
+int pqAnimationTimeWidget::timePrecision() const
+{
+  return this->Internals->Precision;
 }
 
 //-----------------------------------------------------------------------------

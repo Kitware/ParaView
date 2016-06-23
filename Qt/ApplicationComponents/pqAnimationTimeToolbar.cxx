@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -34,7 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationManager.h"
 #include "pqAnimationScene.h"
 #include "pqAnimationTimeWidget.h"
+#include "pqCoreUtilities.h"
 #include "pqPVApplicationCore.h"
+#include "vtkCommand.h"
+#include "vtkPVGeneralSettings.h"
 
 //-----------------------------------------------------------------------------
 void pqAnimationTimeToolbar::constructor()
@@ -46,6 +49,9 @@ void pqAnimationTimeToolbar::constructor()
   this->connect(pqPVApplicationCore::instance()->animationManager(),
     SIGNAL(activeSceneChanged(pqAnimationScene*)),
     SLOT(setAnimationScene(pqAnimationScene*)));
+  pqCoreUtilities::connect(vtkPVGeneralSettings::GetInstance(),
+                           vtkCommand::ModifiedEvent,
+                           this, SLOT(updateTimePrecision()));
 }
 
 //-----------------------------------------------------------------------------
@@ -53,6 +59,17 @@ void pqAnimationTimeToolbar::setAnimationScene(pqAnimationScene* scene)
 {
   this->AnimationTimeWidget->setAnimationScene(
     scene? scene->getProxy() : NULL);
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationTimeToolbar::updateTimePrecision()
+{
+  if (this->AnimationTimeWidget->timePrecision() !=
+      vtkPVGeneralSettings::GetInstance()->GetAnimationTimePrecision())
+    {
+    this->AnimationTimeWidget->setTimePrecision(
+      vtkPVGeneralSettings::GetInstance()->GetAnimationTimePrecision());
+    }
 }
 
 //-----------------------------------------------------------------------------

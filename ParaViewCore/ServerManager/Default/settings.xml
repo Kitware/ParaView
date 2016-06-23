@@ -244,6 +244,18 @@
         </Hints>
       </IntVectorProperty>
 
+      <IntVectorProperty name="AnimationTimePrecision"
+        number_of_elements="1"
+        default_values="17"
+        command="SetAnimationTimePrecision"
+        panel_visibility="advanced">
+        <Documentation>
+          Set the number of significant digits displayed for the time in the animation
+          toolbar.
+        </Documentation>
+        <IntRangeDomain min="1" max="17" />
+      </IntVectorProperty>
+
       <DoubleVectorProperty name="MultiViewImageBorderColor"
         command="SetMultiViewImageBorderColor"
         number_of_elements="3"
@@ -334,6 +346,7 @@
       <PropertyGroup label="Animation">
         <Property name="CacheGeometryForAnimation" />
         <Property name="AnimationGeometryCacheLimit" />
+        <Property name="AnimationTimePrecision" />
       </PropertyGroup>
 
       <PropertyGroup label="Screenshot Options">
