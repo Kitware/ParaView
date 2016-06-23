@@ -22,14 +22,12 @@ doCoprocessing = True
 if doCoprocessing:
     import coprocessor
     coprocessor.initialize()
-    coprocessor.addscript("cpscript.py")
+    #coprocessor.addscript("cpscript.py")
 
 for i in range(100):
     attributes.Update(i)
     if doCoprocessing:
-        import coprocessor
         coprocessor.coprocess(i, i, grid, attributes)
 
 if doCoprocessing:
-    import coprocessor
     coprocessor.finalize()
