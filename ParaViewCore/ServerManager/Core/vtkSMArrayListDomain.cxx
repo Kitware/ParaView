@@ -649,17 +649,35 @@ int vtkSMArrayListDomain::SetDefaultValues(vtkSMProperty* prop, bool use_uncheck
   // use it.
   const char* defaultValue = svp->GetDefaultValue(0);
   unsigned int temp;
-  if (defaultValue && this->IsInDomain(defaultValue, temp))
+  if (defaultValue)
     {
-    if (helper.GetNumberOfElements() == 5)
+    if (this->IsInDomain(defaultValue, temp))
       {
-      helper.Set(4, defaultValue);
-      return 1;
+      // Support for SetInputArrayToProcess with single default value array name
+      if (helper.GetNumberOfElements() == 5)
+        {
+        helper.Set(4, defaultValue);
+        return 1;
+        }
+      // Standard default value
+      else if (helper.GetNumberOfElements() == 1)
+        {
+        helper.Set(0, defaultValue);
+        return 1;
+        }
       }
-    else if (helper.GetNumberOfElements() == 1)
+    else if (helper.GetNumberOfElements() == 5)
       {
-      helper.Set(0, defaultValue);
-      return 1;
+      // Support for set input array to process with full length default values
+      defaultValue = svp->GetDefaultValue(4);
+      if (this->IsInDomain(defaultValue, temp))
+        {
+        if (!svp->IsValueDefault())
+          {
+          svp->ResetToXMLDefaults();
+          }
+        return 1;
+        }
       }
     }
 
