@@ -213,12 +213,6 @@ public:
   static void RegisterHelper(const char *classname,
                              const char *helperclassname);
 
-  // Description:
-  // Specify whether or not to sort the point data, cell data,
-  // and field data arrays. The default is to sort.
-  vtkGetMacro(SortArrays, bool);
-  void SetSortArrays(bool);
-
 protected:
   vtkPVDataInformation();
   ~vtkPVDataInformation();
@@ -283,7 +277,6 @@ private:
   void operator=(const vtkPVDataInformation&); // Not implemented
 
   int PortNumber;
-  bool SortArrays;
 };
 
 #endif

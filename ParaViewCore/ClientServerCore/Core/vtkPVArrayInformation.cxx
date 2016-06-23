@@ -28,10 +28,11 @@
 #include "vtkVariant.h"
 #include "vtkVariantArray.h"
 
+#include <algorithm>
 #include <map>
 #include <set>
-#include <vector>
 #include <sstream>
+#include <vector>
 
 namespace
 {
@@ -390,7 +391,7 @@ void vtkPVArrayInformation::GetDataTypeRange(double range[2])
 //----------------------------------------------------------------------------
 void vtkPVArrayInformation::AddRanges(vtkPVArrayInformation *info)
 {
-  double *range;
+  const double *range;
   double *ptr = this->Ranges;
   int idx;
 
@@ -402,28 +403,16 @@ void vtkPVArrayInformation::AddRanges(vtkPVArrayInformation *info)
   if (this->NumberOfComponents > 1)
     {
     range = info->GetComponentRange(-1);
-    if (range[0] < ptr[0])
-      {
-      ptr[0] = range[0];
-      }
-    if (range[1] > ptr[1])
-      {
-      ptr[1] = range[1];
-      }
+    ptr[0] = std::min(ptr[0], range[0]);
+    ptr[1] = std::max(ptr[1], range[1]);
     ptr += 2;
     }
 
   for (idx = 0; idx < this->NumberOfComponents; ++idx)
     {
     range = info->GetComponentRange(idx);
-    if (range[0] < ptr[0])
-      {
-      ptr[0] = range[0];
-      }
-    if (range[1] > ptr[1])
-      {
-      ptr[1] = range[1];
-      }
+    ptr[0] = std::min(ptr[0], range[0]);
+    ptr[1] = std::max(ptr[1], range[1]);
     ptr += 2;
     }
 }

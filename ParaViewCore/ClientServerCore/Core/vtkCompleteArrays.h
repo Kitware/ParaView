@@ -26,20 +26,12 @@
 #include "vtkDataSetAlgorithm.h"
 
 class vtkMultiProcessController;
-class vtkPVArrayInformation;
-class vtkPVDataSetAttributesInformation;
-class vtkDataSetAttributes;
 
-
-class VTKPVCLIENTSERVERCORECORE_EXPORT vtkCompleteArrays : public vtkDataSetAlgorithm 
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkCompleteArrays : public vtkDataSetAlgorithm
 {
 public:
   vtkTypeMacro(vtkCompleteArrays,vtkDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Construct object with LowPoint=(0,0,0) and HighPoint=(0,0,1). Scalar
-  // range is (0,1).
   static vtkCompleteArrays *New();
 
   // Description:
@@ -54,18 +46,10 @@ protected:
   virtual int RequestData(vtkInformation* request,
                           vtkInformationVector** inputVector,
                           vtkInformationVector* outputVector);
-  void FillArrays(vtkDataSetAttributes* da, 
-                  vtkPVDataSetAttributesInformation* attrInfo);
-
   vtkMultiProcessController* Controller;
-
-  vtkDataArray* CreateArray(vtkPVArrayInformation* aInfo);
-
 private:
   vtkCompleteArrays(const vtkCompleteArrays&);  // Not implemented.
   void operator=(const vtkCompleteArrays&);  // Not implemented.
 };
 
 #endif
-
-
