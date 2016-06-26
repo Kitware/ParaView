@@ -102,7 +102,8 @@ void vtkPythonCalculator::ExecuteScript(void *arg)
 //----------------------------------------------------------------------------
 void vtkPythonCalculator::Exec(const char* expression)
 {
-  if (!expression)
+  // Do not execute if expression is null or empty.
+  if (!expression || expression[0] == '\0')
     {
     return;
     }
