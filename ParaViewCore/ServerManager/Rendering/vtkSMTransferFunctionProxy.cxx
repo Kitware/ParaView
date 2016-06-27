@@ -417,7 +417,6 @@ bool vtkSMTransferFunctionProxy::ComputeAvailableAnnotations(bool extend)
         vtkSMPVRepresentationProxy::GetProminentValuesInformationForColorArray(consumer);
       if (!prominentValues)
         {
-        vtkWarningMacro(<< "No prominent values for consumer");
         continue;
         }
       vtkSmartPointer<vtkAbstractArray> uniqueValues;
