@@ -263,6 +263,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/MultiSliceMultiBlock.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/MultiSliceWavelet.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/NormalGlyphs.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/NumberOfComponentsDomain.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/NiftiReaderWriterPlugin.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/NonConvexPolygon.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/OpenSaveData.xml

@@ -40,9 +40,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMEnumerationDomain.h"
 #include "vtkSMIntRangeDomain.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMNumberOfComponentsDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 
+#include "pqComboBoxDomain.h"
 #include "pqIntRangeWidget.h"
 #include "pqLabel.h"
 #include "pqLineEdit.h"
@@ -162,6 +164,14 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
         {
         comboBox->addItem(ed->GetEntryText(i));
         }
+      // vtkSMNumberOfComponentsDomain is a dynamic domain
+      // hence we need to connect it to a pqComboBoxDomain
+      // so the combobox will stay updated.
+      if (vtkSMNumberOfComponentsDomain::SafeDownCast(domain))
+        {
+        new pqComboBoxDomain(comboBox, smproperty, "comps");
+        }
+
       pqSignalAdaptorComboBox *adaptor = new pqSignalAdaptorComboBox(comboBox);
       this->addPropertyLink(adaptor,
         "currentText",

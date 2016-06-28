@@ -26,16 +26,16 @@
 #define vtkSMNumberOfComponentsDomain_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
-#include "vtkSMIntRangeDomain.h"
+#include "vtkSMEnumerationDomain.h"
 
 class vtkSMSourceProxy;
 class vtkSMInputArrayDomain;
 
-class VTKPVSERVERMANAGERCORE_EXPORT vtkSMNumberOfComponentsDomain : public vtkSMIntRangeDomain
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMNumberOfComponentsDomain : public vtkSMEnumerationDomain
 {
 public:
   static vtkSMNumberOfComponentsDomain* New();
-  vtkTypeMacro(vtkSMNumberOfComponentsDomain, vtkSMIntRangeDomain);
+  vtkTypeMacro(vtkSMNumberOfComponentsDomain, vtkSMEnumerationDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

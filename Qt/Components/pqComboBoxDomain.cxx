@@ -210,6 +210,7 @@ void pqComboBoxDomain::internalDomainChanged()
       texts.append(var.toString());
       data.append(var.toString());
       }
+    combo->setEnabled(enums.size() > 1);
     cur_property_value = pqSMAdaptor::getEnumerationProperty(
       this->Internal->Property);
     }

@@ -45,7 +45,7 @@ void vtkSMNumberOfComponentsDomain::Update(vtkSMProperty*)
   if (!ip || !svp)
     {
     // Missing required properties.
-    this->SetEntries(std::vector<vtkEntry>());
+    this->RemoveAllEntries();
     return;
     }
 
@@ -56,7 +56,7 @@ void vtkSMNumberOfComponentsDomain::Update(vtkSMProperty*)
     // We can only handle array selection properties with 5, 2 or 1 elements.
     // For 5 elements the array name is at indices [4]; for 2
     // elements it's at [1], while for 1 elements, it's at [0].
-    this->SetEntries(std::vector<vtkEntry>());
+    this->RemoveAllEntries();
     return;
     }
 
@@ -65,7 +65,7 @@ void vtkSMNumberOfComponentsDomain::Update(vtkSMProperty*)
   if (!arrayName || arrayName[0] == 0)
     {
     // No array choosen.
-    this->SetEntries(std::vector<vtkEntry>());
+    this->RemoveAllEntries();
     return;
     }
 
@@ -88,7 +88,7 @@ void vtkSMNumberOfComponentsDomain::Update(vtkSMProperty*)
     {
     // Failed to locate a vtkSMInputArrayDomain on the input property, which is
     // required.
-    this->SetEntries(std::vector<vtkEntry>());
+    this->RemoveAllEntries();
     return;
     }
 
@@ -120,7 +120,7 @@ void vtkSMNumberOfComponentsDomain::Update(const char* arrayName,
   vtkPVDataInformation* info = sp->GetDataInformation(outputport);
   if (!info)
     {
-    this->SetEntries(std::vector<vtkEntry>());
+    this->RemoveAllEntries();
     return;
     }
 
@@ -128,36 +128,45 @@ void vtkSMNumberOfComponentsDomain::Update(const char* arrayName,
   vtkPVArrayInformation* ai = 0;
 
   if (iadAttributeType == vtkSMInputArrayDomain::POINT ||
-    iadAttributeType == vtkSMInputArrayDomain::ANY)
+    iadAttributeType == vtkSMInputArrayDomain::ANY ||
+    iadAttributeType == vtkSMInputArrayDomain::ANY_EXCEPT_FIELD)
     {
     ai = info->GetPointDataInformation()->GetArrayInformation(arrayName);
     }
   else if (iadAttributeType == vtkSMInputArrayDomain::CELL || 
-    (iadAttributeType == vtkSMInputArrayDomain::ANY && !ai))
+    ((iadAttributeType == vtkSMInputArrayDomain::ANY || 
+      iadAttributeType == vtkSMInputArrayDomain::ANY_EXCEPT_FIELD) && !ai))
     {
     ai = info->GetCellDataInformation()->GetArrayInformation(arrayName);
     }
-  else if (iadAttributeType == vtkSMInputArrayDomain::VERTEX || 
-    (iadAttributeType == vtkSMInputArrayDomain::ANY && !ai))
+  else if (iadAttributeType == vtkSMInputArrayDomain::VERTEX ||
+    ((iadAttributeType == vtkSMInputArrayDomain::ANY || 
+      iadAttributeType == vtkSMInputArrayDomain::ANY_EXCEPT_FIELD) && !ai))
     {
     ai = info->GetVertexDataInformation()->GetArrayInformation(arrayName);
     }
-  else if (iadAttributeType == vtkSMInputArrayDomain::EDGE || 
-    (iadAttributeType == vtkSMInputArrayDomain::ANY && !ai))
+  else if (iadAttributeType == vtkSMInputArrayDomain::EDGE ||
+    ((iadAttributeType == vtkSMInputArrayDomain::ANY || 
+      iadAttributeType == vtkSMInputArrayDomain::ANY_EXCEPT_FIELD) && !ai))
     {
     ai = info->GetEdgeDataInformation()->GetArrayInformation(arrayName);
     }
-  else if (iadAttributeType == vtkSMInputArrayDomain::ROW || 
-    (iadAttributeType == vtkSMInputArrayDomain::ANY && !ai))
+  else if (iadAttributeType == vtkSMInputArrayDomain::ROW ||
+    ((iadAttributeType == vtkSMInputArrayDomain::ANY || 
+      iadAttributeType == vtkSMInputArrayDomain::ANY_EXCEPT_FIELD) && !ai))
     {
     ai = info->GetRowDataInformation()->GetArrayInformation(arrayName);
     }
 
   if (ai)
     {
-    std::vector<vtkEntry> entries;
-    entries.push_back(vtkEntry(0, ai->GetNumberOfComponents()-1));
-    this->SetEntries(std::vector<vtkEntry>());
+    this->RemoveAllEntries();
+    for (int i = 0; i < ai->GetNumberOfComponents(); i++)
+      {
+      const char* name = ai->GetComponentName(i);
+      this->AddEntry(name, i);
+      }
+    this->DomainModified();
     }
 }
 
