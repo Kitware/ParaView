@@ -195,6 +195,19 @@ namespace
     options.insert("PV_RENDER_SERVER_HOST", resource.renderServerHost());
     options.insert("PV_RENDER_SERVER_PORT",
       QString::number(resource.renderServerPort(22221)));
+
+    #if defined(_WIN32)
+    options.insert("PV_CLIENT_PLATFORM", "Windows");
+    #elif defined(__APPLE__)
+    options.insert("PV_CLIENT_PLATFORM", "Apple");
+    #elif defined(__linux__)
+    options.insert("PV_CLIENT_PLATFORM", "Linux");
+    #elif defined(__unix__)
+    options.insert("PV_CLIENT_PLATFORM", "Unix");
+    #else
+    options.insert("PV_CLIENT_PLATFORM", "Unknown");
+    #endif
+
     return options;
     }
 
