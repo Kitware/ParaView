@@ -64,10 +64,10 @@ public:
   int getWriteFrequency();
   bool fitToScreen();
   int getMagnification();
+  bool getComposite();
 
-  /// Remove or add options depending on whether cinema is visible
-  /// and specA should be supported.
-  void setCinemaVisible(bool status, bool specASupport = true);
+  /// Remove or add options depending on whether cinema is visible.
+  void setCinemaVisible(bool status);
   const QString getCameraType();
   double getPhi();
   double getTheta();

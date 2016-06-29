@@ -64,9 +64,7 @@ public:
     QList<pqContextView*> const & contextViews);
 
   /// Hides/shows cinema options.
-  /// @note The menu 'Export Scene...' -> 'Cinema' currently only supports
-  /// SpecB, for this reason the specASupport flag is necessary.
-  void setCinemaVisible(bool status, bool specASupport = true);
+  void setCinemaVisible(bool status);
 
   QList<pqImageOutputInfo*> getImageOutputInfos();
 
@@ -87,7 +85,7 @@ public:
   /// returns -> 'ViewName1' : ['Imname', 1, 1, 1, 1, 1, {'composite': True ...}],
   ///            'ViewName2' : [...],
   ///            ... (for N views)
-  QString getSelectionAsString(QString const & scriptFromat, bool isComposite = true);
+  QString getSelectionAsString(QString const & scriptFromat);
 
 private slots:
 

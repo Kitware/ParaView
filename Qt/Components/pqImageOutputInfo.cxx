@@ -152,6 +152,12 @@ int pqImageOutputInfo::getMagnification()
 }
 
 //-----------------------------------------------------------------------------
+bool pqImageOutputInfo::getComposite()
+{
+  return this->Ui->composite->isChecked();
+}
+
+//-----------------------------------------------------------------------------
 void pqImageOutputInfo::updateImageFileName()
 {
   QString fileName = this->Ui->imageFileName->displayText();
@@ -237,7 +243,7 @@ void pqImageOutputInfo::setupScreenshotInfo()
 }
 
 //-----------------------------------------------------------------------------
-void pqImageOutputInfo::setCinemaVisible(bool status, bool specASupport)
+void pqImageOutputInfo::setCinemaVisible(bool status)
 {
   if (status)
     {
@@ -245,26 +251,14 @@ void pqImageOutputInfo::setCinemaVisible(bool status, bool specASupport)
     this->updateSpherical();
     }
   else
+    {
     this->Ui->gbCinemaOptions->hide();
+    }
 
-  // Remove/ add options depending on what is supported
-  if (!specASupport)
-    {
-    this->Ui->cinemaExport->clear();
-    QStringList items;
-    items << "None" << "Spherical";
-    this->Ui->cinemaExport->addItems(items);
-    }
-  else
-    {
-      if (this->Ui->cinemaExport->count() < 3)
-        {
-        this->Ui->cinemaExport->clear();
-        QStringList items;
-        items << "None" << "Static" << "Spherical";
-        this->Ui->cinemaExport->addItems(items);
-        }
-    }
+  this->Ui->cinemaExport->clear();
+  QStringList items;
+  items << "None" << "Static" << "Spherical";
+  this->Ui->cinemaExport->addItems(items);
 }
 
 //-----------------------------------------------------------------------------

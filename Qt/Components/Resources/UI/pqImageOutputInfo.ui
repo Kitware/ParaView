@@ -236,6 +236,26 @@
           </property>
          </widget>
         </item>
+        <item row="5" column="1">
+         <widget class="QCheckBox" name="composite">
+          <property name="toolTip">
+           <string>Whether to export specA or B format stores</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Composite</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
      </layout>
