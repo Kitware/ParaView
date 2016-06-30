@@ -36,7 +36,7 @@ import cinema_store
 import paraview
 import pv_explorers
 from itertools import imap
-
+import math
 import numpy as np
 
 def record_visibility():
@@ -449,7 +449,13 @@ def explore(cs, proxies, iSave=True, currentTime=None, userDefined = {}):
     dist = paraview.simple.GetActiveCamera().GetDistance()
 
     #associate control points wlth parameters of the data store
-    cam = pv_explorers.Camera([0,0,0], [0,1,0], dist, view_proxy)
+    up = [math.fabs(x) for x in view_proxy.CameraViewUp]
+    uppest = 0
+    if up[1]>up[uppest]: uppest = 1
+    if up[2]>up[uppest]: uppest = 2
+    cinup = [0,0,0]
+    cinup[uppest]=1
+    cam = pv_explorers.Camera(view_proxy.CameraFocalPoint, cinup, dist, view_proxy)
 
     params = cs.parameter_list.keys()
 
