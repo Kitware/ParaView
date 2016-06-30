@@ -32,7 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDeleteReaction.h"
 
 #include "pqActiveObjects.h"
-#include "pqApplicationCore.h"
+#include "pqAnimationScene.h"
+#include "pqAnimationManager.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
@@ -42,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "pqView.h"
 #include "vtkNew.h"
+#include "pqPVApplicationCore.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkSMAnimationSceneProxy.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
@@ -57,6 +59,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqDeleteReaction::pqDeleteReaction(QAction* parentObject, bool delete_all)
   : Superclass(parentObject)
 {
+  // needed to disable server reset while an animation is playing
+  QObject::connect(pqPVApplicationCore::instance()->animationManager(),
+                   SIGNAL(beginPlay()), this, SLOT(updateEnableState()));
+  QObject::connect(pqPVApplicationCore::instance()->animationManager(),
+                   SIGNAL(endPlay()), this, SLOT(updateEnableState()));
+
   this->DeleteAll = delete_all;
   if (!this->DeleteAll)
     {
@@ -77,6 +85,12 @@ pqDeleteReaction::pqDeleteReaction(QAction* parentObject, bool delete_all)
 //-----------------------------------------------------------------------------
 void pqDeleteReaction::updateEnableState()
 {
+  if (pqPVApplicationCore::instance()->animationManager()->animationPlaying())
+    {
+    this->parentAction()->setEnabled(false);
+    return;
+    }
+
   if (this->DeleteAll)
     {
     this->parentAction()->setEnabled(true);

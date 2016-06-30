@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -46,7 +46,7 @@ class vtkSMProxy;
 
 //// pqAnimationManager manages the Animation sub-system.
 //// It encapsulates the initialization of animation scene per server
-//// connection i.e. this class basically keeps track of the active 
+//// connection i.e. this class basically keeps track of the active
 //// animation scene.
 class PQCOMPONENTS_EXPORT pqAnimationManager : public QObject
 {
@@ -61,10 +61,10 @@ public:
   /// Returns the scene on the server connection, if any.
   pqAnimationScene* getScene(pqServer* server) const;
 
-  /// In the given \c scene, returns the cue that animates the given 
+  /// In the given \c scene, returns the cue that animates the given
   /// \c index of the given \c property on the \c proxy.
   /// This method simply calls getCue() on the pqAnimationScene instance.
-  pqAnimationCue* getCue(pqAnimationScene* scene, 
+  pqAnimationCue* getCue(pqAnimationScene* scene,
     vtkSMProxy* proxy, const char* propertyname, int index) const;
 
   /// Saves the animation from the active scene. The active scene
@@ -75,12 +75,15 @@ public:
   /// Saves the animation geometry from the active scene
   /// as visible in the given view.
   bool saveGeometry(const QString& filename, pqView* view);
-  
+
   /// Save the settings of "save animation" with QSettings.
   void saveSettings();
 
   /// Apply the settings from QSettings to "save animation".
   void restoreSettings();
+
+  /// Query whether or not an animation is currently playing
+  bool animationPlaying() const;
 
 signals:
   /// emitted when the active scene changes (\c scene may be NULL).
@@ -92,8 +95,8 @@ signals:
   /// emitted with the current save progress.
   void saveProgress(const QString&, int);
 
-  /// emitted when the manager begins changes that should not get 
-  /// recorded on the undo stack. 
+  /// emitted when the manager begins changes that should not get
+  /// recorded on the undo stack.
   void beginNonUndoableChanges();
 
   /// emitted when the manager is done with changes that
@@ -107,6 +110,12 @@ signals:
 
   /// emitted to indicate an animation is being written out to a file.
   void writeAnimation(const QString& filename, int magnification, double frameRate);
+
+  /// Emitted when the active animation scene begins playing.
+  void beginPlay();
+
+  /// Emitted when the active animation scene finishes playing.
+  void endPlay();
 
 public slots:
   // Called when the active server changes.
@@ -124,6 +133,10 @@ protected slots:
   /// Called on every tick while saving animation.
   void onTick(int);
 
+  /// Called to demarcate the start and end of an animation
+  void onBeginPlay();
+  void onEndPlay();
+
   /// Manages locking the aspect ratio.
   void onWidthEdited();
   void onHeightEdited();
@@ -134,11 +147,10 @@ private:
 
   class pqInternals;
   pqInternals* Internals;
-  
+
   // the most recently used file extension
   QString AnimationExtension;
 };
 
 
 #endif
-

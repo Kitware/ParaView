@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -90,6 +90,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqAnimationManager::pqInternals
 {
 public:
+  pqInternals() : AnimationPlaying(false) {}
+
   QPointer<pqServer> ActiveServer;
   typedef QMap<pqServer*, QPointer<pqAnimationScene> > SceneMap;
   SceneMap Scenes;
@@ -99,14 +101,15 @@ public:
   QSize OldSize;
 
   double AspectRatio;
+  bool AnimationPlaying;
 };
 
 //-----------------------------------------------------------------------------
-pqAnimationManager::pqAnimationManager(QObject* _parent/*=0*/) 
+pqAnimationManager::pqAnimationManager(QObject* _parent/*=0*/)
 :QObject(_parent)
 {
   this->Internals = new pqAnimationManager::pqInternals();
-  pqServerManagerModel* smmodel = 
+  pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
   QObject::connect(smmodel, SIGNAL(proxyAdded(pqProxy*)),
     this, SLOT(onProxyAdded(pqProxy*)));
@@ -117,7 +120,12 @@ pqAnimationManager::pqAnimationManager(QObject* _parent/*=0*/)
     this, SLOT(updateViewModules()));
   QObject::connect(smmodel, SIGNAL(viewRemoved(pqView*)),
     this, SLOT(updateViewModules()));
-  
+
+  QObject::connect(this, SIGNAL(beginPlay()),
+                   this, SLOT(onBeginPlay()));
+  QObject::connect(this, SIGNAL(endPlay()),
+                   this, SLOT(onEndPlay()));
+
   this->restoreSettings();
 }
 
@@ -137,15 +145,15 @@ void pqAnimationManager::updateViewModules()
     return;
     }
 
-  QList<pqView*> viewModules = 
+  QList<pqView*> viewModules =
     pqApplicationCore::instance()->getServerManagerModel()->
     findItems<pqView*>(this->Internals->ActiveServer);
-  
+
   QList<pqSMProxy> viewList;
   foreach(pqView* view, viewModules)
     {
     viewList.push_back(pqSMProxy(view->getProxy()));
-    } 
+    }
 
   emit this->beginNonUndoableChanges();
 
@@ -175,7 +183,7 @@ void pqAnimationManager::onProxyAdded(pqProxy* proxy)
 void pqAnimationManager::onProxyRemoved(pqProxy* proxy)
 {
   pqAnimationScene* scene = qobject_cast<pqAnimationScene*>(proxy);
-  if (scene) 
+  if (scene)
     {
     this->Internals->Scenes.remove(scene->getServer());
     if (this->Internals->ActiveServer == scene->getServer())
@@ -196,9 +204,27 @@ void pqAnimationManager::onActiveServerChanged(pqServer* server)
     return;
     }
 
+  pqAnimationScene* activeScene = this->getActiveScene();
+  if (activeScene)
+    {
+    QObject::disconnect(activeScene, SIGNAL(beginPlay()),
+                        this, SIGNAL(beginPlay()));
+    QObject::disconnect(activeScene, SIGNAL(endPlay()),
+                        this, SIGNAL(endPlay()));
+    }
+
   this->Internals->ActiveServer = server;
+  activeScene = this->getActiveScene();
   emit this->activeServerChanged(server);
-  emit this->activeSceneChanged(this->getActiveScene());
+  emit this->activeSceneChanged(activeScene);
+
+  if (activeScene)
+    {
+    QObject::connect(activeScene, SIGNAL(beginPlay()),
+                     this, SIGNAL(beginPlay()));
+    QObject::connect(activeScene, SIGNAL(endPlay()),
+                     this, SIGNAL(endPlay()));
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -219,7 +245,7 @@ pqAnimationScene* pqAnimationManager::getScene(pqServer* server) const
 
 //-----------------------------------------------------------------------------
 pqAnimationCue* pqAnimationManager::getCue(
-  pqAnimationScene* scene, vtkSMProxy* proxy, const char* propertyname, 
+  pqAnimationScene* scene, vtkSMProxy* proxy, const char* propertyname,
   int index) const
 {
   return (scene? scene->getCue(proxy, propertyname, index) : 0);
@@ -231,9 +257,9 @@ void pqAnimationManager::updateGUI()
 {
   double framerate =
     this->Internals->AnimationSettingsDialog->frameRate->value();
-  int num_frames = 
+  int num_frames =
     this->Internals->AnimationSettingsDialog->spinBoxNumberOfFrames->value();
-  double duration =  
+  double duration =
     this->Internals->AnimationSettingsDialog->animationDuration->value();
   int frames_per_timestep =
     this->Internals->AnimationSettingsDialog->spinBoxFramesPerTimestep->value();
@@ -337,7 +363,7 @@ inline void enforceMultiple4(QSize& newSize)
     {
     QMessageBox::warning(NULL, "Resolution Changed",
       QString("The requested resolution has been changed from (%1, %2)\n").arg(
-        requested_newSize.width()).arg(requested_newSize.height()) + 
+        requested_newSize.width()).arg(requested_newSize.height()) +
       QString("to (%1, %2) to match format specifications.").arg(
         newSize.width()).arg(newSize.height()));
     }
@@ -379,7 +405,7 @@ bool pqAnimationManager::saveAnimation()
   // Use viewManager is available.
   pqTabbedMultiViewWidget* viewManager = qobject_cast<pqTabbedMultiViewWidget*>(
     pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
-  
+
   // Set current size of the window.
   QSize viewSize = viewManager? viewManager->clientSize() : QSize(800, 600);
   // to avoid some unpredicable padding issues, I am reducing the size by a few
@@ -534,7 +560,7 @@ bool pqAnimationManager::saveAnimation()
   QStringList files  = file_dialog->getSelectedFiles();
   QFileInfo fileInfo = QFileInfo( files[0] );
   this->AnimationExtension = QString("*.") + fileInfo.suffix();
-  
+
   // essential to destroy file dialog, before we disconnect from the server, if
   // at all.
   delete file_dialog;
@@ -546,7 +572,7 @@ bool pqAnimationManager::saveAnimation()
 
   QString filename = files[0];
 
-  // Update Scene properties based on user options. 
+  // Update Scene properties based on user options.
   emit this->beginNonUndoableChanges();
 
   pqStereoModeHelper smhelper(stereo, scene->getServer());
@@ -588,11 +614,11 @@ bool pqAnimationManager::saveAnimation()
   QSize newSize(dialogUI.width->text().toInt(),
                 dialogUI.height->text().toInt());
 
-  // Enforce any view size conditions (such a multiple of 4). 
-  ::enforceMultiple4(newSize); 
+  // Enforce any view size conditions (such a multiple of 4).
+  ::enforceMultiple4(newSize);
   int magnification = viewManager?
     viewManager->prepareForCapture(newSize.width(), newSize.height()): 1;
- 
+
   if (disconnect_and_save)
     {
     pqServer* server = this->Internals->ActiveServer;
@@ -676,7 +702,7 @@ bool pqAnimationManager::saveAnimation()
     .arg("FrameRate", writer->GetFrameRate())
     .arg("comment", "save animation images/movie");
 
-  pqProgressManager* progress_manager = 
+  pqProgressManager* progress_manager =
     pqApplicationCore::instance()->getProgressManager();
 
   progress_manager->setEnableAbort(true);
@@ -699,7 +725,7 @@ bool pqAnimationManager::saveAnimation()
   switch (playMode)
     {
   case SEQUENCE:
-    pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("NumberOfFrames"), 
+    pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("NumberOfFrames"),
       num_frames);
     break;
 
@@ -725,7 +751,7 @@ bool pqAnimationManager::saveAnimation()
 }
 
 //-----------------------------------------------------------------------------
-bool pqAnimationManager::saveGeometry(const QString& filename, 
+bool pqAnimationManager::saveGeometry(const QString& filename,
   pqView* view)
 {
   if (!view)
@@ -773,7 +799,7 @@ void pqAnimationManager::restoreSettings()
 
 //-----------------------------------------------------------------------------
 void pqAnimationManager::saveSettings()
-{ 
+{
   // Save the most recently used file extension to QSettings.
   pqSettings* settings = pqApplicationCore::instance()->settings();
   settings->setValue("extensions/AnimationExtension", this->AnimationExtension);
@@ -783,4 +809,22 @@ void pqAnimationManager::saveSettings()
 void pqAnimationManager::onTick(int progress)
 {
   emit this->saveProgress("Saving Animation", progress);
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationManager::onBeginPlay()
+{
+  this->Internals->AnimationPlaying = true;
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationManager::onEndPlay()
+{
+  this->Internals->AnimationPlaying = false;
+}
+
+//-----------------------------------------------------------------------------
+bool pqAnimationManager::animationPlaying() const
+{
+  return this->Internals->AnimationPlaying;
 }

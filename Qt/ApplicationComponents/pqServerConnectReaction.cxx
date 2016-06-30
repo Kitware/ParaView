@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -34,10 +34,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModule.h"
 
 #include "pqActiveObjects.h"
+#include "pqAnimationManager.h"
+#include "pqAnimationScene.h"
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqObjectBuilder.h"
 #include "pqPipelineSource.h"
+#include "pqPVApplicationCore.h"
 #include "pqServerConfigurationCollection.h"
 #include "pqServerConfiguration.h"
 #include "pqServerConnectDialog.h"
@@ -52,6 +55,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqServerConnectReaction::pqServerConnectReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
+  // needed to disable server connection while an animation is playing
+  QObject::connect(pqPVApplicationCore::instance()->animationManager(),
+                   SIGNAL(beginPlay()), this, SLOT(updateEnableState()));
+  QObject::connect(pqPVApplicationCore::instance()->animationManager(),
+                   SIGNAL(endPlay()), this, SLOT(updateEnableState()));
 }
 
 //-----------------------------------------------------------------------------
@@ -120,4 +128,17 @@ bool pqServerConnectReaction::connectToServerUsingConfiguration(
 {
   QScopedPointer<pqServerLauncher> launcher(pqServerLauncher::newInstance(config));
   return launcher->connectToServer();
+}
+
+//-----------------------------------------------------------------------------
+void pqServerConnectReaction::updateEnableState()
+{
+  if (pqPVApplicationCore::instance()->animationManager()->animationPlaying())
+    {
+    this->parentAction()->setEnabled(false);
+    }
+  else
+    {
+    this->parentAction()->setEnabled(true);
+    }
 }

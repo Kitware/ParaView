@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -32,10 +32,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerDisconnectReaction.h"
 
 #include "pqActiveObjects.h"
+#include "pqAnimationManager.h"
+#include "pqAnimationScene.h"
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqObjectBuilder.h"
 #include "pqPipelineSource.h"
+#include "pqPVApplicationCore.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 
@@ -53,6 +56,12 @@ pqServerDisconnectReaction::pqServerDisconnectReaction(QAction* parentObject)
   QObject::connect(&this->UpdateTimer, SIGNAL(timeout()),
     this, SLOT(updateState()));
   this->updateState();
+
+  // needed to disable server disconnection while an animation is playing
+  QObject::connect(pqPVApplicationCore::instance()->animationManager(),
+                   SIGNAL(beginPlay()), this, SLOT(updateState()));
+  QObject::connect(pqPVApplicationCore::instance()->animationManager(),
+                   SIGNAL(endPlay()), this, SLOT(updateState()));
 }
 
 //-----------------------------------------------------------------------------
@@ -94,8 +103,15 @@ void pqServerDisconnectReaction::disconnectFromServer()
 //-----------------------------------------------------------------------------
 void pqServerDisconnectReaction::updateState()
 {
-  this->parentAction()->setEnabled(
-    pqActiveObjects::instance().activeServer() != NULL);
+  if (pqPVApplicationCore::instance()->animationManager()->animationPlaying())
+    {
+    this->parentAction()->setEnabled(false);
+    }
+  else
+    {
+    this->parentAction()->setEnabled(
+      pqActiveObjects::instance().activeServer() != NULL);
+    }
 }
 
 //-----------------------------------------------------------------------------
