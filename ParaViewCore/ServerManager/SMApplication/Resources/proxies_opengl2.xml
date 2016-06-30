@@ -363,7 +363,11 @@
                             name="GaussianRadius"
                             label="Gaussian Radius"
                             number_of_elements="1">
-        <DoubleRangeDomain min="0" name="range" />
+        <BoundsDomain name="range" mode="scaled_extent" scale_factor="0.05">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
         <Documentation>
           The radius of the gaussian blur for each point.
         </Documentation>
