@@ -364,6 +364,9 @@ else()
   list(APPEND _vtk_modules vtkRenderingLICOpenGL2)
   list(APPEND _vtk_modules vtkDomainsChemistryOpenGL2)
   list(APPEND _vtk_mpi_modules vtkRenderingParallelLIC)
+  if(PARAVIEW_ENABLE_PYTHON)
+    list (APPEND _vtk_modules vtkPVCinemaReader)
+  endif()
 endif()
 
 if (PARAVIEW_USE_MPI)
@@ -391,6 +394,7 @@ if (PARAVIEW_ENABLE_PYTHON)
   if (PARAVIEW_USE_MPI)
     list(APPEND _vtk_modules vtkParallelMPI4Py)
   endif()
+
 endif()
 
 # Any module can import this file and add DEPENDS or COMPILE_DEPENDS on this

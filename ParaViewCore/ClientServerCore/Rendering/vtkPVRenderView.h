@@ -32,6 +32,7 @@
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVView.h"
 #include "vtkSmartPointer.h" // needed for iVar
+#include "vtkWeakPointer.h"  // needed for iVar
 
 class vtkAlgorithmOutput;
 class vtkCamera;
@@ -49,7 +50,9 @@ class vtkLight;
 class vtkLightKit;
 class vtkMatrix4x4;
 class vtkPartitionOrderingInterface;
+class vtkProp;
 class vtkPVAxesWidget;
+class vtkPVCameraCollection;
 class vtkPVCenterAxesActor;
 class vtkPVDataDeliveryManager;
 class vtkPVDataRepresentation;
@@ -57,11 +60,10 @@ class vtkPVGridAxes3DActor;
 class vtkPVHardwareSelector;
 class vtkPVInteractorStyle;
 class vtkPVSynchronizedRenderer;
-class vtkProp;
+class vtkRenderer;
 class vtkRenderViewBase;
 class vtkRenderWindow;
 class vtkRenderWindowInteractor;
-class vtkRenderer;
 class vtkTextRepresentation;
 class vtkTexture;
 class vtkTimerLog;
@@ -894,6 +896,36 @@ public:
   double GetLightScale();
   //@}
 
+  //@{
+  /**
+   * DiscreteCameras are a collection of cameras when specified,
+   * forces the view to only interact *to* a camera in the collection.
+   *
+   * In `vtkPVView::REQUEST_UPDATE()` pass, representations may request the view
+   * to use discrete cameras by providing a vtkPVCameraCollection to the view. Since
+   * multiple representations may be visible in the view, it's up to the
+   * representations how to handle multiple representations providing different
+   * styles.
+   *
+   * When set, on each render, vtkPVRenderView will try to update the current
+   * camera to match a camera in the collection. During interacting, however,
+   * the snapping to a camera in the collection is only done when the snapped to
+   * camera is different from the previous. This avoids side effects on
+   * camera manipulators that simply update existing camera positions during
+   * interaction.
+   *
+   * @note Since this is supposed to set in vtkPVView::REQUEST_UPDATE(), it is unset
+   * before the pass is triggered.
+   *
+   * @warning This is a new/experimental feature that was added to support
+   * viewing of Cinema databases in ParaView. As the support for Cinema in
+   * ParaView improve, this is likely to change.
+   */
+  static vtkPVCameraCollection* GetDiscreteCameras(
+    vtkInformation* info, vtkPVDataRepresentation* repr);
+  static void SetDiscreteCameras(
+    vtkInformation* info, vtkPVDataRepresentation* repr, vtkPVCameraCollection* style);
+  //@}
 protected:
   vtkPVRenderView();
   ~vtkPVRenderView();
@@ -1036,6 +1068,8 @@ protected:
   // Active interactor style either [TwoDInteractorStyle, ThreeDInteractorStyle]
   vtkPVInteractorStyle* InteractorStyle;
 
+  vtkWeakPointer<vtkPVCameraCollection> DiscreteCameras;
+
   // Used in collaboration mode to ensure that views are in the same state
   // (as far as representations added/removed goes) before rendering.
   unsigned int SynchronizationCounter;
@@ -1124,6 +1158,7 @@ private:
   vtkNew<vtkTimerLog> Timer;
 
   int ForceDataDistributionMode;
+  int PreviousDiscreteCameraIndex;
 };
 
 #endif

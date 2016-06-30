@@ -147,7 +147,23 @@
     <string>Load window layout from a file</string>
    </property>
   </action>
+  <action name="actionFileImportCinemaDatabase">
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/cinemascience_mark.png</normaloff>:/pqWidgets/Icons/cinemascience_mark.png</iconset>
+   </property>
+   <property name="text">
+    <string>Import Cinema Database...</string>
+   </property>
+   <property name="toolTip">
+    <string>Import a Cinema Database file</string>
+   </property>
+   <property name="statusTip">
+    <string>Import a Cinema Database file</string>
+   </property>
+  </action>
   <addaction name="actionFileOpen"/>
+  <addaction name="actionFileImportCinemaDatabase"/>
   <addaction name="menuRecentFiles"/>
   <addaction name="separator"/>
   <addaction name="actionFileLoadServerState"/>

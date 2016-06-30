@@ -14,16 +14,18 @@
 =========================================================================*/
 #include "vtkPVRenderView.h"
 
+#include "vtkPVConfig.h"
+
 #include "vtk3DWidgetRepresentation.h"
 #include "vtkAbstractMapper.h"
 #include "vtkAlgorithmOutput.h"
 #include "vtkBoundingBox.h"
 #include "vtkCamera.h"
+#include "vtkCollection.h"
 #include "vtkCommand.h"
 #include "vtkCuller.h"
 #include "vtkDataRepresentation.h"
 #include "vtkFXAAOptions.h"
-#include "vtkFloatArray.h"
 #include "vtkFloatArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationDoubleKey.h"
@@ -48,8 +50,8 @@
 #include "vtkObjectFactory.h"
 #include "vtkPKdTree.h"
 #include "vtkPVAxesWidget.h"
+#include "vtkPVCameraCollection.h"
 #include "vtkPVCenterAxesActor.h"
-#include "vtkPVConfig.h"
 #include "vtkPVDataDeliveryManager.h"
 #include "vtkPVDataRepresentation.h"
 #include "vtkPVDisplayInformation.h"
@@ -63,7 +65,6 @@
 #include "vtkPVSynchronizedRenderer.h"
 #include "vtkPVTrackballMultiRotate.h"
 #include "vtkPVTrackballRoll.h"
-#include "vtkPVTrackballRotate.h"
 #include "vtkPVTrackballRotate.h"
 #include "vtkPVTrackballZoom.h"
 #include "vtkPVTrackballZoomToMouse.h"
@@ -84,17 +85,17 @@
 #include "vtkTextRepresentation.h"
 #include "vtkTimerLog.h"
 #include "vtkTrackballPan.h"
-#include "vtkTrackballPan.h"
 #include "vtkTrivialProducer.h"
+#include "vtkVector.h"
+#include "vtkWeakPointer.h"
+#include "vtkWindowToImageFilter.h"
+
 #ifdef VTKGL2
 #include "vtkLightingMapPass.h"
 #include "vtkValuePass.h"
 #else
 #include "vtkValuePasses.h"
 #endif
-#include "vtkVector.h"
-#include "vtkWeakPointer.h"
-#include "vtkWindowToImageFilter.h"
 
 #ifdef PARAVIEW_USE_PISTON
 #include "vtkPistonMapper.h"
@@ -110,7 +111,7 @@
 #include "vtkOSPRayRendererNode.h"
 #endif
 
-#include <assert.h>
+#include <cassert>
 #include <map>
 #include <set>
 #include <sstream>
@@ -298,6 +299,29 @@ void IceTPassEnableFloatPass(bool enable, vtkPVSynchronizedRenderer* sr)
   }
 };
 #endif
+
+//----------------------------------------------------------------------------
+// This is used in vtkPVRenderView::Update() to change all zoom manipulators to
+// zoom (and not dolly) when a discrete set of cameras are provided. This is
+// essential since dolly changes camera position.
+void vtkUpdateTrackballZoomManipulators(
+  vtkPVInteractorStyle* style, bool useDollyForPerspectiveProjection)
+{
+  if (style == NULL)
+  {
+    return;
+  }
+
+  vtkCollection* manips = style->GetCameraManipulators();
+  for (int cc = 0, max = manips->GetNumberOfItems(); cc < max; ++cc)
+  {
+    vtkPVTrackballZoom* zoom = vtkPVTrackballZoom::SafeDownCast(manips->GetItemAsObject(cc));
+    if (zoom)
+    {
+      zoom->SetUseDollyForPerspectiveProjection(useDollyForPerspectiveProjection);
+    }
+  }
+}
 }
 
 //----------------------------------------------------------------------------
@@ -362,6 +386,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->InteractorStyle = 0;
   this->TwoDInteractorStyle = 0;
   this->ThreeDInteractorStyle = 0;
+  this->DiscreteCameras = 0;
   this->PolygonStyle = 0;
   this->RubberBandStyle = 0;
   this->RubberBandZoom = 0;
@@ -387,6 +412,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->ParallelProjection = 0;
   this->Culler = vtkSmartPointer<vtkPVRendererCuller>::New();
   this->ForceDataDistributionMode = -1;
+  this->PreviousDiscreteCameraIndex = -1;
 
   this->SynchronizedRenderers = vtkPVSynchronizedRenderer::New();
 
@@ -1005,7 +1031,7 @@ void vtkPVRenderView::SetMaxClipBounds(double* bounds)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::ResetCameraClippingRange()
 {
-  if (this->GeometryBounds.IsValid() && !this->LockBounds)
+  if (this->GeometryBounds.IsValid() && !this->LockBounds && this->DiscreteCameras == NULL)
   {
     double bounds[6];
     this->GeometryBounds.GetBounds(bounds);
@@ -1227,7 +1253,16 @@ void vtkPVRenderView::Update()
   this->ForceDataDistributionMode = -1;
 
   this->PartitionOrdering->SetImplementation(NULL);
+
+  // clear discrete interaction style state.
+  this->DiscreteCameras = NULL;
+  this->PreviousDiscreteCameraIndex = -1;
+
   this->Superclass::Update();
+
+  // Update camera zoom manipulators based on whether we have discrete position.
+  vtkUpdateTrackballZoomManipulators(this->TwoDInteractorStyle, this->DiscreteCameras == NULL);
+  vtkUpdateTrackballZoomManipulators(this->ThreeDInteractorStyle, this->DiscreteCameras == NULL);
 
   // After every update we can expect the representation geometries to change.
   // Thus we need to determine whether we are doing to remote-rendering or not,
@@ -1390,6 +1425,21 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
   // BUG #13534. Reset the clip planes on every render. Since this does not
   // involve any communication, doing this on every render is not a big deal.
   this->ResetCameraClippingRange();
+
+  if (this->DiscreteCameras != NULL)
+  {
+    vtkCamera* camera = this->GetActiveCamera();
+    int index = this->DiscreteCameras->FindClosestCamera(camera);
+    if (interactive == false || this->PreviousDiscreteCameraIndex != index)
+    {
+      this->PreviousDiscreteCameraIndex = index;
+      this->DiscreteCameras->UpdateCamera(index, camera);
+    }
+  }
+  else
+  {
+    this->PreviousDiscreteCameraIndex = -1;
+  }
 
   bool in_tile_display_mode = this->InTileDisplayMode();
   bool in_cave_mode = this->InCaveDisplayMode();
@@ -3129,4 +3179,32 @@ double vtkPVRenderView::GetLightScale()
 #else
   return 0.5;
 #endif
+}
+
+//----------------------------------------------------------------------------
+vtkPVCameraCollection* vtkPVRenderView::GetDiscreteCameras(
+  vtkInformation* info, vtkPVDataRepresentation* vtkNotUsed(repr))
+{
+  vtkPVRenderView* self = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!self)
+  {
+    vtkGenericWarningMacro("Missing VIEW().");
+    return NULL;
+  }
+
+  return self->DiscreteCameras;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetDiscreteCameras(
+  vtkInformation* info, vtkPVDataRepresentation*, vtkPVCameraCollection* style)
+{
+  vtkPVRenderView* self = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!self)
+  {
+    vtkGenericWarningMacro("Missing VIEW().");
+    return;
+  }
+
+  self->DiscreteCameras = style;
 }

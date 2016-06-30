@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqFileDialogModel.h"
+#include "pqImportCinemaReaction.h"
 #include "pqLoadDataReaction.h"
 #include "pqLoadStateReaction.h"
 #include "pqRecentlyUsedResourcesList.h"
@@ -58,7 +59,7 @@ pqStandardRecentlyUsedResourceLoaderImplementation::
 //-----------------------------------------------------------------------------
 bool pqStandardRecentlyUsedResourceLoaderImplementation::canLoad(const pqServerResource& resource)
 {
-  return (resource.hasData("PARAVIEW_STATE") ||
+  return (resource.hasData("PARAVIEW_STATE") || resource.hasData("PARAVIEW_CINEMA_DATABASE") ||
     (resource.hasData("PARAVIEW_DATA") && resource.hasData("smgroup") &&
             resource.hasData("smname")));
 }
@@ -76,6 +77,10 @@ bool pqStandardRecentlyUsedResourceLoaderImplementation::load(
   {
     return this->loadData(resource, server);
   }
+  else if (resource.hasData("PARAVIEW_CINEMA_DATABASE"))
+  {
+    return this->loadCinemaDatabase(resource, server);
+  }
 
   return false;
 }
@@ -90,6 +95,10 @@ QIcon pqStandardRecentlyUsedResourceLoaderImplementation::icon(const pqServerRes
   else if (resource.hasData("PARAVIEW_DATA"))
   {
     return QIcon(":/pqWidgets/Icons/pqMultiBlockData16.png");
+  }
+  else if (resource.hasData("PARAVIEW_CINEMA_DATABASE"))
+  {
+    return QIcon(":/pqWidgets/Icons/cinemascience_mark.png");
   }
   return QIcon();
 }
@@ -149,6 +158,21 @@ bool pqStandardRecentlyUsedResourceLoaderImplementation::loadData(
 }
 
 //-----------------------------------------------------------------------------
+bool pqStandardRecentlyUsedResourceLoaderImplementation::loadCinemaDatabase(
+  const pqServerResource& resource, pqServer* server)
+{
+  QString dbase = resource.path();
+
+  pqFileDialogModel fileModel(server, NULL);
+  if (dbase.isEmpty() || !fileModel.fileExists(dbase, dbase))
+  {
+    qCritical() << "Cinema database no longer exists : '" << dbase << "'";
+    return false;
+  }
+  return pqImportCinemaReaction::loadCinemaDatabase(dbase, server);
+}
+
+//-----------------------------------------------------------------------------
 bool pqStandardRecentlyUsedResourceLoaderImplementation::addDataFilesToRecentResources(
   pqServer* server, const QStringList& files, const QString& smgroup, const QString& smname)
 {
@@ -185,6 +209,26 @@ bool pqStandardRecentlyUsedResourceLoaderImplementation::addStateFileToRecentRes
     resource.setPath(filename);
     resource.setSessionServer(server->getResource());
     resource.addData("PARAVIEW_STATE", "1");
+    pqApplicationCore* core = pqApplicationCore::instance();
+    core->recentlyUsedResources().add(resource);
+    core->recentlyUsedResources().save(*core->settings());
+    return true;
+  }
+
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+bool pqStandardRecentlyUsedResourceLoaderImplementation::addCinemaDatabaseToRecentResources(
+  pqServer* server, const QString& filename)
+{
+  if (server)
+  {
+    // Add this to the list of recent server resources ...
+    pqServerResource resource = server->getResource();
+    resource.setPath(filename);
+    resource.addData("PARAVIEW_CINEMA_DATABASE", "1");
+
     pqApplicationCore* core = pqApplicationCore::instance();
     core->recentlyUsedResources().add(resource);
     core->recentlyUsedResources().save(*core->settings());

@@ -164,6 +164,8 @@ set (Module_SRCS
   pqImageCompressorWidget.h
   pqImplicitPlanePropertyWidget.cxx
   pqImplicitPlanePropertyWidget.h
+  pqImportCinemaReaction.cxx
+  pqImportCinemaReaction.h
   pqInputDataTypeDecorator.cxx
   pqInputDataTypeDecorator.h
   pqInteractivePropertyWidget.cxx
@@ -392,6 +394,7 @@ set (Module_MOC_HDRS
   pqIgnoreSourceTimeReaction.h
   pqImageCompressorWidget.h
   pqImplicitPlanePropertyWidget.h
+  pqImportCinemaReaction.h
   pqInputDataTypeDecorator.h
   pqInteractivePropertyWidget.h
   pqLightsEditor.h
@@ -567,6 +570,9 @@ SOURCE_GROUP("Generated" FILES
 )
 
 set(${vtk-module}_NO_HeaderTest 1)
+if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
+  add_definitions(-DVTKGL2)
+endif()
 vtk_module_library(pqApplicationComponents
   ${Module_SRCS}
   ${__Module_RESOURCE_SRCS}

@@ -26,6 +26,7 @@ vtkStandardNewMacro(vtkPVTrackballZoom);
 vtkPVTrackballZoom::vtkPVTrackballZoom()
 {
   this->ZoomScale = 0.0;
+  this->UseDollyForPerspectiveProjection = true;
 }
 
 //-------------------------------------------------------------------------
@@ -39,7 +40,7 @@ void vtkPVTrackballZoom::OnButtonDown(int, int, vtkRenderer* ren, vtkRenderWindo
   int* size = ren->GetSize();
   vtkCamera* camera = ren->GetActiveCamera();
 
-  if (camera->GetParallelProjection())
+  if (camera->GetParallelProjection() || !this->UseDollyForPerspectiveProjection)
   {
     this->ZoomScale = 1.5 / (double)size[1];
   }
@@ -63,10 +64,18 @@ void vtkPVTrackballZoom::OnMouseMove(
   vtkCamera* camera = ren->GetActiveCamera();
   double pos[3], fp[3], *norm, k, tmp;
 
-  if (camera->GetParallelProjection())
+  if (camera->GetParallelProjection() || !this->UseDollyForPerspectiveProjection)
   {
     k = dy * this->ZoomScale;
-    camera->SetParallelScale((1.0 - k) * camera->GetParallelScale());
+
+    if (camera->GetParallelProjection())
+    {
+      camera->SetParallelScale((1.0 - k) * camera->GetParallelScale());
+    }
+    else
+    {
+      camera->SetViewAngle((1.0 - k) * camera->GetViewAngle());
+    }
   }
   else
   {
@@ -93,7 +102,6 @@ void vtkPVTrackballZoom::OnMouseMove(
     }
     camera->SetPosition(pos);
   }
-
   rwi->Render();
 }
 
@@ -101,6 +109,7 @@ void vtkPVTrackballZoom::OnMouseMove(
 void vtkPVTrackballZoom::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-
-  os << indent << "ZoomScale: {" << this->ZoomScale << endl;
+  os << indent << "ZoomScale: " << this->ZoomScale << endl;
+  os << indent << "UseDollyForPerspectiveProjection: " << this->UseDollyForPerspectiveProjection
+     << endl;
 }
