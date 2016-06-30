@@ -669,13 +669,20 @@ int vtkSMArrayListDomain::SetDefaultValues(vtkSMProperty* prop, bool use_uncheck
     else if (helper.GetNumberOfElements() == 5)
       {
       // Support for set input array to process with full length default values
+      // default_values="idx;port;connection;fieldAsso;arrayName"
       defaultValue = svp->GetDefaultValue(4);
       if (this->IsInDomain(defaultValue, temp))
         {
-        if (!svp->IsValueDefault())
-          {
-          svp->ResetToXMLDefaults();
-          }
+        helper.Set(4, defaultValue);
+        
+        // The Default FieldAssociation can be incorrect so we use the actual
+        // in-domain array field association, in a way the arrayName
+        // defaultValue can override the fieldAssociation default value
+        helper.Set(3, this->ALDInternals->DomainValues[temp].FieldAssociation);
+
+        // Other value, idx, port and connexion cannot be changed
+        // and already correspond to the default values thanks to
+        // vtkSIStringVectorProperty::ReadXMLAttributes
         return 1;
         }
       }
