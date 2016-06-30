@@ -148,6 +148,11 @@ public:
   // Forwarded to vtkSMViewProxy.
   void SetTransparentBackground(bool val);
 
+  // Description:
+  // Load all variables when loading a data set.
+  void SetLoadAllVariables(bool val);
+  bool GetLoadAllVariables();
+
 protected:
   vtkPVGeneralSettings();
   ~vtkPVGeneralSettings();
