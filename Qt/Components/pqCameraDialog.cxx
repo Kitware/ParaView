@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDebug>
 
 // ParaView Client includes.
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqRenderView.h"
 #include "pqPropertyLinks.h"
@@ -204,6 +205,10 @@ pqCameraDialog::pqCameraDialog(QWidget* _p/*=null*/,
     this->Internal->configureCustomViews, SIGNAL(clicked()),
     this, SLOT(configureCustomViews()));
 
+  QObject::connect(
+    &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
+    this, SLOT(setRenderModule(pqView*)));
+
   // load custom view buttons with any tool tips set by the user in a previous
   // session.
   pqCameraDialogInternal *w=this->Internal;
@@ -225,10 +230,14 @@ pqCameraDialog::~pqCameraDialog()
 }
 
 //-----------------------------------------------------------------------------
-void pqCameraDialog::setRenderModule(pqRenderView* ren)
+void pqCameraDialog::setRenderModule(pqView* view)
 {
-  this->Internal->RenderModule = ren;
-  this->setupGUI();
+  pqRenderView* renderView = qobject_cast<pqRenderView*>(view);
+  if (renderView)
+    {
+    this->Internal->RenderModule = renderView;
+    this->setupGUI();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -524,7 +533,7 @@ void pqCameraDialog::applyCustomView(int buttonId)
   settings->endGroup();
   settings->endGroup();
 
-  if (!config.isEmpty())
+  if (!config.isEmpty() && ui->RenderModule)
     {
     vtkSmartPointer<vtkPVXMLParser> parser=vtkSmartPointer<vtkPVXMLParser>::New();
     parser->InitializeParser();

@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDialog.h"
 
 class pqCameraDialogInternal;
-class pqRenderView;
+class pqView;
 
 class PQCOMPONENTS_EXPORT pqCameraDialog : public pqDialog 
 {
@@ -47,7 +47,7 @@ public:
   void SetCameraGroupsEnabled(bool enabled);
 
 public slots:
-  void setRenderModule(pqRenderView*);
+  void setRenderModule(pqView*);
 
 private slots:
   // Description:
