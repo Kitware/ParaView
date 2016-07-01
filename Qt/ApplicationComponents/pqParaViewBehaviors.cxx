@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDefaultViewBehavior.h"
 #include "pqFixPathsInStateFilesBehavior.h"
 #include "pqInterfaceTracker.h"
+#include "pqLockPanelsBehavior.h"
 #include "pqObjectPickingBehavior.h"
 #include "pqPersistentMainWindowStateBehavior.h"
 #include "pqPipelineContextMenuBehavior.h"
@@ -90,6 +91,7 @@ PQ_BEHAVIOR_DEFINE_FLAG(ViewStreamingBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(PluginSettingsBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(ApplyBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(QuickLaunchShortcuts, true);
+PQ_BEHAVIOR_DEFINE_FLAG(LockPanelsBehavior, true);
 #undef PQ_BEHAVIOR_DEFINE_FLAG
 
 #define PQ_IS_BEHAVIOR_ENABLED(_name) enable##_name()
@@ -245,6 +247,11 @@ pqParaViewBehaviors::pqParaViewBehaviors(
       mainWindow);
     QObject::connect(ctrlF, SIGNAL(activated()),
       pqApplicationCore::instance(), SLOT(startSearch()));
+    }
+
+  if (PQ_IS_BEHAVIOR_ENABLED(LockPanelsBehavior))
+    {
+    new pqLockPanelsBehavior(mainWindow);
     }
 
   CLEAR_UNDO_STACK();

@@ -577,6 +577,8 @@ void pqServerManagerModel::updateSettingsFromQSettings(pqServer* server)
                    << prop->GetClassName();
         }
       }
+
+      proxy->UpdateVTKObjects();
     }
   iter->Delete();
 }

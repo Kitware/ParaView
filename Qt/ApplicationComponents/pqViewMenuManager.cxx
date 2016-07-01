@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqViewMenuManager.h"
 
+#include "pqLockPanelsReaction.h"
 #include "pqPVApplicationCore.h"
 #include "pqSetName.h"
 #include "pqTabbedMultiViewWidget.h"
@@ -119,6 +120,11 @@ void pqViewMenuManager::buildMenu()
     QObject::connect(fullscreen, SIGNAL(triggered()),
       viewManager, SLOT(toggleFullScreen()));
     }
+
+  QAction* lockDockWidgetsAction = this->Menu->addAction("Toggle Lock Panels");
+  lockDockWidgetsAction->setObjectName("actionLockDockWidgets");
+  lockDockWidgetsAction->setToolTip("Toggle locking of dockable panels so they\
+    cannot be moved");
+
+  new pqLockPanelsReaction(lockDockWidgetsAction);
 }
-
-
