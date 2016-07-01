@@ -2403,6 +2403,16 @@
                            name="range" />
         <Documentation>Color used for showing interactive selection.</Documentation>
       </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.0 1.0 0.0"
+                            label="Interactive Widget"
+                            name="InteractiveWidgetColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Documentation>Color used for showing interactive widget.</Documentation>
+      </DoubleVectorProperty>
       <IntVectorProperty name="UseGradientBackground"
                          label="Use Gradient Background"
                          number_of_elements="1"

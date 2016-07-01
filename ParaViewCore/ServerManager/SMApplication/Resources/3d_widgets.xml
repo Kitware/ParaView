@@ -599,6 +599,51 @@
       </SubProxy>
       <!-- End of TextWidgetRepresentation -->
     </TextWidgetRepresentationProxy>
+    <!-- ================================================================== -->
+    <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
+                                   name="ProgressBarWidgetRepresentation">
+      <Documentation>ProgressBarWidgetRepresentation is a representation for progress bar
+      widget as well as the representation for the progress bar shown in the
+      widget.</Documentation>
+      <IntVectorProperty command="SetEnabled"
+                         default_values="1"
+                         name="Enabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/Disable widget interaction.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseNonCompositedRenderer"
+                         default_values="1"
+                         name="UseNonCompositedRenderer"
+                         number_of_elements="1"></IntVectorProperty>
+      <SubProxy>
+        <Proxy name="Prop2D"
+               proxygroup="3d_widget_representations"
+               proxyname="ProgressBarRepresentation"></Proxy>
+        <ExposedProperties>
+          <Property name="Visibility" />
+          <Property name="ProgressRate" />
+          <Property name="Position" />
+          <Property name="Position2" />
+          <Property name="PositionInfo" />
+          <Property name="Position2Info" />
+          <Property name="ProgressBarColor"/>
+          <Property name="SecondaryProgressBarColor"/>
+          <Property name="DrawBackground"/>
+        </ExposedProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Widget"
+               proxygroup="3d_widgets"
+               proxyname="ProgressBarWidget"></Proxy>
+        <ExposedProperties>
+          <Property name="ProcessEvents" />
+          <Property name="Selectable" />
+          <Property name="Resizable" />
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of ProgressBarWidgetRepresentation -->
+    </NewWidgetRepresentationProxy>
   </ProxyGroup>
   <!-- ****************************************************************** -->
   <ProxyGroup name="3d_widget_representations">
@@ -1486,6 +1531,84 @@
         </ProxyGroupDomain>
       </ProxyProperty>
     </Proxy>
+    <!-- ================================================================== -->
+    <Proxy class="vtkProgressBarRepresentation"
+           name="ProgressBarRepresentation">
+      <IntVectorProperty animateable="1"
+                         command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetPosition"
+                            default_values="0.25 0.05"
+                            information_property="PositionInfo"
+                            name="Position"
+                            number_of_elements="2">
+        <DoubleRangeDomain max="1 1"
+                           min="0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetPosition"
+                            information_only="1"
+                            name="PositionInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPosition2"
+                            default_values="0.5 0.06"
+                            information_property="Position2Info"
+                            name="Position2"
+                            number_of_elements="2">
+        <DoubleRangeDomain max="1 1"
+                           min="0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetPosition2"
+                            information_only="1"
+                            name="Position2Info">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetProgressRate"
+                            default_values="0"
+                            immediate_update="1"
+                            name="ProgressRate">
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="0"
+                            argument_is_array="1"
+                            command="SetProgressBarColor"
+                            default_values="0.0 1.0 0.0"
+                            name="ProgressBarColor"
+                            panel_widget="color_selector_with_palette"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <GlobalPropertyLink type="ColorPalette" property="InteractiveWidgetColor" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="0"
+                            command="SetBackgroundColor"
+                            default_values="1 1 1"
+                            name="SecondaryProgressBarColor"
+                            panel_widget="color_selector_with_palette"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <GlobalPropertyLink type="ColorPalette" property="ForegroundColor" />
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetDrawBackground"
+                         default_values="0"
+                         name="DrawBackground"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+    </Proxy>
   </ProxyGroup>
   <!-- ****************************************************************** -->
   <ProxyGroup name="3d_widgets">
@@ -1627,6 +1750,31 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <!-- End of TextWidget -->
+    </Proxy>
+    <Proxy base_proxygroup="3d_widgets"
+           base_proxyname="WidgetBase"
+           class="vtkProgressBarWidget"
+           name="ProgressBarWidget">
+      <IntVectorProperty command="SetSelectable"
+                         default_values="0"
+                         name="Selectable"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetResizable"
+                         default_values="1"
+                         name="Resizable"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetProcessEvents"
+                         default_values="1"
+                         name="ProcessEvents"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <!-- End of ProgressBarWidget -->
     </Proxy>
     <Proxy base_proxygroup="3d_widgets"
            base_proxyname="WidgetBase"

@@ -68,6 +68,7 @@
     <Proxy group="filters" name="TemporalSnapToTimeStep" />
     <Proxy group="filters" name="TemporalShiftScale" />
     <Proxy group="filters" name="TemporalStatistics" />
+    <Proxy group="filters" name="TimeStepProgressFilter" />
     <Proxy group="filters" name="TimeToTextConvertor" />
   </Category>
 
@@ -114,6 +115,7 @@
     <Proxy group="filters" name="AnnotateAttributeData" />
     <Proxy group="filters" name="PythonAnnotation" />
     <Proxy group="filters" name="TimeToTextConvertor" />
+    <Proxy group="filters" name="TimeStepProgressFilter" />
     <Proxy group="filters" name="DataSetRegionSurfaceFilter" />
     <Proxy group="filters" name="EnvironmentAnnotation" />
   </Category>

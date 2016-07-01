@@ -529,10 +529,16 @@ const char* vtkSMRenderViewProxy::GetRepresentationType(
         strcmp(childName, "OutputPort") == 0 &&
         child->GetScalarAttribute("index", &index) &&
         index == outputPort &&
-        child->GetAttribute("type") &&
-        strcmp(child->GetAttribute("type"), "text") == 0)
+        child->GetAttribute("type"))
         {
-        return "TextSourceRepresentation";
+        if(strcmp(child->GetAttribute("type"), "text") == 0)
+          {
+          return "TextSourceRepresentation";
+          }
+        else if(strcmp(child->GetAttribute("type"), "progress") == 0)
+          {
+          return "ProgressBarSourceRepresentation";
+          }
         }
       }
     }

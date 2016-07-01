@@ -51,6 +51,7 @@ set (Module_SRCS
   vtkMPIMoveData.cxx
   vtkOutlineRepresentation.cxx
   vtkPExtentTranslator.cxx
+  vtkProgressBarSourceRepresentation.cxx
   vtkPVBagChartRepresentation.cxx
   vtkPVBoxChartRepresentation.cxx
   vtkPVCacheKeeper.cxx

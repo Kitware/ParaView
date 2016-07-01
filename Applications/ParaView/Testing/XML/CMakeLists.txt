@@ -316,6 +316,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/TemporalShiftScale.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TestSelectionOnMultipiece.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TimeInspector.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/TimeStepProgressBar.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Tessellate.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Threshold.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/UndoRedo.xml

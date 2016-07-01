@@ -80,7 +80,7 @@ namespace
     }
 
   //---------------------------------------------------------------------------
-  bool vtkTreatDataAsText(vtkPVXMLElement* hints, const int outputPort)
+  bool vtkIsOutputTypeNonStandard(vtkPVXMLElement* hints, const int outputPort)
     {
     if (!hints)
       {
@@ -99,7 +99,14 @@ namespace
           }
         if (const char* type = child->GetAttribute("type"))
           {
-          return (strcmp(type, "text") == 0);
+          if (strcmp(type, "text") == 0)
+            {
+            return true;
+            }
+          else if (strcmp(type, "progress") == 0)
+            {
+            return true;
+            }
           }
         }
       }
@@ -568,7 +575,7 @@ const char* vtkSMParaViewPipelineControllerWithRendering::GetPreferredViewType(
 
   vtkPVDataInformation* dataInfo = producer->GetDataInformation(outputPort);
   if (dataInfo->DataSetTypeIsA("vtkTable") &&
-    (vtkTreatDataAsText(producer->GetHints(), outputPort) == false))
+    (vtkIsOutputTypeNonStandard(producer->GetHints(), outputPort) == false))
     {
     return "SpreadSheetView";
     }
