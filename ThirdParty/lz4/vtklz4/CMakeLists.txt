@@ -41,14 +41,21 @@ add_definitions("-DLZ4_VERSION=\"${CPACK_PACKAGE_VERSION_PATCH}\"")
 
 # XXX(kitware) adding exports for windows shared builds.
 vtk_add_library(vtklz4 ${LZ4_SRCS_LIB} vtklz4Exports.h)
-generate_export_header(vtklz4 EXPORT_FILE_NAME vtklz4Exports.h)
+vtk_generate_export_header(vtklz4 EXPORT_FILE_NAME vtklz4Exports.h)
 if(BUILD_SHARED_LIBS)
   # export flags are only added when building shared libs, they cause
   # mismatched visibility warnings when building statically since not all
   # libraries that VTK builds don't set visibility flags. Until we get a
   # time to do that, we skip visibility flags for static libraries.
-  add_compiler_export_flags(my_abi_flags)
-  set_property(TARGET vtklz4 APPEND PROPERTY COMPILE_FLAGS "${my_abi_flags}")
+  if(CMAKE_VERSION VERSION_LESS 3.0)
+    #CMake 3.0 deprecates add_compiler_export_flags
+    vtk_add_compiler_export_flags(my_abi_flags)
+    set_property(TARGET ${vtk-module}${target_suffix} APPEND
+      PROPERTY COMPILE_FLAGS "${my_abi_flags}")
+  else()
+    set_property(TARGET ${vtk-module}${target_suffix}
+      PROPERTY CXX_VISIBILITY_PRESET "hidden")
+  endif()
 endif()
 
 if(NOT VTK_INSTALL_NO_DEVELOPMENT)
