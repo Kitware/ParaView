@@ -55,6 +55,8 @@ class PQCOMPONENTS_EXPORT pqFileChooserWidget : public QWidget
              READ useDirectoryMode WRITE setUseDirectoryMode)
   Q_PROPERTY(bool forceSingleFile
              READ forceSingleFile WRITE setForceSingleFile)
+  Q_PROPERTY(bool acceptAnyFile
+             READ acceptAnyFile WRITE setAcceptAnyFile)
 
 public:
   /// constructor
@@ -94,6 +96,13 @@ public:
     this->setFilenames(this->filenames());
   }
 
+  /// flag specifying whether this widget should accept any file
+  bool acceptAnyFile() { return this->AcceptAnyFile; }
+  void setAcceptAnyFile(bool flag) {
+    this->AcceptAnyFile = flag;
+    this->setFilenames(this->filenames());
+  }
+
   /// set server to work on.
   /// If server is NULL, a local file dialog is used
   void setServer(pqServer* server);
@@ -126,6 +135,7 @@ protected:
   pqServer* Server;
   bool ForceSingleFile;
   bool UseDirectoryMode;
+  bool AcceptAnyFile;
   QStringList FilenameList;
   bool UseFilenameList;
 

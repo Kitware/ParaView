@@ -151,6 +151,10 @@ class pqFixStateFilenamesDialog::pqInternals : public Ui::FixStateFilenamesDialo
           // Is this a directory?
           info.IsDirectory = (smproperty->GetHints() &&
             smproperty->GetHints()->FindNestedElementByName("UseDirectoryName"));
+          // Does this accept any file?
+          info.AcceptAnyFile = (smproperty->GetHints() &&
+            smproperty->GetHints()->FindNestedElementByName("AcceptAnyFile"));
+
           info.Values = this->getValues(smproperty);
           info.Prototype = tempClone;
           this->PropertiesMap[proxyid][propName] = info;
@@ -198,11 +202,12 @@ public:
     {
     vtkPVXMLElement* XMLElement;
     bool IsDirectory;
+    bool AcceptAnyFile;
     bool SupportsMultiple;
     QStringList Values;
     bool Modified;
     vtkSmartPointer<vtkSMProxy> Prototype;
-    PropertyInfo() : XMLElement(0), IsDirectory(false), SupportsMultiple(false), Modified(false)
+    PropertyInfo() : XMLElement(0), IsDirectory(false), AcceptAnyFile(false), SupportsMultiple(false), Modified(false)
       {
       }
     };
@@ -289,6 +294,7 @@ pqFixStateFilenamesDialog::pqFixStateFilenamesDialog(
       fileChooser->setProperty("pq_property_key", iter2.key());
       fileChooser->setForceSingleFile(!iter2.value().SupportsMultiple);
       fileChooser->setUseDirectoryMode(iter2.value().IsDirectory);
+      fileChooser->setAcceptAnyFile(iter2.value().AcceptAnyFile);
       fileChooser->setFilenames(iter2.value().Values);
       fileChooser->setServer(pqActiveObjects::instance().activeServer());
       QObject::connect(
