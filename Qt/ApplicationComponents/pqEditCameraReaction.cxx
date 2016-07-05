@@ -40,23 +40,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqEditCameraReaction::pqEditCameraReaction(QAction* parentObject, pqView* view)
   : Superclass(parentObject), View(view)
 {
-  if (!view)
-    {
-    QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
-      this, SLOT(updateEnableState()), Qt::QueuedConnection);
-    }
+  QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
+    this, SLOT(updateEnableState()), Qt::QueuedConnection);
+
   this->updateEnableState();
 }
 
 //-----------------------------------------------------------------------------
 void pqEditCameraReaction::updateEnableState()
 {
-  pqView *view = this->View;
-  if (!view)
-    {
-    view = pqActiveObjects::instance().activeView();
-    }
-  if (qobject_cast<pqRenderView*>(view))
+  this->View = pqActiveObjects::instance().activeView();
+  if (qobject_cast<pqRenderView*>(this->View))
     {
     this->parentAction()->setEnabled(true);
     }
