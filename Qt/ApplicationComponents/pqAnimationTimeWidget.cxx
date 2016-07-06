@@ -207,7 +207,8 @@ void pqAnimationTimeWidget::setTimeStepCount(int value)
 
   Ui::AnimationTimeWidget &ui = this->Internals->Ui;
   ui.timestepValue->setMaximum(value > 0? value -1 : 0);
-  ui.timestepCountLabel->setText(QString("of %1").arg(value));
+  ui.timestepCountLabel->setText(QString("(max is %1)")
+                                 .arg(value > 0? value -1 : 0));
   ui.timestepCountLabel->setVisible(
     (value > 0) && (this->playMode() == "Snap To TimeSteps"));
 
