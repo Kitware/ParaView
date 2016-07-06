@@ -45,7 +45,7 @@ Before you begin, perform initial setup:
     "Subscribe to this project" on the right of ParaView.
 
 [GitLab Access]: https://gitlab.kitware.com/users/sign_in
-[Fork ParaView]: https://gitlab.kitware.com/paraview/paraview/fork/new
+[Fork ParaView]: https://gitlab.kitware.com/paraview/paraview/forks/new
 [developer setup script]: /Utilities/SetupForDevelopment.sh
 
 Workflow
