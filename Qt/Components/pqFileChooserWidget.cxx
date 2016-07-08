@@ -164,11 +164,17 @@ void pqFileChooserWidget::chooseFile()
   QString title;
 
   if(this->UseDirectoryMode)
-      title = tr("Open Directory:");
+    {
+    title = tr("Open Directory:");
+    }
   else if (this->AcceptAnyFile)
-      title = tr("Save File:");
+    {
+    title = tr("Save File:");
+    }
   else
-      title = tr("Open File:");
+    {
+    title = tr("Open File:");
+    }
 
   pqFileDialog* dialog = new pqFileDialog(this->Server,
     this, title, QString(), filters);
