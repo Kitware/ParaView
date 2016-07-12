@@ -22,6 +22,8 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMUncheckedPropertyHelper.h"
 
+#include <vtksys/SystemTools.hxx>
+
 vtkStandardNewMacro(vtkSMInputArrayDomain);
 
 bool vtkSMInputArrayDomain::AutomaticPropertyConversion = false;
@@ -43,7 +45,6 @@ static const char* const vtkSMInputArrayDomainAttributeTypes[] = {
 vtkSMInputArrayDomain::vtkSMInputArrayDomain()
 {
   this->AttributeType = vtkSMInputArrayDomain::ANY_EXCEPT_FIELD;
-  this->NumberOfComponents = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -109,7 +110,7 @@ int vtkSMInputArrayDomain::IsInDomain(vtkSMSourceProxy* proxy,
   for (int kk=0; attribute_types_to_try[kk] != -1; kk++)
     {
     int attribute_type = attribute_types_to_try[kk];
-    
+
     // check if attribute_type is acceptable.
     if (this->IsAttributeTypeAcceptable(attribute_type))
       {
@@ -212,35 +213,50 @@ bool vtkSMInputArrayDomain::IsAttributeTypeAcceptable(
 
   return required_type == attribute_type;
 }
+
 //----------------------------------------------------------------------------
-bool vtkSMInputArrayDomain::IsArrayAcceptable(
-    int required_number_of_components, vtkPVArrayInformation* arrayInfo)
+int vtkSMInputArrayDomain::IsArrayAcceptable(vtkPVArrayInformation* arrayInfo)
 {
   if (arrayInfo == NULL)
     {
-    return false;
+    return -1;
     }
 
-  if (
-      // acceptable if the domain doesn't dictate any component requirements.
-      required_number_of_components <= 0 ||
+  int numberOfComponents = arrayInfo->GetNumberOfComponents();
 
-      // acceptable if the components match those in array
-      arrayInfo->GetNumberOfComponents() == required_number_of_components ||
+  // Empty AcceptableNumbersOfComponents means any number of components
+  // are acceptable
+  if (this->AcceptableNumbersOfComponents.size() == 0)
+    {
+    return numberOfComponents;
+    }
 
-      // when using automatic property conversion, we support automatic extraction
-      // of a single component from multi-component arrays. However, we still
-      // don't support automatic extraction of multiple components, so if the
-      // filter needs more than 1 component, then the number of components must
-      // match.
-      (vtkSMInputArrayDomain::AutomaticPropertyConversion &&
-       required_number_of_components == 1 &&
-       arrayInfo->GetNumberOfComponents() > 1))
+  bool acceptableConversion = false;
+  for (unsigned int i = 0; i < this->AcceptableNumbersOfComponents.size(); i++)
+    {
+    // 0 means all are ok
+    if (this->AcceptableNumbersOfComponents[i] == 0)
       {
-      return true;
+      return numberOfComponents;
       }
 
-  return false;
+    // Standard use, where the AcceptableNumbersOfComponents is the
+    // number of components of the array
+    else if (this->AcceptableNumbersOfComponents[i] == numberOfComponents)
+      {
+      return numberOfComponents;
+      }
+
+    // Conversion use, only if activated, and only if AcceptableNumbersOfComponents is 1
+    // Also we keep trying to check if there are other better AcceptableNumbersOfComponents
+    else if (vtkSMInputArrayDomain::AutomaticPropertyConversion &&
+      this->AcceptableNumbersOfComponents[i] == 1 &&
+      numberOfComponents > 1)
+      {
+      acceptableConversion = true;
+      }
+    }
+  return acceptableConversion ? 1 : -1;
 }
 
 //----------------------------------------------------------------------------
@@ -257,8 +273,7 @@ bool vtkSMInputArrayDomain::HasAcceptableArray(
   for (int idx=0, num = attrInfo->GetNumberOfArrays(); idx < num; ++idx)
     {
     vtkPVArrayInformation* arrayInfo = attrInfo->GetArrayInformation(idx);
-    if (vtkSMInputArrayDomain::IsArrayAcceptable(
-      this->NumberOfComponents, arrayInfo))
+    if (this->IsArrayAcceptable(arrayInfo) != -1)
       {
       return true;
       }
@@ -286,11 +301,18 @@ int vtkSMInputArrayDomain::ReadXMLAttributes(
     this->SetAttributeType(attribute_type);
     }
 
-  int numComponents;
-  if (element->GetScalarAttribute("number_of_components", &numComponents))
+  // Recover comma ',' separated acceptable number_of_components
+  const char* numComponents = element->GetAttribute("number_of_components");
+  if (numComponents)
     {
-    numComponents = numComponents < 0? 0 : numComponents;
-    this->SetNumberOfComponents(numComponents);
+    typedef std::vector<vtksys::String> VStrings;
+    const VStrings numbers = vtksys::SystemTools::SplitString(numComponents, ',');
+
+    this->AcceptableNumbersOfComponents.clear();
+    for (VStrings::const_iterator iter = numbers.begin(); iter != numbers.end(); ++iter)
+      {
+      this->AcceptableNumbersOfComponents.push_back(atoi(iter->c_str()));
+      }
     }
 
   return 1;
@@ -333,6 +355,70 @@ void vtkSMInputArrayDomain::SetAttributeType(const char* type)
   vtkErrorMacro("Unrecognized attribute type: " << type);
 }
 
+#ifndef VTK_LEGACY_REMOVE
+//---------------------------------------------------------------------------
+int vtkSMInputArrayDomain::GetNumberOfComponents()
+{
+  VTK_LEGACY_REPLACED_BODY(vtkSMInputArrayDomain::GetNumberOfComponents(), "ParaView 5.2",
+    vtkSMInputArrayDomain::GetAcceptableNumbersOfComponents());
+  return this->AcceptableNumbersOfComponents.size() == 0 ? 0 :
+    this->AcceptableNumbersOfComponents[0];
+}
+
+//---------------------------------------------------------------------------
+void vtkSMInputArrayDomain::SetNumberOfComponents(int nComps)
+{
+  VTK_LEGACY_BODY(vtkSMInputArrayDomain::SetNumberOfComponents(), "ParaView 5.2");
+  if (this->AcceptableNumbersOfComponents.size() == 0)
+    {
+    this->AcceptableNumbersOfComponents.push_back(nComps);
+    }
+  else
+    {
+    this->AcceptableNumbersOfComponents[0] = nComps;
+    }
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMInputArrayDomain::IsArrayAcceptable(
+    int required_number_of_components, vtkPVArrayInformation* arrayInfo)
+{
+  VTK_LEGACY_REPLACED_BODY(static vtkSMInputArrayDomain::IsArrayAcceptable(), "ParaView 5.2",
+    vtkSMInputArrayDomain::IsArrayAcceptable());
+  if (arrayInfo == NULL)
+    {
+    return false;
+    }
+
+  if (
+      // acceptable if the domain doesn't dictate any component requirements.
+      required_number_of_components <= 0 ||
+
+      // acceptable if the components match those in array
+      arrayInfo->GetNumberOfComponents() == required_number_of_components ||
+
+      // when using automatic property conversion, we support automatic extraction
+      // of a single component from multi-component arrays. However, we still
+      // don't support automatic extraction of multiple components, so if the
+      // filter needs more than 1 component, then the number of components must
+      // match.
+      (vtkSMInputArrayDomain::AutomaticPropertyConversion &&
+       required_number_of_components == 1 &&
+       arrayInfo->GetNumberOfComponents() > 1))
+      {
+      return true;
+      }
+
+  return false;
+}
+#endif // VTK_LEGACY_REMOVE
+
+//---------------------------------------------------------------------------
+std::vector<int> vtkSMInputArrayDomain::GetAcceptableNumbersOfComponents() const
+{
+  return this->AcceptableNumbersOfComponents;
+}
+
 //---------------------------------------------------------------------------
 void vtkSMInputArrayDomain::SetAutomaticPropertyConversion(bool convert)
 {
@@ -352,7 +438,18 @@ bool vtkSMInputArrayDomain::GetAutomaticPropertyConversion()
 void vtkSMInputArrayDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "NumberOfComponents: " << this->NumberOfComponents << endl;
+  os << indent << "AcceptableNumbersOfComponents: ";
+  if (this->AcceptableNumbersOfComponents.size() == 0)
+    {
+    os << "0" << endl;
+    }
+  else
+    {
+    for (unsigned int i = 0; i < this->AcceptableNumbersOfComponents.size(); i++)
+      {
+      os << this->AcceptableNumbersOfComponents[i] << " " << endl;
+      }
+    }
   os << indent << "AttributeType: " << this->AttributeType
     << " (" << this->GetAttributeTypeAsString() << ")" << endl;
 }

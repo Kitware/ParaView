@@ -113,12 +113,10 @@ public:
   typedef std::set<vtkSMArrayListDomainArrayInformation> DomainValuesSet;
 
   // Builds the list of acceptable arrays in result.
-  // association is the association requested by the domain
-  // required_number_of_components is the num-of-comps
   void BuildArrayList(DomainValuesSet & result,
     vtkSMArrayListDomain* self,
-    int association,
-    int required_number_of_components,
+    vtkSMProperty* fieldDataSelection,
+    vtkSMInputArrayDomain* iad,
     vtkPVDataInformation* dataInfo);
 
   std::vector<vtkStdString> GetDomainValueStrings()
@@ -181,10 +179,46 @@ private:
 void vtkSMArrayListDomainInternals::BuildArrayList(
   vtkSMArrayListDomainInternals::DomainValuesSet & result,
   vtkSMArrayListDomain* self,
-  int association,
-  int required_number_of_components,
+  vtkSMProperty* fieldDataSelection,
+  vtkSMInputArrayDomain* iad,
   vtkPVDataInformation* dataInfo)
 {
+  // Recover association
+  int association = vtkSMInputArrayDomain::ANY;
+  if (iad)
+    {
+    association = iad->GetAttributeType();
+    }
+
+  if (fieldDataSelection)
+    {
+    vtkSMUncheckedPropertyHelper helper(fieldDataSelection);
+    // Support for ArrayListDomain containing FieldDataSelection property
+    // and a single parameter, see vtkPSciViz* in filters.xml 
+    if (helper.GetNumberOfElements() == 1)
+      {
+      association = helper.GetAsInt(0);
+      }
+    // Support for ArrayListDomain containing FieldDataSelection property
+    // and a 5 parameters, see SetInputArrayToProcess in filters.xml
+    else if (helper.GetNumberOfElements() == 5)
+      {
+      association = helper.GetAsInt(3);
+      }
+    else
+      {
+      vtkWarningWithObjectMacro(self, "FieldDataSelection property not supported, will be ignored.");
+      }
+    }
+
+  // validate association.
+  if (association < vtkSMInputArrayDomain::POINT ||
+    association >= vtkSMInputArrayDomain::NUMBER_OF_ATTRIBUTE_TYPES)
+    {
+    vtkWarningWithObjectMacro(self, "Invalid association. Ignoring.");
+    association = vtkSMInputArrayDomain::ANY;
+    }
+
   if (self->GetNoneString() && result.size() == 0)
     {
     vtkSMArrayListDomainArrayInformation info;
@@ -218,12 +252,20 @@ void vtkSMArrayListDomainInternals::BuildArrayList(
     for (int idx=0, maxIdx=attrInfo->GetNumberOfArrays(); idx < maxIdx; ++idx)
       {
       vtkPVArrayInformation* arrayInfo = attrInfo->GetArrayInformation(idx);
-
-      // First check if the array is acceptable based on the component requirements.
-      if (arrayInfo == NULL||
-        !vtkSMInputArrayDomain::IsArrayAcceptable(required_number_of_components, arrayInfo))
+      if (arrayInfo == NULL)
         {
         continue;
+        }
+
+      // First check if the array is acceptable by the domain.
+      int acceptedNumberOfComponents = 0;
+      if (iad != NULL)
+        {
+        acceptedNumberOfComponents = iad->IsArrayAcceptable(arrayInfo);
+        if (acceptedNumberOfComponents == -1)
+          {
+          continue;
+          }
         }
 
       // Then, check if the array name is acceptable
@@ -248,8 +290,8 @@ void vtkSMArrayListDomainInternals::BuildArrayList(
 
       // ACCEPTABLE ARRAY FOUND!!!
       // Add it to the list.
-      if (required_number_of_components == 0 ||
-          required_number_of_components == arrayInfo->GetNumberOfComponents())
+      if (acceptedNumberOfComponents == 0 ||
+          acceptedNumberOfComponents == arrayInfo->GetNumberOfComponents())
         {
         // the array is directly acceptable (no need to split out components)
         vtkSMArrayListDomainArrayInformation info;
@@ -265,7 +307,7 @@ void vtkSMArrayListDomainInternals::BuildArrayList(
         // array has number of components that doesn't directly match the required
         // component count. The array is being accepted due to automatic property
         // conversion. So we need to split up components and add them individually.
-        assert(required_number_of_components == 1 &&
+        assert(acceptedNumberOfComponents == 1 &&
                vtkSMInputArrayDomain::GetAutomaticPropertyConversion() == true &&
                arrayInfo->GetNumberOfComponents() > 1);
 
@@ -366,55 +408,17 @@ void vtkSMArrayListDomain::Update(vtkSMProperty*)
     vtkSMInputArrayDomain::SafeDownCast(input->GetDomain(this->InputDomainName)):
     vtkSMInputArrayDomain::SafeDownCast(input->FindDomain("vtkSMInputArrayDomain"));
 
-  int association = vtkSMInputArrayDomain::ANY;
-  int required_number_of_components = 0;
-  if (iad)
-    {
-    association = iad->GetAttributeType();
-    required_number_of_components = iad->GetNumberOfComponents();
-    }
-
-  if (fieldDataSelection)
-    {
-    vtkSMUncheckedPropertyHelper helper(fieldDataSelection);
-    if (helper.GetNumberOfElements()==1)
-      {
-      association = helper.GetAsInt(0);
-      }
-    else if (helper.GetNumberOfElements() == 5)
-      {
-      association = helper.GetAsInt(3);
-      }
-    else
-      {
-      vtkWarningMacro("FieldDataSelection property not supported, will be ignored.");
-      }
-    }
-
-  // validate association.
-  if (association < vtkSMInputArrayDomain::POINT ||
-    association >= vtkSMInputArrayDomain::NUMBER_OF_ATTRIBUTE_TYPES)
-    {
-    vtkWarningMacro("Invalid association. Ignoring.");
-    association = vtkSMInputArrayDomain::ANY;
-    }
-
-  if (required_number_of_components <0)
-    {
-    required_number_of_components = 0;
-    }
-
   // we use a set so that the list gets sorted as well as helps us
   // avoid duplicates esp. when processing two datainformation objects.
   vtkSMArrayListDomainInternals::DomainValuesSet set;
   this->ALDInternals->BuildArrayList(set, this,
-    association, required_number_of_components, dataInfo);
+    fieldDataSelection, iad, dataInfo);
 
   vtkPVDataInformation* extraInfo = this->GetExtraDataInformation();
   if (extraInfo)
     {
     this->ALDInternals->BuildArrayList(set, this,
-      association, required_number_of_components, extraInfo);
+      fieldDataSelection, iad, extraInfo);
     }
 
   vtkSMArrayListDomainInternals::DomainValuesVector values;

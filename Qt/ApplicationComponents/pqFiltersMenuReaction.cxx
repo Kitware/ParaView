@@ -99,9 +99,22 @@ namespace
       QString txt = (iad->GetAttributeType() == vtkSMInputArrayDomain::ANY?
         QString("Requires an attribute array") :
         QString("Requires a %1 attribute array").arg(iad->GetAttributeTypeAsString()));
-      if (iad->GetNumberOfComponents() > 0)
+      std::vector<int> numbersOfComponents = iad->GetAcceptableNumbersOfComponents();
+      if (numbersOfComponents.size() > 0)
         {
-        txt += QString(" with %1 component(s)").arg(iad->GetNumberOfComponents());
+        txt += QString(" with ");
+        for (unsigned int i = 0; i < numbersOfComponents.size(); i++)
+          {
+          if (i == numbersOfComponents.size() - 1)
+            {
+            txt += QString("%1 ").arg(numbersOfComponents[i]);
+            }
+          else
+            {
+            txt += QString("%1 or ").arg(numbersOfComponents[i]);
+            }
+          }
+        txt += QString("component(s)");
         }
       return txt;
       }
