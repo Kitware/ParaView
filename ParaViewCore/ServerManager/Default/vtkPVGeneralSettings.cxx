@@ -49,6 +49,7 @@ vtkPVGeneralSettings::vtkPVGeneralSettings()
   ScalarBarMode(vtkPVGeneralSettings::AUTOMATICALLY_HIDE_SCALAR_BARS),
   CacheGeometryForAnimation(false),
   AnimationGeometryCacheLimit(0),
+  AnimationTimePrecision(17),
   PropertiesPanelMode(vtkPVGeneralSettings::ALL_IN_ONE)
 {
   this->SetDefaultViewType("RenderView");

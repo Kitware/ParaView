@@ -48,10 +48,12 @@ public:
   void* AnimationSceneVoidPtr;
   pqPropertyLinks Links;
   int CachedTimestepCount;
+  int Precision;
 
   pqInternals(pqAnimationTimeWidget* self) :
     AnimationSceneVoidPtr(NULL),
-    CachedTimestepCount(-1)
+    CachedTimestepCount(-1),
+    Precision(17)
     {
     this->Ui.setupUi(self);
     this->Ui.timeValue->setValidator(new QDoubleValidator(self));
@@ -170,7 +172,8 @@ vtkSMProxy* pqAnimationTimeWidget::timeKeeper() const
 void pqAnimationTimeWidget::setTimeValue(double time)
 {
   Ui::AnimationTimeWidget &ui = this->Internals->Ui;
-  ui.timeValue->setTextAndResetCursor(QString::number(time, 'g', 17));
+  ui.timeValue->setTextAndResetCursor(
+    QString::number(time, 'g', this->Internals->Precision));
   bool prev = ui.timestepValue->blockSignals(true);
   int index = vtkSMTimeKeeperProxy::GetLowerBoundTimeStepIndex(this->timeKeeper(), time);
   ui.timestepValue->setValue(index);
@@ -185,6 +188,18 @@ double pqAnimationTimeWidget::timeValue() const
 }
 
 //-----------------------------------------------------------------------------
+void pqAnimationTimeWidget::setTimePrecision(int val)
+{
+  this->Internals->Precision = val;
+}
+
+//-----------------------------------------------------------------------------
+int pqAnimationTimeWidget::timePrecision() const
+{
+  return this->Internals->Precision;
+}
+
+//-----------------------------------------------------------------------------
 void pqAnimationTimeWidget::setTimeStepCount(int value)
 {
   pqInternals& internals = *this->Internals;
@@ -192,7 +207,8 @@ void pqAnimationTimeWidget::setTimeStepCount(int value)
 
   Ui::AnimationTimeWidget &ui = this->Internals->Ui;
   ui.timestepValue->setMaximum(value > 0? value -1 : 0);
-  ui.timestepCountLabel->setText(QString("of %1").arg(value));
+  ui.timestepCountLabel->setText(QString("(max is %1)")
+                                 .arg(value > 0? value -1 : 0));
   ui.timestepCountLabel->setVisible(
     (value > 0) && (this->playMode() == "Snap To TimeSteps"));
 

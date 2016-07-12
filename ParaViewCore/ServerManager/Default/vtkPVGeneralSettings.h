@@ -124,6 +124,11 @@ public:
   vtkGetMacro(AnimationGeometryCacheLimit, unsigned long);
 
   // Description:
+  // Set the precision of the animation time toolbar.
+  vtkSetMacro(AnimationTimePrecision, int);
+  vtkGetMacro(AnimationTimePrecision, int);
+
+  // Description:
   // Forwarded for vtkSMParaViewPipelineControllerWithRendering.
   void SetInheritRepresentationProperties(bool val);
 
@@ -165,6 +170,7 @@ protected:
   int ScalarBarMode;
   bool CacheGeometryForAnimation;
   unsigned long AnimationGeometryCacheLimit;
+  int AnimationTimePrecision;
   int PropertiesPanelMode;
 
 private:

@@ -73,6 +73,10 @@ public:
   void setTimeValue(double time);
   double timeValue() const;
 
+  /// Get/set the precision with which time is reported.
+  void setTimePrecision(int val);
+  int timePrecision() const;
+
   /// Get/set the number of timesteps.
   void setTimeStepCount(int count);
   int timeStepCount() const;

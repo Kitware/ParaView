@@ -64,6 +64,8 @@ public:
 private slots:
   void setAnimationScene(pqAnimationScene* scene);
 
+  void updateTimePrecision();
+
 private:
   Q_DISABLE_COPY(pqAnimationTimeToolbar)
   void constructor();
@@ -71,5 +73,3 @@ private:
 };
 
 #endif
-
-
