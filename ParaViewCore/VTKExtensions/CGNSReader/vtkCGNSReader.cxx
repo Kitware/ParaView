@@ -1636,7 +1636,7 @@ int vtkCGNSReader::GetUnstructuredZone(int base, int zone,
   for (std::vector<int>::iterator iter = coreSec.begin();
        iter != coreSec.end(); ++iter)
     {
-    int sec = *iter;
+    size_t sec = *iter;
     CGNS_ENUMT(ElementType_t) elemType = CGNS_ENUMV(ElementTypeNull);
     cgsize_t start = 1, end = 1;
     cgsize_t elementSize = 0;
