@@ -547,6 +547,8 @@ int vtkCGNSReader::vtkPrivate::AllocateVtkArray(const int physicalDim, const vtk
         case CGNS_ENUMV(Character):
           vtkVars[ff] = vtkCharArray::New();
           break;
+        default:
+          continue;
         }
       vtkVars[ff]->SetName(cgnsVars[ff].name);
       vtkVars[ff]->SetNumberOfComponents(1);
@@ -583,6 +585,8 @@ int vtkCGNSReader::vtkPrivate::AllocateVtkArray(const int physicalDim, const vtk
       case CGNS_ENUMV(Character):
         arr = vtkCharArray::New();
         break;
+      default:
+        continue;
       }
 
     arr->SetName(iter->name);
