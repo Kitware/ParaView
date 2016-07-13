@@ -107,10 +107,10 @@ class DataProberDataSetBuilder(DataSetBuilder):
         DataSetBuilder.__init__(self, location, None, metadata)
         self.fieldsToWrite = fields_to_keep
         self.resamplerFilter = simple.ResampleToImage(Input=input)
-        self.resamplerFilter.SamplingDimension = sampling_dimesions
+        self.resamplerFilter.SamplingDimensions = sampling_dimesions
         if custom_probing_bounds:
             self.resamplerFilter.UseInputBounds = 0
-            self.resamplerFilter.CustomSamplingBounds = custom_probing_bounds
+            self.resamplerFilter.SamplingBounds = custom_probing_bounds
         else:
             self.resamplerFilter.UseInputBounds = 1
 
