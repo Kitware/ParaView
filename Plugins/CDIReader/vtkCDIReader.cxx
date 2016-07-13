@@ -1304,8 +1304,8 @@ int vtkCDIReader::CheckForMaskData()
             int i = j*this->MaximumNVertLevels;
             this->CellMask[i+levelNum] = (int) (dataTmpMask[j+(levelNum * this->NumberOfCells)]);
           }
-          free(dataTmpMask);
-          vtkDebugMacro(<< "Got data for land/sea mask (3D)"  << endl);
+        free(dataTmpMask);
+        vtkDebugMacro(<< "Got data for land/sea mask (3D)"  << endl);
       }
       else
       {
@@ -1818,8 +1818,8 @@ int vtkCDIReader::LoadPointVarData(int variableIndex, double dTimeStep)
     {
       k = this->PointMap[j - this->NumberOfPoints]*this->MaximumNVertLevels;
       // write data for one point -- lowest level to highest
-    for (int levelNum = 0; levelNum < this->MaximumNVertLevels; levelNum++)
-      dataBlock[i++] = dataTmp[k++];
+      for (int levelNum = 0; levelNum < this->MaximumNVertLevels; levelNum++)
+        dataBlock[i++] = dataTmp[k++];
 
       // for last layer of points, repeat last level's values
       dataBlock[i++] = dataTmp[--k];
@@ -2524,13 +2524,13 @@ void vtkCDIReader::InvertTopography(bool val)
   else
     this->masking_value = 0.0;
 
-    if (!this->InfoRequested)
-      return;
+  if (!this->InfoRequested)
+    return;
 
-    if (!this->DataRequested)
-      return;
+  if (!this->DataRequested)
+    return;
 
-    RegenerateGeometry();
+  RegenerateGeometry();
 }
 
 //----------------------------------------------------------------------------
