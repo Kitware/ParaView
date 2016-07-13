@@ -51,6 +51,8 @@ protected:
     const char* arrayName, int fieldAssociation,
     vtkSMSourceProxy* producer, int producerPort);
 
+  friend class vtkSMBoundsDomain;
+
 private:
 
   vtkSMArrayRangeDomain(const vtkSMArrayRangeDomain&); // Not implemented

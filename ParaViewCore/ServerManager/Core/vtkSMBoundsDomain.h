@@ -53,6 +53,7 @@
 
 class vtkPVDataInformation;
 class vtkSMProxyProperty;
+class vtkSMArrayRangeDomain;
 
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMBoundsDomain : public vtkSMDoubleRangeDomain
 {
@@ -78,6 +79,7 @@ public:
     MAGNITUDE,
     ORIENTED_MAGNITUDE,
     SCALED_EXTENT,
+    ARRAY_SCALED_EXTENT,
     APPROXIMATE_CELL_LENGTH,
     DATA_BOUNDS,
     EXTENTS,
@@ -111,6 +113,8 @@ protected:
 private:
   vtkSMBoundsDomain(const vtkSMBoundsDomain&); // Not implemented
   void operator=(const vtkSMBoundsDomain&); // Not implemented
+  
+  vtkSMArrayRangeDomain* ArrayRangeDomain;
 };
 
 #endif
