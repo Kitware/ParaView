@@ -94,7 +94,14 @@ void pqPipelineBrowserWidget::configureModel()
   // Connect the model to the ServerManager model.
   pqServerManagerModel *smModel =
     pqApplicationCore::instance()->getServerManagerModel();
-  QObject::connect(smModel, SIGNAL(serverAdded(pqServer*)),
+
+  // We connect to `preServerAdded` instead of `serverAdded` signal.
+  // This makes it possible for the pqPipelineModel to become aware of a new
+  // server connection before the
+  // vtkSMParaViewPipelineController::InitializeSession is called by
+  // pqServerManagerModel. Thus if any proxies are created during that call, the
+  // pqPipelineModel knows which session they belong to.
+  QObject::connect(smModel, SIGNAL(preServerAdded(pqServer*)),
     this->PipelineModel, SLOT(addServer(pqServer*)));
   QObject::connect(smModel, SIGNAL(serverRemoved(pqServer*)),
     this->PipelineModel, SLOT(removeServer(pqServer*)));

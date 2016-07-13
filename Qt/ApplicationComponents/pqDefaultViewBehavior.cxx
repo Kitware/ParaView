@@ -161,10 +161,9 @@ void pqDefaultViewBehavior::onServerCreation(pqServer* server)
     pqTimer::singleShot(500, this, SLOT(showWarnings()));
     }
 
-  // See if some view are already present. This allow us to create one by
-  // default if needed and use the existing one if a client connect to a
-  // collaborative visualization server.
-  if(core->getServerManagerModel()->getNumberOfItems<pqView*>() == 0)
+  // See if some view are already present and if we're in a collaborative
+  // session, we are the master.
+  if (core->getServerManagerModel()->getNumberOfItems<pqView*>() == 0 && server->isMaster())
     {
     pqObjectBuilder* builder =
       pqApplicationCore::instance()->getObjectBuilder();
