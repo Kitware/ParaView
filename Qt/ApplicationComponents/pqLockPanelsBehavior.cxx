@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSettings.h"
 
 #include "vtkCommand.h"
+#include "vtkNew.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
@@ -93,7 +94,7 @@ pqLockPanelsBehavior::pqLockPanelsBehavior(QObject* parentObject) :
   Superclass(parentObject),
   Internals(new pqInternals(this))
 {
-  vtkPVGeneralSettings* settings = vtkPVGeneralSettings::New();
+  vtkNew<vtkPVGeneralSettings> settings;;
 
   // Lock or unlock the panels as dictated by the settings
   this->lockPanels(settings->GetLockPanels());
@@ -106,14 +107,14 @@ pqLockPanelsBehavior::pqLockPanelsBehavior(QObject* parentObject) :
 //-----------------------------------------------------------------------------
 pqLockPanelsBehavior::~pqLockPanelsBehavior()
 {
-  vtkPVGeneralSettings* settings = vtkPVGeneralSettings::New();
+  vtkNew<vtkPVGeneralSettings> settings;
   settings->RemoveObserver(this->Internals->ObserverID);
 }
 
 //-----------------------------------------------------------------------------
 void pqLockPanelsBehavior::generalSettingsChanged()
 {
-  vtkPVGeneralSettings* settings = vtkPVGeneralSettings::New();
+  vtkNew<vtkPVGeneralSettings> settings;
   this->lockPanels(settings->GetLockPanels());
 }
 
