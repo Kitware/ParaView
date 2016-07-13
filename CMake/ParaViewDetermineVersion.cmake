@@ -30,7 +30,12 @@
 #   git_command : git executable
 #   var_prefix : prefix for variables e.g. "PARAVIEW".
 function(determine_version source_dir git_command var_prefix)
-  if(NOT PARAVIEW_GIT_DESCRIBE)
+  if ("$Format:$" STREQUAL "")
+    # We are in an exported tarball and should use the shipped version
+    # information. Just return here to avoid the warning message at the end of
+    # this function.
+    return ()
+  elseif (NOT PARAVIEW_GIT_DESCRIBE)
     if(EXISTS ${git_command})
       execute_process(
         COMMAND ${git_command} describe
