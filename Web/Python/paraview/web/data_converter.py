@@ -2,7 +2,7 @@ from vtk import *
 
 from vtk.web.camera import *
 
-import json, os, math, gzip, shutil
+import json, os, math, gzip, shutil, array
 
 # -----------------------------------------------------------------------------
 # Helper function
@@ -42,6 +42,20 @@ def convertImageToFloat(srcPngImage, destFile, scalarRange=[0.0, 1.0]):
 
     return size
 
+def convertRGBArrayToFloatArray(rgbArray, scalarRange=[0.0, 1.0]):
+    linearSize = rgbArray.GetNumberOfTuples()
+
+    outputArray = vtkFloatArray()
+    outputArray.SetNumberOfComponents(1)
+    outputArray.SetNumberOfTuples(linearSize)
+
+    for idx in range(linearSize):
+        outputArray.SetTuple1(
+            idx,
+            getScalarFromRGB(rgbArray.GetTuple(idx), scalarRange)
+        )
+
+    return outputArray
 
 # -----------------------------------------------------------------------------
 # Composite.json To order.array
@@ -108,6 +122,7 @@ class CompositeJSON(object):
 # -----------------------------------------------------------------------------
 # Composite Sprite to Sorted Composite Dataset Builder
 # -----------------------------------------------------------------------------
+
 class ConvertCompositeSpriteToSortedStack(object):
     def __init__(self, directory):
         self.basePath = directory
@@ -284,3 +299,193 @@ class ConvertCompositeSpriteToSortedStack(object):
                         self.data.append({'name': '%d_%s' % (layerIdx, scalar), 'type': 'array', 'fileName': '/%d_%s.float32' % (layerIdx, scalar), 'categories': ['%d_%s' % (layerIdx, scalar)]})
 
             layerIdx += 1
+
+
+# -----------------------------------------------------------------------------
+# Composite Sprite to Sorted Composite Dataset Builder
+# -----------------------------------------------------------------------------
+
+class ConvertCompositeDataToSortedStack(object):
+    def __init__(self, directory):
+        self.basePath = directory
+        self.layers = []
+        self.data = []
+        self.imageReader = vtkPNGReader()
+
+        # Load JSON metadata
+        with open(os.path.join(directory, "config.json"), "r") as f:
+            self.config = json.load(f)
+            self.nbLayers = len(self.config['scene'])
+            while len(self.layers) < self.nbLayers:
+                self.layers.append({})
+
+        with open(os.path.join(directory, "index.json"), "r") as f:
+            self.info = json.load(f)
+
+    def listData(self):
+        return self.data
+
+    def convert(self):
+        for root, dirs, files in os.walk(self.basePath):
+            if 'depth_0.float32' in files:
+                print 'Process', root
+                self.processDirectory(root)
+
+    def processDirectory(self, directory):
+        # Load depth
+        depthStack = []
+        imageSize = self.config['size']
+        linearSize = imageSize[0] * imageSize[1]
+        nbLayers = len(self.layers)
+        stackSize = nbLayers * linearSize
+        layerList = range(nbLayers)
+        for layerIdx in layerList:
+            with open(os.path.join(directory, 'depth_%d.float32' % layerIdx), "rb") as f:
+                a = array.array('f')
+                a.fromfile(f, linearSize)
+                depthStack.append(a)
+
+        orderArray = vtkUnsignedCharArray()
+        orderArray.SetName('layerIdx');
+        orderArray.SetNumberOfComponents(1)
+        orderArray.SetNumberOfTuples(stackSize)
+
+        pixelSorter = [(i, i) for i in layerList]
+
+        for pixelId in range(linearSize):
+            # Fill pixelSorter
+            for layerIdx in layerList:
+                if depthStack[layerIdx][pixelId] < 1.0:
+                    pixelSorter[layerIdx] = (layerIdx, depthStack[layerIdx][pixelId])
+                else:
+                    pixelSorter[layerIdx] = (255, 1.0)
+
+            # Sort pixel layers
+            pixelSorter.sort(key=lambda tup: tup[1])
+
+            # Fill sortedOrder array
+            for layerIdx in layerList:
+                orderArray.SetValue(layerIdx * linearSize + pixelId, pixelSorter[layerIdx][0])
+
+        # Write order (sorted order way)
+        with open(os.path.join(directory, 'order.uint8'), 'wb') as f:
+            f.write(buffer(orderArray))
+            self.data.append({'name': 'order', 'type': 'array', 'fileName': '/order.uint8'})
+
+        # Remove depth files
+        for layerIdx in layerList:
+            os.remove(os.path.join(directory, 'depth_%d.float32' % layerIdx))
+
+
+        # Encode Normals (sorted order way)
+        if 'normal' in self.config['light']:
+            sortedNormal = vtkUnsignedCharArray()
+            sortedNormal.SetNumberOfComponents(3) # x,y,z
+            sortedNormal.SetNumberOfTuples(stackSize)
+
+            # Get Camera orientation and rotation information
+            camDir = [0,0,0]
+            worldUp = [0,0,0]
+            with open(os.path.join(directory, "camera.json"), "r") as f:
+                camera = json.load(f)
+                camDir = normalize([ camera['position'][i] - camera['focalPoint'][i] for i in range(3) ])
+                worldUp = normalize(camera['viewUp'])
+
+            # [ camRight, camUp, camDir ] will be our new orthonormal basis for normals
+            camRight = vectProduct(camDir, worldUp)
+            camUp = vectProduct(camRight, camDir)
+
+            # Tmp structure to capture (x,y,z) normal
+            normalByLayer = vtkFloatArray()
+            normalByLayer.SetNumberOfComponents(3)
+            normalByLayer.SetNumberOfTuples(stackSize)
+
+            # Capture all layer normals
+            zPosCount = 0
+            zNegCount = 0
+            for layerIdx in layerList:
+
+                # Load normal(x,y,z) from current layer
+                normalLayer = []
+                for comp in [0, 1, 2]:
+                    with open(os.path.join(directory, 'normal_%d_%d.float32' % (layerIdx, comp)), "rb") as f:
+                        a = array.array('f')
+                        a.fromfile(f, linearSize)
+                        normalLayer.append(a)
+
+                # Store normal inside vtkArray
+                offset = layerIdx * linearSize
+                for idx in range(linearSize):
+                    normalByLayer.SetTuple3(
+                        idx + offset,
+                        normalLayer[0][idx],
+                        normalLayer[1][idx],
+                        normalLayer[2][idx]
+                    )
+
+                    # Re-orient normal to be view based
+                    vect = normalByLayer.GetTuple3(layerIdx * linearSize + idx)
+                    if not math.isnan(vect[0]):
+                        # Express normal in new basis we computed above
+                        rVect = normalize([ -dotProduct(vect, camRight), dotProduct(vect, camUp), dotProduct(vect, camDir)  ])
+
+                        # Need to reverse vector ?
+                        if rVect[2] < 0:
+                            normalByLayer.SetTuple3(layerIdx * linearSize + idx, -rVect[0], -rVect[1], -rVect[2])
+                        else:
+                            normalByLayer.SetTuple3(layerIdx * linearSize + idx, rVect[0], rVect[1], rVect[2])
+
+            # Sort normals and encode them as 3 bytes ( -1 < xy < 1 | 0 < z < 1)
+            for idx in range(stackSize):
+                layerIdx = int(orderArray.GetValue(idx))
+                if layerIdx == 255:
+                    # No normal => same as view direction
+                    sortedNormal.SetTuple3(idx, 128, 128, 255)
+                else:
+                    offset = layerIdx * linearSize
+                    imageIdx = idx % linearSize
+                    vect = normalByLayer.GetTuple3(imageIdx + offset)
+                    if not math.isnan(vect[0]) and not math.isnan(vect[1]) and not math.isnan(vect[2]):
+                        sortedNormal.SetTuple3(idx, int(127.5 * (vect[0] + 1)), int(127.5 * (vect[1] + 1)), int(255 * vect[2]))
+                    else:
+                        print 'WARNING: encountered NaN in normal of layer ',layerIdx,': [',vect[0],',',vect[1],',',vect[2],']'
+                        sortedNormal.SetTuple3(idx, 128, 128, 255)
+
+            # Write the sorted data
+            with open(os.path.join(directory, 'normal.uint8'), 'wb') as f:
+                f.write(buffer(sortedNormal))
+                self.data.append({'name': 'normal', 'type': 'array', 'fileName': '/normal.uint8', 'categories': ['normal']})
+
+            # Remove depth files
+            for layerIdx in layerList:
+                os.remove(os.path.join(directory, 'normal_%d_%d.float32' % (layerIdx, 0)))
+                os.remove(os.path.join(directory, 'normal_%d_%d.float32' % (layerIdx, 1)))
+                os.remove(os.path.join(directory, 'normal_%d_%d.float32' % (layerIdx, 2)))
+
+        # Encode Intensity (sorted order way)
+        if 'intensity' in self.config['light']:
+            sortedIntensity = vtkUnsignedCharArray()
+            sortedIntensity.SetNumberOfTuples(stackSize)
+
+            intensityLayers = []
+            for layerIdx in layerList:
+                with open(os.path.join(directory, 'intensity_%d.uint8' % layerIdx), "rb") as f:
+                    a = array.array('B')
+                    a.fromfile(f, linearSize)
+                    intensityLayers.append(a)
+
+            for idx in range(stackSize):
+                layerIdx = int(orderArray.GetValue(idx))
+                if layerIdx == 255:
+                    sortedIntensity.SetValue(idx, 255)
+                else:
+                    imageIdx = idx % linearSize
+                    sortedIntensity.SetValue(idx, intensityLayers[layerIdx][imageIdx])
+
+            with open(os.path.join(directory, 'intensity.uint8'), 'wb') as f:
+                f.write(buffer(sortedIntensity))
+                self.data.append({'name': 'intensity', 'type': 'array', 'fileName': '/intensity.uint8', 'categories': ['intensity']})
+
+            # Remove depth files
+            for layerIdx in layerList:
+                os.remove(os.path.join(directory, 'intensity_%d.uint8' % layerIdx))

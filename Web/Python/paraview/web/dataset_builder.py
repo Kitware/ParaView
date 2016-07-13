@@ -331,283 +331,283 @@ class LayerDataSetBuilder(DataSetBuilder):
 # Composite Dataset Builder
 # -----------------------------------------------------------------------------
 
-# FIXME: Need to use normal view...
+class CompositeDataSetBuilder(DataSetBuilder):
+    def __init__(self, location, sceneConfig, cameraInfo, metadata={}, sections={}):
+        DataSetBuilder.__init__(self, location, cameraInfo, metadata, sections)
 
-# class CompositeDataSetBuilder(DataSetBuilder):
-#     def __init__(self, location, sceneConfig, cameraInfo, metadata={}, sections={}):
-#         DataSetBuilder.__init__(self, location, cameraInfo, metadata, sections)
+        self.view = simple.CreateView('RenderView')
+        self.view.ViewSize = sceneConfig['size']
+        self.view.CenterAxesVisibility = 0
+        self.view.OrientationAxesVisibility = 0
+        self.view.UpdatePropertyInformation()
 
-#         self.view = simple.CreateView('RenderView')
-#         self.view.ImageFormatExtension = 'png' # Only option for scalar data
-#         self.view.ViewSize = sceneConfig['size']
-#         self.view.CenterAxesVisibility = 0
-#         self.view.OrientationAxesVisibility = 0
-#         self.view.UpdatePropertyInformation()
+        # Initialize camera
+        for key, value in sceneConfig['camera'].iteritems():
+            self.view.GetProperty(key).SetData(value)
 
-#         # Initialize camera
-#         for key, value in sceneConfig['camera'].iteritems():
-#             self.view.GetProperty(key).SetData(value)
+        # Create a representation for all scene sources
+        self.config = sceneConfig
+        self.representations = []
+        for data in self.config['scene']:
+            rep = simple.Show(data['source'], self.view)
+            self.representations.append(rep)
 
-#         # Create a representation for all scene sources
-#         self.config = sceneConfig
-#         self.representations = []
-#         for data in self.config['scene']:
-#             rep = simple.Show(data['source'], self.view)
-#             self.representations.append(rep)
+        # Add directory path
+        self.dataHandler.registerData(name='directory', rootFile=True, fileName='file.txt', categories=['trash'])
 
-#         # Add directory path
-#         self.dataHandler.registerData(name='directory', rootFile=True, fileName='file.txt', categories=['trash'])
-#         self.offsetMap = {}
+    def start(self):
+        DataSetBuilder.start(self, self.view)
 
-#     def start(self):
-#         DataSetBuilder.start(self, self.view)
+    def stop(self, compress=True, clean=True):
+        DataSetBuilder.stop(self)
 
-#     def stop(self, compress=True, clean=True):
-#         DataSetBuilder.stop(self)
+        if not self.dataHandler.can_write:
+            return
 
-#         if not self.dataHandler.can_write:
-#             return
+        # Make the config serializable
+        for item in self.config['scene']:
+            del item['source']
 
-#         with open(os.path.join(self.dataHandler.getBasePath(), "offset.json"), 'w') as f:
-#             f.write(json.dumps(self.offsetMap))
+        # Write the scene to disk
+        with open(os.path.join(self.dataHandler.getBasePath(), "config.json"), 'w') as f:
+            f.write(json.dumps(self.config))
 
-#         # Make the config serializable
-#         for item in self.config['scene']:
-#             del item['source']
+        dataConverter = data_converter.ConvertCompositeDataToSortedStack(self.dataHandler.getBasePath())
+        dataConverter.convert()
 
-#         # Write the scene to disk
-#         with open(os.path.join(self.dataHandler.getBasePath(), "config.json"), 'w') as f:
-#             f.write(json.dumps(self.config))
+        # Remove tmp files
+        os.remove(os.path.join(self.dataHandler.getBasePath(), "index.json"))
+        os.remove(os.path.join(self.dataHandler.getBasePath(), "config.json"))
 
-#         dataConverter = data_converter.ConvertCompositeSpriteToSortedStack(self.dataHandler.getBasePath())
-#         dataConverter.convert()
+        # Composite pipeline meta description
+        compositePipeline = {
+            'default_pipeline': '',
+            'layers': [],
+            'fields': {},
+            'layer_fields': {},
+            'pipeline': []
+        }
+        rootItems = {}
+        fieldNameMapping = {}
 
-#         # Remove tmp files
-#         os.remove(os.path.join(self.dataHandler.getBasePath(), "offset.json"))
-#         os.remove(os.path.join(self.dataHandler.getBasePath(), "index.json"))
-#         os.remove(os.path.join(self.dataHandler.getBasePath(), "config.json"))
+        # Clean scene in config and gather ranges
+        dataRanges = {}
+        layerIdx = 0
+        for layer in self.config['scene']:
+            # Create group node if any
+            if 'parent' in layer and layer['parent'] not in rootItems:
+                rootItems[layer['parent']] = { 'name': layer['parent'], 'ids': [], 'children': [] }
+                compositePipeline['pipeline'].append(rootItems[layer['parent']])
 
-#         # Composite pipeline meta description
-#         compositePipeline = {
-#             'default_pipeline': '',
-#             'layers': [],
-#             'fields': {},
-#             'layer_fields': {},
-#             'pipeline': []
-#         }
-#         rootItems = {}
-#         fieldNameMapping = {}
+            # Create layer entry
+            layerCode = encode_codes[layerIdx]
+            layerItem = { 'name': layer['name'], 'ids': [ layerCode ]}
+            compositePipeline['layers'].append(layerCode)
+            compositePipeline['layer_fields'][layerCode] = []
+            compositePipeline['default_pipeline'] += layerCode
 
-#         # Clean scene in config and gather ranges
-#         dataRanges = {}
-#         layerIdx = 0
-#         for layer in self.config['scene']:
-#             # Create group node if any
-#             if 'parent' in layer and layer['parent'] not in rootItems:
-#                 rootItems[layer['parent']] = { 'name': layer['parent'], 'ids': [], 'children': [] }
-#                 compositePipeline['pipeline'].append(rootItems[layer['parent']])
+            # Register layer entry in pipeline
+            if 'parent' in layer:
+                rootItems[layer['parent']]['children'].append(layerItem)
+                rootItems[layer['parent']]['ids'].append(layerCode)
+            else:
+                compositePipeline['pipeline'].append(layerItem)
 
-#             # Create layer entry
-#             layerCode = encode_codes[layerIdx]
-#             layerItem = { 'name': layer['name'], 'ids': [ layerCode ]}
-#             compositePipeline['layers'].append(layerCode)
-#             compositePipeline['layer_fields'][layerCode] = []
-#             compositePipeline['default_pipeline'] += layerCode
+            # Handle color / field
+            colorByList = []
+            for color in layer['colors']:
+                # Find color code
+                if color not in fieldNameMapping:
+                    colorCode = encode_codes[len(fieldNameMapping)]
+                    fieldNameMapping[color] = colorCode
+                    compositePipeline['fields'][colorCode] = color
+                else:
+                    colorCode = fieldNameMapping[color]
 
-#             # Register layer entry in pipeline
-#             if 'parent' in layer:
-#                 rootItems[layer['parent']]['children'].append(layerItem)
-#                 rootItems[layer['parent']]['ids'].append(layerCode)
-#             else:
-#                 compositePipeline['pipeline'].append(layerItem)
+                # Register color code
+                compositePipeline['layer_fields'][layerCode].append(colorCode)
+                if len(colorByList) == 0:
+                    compositePipeline['default_pipeline'] += colorCode
 
-#             # Handle color / field
-#             colorByList = []
-#             for color in layer['colors']:
-#                 # Find color code
-#                 if color not in fieldNameMapping:
-#                     colorCode = encode_codes[len(fieldNameMapping)]
-#                     fieldNameMapping[color] = colorCode
-#                     compositePipeline['fields'][colorCode] = color
-#                 else:
-#                     colorCode = fieldNameMapping[color]
+                values = None
+                if 'constant' in layer['colors'][color]:
+                    value = layer['colors'][color]['constant']
+                    values = [ value, value ]
+                    colorByList.append({'name': color, 'type': 'const', 'value': value})
+                elif 'range' in layer['colors'][color]:
+                    values = layer['colors'][color]['range']
+                    colorByList.append({'name': color, 'type': 'field'})
 
-#                 # Register color code
-#                 compositePipeline['layer_fields'][layerCode].append(colorCode)
-#                 if len(colorByList) == 0:
-#                     compositePipeline['default_pipeline'] += colorCode
+                if values:
+                    if color not in dataRanges:
+                        dataRanges[color] = values
+                    else:
+                        dataRanges[color][0] = min(dataRanges[color][0], values[0], values[1])
+                        dataRanges[color][1] = max(dataRanges[color][1], values[0], values[1])
 
-#                 values = None
-#                 if 'constant' in layer['colors'][color]:
-#                     value = layer['colors'][color]['constant']
-#                     values = [ value, value ]
-#                     colorByList.append({'name': color, 'type': 'const', 'value': value})
-#                 elif 'range' in layer['colors'][color]:
-#                     values = layer['colors'][color]['range']
-#                     colorByList.append({'name': color, 'type': 'field'})
+            layer['colorBy'] = colorByList
+            del layer['colors']
+            layerIdx += 1
 
-#                 if values:
-#                     if color not in dataRanges:
-#                         dataRanges[color] = values
-#                     else:
-#                         dataRanges[color][0] = min(dataRanges[color][0], values[0], values[1])
-#                         dataRanges[color][1] = max(dataRanges[color][1], values[0], values[1])
+        sortedCompositeSection = {
+            'dimensions': self.config['size'],
+            'pipeline': self.config['scene'],
+            'ranges': dataRanges,
+            'layers': len(self.config['scene']),
+            'light': self.config['light']
+        }
+        self.dataHandler.addSection('SortedComposite', sortedCompositeSection)
+        self.dataHandler.addSection('CompositePipeline', compositePipeline)
+        self.dataHandler.addTypes('sorted-composite', 'multi-color-by')
 
-#             layer['colorBy'] = colorByList
-#             del layer['colors']
-#             layerIdx += 1
+        self.dataHandler.removeData('directory')
+        for dataToRegister in dataConverter.listData():
+            self.dataHandler.registerData(**dataToRegister)
 
-#         sortedCompositeSection = {
-#             'dimensions': self.config['size'],
-#             'pipeline': self.config['scene'],
-#             'ranges': dataRanges,
-#             'layers': len(self.config['scene']),
-#             'light': self.config['light']
-#         }
-#         self.dataHandler.addSection('SortedComposite', sortedCompositeSection)
-#         self.dataHandler.addSection('CompositePipeline', compositePipeline)
-#         self.dataHandler.addTypes('sorted-composite', 'multi-color-by')
+        self.dataHandler.writeDataDescriptor()
 
-#         self.dataHandler.removeData('directory')
-#         for dataToRegister in dataConverter.listData():
-#             self.dataHandler.registerData(**dataToRegister)
+        if clean:
+          for root, dirs, files in os.walk(self.dataHandler.getBasePath()):
+              print 'Clean', root
+              for name in files:
+                  if name in ['camera.json']:
+                      os.remove(os.path.join(root, name))
 
-#         self.dataHandler.writeDataDescriptor()
+        if compress:
+            for root, dirs, files in os.walk(self.dataHandler.getBasePath()):
+                print 'Compress', root
+                for name in files:
+                    if ('.float32' in name or '.uint8' in name) and '.gz' not in name:
+                        with open(os.path.join(root, name), 'rb') as f_in, gzip.open(os.path.join(root, name + '.gz'), 'wb') as f_out:
+                            shutil.copyfileobj(f_in, f_out)
+                        os.remove(os.path.join(root, name))
 
-#         if clean:
-#             for root, dirs, files in os.walk(self.dataHandler.getBasePath()):
-#                 print 'Clean', root
-#                 for name in files:
-#                     if name in ['camera.json', 'composite.json', 'query.json', 'rgb.png']:
-#                         os.remove(os.path.join(root, name))
+    def writeData(self):
+        composite_size = len(self.representations)
 
-#         if compress:
-#             for root, dirs, files in os.walk(self.dataHandler.getBasePath()):
-#                 print 'Compress', root
-#                 for name in files:
-#                     if ('.float32' in name or '.uint8' in name) and '.gz' not in name:
-#                         with open(os.path.join(root, name), 'rb') as f_in, gzip.open(os.path.join(root, name + '.gz'), 'wb') as f_out:
-#                             shutil.copyfileobj(f_in, f_out)
-#                         os.remove(os.path.join(root, name))
+        self.view.UpdatePropertyInformation()
+        self.view.Background = [0,0,0]
 
-#     def writeData(self):
-#         # Fix camera bounds
-#         simple.Render(self.view)
-#         self.view.ResetClippingBounds()
-#         self.view.FreezeGeometryBounds()
-#         self.view.UpdatePropertyInformation()
-#         self.view.Background = [0,0,0]
+        # Generate the heavy data
+        for camPos in self.getCamera():
+            self.view.CameraFocalPoint = camPos['focalPoint']
+            self.view.CameraPosition = camPos['position']
+            self.view.CameraViewUp = camPos['viewUp']
 
-#         # Compute the number of images by stack
-#         nbImages = 0
-#         nbLightImagePerLayer = 0
-#         for item in self.config['scene']:
-#             for key, value in item['colors'].iteritems():
-#                 if 'constant' not in value:
-#                     nbImages += 1
+            # Show all representations
+            for compositeIdx in range(composite_size):
+                rep = self.representations[compositeIdx]
+                rep.Visibility = 1
 
-#         if 'intensity' in self.config['light']:
-#             nbLightImagePerLayer += 1
+            # Fix camera bounds
+            self.view.LockBounds = 0
+            simple.Render(self.view)
+            self.view.LockBounds = 1
 
-#         if 'normal' in self.config['light']:
-#             nbLightImagePerLayer += 3
+            # Update destination directory
+            dest_path = os.path.dirname(self.dataHandler.getDataAbsoluteFilePath('directory'))
 
-#         nbImages += len(self.config['scene']) * nbLightImagePerLayer
-#         nbImages += 1 # Background
+            # Write camera informations
+            if self.dataHandler.can_write:
+                with open(os.path.join(dest_path, "camera.json"), 'w') as f:
+                    f.write(json.dumps(camPos))
 
-#         # Generate the heavy data
-#         composite_size = len(self.representations)
-#         for camPos in self.getCamera():
-#             self.view.CameraFocalPoint = camPos['focalPoint']
-#             self.view.CameraPosition = camPos['position']
-#             self.view.CameraViewUp = camPos['viewUp']
+            # Hide all representations
+            for compositeIdx in range(composite_size):
+                rep = self.representations[compositeIdx]
+                rep.Visibility = 0
 
-#             # Update destination directory
-#             dest_path = os.path.dirname(self.dataHandler.getDataAbsoluteFilePath('directory'))
+            # Show only active Representation
+            # Extract images for each fields
+            for compositeIdx in range(composite_size):
+                rep = self.representations[compositeIdx]
+                if compositeIdx > 0:
+                    self.representations[compositeIdx - 1].Visibility = 0
+                rep.Visibility = 1
 
-#             # Write camera informations
-#             if self.dataHandler.can_write:
-#                 with open(os.path.join(dest_path, "camera.json"), 'w') as f:
-#                     f.write(json.dumps(camPos))
+                # capture Z
+                simple.Render()
+                zBuffer = self.view.CaptureDepthBuffer()
+                with open(os.path.join(dest_path, 'depth_%d.float32' % compositeIdx), 'wb') as f:
+                    f.write(buffer(zBuffer))
 
-#             # Extract images for each fields
-#             self.view.ResetActiveImageStack()
-#             self.view.RGBStackSize = nbImages
-#             offset_value = 1
-#             for compositeIdx in range(composite_size):
-#                 rep = self.representations[compositeIdx]
-#                 index = 0
+                # Prevent color interference
+                rep.DiffuseColor = [1,1,1]
 
-#                 # Prevent color interference
-#                 rep.DiffuseColor = [1,1,1]
+                # Handle light
+                for lightType in self.config['light']:
+                    if lightType == 'intensity':
+                        rep.AmbientColor  = [1,1,1]
+                        rep.SpecularColor = [1,1,1]
 
-#                 # Handle light
-#                 for lightType in self.config['light']:
-#                     if lightType == 'intensity':
-#                         index += 1
-#                         rep.AmbientColor  = [1,1,1]
-#                         rep.SpecularColor = [1,1,1]
+                        self.view.StartCaptureLuminance()
+                        image = self.view.CaptureWindow(1)
+                        imagescalars = image.GetPointData().GetScalars()
+                        self.view.StopCaptureLuminance()
 
-#                         self.view.CompositeDirectory = dest_path
-#                         self.view.ActiveRepresentation = rep
-#                         self.view.CaptureActiveRepresentation()
+                        # Extract specular information
+                        specularOffset = 1 # [diffuse, specular, ?]
+                        imageSize = imagescalars.GetNumberOfTuples()
+                        specularComponent = vtkUnsignedCharArray()
+                        specularComponent.SetNumberOfComponents(1)
+                        specularComponent.SetNumberOfTuples(imageSize)
 
-#                         self.offsetMap['%d|%s' % (compositeIdx, 'intensity')] = offset_value
-#                         offset_value += 1
+                        for idx in range(imageSize):
+                            specularComponent.SetValue(idx, imagescalars.GetValue(idx * 3 + specularOffset))
 
-#                     if lightType == 'normal':
-#                         for comp in range(3):
-#                             index += 1
+                        with open(os.path.join(dest_path, 'intensity_%d.uint8' % compositeIdx), 'wb') as f:
+                            f.write(buffer(specularComponent))
 
-#                             self.view.CompositeDirectory = dest_path
-#                             self.view.ActiveRepresentation = rep
+                        # Free memory
+                        image.UnRegister(None)
 
-#                             # Configure view to handle POINT_DATA / CELL_DATA
-#                             self.view.SetDrawCells = 0
-#                             self.view.SetArrayNameToDraw = 'Normals'
-#                             self.view.SetArrayComponentToDraw = comp
-#                             self.view.SetScalarRange = [-1.0, 1.0]
-#                             self.view.StartCaptureValues()
-#                             self.view.CaptureActiveRepresentation()
-#                             self.view.StopCaptureValues()
+                    if lightType == 'normal':
+                        for comp in range(3):
+                            # Configure view to handle POINT_DATA / CELL_DATA
+                            self.view.DrawCells = 0
+                            self.view.ArrayNameToDraw = 'Normals'
+                            self.view.ArrayComponentToDraw = comp
+                            self.view.ScalarRange = [-1.0, 1.0]
+                            self.view.StartCaptureValues()
+                            image = self.view.CaptureWindow(1)
+                            imagescalars = image.GetPointData().GetScalars()
+                            self.view.StopCaptureValues()
 
-#                             self.offsetMap['%d|%s|%d' % (compositeIdx, 'normal', comp)] = offset_value
-#                             offset_value += 1
+                            # Convert RGB => Float => Write
+                            floatArray = data_converter.convertRGBArrayToFloatArray(imagescalars, [-1.0, 1.0])
+                            with open(os.path.join(dest_path, 'normal_%d_%d.float32' % (compositeIdx, comp)), 'wb') as f:
+                                f.write(buffer(floatArray))
 
+                            # Free memory
+                            image.UnRegister(None)
 
-#                 # Handle color by
-#                 for fieldName, fieldConfig in self.config['scene'][compositeIdx]['colors'].iteritems():
-#                     index += 1
-#                     if 'constant' in fieldConfig:
-#                         # Skip nothing to render
-#                         index -= 1
-#                         continue
+                # Handle color by
+                for fieldName, fieldConfig in self.config['scene'][compositeIdx]['colors'].iteritems():
+                    if 'constant' in fieldConfig:
+                        # Skip nothing to render
+                        continue
 
-#                     self.view.CompositeDirectory = dest_path
-#                     self.view.ActiveRepresentation = rep
+                    # Configure view to handle POINT_DATA / CELL_DATA
+                    if fieldConfig['location'] == 'POINT_DATA':
+                        self.view.DrawCells = 0
+                    else:
+                        self.view.DrawCells = 1
 
-#                     # Configure view to handle POINT_DATA / CELL_DATA
-#                     if fieldConfig['location'] == 'POINT_DATA':
-#                         self.view.SetDrawCells = 0
-#                         self.view.SetArrayNameToDraw = fieldName
-#                     else:
-#                         self.view.SetDrawCells = 1
-#                         self.view.SetArrayNameToDraw = fieldName
+                    self.view.ArrayNameToDraw = fieldName
+                    self.view.ArrayComponentToDraw = 0
+                    self.view.ScalarRange = fieldConfig['range']
+                    self.view.StartCaptureValues()
+                    image = self.view.CaptureWindow(1)
+                    imagescalars = image.GetPointData().GetScalars()
+                    self.view.StopCaptureValues()
 
-#                     self.view.SetArrayComponentToDraw = 0
-#                     self.view.SetScalarRange = fieldConfig['range']
-#                     self.view.StartCaptureValues()
-#                     self.view.CaptureActiveRepresentation()
-#                     self.view.StopCaptureValues()
+                    floatArray = data_converter.convertRGBArrayToFloatArray(imagescalars, fieldConfig['range'])
+                    with open(os.path.join(dest_path, '%d_%s.float32' % (compositeIdx, fieldName)), 'wb') as f:
+                        f.write(buffer(floatArray))
+                        self.dataHandler.registerData(name='%d_%s' % (compositeIdx, fieldName), fileName='/%d_%s.float32' % (compositeIdx, fieldName), type='array', categories=['%d_%s' % (compositeIdx, fieldName)])
 
-#                     self.offsetMap['%d|%s' % (compositeIdx, fieldName)] = offset_value
-#                     offset_value += 1
-
-#             # Extract RGB + Z-buffer
-#             self.view.WriteImage()
-#             self.view.ComputeZOrdering()
-#             self.view.WriteComposite()
-
+                    # Free memory
+                    image.UnRegister(None)
 
 # -----------------------------------------------------------------------------
 # GeometryDataSetBuilder Dataset Builder
