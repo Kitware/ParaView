@@ -32,9 +32,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCylinderPropertyWidget.h"
 #include "ui_pqCylinderPropertyWidget.h"
 
+#include "pqRenderView.h"
+#include "vtkCamera.h"
+#include "vtkMath.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMRenderViewProxy.h"
 
 #include <QDoubleValidator>
 
@@ -128,6 +132,13 @@ pqCylinderPropertyWidget::pqCylinderPropertyWidget(
     ui.resetBounds->hide();
     }
 
+  // link a few buttons
+  this->connect(ui.useXAxis, SIGNAL(clicked()), SLOT(useXAxis()));
+  this->connect(ui.useYAxis, SIGNAL(clicked()), SLOT(useYAxis()));
+  this->connect(ui.useZAxis, SIGNAL(clicked()), SLOT(useZAxis()));
+  this->connect(ui.useCameraAxis, SIGNAL(clicked()), SLOT(useCameraAxis()));
+  this->connect(ui.resetCameraToAxis, SIGNAL(clicked()), SLOT(resetCameraToAxis()));
+
   // Let's link some of the UI elements that only affect the interactive widget
   // properties without affecting properties on the main proxy.
   vtkSMProxy* wdgProxy = this->widgetProxy();
@@ -141,6 +152,10 @@ pqCylinderPropertyWidget::pqCylinderPropertyWidget(
   this->connect(ui.show3DWidget, SIGNAL(toggled(bool)), SLOT(setWidgetVisible(bool)));
   ui.show3DWidget->connect(this, SIGNAL(widgetVisibilityToggled(bool)), SLOT(setChecked(bool)));
   this->setWidgetVisible(ui.show3DWidget->isChecked());
+
+  // save pointers to advanced widgets to toggle their visibility in updateWidget
+  this->AdvancedPropertyWidgets[0] = ui.scaling;
+  this->AdvancedPropertyWidgets[1] = ui.outlineTranslation;
 
   this->placeWidget();
 }
@@ -198,5 +213,61 @@ void pqCylinderPropertyWidget::resetBounds()
 
     emit this->changeAvailable();
     this->render();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqCylinderPropertyWidget::resetCameraToAxis()
+{
+  if (pqRenderView* renView = qobject_cast<pqRenderView*>(this->view()))
+    {
+    vtkCamera* camera = renView->getRenderViewProxy()->GetActiveCamera();
+    vtkSMProxy* wdgProxy = this->widgetProxy();
+    double up[3], forward[3];
+    camera->GetViewUp(up);
+    vtkSMPropertyHelper(wdgProxy, "Axis").Get(forward, 3);
+    vtkMath::Cross(up, forward, up);
+    vtkMath::Cross(forward, up, up);
+    renView->resetViewDirection(
+      forward[0], forward[1], forward[2], up[0], up[1], up[2]);
+    renView->render();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqCylinderPropertyWidget::useCameraAxis()
+{
+  vtkSMRenderViewProxy* viewProxy = this->view()?
+    vtkSMRenderViewProxy::SafeDownCast(this->view()->getProxy()) : NULL;
+  if (viewProxy)
+    {
+    vtkCamera* camera = viewProxy->GetActiveCamera();
+
+    double camera_normal[3];
+    camera->GetViewPlaneNormal(camera_normal);
+    camera_normal[0] = -camera_normal[0];
+    camera_normal[1] = -camera_normal[1];
+    camera_normal[2] = -camera_normal[2];
+    this->setAxis(camera_normal[0], camera_normal[1], camera_normal[2]);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqCylinderPropertyWidget::setAxis(double wx, double wy, double wz)
+{
+  vtkSMProxy* wdgProxy = this->widgetProxy();
+  double axis[3] = {wx, wy, wz};
+  vtkSMPropertyHelper(wdgProxy, "Axis").Set(axis, 3);
+  wdgProxy->UpdateVTKObjects();
+  emit this->changeAvailable();
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqCylinderPropertyWidget::updateWidget(bool showing_advanced_properties)
+{
+  for (int i = 0; i < 2; ++i)
+    {
+    this->AdvancedPropertyWidgets[i]->setVisible(showing_advanced_properties);
     }
 }
