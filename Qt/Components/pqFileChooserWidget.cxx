@@ -30,7 +30,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-
 #include "pqFileChooserWidget.h"
 
 // Qt includes
@@ -41,12 +40,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView
 #include "pqFileDialog.h"
 
+
+
 pqFileChooserWidget::pqFileChooserWidget(QWidget* p)
   : QWidget(p), Server(NULL)
 {
   this->ForceSingleFile = false;
   this->UseDirectoryMode = false;
   this->UseFilenameList = false;
+  this->AcceptAnyFile = false;
 
   QHBoxLayout* l = new QHBoxLayout(this);
   l->setMargin(0);
@@ -159,11 +161,31 @@ void pqFileChooserWidget::chooseFile()
   QString filters = this->Extension;
   filters += ";;All files (*)";
 
+  QString title;
+
+  if(this->UseDirectoryMode)
+    {
+    title = tr("Open Directory:");
+    }
+  else if (this->AcceptAnyFile)
+    {
+    title = tr("Save File:");
+    }
+  else
+    {
+    title = tr("Open File:");
+    }
+
   pqFileDialog* dialog = new pqFileDialog(this->Server,
-    this, tr("Open File:"), QString(), filters);
+    this, title, QString(), filters);
+
   if(this->UseDirectoryMode)
     {
     dialog->setFileMode(pqFileDialog::Directory);
+    }
+  else if (this->AcceptAnyFile)
+    {
+    dialog->setFileMode(pqFileDialog::AnyFile);
     }
   else if (this->forceSingleFile())
     {
@@ -173,6 +195,7 @@ void pqFileChooserWidget::chooseFile()
     {
     dialog->setFileMode(pqFileDialog::ExistingFiles);
     }
+
   if(QDialog::Accepted == dialog->exec())
     {
     QStringList files;

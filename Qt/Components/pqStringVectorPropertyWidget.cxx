@@ -204,6 +204,14 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
       chooser->setUseDirectoryMode(true);
       }
 
+    // If there's a hint on the smproperty indicating that this smproperty accepts
+    // any file name, then, we will use the AnyFile mode.
+
+    if (hints && hints->FindNestedElementByName("AcceptAnyFile"))
+      {
+      chooser->setAcceptAnyFile(true);
+      }
+
     if (vtkPVXMLElement* fileChooserHints = hints? hints->FindNestedElementByName("FileChooser") : NULL)
       {
       // We could also support multiple FileChooser hints. For now, we will only
