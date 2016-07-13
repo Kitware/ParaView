@@ -1,16 +1,16 @@
 /*=========================================================================
- * 
+ *
  *  Program:   Visualization Toolkit
  *  Module:    cdi.h
- *  
+ *
  *  Copyright (c) 2015 Uwe Schulzweida, MPI-M Hamburg
  *  All rights reserved.
  *  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
- * 
+ *
  *     This software is distributed WITHOUT ANY WARRANTY; without even
  *     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  *     PURPOSE.  See the above copyright notice for more information.
- * 
+ *
  *  =========================================================================*/
 // .NAME vtkCDIReader - reads ICON/CDI netCDF data sets
 // .SECTION Description
@@ -30,7 +30,7 @@
 // and/or contact Niklas Roeber at roeber@dkrz.de
 //
 // .SECTION Thanks
-// Thanks to Uwe Schulzweida for the CDI code (uwe.schulzweida@mpimet.mpg.de) 
+// Thanks to Uwe Schulzweida for the CDI code (uwe.schulzweida@mpimet.mpg.de)
 // Thanks to Moritz Hanke for the sorting code (hanke@dkrz.de)
 
 #ifndef  CDI_H_
