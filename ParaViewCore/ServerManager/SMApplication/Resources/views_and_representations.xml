@@ -3307,13 +3307,6 @@
         The output of this filter will have at most BlockSize
         rows.</Documentation>
       </IdTypeVectorProperty>
-      <IntVectorProperty command="SetTransparentBackground"
-                         default_values="0"
-                         name="TransparentBackground"
-                         number_of_elements="1"
-                         panel_visibility="never">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
 
       <Hints>
         <ShowOneRepresentationAtATime />
