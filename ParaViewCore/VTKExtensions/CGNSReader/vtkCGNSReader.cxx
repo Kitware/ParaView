@@ -728,7 +728,7 @@ int vtkCGNSReader::GetCurvilinearZone(int base, int zone,
   //----------------------------------------------------------------------------
   vtkMultiBlockDataSet* mzone = vtkMultiBlockDataSet::New();
 
-  bool CreateEachSolutionAsBlock = (this->CreateEachSolutionAsBlock != 0); // Debugging mode !
+  bool createEachSolutionAsBlock = (this->CreateEachSolutionAsBlock != 0); // Debugging mode !
   bool nosolutionread = false;
 
   if (readSolutionName != true)
@@ -903,7 +903,7 @@ int vtkCGNSReader::GetCurvilinearZone(int base, int zone,
       sgrid->Delete();
       }
     }
-  else if (!CreateEachSolutionAsBlock)
+  else if (!createEachSolutionAsBlock)
     {
     nosolutionread = true;
 
@@ -1107,7 +1107,7 @@ int vtkCGNSReader::GetCurvilinearZone(int base, int zone,
       sgrid->Delete();
       }
     }
-  else if (CreateEachSolutionAsBlock)
+  else if (createEachSolutionAsBlock)
     {
     nosolutionread = true;
 
@@ -1521,25 +1521,25 @@ int vtkCGNSReader::GetUnstructuredZone(int base, int zone,
 
     if (strcmp(dataType, "I4") == 0)
       {
-      std::vector<int> mdata;
-      CGNSRead::readNodeData<int>(this->cgioNum, elemRangeId, mdata);
-      if (mdata.size() != 2)
+      std::vector<int> mdata2;
+      CGNSRead::readNodeData<int>(this->cgioNum, elemRangeId, mdata2);
+      if (mdata2.size() != 2)
         {
         vtkErrorMacro(<< "Unexpected data for ElementRange node\n");
         }
-      sectionInfoList[sec].range[0] = static_cast<cgsize_t>(mdata[0]);
-      sectionInfoList[sec].range[1] = static_cast<cgsize_t>(mdata[1]);
+      sectionInfoList[sec].range[0] = static_cast<cgsize_t>(mdata2[0]);
+      sectionInfoList[sec].range[1] = static_cast<cgsize_t>(mdata2[1]);
       }
     else if ( strcmp ( dataType, "I8" ) == 0 )
       {
-      std::vector<cglong_t> mdata;
-      CGNSRead::readNodeData<cglong_t>(this->cgioNum, elemRangeId, mdata);
-      if (mdata.size() != 2)
+      std::vector<cglong_t> mdata2;
+      CGNSRead::readNodeData<cglong_t>(this->cgioNum, elemRangeId, mdata2);
+      if (mdata2.size() != 2)
         {
         vtkErrorMacro(<< "Unexpected data for ElementRange node\n");
         }
-      sectionInfoList[sec].range[0] = static_cast<cgsize_t>(mdata[0]);
-      sectionInfoList[sec].range[1] = static_cast<cgsize_t>(mdata[1]);
+      sectionInfoList[sec].range[0] = static_cast<cgsize_t>(mdata2[0]);
+      sectionInfoList[sec].range[1] = static_cast<cgsize_t>(mdata2[1]);
       }
     else
       {

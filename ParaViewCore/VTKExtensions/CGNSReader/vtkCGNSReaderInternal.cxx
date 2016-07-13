@@ -872,13 +872,13 @@ static void BroadcastSelection(vtkMultiProcessController* controller,
     int tmp;
     for (ite = selection.begin(); ite != selection.end(); ++ ite)
       {
-      unsigned long len = static_cast<unsigned long>(ite->first.size()) + 1;
-      controller->Broadcast(&len, 1, 0);
-      if (len)
+      unsigned long len2 = static_cast<unsigned long>(ite->first.size()) + 1;
+      controller->Broadcast(&len2, 1, 0);
+      if (len2)
         {
           const char* start = ite->first.c_str();
-          std::vector<char> tmp(start, start + len);
-          controller->Broadcast(&tmp[0], len, 0);
+          std::vector<char> tmpVector(start, start + len2);
+          controller->Broadcast(&tmpVector[0], len2, 0);
         }
       tmp = (int) ite->second;
       controller->Broadcast(&tmp, 1, 0);
@@ -910,13 +910,13 @@ static void BroadcastRefState(vtkMultiProcessController* controller,
     std::map<std::string, double>::iterator ite;
     for (ite = refInfo.begin(); ite != refInfo.end(); ++ ite)
       {
-      unsigned long len = static_cast<unsigned long>(ite->first.size()) + 1;
-      controller->Broadcast(&len, 1, 0);
-      if (len)
+      unsigned long len2 = static_cast<unsigned long>(ite->first.size()) + 1;
+      controller->Broadcast(&len2, 1, 0);
+      if (len2)
         {
           const char* start = ite->first.c_str();
-          std::vector<char> tmp(start, start + len);
-          controller->Broadcast(&tmp[0], len, 0);
+          std::vector<char> tmp(start, start + len2);
+          controller->Broadcast(&tmp[0], len2, 0);
         }
       controller->Broadcast(&ite->second, 1, 0);
       }
