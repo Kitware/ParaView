@@ -177,39 +177,7 @@ vtkStdString vtkPVPostFilter::DefaultComponentName(int componentNumber, int comp
 int vtkPVPostFilter::FillInputPortInformation(
   int vtkNotUsed(port), vtkInformation* info)
 {
-  // We want to exclude vtkTemporalDataSet from being accepted as an input,
-  // everything else is acceptable.
-
-  std::string currentDataObject;
-
-  const std::string invalid("UnknownClass");
-
-  std::set<std::string> exemptClasses;
-
-  //too properly exclude datasets you need to exclude all abstract
-  //classes so that only thing left in the valid input list
-  //is concrete implementations. This listing is of all abstract data objects
-  exemptClasses.insert("vtkDataObject");
-  exemptClasses.insert("vtkCompositeDataSet");
-  exemptClasses.insert("vtkDataSet");
-  exemptClasses.insert("vtkGraph");
-
-  //now exclude concrete classes, that we don't want the post
-  //filter to work on
-  exemptClasses.insert("vtkTemporalDataSet");
-
-  int i=0;
-  while(currentDataObject != invalid)
-    {
-    currentDataObject = vtkDataObjectTypes::GetClassNameFromTypeId(i++);
-    if (exemptClasses.count(currentDataObject)==0)
-      {
-      //if the set doesn't contain this dataobject
-      //it is a failed input type
-      vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE()->Append(
-            info,currentDataObject.c_str());
-      }
-    }
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
   return 1;
 }
 
