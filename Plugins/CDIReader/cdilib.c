@@ -1,16 +1,16 @@
 /*=========================================================================
- * 
+ *
  *  Program:   Visualization Toolkit
  *  Module:    cdilib.c
- *  
+ *
  *  Copyright (c) 2015 Uwe Schulzweida, MPI-M Hamburg
  *  All rights reserved.
  *  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
- * 
+ *
  *     This software is distributed WITHOUT ANY WARRANTY; without even
  *     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  *     PURPOSE.  See the above copyright notice for more information.
- * 
+ *
  *  =========================================================================*/
 // .NAME vtkCDIReader - reads ICON/CDI netCDF data sets
 // .SECTION Description
@@ -30,10 +30,10 @@
 // and/or contact Niklas Roeber at roeber@dkrz.de
 //
 // .SECTION Thanks
-// Thanks to Uwe Schulzweida for the CDI code (uwe.schulzweida@mpimet.mpg.de) 
+// Thanks to Uwe Schulzweida for the CDI code (uwe.schulzweida@mpimet.mpg.de)
 // Thanks to Moritz Hanke for the sorting code (hanke@dkrz.de)
 
-#define HAVE_LIBNETCDF 
+#define HAVE_LIBNETCDF
 
 #ifdef _ARCH_PWR6
 #pragma options nostrict
@@ -47,7 +47,7 @@
 #define _XOPEN_SOURCE 600
 #endif
 
-#if defined(__linux__) || defined(__APPLE__) 
+#if defined(__linux__) || defined(__APPLE__)
   #include <unistd.h>
   #include <stdbool.h>
   #include <sys/types.h>
@@ -65,7 +65,7 @@
   #define false 0
   #define true 1
 #endif
-  
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -95,13 +95,13 @@
 static void tableDefault(void) {}
 
 #ifndef _ERROR_H
-#define _ERROR_H 
+#define _ERROR_H
 
 #include <stdarg.h>
 #include <stdlib.h>
 
 #ifndef WITH_CALLER_NAME
-#define WITH_CALLER_NAME 
+#define WITH_CALLER_NAME
 #endif
 
 #define _FATAL 1
@@ -137,7 +137,7 @@ void Message_(const char *caller, const char *fmt, ...);
 
 
 #ifndef __GNUC__
-#define __attribute__(x) 
+#define __attribute__(x)
 #endif
 
 void cdiAbortC(const char *caller, const char *filename,
@@ -162,7 +162,7 @@ cdiAbortC_serial(const char *caller, const char *filename,
 #endif
 
 #ifndef CDI_H_
-#define CDI_H_ 
+#define CDI_H_
 
 #include <stdio.h>
 #include <sys/types.h>
@@ -1333,7 +1333,7 @@ void gribapiLibraryVersion(int *major_version, int *minor_version, int *revision
 
 #endif
 #ifndef _BASETIME_H
-#define _BASETIME_H 
+#define _BASETIME_H
 
 
 #define MAX_TIMECACHE_SIZE 1024
@@ -1381,7 +1381,7 @@ void basetimeInit(basetime_t *basetime)
   basetime->timevar_cache = NULL;
 }
 #ifndef _CALENDAR_H
-#define _CALENDAR_H 
+#define _CALENDAR_H
 
 void encode_caldaysec(int calendar, int year, int month, int day, int hour, int minute, int second,
                       int *julday, int *secofday);
@@ -1395,7 +1395,7 @@ int days_per_month(int calendar, int year, int month);
 
 #endif
 #ifndef _TIMEBASE_H
-#define _TIMEBASE_H 
+#define _TIMEBASE_H
 
 #include <inttypes.h>
 
@@ -1580,7 +1580,7 @@ void decode_caldaysec(int calendar, int julday, int secofday,
 }
 
 #ifndef _CDF_H
-#define _CDF_H 
+#define _CDF_H
 
 void cdfDebug(int debug);
 
@@ -1596,7 +1596,7 @@ void cdfClose(int fileID);
 
 #endif
 #ifndef RESOURCE_HANDLE_H
-#define RESOURCE_HANDLE_H 
+#define RESOURCE_HANDLE_H
 
 #ifdef HAVE_CONFIG_H
 #endif
@@ -1690,7 +1690,7 @@ void reshListPrint(FILE *fp);
 
 #endif
 #ifndef _TAXIS_H
-#define _TAXIS_H 
+#define _TAXIS_H
 
 #ifndef RESOURCE_HANDLE_H
 #endif
@@ -1745,7 +1745,7 @@ taxisUnpack(char *unpackBuffer, int unpackBufferSize, int *unpackBufferPos,
 
 #endif
 #ifndef _CDI_LIMITS_H
-#define _CDI_LIMITS_H 
+#define _CDI_LIMITS_H
 
 #define MAX_GRIDS_PS 128
 #define MAX_ZAXES_PS 128
@@ -1754,7 +1754,7 @@ taxisUnpack(char *unpackBuffer, int unpackBufferSize, int *unpackBufferPos,
 
 #endif
 #ifndef _SERVICE_H
-#define _SERVICE_H 
+#define _SERVICE_H
 
 
 typedef struct {
@@ -1794,7 +1794,7 @@ int srvDefDataDP(void *srv, const double *data);
 #endif
 
 #ifndef _EXTRA_H
-#define _EXTRA_H 
+#define _EXTRA_H
 
 #define EXT_REAL 1
 #define EXT_COMP 2
@@ -1836,7 +1836,7 @@ int extDefDataDP(void *ext, const double *data);
 #endif
 
 #ifndef _IEG_H
-#define _IEG_H 
+#define _IEG_H
 
 
 #define IEG_LTYPE_SURFACE 1
@@ -1929,7 +1929,7 @@ int iegDefDataDP(void *ieg, const double *data);
 
 #endif
 #ifndef _CDI_INT_H
-#define _CDI_INT_H 
+#define _CDI_INT_H
 
 #if defined (HAVE_CONFIG_H)
 #endif
@@ -2356,7 +2356,7 @@ void cdiDefTableID(int tableID);
 
 #endif
 #ifndef _CDF_INT_H
-#define _CDF_INT_H 
+#define _CDF_INT_H
 
 #if defined (HAVE_LIBNETCDF)
 
@@ -2678,7 +2678,7 @@ void cdfClose(int fileID)
   cdfCloseFile(fileID);
 }
 #ifndef NAMESPACE_H
-#define NAMESPACE_H 
+#define NAMESPACE_H
 
 #ifdef HAVE_CONFIG_H
 #endif
@@ -3478,7 +3478,7 @@ void cdf_inq_attid(int ncid, int varid, const char *name, int *attnump)
 
 #endif
 #ifndef CDI_CKSUM_H_
-#define CDI_CKSUM_H_ 
+#define CDI_CKSUM_H_
 
 #include <inttypes.h>
 
@@ -3507,7 +3507,7 @@ memcrc(const unsigned char *b, size_t n);
 #endif
 
 #ifndef SERIALIZE_H
-#define SERIALIZE_H 
+#define SERIALIZE_H
 
 #include <string.h>
 
@@ -3646,15 +3646,15 @@ const char *cdiStringError(int cdiErrno)
   return UnknownError;
 }
 #ifndef _DMEMORY_H
-#define _DMEMORY_H 
+#define _DMEMORY_H
 
 #include <stdio.h>
 
 
-#define DEBUG_MEMORY 
+#define DEBUG_MEMORY
 
 #ifndef WITH_FUNCTION_NAME
-#define WITH_FUNCTION_NAME 
+#define WITH_FUNCTION_NAME
 #endif
 
 extern size_t memTotal(void);
@@ -3684,7 +3684,7 @@ extern void memFree (void *ptr, const char *file, const char *functionname, int 
 
 #endif
 #ifndef _FILE_H
-#define _FILE_H 
+#define _FILE_H
 
 #include <stdio.h>
 #include <sys/types.h>
@@ -3735,7 +3735,7 @@ size_t fileWrite(int fileID, const void *restrict ptr, size_t size);
 
 #endif
 #ifndef _STREAM_CDF_H
-#define _STREAM_CDF_H 
+#define _STREAM_CDF_H
 
 void cdfDefVars(stream_t *streamptr);
 void cdfDefTimestep(stream_t *streamptr, int tsID);
@@ -4472,7 +4472,7 @@ memcrc_finish(uint32_t *state, off_t total_size)
 #include <errno.h>
 
 #if !defined(HAVE_CONFIG_H) && !defined(HAVE_MALLOC_H) && defined(SX)
-#define HAVE_MALLOC_H 
+#define HAVE_MALLOC_H
 #endif
 
 #if defined(HAVE_MALLOC_H)
@@ -4533,7 +4533,7 @@ void memDebug(int debug)
 
 
 #if ! defined __GNUC__ && ! defined __attribute__
-#define __attribute__(x) 
+#define __attribute__(x)
 #endif
 
 static
@@ -5024,7 +5024,7 @@ int _Debug = 0;
 
 
 #if ! defined __GNUC__ && ! defined __attribute__
-#define __attribute__(x) 
+#define __attribute__(x)
 #endif
 
 void SysError_(const char *caller, const char *fmt, ...)
@@ -5198,8 +5198,8 @@ static pthread_mutex_t _file_mutex;
 
 #else
 
-#define FILE_LOCK() 
-#define FILE_UNLOCK() 
+#define FILE_LOCK()
+#define FILE_UNLOCK()
 #define FILE_INIT() \
    if ( _file_init == FALSE ) file_initialize()
 
@@ -6544,7 +6544,7 @@ size_t fileWrite(int fileID, const void *restrict ptr, size_t size)
   return (nwrite);
 }
 #ifndef _GAUSSGRID_H
-#define _GAUSSGRID_H 
+#define _GAUSSGRID_H
 
 void gaussaw(double *restrict pa, double *restrict pw, size_t nlat);
 
@@ -6848,7 +6848,7 @@ void gaussaw(double *restrict pa, double *restrict pw, size_t nlat)
   gauaw(nlat, pa, pw);
 }
 #ifndef _GRID_H
-#define _GRID_H 
+#define _GRID_H
 
 
 typedef unsigned char mask_t;
@@ -6955,7 +6955,7 @@ void gridGenYvals(int gridtype, int ysize, double yfirst, double ylast,
 
 #endif
 #ifndef RESOURCE_UNPACK_H
-#define RESOURCE_UNPACK_H 
+#define RESOURCE_UNPACK_H
 
 #ifdef HAVE_CONFIG_H
 #endif
@@ -6978,7 +6978,7 @@ int reshUnpackResources(char * unpackBuffer, int unpackBufferSize,
 
 #endif
 #ifndef _VLIST_H
-#define _VLIST_H 
+#define _VLIST_H
 
 #ifdef HAVE_CONFIG_H
 #endif
@@ -10686,7 +10686,7 @@ int varDefGrid(int vlistID, const grid_t *grid, int mode)
   return (gridID);
 }
 #ifndef INSTITUTION_H
-#define INSTITUTION_H 
+#define INSTITUTION_H
 
 int
 instituteUnpack(void *buf, int size, int *position, int originNamespace,
@@ -11034,7 +11034,7 @@ int instituteUnpack(void *buf, int size, int *position, int originNamespace,
   return instituteID;
 }
 #ifndef MODEL_H
-#define MODEL_H 
+#define MODEL_H
 
 int
 modelUnpack(void *buf, int size, int *position,
@@ -11406,7 +11406,7 @@ static int activeNamespace = 0;
   { .func = (void (*)()) cdfDefVars }
 
 #else
-#define CDI_NETCDF_SWITCHES 
+#define CDI_NETCDF_SWITCHES
 #endif
 
 #define defaultSwitches { \
@@ -11479,8 +11479,8 @@ namespaceInitialize(void)
 #else
 
 #define NAMESPACE_INIT() do { } while (0)
-#define NAMESPACE_LOCK() 
-#define NAMESPACE_UNLOCK() 
+#define NAMESPACE_LOCK()
+#define NAMESPACE_UNLOCK()
 
 #endif
 
@@ -11675,7 +11675,7 @@ void cdiReset(void)
   NAMESPACE_UNLOCK();
 }
 #ifndef INCLUDE_GUARD_CDI_REFERENCE_COUNTING
-#define INCLUDE_GUARD_CDI_REFERENCE_COUNTING 
+#define INCLUDE_GUARD_CDI_REFERENCE_COUNTING
 
 
 #include <sys/types.h>
@@ -11810,8 +11810,8 @@ static pthread_mutex_t listMutex;
 
 static int listInit = 0;
 
-#define LIST_LOCK() 
-#define LIST_UNLOCK() 
+#define LIST_LOCK()
+#define LIST_UNLOCK()
 #define LIST_INIT(init0) do { \
   if ( !listInit ) \
     { \
@@ -12615,7 +12615,7 @@ void serializeUnpackInCore(const void *buf, int buf_size, int *position,
   *position = pos;
 }
 #ifndef _DTYPES_H
-#define _DTYPES_H 
+#define _DTYPES_H
 
 #include <stdio.h>
 #include <limits.h>
@@ -12663,7 +12663,7 @@ void serializeUnpackInCore(const void *buf, int buf_size, int *position,
 
 #endif
 #ifndef _BINARY_H
-#define _BINARY_H 
+#define _BINARY_H
 
 #ifdef HAVE_CONFIG_H
 #endif
@@ -12707,7 +12707,7 @@ int binWriteFlt64(int fileID, int byteswap, size_t size, FLT64 *ptr);
 
 #endif
 #ifndef _STREAM_GRB_H
-#define _STREAM_GRB_H 
+#define _STREAM_GRB_H
 
 int grbBitsPerValue(int datatype);
 
@@ -12734,7 +12734,7 @@ int zaxisTypeToGrib2ltype(int zaxistype);
 
 #endif
 #ifndef _STREAM_SRV_H
-#define _STREAM_SRV_H 
+#define _STREAM_SRV_H
 
 #ifndef _SERVICE_H
 #endif
@@ -12756,7 +12756,7 @@ void srvWriteVarSliceDP(stream_t *streamptr, int varID, int levelID, const doubl
 
 #endif
 #ifndef _STREAM_EXT_H
-#define _STREAM_EXT_H 
+#define _STREAM_EXT_H
 
 #ifndef _EXTRA_H
 #endif
@@ -12778,7 +12778,7 @@ void extWriteVarSliceDP(stream_t *streamptr, int varID, int levelID, const doubl
 
 #endif
 #ifndef _STREAM_IEG_H
-#define _STREAM_IEG_H 
+#define _STREAM_IEG_H
 
 #ifndef _IEG_H
 #endif
@@ -14847,7 +14847,7 @@ void streamReadRecordF(int streamID, float *data, int *nmiss)
   stream_read_record(streamID, MEMTYPE_FLOAT, (void *) data, nmiss);
 }
 #ifndef _VARSCAN_H
-#define _VARSCAN_H 
+#define _VARSCAN_H
 
 #ifndef _GRID_H
 #endif
@@ -23354,7 +23354,7 @@ void cdf_read_record(stream_t *streamptr, int memtype, void *data, int *nmiss)
 
 #endif
 #ifndef _SUBTYPE_H
-#define _SUBTYPE_H 
+#define _SUBTYPE_H
 
 
 enum {
@@ -24145,7 +24145,7 @@ static void subtypePack( void * subtype_ptr, void * buffer, int size, int *pos, 
 static int subtypeTxCode( void )
 { Error("Not yet implemented for subtypes!"); return 0; }
 #ifndef _TABLEPAR_H
-#define _TABLEPAR_H 
+#define _TABLEPAR_H
 
 enum {
   TABLE_DUP_NAME = 1 << 0,
@@ -26777,7 +26777,7 @@ void cdiCreateTimesteps(stream_t *streamptr)
     }
 }
 #ifndef CREATE_UUID_H
-#define CREATE_UUID_H 
+#define CREATE_UUID_H
 
 #if defined (HAVE_CONFIG_H)
 #endif
@@ -27009,7 +27009,7 @@ create_uuid(unsigned char *uuid)
 }
 #endif
 #ifndef _ZAXIS_H
-#define _ZAXIS_H 
+#define _ZAXIS_H
 
 void zaxisGetTypeDescription(int zaxisType, int* outPositive, const char** outName, const char** outLongName, const char** outStdName, const char** outUnit);
 
@@ -28145,7 +28145,7 @@ void varDefProductDefinitionTemplate(int varID, int productDefinitionTemplate)
   vartable[varID].productDefinitionTemplate = productDefinitionTemplate;
 }
 #ifndef VLIST_VAR_H
-#define VLIST_VAR_H 
+#define VLIST_VAR_H
 
 #ifdef HAVE_CONFIG_H
 #endif
@@ -28166,7 +28166,7 @@ void cdiVlistCreateVarLevInfo(vlist_t *vlistptr, int varID);
 
 #endif
 #ifndef VLIST_ATT_H
-#define VLIST_ATT_H 
+#define VLIST_ATT_H
 
 #ifdef HAVE_CONFIG_H
 #endif

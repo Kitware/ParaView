@@ -1,17 +1,17 @@
 // -*- c++ -*-
 /*=========================================================================
- * 
+ *
  *  Program:   Visualization Toolkit
  *  Module:    vtkCDIReader.h
- * 
+ *
  *  Copyright (c) 2015 Niklas Roeber, DKRZ Hamburg
  *  All rights reserved.
  *  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
- * 
+ *
  *     This software is distributed WITHOUT ANY WARRANTY; without even
  *     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  *     PURPOSE.  See the above copyright notice for more information.
- * 
+ *
  *  =========================================================================*/
 // .NAME vtkCDIReader - reads ICON/CDI netCDF data sets
 // .SECTION Description
@@ -31,7 +31,7 @@
 // and/or contact Niklas Roeber at roeber@dkrz.de
 //
 // .SECTION Thanks
-// Thanks to Uwe Schulzweida for the CDI code (uwe.schulzweida@mpimet.mpg.de) 
+// Thanks to Uwe Schulzweida for the CDI code (uwe.schulzweida@mpimet.mpg.de)
 // Thanks to Moritz Hanke for the sorting code (hanke@dkrz.de)
 
 #ifndef __vtkCDIReader_h
@@ -49,7 +49,7 @@
 #include "vtkUnstructuredGridAlgorithm.h"
 #include <string>
 #include <vtkSmartPointer.h>
-#include "vtkIONetCDFModule.h" 
+#include "vtkIONetCDFModule.h"
 #include <vtkSelectionNode.h>
 #include <vtkSelection.h>
 #include <vtkExtractSelection.h>
@@ -89,13 +89,13 @@ typedef struct
   char name[CDI_MAX_NAME];
 } cdiVar_t;
 
-struct point 
+struct point
 {
   double lon;
   double lat;
 };
 
-struct point_with_index 
+struct point_with_index
 {
   point p;
   int i;
@@ -114,7 +114,7 @@ public:
   vtkGetMacro(MaximumPoints, int);
   vtkGetMacro(NumberOfCellVars, int);
   vtkGetMacro(NumberOfPointVars, int);
-  
+
   vtkUnstructuredGrid *GetOutput();
   vtkUnstructuredGrid *GetOutput(int index);
 
@@ -126,12 +126,12 @@ public:
   vtkSmartPointer<vtkStringArray> AllVariableArrayNames;
   vtkGetObjectMacro(AllDimensions, vtkStringArray);
   vtkGetObjectMacro(VariableDimensions, vtkStringArray);
-  
+
   int GetNumberOfVariableArrays() {return GetNumberOfCellArrays();};
   const char *GetVariableArrayName(int idx) {return GetCellArrayName(idx);};
   int GetVariableArrayStatus(const char *name) {return GetCellArrayStatus(name);};
   void SetVariableArrayStatus(const char *name, int status) {SetCellArrayStatus(name, status);};
-  
+
   int GetNumberOfPointArrays();
   const char* GetPointArrayName(int index);
   int GetPointArrayStatus(const char* name);
@@ -152,11 +152,11 @@ public:
   void SetDomainArrayStatus(const char* name, int status);
   void DisableAllDomainArrays();
   void EnableAllDomainArrays();
-  
+
   int getNumberOfDomains() {return NumberOfDomains;};
   int getNumberOfDomainsVars() {return NumberOfDomainVars;};
   bool SupportDomainData() {return (haveDomainData && haveDomainVariable);};
-  
+
   void SetVerticalLevel(int level);
   vtkGetVector2Macro(VerticalLevelRange, int);
 
@@ -165,30 +165,30 @@ public:
 
   void SetProjectLatLon(bool val);
   vtkGetMacro(ProjectLatLon, bool);
-  
+
   void SetProjectCassini(bool val);
   vtkGetMacro(ProjectCassini, bool);
-  
+
   void SetMissingValue(double val);
   void EnableMissingValue(bool val);
   vtkGetMacro(MissingValue, double);
-  
+
   void SetInvertZAxis(bool val);
   vtkGetMacro(InvertZAxis, bool);
-  
+
   void SetTopography(bool val);
   vtkGetMacro(IncludeTopography, bool);
-  
+
   void InvertTopography(bool val);
   vtkGetMacro(invertedTopography, bool);
 
   void SetShowMultilayerView(bool val);
   vtkGetMacro(ShowMultilayerView, bool);
-  
+
 protected:
   vtkCDIReader();
   ~vtkCDIReader();
-  void DestroyData();  
+  void DestroyData();
   void SetDefaults();
   bool invertedTopography;
   int CheckForMaskData();
@@ -213,28 +213,28 @@ protected:
   int ConstructGridGeometry();
   int MirrorMesh();
   bool BuildDomainCellVars();
-  void Remove_Duplicates(double * PointLon, double * PointLat, int temp_nbr_vertices, int * vertexID, int * nbr_cells); 
+  void Remove_Duplicates(double * PointLon, double * PointLat, int temp_nbr_vertices, int * vertexID, int * nbr_cells);
   void cellMask(const char* arg1);
-  
-  char *FileName;        
-  vtkStdString* VariableName;   
-  int* VariableType;          
-  int NumberOfTimeSteps;      
-  double* TimeSteps;         
+
+  char *FileName;
+  vtkStdString* VariableName;
+  int* VariableType;
+  int NumberOfTimeSteps;
+  double* TimeSteps;
   double DTime;
 
   vtkCallbackCommand* SelectionObserver;
   int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   int RequestInformation(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   static void SelectionCallback(vtkObject* caller, unsigned long eid, void* clientdata, void* calldata);
-  
+
   bool InfoRequested;
   bool DataRequested;
 
   vtkDataArraySelection* PointDataArraySelection;
   vtkDataArraySelection* CellDataArraySelection;
   vtkDataArraySelection* DomainDataArraySelection;
-  
+
   vtkDoubleArray** CellVarDataArray;    // Actual data arrays
   vtkDoubleArray** PointVarDataArray;   // Actual data arrays
   vtkDoubleArray** DomainVarDataArray;   // Actual data arrays
@@ -248,7 +248,7 @@ protected:
   int LayerThicknessRange[2];
 
   int FillVariableDimensions();
-  int dimensionSelection; 
+  int dimensionSelection;
   int RegenerateVariables();
   double MissingValue;
   bool RemoveMissingValues;
@@ -273,8 +273,8 @@ protected:
   int CurrentExtraPoint;  	// current extra point
   int CurrentExtraCell;   	// current extra  cell
   bool reconstruct_new;
-  
-  double* clon_vertices; 
+
+  double* clon_vertices;
   double* clat_vertices;
   double* depth_var;
   double* PointX;      		// x coord of point
@@ -297,7 +297,7 @@ protected:
   int NumberOfCellVars;
   int NumberOfPointVars;
   int NumberOfDomainVars;
-  double* PointVarData;  
+  double* PointVarData;
   bool grid_reconstructed;
 
   // cdi vars
@@ -306,10 +306,10 @@ protected:
   int gridID;
   int zaxisID;
   int surfID;
-  
+
 private:
-  vtkCDIReader(const vtkCDIReader&);    
-  void operator=(const vtkCDIReader&); 
+  vtkCDIReader(const vtkCDIReader&);
+  void operator=(const vtkCDIReader&);
   class Internal;
   Internal *Internals;
 
