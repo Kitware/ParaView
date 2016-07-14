@@ -204,6 +204,10 @@ public:
                       int& listLength, int& initialized)
     {
     double total_time = 0;
+    if (listLength <= 0)
+      {
+      return total_time;
+      }
     double *allocatedTimeList = new double[listLength];
     for (int propLoop = 0; propLoop < listLength; ++propLoop)
       {
