@@ -109,8 +109,8 @@ protected:
 private:
   vtkSMProxyIteratorInternals* Internals;
 
-  vtkSMProxyIterator(const vtkSMProxyIterator&); // Not implemented
-  void operator=(const vtkSMProxyIterator&); // Not implemented
+  vtkSMProxyIterator(const vtkSMProxyIterator&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMProxyIterator&) VTK_DELETE_FUNCTION;
 };
 
 #endif

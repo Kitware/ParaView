@@ -143,8 +143,8 @@ protected:
   long long GetProcRam();
 
 private:
-  vtkSQBOVMetaReader(const vtkSQBOVMetaReader &); // Not implemented
-  void operator=(const vtkSQBOVMetaReader &); // Not implemented
+  vtkSQBOVMetaReader(const vtkSQBOVMetaReader &) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQBOVMetaReader &) VTK_DELETE_FUNCTION;
 
 private:
   int PeriodicBC[3];       // flag indicating which directions have periodic BC

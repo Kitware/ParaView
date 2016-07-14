@@ -60,7 +60,7 @@ protected:
   vtkTesting* Testing;
 
 private:
-  vtkSMTesting(const vtkSMTesting&); // Not implemented.
-  void operator=(const vtkSMTesting&); // Not implemented.
+  vtkSMTesting(const vtkSMTesting&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMTesting&) VTK_DELETE_FUNCTION;
 };
 #endif

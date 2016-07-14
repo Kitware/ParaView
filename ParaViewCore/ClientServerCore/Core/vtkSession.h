@@ -56,8 +56,8 @@ protected:
   virtual void DeActivate();
 
 private:
-  vtkSession(const vtkSession&); // Not implemented
-  void operator=(const vtkSession&); // Not implemented
+  vtkSession(const vtkSession&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSession&) VTK_DELETE_FUNCTION;
 
 };
 

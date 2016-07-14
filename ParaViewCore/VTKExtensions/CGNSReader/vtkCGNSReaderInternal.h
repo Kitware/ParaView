@@ -269,8 +269,8 @@ public:
   ~vtkCGNSMetaData();
 
 private:
-  vtkCGNSMetaData(const vtkCGNSMetaData&);  // Not implemented.
-  void operator=(const vtkCGNSMetaData&);  // Not implemented.
+  vtkCGNSMetaData(const vtkCGNSMetaData&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCGNSMetaData&) VTK_DELETE_FUNCTION;
 
   std::vector<CGNSRead::BaseInformation> baseList;
   std::string LastReadFilename;

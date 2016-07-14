@@ -54,7 +54,7 @@ protected:
 
 private:
 
-  vtkCleanUnstructuredGrid(const vtkCleanUnstructuredGrid&); // Not implemented
-  void operator=(const vtkCleanUnstructuredGrid&); // Not implemented
+  vtkCleanUnstructuredGrid(const vtkCleanUnstructuredGrid&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCleanUnstructuredGrid&) VTK_DELETE_FUNCTION;
 };
 #endif

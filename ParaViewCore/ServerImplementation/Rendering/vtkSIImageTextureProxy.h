@@ -42,8 +42,8 @@ protected:
   virtual bool CreateVTKObjects(vtkSMMessage* message);
 
 private:
-  vtkSIImageTextureProxy(const vtkSIImageTextureProxy&); // Not implemented
-  void operator=(const vtkSIImageTextureProxy&); // Not implemented
+  vtkSIImageTextureProxy(const vtkSIImageTextureProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSIImageTextureProxy&) VTK_DELETE_FUNCTION;
 
 };
 

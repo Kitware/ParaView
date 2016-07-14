@@ -77,8 +77,8 @@ protected:
   void RegisterInterpreter(vtkClientServerInterpreter*);
 
 private:
-  vtkClientServerInterpreterInitializer(const vtkClientServerInterpreterInitializer&); // Not implemented
-  void operator=(const vtkClientServerInterpreterInitializer&); // Not implemented
+  vtkClientServerInterpreterInitializer(const vtkClientServerInterpreterInitializer&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkClientServerInterpreterInitializer&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals *Internals;

@@ -33,8 +33,8 @@ public:
   pqSierraPlotToolsActionGroup(QObject *p);
 
 private:
-  pqSierraPlotToolsActionGroup(const pqSierraPlotToolsActionGroup &);     // Not implemented
-  void operator=(const pqSierraPlotToolsActionGroup &);        // Not implemented
+  pqSierraPlotToolsActionGroup(const pqSierraPlotToolsActionGroup &) VTK_DELETE_FUNCTION;
+  void operator=(const pqSierraPlotToolsActionGroup &) VTK_DELETE_FUNCTION;
 };
 
 #endif //pqSierraPlotToolsActionGroup_h

@@ -188,8 +188,8 @@ protected:
   std::vector<DefaultModes> DefaultModeVector;
   DefaultModes DefaultDefaultMode;
 private:
-  vtkSMRangeDomainTemplate(const vtkSMRangeDomainTemplate&); // Not implemented
-  void operator=(const vtkSMRangeDomainTemplate&); // Not implemented
+  vtkSMRangeDomainTemplate(const vtkSMRangeDomainTemplate&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMRangeDomainTemplate&) VTK_DELETE_FUNCTION;
 
   bool GetComputedDefaultValue(unsigned int index, T& value);
 

@@ -53,8 +53,8 @@ protected:
                   vtkInformationVector** inputVector, 
                   vtkInformationVector* outputVector);
 private:
-  vtkPolyLineToRectilinearGridFilter(const vtkPolyLineToRectilinearGridFilter&); // Not implemented.
-  void operator=(const vtkPolyLineToRectilinearGridFilter&); // Not implemented.
+  vtkPolyLineToRectilinearGridFilter(const vtkPolyLineToRectilinearGridFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPolyLineToRectilinearGridFilter&) VTK_DELETE_FUNCTION;
 };
 
 #endif

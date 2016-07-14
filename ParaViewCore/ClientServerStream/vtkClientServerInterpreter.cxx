@@ -65,8 +65,8 @@ public:
     FunctionType Function;
     ContextInformation* Context;
     private:
-      FunctionWithContext(const FunctionWithContext&);  // Not implemented.
-      FunctionWithContext& operator=(const FunctionWithContext&);  // Not implemented.
+      FunctionWithContext(const FunctionWithContext&) VTK_DELETE_FUNCTION;
+      FunctionWithContext& operator=(const FunctionWithContext&) VTK_DELETE_FUNCTION;
     };
   typedef FunctionWithContext<vtkClientServerNewInstanceFunction> NewInstanceFunction;
   typedef FunctionWithContext<vtkClientServerCommandFunction> CommandFunction;

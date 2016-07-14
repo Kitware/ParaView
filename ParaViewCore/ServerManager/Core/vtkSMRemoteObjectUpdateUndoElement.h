@@ -70,8 +70,8 @@ protected:
   vtkSMProxyLocator* ProxyLocator;
 
 private:
-  vtkSMRemoteObjectUpdateUndoElement(const vtkSMRemoteObjectUpdateUndoElement&); // Not implemented.
-  void operator=(const vtkSMRemoteObjectUpdateUndoElement&); // Not implemented.
+  vtkSMRemoteObjectUpdateUndoElement(const vtkSMRemoteObjectUpdateUndoElement&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMRemoteObjectUpdateUndoElement&) VTK_DELETE_FUNCTION;
 
 };
 

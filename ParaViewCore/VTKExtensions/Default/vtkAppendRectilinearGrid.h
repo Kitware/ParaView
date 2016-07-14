@@ -54,8 +54,8 @@ protected:
   void CopyArray(vtkAbstractArray* outArray, const int* outExt,
     vtkAbstractArray* inArray, const int* inExt);
 private:
-  vtkAppendRectilinearGrid(const vtkAppendRectilinearGrid&); // Not implemented.
-  void operator=(const vtkAppendRectilinearGrid&); // Not implemented.
+  vtkAppendRectilinearGrid(const vtkAppendRectilinearGrid&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkAppendRectilinearGrid&) VTK_DELETE_FUNCTION;
 };
 
 #endif

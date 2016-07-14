@@ -60,8 +60,8 @@ protected:
   double Scale[3];
   int Resolution[3];
 private:
-  vtkBoundedVolumeSource(const vtkBoundedVolumeSource&); // Not implemented
-  void operator=(const vtkBoundedVolumeSource&); // Not implemented
+  vtkBoundedVolumeSource(const vtkBoundedVolumeSource&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkBoundedVolumeSource&) VTK_DELETE_FUNCTION;
 
 };
 

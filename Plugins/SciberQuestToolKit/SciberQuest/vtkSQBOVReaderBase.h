@@ -193,8 +193,8 @@ protected:
   virtual int GetTimeStepId(vtkInformation *inInfo, vtkInformation *outInfo);
 
 private:
-  vtkSQBOVReaderBase(const vtkSQBOVReaderBase &); // Not implemented
-  void operator=(const vtkSQBOVReaderBase &); // Not implemented
+  vtkSQBOVReaderBase(const vtkSQBOVReaderBase &) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQBOVReaderBase &) VTK_DELETE_FUNCTION;
 
 protected:
   BOVReader *Reader;       // Implementation

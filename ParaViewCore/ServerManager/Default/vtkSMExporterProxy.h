@@ -60,8 +60,8 @@ protected:
   vtkSMViewProxy* View;
   char* FileExtension;
 private:
-  vtkSMExporterProxy(const vtkSMExporterProxy&); // Not implemented
-  void operator=(const vtkSMExporterProxy&); // Not implemented
+  vtkSMExporterProxy(const vtkSMExporterProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMExporterProxy&) VTK_DELETE_FUNCTION;
 
 };
 

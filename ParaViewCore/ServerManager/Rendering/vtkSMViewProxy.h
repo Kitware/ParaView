@@ -218,8 +218,8 @@ protected:
   bool Enable;
 
 private:
-  vtkSMViewProxy(const vtkSMViewProxy&); // Not implemented
-  void operator=(const vtkSMViewProxy&); // Not implemented
+  vtkSMViewProxy(const vtkSMViewProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMViewProxy&) VTK_DELETE_FUNCTION;
 
   static bool TransparentBackground;
 

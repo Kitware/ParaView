@@ -118,8 +118,8 @@ protected:
   vtkSQPlaneSourceCellGenerator();
   virtual ~vtkSQPlaneSourceCellGenerator(){};
 private:
-  vtkSQPlaneSourceCellGenerator(const vtkSQPlaneSourceCellGenerator&); // Not implemented
-  void operator=(const vtkSQPlaneSourceCellGenerator&); // Not implemented
+  vtkSQPlaneSourceCellGenerator(const vtkSQPlaneSourceCellGenerator&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQPlaneSourceCellGenerator&) VTK_DELETE_FUNCTION;
 
 private:
   int Resolution[3];

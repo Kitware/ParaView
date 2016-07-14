@@ -204,8 +204,8 @@ protected:
   unsigned long IterationIndex;
 
 private:
-  vtkFastMarchingGeodesicDistance(const vtkFastMarchingGeodesicDistance&);  // Not implemented.
-  void operator=(const vtkFastMarchingGeodesicDistance&);  // Not implemented.
+  vtkFastMarchingGeodesicDistance(const vtkFastMarchingGeodesicDistance&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkFastMarchingGeodesicDistance&) VTK_DELETE_FUNCTION;
 };
 
 #endif

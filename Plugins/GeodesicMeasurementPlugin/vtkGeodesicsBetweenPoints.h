@@ -72,8 +72,8 @@ protected:
   virtual int FillInputPortInformation(int port, vtkInformation* info);
 
 private:
-  vtkGeodesicsBetweenPoints(const vtkGeodesicsBetweenPoints&); // Not implemented
-  void operator=(const vtkGeodesicsBetweenPoints&); // Not implemented
+  vtkGeodesicsBetweenPoints(const vtkGeodesicsBetweenPoints&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkGeodesicsBetweenPoints&) VTK_DELETE_FUNCTION;
 };
 
 #endif

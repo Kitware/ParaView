@@ -58,8 +58,8 @@ namespace
       }
 
   private:
-    vtkFlagStateUpdated(const vtkFlagStateUpdated&); // Not implemented
-    void operator=(const vtkFlagStateUpdated&); // Not implemented
+    vtkFlagStateUpdated(const vtkFlagStateUpdated&) VTK_DELETE_FUNCTION;
+    void operator=(const vtkFlagStateUpdated&) VTK_DELETE_FUNCTION;
   };
 }
 

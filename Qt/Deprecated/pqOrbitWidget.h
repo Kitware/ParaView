@@ -43,8 +43,8 @@ public:
   virtual ~pqOrbitWidget();
 
 private:
-  pqOrbitWidget(const pqOrbitWidget&); // Not implemented.
-  void operator=(const pqOrbitWidget&); // Not implemented.
+  pqOrbitWidget(const pqOrbitWidget&) VTK_DELETE_FUNCTION;
+  void operator=(const pqOrbitWidget&) VTK_DELETE_FUNCTION;
 };
 
 #endif

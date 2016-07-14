@@ -80,8 +80,8 @@ private:
                                        vtkIdType cellId, 
                                        vtkIdList* ptIds);
   
-  vtkCellIntegrator(const vtkCellIntegrator&);  // Not implemented.
-  void operator=(const vtkCellIntegrator&);  // Not implemented.
+  vtkCellIntegrator(const vtkCellIntegrator&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCellIntegrator&) VTK_DELETE_FUNCTION;
 };
 
 #endif

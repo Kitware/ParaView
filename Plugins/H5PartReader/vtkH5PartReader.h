@@ -220,8 +220,8 @@ protected:
     #endif
 
 private:
-  vtkH5PartReader(const vtkH5PartReader&);  // Not implemented.
-  void operator=(const vtkH5PartReader&);  // Not implemented.
+  vtkH5PartReader(const vtkH5PartReader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkH5PartReader&) VTK_DELETE_FUNCTION;
 };
 
 #endif

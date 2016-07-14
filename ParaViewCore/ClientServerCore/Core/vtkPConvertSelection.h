@@ -47,8 +47,8 @@ protected:
 
   vtkMultiProcessController* Controller;
 private:
-  vtkPConvertSelection(const vtkPConvertSelection&); // Not implemented
-  void operator=(const vtkPConvertSelection&); // Not implemented
+  vtkPConvertSelection(const vtkPConvertSelection&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPConvertSelection&) VTK_DELETE_FUNCTION;
 
 };
 

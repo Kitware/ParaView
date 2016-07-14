@@ -101,8 +101,8 @@ private slots:
   void domainChanged();
 
 private:
-  pqSignalAdaptorSelectionTreeWidget(const pqSignalAdaptorSelectionTreeWidget&); // Not implemented.
-  void operator=(const pqSignalAdaptorSelectionTreeWidget&); // Not implemented.
+  pqSignalAdaptorSelectionTreeWidget(const pqSignalAdaptorSelectionTreeWidget&) VTK_DELETE_FUNCTION;
+  void operator=(const pqSignalAdaptorSelectionTreeWidget&) VTK_DELETE_FUNCTION;
 
   class pqInternal;
   pqInternal* Internal;

@@ -46,8 +46,8 @@ protected:
   void ExecuteInformation();
 
 private:
-  vtkPVArrowSource(const vtkPVArrowSource&); // Not implemented.
-  void operator=(const vtkPVArrowSource&); // Not implemented.
+  vtkPVArrowSource(const vtkPVArrowSource&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVArrowSource&) VTK_DELETE_FUNCTION;
 };
 
 #endif

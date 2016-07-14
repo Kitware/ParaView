@@ -95,8 +95,8 @@ protected:
   int MultipleInput;
   int PortIndex;
 private:
-  vtkSMInputProperty(const vtkSMInputProperty&); // Not implemented
-  void operator=(const vtkSMInputProperty&); // Not implemented
+  vtkSMInputProperty(const vtkSMInputProperty&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMInputProperty&) VTK_DELETE_FUNCTION;
 };
 
 #endif

@@ -89,8 +89,8 @@ protected:
   int UniqueId;
   vtkWeakPointer<vtkPVSynchronizedRenderWindows> SynchronizedWindows;
 private:
-  vtkPVHardwareSelector(const vtkPVHardwareSelector&); // Not implemented
-  void operator=(const vtkPVHardwareSelector&); // Not implemented
+  vtkPVHardwareSelector(const vtkPVHardwareSelector&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVHardwareSelector&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;

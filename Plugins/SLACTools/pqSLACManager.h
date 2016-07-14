@@ -134,8 +134,8 @@ private:
   class pqInternal;
   pqInternal *Internal;
 
-  pqSLACManager(const pqSLACManager &);         // Not implemented
-  void operator=(const pqSLACManager &);        // Not implemented
+  pqSLACManager(const pqSLACManager &) VTK_DELETE_FUNCTION;
+  void operator=(const pqSLACManager &) VTK_DELETE_FUNCTION;
 };
 
 #endif //pqSLACManager_h

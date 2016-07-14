@@ -164,8 +164,8 @@ protected:
 
   int ChooseInput(vtkInformation*);
 private:
-  vtkFileSeriesReader(const vtkFileSeriesReader&); // Not implemented.
-  void operator=(const vtkFileSeriesReader&); // Not implemented.
+  vtkFileSeriesReader(const vtkFileSeriesReader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkFileSeriesReader&) VTK_DELETE_FUNCTION;
 
   vtkFileSeriesReaderInternals* Internal;
 };

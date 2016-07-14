@@ -71,11 +71,8 @@ private:
   /// initializes it if required.
   bool checkInterpreterInitialization();
 
-  /// @{
-  /// @brief Not implemented
-  vtkCinemaExporter(const vtkCinemaExporter&); // Not implemented
-  void operator=(const vtkCinemaExporter&); // Not implemented
-  /// @}
+  vtkCinemaExporter(const vtkCinemaExporter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCinemaExporter&) VTK_DELETE_FUNCTION;
 };
 
 #endif

@@ -47,8 +47,8 @@ protected:
   vtkPVTrackballMoveActor();
   ~vtkPVTrackballMoveActor();
 
-  vtkPVTrackballMoveActor(const vtkPVTrackballMoveActor&); // Not implemented
-  void operator=(const vtkPVTrackballMoveActor&); // Not implemented
+  vtkPVTrackballMoveActor(const vtkPVTrackballMoveActor&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVTrackballMoveActor&) VTK_DELETE_FUNCTION;
 };
 
 #endif

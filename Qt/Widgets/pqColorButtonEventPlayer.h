@@ -50,8 +50,8 @@ public:
 
   static const QString &EVENT_NAME();
 private:
-  pqColorButtonEventPlayer(const pqColorButtonEventPlayer&); // Not implemented.
-  void operator=(const pqColorButtonEventPlayer&); // Not implemented.
+  pqColorButtonEventPlayer(const pqColorButtonEventPlayer&) VTK_DELETE_FUNCTION;
+  void operator=(const pqColorButtonEventPlayer&) VTK_DELETE_FUNCTION;
 };
 
 #endif

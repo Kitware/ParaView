@@ -49,8 +49,8 @@ protected:
   ~vtkPVEnableStackTraceSignalHandler(){}
 
 private:
-  vtkPVEnableStackTraceSignalHandler(const vtkPVEnableStackTraceSignalHandler&); // Not implemented
-  void operator=(const vtkPVEnableStackTraceSignalHandler&); // Not implemented
+  vtkPVEnableStackTraceSignalHandler(const vtkPVEnableStackTraceSignalHandler&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVEnableStackTraceSignalHandler&) VTK_DELETE_FUNCTION;
 };
 
 #endif

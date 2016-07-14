@@ -63,8 +63,8 @@ protected :
   int CachedTextureIndex;
 
 private:
-  pqPointSpriteTextureComboBox(const pqPointSpriteTextureComboBox&); // Not implemented.
-  void operator=(const pqPointSpriteTextureComboBox&); // Not implemented.
+  pqPointSpriteTextureComboBox(const pqPointSpriteTextureComboBox&) VTK_DELETE_FUNCTION;
+  void operator=(const pqPointSpriteTextureComboBox&) VTK_DELETE_FUNCTION;
 };
 
 #endif

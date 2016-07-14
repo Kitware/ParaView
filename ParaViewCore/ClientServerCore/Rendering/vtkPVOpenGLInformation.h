@@ -75,8 +75,8 @@ protected:
 
 
 private:
-  vtkPVOpenGLInformation(const vtkPVOpenGLInformation&); // Not implemented
-  void operator=(const vtkPVOpenGLInformation&); // Not implemented
+  vtkPVOpenGLInformation(const vtkPVOpenGLInformation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVOpenGLInformation&) VTK_DELETE_FUNCTION;
 
 bool LocalDisplay;
 

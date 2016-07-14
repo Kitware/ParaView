@@ -79,8 +79,8 @@ protected slots:
   void setBufferLengthById(int id);
 
 private:
-  pqTimerLogDisplay(const pqTimerLogDisplay &); // Not implemented
-  void operator=(const pqTimerLogDisplay &);    // Not implemented
+  pqTimerLogDisplay(const pqTimerLogDisplay &) VTK_DELETE_FUNCTION;
+  void operator=(const pqTimerLogDisplay &) VTK_DELETE_FUNCTION;
 
   double LogThreshold;
   pqTimerLogDisplayUi *ui;

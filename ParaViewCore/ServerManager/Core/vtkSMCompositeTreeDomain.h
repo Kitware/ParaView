@@ -155,8 +155,8 @@ protected:
   int DefaultMode;
   int SourcePort;
 private:
-  vtkSMCompositeTreeDomain(const vtkSMCompositeTreeDomain&); // Not implemented
-  void operator=(const vtkSMCompositeTreeDomain&); // Not implemented
+  vtkSMCompositeTreeDomain(const vtkSMCompositeTreeDomain&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMCompositeTreeDomain&) VTK_DELETE_FUNCTION;
 
 };
 

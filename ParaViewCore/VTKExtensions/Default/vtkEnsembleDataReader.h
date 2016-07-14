@@ -79,8 +79,8 @@ private:
   class vtkInternal;
   vtkInternal *Internal;
 
-  vtkEnsembleDataReader(const vtkEnsembleDataReader&); // Not implemented
-  void operator=(const vtkEnsembleDataReader&); // Not implemented
+  vtkEnsembleDataReader(const vtkEnsembleDataReader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkEnsembleDataReader&) VTK_DELETE_FUNCTION;
 };
 
 #endif

@@ -43,8 +43,8 @@ protected:
   //virtual int RequestUpdateExtent(vtkInformation*,vtkInformationVector**,vtkInformationVector*);
 
 private:
-  vtkSQSurfaceVectors(const vtkSQSurfaceVectors&);  // Not implemented.
-  void operator=(const vtkSQSurfaceVectors&);  // Not implemented.
+  vtkSQSurfaceVectors(const vtkSQSurfaceVectors&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQSurfaceVectors&) VTK_DELETE_FUNCTION;
 };
 
 #endif

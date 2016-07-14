@@ -285,8 +285,8 @@ protected slots:
   virtual void onStateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*);
 
 private:
-  pqServerManagerModel(const pqServerManagerModel&); // Not implemented.
-  void operator=(const pqServerManagerModel&); // Not implemented.
+  pqServerManagerModel(const pqServerManagerModel&) VTK_DELETE_FUNCTION;
+  void operator=(const pqServerManagerModel&) VTK_DELETE_FUNCTION;
 
   /// Process the QSettings-only settings, setting the values in the
   /// various settings proxies.

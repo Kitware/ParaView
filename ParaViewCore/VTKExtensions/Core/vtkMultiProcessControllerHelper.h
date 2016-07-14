@@ -67,8 +67,8 @@ protected:
   ~vtkMultiProcessControllerHelper();
 
 private:
-  vtkMultiProcessControllerHelper(const vtkMultiProcessControllerHelper&); // Not implemented
-  void operator=(const vtkMultiProcessControllerHelper&); // Not implemented
+  vtkMultiProcessControllerHelper(const vtkMultiProcessControllerHelper&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMultiProcessControllerHelper&) VTK_DELETE_FUNCTION;
 
 };
 

@@ -91,8 +91,8 @@ protected:
   bool Interacted;
 
 private:
-  vtkSMViewProxyInteractorHelper(const vtkSMViewProxyInteractorHelper&); // Not implemented
-  void operator=(const vtkSMViewProxyInteractorHelper&); // Not implemented
+  vtkSMViewProxyInteractorHelper(const vtkSMViewProxyInteractorHelper&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMViewProxyInteractorHelper&) VTK_DELETE_FUNCTION;
 
 };
 

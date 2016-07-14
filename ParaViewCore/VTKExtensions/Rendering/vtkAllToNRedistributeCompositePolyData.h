@@ -61,8 +61,8 @@ protected:
   int NumberOfProcesses;
   vtkMultiProcessController* Controller;
 private:
-  vtkAllToNRedistributeCompositePolyData(const vtkAllToNRedistributeCompositePolyData&); // Not implemented
-  void operator=(const vtkAllToNRedistributeCompositePolyData&); // Not implemented
+  vtkAllToNRedistributeCompositePolyData(const vtkAllToNRedistributeCompositePolyData&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkAllToNRedistributeCompositePolyData&) VTK_DELETE_FUNCTION;
 
 };
 

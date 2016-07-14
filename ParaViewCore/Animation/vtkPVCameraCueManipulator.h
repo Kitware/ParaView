@@ -81,8 +81,8 @@ protected:
   vtkCameraInterpolator* CameraInterpolator;
   vtkSMProxy* DataSourceProxy;
 private:
-  vtkPVCameraCueManipulator(const vtkPVCameraCueManipulator&); // Not implemented.
-  void operator=(const vtkPVCameraCueManipulator&); // Not implemented.
+  vtkPVCameraCueManipulator(const vtkPVCameraCueManipulator&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVCameraCueManipulator&) VTK_DELETE_FUNCTION;
 
 };
 

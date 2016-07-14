@@ -117,8 +117,8 @@ protected:
 
   int *Regions;
 private:
-  vtkKdTreeGenerator(const vtkKdTreeGenerator&); // Not implemented.
-  void operator=(const vtkKdTreeGenerator&); // Not implemented.
+  vtkKdTreeGenerator(const vtkKdTreeGenerator&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkKdTreeGenerator&) VTK_DELETE_FUNCTION;
 };
 
 

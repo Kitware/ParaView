@@ -104,8 +104,8 @@ protected:
   ~vtkMantaLight();
 
 private:
-  vtkMantaLight(const vtkMantaLight&); // Not implemented.
-  void operator=(const vtkMantaLight&); // Not implemented.
+  vtkMantaLight(const vtkMantaLight&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMantaLight&) VTK_DELETE_FUNCTION;
 
   void CreateMantaLight(vtkRenderer *);
   void UpdateMantaLight(vtkRenderer *ren);

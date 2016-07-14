@@ -54,8 +54,8 @@ protected:
   ~vtkPVImageReader();
 
 private:
-  vtkPVImageReader(const vtkPVImageReader&); // Not implemented.
-  void operator=(const vtkPVImageReader&); // Not implemented.
+  vtkPVImageReader(const vtkPVImageReader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVImageReader&) VTK_DELETE_FUNCTION;
 
 };
 

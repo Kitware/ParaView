@@ -90,8 +90,8 @@ protected:
 
   ofstream* Stream;
 private:
-  vtkCSVWriter(const vtkCSVWriter&); // Not implemented.
-  void operator=(const vtkCSVWriter&); // Not implemented.
+  vtkCSVWriter(const vtkCSVWriter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCSVWriter&) VTK_DELETE_FUNCTION;
 
 };
 

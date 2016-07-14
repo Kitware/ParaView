@@ -124,8 +124,8 @@ protected:
   char *DescriptiveName;
 
 private:
-  vtkSQSphereSource(const vtkSQSphereSource&);  // Not implemented.
-  void operator=(const vtkSQSphereSource&);  // Not implemented.
+  vtkSQSphereSource(const vtkSQSphereSource&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQSphereSource&) VTK_DELETE_FUNCTION;
 };
 
 #endif

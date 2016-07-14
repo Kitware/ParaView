@@ -178,8 +178,8 @@ protected:
 
   vtkPVServerOptionsInternals* MachinesInternals;
 
-  vtkPVServerInformation(const vtkPVServerInformation&); // Not implemented
-  void operator=(const vtkPVServerInformation&); // Not implemented
+  vtkPVServerInformation(const vtkPVServerInformation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVServerInformation&) VTK_DELETE_FUNCTION;
 };
 
 #endif

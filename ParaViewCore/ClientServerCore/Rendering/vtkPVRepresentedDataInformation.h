@@ -39,8 +39,8 @@ protected:
   ~vtkPVRepresentedDataInformation();
 
 private:
-  vtkPVRepresentedDataInformation(const vtkPVRepresentedDataInformation&); // Not implemented
-  void operator=(const vtkPVRepresentedDataInformation&); // Not implemented
+  vtkPVRepresentedDataInformation(const vtkPVRepresentedDataInformation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVRepresentedDataInformation&) VTK_DELETE_FUNCTION;
 
 };
 

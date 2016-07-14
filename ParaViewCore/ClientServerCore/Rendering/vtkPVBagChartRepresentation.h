@@ -149,8 +149,8 @@ protected:
   virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
                           vtkInformationVector* outputVector);
 private:
-  vtkPVBagChartRepresentation(const vtkPVBagChartRepresentation&); // Not implemented
-  void operator=(const vtkPVBagChartRepresentation&); // Not implemented
+  vtkPVBagChartRepresentation(const vtkPVBagChartRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVBagChartRepresentation&) VTK_DELETE_FUNCTION;
 
   int LineThickness;
   int LineStyle;

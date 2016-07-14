@@ -86,8 +86,8 @@ protected:
     const QModelIndex & curIdx,
     const QString & searchString) const;
 private:
-  pqItemViewSearchWidget(const pqItemViewSearchWidget&); // Not implemented.
-  void operator=(const pqItemViewSearchWidget&); // Not implemented.
+  pqItemViewSearchWidget(const pqItemViewSearchWidget&) VTK_DELETE_FUNCTION;
+  void operator=(const pqItemViewSearchWidget&) VTK_DELETE_FUNCTION;
 
   class PIMPL;
   PIMPL *Private;

@@ -53,8 +53,8 @@ protected:
   virtual ~vtkCPPipeline();
 
 private:
-  vtkCPPipeline(const vtkCPPipeline&); // Not implemented
-  void operator=(const vtkCPPipeline&); // Not implemented
+  vtkCPPipeline(const vtkCPPipeline&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCPPipeline&) VTK_DELETE_FUNCTION;
 };
 
 #endif

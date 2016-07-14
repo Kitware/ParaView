@@ -82,8 +82,8 @@ private slots:
   void changeCurrentPage();
 
 private:
-  pqCameraKeyFrameWidget(const pqCameraKeyFrameWidget&); // Not implemented.
-  void operator=(const pqCameraKeyFrameWidget&); // Not implemented.
+  pqCameraKeyFrameWidget(const pqCameraKeyFrameWidget&) VTK_DELETE_FUNCTION;
+  void operator=(const pqCameraKeyFrameWidget&) VTK_DELETE_FUNCTION;
 
   class pqInternal;
   pqInternal* Internal;

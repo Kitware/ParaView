@@ -239,8 +239,8 @@ protected:
   // done cleanly.
   bool PickFirstAvailableArrayByDefault;
 private:
-  vtkSMArrayListDomain(const vtkSMArrayListDomain&); // Not implemented
-  void operator=(const vtkSMArrayListDomain&); // Not implemented
+  vtkSMArrayListDomain(const vtkSMArrayListDomain&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMArrayListDomain&) VTK_DELETE_FUNCTION;
 
   friend class vtkSMArrayListDomainInternals;
   vtkSMArrayListDomainInternals* ALDInternals;

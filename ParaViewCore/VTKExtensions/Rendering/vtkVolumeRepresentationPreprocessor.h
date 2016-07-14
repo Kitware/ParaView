@@ -76,8 +76,8 @@ protected:
 
 private:
 
-  vtkVolumeRepresentationPreprocessor(const vtkVolumeRepresentationPreprocessor&);  // Not implemented.
-  void operator=(const vtkVolumeRepresentationPreprocessor&);  // Not implemented.
+  vtkVolumeRepresentationPreprocessor(const vtkVolumeRepresentationPreprocessor&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkVolumeRepresentationPreprocessor&) VTK_DELETE_FUNCTION;
 };
 
 

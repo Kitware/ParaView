@@ -97,8 +97,8 @@ protected:
   const std::vector<vtkStdString>& GetStrings();
 
 private:
-  vtkSMStringListDomain(const vtkSMStringListDomain&); // Not implemented
-  void operator=(const vtkSMStringListDomain&); // Not implemented
+  vtkSMStringListDomain(const vtkSMStringListDomain&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMStringListDomain&) VTK_DELETE_FUNCTION;
   
   vtkSMStringListDomainInternals* SLInternals;
 };

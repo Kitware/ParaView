@@ -51,8 +51,8 @@ public:
   int ConnectToRemoteBuiltInSelf ();
 
 private:
-  vtkProcessModuleAutoMPI(const vtkProcessModuleAutoMPI&); // Not implemented.
-  void operator=(const vtkProcessModuleAutoMPI&); // Not implemented.
+  vtkProcessModuleAutoMPI(const vtkProcessModuleAutoMPI&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkProcessModuleAutoMPI&) VTK_DELETE_FUNCTION;
   vtkProcessModuleAutoMPIInternals *Internals;
 };
 

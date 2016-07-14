@@ -86,8 +86,8 @@ protected:
   double BasisV[3];
   double BasisW[3];
 private:
-  vtkShearedWaveletSource(const vtkShearedWaveletSource&); // Not implemented
-  void operator=(const vtkShearedWaveletSource&); // Not implemented
+  vtkShearedWaveletSource(const vtkShearedWaveletSource&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkShearedWaveletSource&) VTK_DELETE_FUNCTION;
 
 };
 

@@ -87,8 +87,8 @@ protected:
   bool SwitchFilterForCrinkle();
 
 private:
-  vtkPVMetaClipDataSet(const vtkPVMetaClipDataSet&);  // Not implemented.
-  void operator=(const vtkPVMetaClipDataSet&);  // Not implemented.
+  vtkPVMetaClipDataSet(const vtkPVMetaClipDataSet&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVMetaClipDataSet&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals *Internal;

@@ -86,8 +86,8 @@ protected:
   QPointer<QWidget> Widget;
 
 private:
-  pqComparativeContextView(const pqComparativeContextView&); // Not implemented.
-  void operator=(const pqComparativeContextView&); // Not implemented.
+  pqComparativeContextView(const pqComparativeContextView&) VTK_DELETE_FUNCTION;
+  void operator=(const pqComparativeContextView&) VTK_DELETE_FUNCTION;
 
   class pqInternal;
   pqInternal* Internal;

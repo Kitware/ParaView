@@ -99,8 +99,8 @@ protected:
     vtkIdType** KeepCellList;
    
   private:
-    vtkCommSched(const vtkCommSched&); // Not implemented
-    void operator=(const vtkCommSched&); // Not implemented
+    vtkCommSched(const vtkCommSched&) VTK_DELETE_FUNCTION;
+    void operator=(const vtkCommSched&) VTK_DELETE_FUNCTION;
   };
 
   virtual void MakeSchedule (vtkPolyData* input, vtkCommSched*);
@@ -170,8 +170,8 @@ protected:
   int ColorProc; // Set to 1 to color data according to processor
 
 private:
-  vtkRedistributePolyData(const vtkRedistributePolyData&); // Not implemented
-  void operator=(const vtkRedistributePolyData&); // Not implemented
+  vtkRedistributePolyData(const vtkRedistributePolyData&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkRedistributePolyData&) VTK_DELETE_FUNCTION;
   
 };
 

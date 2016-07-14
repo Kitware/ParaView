@@ -56,8 +56,8 @@ private:
   pqInternals* Internals;
 
 private:
-  pqEditMenu(const pqEditMenu&); // Not implemented.
-  void operator=(const pqEditMenu&); // Not implemented.
+  pqEditMenu(const pqEditMenu&) VTK_DELETE_FUNCTION;
+  void operator=(const pqEditMenu&) VTK_DELETE_FUNCTION;
 };
 
 #endif

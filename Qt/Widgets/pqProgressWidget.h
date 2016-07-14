@@ -73,8 +73,8 @@ protected:
   QTime EnableTime;
 
 private:
-  pqProgressWidget(const pqProgressWidget&); // Not implemented.
-  void operator=(const pqProgressWidget&); // Not implemented.
+  pqProgressWidget(const pqProgressWidget&) VTK_DELETE_FUNCTION;
+  void operator=(const pqProgressWidget&) VTK_DELETE_FUNCTION;
 };
 
 #endif

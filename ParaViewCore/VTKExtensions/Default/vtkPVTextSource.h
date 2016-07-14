@@ -49,8 +49,8 @@ protected:
                                  vtkInformationVector* outputVector);
   char* Text;
 private:
-  vtkPVTextSource(const vtkPVTextSource&); // Not implemented
-  void operator=(const vtkPVTextSource&); // Not implemented
+  vtkPVTextSource(const vtkPVTextSource&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVTextSource&) VTK_DELETE_FUNCTION;
 
 };
 

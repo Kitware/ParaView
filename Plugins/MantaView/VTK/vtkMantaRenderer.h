@@ -248,8 +248,8 @@ protected:
   vtkGetObjectMacro(MantaTexture, vtkMantaTexture);
 
 private:
-  vtkMantaRenderer(const vtkMantaRenderer&); // Not implemented.
-  void operator=(const vtkMantaRenderer&); // Not implemented.
+  vtkMantaRenderer(const vtkMantaRenderer&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMantaRenderer&) VTK_DELETE_FUNCTION;
 
   void InitEngine();
   void LayerRender();

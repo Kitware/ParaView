@@ -45,8 +45,8 @@ protected:
   vtkPVTrackballRoll();
   ~vtkPVTrackballRoll();
 
-  vtkPVTrackballRoll(const vtkPVTrackballRoll&); // Not implemented
-  void operator=(const vtkPVTrackballRoll&); // Not implemented
+  vtkPVTrackballRoll(const vtkPVTrackballRoll&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVTrackballRoll&) VTK_DELETE_FUNCTION;
 };
 
 #endif

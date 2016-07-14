@@ -58,8 +58,8 @@ public:
   virtual ~pqXYFunctionalBagChartView();
 
 private:
-  pqXYFunctionalBagChartView(const pqXYFunctionalBagChartView&); // Not implemented.
-  void operator=(const pqXYFunctionalBagChartView&); // Not implemented.
+  pqXYFunctionalBagChartView(const pqXYFunctionalBagChartView&) VTK_DELETE_FUNCTION;
+  void operator=(const pqXYFunctionalBagChartView&) VTK_DELETE_FUNCTION;
 };
 
 #endif

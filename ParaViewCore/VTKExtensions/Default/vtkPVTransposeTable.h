@@ -60,8 +60,8 @@ protected:
   bool DoNotTranspose;
 
 private:
-  vtkPVTransposeTable( const vtkPVTransposeTable& ); // Not implemented.
-  void operator = ( const vtkPVTransposeTable& ); // Not implemented.
+  vtkPVTransposeTable( const vtkPVTransposeTable& ) VTK_DELETE_FUNCTION;
+  void operator = ( const vtkPVTransposeTable& ) VTK_DELETE_FUNCTION;
 };
 
 #endif // vtkPVTransposeTable_h

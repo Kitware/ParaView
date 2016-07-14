@@ -79,8 +79,8 @@ protected:
   vtkIdList * Seeds;
 
 private:
-  vtkPolyDataGeodesicDistance(const vtkPolyDataGeodesicDistance&);  // Not implemented.
-  void operator=(const vtkPolyDataGeodesicDistance&);  // Not implemented.
+  vtkPolyDataGeodesicDistance(const vtkPolyDataGeodesicDistance&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPolyDataGeodesicDistance&) VTK_DELETE_FUNCTION;
 };
 
 #endif

@@ -48,8 +48,8 @@ public:
   // Callback for startup.
   void onStartup();
 private:
-  pqRepresentationBehaviorStarter(const pqRepresentationBehaviorStarter&); // Not implemented.
-  void operator=(const pqRepresentationBehaviorStarter&); // Not implemented.
+  pqRepresentationBehaviorStarter(const pqRepresentationBehaviorStarter&) VTK_DELETE_FUNCTION;
+  void operator=(const pqRepresentationBehaviorStarter&) VTK_DELETE_FUNCTION;
 };
 
 #endif

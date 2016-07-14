@@ -57,8 +57,8 @@ public:
   virtual ~pqXYChartView();
 
 private:
-  pqXYChartView(const pqXYChartView&); // Not implemented.
-  void operator=(const pqXYChartView&); // Not implemented.
+  pqXYChartView(const pqXYChartView&) VTK_DELETE_FUNCTION;
+  void operator=(const pqXYChartView&) VTK_DELETE_FUNCTION;
 };
 
 #endif

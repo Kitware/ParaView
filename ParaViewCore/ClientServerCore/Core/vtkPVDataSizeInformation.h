@@ -60,8 +60,8 @@ protected:
 
   int MemorySize;
 private:
-  vtkPVDataSizeInformation(const vtkPVDataSizeInformation&); // Not implemented
-  void operator=(const vtkPVDataSizeInformation&); // Not implemented
+  vtkPVDataSizeInformation(const vtkPVDataSizeInformation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVDataSizeInformation&) VTK_DELETE_FUNCTION;
 
 };
 

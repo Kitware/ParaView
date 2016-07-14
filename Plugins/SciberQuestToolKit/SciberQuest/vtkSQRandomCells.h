@@ -70,8 +70,8 @@ private:
   int Seed;
 
 private:
-  vtkSQRandomCells(const vtkSQRandomCells&);  // Not implemented.
-  void operator=(const vtkSQRandomCells&);  // Not implemented.
+  vtkSQRandomCells(const vtkSQRandomCells&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQRandomCells&) VTK_DELETE_FUNCTION;
 };
 
 #endif

@@ -85,8 +85,8 @@ signals:
   void timeRangeChanged();
 
 private:
-  pqTimeKeeper(const pqTimeKeeper&); // Not implemented.
-  void operator=(const pqTimeKeeper&); // Not implemented.
+  pqTimeKeeper(const pqTimeKeeper&) VTK_DELETE_FUNCTION;
+  void operator=(const pqTimeKeeper&) VTK_DELETE_FUNCTION;
 
   class pqInternals;
   pqInternals* Internals;

@@ -43,8 +43,8 @@ protected:
   ~vtkSpyPlotFileSeriesReader();
 
 private:
-  vtkSpyPlotFileSeriesReader(const vtkSpyPlotFileSeriesReader&); // Not implemented.
-  void operator=(const vtkSpyPlotFileSeriesReader&); // Not implemented.
+  vtkSpyPlotFileSeriesReader(const vtkSpyPlotFileSeriesReader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSpyPlotFileSeriesReader&) VTK_DELETE_FUNCTION;
 };
 
 #endif /* vtkSpyPlotFileSeriesReader_h */

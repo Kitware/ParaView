@@ -141,8 +141,8 @@ protected:
   bool IgnoreAllChanges;
 
 private:
-  vtkSMUndoStackBuilder(const vtkSMUndoStackBuilder&); // Not implemented.
-  void operator=(const vtkSMUndoStackBuilder&); // Not implemented.
+  vtkSMUndoStackBuilder(const vtkSMUndoStackBuilder&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMUndoStackBuilder&) VTK_DELETE_FUNCTION;
 
 };
 

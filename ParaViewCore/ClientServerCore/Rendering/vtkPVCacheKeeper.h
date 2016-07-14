@@ -96,8 +96,8 @@ protected:
   vtkCacheSizeKeeper* CacheSizeKeeper;
 
 private:
-  vtkPVCacheKeeper(const vtkPVCacheKeeper&); // Not implemented
-  void operator=(const vtkPVCacheKeeper&); // Not implemented
+  vtkPVCacheKeeper(const vtkPVCacheKeeper&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVCacheKeeper&) VTK_DELETE_FUNCTION;
 
   class vtkCacheMap;
   vtkCacheMap* Cache;

@@ -72,8 +72,8 @@ protected:
   vtkImageCompressor* Compressor;
   bool LossLessCompression;
 private:
-  vtkPVClientServerSynchronizedRenderers(const vtkPVClientServerSynchronizedRenderers&); // Not implemented
-  void operator=(const vtkPVClientServerSynchronizedRenderers&); // Not implemented
+  vtkPVClientServerSynchronizedRenderers(const vtkPVClientServerSynchronizedRenderers&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVClientServerSynchronizedRenderers&) VTK_DELETE_FUNCTION;
 
 };
 

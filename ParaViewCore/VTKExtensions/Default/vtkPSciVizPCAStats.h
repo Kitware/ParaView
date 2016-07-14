@@ -83,8 +83,8 @@ protected:
   bool RobustPCA;
 
 private:
-  vtkPSciVizPCAStats( const vtkPSciVizPCAStats& ); // Not implemented.
-  void operator = ( const vtkPSciVizPCAStats& ); // Not implemented.
+  vtkPSciVizPCAStats( const vtkPSciVizPCAStats& ) VTK_DELETE_FUNCTION;
+  void operator = ( const vtkPSciVizPCAStats& ) VTK_DELETE_FUNCTION;
 };
 
 #endif // vtkPSciVizPCAStats_h

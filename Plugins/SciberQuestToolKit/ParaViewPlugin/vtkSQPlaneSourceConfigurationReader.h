@@ -72,8 +72,8 @@ protected:
   virtual ~vtkSQPlaneSourceConfigurationReader();
 
 private:
-  vtkSQPlaneSourceConfigurationReader(const vtkSQPlaneSourceConfigurationReader&);  // Not implemented.
-  void operator=(const vtkSQPlaneSourceConfigurationReader&);  // Not implemented.
+  vtkSQPlaneSourceConfigurationReader(const vtkSQPlaneSourceConfigurationReader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQPlaneSourceConfigurationReader&) VTK_DELETE_FUNCTION;
 };
 
 #endif

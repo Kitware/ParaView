@@ -176,8 +176,8 @@ protected:
   virtual void SaveStateValues(vtkPVXMLElement* propElement);
 
 private:
-  vtkSMIntVectorProperty(const vtkSMIntVectorProperty&); // Not implemented
-  void operator=(const vtkSMIntVectorProperty&); // Not implemented
+  vtkSMIntVectorProperty(const vtkSMIntVectorProperty&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMIntVectorProperty&) VTK_DELETE_FUNCTION;
 
 };
 

@@ -65,8 +65,8 @@ protected:
     const char* demagled_component_name);
 
 private:
-  vtkPVPostFilter(const vtkPVPostFilter&);  // Not implemented.
-  void operator=(const vtkPVPostFilter&);  // Not implemented.
+  vtkPVPostFilter(const vtkPVPostFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVPostFilter&) VTK_DELETE_FUNCTION;
 };
 
 #endif

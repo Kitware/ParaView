@@ -93,8 +93,8 @@ protected:
     vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 
 private:
-  vtkOrderedCompositeDistributor(const vtkOrderedCompositeDistributor &);  // Not implemented.
-  void operator=(const vtkOrderedCompositeDistributor &);  // Not implemented.
+  vtkOrderedCompositeDistributor(const vtkOrderedCompositeDistributor &) VTK_DELETE_FUNCTION;
+  void operator=(const vtkOrderedCompositeDistributor &) VTK_DELETE_FUNCTION;
 };
 
 #endif //vtkOrderedCompositeDistributor_h

@@ -49,8 +49,8 @@ protected:
   vtkTypeInt64 GetNumberOfRows();
 
 private:
-  vtkPistonInformationHelper(const vtkPistonInformationHelper&); // Not implemented
-  void operator=(const vtkPistonInformationHelper&); // Not implemented
+  vtkPistonInformationHelper(const vtkPistonInformationHelper&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPistonInformationHelper&) VTK_DELETE_FUNCTION;
 };
 
 #endif

@@ -68,8 +68,8 @@ protected:
   ~vtkCPUniformGridBuilder();
 
 private:
-  vtkCPUniformGridBuilder(const vtkCPUniformGridBuilder&); // Not implemented
-  void operator=(const vtkCPUniformGridBuilder&); // Not implemented
+  vtkCPUniformGridBuilder(const vtkCPUniformGridBuilder&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCPUniformGridBuilder&) VTK_DELETE_FUNCTION;
 
   // Description:
   // The dimensions of the vtkUniformGrid.

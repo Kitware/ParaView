@@ -187,8 +187,8 @@ protected:
   std::vector<int> AcceptableNumbersOfComponents;
 private:
   static bool AutomaticPropertyConversion;
-  vtkSMInputArrayDomain(const vtkSMInputArrayDomain&); // Not implemented
-  void operator=(const vtkSMInputArrayDomain&); // Not implemented
+  vtkSMInputArrayDomain(const vtkSMInputArrayDomain&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMInputArrayDomain&) VTK_DELETE_FUNCTION;
 };
 
 #endif

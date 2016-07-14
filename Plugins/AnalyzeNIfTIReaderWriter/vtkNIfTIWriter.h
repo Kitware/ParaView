@@ -63,8 +63,8 @@ private:
   int sform_code;
   int qform_code;
 
-  vtkNIfTIWriter(const vtkNIfTIWriter&);  // Not implemented.
-  void operator=(const vtkNIfTIWriter&);  // Not implemented.
+  vtkNIfTIWriter(const vtkNIfTIWriter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkNIfTIWriter&) VTK_DELETE_FUNCTION;
 };
 
 #endif

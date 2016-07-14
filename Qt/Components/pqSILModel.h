@@ -183,8 +183,8 @@ protected:
   vtkSmartPointer<vtkGraph> SIL;
 
 private:
-  pqSILModel(const pqSILModel&); // Not implemented.
-  void operator=(const pqSILModel&); // Not implemented.
+  pqSILModel(const pqSILModel&) VTK_DELETE_FUNCTION;
+  void operator=(const pqSILModel&) VTK_DELETE_FUNCTION;
 };
 
 #endif

@@ -72,8 +72,8 @@ private slots:
   void onTypeChanged();
 
 private:
-  pqSignalAdaptorKeyFrameType(const pqSignalAdaptorKeyFrameType&); // Not implemented.
-  void operator=(const pqSignalAdaptorKeyFrameType&); // Not implemented.
+  pqSignalAdaptorKeyFrameType(const pqSignalAdaptorKeyFrameType&) VTK_DELETE_FUNCTION;
+  void operator=(const pqSignalAdaptorKeyFrameType&) VTK_DELETE_FUNCTION;
 
   class pqInternals;
   pqInternals* Internals;

@@ -53,8 +53,8 @@ protected:
   ~vtkPVEnsembleDataReaderInformation();
 
 private:
-  vtkPVEnsembleDataReaderInformation(const vtkPVEnsembleDataReaderInformation&); // Not implemented.
-  void operator=(const vtkPVEnsembleDataReaderInformation&); // Not implemented.
+  vtkPVEnsembleDataReaderInformation(const vtkPVEnsembleDataReaderInformation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVEnsembleDataReaderInformation&) VTK_DELETE_FUNCTION;
 
   class vtkInternal;
   vtkInternal *Internal;

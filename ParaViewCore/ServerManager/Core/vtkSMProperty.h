@@ -557,8 +557,8 @@ protected:
   vtkSMPropertyLink* Links;
 
 private:
-  vtkSMProperty(const vtkSMProperty&); // Not implemented
-  void operator=(const vtkSMProperty&); // Not implemented
+  vtkSMProperty(const vtkSMProperty&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMProperty&) VTK_DELETE_FUNCTION;
 
   // Callback to fire vtkCommand::DomainModifiedEvent every time any of the
   // domains change.

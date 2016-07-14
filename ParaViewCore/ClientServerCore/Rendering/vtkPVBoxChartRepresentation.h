@@ -88,8 +88,8 @@ protected:
   bool Legend;
 private:
   vtkPVBoxChartRepresentation(
-      const vtkPVBoxChartRepresentation&); // Not implemented
-  void operator=(const vtkPVBoxChartRepresentation&); // Not implemented
+      const vtkPVBoxChartRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVBoxChartRepresentation&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;

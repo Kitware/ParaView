@@ -82,8 +82,8 @@ protected:
   int PointPickingRadius;
   bool DisableIceT;
 private:
-  vtkPVRenderViewSettings(const vtkPVRenderViewSettings&); // Not implemented
-  void operator=(const vtkPVRenderViewSettings&); // Not implemented
+  vtkPVRenderViewSettings(const vtkPVRenderViewSettings&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVRenderViewSettings&) VTK_DELETE_FUNCTION;
 
   static vtkSmartPointer<vtkPVRenderViewSettings> Instance;
 

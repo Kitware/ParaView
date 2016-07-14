@@ -160,8 +160,8 @@ protected:
                  vtkDataObject* actualOutput);
   
 private:
-  vtkXMLCollectionReader(const vtkXMLCollectionReader&);  // Not implemented.
-  void operator=(const vtkXMLCollectionReader&);  // Not implemented.
+  vtkXMLCollectionReader(const vtkXMLCollectionReader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkXMLCollectionReader&) VTK_DELETE_FUNCTION;
   
   int CurrentOutput;
 };

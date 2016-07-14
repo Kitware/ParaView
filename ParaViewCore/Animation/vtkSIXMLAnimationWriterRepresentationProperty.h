@@ -41,8 +41,8 @@ protected:
   virtual bool Push(vtkSMMessage*, int);
 
 private:
-  vtkSIXMLAnimationWriterRepresentationProperty(const vtkSIXMLAnimationWriterRepresentationProperty&); // Not implemented
-  void operator=(const vtkSIXMLAnimationWriterRepresentationProperty&); // Not implemented
+  vtkSIXMLAnimationWriterRepresentationProperty(const vtkSIXMLAnimationWriterRepresentationProperty&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSIXMLAnimationWriterRepresentationProperty&) VTK_DELETE_FUNCTION;
 
 };
 

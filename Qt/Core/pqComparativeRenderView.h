@@ -73,8 +73,8 @@ protected:
   virtual QWidget* createWidget();
 
 private:
-  pqComparativeRenderView(const pqComparativeRenderView&); // Not implemented.
-  void operator=(const pqComparativeRenderView&); // Not implemented.
+  pqComparativeRenderView(const pqComparativeRenderView&) VTK_DELETE_FUNCTION;
+  void operator=(const pqComparativeRenderView&) VTK_DELETE_FUNCTION;
 
   class pqInternal;
   pqInternal* Internal;

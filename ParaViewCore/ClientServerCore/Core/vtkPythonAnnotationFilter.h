@@ -99,8 +99,8 @@ protected:
   int ArrayAssociation;
 
 private:
-  vtkPythonAnnotationFilter(const vtkPythonAnnotationFilter&); // Not implemented
-  void operator=(const vtkPythonAnnotationFilter&); // Not implemented
+  vtkPythonAnnotationFilter(const vtkPythonAnnotationFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPythonAnnotationFilter&) VTK_DELETE_FUNCTION;
 
   bool DataTimeValid;
   double DataTime;

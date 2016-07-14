@@ -51,8 +51,8 @@ protected:
   vtkSetMacro(PortIndex, int);
   int PortIndex;
 private:
-  vtkSIInputProperty(const vtkSIInputProperty&); // Not implemented
-  void operator=(const vtkSIInputProperty&); // Not implemented
+  vtkSIInputProperty(const vtkSIInputProperty&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSIInputProperty&) VTK_DELETE_FUNCTION;
 
 };
 

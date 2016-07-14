@@ -91,10 +91,9 @@ protected:
   bool TooltipEnabled;
 
 private:
-  // Not implemented
   vtkSMTooltipSelectionPipeline(
-    const vtkSMTooltipSelectionPipeline&); // Not implemented
-  void operator=(const vtkSMTooltipSelectionPipeline&); // Not implemented
+    const vtkSMTooltipSelectionPipeline&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMTooltipSelectionPipeline&) VTK_DELETE_FUNCTION;
 };
 
 #endif

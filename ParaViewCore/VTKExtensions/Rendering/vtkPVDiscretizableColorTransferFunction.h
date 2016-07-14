@@ -73,8 +73,8 @@ protected:
   ~vtkPVDiscretizableColorTransferFunction();
 
 private:
-  vtkPVDiscretizableColorTransferFunction(const vtkPVDiscretizableColorTransferFunction&); // Not implemented
-  void operator=(const vtkPVDiscretizableColorTransferFunction&); // Not implemented
+  vtkPVDiscretizableColorTransferFunction(const vtkPVDiscretizableColorTransferFunction&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVDiscretizableColorTransferFunction&) VTK_DELETE_FUNCTION;
 
   // All annotations.
   vtkAbstractArray* AnnotatedValuesInFullSet;

@@ -170,8 +170,8 @@ protected:
   int PortNumber;
 
 private:
-  pqOutputPort(const pqOutputPort&); // Not implemented.
-  void operator=(const pqOutputPort&); // Not implemented.
+  pqOutputPort(const pqOutputPort&) VTK_DELETE_FUNCTION;
+  void operator=(const pqOutputPort&) VTK_DELETE_FUNCTION;
 
   class pqInternal;
   pqInternal* Internal;

@@ -51,8 +51,8 @@ protected slots:
   void updateDistance();
 
 private:
-  pqDistanceWidget(const pqDistanceWidget&); // Not implemented.
-  void operator=(const pqDistanceWidget&); // Not implemented.
+  pqDistanceWidget(const pqDistanceWidget&) VTK_DELETE_FUNCTION;
+  void operator=(const pqDistanceWidget&) VTK_DELETE_FUNCTION;
   QLabel* Label;
 };
 

@@ -54,8 +54,8 @@ private:
   class pqInternals;
   pqInternals* Internals;
 
-  pqTransferFunctionDialog(const pqTransferFunctionDialog&); // Not implemented.
-  void operator=(const pqTransferFunctionDialog&); // Not implemented.
+  pqTransferFunctionDialog(const pqTransferFunctionDialog&) VTK_DELETE_FUNCTION;
+  void operator=(const pqTransferFunctionDialog&) VTK_DELETE_FUNCTION;
 };
 
 #endif

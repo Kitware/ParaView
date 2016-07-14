@@ -214,8 +214,8 @@ protected:
   vtkMPIMToNSocketConnection* MPIMToNSocketConnection;
 
 private:
-  vtkPVSessionCore(const vtkPVSessionCore&); // Not implemented
-  void operator=(const vtkPVSessionCore&);   // Not implemented
+  vtkPVSessionCore(const vtkPVSessionCore&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVSessionCore&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;

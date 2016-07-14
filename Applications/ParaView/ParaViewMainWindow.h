@@ -53,8 +53,8 @@ protected slots:
   void showWelcomeDialog();
 
 private:
-  ParaViewMainWindow(const ParaViewMainWindow&); // Not implemented.
-  void operator=(const ParaViewMainWindow&); // Not implemented.
+  ParaViewMainWindow(const ParaViewMainWindow&) VTK_DELETE_FUNCTION;
+  void operator=(const ParaViewMainWindow&) VTK_DELETE_FUNCTION;
 
   class pqInternals;
   pqInternals* Internals;

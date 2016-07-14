@@ -72,8 +72,8 @@ protected:
   void AddInputInternal(const char* group);
   
 private:
-  vtkXMLPVAnimationWriter(const vtkXMLPVAnimationWriter&);  // Not implemented.
-  void operator=(const vtkXMLPVAnimationWriter&);  // Not implemented.
+  vtkXMLPVAnimationWriter(const vtkXMLPVAnimationWriter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkXMLPVAnimationWriter&) VTK_DELETE_FUNCTION;
 };
 
 #endif

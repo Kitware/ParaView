@@ -92,8 +92,8 @@ protected:
   double Radius;
 
 private:
-  vtkSQPointSource(const vtkSQPointSource&);  // Not implemented.
-  void operator=(const vtkSQPointSource&);  // Not implemented.
+  vtkSQPointSource(const vtkSQPointSource&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQPointSource&) VTK_DELETE_FUNCTION;
 };
 
 #endif

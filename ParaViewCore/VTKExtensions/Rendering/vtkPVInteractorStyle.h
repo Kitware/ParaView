@@ -126,8 +126,8 @@ protected:
   void OnButtonUp(int button);
   void ResetLights();
 
-  vtkPVInteractorStyle(const vtkPVInteractorStyle&); // Not implemented
-  void operator=(const vtkPVInteractorStyle&); // Not implemented
+  vtkPVInteractorStyle(const vtkPVInteractorStyle&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVInteractorStyle&) VTK_DELETE_FUNCTION;
 };
 
 #endif

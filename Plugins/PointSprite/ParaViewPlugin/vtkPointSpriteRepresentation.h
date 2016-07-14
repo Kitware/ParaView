@@ -148,8 +148,8 @@ protected:
   vtk1DGaussianTransferFunction* OpacityGaussianTransferFunction;
 
 private:
-  vtkPointSpriteRepresentation(const vtkPointSpriteRepresentation&); // Not implemented
-  void operator=(const vtkPointSpriteRepresentation&); // Not implemented
+  vtkPointSpriteRepresentation(const vtkPointSpriteRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPointSpriteRepresentation&) VTK_DELETE_FUNCTION;
 
   vtkTexture* TextureInternal;
   void SetTextureInternal(vtkTexture*);

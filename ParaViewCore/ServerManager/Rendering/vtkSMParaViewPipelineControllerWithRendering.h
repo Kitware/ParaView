@@ -138,8 +138,8 @@ protected:
     vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view);
 
 private:
-  vtkSMParaViewPipelineControllerWithRendering(const vtkSMParaViewPipelineControllerWithRendering&); // Not implemented
-  void operator=(const vtkSMParaViewPipelineControllerWithRendering&); // Not implemented
+  vtkSMParaViewPipelineControllerWithRendering(const vtkSMParaViewPipelineControllerWithRendering&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMParaViewPipelineControllerWithRendering&) VTK_DELETE_FUNCTION;
   static bool HideScalarBarOnHide;
   static bool InheritRepresentationProperties;
 

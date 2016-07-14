@@ -52,8 +52,8 @@ protected:
   vtkWeakPointer<vtkSMSession> Session;
 
 private:
-  vtkSMSessionObject(const vtkSMSessionObject&); // Not implemented
-  void operator=(const vtkSMSessionObject&); // Not implemented
+  vtkSMSessionObject(const vtkSMSessionObject&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMSessionObject&) VTK_DELETE_FUNCTION;
 };
 
 #endif

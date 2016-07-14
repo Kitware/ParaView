@@ -48,8 +48,8 @@ protected:
   ~vtkSMPluginLoaderProxy();
 
 private:
-  vtkSMPluginLoaderProxy(const vtkSMPluginLoaderProxy&); // Not implemented
-  void operator=(const vtkSMPluginLoaderProxy&); // Not implemented
+  vtkSMPluginLoaderProxy(const vtkSMPluginLoaderProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMPluginLoaderProxy&) VTK_DELETE_FUNCTION;
 
 };
 

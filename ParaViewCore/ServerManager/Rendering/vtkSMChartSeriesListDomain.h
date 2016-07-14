@@ -77,8 +77,8 @@ protected:
 
   bool HidePartialArrays;
 private:
-  vtkSMChartSeriesListDomain(const vtkSMChartSeriesListDomain&); // Not implemented
-  void operator=(const vtkSMChartSeriesListDomain&); // Not implemented
+  vtkSMChartSeriesListDomain(const vtkSMChartSeriesListDomain&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMChartSeriesListDomain&) VTK_DELETE_FUNCTION;
 
 };
 

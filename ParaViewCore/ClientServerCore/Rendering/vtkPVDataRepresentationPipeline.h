@@ -53,8 +53,8 @@ protected:
     vtkInformationVector* outInfoVec);
 
 private:
-  vtkPVDataRepresentationPipeline(const vtkPVDataRepresentationPipeline&); // Not implemented
-  void operator=(const vtkPVDataRepresentationPipeline&); // Not implemented
+  vtkPVDataRepresentationPipeline(const vtkPVDataRepresentationPipeline&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVDataRepresentationPipeline&) VTK_DELETE_FUNCTION;
 
 };
 

@@ -43,8 +43,8 @@ protected:
   ~vtkSMIndexSelectionDomain();
 
 private:
-  vtkSMIndexSelectionDomain(const vtkSMIndexSelectionDomain &); // Not implemented.
-  void operator=(const vtkSMIndexSelectionDomain &);   // Not implemented.
+  vtkSMIndexSelectionDomain(const vtkSMIndexSelectionDomain &) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMIndexSelectionDomain &) VTK_DELETE_FUNCTION;
 };
 
 #endif // vtkSMIndexSelectionDomain_h

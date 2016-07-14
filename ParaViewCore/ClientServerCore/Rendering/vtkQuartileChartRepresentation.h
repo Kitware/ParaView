@@ -67,8 +67,8 @@ protected:
   bool MedianVisibility;
 
 private:
-  vtkQuartileChartRepresentation(const vtkQuartileChartRepresentation&); // Not implemented
-  void operator=(const vtkQuartileChartRepresentation&); // Not implemented
+  vtkQuartileChartRepresentation(const vtkQuartileChartRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkQuartileChartRepresentation&) VTK_DELETE_FUNCTION;
 
   class vtkQCRInternals;
   friend class vtkQCRInternals;

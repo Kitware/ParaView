@@ -92,8 +92,8 @@ protected:
   void FillWithRemoteObjects( vtkUndoSet *undoSet, vtkCollection *collection);
 
 private:
-  vtkSMUndoStack(const vtkSMUndoStack&); // Not implemented.
-  void operator=(const vtkSMUndoStack&); // Not implemented.
+  vtkSMUndoStack(const vtkSMUndoStack&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMUndoStack&) VTK_DELETE_FUNCTION;
 
   class vtkInternal;
   vtkInternal* Internal;

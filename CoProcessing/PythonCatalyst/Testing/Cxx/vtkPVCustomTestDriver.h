@@ -51,8 +51,8 @@ protected:
   ~vtkPVCustomTestDriver();
 
 private:
-  vtkPVCustomTestDriver(const vtkPVCustomTestDriver&); // Not implemented
-  void operator=(const vtkPVCustomTestDriver&); // Not implemented
+  vtkPVCustomTestDriver(const vtkPVCustomTestDriver&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVCustomTestDriver&) VTK_DELETE_FUNCTION;
 
   // Description:
   // The coprocessor to be called by this custom test.

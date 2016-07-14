@@ -103,8 +103,8 @@ protected:
   bool UndoRedoing;
 
 private:
-  pqUndoStackBuilder(const pqUndoStackBuilder&); // Not implemented.
-  void operator=(const pqUndoStackBuilder&); // Not implemented.
+  pqUndoStackBuilder(const pqUndoStackBuilder&) VTK_DELETE_FUNCTION;
+  void operator=(const pqUndoStackBuilder&) VTK_DELETE_FUNCTION;
 };
 
 #endif

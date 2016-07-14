@@ -78,8 +78,8 @@ protected:
   int MaxDepth;
 
 private:
-  vtkPVMantaView(const vtkPVMantaView&); // Not implemented
-  void operator=(const vtkPVMantaView&); // Not implemented
+  vtkPVMantaView(const vtkPVMantaView&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVMantaView&) VTK_DELETE_FUNCTION;
 
 };
 

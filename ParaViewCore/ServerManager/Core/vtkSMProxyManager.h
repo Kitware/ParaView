@@ -200,8 +200,8 @@ private:
 
   static vtkSmartPointer<vtkSMProxyManager> Singleton;
 
-  vtkSMProxyManager(const vtkSMProxyManager&); // Not implemented
-  void operator=(const vtkSMProxyManager&); // Not implemented
+  vtkSMProxyManager(const vtkSMProxyManager&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMProxyManager&) VTK_DELETE_FUNCTION;
 
 };
 

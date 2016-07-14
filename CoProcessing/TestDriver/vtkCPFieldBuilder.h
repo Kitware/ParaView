@@ -54,8 +54,8 @@ protected:
   ~vtkCPFieldBuilder();
 
 private:
-  vtkCPFieldBuilder(const vtkCPFieldBuilder&); // Not implemented
-  void operator=(const vtkCPFieldBuilder&); // Not implemented
+  vtkCPFieldBuilder(const vtkCPFieldBuilder&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCPFieldBuilder&) VTK_DELETE_FUNCTION;
 
   // Description:
   // The name of the array that will be inserted into the point/cell data.

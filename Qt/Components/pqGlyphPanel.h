@@ -70,8 +70,8 @@ protected:
   QCheckBox *OrientWidget;
 
 private:
-  pqGlyphPanel(const pqGlyphPanel&); // Not implemented.
-  void operator=(const pqGlyphPanel&); // Not implemented.
+  pqGlyphPanel(const pqGlyphPanel&) VTK_DELETE_FUNCTION;
+  void operator=(const pqGlyphPanel&) VTK_DELETE_FUNCTION;
 };
 
 #endif

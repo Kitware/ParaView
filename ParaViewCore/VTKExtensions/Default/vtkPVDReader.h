@@ -60,8 +60,8 @@ protected:
   int TimeStepRange[2];
 
 private:
-  vtkPVDReader(const vtkPVDReader&);  // Not implemented.
-  void operator=(const vtkPVDReader&);  // Not implemented.
+  vtkPVDReader(const vtkPVDReader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVDReader&) VTK_DELETE_FUNCTION;
 };
 
 #endif

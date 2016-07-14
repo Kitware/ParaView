@@ -46,8 +46,8 @@ protected:
   virtual bool Pull(vtkSMMessage*);
 
 private:
-  vtkSIIndexSelectionProperty(const vtkSIIndexSelectionProperty&); // Not implemented
-  void operator=(const vtkSIIndexSelectionProperty&); // Not implemented
+  vtkSIIndexSelectionProperty(const vtkSIIndexSelectionProperty&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSIIndexSelectionProperty&) VTK_DELETE_FUNCTION;
 
 };
 

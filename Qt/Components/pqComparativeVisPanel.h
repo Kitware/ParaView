@@ -87,8 +87,8 @@ protected:
   int findRow(
     vtkSMProxy* animatedProxy, const QString& animatedPName, int animatedIndex);
 private:
-  pqComparativeVisPanel(const pqComparativeVisPanel&); // Not implemented.
-  void operator=(const pqComparativeVisPanel&); // Not implemented.
+  pqComparativeVisPanel(const pqComparativeVisPanel&) VTK_DELETE_FUNCTION;
+  void operator=(const pqComparativeVisPanel&) VTK_DELETE_FUNCTION;
 
   vtkEventQtSlotConnect* VTKConnect;
   class pqInternal;

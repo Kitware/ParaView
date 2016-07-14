@@ -84,8 +84,8 @@ protected:
   int TileWindowSize[2];
 
 private:
-  vtkTilesHelper(const vtkTilesHelper&); // Not implemented
-  void operator=(const vtkTilesHelper&); // Not implemented
+  vtkTilesHelper(const vtkTilesHelper&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkTilesHelper&) VTK_DELETE_FUNCTION;
 
 };
 

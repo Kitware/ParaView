@@ -127,8 +127,8 @@ protected:
   vtkMultiProcessController* Controller;
 
 private:
-  vtkPVGlyphFilter(const vtkPVGlyphFilter&);  // Not implemented.
-  void operator=(const vtkPVGlyphFilter&);  // Not implemented.
+  vtkPVGlyphFilter(const vtkPVGlyphFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVGlyphFilter&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;

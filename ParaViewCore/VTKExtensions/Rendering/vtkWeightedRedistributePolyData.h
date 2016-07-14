@@ -60,8 +60,8 @@ protected:
   float* Weights;
 
 private:
-  vtkWeightedRedistributePolyData(const vtkWeightedRedistributePolyData&); // Not implemented
-  void operator=(const vtkWeightedRedistributePolyData&); // Not implemented
+  vtkWeightedRedistributePolyData(const vtkWeightedRedistributePolyData&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkWeightedRedistributePolyData&) VTK_DELETE_FUNCTION;
 };
 
 //****************************************************************

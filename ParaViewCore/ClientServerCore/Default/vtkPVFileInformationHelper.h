@@ -105,8 +105,8 @@ protected:
   char* PathSeparator;
   vtkSetStringMacro(PathSeparator);
 private:
-  vtkPVFileInformationHelper(const vtkPVFileInformationHelper&); // Not implemented.
-  void operator=(const vtkPVFileInformationHelper&); // Not implemented.
+  vtkPVFileInformationHelper(const vtkPVFileInformationHelper&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVFileInformationHelper&) VTK_DELETE_FUNCTION;
 };
 
 #endif

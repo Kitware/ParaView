@@ -79,8 +79,8 @@ protected:
   vtkCameraInterpolator2* Interpolator;
 
 private:
-  vtkPVCameraKeyFrame(const vtkPVCameraKeyFrame&); // Not implemented.
-  void operator=(const vtkPVCameraKeyFrame&); // Not implemented.
+  vtkPVCameraKeyFrame(const vtkPVCameraKeyFrame&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVCameraKeyFrame&) VTK_DELETE_FUNCTION;
 };
 
 

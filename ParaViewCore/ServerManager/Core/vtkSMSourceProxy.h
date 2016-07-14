@@ -249,8 +249,8 @@ private:
   unsigned int NumberOfAlgorithmOutputPorts;
   unsigned int NumberOfAlgorithmRequiredInputPorts;
 
-  vtkSMSourceProxy(const vtkSMSourceProxy&); // Not implemented
-  void operator=(const vtkSMSourceProxy&); // Not implemented
+  vtkSMSourceProxy(const vtkSMSourceProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMSourceProxy&) VTK_DELETE_FUNCTION;
 
 };
 

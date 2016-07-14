@@ -76,8 +76,8 @@ protected:
   vtkDoubleArray* GaussianControlPoints;
 
 private:
-  vtk1DGaussianTransferFunction(const vtk1DGaussianTransferFunction&); // Not implemented.
-  void operator=(const vtk1DGaussianTransferFunction&); // Not implemented.
+  vtk1DGaussianTransferFunction(const vtk1DGaussianTransferFunction&) VTK_DELETE_FUNCTION;
+  void operator=(const vtk1DGaussianTransferFunction&) VTK_DELETE_FUNCTION;
 };
 
 #endif

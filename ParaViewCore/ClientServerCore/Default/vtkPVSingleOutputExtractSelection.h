@@ -35,8 +35,8 @@ protected:
   ~vtkPVSingleOutputExtractSelection();
 
 private:
-  vtkPVSingleOutputExtractSelection(const vtkPVSingleOutputExtractSelection&); // Not implemented
-  void operator=(const vtkPVSingleOutputExtractSelection&); // Not implemented
+  vtkPVSingleOutputExtractSelection(const vtkPVSingleOutputExtractSelection&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVSingleOutputExtractSelection&) VTK_DELETE_FUNCTION;
 
 };
 

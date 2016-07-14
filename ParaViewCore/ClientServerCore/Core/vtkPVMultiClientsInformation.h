@@ -79,8 +79,8 @@ protected:
   int MultiClientEnable;
   int MasterId;
 
-  vtkPVMultiClientsInformation(const vtkPVMultiClientsInformation&); // Not implemented
-  void operator=(const vtkPVMultiClientsInformation&); // Not implemented
+  vtkPVMultiClientsInformation(const vtkPVMultiClientsInformation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVMultiClientsInformation&) VTK_DELETE_FUNCTION;
 };
 
 #endif

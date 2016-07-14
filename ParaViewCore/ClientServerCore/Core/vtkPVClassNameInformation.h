@@ -73,8 +73,8 @@ protected:
   char* VTKClassName;
   vtkSetStringMacro(VTKClassName);
 private:
-  vtkPVClassNameInformation(const vtkPVClassNameInformation&); // Not implemented
-  void operator=(const vtkPVClassNameInformation&); // Not implemented
+  vtkPVClassNameInformation(const vtkPVClassNameInformation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVClassNameInformation&) VTK_DELETE_FUNCTION;
 };
 
 #endif

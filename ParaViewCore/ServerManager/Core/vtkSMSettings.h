@@ -226,8 +226,8 @@ protected:
   virtual ~vtkSMSettings();
 
 private:
-  vtkSMSettings(const vtkSMSettings&); // Not implemented
-  void operator=(const vtkSMSettings&); // Not implemented
+  vtkSMSettings(const vtkSMSettings&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMSettings&) VTK_DELETE_FUNCTION;
 
   class vtkSMSettingsInternal;
   vtkSMSettingsInternal * Internal;

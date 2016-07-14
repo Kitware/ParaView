@@ -863,8 +863,8 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPEnSightReader : public vtkPGenericEnS
   std::map<std::string, std::map<int, long> > FileOffsets;
 
  private:
-  vtkPEnSightReader(const vtkPEnSightReader&);  // Not implemented.
-  void operator=(const vtkPEnSightReader&);  // Not implemented.
+  vtkPEnSightReader(const vtkPEnSightReader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPEnSightReader&) VTK_DELETE_FUNCTION;
 };
 
 #endif

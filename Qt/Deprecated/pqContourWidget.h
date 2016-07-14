@@ -110,8 +110,8 @@ protected slots:
   void deleteAllNodes();
 
 private:
-  pqContourWidget(const pqContourWidget&); // Not implemented.
-  void operator=(const pqContourWidget&); // Not implemented.
+  pqContourWidget(const pqContourWidget&) VTK_DELETE_FUNCTION;
+  void operator=(const pqContourWidget&) VTK_DELETE_FUNCTION;
 
   void updateRepProperty(vtkSMProxy* smProxy,
     const char* propertyName);

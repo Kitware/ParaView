@@ -49,8 +49,8 @@ protected:
   virtual void WriteFileHeader(ofstream *file, vtkImageData *cache, int wholeExtent[6]);
 
 private:
-  vtkAnalyzeWriter(const vtkAnalyzeWriter&);  // Not implemented.
-  void operator=(const vtkAnalyzeWriter&);  // Not implemented.
+  vtkAnalyzeWriter(const vtkAnalyzeWriter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkAnalyzeWriter&) VTK_DELETE_FUNCTION;
 
   int FileType;
   unsigned int imageSizeInBytes;

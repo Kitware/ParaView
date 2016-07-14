@@ -109,8 +109,8 @@ protected:
   vtkIdType MaximumNumberOfPointsOld;
 
 private:
-  vtkPVLegacyGlyphFilter(const vtkPVLegacyGlyphFilter&);  // Not implemented.
-  void operator=(const vtkPVLegacyGlyphFilter&);  // Not implemented.
+  vtkPVLegacyGlyphFilter(const vtkPVLegacyGlyphFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVLegacyGlyphFilter&) VTK_DELETE_FUNCTION;
 
 public:
 

@@ -80,8 +80,8 @@ protected:
   vtkWeakPointer<vtkPVSessionCore> Core;
   int LogLevel;
 private:
-  vtkPVSessionCoreInterpreterHelper(const vtkPVSessionCoreInterpreterHelper&); // Not implemented
-  void operator=(const vtkPVSessionCoreInterpreterHelper&); // Not implemented
+  vtkPVSessionCoreInterpreterHelper(const vtkPVSessionCoreInterpreterHelper&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVSessionCoreInterpreterHelper&) VTK_DELETE_FUNCTION;
 
 };
 

@@ -210,8 +210,8 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPEnSightGoldBinaryReader : public vtkP
   int FloatBufferNumberOfVectors;
 
  private:
-  vtkPEnSightGoldBinaryReader(const vtkPEnSightGoldBinaryReader&);  // Not implemented.
-  void operator=(const vtkPEnSightGoldBinaryReader&);  // Not implemented.
+  vtkPEnSightGoldBinaryReader(const vtkPEnSightGoldBinaryReader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPEnSightGoldBinaryReader&) VTK_DELETE_FUNCTION;
 };
 
 #endif

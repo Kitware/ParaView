@@ -34,8 +34,8 @@ protected:
   ~vtkGeometryRepresentationWithHiddenLinesRemoval();
 
 private:
-  vtkGeometryRepresentationWithHiddenLinesRemoval(const vtkGeometryRepresentationWithHiddenLinesRemoval&); // Not implemented
-  void operator=(const vtkGeometryRepresentationWithHiddenLinesRemoval&); // Not implemented
+  vtkGeometryRepresentationWithHiddenLinesRemoval(const vtkGeometryRepresentationWithHiddenLinesRemoval&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkGeometryRepresentationWithHiddenLinesRemoval&) VTK_DELETE_FUNCTION;
 
 };
 

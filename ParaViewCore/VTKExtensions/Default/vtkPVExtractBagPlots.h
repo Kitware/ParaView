@@ -103,8 +103,8 @@ protected:
   bool UseSilvermanRule;
 
 private:
-  vtkPVExtractBagPlots( const vtkPVExtractBagPlots& ); // Not implemented.
-  void operator = ( const vtkPVExtractBagPlots& ); // Not implemented.
+  vtkPVExtractBagPlots( const vtkPVExtractBagPlots& ) VTK_DELETE_FUNCTION;
+  void operator = ( const vtkPVExtractBagPlots& ) VTK_DELETE_FUNCTION;
 };
 
 #endif // vtkPVExtractBagPlots_h

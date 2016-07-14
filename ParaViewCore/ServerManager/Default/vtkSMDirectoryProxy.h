@@ -50,8 +50,8 @@ protected:
   ~vtkSMDirectoryProxy();
 
 private:
-  vtkSMDirectoryProxy(const vtkSMDirectoryProxy&); // Not implemented
-  void operator=(const vtkSMDirectoryProxy&); // Not implemented
+  vtkSMDirectoryProxy(const vtkSMDirectoryProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMDirectoryProxy&) VTK_DELETE_FUNCTION;
 
 };
 

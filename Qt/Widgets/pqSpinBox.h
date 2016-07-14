@@ -63,8 +63,8 @@ private slots:
   void onEditingFinished();
 
 private:
-  pqSpinBox(const pqSpinBox&); // Not implemented.
-  void operator=(const pqSpinBox&); // Not implemented.
+  pqSpinBox(const pqSpinBox&) VTK_DELETE_FUNCTION;
+  void operator=(const pqSpinBox&) VTK_DELETE_FUNCTION;
   bool EditingFinishedPending;
 };
 

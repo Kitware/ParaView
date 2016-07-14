@@ -172,8 +172,8 @@ protected:
   vtkCommand* PropertyObserver;
   vtkCommand* DomainObserver;
 private:
-  vtkSMSILModel(const vtkSMSILModel&); // Not implemented.
-  void operator=(const vtkSMSILModel&); // Not implemented.
+  vtkSMSILModel(const vtkSMSILModel&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMSILModel&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;

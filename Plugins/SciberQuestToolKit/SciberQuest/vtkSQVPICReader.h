@@ -171,8 +171,8 @@ protected:
 
 
 private:
-  vtkSQVPICReader(const vtkSQVPICReader&);  // Not implemented.
-  void operator=(const vtkSQVPICReader&); // Not implemented.
+  vtkSQVPICReader(const vtkSQVPICReader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQVPICReader&) VTK_DELETE_FUNCTION;
 };
 
 #endif

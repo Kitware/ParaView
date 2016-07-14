@@ -69,8 +69,8 @@ protected:
   std::string FileName;
 
 private:
-  vtkEnvironmentAnnotationFilter(const vtkEnvironmentAnnotationFilter&); // Not implemented
-  void operator=(const vtkEnvironmentAnnotationFilter&); // Not implemented
+  vtkEnvironmentAnnotationFilter(const vtkEnvironmentAnnotationFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkEnvironmentAnnotationFilter&) VTK_DELETE_FUNCTION;
 
   void UpdateAnnotationValue();
 

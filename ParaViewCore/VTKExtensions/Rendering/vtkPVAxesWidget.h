@@ -139,8 +139,8 @@ protected:
 
   unsigned long StartEventObserverId;
 private:
-  vtkPVAxesWidget(const vtkPVAxesWidget&);  // Not implemented
-  void operator=(const vtkPVAxesWidget&);  // Not implemented
+  vtkPVAxesWidget(const vtkPVAxesWidget&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVAxesWidget&) VTK_DELETE_FUNCTION;
 
 };
 

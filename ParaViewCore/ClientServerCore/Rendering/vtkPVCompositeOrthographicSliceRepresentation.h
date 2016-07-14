@@ -86,8 +86,8 @@ protected:
   vtkSmartPointer<vtkGeometrySliceRepresentation> SliceRepresentations[3];
 
 private:
-  vtkPVCompositeOrthographicSliceRepresentation(const vtkPVCompositeOrthographicSliceRepresentation&); // Not implemented
-  void operator=(const vtkPVCompositeOrthographicSliceRepresentation&); // Not implemented
+  vtkPVCompositeOrthographicSliceRepresentation(const vtkPVCompositeOrthographicSliceRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVCompositeOrthographicSliceRepresentation&) VTK_DELETE_FUNCTION;
 
 };
 

@@ -48,8 +48,8 @@ protected:
   virtual bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element);
 
 private:
-  vtkSIStringVectorProperty(const vtkSIStringVectorProperty&); // Not implemented
-  void operator=(const vtkSIStringVectorProperty&); // Not implemented
+  vtkSIStringVectorProperty(const vtkSIStringVectorProperty&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSIStringVectorProperty&) VTK_DELETE_FUNCTION;
 
   class vtkVectorOfStrings;
   class vtkVectorOfInts;

@@ -57,8 +57,8 @@ protected:
     vtkSMViewProxy*, int magnification);
 
 private:
-  pqAnimationSceneImageWriter(const pqAnimationSceneImageWriter&); // Not implemented.
-  void operator=(const pqAnimationSceneImageWriter&); // Not implemented.
+  pqAnimationSceneImageWriter(const pqAnimationSceneImageWriter&) VTK_DELETE_FUNCTION;
+  void operator=(const pqAnimationSceneImageWriter&) VTK_DELETE_FUNCTION;
 };
 
 

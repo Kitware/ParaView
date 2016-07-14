@@ -175,8 +175,8 @@ protected slots:
   void updateFromSettings();
 
 private:
-  pqSearchBox(const pqSearchBox&); // Not implemented.
-  void operator=(const pqSearchBox&); // Not implemented.
+  pqSearchBox(const pqSearchBox&) VTK_DELETE_FUNCTION;
+  void operator=(const pqSearchBox&) VTK_DELETE_FUNCTION;
 
   class pqInternals;
   friend class pqInternals;

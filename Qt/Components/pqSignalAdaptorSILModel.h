@@ -53,8 +53,8 @@ slots:
   void setValues(const QList<QVariant>&);
 
 private:
-  pqSignalAdaptorSILModel(const pqSignalAdaptorSILModel&); // Not implemented.
-  void operator=(const pqSignalAdaptorSILModel&); // Not implemented.
+  pqSignalAdaptorSILModel(const pqSignalAdaptorSILModel&) VTK_DELETE_FUNCTION;
+  void operator=(const pqSignalAdaptorSILModel&) VTK_DELETE_FUNCTION;
 
   pqSILModel* Model;
   QString HierarchyName;

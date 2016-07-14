@@ -62,8 +62,8 @@ protected:
   vtkDataSet* LocateDataSet(vtkCompositeDataIterator* iter, unsigned int index);
 
 private:
-  vtkSelectionConverter(const vtkSelectionConverter&);  // Not implemented.
-  void operator=(const vtkSelectionConverter&);  // Not implemented.
+  vtkSelectionConverter(const vtkSelectionConverter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSelectionConverter&) VTK_DELETE_FUNCTION;
 
   class vtkKeyType;
 

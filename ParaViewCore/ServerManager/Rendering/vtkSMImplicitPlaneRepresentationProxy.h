@@ -37,8 +37,8 @@ protected:
   virtual void SendRepresentation();
 
 private:
-  vtkSMImplicitPlaneRepresentationProxy(const vtkSMImplicitPlaneRepresentationProxy&); // Not implemented
-  void operator=(const vtkSMImplicitPlaneRepresentationProxy&); // Not implemented
+  vtkSMImplicitPlaneRepresentationProxy(const vtkSMImplicitPlaneRepresentationProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMImplicitPlaneRepresentationProxy&) VTK_DELETE_FUNCTION;
 };
 
 #endif

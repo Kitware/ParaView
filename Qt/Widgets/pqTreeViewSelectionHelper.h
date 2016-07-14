@@ -55,8 +55,8 @@ protected slots:
   void saveSelection();
 
 private:
-  pqTreeViewSelectionHelper(const pqTreeViewSelectionHelper&); // Not implemented.
-  void operator=(const pqTreeViewSelectionHelper&); // Not implemented.
+  pqTreeViewSelectionHelper(const pqTreeViewSelectionHelper&) VTK_DELETE_FUNCTION;
+  void operator=(const pqTreeViewSelectionHelper&) VTK_DELETE_FUNCTION;
 
   void setSelectedItemsCheckState(Qt::CheckState state);
 

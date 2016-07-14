@@ -99,8 +99,8 @@ protected:
 
   friend class vtkSICompoundSourceProxy;
 private:
-  vtkSISourceProxy(const vtkSISourceProxy&); // Not implemented
-  void operator=(const vtkSISourceProxy&); // Not implemented
+  vtkSISourceProxy(const vtkSISourceProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSISourceProxy&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;

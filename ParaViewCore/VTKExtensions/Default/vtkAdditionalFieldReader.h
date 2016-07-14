@@ -47,7 +47,7 @@ protected:
   char *FileName;
 
 private:
-  vtkAdditionalFieldReader(const vtkAdditionalFieldReader&);  // Not implemented.
-  void operator=(const vtkAdditionalFieldReader&);  // Not implemented.
+  vtkAdditionalFieldReader(const vtkAdditionalFieldReader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkAdditionalFieldReader&) VTK_DELETE_FUNCTION;
 };
 #endif

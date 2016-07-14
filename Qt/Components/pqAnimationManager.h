@@ -142,8 +142,8 @@ protected slots:
   void onHeightEdited();
   void onLockAspectRatio(bool lock);
 private:
-  pqAnimationManager(const pqAnimationManager&); // Not implemented.
-  void operator=(const pqAnimationManager&); // Not implemented.
+  pqAnimationManager(const pqAnimationManager&) VTK_DELETE_FUNCTION;
+  void operator=(const pqAnimationManager&) VTK_DELETE_FUNCTION;
 
   class pqInternals;
   pqInternals* Internals;

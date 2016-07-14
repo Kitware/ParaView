@@ -167,8 +167,8 @@ private:
   char* ApplicationPath;
   int ProcessType; // data-server, render-server, combined-server, client
 
-  vtkCommandOptions(const vtkCommandOptions&); // Not implemented
-  void operator=(const vtkCommandOptions&); // Not implemented
+  vtkCommandOptions(const vtkCommandOptions&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCommandOptions&) VTK_DELETE_FUNCTION;
 
   vtkCommandOptionsInternal* Internals;
 

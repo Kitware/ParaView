@@ -83,8 +83,8 @@ private:
   double Spacing[3];
 
 private:
-  vtkSQImageSource(const vtkSQImageSource &); // Not implemented
-  void operator=(const vtkSQImageSource &); // Not implemented
+  vtkSQImageSource(const vtkSQImageSource &) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQImageSource &) VTK_DELETE_FUNCTION;
 };
 
 #endif

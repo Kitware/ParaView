@@ -247,8 +247,8 @@ private:
   vtkSetStringMacro(StereoType);
 
 private:
-  vtkPVOptions(const vtkPVOptions&); // Not implemented
-  void operator=(const vtkPVOptions&); // Not implemented
+  vtkPVOptions(const vtkPVOptions&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVOptions&) VTK_DELETE_FUNCTION;
 
   vtkSetStringMacro(HostName);
   char* HostName;

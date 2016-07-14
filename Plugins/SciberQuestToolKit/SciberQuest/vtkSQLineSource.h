@@ -88,8 +88,8 @@ protected:
   double Point2[3];
   int Resolution;
 private:
-  vtkSQLineSource(const vtkSQLineSource&);  // Not implemented.
-  void operator=(const vtkSQLineSource&);  // Not implemented.
+  vtkSQLineSource(const vtkSQLineSource&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQLineSource&) VTK_DELETE_FUNCTION;
 };
 
 #endif

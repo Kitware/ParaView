@@ -160,8 +160,8 @@ protected:
   class vtkInternalComponentNames;
   vtkInternalComponentNames* ComponentNames;
 
-  vtkPVArrayInformation(const vtkPVArrayInformation&); // Not implemented
-  void operator=(const vtkPVArrayInformation&); // Not implemented
+  vtkPVArrayInformation(const vtkPVArrayInformation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVArrayInformation&) VTK_DELETE_FUNCTION;
 };
 
 #endif

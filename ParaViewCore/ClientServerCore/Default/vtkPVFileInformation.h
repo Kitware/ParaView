@@ -125,8 +125,8 @@ protected:
   void SetHiddenFlag( );
   int FastFileTypeDetection;
 private:
-  vtkPVFileInformation(const vtkPVFileInformation&); // Not implemented.
-  void operator=(const vtkPVFileInformation&); // Not implemented.
+  vtkPVFileInformation(const vtkPVFileInformation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVFileInformation&) VTK_DELETE_FUNCTION;
 
   struct vtkInfo;
 

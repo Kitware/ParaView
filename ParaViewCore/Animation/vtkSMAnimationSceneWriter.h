@@ -96,8 +96,8 @@ protected:
   double PlaybackTimeWindow[2];
   int    StartFileCount;
 private:
-  vtkSMAnimationSceneWriter(const vtkSMAnimationSceneWriter&); // Not implemented.
-  void operator=(const vtkSMAnimationSceneWriter&); // Not implemented.
+  vtkSMAnimationSceneWriter(const vtkSMAnimationSceneWriter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMAnimationSceneWriter&) VTK_DELETE_FUNCTION;
 };
 
 #endif

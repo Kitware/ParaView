@@ -101,8 +101,8 @@ protected:
   vtkPExtractHistogram* ExtractHistogram;
 
 private:
-  vtkPVHistogramChartRepresentation(const vtkPVHistogramChartRepresentation&); // Not implemented
-  void operator=(const vtkPVHistogramChartRepresentation&); // Not implemented
+  vtkPVHistogramChartRepresentation(const vtkPVHistogramChartRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVHistogramChartRepresentation&) VTK_DELETE_FUNCTION;
 
   std::string ArrayName;
   int AttributeType;

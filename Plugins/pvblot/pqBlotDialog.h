@@ -55,8 +55,8 @@ protected slots:
   virtual void open(const QStringList &filenames);
 
 private:
-  pqBlotDialog(const pqBlotDialog &);   // Not implemented
-  void operator=(const pqBlotDialog &); // Not implemented
+  pqBlotDialog(const pqBlotDialog &) VTK_DELETE_FUNCTION;
+  void operator=(const pqBlotDialog &) VTK_DELETE_FUNCTION;
 
   class UI;
   UI *ui;

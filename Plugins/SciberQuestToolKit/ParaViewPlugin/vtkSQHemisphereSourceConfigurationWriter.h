@@ -62,8 +62,8 @@ protected:
   ~vtkSQHemisphereSourceConfigurationWriter();
 
 private:
-  vtkSQHemisphereSourceConfigurationWriter(const vtkSQHemisphereSourceConfigurationWriter&);  // Not implemented.
-  void operator=(const vtkSQHemisphereSourceConfigurationWriter&);  // Not implemented.
+  vtkSQHemisphereSourceConfigurationWriter(const vtkSQHemisphereSourceConfigurationWriter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQHemisphereSourceConfigurationWriter&) VTK_DELETE_FUNCTION;
 };
 
 #endif

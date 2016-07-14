@@ -53,8 +53,8 @@ public:
                           vtkInformationVector*);
 
 private:
-  vtkPVAMRDualClip(const vtkPVAMRDualClip&);  // Not implemented.
-  void operator=(const vtkPVAMRDualClip&);    // Not implemented.
+  vtkPVAMRDualClip(const vtkPVAMRDualClip&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVAMRDualClip&) VTK_DELETE_FUNCTION;
 
 protected:
 

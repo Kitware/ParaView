@@ -63,8 +63,8 @@ protected:
   double Time;
   int TimeAxisMode;
 private:
-  vtkPVPlotTime(const vtkPVPlotTime&); // Not implemented
-  void operator=(const vtkPVPlotTime&); // Not implemented
+  vtkPVPlotTime(const vtkPVPlotTime&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVPlotTime&) VTK_DELETE_FUNCTION;
 
 };
 

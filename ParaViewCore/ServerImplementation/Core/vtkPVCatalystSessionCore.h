@@ -58,8 +58,8 @@ protected:
   ~vtkPVCatalystSessionCore();
 
 private:
-  vtkPVCatalystSessionCore(const vtkPVCatalystSessionCore&); // Not implemented
-  void operator=(const vtkPVCatalystSessionCore&);   // Not implemented
+  vtkPVCatalystSessionCore(const vtkPVCatalystSessionCore&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVCatalystSessionCore&) VTK_DELETE_FUNCTION;
 
   class vtkInternal;
   vtkInternal* CatalystInternal;

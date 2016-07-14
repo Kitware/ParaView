@@ -79,8 +79,8 @@ protected:
   QPointer<pqFileDialogModel> FileDialogModel;
 
 private:
-  pqFileDialogRecentDirsModel(const pqFileDialogRecentDirsModel&); // Not implemented.
-  void operator=(const pqFileDialogRecentDirsModel&); // Not implemented.
+  pqFileDialogRecentDirsModel(const pqFileDialogRecentDirsModel&) VTK_DELETE_FUNCTION;
+  void operator=(const pqFileDialogRecentDirsModel&) VTK_DELETE_FUNCTION;
 };
 
 #endif

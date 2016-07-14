@@ -60,8 +60,8 @@ protected:
   ~vtkPVTestUtilities(){ this->Initialize(0,0); }
 
 private:
-  vtkPVTestUtilities(const vtkPVTestUtilities &); // Not implemented
-  void operator=(const vtkPVTestUtilities &); // Not implemented
+  vtkPVTestUtilities(const vtkPVTestUtilities &) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVTestUtilities &) VTK_DELETE_FUNCTION;
   ///
   char GetPathSep();
   char *GetDataRoot();

@@ -86,8 +86,8 @@ protected:
   unsigned long FramesPerTimestep;
   unsigned long Count;
 private:
-  vtkTimestepsAnimationPlayer(const vtkTimestepsAnimationPlayer&); // Not implemented.
-  void operator=(const vtkTimestepsAnimationPlayer&); // Not implemented.
+  vtkTimestepsAnimationPlayer(const vtkTimestepsAnimationPlayer&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkTimestepsAnimationPlayer&) VTK_DELETE_FUNCTION;
 
   vtkTimestepsAnimationPlayerSetOfDouble* TimeSteps;
 };

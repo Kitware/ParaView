@@ -62,8 +62,8 @@ protected:
                          vtkInformationVector* outputVector);
 
 private:
-  vtkNetworkImageSource(const vtkNetworkImageSource&); // Not implemented.
-  void operator=(const vtkNetworkImageSource&); // Not implemented.
+  vtkNetworkImageSource(const vtkNetworkImageSource&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkNetworkImageSource&) VTK_DELETE_FUNCTION;
 };
 
 #endif

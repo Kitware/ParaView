@@ -145,8 +145,8 @@ protected:
   vtkBoundingBox DataBounds;
 
 private:
-  vtkAMROutlineRepresentation(const vtkAMROutlineRepresentation&); // Not implemented
-  void operator=(const vtkAMROutlineRepresentation&); // Not implemented
+  vtkAMROutlineRepresentation(const vtkAMROutlineRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkAMROutlineRepresentation&) VTK_DELETE_FUNCTION;
 
   // Description:
   // This flag is set to true if the input pipeline is streaming capable in

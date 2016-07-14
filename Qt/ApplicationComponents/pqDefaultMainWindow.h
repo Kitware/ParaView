@@ -43,8 +43,8 @@ public:
   ~pqDefaultMainWindow();
 
 private:
-  pqDefaultMainWindow(const pqDefaultMainWindow&); // Not implemented.
-  void operator=(const pqDefaultMainWindow&); // Not implemented.
+  pqDefaultMainWindow(const pqDefaultMainWindow&) VTK_DELETE_FUNCTION;
+  void operator=(const pqDefaultMainWindow&) VTK_DELETE_FUNCTION;
 
   class pqInternals;
   pqInternals* Internals;

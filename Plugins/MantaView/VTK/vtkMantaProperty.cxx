@@ -118,8 +118,8 @@ public:
   static int GlobalCntr;
 
 private:
-  vtkMantaPropertyThreadCache(const vtkMantaPropertyThreadCache&);  // Not implemented.
-  void operator=(const vtkMantaPropertyThreadCache&);  // Not implemented.
+  vtkMantaPropertyThreadCache(const vtkMantaPropertyThreadCache&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMantaPropertyThreadCache&) VTK_DELETE_FUNCTION;
 };
 
 int vtkMantaPropertyThreadCache::GlobalCntr = 0;

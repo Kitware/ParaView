@@ -120,8 +120,8 @@ protected:
   // attribute "skip_plotable_check".
   bool SkipPlotableCheck;
 private:
-  vtkSMContextViewProxy(const vtkSMContextViewProxy&); // Not implemented
-  void operator=(const vtkSMContextViewProxy&); // Not implemented
+  vtkSMContextViewProxy(const vtkSMContextViewProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMContextViewProxy&) VTK_DELETE_FUNCTION;
 
   // Description:
   // Copies axis ranges from each of the vtkAxis on the vtkChartXY to the

@@ -89,8 +89,8 @@ private:
   class pqInternals;
   pqInternals* Internals;
 
-  pqTransferFunctionEditor(const pqTransferFunctionEditor&); // Not implemented.
-  void operator=(const pqTransferFunctionEditor&); // Not implemented.
+  pqTransferFunctionEditor(const pqTransferFunctionEditor&) VTK_DELETE_FUNCTION;
+  void operator=(const pqTransferFunctionEditor&) VTK_DELETE_FUNCTION;
 };
 
 #endif

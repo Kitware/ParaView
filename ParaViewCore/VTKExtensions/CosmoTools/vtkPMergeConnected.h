@@ -53,8 +53,8 @@ protected:
   int FillOutputPortInformation(int port, vtkInformation* info);
 
 private:
-  vtkPMergeConnected(const vtkPMergeConnected&);  // Not implemented.
-  void operator=(const vtkPMergeConnected&);  // Not implemented.
+  vtkPMergeConnected(const vtkPMergeConnected&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPMergeConnected&) VTK_DELETE_FUNCTION;
 
   //parallelism
   int NumProcesses;

@@ -78,8 +78,8 @@ protected:
   bool EnableServerSideRendering;
 
 private:
-  vtkChartSelectionRepresentation(const vtkChartSelectionRepresentation&); // Not implemented
-  void operator=(const vtkChartSelectionRepresentation&); // Not implemented
+  vtkChartSelectionRepresentation(const vtkChartSelectionRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkChartSelectionRepresentation&) VTK_DELETE_FUNCTION;
 
 };
 

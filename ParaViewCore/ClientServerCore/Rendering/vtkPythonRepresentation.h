@@ -98,8 +98,8 @@ protected:
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
 private:
-  vtkPythonRepresentation(const vtkPythonRepresentation&); // Not implemented
-  void operator=(const vtkPythonRepresentation&); // Not implemented
+  vtkPythonRepresentation(const vtkPythonRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPythonRepresentation&) VTK_DELETE_FUNCTION;
 
   // Description:
   // Local input for each processor.

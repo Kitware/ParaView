@@ -87,8 +87,8 @@ public:
 protected:
 
 private:
-  MantaView(const MantaView&); // Not implemented.
-  void operator=(const MantaView&); // Not implemented.
+  MantaView(const MantaView&) VTK_DELETE_FUNCTION;
+  void operator=(const MantaView&) VTK_DELETE_FUNCTION;
 
 };
 

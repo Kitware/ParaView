@@ -77,8 +77,8 @@ private:
   QString WritersMenuName;
   QString ObjectMenuName;
 
-  pqSGWritersMenuManager(const pqSGWritersMenuManager&); // Not implemented.
-  void operator=(const pqSGWritersMenuManager&); // Not implemented.
+  pqSGWritersMenuManager(const pqSGWritersMenuManager&) VTK_DELETE_FUNCTION;
+  void operator=(const pqSGWritersMenuManager&) VTK_DELETE_FUNCTION;
 
   QTimer Timer;
 };

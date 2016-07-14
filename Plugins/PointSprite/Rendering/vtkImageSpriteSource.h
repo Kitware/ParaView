@@ -89,8 +89,8 @@ protected:
   virtual int RequestInformation (vtkInformation *, vtkInformationVector**, vtkInformationVector *);
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 private:
-  vtkImageSpriteSource(const vtkImageSpriteSource&);  // Not implemented.
-  void operator=(const vtkImageSpriteSource&);  // Not implemented.
+  vtkImageSpriteSource(const vtkImageSpriteSource&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkImageSpriteSource&) VTK_DELETE_FUNCTION;
 };
 
 

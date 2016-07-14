@@ -44,8 +44,8 @@ protected:
 
   int ZoomPosition[2];
 
-  vtkPVTrackballZoomToMouse(const vtkPVTrackballZoomToMouse&); // Not implemented
-  void operator=(const vtkPVTrackballZoomToMouse&); // Not implemented
+  vtkPVTrackballZoomToMouse(const vtkPVTrackballZoomToMouse&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVTrackballZoomToMouse&) VTK_DELETE_FUNCTION;
 };
 
 #endif

@@ -82,8 +82,8 @@ public:
 public:
   vtkTypeMacro(vtkSQCellGenerator, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
-  vtkSQCellGenerator(const vtkSQCellGenerator&); // Not implemented
-  void operator=(const vtkSQCellGenerator&); // Not implemented
+  vtkSQCellGenerator(const vtkSQCellGenerator&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQCellGenerator&) VTK_DELETE_FUNCTION;
 
 
 protected:

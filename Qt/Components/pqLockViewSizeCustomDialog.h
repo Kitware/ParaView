@@ -59,8 +59,8 @@ public slots:
   virtual void unlock();
 
 private:
-  pqLockViewSizeCustomDialog(const pqLockViewSizeCustomDialog &); // Not implemented
-  void operator=(const pqLockViewSizeCustomDialog &);   // Not implemented
+  pqLockViewSizeCustomDialog(const pqLockViewSizeCustomDialog &) VTK_DELETE_FUNCTION;
+  void operator=(const pqLockViewSizeCustomDialog &) VTK_DELETE_FUNCTION;
 
   class pqUI;
   pqUI *ui;

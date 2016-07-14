@@ -38,8 +38,8 @@ protected:
   ~vtkViewLayout();
 
 private:
-  vtkViewLayout(const vtkViewLayout&); // Not implemented
-  void operator=(const vtkViewLayout&); // Not implemented
+  vtkViewLayout(const vtkViewLayout&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkViewLayout&) VTK_DELETE_FUNCTION;
 
 };
 

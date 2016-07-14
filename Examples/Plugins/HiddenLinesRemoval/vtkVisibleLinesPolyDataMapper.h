@@ -33,8 +33,8 @@ protected:
   ~vtkVisibleLinesPolyDataMapper();
 
 private:
-  vtkVisibleLinesPolyDataMapper(const vtkVisibleLinesPolyDataMapper&); // Not implemented
-  void operator=(const vtkVisibleLinesPolyDataMapper&); // Not implemented
+  vtkVisibleLinesPolyDataMapper(const vtkVisibleLinesPolyDataMapper&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkVisibleLinesPolyDataMapper&) VTK_DELETE_FUNCTION;
 
 };
 

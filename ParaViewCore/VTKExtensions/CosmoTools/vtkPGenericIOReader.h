@@ -289,8 +289,8 @@ protected:
   int RequestInfoCounter;
   int RequestDataCounter;
 private:
-  vtkPGenericIOReader(const vtkPGenericIOReader&); // Not implemented.
-  void operator=(const vtkPGenericIOReader&); // Not implemented.
+  vtkPGenericIOReader(const vtkPGenericIOReader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPGenericIOReader&) VTK_DELETE_FUNCTION;
 };
 
 #endif /* vtkPGenericIOReader_h */

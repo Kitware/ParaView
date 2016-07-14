@@ -87,8 +87,8 @@ protected:
   virtual double GoToNext(double start, double end, double currenttime)=0;
   virtual double GoToPrevious(double start, double end, double currenttime)=0;
 private:
-  vtkAnimationPlayer(const vtkAnimationPlayer&); // Not implemented
-  void operator=(const vtkAnimationPlayer&); // Not implemented
+  vtkAnimationPlayer(const vtkAnimationPlayer&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkAnimationPlayer&) VTK_DELETE_FUNCTION;
 
   vtkWeakPointer<vtkSMAnimationScene> AnimationScene;
   bool InPlay;

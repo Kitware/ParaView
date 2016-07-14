@@ -92,8 +92,8 @@ protected:
                           vtkInformationVector *outputVector);
 
 private:
-  vtkMomentVectors(const vtkMomentVectors &);       // Not implemented
-  void operator=(const vtkMomentVectors &);         // Not implemented
+  vtkMomentVectors(const vtkMomentVectors &) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMomentVectors &) VTK_DELETE_FUNCTION;
 };
 
 #endif //vtkMomentVectors_h

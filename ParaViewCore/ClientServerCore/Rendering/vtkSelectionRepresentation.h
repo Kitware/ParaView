@@ -125,8 +125,8 @@ protected:
   vtkDataLabelRepresentation* LabelRepresentation;
 
 private:
-  vtkSelectionRepresentation(const vtkSelectionRepresentation&); // Not implemented
-  void operator=(const vtkSelectionRepresentation&); // Not implemented
+  vtkSelectionRepresentation(const vtkSelectionRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSelectionRepresentation&) VTK_DELETE_FUNCTION;
 
 };
 

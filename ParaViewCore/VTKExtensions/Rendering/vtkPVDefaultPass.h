@@ -40,8 +40,8 @@ protected:
   ~vtkPVDefaultPass();
 
 private:
-  vtkPVDefaultPass(const vtkPVDefaultPass&); // Not implemented
-  void operator=(const vtkPVDefaultPass&); // Not implemented
+  vtkPVDefaultPass(const vtkPVDefaultPass&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVDefaultPass&) VTK_DELETE_FUNCTION;
 
 };
 

@@ -248,8 +248,8 @@ protected:
   class vtkInternals;
   vtkInternals* Internal;
 private:
-  vtkPANLHaloFinder(const vtkPANLHaloFinder&); // Not implemented
-  void operator=(const vtkPANLHaloFinder&); // Not implemented
+  vtkPANLHaloFinder(const vtkPANLHaloFinder&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPANLHaloFinder&) VTK_DELETE_FUNCTION;
 
   void ExtractDataArrays(vtkUnstructuredGrid* input, vtkIdType offset);
   void DistributeInput();

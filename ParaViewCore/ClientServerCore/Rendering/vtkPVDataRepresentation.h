@@ -188,8 +188,8 @@ protected:
   bool UpdateTimeValid;
   unsigned int UniqueIdentifier;
 private:
-  vtkPVDataRepresentation(const vtkPVDataRepresentation&); // Not implemented
-  void operator=(const vtkPVDataRepresentation&); // Not implemented
+  vtkPVDataRepresentation(const vtkPVDataRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVDataRepresentation&) VTK_DELETE_FUNCTION;
 
   bool Visibility;
   bool ForceUseCache;

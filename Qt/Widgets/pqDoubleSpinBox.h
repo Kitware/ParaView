@@ -49,8 +49,8 @@ public:
   virtual void stepBy(int steps);
 
 private:
-  pqDoubleSpinBox(const pqDoubleSpinBox&); // Not implemented.
-  void operator=(const pqDoubleSpinBox&); // Not implemented.
+  pqDoubleSpinBox(const pqDoubleSpinBox&) VTK_DELETE_FUNCTION;
+  void operator=(const pqDoubleSpinBox&) VTK_DELETE_FUNCTION;
 };
 
 #endif

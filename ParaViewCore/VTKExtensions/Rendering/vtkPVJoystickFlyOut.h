@@ -35,8 +35,8 @@ protected:
   ~vtkPVJoystickFlyOut();
 
 private:
-  vtkPVJoystickFlyOut(const vtkPVJoystickFlyOut&); // Not implemented
-  void operator=(const vtkPVJoystickFlyOut&); // Not implemented
+  vtkPVJoystickFlyOut(const vtkPVJoystickFlyOut&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVJoystickFlyOut&) VTK_DELETE_FUNCTION;
 };
 
 #endif

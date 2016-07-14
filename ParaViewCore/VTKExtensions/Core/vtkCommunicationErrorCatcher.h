@@ -54,8 +54,8 @@ public:
     { return this->ErrorMessages; }
 
 private:
-  vtkCommunicationErrorCatcher(const vtkCommunicationErrorCatcher&); // Not implemented
-  void operator=(const vtkCommunicationErrorCatcher&); // Not implemented
+  vtkCommunicationErrorCatcher(const vtkCommunicationErrorCatcher&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCommunicationErrorCatcher&) VTK_DELETE_FUNCTION;
 
   void Initialize();
   void OnErrorEvent(vtkObject* caller, unsigned long eventid, void* calldata);

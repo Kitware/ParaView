@@ -140,8 +140,8 @@ protected:
   vtkFastMarchingGeodesicDistance *Geodesic;
 
 private:
-  vtkFastMarchingGeodesicPath(const vtkFastMarchingGeodesicPath&); // Not implemented.
-  void operator=(const vtkFastMarchingGeodesicPath&);  // Not implemented.
+  vtkFastMarchingGeodesicPath(const vtkFastMarchingGeodesicPath&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkFastMarchingGeodesicPath&) VTK_DELETE_FUNCTION;
 };
 
 #endif

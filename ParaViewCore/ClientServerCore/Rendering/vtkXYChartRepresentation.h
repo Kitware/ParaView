@@ -132,8 +132,8 @@ protected:
   vtkInternals* Internals;
 
 private:
-  vtkXYChartRepresentation(const vtkXYChartRepresentation&); // Not implemented
-  void operator=(const vtkXYChartRepresentation&); // Not implemented
+  vtkXYChartRepresentation(const vtkXYChartRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkXYChartRepresentation&) VTK_DELETE_FUNCTION;
 
   int ChartType;
   char* XAxisSeriesName;

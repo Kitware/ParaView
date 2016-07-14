@@ -130,8 +130,8 @@ private:
   int LogLevel;
 
 private:
-  vtkSQImageGhosts(const vtkSQImageGhosts &); // Not implemented
-  void operator=(const vtkSQImageGhosts &); // Not implemented
+  vtkSQImageGhosts(const vtkSQImageGhosts &) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQImageGhosts &) VTK_DELETE_FUNCTION;
 };
 
 #endif

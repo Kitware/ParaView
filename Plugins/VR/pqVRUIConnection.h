@@ -193,8 +193,8 @@ protected:
   pqInternals* Internals;
 
 private:
-  pqVRUIConnection(const pqVRUIConnection&); // Not implemented.
-  void operator=(const pqVRUIConnection&); // Not implemented.
+  pqVRUIConnection(const pqVRUIConnection&) VTK_DELETE_FUNCTION;
+  void operator=(const pqVRUIConnection&) VTK_DELETE_FUNCTION;
 };
 
 #endif

@@ -84,8 +84,8 @@ protected:
   bool UpdatingSelection;
 
 private:
-  pqSpreadSheetViewSelectionModel(const pqSpreadSheetViewSelectionModel&); // Not implemented.
-  void operator=(const pqSpreadSheetViewSelectionModel&); // Not implemented.
+  pqSpreadSheetViewSelectionModel(const pqSpreadSheetViewSelectionModel&) VTK_DELETE_FUNCTION;
+  void operator=(const pqSpreadSheetViewSelectionModel&) VTK_DELETE_FUNCTION;
 
   class pqInternal;
   pqInternal* Internal;

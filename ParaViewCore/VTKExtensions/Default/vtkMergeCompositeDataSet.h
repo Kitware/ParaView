@@ -48,8 +48,8 @@ protected:
   virtual int FillInputPortInformation(int, vtkInformation *);
 
 private:
-  vtkMergeCompositeDataSet(const vtkMergeCompositeDataSet &); // Not implemented
-  void operator=(const vtkMergeCompositeDataSet &);    // Not implemented
+  vtkMergeCompositeDataSet(const vtkMergeCompositeDataSet &) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMergeCompositeDataSet &) VTK_DELETE_FUNCTION;
 };
 
 #endif //vtkMergeCompositeDataSet_h

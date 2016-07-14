@@ -435,8 +435,8 @@ protected:
   
 private:
   vtkRectilinearGridConnectivity
-                  ( const vtkRectilinearGridConnectivity & );  // Not implemented.
-  void operator = ( const vtkRectilinearGridConnectivity & );  // Not implemented.
+                  ( const vtkRectilinearGridConnectivity & ) VTK_DELETE_FUNCTION;
+  void operator = ( const vtkRectilinearGridConnectivity & ) VTK_DELETE_FUNCTION;
 };
 
 #endif

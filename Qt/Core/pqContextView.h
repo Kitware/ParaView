@@ -96,8 +96,8 @@ protected:
   command* Command;
 
 private:
-  pqContextView(const pqContextView&); // Not implemented.
-  void operator=(const pqContextView&); // Not implemented.
+  pqContextView(const pqContextView&) VTK_DELETE_FUNCTION;
+  void operator=(const pqContextView&) VTK_DELETE_FUNCTION;
 
   class pqInternal;
   pqInternal* Internal;

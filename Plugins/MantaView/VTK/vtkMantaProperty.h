@@ -154,8 +154,8 @@ protected:
   ~vtkMantaProperty();
 
 private:
-  vtkMantaProperty(const vtkMantaProperty&);  // Not implemented.
-  void operator=(const vtkMantaProperty&);  // Not implemented.
+  vtkMantaProperty(const vtkMantaProperty&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMantaProperty&) VTK_DELETE_FUNCTION;
 
   // the last time MantaMaterial is modified
   vtkTimeStamp MantaMaterialMTime;

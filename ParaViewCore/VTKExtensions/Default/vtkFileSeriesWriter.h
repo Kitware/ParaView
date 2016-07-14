@@ -90,8 +90,8 @@ protected:
                   vtkInformationVector* outputVector);
 
 private:
-  vtkFileSeriesWriter(const vtkFileSeriesWriter&); // Not implemented.
-  void operator=(const vtkFileSeriesWriter&); // Not implemented.
+  vtkFileSeriesWriter(const vtkFileSeriesWriter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkFileSeriesWriter&) VTK_DELETE_FUNCTION;
   
   void SetWriterFileName(const char* fname);
   void WriteATimestep(vtkDataObject*, vtkInformation* inInfo);

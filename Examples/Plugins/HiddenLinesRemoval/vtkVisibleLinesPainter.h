@@ -59,8 +59,8 @@ protected:
   bool CanRender(vtkRenderer*, vtkActor*);
 
 private:
-  vtkVisibleLinesPainter(const vtkVisibleLinesPainter&); // Not implemented.
-  void operator=(const vtkVisibleLinesPainter&); // Not implemented.
+  vtkVisibleLinesPainter(const vtkVisibleLinesPainter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkVisibleLinesPainter&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;

@@ -200,8 +200,8 @@ protected:
   void FinalizeCopyAttributes(vtkDataSet* mesh);
 
 private:
-  vtkAMRDualContour(const vtkAMRDualContour&);  // Not implemented.
-  void operator=(const vtkAMRDualContour&);  // Not implemented.
+  vtkAMRDualContour(const vtkAMRDualContour&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkAMRDualContour&) VTK_DELETE_FUNCTION;
 
 };
 

@@ -69,8 +69,8 @@ protected:
   /// Given the user entered text, update the GUI.
   void updateSearch();
 private:
-  pqQuickLaunchDialog(const pqQuickLaunchDialog&); // Not implemented.
-  void operator=(const pqQuickLaunchDialog&); // Not implemented.
+  pqQuickLaunchDialog(const pqQuickLaunchDialog&) VTK_DELETE_FUNCTION;
+  void operator=(const pqQuickLaunchDialog&) VTK_DELETE_FUNCTION;
 
   class pqInternal;
   pqInternal *Internal;

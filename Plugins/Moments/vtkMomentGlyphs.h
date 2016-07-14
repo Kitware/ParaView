@@ -88,8 +88,8 @@ protected:
                                                   vtkDataArray *inputArray);
 
 private:
-  vtkMomentGlyphs(const vtkMomentGlyphs &);         // Not implemented
-  void operator=(const vtkMomentGlyphs &);          // Not implemented
+  vtkMomentGlyphs(const vtkMomentGlyphs &) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMomentGlyphs &) VTK_DELETE_FUNCTION;
 };
 
 #endif //vtkMomentGlyphs_h

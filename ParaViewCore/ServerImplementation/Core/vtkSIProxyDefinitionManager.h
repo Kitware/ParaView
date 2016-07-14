@@ -285,8 +285,8 @@ protected:
   void InvokeCustomDefitionsUpdated();
 
 private:
-  vtkSIProxyDefinitionManager(const vtkSIProxyDefinitionManager&); // Not implemented
-  void operator=(const vtkSIProxyDefinitionManager&); // Not implemented
+  vtkSIProxyDefinitionManager(const vtkSIProxyDefinitionManager&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSIProxyDefinitionManager&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;

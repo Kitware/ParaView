@@ -84,8 +84,8 @@ protected:
   vtkMultiProcessController* Controller;
 
 private:
-  vtkAMRStreamingPriorityQueue(const vtkAMRStreamingPriorityQueue&); // Not implemented
-  void operator=(const vtkAMRStreamingPriorityQueue&); // Not implemented
+  vtkAMRStreamingPriorityQueue(const vtkAMRStreamingPriorityQueue&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkAMRStreamingPriorityQueue&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;

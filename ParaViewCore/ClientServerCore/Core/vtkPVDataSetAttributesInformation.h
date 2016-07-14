@@ -101,8 +101,8 @@ protected:
   int FieldAssociation;
 
 private:
-  vtkPVDataSetAttributesInformation(const vtkPVDataSetAttributesInformation&); // Not implemented
-  void operator=(const vtkPVDataSetAttributesInformation&); // Not implemented
+  vtkPVDataSetAttributesInformation(const vtkPVDataSetAttributesInformation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVDataSetAttributesInformation&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;

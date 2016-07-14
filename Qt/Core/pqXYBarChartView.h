@@ -60,8 +60,8 @@ public:
   virtual ~pqXYBarChartView();
 
 private:
-  pqXYBarChartView(const pqXYBarChartView&); // Not implemented.
-  void operator=(const pqXYBarChartView&); // Not implemented.
+  pqXYBarChartView(const pqXYBarChartView&) VTK_DELETE_FUNCTION;
+  void operator=(const pqXYBarChartView&) VTK_DELETE_FUNCTION;
 };
 
 #endif

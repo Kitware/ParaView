@@ -69,8 +69,8 @@ signals:
   void currentProxyChanged(vtkSMProxy*);
 
 private:
-  pqAnimatableProxyComboBox(const pqAnimatableProxyComboBox&); // Not implemented.
-  void operator=(const pqAnimatableProxyComboBox&); // Not implemented.
+  pqAnimatableProxyComboBox(const pqAnimatableProxyComboBox&) VTK_DELETE_FUNCTION;
+  void operator=(const pqAnimatableProxyComboBox&) VTK_DELETE_FUNCTION;
 };
 
 #endif

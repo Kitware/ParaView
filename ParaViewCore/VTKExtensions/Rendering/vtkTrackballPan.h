@@ -47,8 +47,8 @@ protected:
   vtkTrackballPan();
   ~vtkTrackballPan();
 
-  vtkTrackballPan(const vtkTrackballPan&); // Not implemented
-  void operator=(const vtkTrackballPan&); // Not implemented
+  vtkTrackballPan(const vtkTrackballPan&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkTrackballPan&) VTK_DELETE_FUNCTION;
 };
 
 #endif

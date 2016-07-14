@@ -74,8 +74,8 @@ protected:
   vtkWeakPointer<vtkSMSessionProxyManager> SessionProxyManager;
 
 private:
-  vtkSMDeserializer(const vtkSMDeserializer&); // Not implemented
-  void operator=(const vtkSMDeserializer&); // Not implemented
+  vtkSMDeserializer(const vtkSMDeserializer&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMDeserializer&) VTK_DELETE_FUNCTION;
 
 };
 

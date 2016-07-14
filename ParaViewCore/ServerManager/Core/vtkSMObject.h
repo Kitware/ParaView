@@ -37,8 +37,8 @@ protected:
   ~vtkSMObject();
 
 private:
-  vtkSMObject(const vtkSMObject&); // Not implemented
-  void operator=(const vtkSMObject&); // Not implemented
+  vtkSMObject(const vtkSMObject&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMObject&) VTK_DELETE_FUNCTION;
 };
 
 #endif

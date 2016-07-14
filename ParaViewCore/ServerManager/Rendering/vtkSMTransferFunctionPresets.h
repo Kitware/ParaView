@@ -127,8 +127,8 @@ protected:
   ~vtkSMTransferFunctionPresets();
 
 private:
-  vtkSMTransferFunctionPresets(const vtkSMTransferFunctionPresets&); // Not implemented
-  void operator=(const vtkSMTransferFunctionPresets&); // Not implemented
+  vtkSMTransferFunctionPresets(const vtkSMTransferFunctionPresets&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMTransferFunctionPresets&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;

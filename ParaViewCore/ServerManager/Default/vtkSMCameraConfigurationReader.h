@@ -65,8 +65,8 @@ protected:
   void SetProxy(vtkSMProxy *){ vtkErrorMacro("Use SetRenderViewProxy."); }
 
 private:
-  vtkSMCameraConfigurationReader(const vtkSMCameraConfigurationReader&);  // Not implemented.
-  void operator=(const vtkSMCameraConfigurationReader&);  // Not implemented.
+  vtkSMCameraConfigurationReader(const vtkSMCameraConfigurationReader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMCameraConfigurationReader&) VTK_DELETE_FUNCTION;
 };
 
 #endif

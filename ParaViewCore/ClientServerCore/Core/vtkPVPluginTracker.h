@@ -107,8 +107,8 @@ protected:
   ~vtkPVPluginTracker();
 
 private:
-  vtkPVPluginTracker(const vtkPVPluginTracker&); // Not implemented
-  void operator=(const vtkPVPluginTracker&); // Not implemented
+  vtkPVPluginTracker(const vtkPVPluginTracker&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVPluginTracker&) VTK_DELETE_FUNCTION;
 
   class vtkPluginsList;
   vtkPluginsList* PluginsList;

@@ -80,8 +80,8 @@ protected:
   bool AllowCaching;
 
 private: 
-  pqPythonView(const pqPythonView&); // Not implemented.
-  void operator=(const pqPythonView&); // Not implemented.
+  pqPythonView(const pqPythonView&) VTK_DELETE_FUNCTION;
+  void operator=(const pqPythonView&) VTK_DELETE_FUNCTION;
 
   class pqInternal;
   pqInternal* Internal;

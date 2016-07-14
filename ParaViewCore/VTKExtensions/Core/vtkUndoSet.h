@@ -83,8 +83,8 @@ protected:
   vtkCollection* Collection;
   vtkCollection* TmpWorkingCollection;
 private:
-  vtkUndoSet(const vtkUndoSet&); // Not implemented.
-  void operator=(const vtkUndoSet&); // Not implemented.
+  vtkUndoSet(const vtkUndoSet&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkUndoSet&) VTK_DELETE_FUNCTION;
 };
 
 

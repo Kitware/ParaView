@@ -74,8 +74,8 @@ protected:
   vtkIdType SILTimeStamp;
 
 private:
-  vtkSMSILDomain(const vtkSMSILDomain&); // Not implemented
-  void operator=(const vtkSMSILDomain&); // Not implemented
+  vtkSMSILDomain(const vtkSMSILDomain&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMSILDomain&) VTK_DELETE_FUNCTION;
 
 };
 

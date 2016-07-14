@@ -71,8 +71,8 @@ protected:
   virtual ~vtkSQVolumeSourceConfigurationReader();
 
 private:
-  vtkSQVolumeSourceConfigurationReader(const vtkSQVolumeSourceConfigurationReader&);  // Not implemented.
-  void operator=(const vtkSQVolumeSourceConfigurationReader&);  // Not implemented.
+  vtkSQVolumeSourceConfigurationReader(const vtkSQVolumeSourceConfigurationReader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQVolumeSourceConfigurationReader&) VTK_DELETE_FUNCTION;
 };
 
 #endif

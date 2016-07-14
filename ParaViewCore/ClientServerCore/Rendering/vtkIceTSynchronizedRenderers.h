@@ -153,8 +153,8 @@ protected:
   vtkImageProcessingPass *ImageProcessingPass;
 
 private:
-  vtkIceTSynchronizedRenderers(const vtkIceTSynchronizedRenderers&); // Not implemented
-  void operator=(const vtkIceTSynchronizedRenderers&); // Not implemented
+  vtkIceTSynchronizedRenderers(const vtkIceTSynchronizedRenderers&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkIceTSynchronizedRenderers&) VTK_DELETE_FUNCTION;
 
 };
 

@@ -83,8 +83,8 @@ protected:
   friend class vtkPVAnimationCue;
 
 private:
-  vtkPVCueManipulator(const vtkPVCueManipulator&); // Not implemented.
-  void operator=(const vtkPVCueManipulator&); // Not implemented.
+  vtkPVCueManipulator(const vtkPVCueManipulator&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVCueManipulator&) VTK_DELETE_FUNCTION;
 
 };
 

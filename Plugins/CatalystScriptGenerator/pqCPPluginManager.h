@@ -51,8 +51,8 @@ public:
   virtual const char* getObjectMenuName();
 
 private:
-  pqCPPluginManager(const pqCPPluginManager&); // Not implemented.
-  void operator=(const pqCPPluginManager&); // Not implemented.
+  pqCPPluginManager(const pqCPPluginManager&) VTK_DELETE_FUNCTION;
+  void operator=(const pqCPPluginManager&) VTK_DELETE_FUNCTION;
 };
 
 #endif

@@ -68,8 +68,8 @@ protected:
   double Scale;
 
 private:
-  vtkTimeToTextConvertor(const vtkTimeToTextConvertor&); // Not implemented
-  void operator=(const vtkTimeToTextConvertor&); // Not implemented
+  vtkTimeToTextConvertor(const vtkTimeToTextConvertor&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkTimeToTextConvertor&) VTK_DELETE_FUNCTION;
 
 };
 

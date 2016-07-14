@@ -141,8 +141,8 @@ protected:
     this->onInputChanged();
     }
 private:
-  pqDataRepresentation(const pqDataRepresentation&); // Not implemented.
-  void operator=(const pqDataRepresentation&); // Not implemented.
+  pqDataRepresentation(const pqDataRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const pqDataRepresentation&) VTK_DELETE_FUNCTION;
 
   pqDataRepresentationInternal* Internal;
 };

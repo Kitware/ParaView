@@ -79,8 +79,8 @@ protected:
   int PropertyNameIndex;
 
 private:
-  vtkSMNamedPropertyIterator(const vtkSMNamedPropertyIterator&); // Not implemented
-  void operator=(const vtkSMNamedPropertyIterator&); // Not implemented
+  vtkSMNamedPropertyIterator(const vtkSMNamedPropertyIterator&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMNamedPropertyIterator&) VTK_DELETE_FUNCTION;
 };
 
 #endif

@@ -40,8 +40,8 @@ protected:
   ~vtkPVRenderViewWithShadowMap();
 
 private:
-  vtkPVRenderViewWithShadowMap(const vtkPVRenderViewWithShadowMap&); // Not implemented
-  void operator=(const vtkPVRenderViewWithShadowMap&); // Not implemented
+  vtkPVRenderViewWithShadowMap(const vtkPVRenderViewWithShadowMap&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVRenderViewWithShadowMap&) VTK_DELETE_FUNCTION;
 
 };
 

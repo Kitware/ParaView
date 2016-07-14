@@ -40,8 +40,8 @@ protected:
   virtual bool Pull(vtkSMMessage*);
 
 private:
-  vtkSITimeRangeProperty(const vtkSITimeRangeProperty&); // Not implemented
-  void operator=(const vtkSITimeRangeProperty&); // Not implemented
+  vtkSITimeRangeProperty(const vtkSITimeRangeProperty&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSITimeRangeProperty&) VTK_DELETE_FUNCTION;
 
 };
 

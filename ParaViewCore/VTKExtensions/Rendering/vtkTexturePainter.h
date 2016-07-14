@@ -178,8 +178,8 @@ protected:
 
   vtkTimeStamp UpdateTime;
 private:
-  vtkTexturePainter(const vtkTexturePainter&); // Not implemented.
-  void operator=(const vtkTexturePainter&); // Not implemented.
+  vtkTexturePainter(const vtkTexturePainter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkTexturePainter&) VTK_DELETE_FUNCTION;
 
 };
 

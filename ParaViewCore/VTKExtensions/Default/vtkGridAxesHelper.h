@@ -188,8 +188,8 @@ protected:
   unsigned long GetTransformedPointsMTime;
 
 private:
-  vtkGridAxesHelper(const vtkGridAxesHelper&); // Not implemented.
-  void operator=(const vtkGridAxesHelper&); // Not implemented.
+  vtkGridAxesHelper(const vtkGridAxesHelper&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkGridAxesHelper&) VTK_DELETE_FUNCTION;
 
 };
 

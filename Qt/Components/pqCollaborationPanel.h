@@ -101,8 +101,8 @@ protected:
   /// Promote a new master
   void promoteToMaster(int masterId);
 
-  pqCollaborationPanel(const pqCollaborationPanel&); // Not implemented.
-  void operator=(const pqCollaborationPanel&); // Not implemented.
+  pqCollaborationPanel(const pqCollaborationPanel&) VTK_DELETE_FUNCTION;
+  void operator=(const pqCollaborationPanel&) VTK_DELETE_FUNCTION;
 
   pqCollaborationManager* getCollaborationManager();
   vtkSMCollaborationManager* getSMCollaborationManager();

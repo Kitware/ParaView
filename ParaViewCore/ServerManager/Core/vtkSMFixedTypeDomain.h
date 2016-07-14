@@ -56,8 +56,8 @@ protected:
   ~vtkSMFixedTypeDomain();
 
 private:
-  vtkSMFixedTypeDomain(const vtkSMFixedTypeDomain&); // Not implemented
-  void operator=(const vtkSMFixedTypeDomain&); // Not implemented
+  vtkSMFixedTypeDomain(const vtkSMFixedTypeDomain&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMFixedTypeDomain&) VTK_DELETE_FUNCTION;
 };
 
 #endif

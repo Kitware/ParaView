@@ -53,8 +53,8 @@ public:
                           vtkInformationVector*);
 
 private:
-  vtkPVAMRDualContour(const vtkPVAMRDualContour&);  // Not implemented.
-  void operator=(const vtkPVAMRDualContour&);    // Not implemented.
+  vtkPVAMRDualContour(const vtkPVAMRDualContour&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVAMRDualContour&) VTK_DELETE_FUNCTION;
 
 protected:
   double VolumeFractionSurfaceValue;

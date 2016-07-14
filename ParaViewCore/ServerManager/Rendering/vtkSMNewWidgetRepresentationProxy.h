@@ -85,8 +85,8 @@ protected:
   void ProcessLinkedPropertyEvent(vtkSMProperty* controlledProperty, unsigned long event);
 private:
 
-  vtkSMNewWidgetRepresentationProxy(const vtkSMNewWidgetRepresentationProxy&); // Not implemented
-  void operator=(const vtkSMNewWidgetRepresentationProxy&); // Not implemented
+  vtkSMNewWidgetRepresentationProxy(const vtkSMNewWidgetRepresentationProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMNewWidgetRepresentationProxy&) VTK_DELETE_FUNCTION;
 
 };
 

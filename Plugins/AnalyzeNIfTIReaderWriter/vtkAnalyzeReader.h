@@ -72,8 +72,8 @@ protected:
   virtual void ExecuteDataWithInformation(vtkDataObject *out, vtkInformation* outInfo);
 
 private:
-  vtkAnalyzeReader(const vtkAnalyzeReader&);  // Not implemented.
-  void operator=(const vtkAnalyzeReader&);  // Not implemented.
+  vtkAnalyzeReader(const vtkAnalyzeReader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkAnalyzeReader&) VTK_DELETE_FUNCTION;
 
   void vtkAnalyzeReaderUpdateVTKBit(vtkImageData *data, void *outPtr);
 

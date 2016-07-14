@@ -70,8 +70,8 @@ protected:
   bool UseDataParititions;
   vtkTableExtentTranslator* TableExtentTranslator;
 private:
-  vtkStructuredGridVolumeRepresentation(const vtkStructuredGridVolumeRepresentation&); // Not implemented
-  void operator=(const vtkStructuredGridVolumeRepresentation&); // Not implemented
+  vtkStructuredGridVolumeRepresentation(const vtkStructuredGridVolumeRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkStructuredGridVolumeRepresentation&) VTK_DELETE_FUNCTION;
 
 };
 

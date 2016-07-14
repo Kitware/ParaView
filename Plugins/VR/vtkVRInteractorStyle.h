@@ -138,8 +138,8 @@ protected:
                            const vtkStdString &value);
 
 private:
-  vtkVRInteractorStyle(const vtkVRInteractorStyle&); // Not implemented.
-  void operator=(const vtkVRInteractorStyle&); // Not implemented.
+  vtkVRInteractorStyle(const vtkVRInteractorStyle&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkVRInteractorStyle&) VTK_DELETE_FUNCTION;
 };
 
 #endif

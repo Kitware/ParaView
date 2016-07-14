@@ -62,8 +62,8 @@ protected:
   class vtkInternals;
   vtkInternals* Internals;
 private:
-  vtkSessionIterator(const vtkSessionIterator&); // Not implemented
-  void operator=(const vtkSessionIterator&); // Not implemented
+  vtkSessionIterator(const vtkSessionIterator&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSessionIterator&) VTK_DELETE_FUNCTION;
 
 };
 

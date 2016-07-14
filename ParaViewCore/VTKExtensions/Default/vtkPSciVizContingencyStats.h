@@ -53,8 +53,8 @@ protected:
   virtual int AssessData( vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model );
 
 private:
-  vtkPSciVizContingencyStats( const vtkPSciVizContingencyStats& ); // Not implemented.
-  void operator = ( const vtkPSciVizContingencyStats& ); // Not implemented.
+  vtkPSciVizContingencyStats( const vtkPSciVizContingencyStats& ) VTK_DELETE_FUNCTION;
+  void operator = ( const vtkPSciVizContingencyStats& ) VTK_DELETE_FUNCTION;
 };
 
 #endif // vtkPSciVizContingencyStats_h

@@ -128,8 +128,8 @@ private:
   class pqInternal;
   pqInternal *Internal;
 
-  pqSierraPlotToolsManager(const pqSierraPlotToolsManager &);         // Not implemented
-  void operator=(const pqSierraPlotToolsManager &);        // Not implemented
+  pqSierraPlotToolsManager(const pqSierraPlotToolsManager &) VTK_DELETE_FUNCTION;
+  void operator=(const pqSierraPlotToolsManager &) VTK_DELETE_FUNCTION;
 };
 
 #endif //pqSierraPlotToolsManager_h

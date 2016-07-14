@@ -57,8 +57,8 @@ private slots:
   void onFinished(int);
 
 private:
-  pqColorDialogEventTranslator(const pqColorDialogEventTranslator&); // Not implemented.
-  void operator=(const pqColorDialogEventTranslator&); // Not implemented.
+  pqColorDialogEventTranslator(const pqColorDialogEventTranslator&) VTK_DELETE_FUNCTION;
+  void operator=(const pqColorDialogEventTranslator&) VTK_DELETE_FUNCTION;
 };
 
 #endif

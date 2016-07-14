@@ -184,8 +184,8 @@ protected:
   class vtkInternals;
   vtkInternals* Internal;
 private:
-  vtkPANLSubhaloFinder(const vtkPANLSubhaloFinder&); // Not implemented
-  void operator=(const vtkPANLSubhaloFinder&); // Not implemented
+  vtkPANLSubhaloFinder(const vtkPANLSubhaloFinder&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPANLSubhaloFinder&) VTK_DELETE_FUNCTION;
 
   void ExecuteSubHaloFinder(vtkUnstructuredGrid* input,
                             vtkUnstructuredGrid* allParticles,

@@ -97,8 +97,8 @@ protected:
   bool AutoUpdateIndex;
 
 private:
-  pqOutputPortComboBox(const pqOutputPortComboBox&); // Not implemented.
-  void operator=(const pqOutputPortComboBox&); // Not implemented.
+  pqOutputPortComboBox(const pqOutputPortComboBox&) VTK_DELETE_FUNCTION;
+  void operator=(const pqOutputPortComboBox&) VTK_DELETE_FUNCTION;
 };
 
 #endif

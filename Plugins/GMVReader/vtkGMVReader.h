@@ -248,8 +248,8 @@ protected:
 #endif
 
 private:
-  vtkGMVReader(const vtkGMVReader&);  // Not implemented.
-  void operator=(const vtkGMVReader&);  // Not implemented.
+  vtkGMVReader(const vtkGMVReader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkGMVReader&) VTK_DELETE_FUNCTION;
 
   vtkStringArray *FileNames;      // VTK array of files
   bool ContainsProbtimeKeyword;

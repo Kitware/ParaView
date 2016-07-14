@@ -55,8 +55,8 @@ protected:
   ~vtkSMViewExportHelper();
 
 private:
-  vtkSMViewExportHelper(const vtkSMViewExportHelper&); // Not implemented
-  void operator=(const vtkSMViewExportHelper&); // Not implemented
+  vtkSMViewExportHelper(const vtkSMViewExportHelper&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMViewExportHelper&) VTK_DELETE_FUNCTION;
 
 };
 

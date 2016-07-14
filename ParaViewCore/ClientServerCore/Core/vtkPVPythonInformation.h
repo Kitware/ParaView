@@ -179,8 +179,8 @@ protected:
   std::string MatplotlibPath;
 
 private:
-  vtkPVPythonInformation(const vtkPVPythonInformation&); // Not implemented
-  void operator=(const vtkPVPythonInformation&); // Not implemented
+  vtkPVPythonInformation(const vtkPVPythonInformation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVPythonInformation&) VTK_DELETE_FUNCTION;
 };
 
 #endif

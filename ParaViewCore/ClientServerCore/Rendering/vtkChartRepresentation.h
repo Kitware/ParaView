@@ -214,8 +214,8 @@ protected:
 
   vtkWeakPointer<vtkChartSelectionRepresentation> SelectionRepresentation;
 private:
-  vtkChartRepresentation(const vtkChartRepresentation&); // Not implemented
-  void operator=(const vtkChartRepresentation&); // Not implemented
+  vtkChartRepresentation(const vtkChartRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkChartRepresentation&) VTK_DELETE_FUNCTION;
 
   vtkTimeStamp PrepareForRenderingTime;
   vtkSmartPointer<vtkChartSelectionRepresentation> DummyRepresentation;

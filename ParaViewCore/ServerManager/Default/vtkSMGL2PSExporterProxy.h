@@ -54,8 +54,8 @@ protected:
   int ViewType;
 
 private:
-  vtkSMGL2PSExporterProxy(const vtkSMGL2PSExporterProxy&); // Not implemented
-  void operator=(const vtkSMGL2PSExporterProxy&); // Not implemented
+  vtkSMGL2PSExporterProxy(const vtkSMGL2PSExporterProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMGL2PSExporterProxy&) VTK_DELETE_FUNCTION;
 
 };
 

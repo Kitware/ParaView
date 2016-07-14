@@ -33,8 +33,8 @@ public:
   pqSLACActionGroup(QObject *p);
 
 private:
-  pqSLACActionGroup(const pqSLACActionGroup &);     // Not implemented
-  void operator=(const pqSLACActionGroup &);        // Not implemented
+  pqSLACActionGroup(const pqSLACActionGroup &) VTK_DELETE_FUNCTION;
+  void operator=(const pqSLACActionGroup &) VTK_DELETE_FUNCTION;
 };
 
 #endif //pqSLACActionGroup_h

@@ -93,8 +93,8 @@ protected:
   ~vtkSMUtilities(){}
 
 private:
-  vtkSMUtilities(const vtkSMUtilities&); // Not implemented
-  void operator=(const vtkSMUtilities&); // Not implemented
+  vtkSMUtilities(const vtkSMUtilities&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMUtilities&) VTK_DELETE_FUNCTION;
 
 };
 

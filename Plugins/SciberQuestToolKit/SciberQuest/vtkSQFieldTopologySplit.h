@@ -89,8 +89,8 @@ private:
 
 
 private:
-  vtkSQFieldTopologySplit(const vtkSQFieldTopologySplit&);  // Not implemented.
-  void operator=(const vtkSQFieldTopologySplit&);  // Not implemented.
+  vtkSQFieldTopologySplit(const vtkSQFieldTopologySplit&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQFieldTopologySplit&) VTK_DELETE_FUNCTION;
 };
 
 #endif

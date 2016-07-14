@@ -73,8 +73,8 @@ protected:
   int Mode;
 
 private:
-  vtkHybridProbeFilter(const vtkHybridProbeFilter&); // Not implemented
-  void operator=(const vtkHybridProbeFilter&); // Not implemented
+  vtkHybridProbeFilter(const vtkHybridProbeFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkHybridProbeFilter&) VTK_DELETE_FUNCTION;
 
 };
 

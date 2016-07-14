@@ -37,8 +37,8 @@ protected:
   ~vtkSMPWriterProxy();
 
 private:
-  vtkSMPWriterProxy(const vtkSMPWriterProxy&); // Not implemented.
-  void operator=(const vtkSMPWriterProxy&); // Not implemented.
+  vtkSMPWriterProxy(const vtkSMPWriterProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMPWriterProxy&) VTK_DELETE_FUNCTION;
 };
 
 

@@ -46,8 +46,8 @@ protected:
 
   vtkWeakPointer<vtkSMProxy> SourceProxy;
 private:
-  vtkPVRepresentationAnimationHelper(const vtkPVRepresentationAnimationHelper&); // Not implemented
-  void operator=(const vtkPVRepresentationAnimationHelper&); // Not implemented
+  vtkPVRepresentationAnimationHelper(const vtkPVRepresentationAnimationHelper&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVRepresentationAnimationHelper&) VTK_DELETE_FUNCTION;
 
 };
 

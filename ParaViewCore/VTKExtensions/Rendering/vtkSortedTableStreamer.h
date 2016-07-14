@@ -105,8 +105,8 @@ protected:
   int SelectedComponent;
   int InvertOrder;
 private:
-  vtkSortedTableStreamer(const vtkSortedTableStreamer&); // Not implemented
-  void operator=(const vtkSortedTableStreamer&);   // Not implemented
+  vtkSortedTableStreamer(const vtkSortedTableStreamer&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSortedTableStreamer&) VTK_DELETE_FUNCTION;
 };
 
 #endif

@@ -63,8 +63,8 @@ protected:
   int RootOnly;
   vtkSetMacro(RootOnly, int);
 
-  vtkPVInformation(const vtkPVInformation&); // Not implemented
-  void operator=(const vtkPVInformation&); // Not implemented
+  vtkPVInformation(const vtkPVInformation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVInformation&) VTK_DELETE_FUNCTION;
 };
 
 #endif

@@ -89,8 +89,8 @@ protected slots:
   virtual void printStdout(vtkObject *, unsigned long, void *, void *);
 
 private:
-  pqBlotShell(const pqBlotShell &);     // Not implemented
-  void operator=(const pqBlotShell &);  // Not implemented
+  pqBlotShell(const pqBlotShell &) VTK_DELETE_FUNCTION;
+  void operator=(const pqBlotShell &) VTK_DELETE_FUNCTION;
 };
 
 #endif //pqBlotWidget_h

@@ -49,8 +49,8 @@ protected:
   virtual int ReadXMLAttributes(vtkSMProxy *parent, vtkPVXMLElement *element);
 
 private:
-  vtkSMMapProperty(const vtkSMMapProperty&); // Not implemented
-  void operator=(const vtkSMMapProperty&); // Not implemented
+  vtkSMMapProperty(const vtkSMMapProperty&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMMapProperty&) VTK_DELETE_FUNCTION;
 };
 
 #endif // vtkSMMapProperty_h

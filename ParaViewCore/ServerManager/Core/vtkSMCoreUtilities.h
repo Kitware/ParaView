@@ -74,8 +74,8 @@ protected:
   ~vtkSMCoreUtilities();
 
 private:
-  vtkSMCoreUtilities(const vtkSMCoreUtilities&); // Not implemented
-  void operator=(const vtkSMCoreUtilities&); // Not implemented
+  vtkSMCoreUtilities(const vtkSMCoreUtilities&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMCoreUtilities&) VTK_DELETE_FUNCTION;
 
 };
 

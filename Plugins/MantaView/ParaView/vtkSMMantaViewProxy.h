@@ -109,8 +109,8 @@ protected:
 
 private:
 
-  vtkSMMantaViewProxy(const vtkSMMantaViewProxy&); // Not implemented.
-  void operator=(const vtkSMMantaViewProxy&); // Not implemented.
+  vtkSMMantaViewProxy(const vtkSMMantaViewProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMMantaViewProxy&) VTK_DELETE_FUNCTION;
 
   class Internal;
   Internal *Internals;

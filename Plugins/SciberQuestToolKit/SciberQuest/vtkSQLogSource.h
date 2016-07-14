@@ -74,8 +74,8 @@ protected:
   int RequestData(vtkInformation *req, vtkInformationVector **input, vtkInformationVector *output);
 
 private:
-  vtkSQLogSource(const vtkSQLogSource&);  // Not implemented.
-  void operator=(const vtkSQLogSource&);  // Not implemented.
+  vtkSQLogSource(const vtkSQLogSource&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQLogSource&) VTK_DELETE_FUNCTION;
 
 private:
   int GlobalLevel;

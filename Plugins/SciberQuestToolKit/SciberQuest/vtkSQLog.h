@@ -194,8 +194,8 @@ protected:
   virtual ~vtkSQLog();
 
 private:
-  vtkSQLog(const vtkSQLog&); // Not implemented
-  void operator=(const vtkSQLog&); // Not implemented
+  vtkSQLog(const vtkSQLog&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQLog&) VTK_DELETE_FUNCTION;
 
 private:
   int GlobalLevel;

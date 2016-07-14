@@ -218,8 +218,8 @@ private:
   int EnableAsynchronousCommunication;
 
 private:
-  vtkAMRDualGridHelper(const vtkAMRDualGridHelper&);  // Not implemented.
-  void operator=(const vtkAMRDualGridHelper&);  // Not implemented.
+  vtkAMRDualGridHelper(const vtkAMRDualGridHelper&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkAMRDualGridHelper&) VTK_DELETE_FUNCTION;
 
 };
 

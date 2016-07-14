@@ -115,8 +115,8 @@ protected:
   bool MeshVisibility;
 
 private:
-  vtkGlyph3DRepresentation(const vtkGlyph3DRepresentation&); // Not implemented
-  void operator=(const vtkGlyph3DRepresentation&); // Not implemented
+  vtkGlyph3DRepresentation(const vtkGlyph3DRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkGlyph3DRepresentation&) VTK_DELETE_FUNCTION;
 
 };
 

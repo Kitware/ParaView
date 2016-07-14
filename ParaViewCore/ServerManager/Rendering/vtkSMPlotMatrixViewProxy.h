@@ -48,8 +48,8 @@ protected:
   void AnimationTickEvent();
 
 private:
-  vtkSMPlotMatrixViewProxy(const vtkSMPlotMatrixViewProxy&); // Not implemented
-  void operator=(const vtkSMPlotMatrixViewProxy&); // Not implemented
+  vtkSMPlotMatrixViewProxy(const vtkSMPlotMatrixViewProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMPlotMatrixViewProxy&) VTK_DELETE_FUNCTION;
 
 };
 

@@ -48,8 +48,8 @@ protected:
                           vtkInformationVector* outputVector);
   vtkMultiProcessController* Controller;
 private:
-  vtkCompleteArrays(const vtkCompleteArrays&);  // Not implemented.
-  void operator=(const vtkCompleteArrays&);  // Not implemented.
+  vtkCompleteArrays(const vtkCompleteArrays&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCompleteArrays&) VTK_DELETE_FUNCTION;
 };
 
 #endif

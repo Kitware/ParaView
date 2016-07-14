@@ -175,8 +175,8 @@ protected slots:
   void onCheckStatusChanged();
 
 private:
-  pqProxySILModel(const pqProxySILModel&); // Not implemented.
-  void operator=(const pqProxySILModel&); // Not implemented.
+  pqProxySILModel(const pqProxySILModel&) VTK_DELETE_FUNCTION;
+  void operator=(const pqProxySILModel&) VTK_DELETE_FUNCTION;
 
   pqTimer DelayedValuesChangedSignalTimer;
   QPixmap CheckboxPixmaps[3];

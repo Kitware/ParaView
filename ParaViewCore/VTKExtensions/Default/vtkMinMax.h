@@ -106,8 +106,8 @@ protected:
   int MismatchOccurred;
 
 private:
-  vtkMinMax(const vtkMinMax&); // Not implemented.
-  void operator=(const vtkMinMax&); // Not implemented.
+  vtkMinMax(const vtkMinMax&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMinMax&) VTK_DELETE_FUNCTION;
 
 };
 

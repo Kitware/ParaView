@@ -114,8 +114,8 @@ protected:
   virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader);
 
 private:
-  vtkSMDoubleMapProperty(const vtkSMDoubleMapProperty&); // Not implemented
-  void operator=(const vtkSMDoubleMapProperty&); // Not implemented
+  vtkSMDoubleMapProperty(const vtkSMDoubleMapProperty&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMDoubleMapProperty&) VTK_DELETE_FUNCTION;
 
   vtkSMDoubleMapPropertyPrivate *Private;
 };

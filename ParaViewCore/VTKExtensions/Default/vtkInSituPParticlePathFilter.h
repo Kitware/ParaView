@@ -102,8 +102,8 @@ protected:
     int &localAssignedCount);
 
 private:
-  vtkInSituPParticlePathFilter(const vtkInSituPParticlePathFilter&);  // Not implemented.
-  void operator=(const vtkInSituPParticlePathFilter&); // Not implemented
+  vtkInSituPParticlePathFilter(const vtkInSituPParticlePathFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkInSituPParticlePathFilter&) VTK_DELETE_FUNCTION;
 
   // Description:
   // For restart input we need to mark that we will use arrays to

@@ -84,8 +84,8 @@ protected:
   ~vtkTileDisplayHelper();
 
 private:
-  vtkTileDisplayHelper(const vtkTileDisplayHelper&); // Not implemented
-  void operator=(const vtkTileDisplayHelper&); // Not implemented
+  vtkTileDisplayHelper(const vtkTileDisplayHelper&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkTileDisplayHelper&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;

@@ -63,8 +63,8 @@ protected slots:
   void resetBounds();
 
 private:
-  pqOrbitCreatorDialog(const pqOrbitCreatorDialog&); // Not implemented.
-  void operator=(const pqOrbitCreatorDialog&); // Not implemented.
+  pqOrbitCreatorDialog(const pqOrbitCreatorDialog&) VTK_DELETE_FUNCTION;
+  void operator=(const pqOrbitCreatorDialog&) VTK_DELETE_FUNCTION;
 
   class pqInternals;
   pqInternals* Internals;

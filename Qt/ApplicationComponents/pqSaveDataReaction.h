@@ -67,8 +67,8 @@ protected:
     { pqSaveDataReaction::saveActiveData(); }
 
 private:
-  pqSaveDataReaction(const pqSaveDataReaction&); // Not implemented.
-  void operator=(const pqSaveDataReaction&); // Not implemented.
+  pqSaveDataReaction(const pqSaveDataReaction&) VTK_DELETE_FUNCTION;
+  void operator=(const pqSaveDataReaction&) VTK_DELETE_FUNCTION;
 };
 
 #endif

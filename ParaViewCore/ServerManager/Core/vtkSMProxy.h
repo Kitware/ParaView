@@ -790,8 +790,8 @@ protected:
 protected:
   vtkSMProxyInternals* Internals;
   vtkSMProxyObserver* SubProxyObserver;
-  vtkSMProxy(const vtkSMProxy&); // Not implemented
-  void operator=(const vtkSMProxy&); // Not implemented
+  vtkSMProxy(const vtkSMProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMProxy&) VTK_DELETE_FUNCTION;
 
 private:
   vtkSMProperty* SetupExposedProperty(vtkPVXMLElement* propertyElement,

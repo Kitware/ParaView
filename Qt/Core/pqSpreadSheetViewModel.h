@@ -174,8 +174,8 @@ protected:
 
   vtkSpreadSheetView* GetView() const;
 private:
-  pqSpreadSheetViewModel(const pqSpreadSheetViewModel&); // Not implemented.
-  void operator=(const pqSpreadSheetViewModel&); // Not implemented.
+  pqSpreadSheetViewModel(const pqSpreadSheetViewModel&) VTK_DELETE_FUNCTION;
+  void operator=(const pqSpreadSheetViewModel&) VTK_DELETE_FUNCTION;
 
   class pqInternal;
   pqInternal* Internal;

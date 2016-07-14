@@ -40,8 +40,8 @@ protected:
   ~vtkPVExtractArraysOverTime();
 
 private:
-  vtkPVExtractArraysOverTime(const vtkPVExtractArraysOverTime&);  // Not implemented.
-  void operator=(const vtkPVExtractArraysOverTime&);  // Not implemented.
+  vtkPVExtractArraysOverTime(const vtkPVExtractArraysOverTime&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVExtractArraysOverTime&) VTK_DELETE_FUNCTION;
 };
 
 #endif // vtkPVExtractArraysOverTime_h

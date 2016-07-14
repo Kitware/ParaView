@@ -87,8 +87,8 @@ protected:
   virtual ~vtkPVProxyDefinitionIterator();
 
 private:
-  vtkPVProxyDefinitionIterator(const vtkPVProxyDefinitionIterator&); // Not implemented.
-  void operator=(const vtkPVProxyDefinitionIterator&); // Not implemented.
+  vtkPVProxyDefinitionIterator(const vtkPVProxyDefinitionIterator&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVProxyDefinitionIterator&) VTK_DELETE_FUNCTION;
 };
 
 #endif

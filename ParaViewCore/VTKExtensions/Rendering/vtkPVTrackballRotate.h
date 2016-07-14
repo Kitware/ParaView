@@ -65,8 +65,8 @@ protected:
 
   char KeyCode;
 
-  vtkPVTrackballRotate(const vtkPVTrackballRotate&); // Not implemented
-  void operator=(const vtkPVTrackballRotate&); // Not implemented
+  vtkPVTrackballRotate(const vtkPVTrackballRotate&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVTrackballRotate&) VTK_DELETE_FUNCTION;
 };
 
 #endif

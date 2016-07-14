@@ -48,8 +48,8 @@ public:
   // Callback for startup.
   void onStartup();
 private:
-  pqMyApplicationStarter(const pqMyApplicationStarter&); // Not implemented.
-  void operator=(const pqMyApplicationStarter&); // Not implemented.
+  pqMyApplicationStarter(const pqMyApplicationStarter&) VTK_DELETE_FUNCTION;
+  void operator=(const pqMyApplicationStarter&) VTK_DELETE_FUNCTION;
 };
 
 #endif

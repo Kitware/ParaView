@@ -101,8 +101,8 @@ protected:
   char *Configuration;
 
 private:
-  vtkImageCompressor(const vtkImageCompressor&); // Not implemented.
-  void operator=(const vtkImageCompressor&); // Not implemented.
+  vtkImageCompressor(const vtkImageCompressor&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkImageCompressor&) VTK_DELETE_FUNCTION;
 };
 
 #endif

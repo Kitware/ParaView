@@ -109,9 +109,9 @@ protected:
 
 private:
   vtkCPMappedVectorArrayTemplate(
-      const vtkCPMappedVectorArrayTemplate &); // Not implemented.
+      const vtkCPMappedVectorArrayTemplate &) VTK_DELETE_FUNCTION;
   void operator=(
-      const vtkCPMappedVectorArrayTemplate &); // Not implemented.
+      const vtkCPMappedVectorArrayTemplate &) VTK_DELETE_FUNCTION;
 
   vtkIdType Lookup(const Scalar &val, vtkIdType startIndex);
   double TempDoubleArray[3];

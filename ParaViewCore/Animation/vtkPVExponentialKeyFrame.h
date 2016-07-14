@@ -55,8 +55,8 @@ protected:
   double EndPower;
 
 private:
-  vtkPVExponentialKeyFrame(const vtkPVExponentialKeyFrame&); // Not implemented.
-  void operator=(const vtkPVExponentialKeyFrame&); // Not implemented.
+  vtkPVExponentialKeyFrame(const vtkPVExponentialKeyFrame&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVExponentialKeyFrame&) VTK_DELETE_FUNCTION;
 
 };
 

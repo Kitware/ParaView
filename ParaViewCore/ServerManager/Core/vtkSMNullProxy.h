@@ -36,8 +36,8 @@ protected:
   virtual void CreateVTKObjects();
 
 private:
-  vtkSMNullProxy(const vtkSMNullProxy&); // Not implemented.
-  void operator=(const vtkSMNullProxy&); // Not implemented.
+  vtkSMNullProxy(const vtkSMNullProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMNullProxy&) VTK_DELETE_FUNCTION;
 };
 
 #endif

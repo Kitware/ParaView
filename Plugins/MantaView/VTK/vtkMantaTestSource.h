@@ -72,8 +72,8 @@ protected:
 
 private:
 
-  vtkMantaTestSource(const vtkMantaTestSource&);  // Not implemented.
-  void operator=(const vtkMantaTestSource&);  // Not implemented.
+  vtkMantaTestSource(const vtkMantaTestSource&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMantaTestSource&) VTK_DELETE_FUNCTION;
 
 };
 

@@ -195,8 +195,8 @@ protected:
   vtkWeakPointer<vtkSIProxyDefinitionManager> ProxyDefinitionManager;
 
 private:
-  vtkSMProxyDefinitionManager(const vtkSMProxyDefinitionManager&); // Not implemented
-  void operator=(const vtkSMProxyDefinitionManager&); // Not implemented
+  vtkSMProxyDefinitionManager(const vtkSMProxyDefinitionManager&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMProxyDefinitionManager&) VTK_DELETE_FUNCTION;
 
 };
 

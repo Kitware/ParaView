@@ -99,8 +99,8 @@ protected:
   int RequestInformation(vtkInformation* req, vtkInformationVector** input, vtkInformationVector* output);
 
 private:
-  vtkSQHemisphereSource(const vtkSQHemisphereSource&);  // Not implemented.
-  void operator=(const vtkSQHemisphereSource&);  // Not implemented.
+  vtkSQHemisphereSource(const vtkSQHemisphereSource&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQHemisphereSource&) VTK_DELETE_FUNCTION;
 
 private:
   double North[3];

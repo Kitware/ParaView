@@ -166,8 +166,8 @@ protected:
   vtkStringList* Readers;
 
 private:
-  vtkSMReaderFactory(const vtkSMReaderFactory&); // Not implemented
-  void operator=(const vtkSMReaderFactory&); // Not implemented
+  vtkSMReaderFactory(const vtkSMReaderFactory&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMReaderFactory&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;

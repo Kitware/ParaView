@@ -58,8 +58,8 @@ protected:
 
 
 private:
-  vtkSMDimensionsDomain(const vtkSMDimensionsDomain&); // Not implemented
-  void operator=(const vtkSMDimensionsDomain&); // Not implemented
+  vtkSMDimensionsDomain(const vtkSMDimensionsDomain&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMDimensionsDomain&) VTK_DELETE_FUNCTION;
 
 };
 

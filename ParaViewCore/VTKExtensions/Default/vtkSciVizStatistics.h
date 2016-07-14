@@ -171,8 +171,8 @@ protected:
   vtkSciVizStatisticsP* P;
 
 private:
-  vtkSciVizStatistics( const vtkSciVizStatistics& ); // Not implemented.
-  void operator = ( const vtkSciVizStatistics& ); // Not implemented.
+  vtkSciVizStatistics( const vtkSciVizStatistics& ) VTK_DELETE_FUNCTION;
+  void operator = ( const vtkSciVizStatistics& ) VTK_DELETE_FUNCTION;
 };
 
 #endif // vtkSciVizStatistics_h

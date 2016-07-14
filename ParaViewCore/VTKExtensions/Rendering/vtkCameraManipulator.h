@@ -107,8 +107,8 @@ protected:
   vtkCameraManipulatorGUIHelper* GUIHelper;
 
 private:
-  vtkCameraManipulator(const vtkCameraManipulator&); // Not implemented
-  void operator=(const vtkCameraManipulator&); // Not implemented
+  vtkCameraManipulator(const vtkCameraManipulator&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCameraManipulator&) VTK_DELETE_FUNCTION;
 };
 
 #endif

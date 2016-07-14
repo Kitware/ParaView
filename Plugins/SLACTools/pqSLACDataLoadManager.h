@@ -46,8 +46,8 @@ protected:
   pqServer *Server;
 
 private:
-  pqSLACDataLoadManager(const pqSLACDataLoadManager &); // Not implemented
-  void operator=(const pqSLACDataLoadManager &);        // Not implemented
+  pqSLACDataLoadManager(const pqSLACDataLoadManager &) VTK_DELETE_FUNCTION;
+  void operator=(const pqSLACDataLoadManager &) VTK_DELETE_FUNCTION;
 
   class pqUI;
   pqUI *ui;

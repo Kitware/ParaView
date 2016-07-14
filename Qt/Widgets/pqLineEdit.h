@@ -101,8 +101,8 @@ protected:
   void triggerTextChangedAndEditingFinished();
 
 private:
-  pqLineEdit(const pqLineEdit&); // Not implemented.
-  void operator=(const pqLineEdit&); // Not implemented.
+  pqLineEdit(const pqLineEdit&) VTK_DELETE_FUNCTION;
+  void operator=(const pqLineEdit&) VTK_DELETE_FUNCTION;
 
   bool EditingFinishedPending;
   bool ResetCursorPositionOnEditingFinished;

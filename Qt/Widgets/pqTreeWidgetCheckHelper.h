@@ -72,8 +72,8 @@ protected slots:
   void onItemClicked (QTreeWidgetItem *item, int column);
   void onItemPressed (QTreeWidgetItem *item, int column);
 private:
-  pqTreeWidgetCheckHelper(const pqTreeWidgetCheckHelper&); // Not implemented.
-  void operator=(const pqTreeWidgetCheckHelper&); // Not implemented.
+  pqTreeWidgetCheckHelper(const pqTreeWidgetCheckHelper&) VTK_DELETE_FUNCTION;
+  void operator=(const pqTreeWidgetCheckHelper&) VTK_DELETE_FUNCTION;
 
   QTreeWidget* Tree;
   int CheckableColumn;

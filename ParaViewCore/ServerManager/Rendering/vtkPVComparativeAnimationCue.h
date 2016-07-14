@@ -145,8 +145,8 @@ protected:
   double* Values;
   bool Enabled;
 private:
-  vtkPVComparativeAnimationCue(const vtkPVComparativeAnimationCue&); // Not implemented
-  void operator=(const vtkPVComparativeAnimationCue&); // Not implemented
+  vtkPVComparativeAnimationCue(const vtkPVComparativeAnimationCue&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVComparativeAnimationCue&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;

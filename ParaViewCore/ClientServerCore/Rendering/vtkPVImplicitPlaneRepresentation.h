@@ -37,8 +37,8 @@ protected:
   ~vtkPVImplicitPlaneRepresentation();
 
 private:
-  vtkPVImplicitPlaneRepresentation(const vtkPVImplicitPlaneRepresentation&); // Not implemented
-  void operator=(const vtkPVImplicitPlaneRepresentation&); // Not implemented
+  vtkPVImplicitPlaneRepresentation(const vtkPVImplicitPlaneRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVImplicitPlaneRepresentation&) VTK_DELETE_FUNCTION;
 };
 
 #endif

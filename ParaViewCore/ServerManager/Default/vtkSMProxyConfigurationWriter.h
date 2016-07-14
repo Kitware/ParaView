@@ -93,8 +93,8 @@ protected:
   virtual ~vtkSMProxyConfigurationWriter();
 
 private:
-  vtkSMProxyConfigurationWriter(const vtkSMProxyConfigurationWriter&); // Not implemented
-  void operator=(const vtkSMProxyConfigurationWriter&); // Not implemented
+  vtkSMProxyConfigurationWriter(const vtkSMProxyConfigurationWriter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMProxyConfigurationWriter&) VTK_DELETE_FUNCTION;
 
 private:
   char *FileName;

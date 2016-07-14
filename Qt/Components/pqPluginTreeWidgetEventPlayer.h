@@ -55,8 +55,8 @@ public:
     arguments, bool& error);
 
 private:
-  pqPluginTreeWidgetEventPlayer(const pqPluginTreeWidgetEventPlayer&); // Not implemented.
-  void operator=(const pqPluginTreeWidgetEventPlayer&); // Not implemented.
+  pqPluginTreeWidgetEventPlayer(const pqPluginTreeWidgetEventPlayer&) VTK_DELETE_FUNCTION;
+  void operator=(const pqPluginTreeWidgetEventPlayer&) VTK_DELETE_FUNCTION;
 };
 
 #endif // !_pqPluginTreeWidgetEventPlayer_h

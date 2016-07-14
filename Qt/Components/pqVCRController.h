@@ -103,8 +103,8 @@ protected slots:
   void onEndPlay();
 
 private:
-  pqVCRController(const pqVCRController&); // Not implemented.
-  void operator=(const pqVCRController&); // Not implemented.
+  pqVCRController(const pqVCRController&) VTK_DELETE_FUNCTION;
+  void operator=(const pqVCRController&) VTK_DELETE_FUNCTION;
 
   QPointer<pqAnimationScene> Scene;
 };

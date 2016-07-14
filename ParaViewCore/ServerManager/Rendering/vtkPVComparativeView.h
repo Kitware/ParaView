@@ -206,8 +206,8 @@ protected:
   void SetRootView(vtkSMViewProxy*);
   vtkSMViewProxy* RootView;
 private:
-  vtkPVComparativeView(const vtkPVComparativeView&); // Not implemented
-  void operator=(const vtkPVComparativeView&); // Not implemented
+  vtkPVComparativeView(const vtkPVComparativeView&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVComparativeView&) VTK_DELETE_FUNCTION;
 
   class vtkInternal;
   vtkInternal* Internal;

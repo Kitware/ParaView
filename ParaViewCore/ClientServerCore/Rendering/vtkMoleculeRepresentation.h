@@ -53,8 +53,8 @@ protected:
   int MoleculeRenderMode;
 
 private:
-  vtkMoleculeRepresentation(const vtkMoleculeRepresentation&); // Not implemented
-  void operator=(const vtkMoleculeRepresentation&); // Not implemented
+  vtkMoleculeRepresentation(const vtkMoleculeRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMoleculeRepresentation&) VTK_DELETE_FUNCTION;
 
 };
 

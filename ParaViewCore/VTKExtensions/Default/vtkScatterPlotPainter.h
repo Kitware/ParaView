@@ -204,8 +204,8 @@ protected:
 
   vtkScalarsToColors* LookupTable;
 private:
-  vtkScatterPlotPainter(const vtkScatterPlotPainter&); // Not implemented.
-  void operator=(const vtkScatterPlotPainter&); // Not implemented.
+  vtkScatterPlotPainter(const vtkScatterPlotPainter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkScatterPlotPainter&) VTK_DELETE_FUNCTION;
 
 };
 

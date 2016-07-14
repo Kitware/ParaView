@@ -202,8 +202,8 @@ protected:
   pqInternals* Internals;
 
 private:
-  pqVRPNConnection(const pqVRPNConnection&); // Not implemented.
-  void operator=(const pqVRPNConnection&); // Not implemented.
+  pqVRPNConnection(const pqVRPNConnection&) VTK_DELETE_FUNCTION;
+  void operator=(const pqVRPNConnection&) VTK_DELETE_FUNCTION;
 };
 
 #endif

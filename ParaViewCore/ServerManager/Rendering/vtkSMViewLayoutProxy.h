@@ -235,8 +235,8 @@ protected:
 
   int MaximizedCell;
 private:
-  vtkSMViewLayoutProxy(const vtkSMViewLayoutProxy&); // Not implemented
-  void operator=(const vtkSMViewLayoutProxy&); // Not implemented
+  vtkSMViewLayoutProxy(const vtkSMViewLayoutProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMViewLayoutProxy&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;

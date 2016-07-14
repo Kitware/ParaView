@@ -40,8 +40,8 @@ protected:
   ~vtkPVRampKeyFrame();
 
 private:
-  vtkPVRampKeyFrame(const vtkPVRampKeyFrame&); // Not implemented.
-  void operator=(const vtkPVRampKeyFrame&); // Not implemented.
+  vtkPVRampKeyFrame(const vtkPVRampKeyFrame&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVRampKeyFrame&) VTK_DELETE_FUNCTION;
 
 };
 

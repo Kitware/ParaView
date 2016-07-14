@@ -219,8 +219,8 @@ protected:
   vtkSmartPointer<vtkExtractsDeliveryHelper> ExtractsDeliveryHelper;
 
 private:
-  vtkLiveInsituLink(const vtkLiveInsituLink&); // Not implemented
-  void operator=(const vtkLiveInsituLink&); // Not implemented
+  vtkLiveInsituLink(const vtkLiveInsituLink&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkLiveInsituLink&) VTK_DELETE_FUNCTION;
 
   vtkWeakPointer<vtkSMSessionProxyManager> InsituProxyManager;
 

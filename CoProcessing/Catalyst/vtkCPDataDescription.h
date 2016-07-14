@@ -101,8 +101,8 @@ protected:
   virtual ~vtkCPDataDescription();
 
 private:
-  vtkCPDataDescription(const vtkCPDataDescription&); // Not implemented
-  void operator=(const vtkCPDataDescription&); // Not implemented
+  vtkCPDataDescription(const vtkCPDataDescription&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCPDataDescription&) VTK_DELETE_FUNCTION;
 
   /// The current simulation time.  This should be set in the adaptor.
   double Time;

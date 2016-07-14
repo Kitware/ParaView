@@ -63,8 +63,8 @@ protected:
   ~vtkSMProxyInitializationHelper();
 
 private:
-  vtkSMProxyInitializationHelper(const vtkSMProxyInitializationHelper&); // Not implemented
-  void operator=(const vtkSMProxyInitializationHelper&); // Not implemented
+  vtkSMProxyInitializationHelper(const vtkSMProxyInitializationHelper&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMProxyInitializationHelper&) VTK_DELETE_FUNCTION;
 };
 
 #endif

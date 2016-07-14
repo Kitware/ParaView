@@ -72,8 +72,8 @@ protected:
 
   bool UseAMRDualClipForAMR;
 private:
-  vtkPVClipDataSet(const vtkPVClipDataSet&);  // Not implemented.
-  void operator=(const vtkPVClipDataSet&);  // Not implemented.
+  vtkPVClipDataSet(const vtkPVClipDataSet&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVClipDataSet&) VTK_DELETE_FUNCTION;
 
 };
 

@@ -128,8 +128,8 @@ protected:
   bool EnableProgress;
   bool ReadyEnableProgress;
 private:
-  pqProgressManager(const pqProgressManager&); // Not implemented.
-  void operator=(const pqProgressManager&); // Not implemented.
+  pqProgressManager(const pqProgressManager&) VTK_DELETE_FUNCTION;
+  void operator=(const pqProgressManager&) VTK_DELETE_FUNCTION;
 };
 
 #endif

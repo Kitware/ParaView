@@ -79,8 +79,8 @@ protected:
   ~vtkSMDoubleRangeDomain();
 
 private:
-  vtkSMDoubleRangeDomain(const vtkSMDoubleRangeDomain&); // Not implemented
-  void operator=(const vtkSMDoubleRangeDomain&); // Not implemented
+  vtkSMDoubleRangeDomain(const vtkSMDoubleRangeDomain&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMDoubleRangeDomain&) VTK_DELETE_FUNCTION;
 
   typedef vtkSMRangeDomainTemplate<double> RealSuperclass;
 };

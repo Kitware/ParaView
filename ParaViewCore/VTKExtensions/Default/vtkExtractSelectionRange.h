@@ -65,8 +65,8 @@ protected:
   double Range[2];
 
 private:
-  vtkExtractSelectionRange(const vtkExtractSelectionRange&); // Not implemented
-  void operator=(const vtkExtractSelectionRange&); // Not implemented
+  vtkExtractSelectionRange(const vtkExtractSelectionRange&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkExtractSelectionRange&) VTK_DELETE_FUNCTION;
 
 };
 

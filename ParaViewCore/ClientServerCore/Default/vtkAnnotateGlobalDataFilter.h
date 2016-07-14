@@ -62,8 +62,8 @@ protected:
   char* Postfix;
   char* FieldArrayName;
 private:
-  vtkAnnotateGlobalDataFilter(const vtkAnnotateGlobalDataFilter&); // Not implemented
-  void operator=(const vtkAnnotateGlobalDataFilter&); // Not implemented
+  vtkAnnotateGlobalDataFilter(const vtkAnnotateGlobalDataFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkAnnotateGlobalDataFilter&) VTK_DELETE_FUNCTION;
 };
 
 #endif

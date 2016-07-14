@@ -56,8 +56,8 @@ public:
   vtkSMSettingsObserver* Observer;
 
 private:
-  vtkSMSettingsProxy(const vtkSMSettingsProxy&); // Not implemented
-  void operator=(const vtkSMSettingsProxy&); // Not implemented
+  vtkSMSettingsProxy(const vtkSMSettingsProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMSettingsProxy&) VTK_DELETE_FUNCTION;
 
 };
 

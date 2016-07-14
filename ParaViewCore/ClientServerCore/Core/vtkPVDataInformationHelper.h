@@ -60,8 +60,8 @@ protected:
   virtual vtkTypeInt64 GetNumberOfRows() = 0;
 
 private:
-  vtkPVDataInformationHelper(const vtkPVDataInformationHelper&); // Not implemented
-  void operator=(const vtkPVDataInformationHelper&); // Not implemented
+  vtkPVDataInformationHelper(const vtkPVDataInformationHelper&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVDataInformationHelper&) VTK_DELETE_FUNCTION;
 };
 
 #endif

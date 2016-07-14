@@ -43,8 +43,8 @@ protected:
 
 private:
   vtkPointSpriteCoincidentTopologyResolutionPainter(
-    const vtkPointSpriteCoincidentTopologyResolutionPainter&); // Not implemented.
-  void operator=(const vtkPointSpriteCoincidentTopologyResolutionPainter&); // Not implemented.
+    const vtkPointSpriteCoincidentTopologyResolutionPainter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPointSpriteCoincidentTopologyResolutionPainter&) VTK_DELETE_FUNCTION;
 };
 
 

@@ -272,8 +272,8 @@ protected:
   virtual void destroyProxyInternal(pqProxy* proxy);
 
 private:
-  pqObjectBuilder(const pqObjectBuilder&); // Not implemented.
-  void operator=(const pqObjectBuilder&); // Not implemented.
+  pqObjectBuilder(const pqObjectBuilder&) VTK_DELETE_FUNCTION;
+  void operator=(const pqObjectBuilder&) VTK_DELETE_FUNCTION;
 
   bool WaitingForConnection;
 

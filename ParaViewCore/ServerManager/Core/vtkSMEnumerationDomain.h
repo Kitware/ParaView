@@ -111,8 +111,8 @@ protected:
   vtkSMEnumerationDomainInternals* EInternals;
 
 private:
-  vtkSMEnumerationDomain(const vtkSMEnumerationDomain&); // Not implemented
-  void operator=(const vtkSMEnumerationDomain&); // Not implemented
+  vtkSMEnumerationDomain(const vtkSMEnumerationDomain&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMEnumerationDomain&) VTK_DELETE_FUNCTION;
 };
 
 #endif

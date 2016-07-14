@@ -65,8 +65,8 @@ protected:
   double Offset;
 
 private:
-  vtkPVSinusoidKeyFrame(const vtkPVSinusoidKeyFrame&); // Not implemented.
-  void operator=(const vtkPVSinusoidKeyFrame&); // Not implemented.
+  vtkPVSinusoidKeyFrame(const vtkPVSinusoidKeyFrame&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVSinusoidKeyFrame&) VTK_DELETE_FUNCTION;
 };
 
 #endif

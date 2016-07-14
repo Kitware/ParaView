@@ -47,8 +47,8 @@ protected slots:
   void showHelpForProxy(const QString& proxyname);
 
 private:
-  myMainWindow(const myMainWindow&); // Not implemented.
-  void operator=(const myMainWindow&); // Not implemented.
+  myMainWindow(const myMainWindow&) VTK_DELETE_FUNCTION;
+  void operator=(const myMainWindow&) VTK_DELETE_FUNCTION;
 
   class pqInternals;
   pqInternals* Internals;

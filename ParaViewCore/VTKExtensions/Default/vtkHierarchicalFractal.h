@@ -202,8 +202,8 @@ protected:
   vtkSmartPointer<HierarchicalFractalOutputUtil> OutputUtil; //convenient class to create composite output
 
 private:
-  vtkHierarchicalFractal(const vtkHierarchicalFractal&);  // Not implemented.
-  void operator=(const vtkHierarchicalFractal&);  // Not implemented.
+  vtkHierarchicalFractal(const vtkHierarchicalFractal&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkHierarchicalFractal&) VTK_DELETE_FUNCTION;
 };
 
 

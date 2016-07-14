@@ -47,8 +47,8 @@ protected:
   virtual std::vector<vtkStdString> GetDefaultValue(const char* series);
 
 private:
-  vtkSMFunctionalBagChartSeriesSelectionDomain(const vtkSMFunctionalBagChartSeriesSelectionDomain&); // Not implemented
-  void operator=(const vtkSMFunctionalBagChartSeriesSelectionDomain&); // Not implemented
+  vtkSMFunctionalBagChartSeriesSelectionDomain(const vtkSMFunctionalBagChartSeriesSelectionDomain&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMFunctionalBagChartSeriesSelectionDomain&) VTK_DELETE_FUNCTION;
 
 };
 

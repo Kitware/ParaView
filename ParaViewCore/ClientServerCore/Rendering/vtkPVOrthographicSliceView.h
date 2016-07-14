@@ -139,8 +139,8 @@ protected:
   double SlicePosition[3];
   bool SliceAnnotationsVisibility;
 private:
-  vtkPVOrthographicSliceView(const vtkPVOrthographicSliceView&); // Not implemented
-  void operator=(const vtkPVOrthographicSliceView&); // Not implemented
+  vtkPVOrthographicSliceView(const vtkPVOrthographicSliceView&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVOrthographicSliceView&) VTK_DELETE_FUNCTION;
 
   void OnMouseWheelForwardEvent();
   void OnMouseWheelBackwardEvent();

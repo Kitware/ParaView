@@ -95,8 +95,8 @@ protected:
   ~vtkSMTransferFunctionManager();
 
 private:
-  vtkSMTransferFunctionManager(const vtkSMTransferFunctionManager&); // Not implemented
-  void operator=(const vtkSMTransferFunctionManager&); // Not implemented
+  vtkSMTransferFunctionManager(const vtkSMTransferFunctionManager&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMTransferFunctionManager&) VTK_DELETE_FUNCTION;
 
 };
 

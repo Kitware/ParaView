@@ -72,8 +72,8 @@ protected:
   virtual ~vtkSQHemisphereSourceConfigurationReader();
 
 private:
-  vtkSQHemisphereSourceConfigurationReader(const vtkSQHemisphereSourceConfigurationReader&);  // Not implemented.
-  void operator=(const vtkSQHemisphereSourceConfigurationReader&);  // Not implemented.
+  vtkSQHemisphereSourceConfigurationReader(const vtkSQHemisphereSourceConfigurationReader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQHemisphereSourceConfigurationReader&) VTK_DELETE_FUNCTION;
 };
 
 #endif

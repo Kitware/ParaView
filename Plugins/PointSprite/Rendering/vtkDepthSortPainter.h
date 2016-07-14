@@ -145,8 +145,8 @@ protected:
   vtkWeakPointer<vtkUnsignedCharArray> CachedColors;
 
 private:
-  vtkDepthSortPainter(const vtkDepthSortPainter &);  // Not implemented.
-  void operator=(const vtkDepthSortPainter &);  // Not implemented.
+  vtkDepthSortPainter(const vtkDepthSortPainter &) VTK_DELETE_FUNCTION;
+  void operator=(const vtkDepthSortPainter &) VTK_DELETE_FUNCTION;
 };
 
 #endif //vtkDepthSortPainter_h

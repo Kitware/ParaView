@@ -44,8 +44,8 @@ protected:
   ~vtkSMDataSourceProxy();
 
 private:
-  vtkSMDataSourceProxy(const vtkSMDataSourceProxy&); // Not implemented
-  void operator=(const vtkSMDataSourceProxy&); // Not implemented
+  vtkSMDataSourceProxy(const vtkSMDataSourceProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMDataSourceProxy&) VTK_DELETE_FUNCTION;
 
 };
 

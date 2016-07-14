@@ -40,8 +40,8 @@ protected:
   virtual bool Pull(vtkSMMessage*);
 
 private:
-  vtkSIDataArrayProperty(const vtkSIDataArrayProperty&); // Not implemented
-  void operator=(const vtkSIDataArrayProperty&); // Not implemented
+  vtkSIDataArrayProperty(const vtkSIDataArrayProperty&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSIDataArrayProperty&) VTK_DELETE_FUNCTION;
 
 };
 

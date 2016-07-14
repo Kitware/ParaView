@@ -110,8 +110,8 @@ protected:
 
 
 private:
-  vtkFlashContour(const vtkFlashContour&);  // Not implemented.
-  void operator=(const vtkFlashContour&);  // Not implemented.
+  vtkFlashContour(const vtkFlashContour&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkFlashContour&) VTK_DELETE_FUNCTION;
 
 };
 

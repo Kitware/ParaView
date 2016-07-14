@@ -99,8 +99,8 @@ protected:
   pqServer *Server;
 
 private:
-  pqPlotVariablesDialog(const pqPlotVariablesDialog &); // Not implemented
-  void operator=(const pqPlotVariablesDialog &);        // Not implemented
+  pqPlotVariablesDialog(const pqPlotVariablesDialog &) VTK_DELETE_FUNCTION;
+  void operator=(const pqPlotVariablesDialog &) VTK_DELETE_FUNCTION;
 
   pqUI *ui;
 

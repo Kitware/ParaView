@@ -64,8 +64,8 @@ protected:
   virtual ~vtkSMPipelineState();
 
 private:
-  vtkSMPipelineState(const vtkSMPipelineState&); // Not implemented
-  void operator=(const vtkSMPipelineState&);       // Not implemented
+  vtkSMPipelineState(const vtkSMPipelineState&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMPipelineState&) VTK_DELETE_FUNCTION;
 
 };
 

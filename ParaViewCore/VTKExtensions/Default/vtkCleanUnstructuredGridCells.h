@@ -51,8 +51,8 @@ protected:
   virtual int FillInputPortInformation(int port, vtkInformation *info);
 
 private:
-  vtkCleanUnstructuredGridCells(const vtkCleanUnstructuredGridCells&); // Not implemented
-  void operator=(const vtkCleanUnstructuredGridCells&); // Not implemented
+  vtkCleanUnstructuredGridCells(const vtkCleanUnstructuredGridCells&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCleanUnstructuredGridCells&) VTK_DELETE_FUNCTION;
 };
 
 #endif

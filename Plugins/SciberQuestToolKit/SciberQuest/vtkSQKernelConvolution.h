@@ -210,8 +210,8 @@ private:
   int LogLevel;
 
 private:
-  vtkSQKernelConvolution(const vtkSQKernelConvolution &); // Not implemented
-  void operator=(const vtkSQKernelConvolution &); // Not implemented
+  vtkSQKernelConvolution(const vtkSQKernelConvolution &) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQKernelConvolution &) VTK_DELETE_FUNCTION;
 };
 
 #endif

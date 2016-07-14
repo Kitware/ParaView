@@ -89,8 +89,8 @@ public:
   ~vtkMantaManager();
   
  private:
-  vtkMantaManager(const vtkMantaManager&);  // Not implemented.
-  void operator=(const vtkMantaManager&);  // Not implemented.
+  vtkMantaManager(const vtkMantaManager&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMantaManager&) VTK_DELETE_FUNCTION;
 
   Manta::MantaInterface * MantaEngine;
   Manta::Factory * MantaFactory;

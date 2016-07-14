@@ -36,8 +36,8 @@ protected:
   ~vtkPVLinearExtrusionFilter() {};
   
 private:
-  vtkPVLinearExtrusionFilter(const vtkPVLinearExtrusionFilter&); // Not implemented.
-  void operator=(const vtkPVLinearExtrusionFilter&); // Not implemented.
+  vtkPVLinearExtrusionFilter(const vtkPVLinearExtrusionFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVLinearExtrusionFilter&) VTK_DELETE_FUNCTION;
 };
 
 #endif

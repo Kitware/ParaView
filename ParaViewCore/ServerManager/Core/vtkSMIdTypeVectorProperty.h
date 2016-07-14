@@ -164,8 +164,8 @@ protected:
   virtual void SaveStateValues(vtkPVXMLElement* propElement);
 
 private:
-  vtkSMIdTypeVectorProperty(const vtkSMIdTypeVectorProperty&); // Not implemented
-  void operator=(const vtkSMIdTypeVectorProperty&); // Not implemented
+  vtkSMIdTypeVectorProperty(const vtkSMIdTypeVectorProperty&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMIdTypeVectorProperty&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;

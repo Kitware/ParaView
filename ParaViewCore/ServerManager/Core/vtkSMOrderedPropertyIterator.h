@@ -79,8 +79,8 @@ protected:
   unsigned int Index;
 
 private:
-  vtkSMOrderedPropertyIterator(const vtkSMOrderedPropertyIterator&); // Not implemented
-  void operator=(const vtkSMOrderedPropertyIterator&); // Not implemented
+  vtkSMOrderedPropertyIterator(const vtkSMOrderedPropertyIterator&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMOrderedPropertyIterator&) VTK_DELETE_FUNCTION;
 };
 
 #endif

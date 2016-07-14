@@ -62,8 +62,8 @@ protected:
   ~vtkMPICompositeManager();
   
 private:
-  vtkMPICompositeManager(const vtkMPICompositeManager&); // Not implemented.
-  void operator=(const vtkMPICompositeManager&); // Not implemented.
+  vtkMPICompositeManager(const vtkMPICompositeManager&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMPICompositeManager&) VTK_DELETE_FUNCTION;
   
 };
 

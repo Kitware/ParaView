@@ -98,8 +98,8 @@ protected:
   ~vtkVRQueue();
 
 private:
-  vtkVRQueue(const vtkVRQueue&); // Not implemented.
-  void operator=(const vtkVRQueue&); // Not implemented.
+  vtkVRQueue(const vtkVRQueue&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkVRQueue&) VTK_DELETE_FUNCTION;
 
   std::queue<vtkVREventData> Queue;
   mutable vtkNew<vtkMutexLock> Mutex;

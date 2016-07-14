@@ -158,8 +158,8 @@ protected:
   virtual ~vtkSQOOCBOVReader();
 
 private:
-  vtkSQOOCBOVReader(const vtkSQOOCBOVReader&); // Not implemented
-  void operator=(const vtkSQOOCBOVReader&); // Not implemented
+  vtkSQOOCBOVReader(const vtkSQOOCBOVReader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQOOCBOVReader&) VTK_DELETE_FUNCTION;
 
 private:
   BOVReader *Reader;                            // reader
