@@ -145,6 +145,11 @@ public:
   vtkGetMacro(PropertiesPanelMode, int);
 
   // Description:
+  // Set whether to dock widgets into place.
+  vtkSetMacro(LockPanels, bool);
+  vtkGetMacro(LockPanels, bool);
+
+  // Description:
   // Forwarded to vtkSMViewLayoutProxy.
   void SetMultiViewImageBorderColor(double r, double g, double b);
   void SetMultiViewImageBorderWidth(int width);
@@ -172,6 +177,7 @@ protected:
   unsigned long AnimationGeometryCacheLimit;
   int AnimationTimePrecision;
   int PropertiesPanelMode;
+  bool LockPanels;
 
 private:
   vtkPVGeneralSettings(const vtkPVGeneralSettings&); // Not implemented

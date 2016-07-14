@@ -50,7 +50,8 @@ vtkPVGeneralSettings::vtkPVGeneralSettings()
   CacheGeometryForAnimation(false),
   AnimationGeometryCacheLimit(0),
   AnimationTimePrecision(17),
-  PropertiesPanelMode(vtkPVGeneralSettings::ALL_IN_ONE)
+  PropertiesPanelMode(vtkPVGeneralSettings::ALL_IN_ONE),
+  LockPanels(false)
 {
   this->SetDefaultViewType("RenderView");
 }
@@ -234,4 +235,5 @@ void vtkPVGeneralSettings::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "CacheGeometryForAnimation: " << this->CacheGeometryForAnimation << "\n";
   os << indent << "AnimationGeometryCacheLimit: " << this->AnimationGeometryCacheLimit << "\n";
   os << indent << "PropertiesPanelMode: " << this->PropertiesPanelMode << "\n";
+  os << indent << "LockPanels: " << this->LockPanels << "\n";
 }

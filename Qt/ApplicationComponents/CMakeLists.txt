@@ -184,6 +184,10 @@ set (Module_SRCS
   pqLoadRestoreWindowLayoutReaction.h
   pqLoadStateReaction.cxx
   pqLoadStateReaction.h
+  pqLockPanelsBehavior.cxx
+  pqLockPanelsBehavior.h
+  pqLockPanelsReaction.cxx
+  pqLockPanelsReaction.h
   pqMainControlsToolbar.cxx
   pqMainControlsToolbar.h
   pqManageCustomFiltersReaction.cxx
@@ -396,6 +400,8 @@ set (Module_MOC_HDRS
   pqLoadPaletteReaction.h
   pqLoadRestoreWindowLayoutReaction.h
   pqLoadStateReaction.h
+  pqLockPanelsBehavior.h
+  pqLockPanelsReaction.h
   pqMainControlsToolbar.h
   pqManageCustomFiltersReaction.h
   pqManageLinksReaction.h

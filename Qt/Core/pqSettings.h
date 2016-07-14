@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QDialog;
 class QMainWindow;
 class QDockWidget;
+class vtkSMProperty;
 
 /// pqSettings extends QSettings to add support for following:
 /// \li saving/restoring window/dialog geometry.
@@ -61,6 +62,9 @@ public:
 
   /// Calling this method will cause the modified signal to be emited.
   void alertSettingsModified();
+
+  /// Save a property value to a given setting name
+  void saveInQSettings(const char* key, vtkSMProperty* smproperty);
 
 private:
   /// ensure that when window state is being loaded, if dock windows are

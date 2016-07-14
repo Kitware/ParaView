@@ -118,6 +118,20 @@
         </Hints>
       </IntVectorProperty>
 
+      <IntVectorProperty name="LockPanels"
+        command="SetLockPanels"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <Documentation>
+          Prevent movement of dockable control panels to other positions.
+        </Documentation>
+        <BooleanDomain name="bool" />
+        <Hints>
+          <SaveInQSettings/>
+        </Hints>
+      </IntVectorProperty>
+
       <IntVectorProperty name="AutoConvertProperties"
         number_of_elements="1"
         default_values="0"

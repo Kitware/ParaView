@@ -89,6 +89,7 @@ public:
   PQ_BEHAVIOR_DEFINE_METHODS(PluginSettingsBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(ApplyBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(QuickLaunchShortcuts);
+  PQ_BEHAVIOR_DEFINE_METHODS(LockPanelsBehavior);
 
   pqParaViewBehaviors(QMainWindow* window, QObject* parent=NULL);
   virtual ~pqParaViewBehaviors();
@@ -120,6 +121,7 @@ private:
   PQ_BEHAVIOR_DECLARE_FLAG(PluginSettingsBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(ApplyBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(QuickLaunchShortcuts);
+  PQ_BEHAVIOR_DECLARE_FLAG(LockPanelsBehavior);
 };
 
 #undef PQ_BEHAVIOR_DECLARE_FLAG

@@ -37,6 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFile>
 #include <QMainWindow>
 
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
+
 namespace
 {
   class pqSettingsCleaner : public QObject
@@ -151,6 +154,27 @@ void pqSettings::restoreState(const QString& key, QMainWindow& window)
    }
 
   this->endGroup();
+}
+
+//-----------------------------------------------------------------------------
+void pqSettings::saveInQSettings(
+  const char* key, vtkSMProperty* smproperty)
+{
+  // FIXME: handle all property types. This will only work for single value
+  // properties.
+  if (smproperty->IsA("vtkSMIntVectorProperty") ||
+    smproperty->IsA("vtkSMIdTypeVectorProperty"))
+    {
+    this->setValue(key, vtkSMPropertyHelper(smproperty).GetAsInt());
+    }
+  else if (smproperty->IsA("vtkSMDoubleVectorProperty"))
+    {
+    this->setValue(key, vtkSMPropertyHelper(smproperty).GetAsDouble());
+    }
+  else if (smproperty->IsA("vtkSMStringVectorProperty"))
+    {
+    this->setValue(key, vtkSMPropertyHelper(smproperty).GetAsString());
+    }
 }
 
 //-----------------------------------------------------------------------------

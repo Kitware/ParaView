@@ -222,6 +222,7 @@ void pqSettingsDialog::onAccepted()
   // If there are any properties that needed to save their values in QSettings,
   // do that. Otherwise, save to the vtkSMSettings singleton.
   vtkSMSettings * settings = vtkSMSettings::GetInstance();
+  pqSettings* qSettings = pqApplicationCore::instance()->settings();
   pqServer* server = pqActiveObjects::instance().activeServer();
   vtkNew<vtkSMProxyIterator> iter;
   iter->SetSession(server->session());
@@ -239,7 +240,7 @@ void pqSettingsDialog::onAccepted()
         smproperty->GetHints()->FindNestedElementByName("SaveInQSettings"))
         {
         QString key = QString("%1.%2").arg(iter->GetKey()).arg(iter2->GetKey());
-        this->saveInQSettings(key.toLatin1().data(), smproperty);
+        qSettings->saveInQSettings(key.toLatin1().data(), smproperty);
         }
       }
     }
@@ -328,29 +329,6 @@ void pqSettingsDialog::showRestartRequiredMessage()
   Ui::SettingsDialog &ui = this->Internals->Ui;
   ui.restartRequiredLabel->setVisible(true);
   pqSettingsDialog::ShowRestartRequired = true;
-}
-
-//-----------------------------------------------------------------------------
-void pqSettingsDialog::saveInQSettings(
-  const char* key, vtkSMProperty* smproperty)
-{
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-
-  // FIXME: handle all property types. This will only work for single value
-  // properties.
-  if (smproperty->IsA("vtkSMIntVectorProperty") ||
-    smproperty->IsA("vtkSMIdTypeVectorProperty"))
-    {
-    settings->setValue(key, vtkSMPropertyHelper(smproperty).GetAsInt());
-    }
-  else if (smproperty->IsA("vtkSMDoubleVectorProperty"))
-    {
-    settings->setValue(key, vtkSMPropertyHelper(smproperty).GetAsDouble());
-    }
-  else if (smproperty->IsA("vtkSMStringVectorProperty"))
-    {
-    settings->setValue(key, vtkSMPropertyHelper(smproperty).GetAsString());
-    }
 }
 
 //-----------------------------------------------------------------------------
