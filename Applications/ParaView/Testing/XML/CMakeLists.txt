@@ -589,6 +589,7 @@ set (SpreadSheet2_THRESHOLD 50)
 set (PlotOverTimeAutoApply_THRESHOLD 50)
 set (ExportLinePlotToCSV_THRESHOLD 30)
 set (PlotOverTimeAutoApply_DISABLE_CRS TRUE) # since this uses surface selection.
+set (QuartilePlot_THRESHOLD 20)
 
 
 # DisconnectAndSaveAnimation is only support in Client-Server mode.

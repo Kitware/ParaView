@@ -124,6 +124,14 @@ public:
   // Provides access to the actor used by this representation.
   vtkPVLODActor* GetActor() { return this->Actor; }
 
+  // Description:
+  // Pass lighting parameters to vtkProperty.
+  void SetAmbient(double ambient);
+  void SetDiffuse(double diffuse);
+  void SetSpecular(double specular);
+  void SetSpecularPower(double val);
+  void SetSpecularColor(double r, double g, double b);
+
 protected:
   vtkImageSliceRepresentation();
   ~vtkImageSliceRepresentation();

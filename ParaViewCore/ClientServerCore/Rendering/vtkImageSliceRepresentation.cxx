@@ -384,3 +384,33 @@ void vtkImageSliceRepresentation::SetUseXYPlane(int val)
 {
   this->SliceMapper->SetUseXYPlane(val);
 }
+
+//----------------------------------------------------------------------------
+void vtkImageSliceRepresentation::SetAmbient(double ambient)
+{
+  this->Actor->GetProperty()->SetAmbient(ambient);
+}
+
+//----------------------------------------------------------------------------
+void vtkImageSliceRepresentation::SetDiffuse(double diffuse)
+{
+  this->Actor->GetProperty()->SetDiffuse(diffuse);
+}
+
+//----------------------------------------------------------------------------
+void vtkImageSliceRepresentation::SetSpecular(double specular)
+{
+  this->Actor->GetProperty()->SetSpecular(specular);
+}
+
+//----------------------------------------------------------------------------
+void vtkImageSliceRepresentation::SetSpecularPower(double val)
+{
+  this->Actor->GetProperty()->SetSpecularPower(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkImageSliceRepresentation::SetSpecularColor(double r, double g, double b)
+{
+  this->Actor->GetProperty()->SetSpecularColor(r, g, b);
+}
