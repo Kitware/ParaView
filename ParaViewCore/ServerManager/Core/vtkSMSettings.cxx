@@ -112,7 +112,7 @@ public:
   //----------------------------------------------------------------------------
   // Description: Get a Json::Value given a setting name. Returns the
   // highest-priority setting defined in the setting collections, and
-  // nullRef if it isn't defined in any of the collections.
+  // null if it isn't defined in any of the collections.
   //
   // String format is:
   // "." => root node
@@ -509,7 +509,7 @@ public:
       {
       if (jsonValue.isArray())
         {
-        // Reset to nullRef so that we aren't setting a value on a Json::Value array
+        // Reset to null so that we aren't setting a value on a Json::Value array
         jsonValue = Json::Value::nullRef;
         this->Modified();
         }
@@ -524,7 +524,7 @@ public:
       {
       if (!jsonValue.isArray() && !jsonValue.isNull())
         {
-        // Reset to nullRef so that the jsonValue.resize() operation works
+        // Reset to null so that the jsonValue.resize() operation works
         jsonValue = Json::Value::nullRef;
         this->Modified();
         }
@@ -553,7 +553,7 @@ public:
       {
       if (jsonValue.isArray())
         {
-        // Reset to nullRef so that we aren't setting a value on a Json::Value array
+        // Reset to null so that we aren't setting a value on a Json::Value array
         jsonValue = Json::Value::nullRef;
         this->Modified();
         }
@@ -568,7 +568,7 @@ public:
       {
       if (!jsonValue.isArray() && !jsonValue.isNull())
         {
-        // Reset to nullRef so that the jsonValue.resize() operation works
+        // Reset to null so that the jsonValue.resize() operation works
         jsonValue = Json::Value::nullRef;
         this->Modified();
         }
@@ -597,7 +597,7 @@ public:
       {
       if (jsonValue.isArray())
         {
-        // Reset to nullRef so that we aren't setting a value on a Json::Value array
+        // Reset to null so that we aren't setting a value on a Json::Value array
         jsonValue = Json::Value::nullRef;
         this->Modified();
         }
@@ -612,7 +612,7 @@ public:
       {
       if (!jsonValue.isArray() && !jsonValue.isNull())
         {
-        // Reset to nullRef so that the jsonValue.resize() operation works
+        // Reset to null so that the jsonValue.resize() operation works
         jsonValue = Json::Value::nullRef;
         this->Modified();
         }
