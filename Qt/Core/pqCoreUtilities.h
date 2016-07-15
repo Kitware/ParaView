@@ -61,7 +61,7 @@ signals:
   void eventInvoked(vtkObject*, unsigned long, void*);
 
 private:
-  Q_DISABLE_COPY(pqCoreUtilitiesEventHelper);
+  Q_DISABLE_COPY(pqCoreUtilitiesEventHelper)
 
   void executeEvent(vtkObject*, unsigned long, void*);
   class pqInternal;

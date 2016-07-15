@@ -172,7 +172,7 @@ private:
     int& maxIndex);
 
 private:
-  Q_DISABLE_COPY(pqMultiViewWidget);
+  Q_DISABLE_COPY(pqMultiViewWidget)
 
   class pqInternals;
   pqInternals* Internals;

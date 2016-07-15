@@ -60,7 +60,7 @@ public:
   virtual ~pqXYHistogramChartView();
 
 private:
-  Q_DISABLE_COPY(pqXYHistogramChartView);
+  Q_DISABLE_COPY(pqXYHistogramChartView)
 };
 
 #endif

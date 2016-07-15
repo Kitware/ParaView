@@ -111,7 +111,7 @@ protected:
     this->Superclass::setServerManagerValue(use_unchecked, value);
     }
 private:
-  Q_DISABLE_COPY(pqTraceablePropertyLinksConnection);
+  Q_DISABLE_COPY(pqTraceablePropertyLinksConnection)
 };
 
 //-----------------------------------------------------------------------------

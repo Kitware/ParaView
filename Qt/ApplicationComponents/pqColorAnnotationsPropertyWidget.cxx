@@ -102,7 +102,7 @@ public:
     }
 
 private:
-  Q_DISABLE_COPY(pqColorAnnotationsPropertyWidgetDecorator);
+  Q_DISABLE_COPY(pqColorAnnotationsPropertyWidgetDecorator)
 };
 
 //-----------------------------------------------------------------------------
@@ -401,7 +401,7 @@ public:
     }
 
 private:
-  Q_DISABLE_COPY(pqAnnotationsModel);
+  Q_DISABLE_COPY(pqAnnotationsModel)
   };
 }
 

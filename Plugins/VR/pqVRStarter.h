@@ -64,7 +64,7 @@ public:
   void onShutdown();
 
 private:
-  Q_DISABLE_COPY(pqVRStarter);
+  Q_DISABLE_COPY(pqVRStarter)
   class pqInternals;
   pqInternals* Internals;
   bool IsShutdown;

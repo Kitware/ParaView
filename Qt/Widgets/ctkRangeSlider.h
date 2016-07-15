@@ -231,7 +231,7 @@ protected:
 
 private:
   Q_DECLARE_PRIVATE(ctkRangeSlider);
-  Q_DISABLE_COPY(ctkRangeSlider);
+  Q_DISABLE_COPY(ctkRangeSlider)
 };
 
 #endif

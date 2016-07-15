@@ -85,7 +85,7 @@ signals:
   void dummySignal();
 
 private:
-  Q_DISABLE_COPY(pqProxyEditorPropertyWidget);
+  Q_DISABLE_COPY(pqProxyEditorPropertyWidget)
 
   vtkWeakPointer<vtkSMProxy> ProxyToEdit;
   QPointer<QPushButton> Button;

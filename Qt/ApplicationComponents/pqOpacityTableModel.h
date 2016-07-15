@@ -65,7 +65,7 @@ public:
   virtual void refresh();
 
 private:
-  Q_DISABLE_COPY(pqOpacityTableModel);
+  Q_DISABLE_COPY(pqOpacityTableModel)
 
   pqColorOpacityEditorWidget * Widget;
 

@@ -57,7 +57,7 @@ private slots:
   void actionTriggered(QAction* actn);
 
 private:
-  Q_DISABLE_COPY(pqLoadPaletteReaction);
+  Q_DISABLE_COPY(pqLoadPaletteReaction)
   QPointer<QMenu> Menu;
 };
 

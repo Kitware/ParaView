@@ -91,7 +91,7 @@ public:
   /// for an empty view).
   virtual VisibilityState getVisibility(pqView* view, pqOutputPort* port) const;
 private:
-  Q_DISABLE_COPY(pqDisplayPolicy);
+  Q_DISABLE_COPY(pqDisplayPolicy)
 };
 
 #endif

@@ -86,7 +86,7 @@ protected:
   virtual void onTriggered();
 
 private:
-  Q_DISABLE_COPY(pqResetScalarRangeReaction);
+  Q_DISABLE_COPY(pqResetScalarRangeReaction)
   QPointer<pqPipelineRepresentation> Representation;
   Modes Mode;
 };

@@ -75,7 +75,7 @@ private slots:
   void actionTriggered(QAction*);
 
 private:
-  Q_DISABLE_COPY(pqColorChooserButtonWithPalettes);
+  Q_DISABLE_COPY(pqColorChooserButtonWithPalettes)
 
   /// Returns the color palette proxy for the active session.
   vtkSMGlobalPropertiesProxy* colorPalette() const;
@@ -105,7 +105,7 @@ private:
   QString selectedPaletteColor() const;
 
 private:
-  Q_DISABLE_COPY(pqColorPaletteLinkHelper);
+  Q_DISABLE_COPY(pqColorPaletteLinkHelper)
 
   vtkWeakPointer<vtkSMProxy> SMProxy;
   QString SMPropertyName;

@@ -418,7 +418,7 @@ namespace
         }
       }
   private:
-    Q_DISABLE_COPY(pqProxyWidgetItem);
+    Q_DISABLE_COPY(pqProxyWidgetItem)
     };
 
 

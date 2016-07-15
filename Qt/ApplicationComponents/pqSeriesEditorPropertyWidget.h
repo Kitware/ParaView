@@ -160,7 +160,7 @@ private slots:
   void domainModified(vtkObject* sender);
 
 private:
-  Q_DISABLE_COPY(pqSeriesEditorPropertyWidget);
+  Q_DISABLE_COPY(pqSeriesEditorPropertyWidget)
 
   class pqInternals;
   pqInternals* Internals;

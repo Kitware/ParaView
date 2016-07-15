@@ -85,7 +85,7 @@ protected:
 
 private:
   Q_DECLARE_PRIVATE(pqTextEdit);
-  Q_DISABLE_COPY(pqTextEdit);
+  Q_DISABLE_COPY(pqTextEdit)
 };
 
 #endif

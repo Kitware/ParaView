@@ -83,7 +83,7 @@ public:
   static int stereoMode(const QString& label);
 
 private:
-  Q_DISABLE_COPY(pqStereoModeHelper);
+  Q_DISABLE_COPY(pqStereoModeHelper)
   class pqInternals;
   QScopedPointer<pqInternals> Internals;
 };

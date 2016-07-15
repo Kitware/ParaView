@@ -54,7 +54,7 @@ public slots:
   void clear() { this->highlight(true); }
 
 private:
-  Q_DISABLE_COPY(pqHighlightablePushButton);
+  Q_DISABLE_COPY(pqHighlightablePushButton)
   class pqInternals;
   const QScopedPointer<pqInternals> Internals;
 };

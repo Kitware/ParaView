@@ -162,7 +162,7 @@ protected:
     }
 
 private:
-  Q_DISABLE_COPY(pqNetworkAccessManager);
+  Q_DISABLE_COPY(pqNetworkAccessManager)
 };
 
 //----------------------------------------------------------------------------------
@@ -190,7 +190,7 @@ public:
     }
 
 private:
-  Q_DISABLE_COPY(pqWebView);
+  Q_DISABLE_COPY(pqWebView)
 };
 
 } // end of namespace

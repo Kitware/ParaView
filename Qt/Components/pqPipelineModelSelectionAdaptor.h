@@ -49,6 +49,6 @@ protected:
   virtual pqServerManagerModelItem* mapToItem(const QModelIndex& index) const;
 
 private:
-  Q_DISABLE_COPY(pqPipelineModelSelectionAdaptor);
+  Q_DISABLE_COPY(pqPipelineModelSelectionAdaptor)
 };
 #endif

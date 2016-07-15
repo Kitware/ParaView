@@ -66,7 +66,7 @@ protected:
   bool BoolProperty;
 
 private:
-  Q_DISABLE_COPY(pqBoolPropertyWidgetDecorator);
+  Q_DISABLE_COPY(pqBoolPropertyWidgetDecorator)
 
   /// updates the enabled state.
   void updateBoolPropertyState();

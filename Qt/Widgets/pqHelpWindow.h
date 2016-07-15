@@ -72,7 +72,7 @@ protected:
   QHelpEngine* HelpEngine;
 
 private:
-  Q_DISABLE_COPY(pqHelpWindow);
+  Q_DISABLE_COPY(pqHelpWindow)
   const QScopedPointer<pqBrowser> Browser;
 };
 

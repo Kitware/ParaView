@@ -73,7 +73,7 @@ protected slots:
   virtual void onTriggered();
 
 private:
-  Q_DISABLE_COPY(pqEditScalarBarReaction);
+  Q_DISABLE_COPY(pqEditScalarBarReaction)
   QPointer<pqScalarBarVisibilityReaction> SBVReaction;
 };
 

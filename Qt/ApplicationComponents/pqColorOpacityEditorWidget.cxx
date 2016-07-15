@@ -99,7 +99,7 @@ public:
     }
 
 private:
-  Q_DISABLE_COPY(pqColorOpacityEditorWidgetDecorator);
+  Q_DISABLE_COPY(pqColorOpacityEditorWidgetDecorator)
 };
 
 } // end anonymous namespace

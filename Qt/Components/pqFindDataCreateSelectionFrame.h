@@ -84,7 +84,7 @@ private slots:
   void onSelectionChanged(pqOutputPort*);
 
 private:
-  Q_DISABLE_COPY(pqFindDataCreateSelectionFrame);
+  Q_DISABLE_COPY(pqFindDataCreateSelectionFrame)
 
   class pqInternals;
   friend class pqInternals;

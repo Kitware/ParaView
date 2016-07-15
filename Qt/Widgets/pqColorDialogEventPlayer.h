@@ -51,7 +51,7 @@ public:
 
   static const QString &EVENT_NAME();
 private:
-  Q_DISABLE_COPY(pqColorDialogEventPlayer);
+  Q_DISABLE_COPY(pqColorDialogEventPlayer)
 };
 
 #endif

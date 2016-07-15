@@ -80,7 +80,7 @@ protected slots:
   void processEvents();
 
 private:
-  Q_DISABLE_COPY(pqVRQueueHandler);
+  Q_DISABLE_COPY(pqVRQueueHandler)
   void render();
   class pqInternals;
   pqInternals* Internals;

@@ -66,7 +66,7 @@ protected:
   /// Called when the action is triggered.
   virtual void onTriggered();
 private:
-  Q_DISABLE_COPY(pqEditColorMapReaction);
+  Q_DISABLE_COPY(pqEditColorMapReaction)
   QPointer<pqPipelineRepresentation> Representation;
 };
 

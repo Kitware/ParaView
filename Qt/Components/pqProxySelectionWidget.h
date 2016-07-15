@@ -84,7 +84,7 @@ private:
   class pqInternal;
   const QScopedPointer<pqInternal> Internal;
 
-  Q_DISABLE_COPY(pqProxySelectionWidget);
+  Q_DISABLE_COPY(pqProxySelectionWidget)
 };
 
 #endif

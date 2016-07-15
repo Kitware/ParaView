@@ -85,7 +85,7 @@ protected slots:
   void sourceRemoved(pqPipelineSource*);
 
 private:
-  Q_DISABLE_COPY(pqLiveInsituVisualizationManager);
+  Q_DISABLE_COPY(pqLiveInsituVisualizationManager)
 
   class pqInternals;
   pqInternals* Internals;

@@ -139,7 +139,7 @@ signals:
   void suppressedTimeSourcesChanged();
 
 private:
-  Q_DISABLE_COPY(pqTimeInspectorWidget);
+  Q_DISABLE_COPY(pqTimeInspectorWidget)
 
   class pqInternals;
   const QScopedPointer<pqInternals> Internals;

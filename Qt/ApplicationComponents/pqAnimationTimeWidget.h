@@ -112,7 +112,7 @@ private slots:
   void timestepValueChanged();
 
 private:
-  Q_DISABLE_COPY(pqAnimationTimeWidget);
+  Q_DISABLE_COPY(pqAnimationTimeWidget)
 
   // Returns the current timekeeper.
   vtkSMProxy* timeKeeper() const;

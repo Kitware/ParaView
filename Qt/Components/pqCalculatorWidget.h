@@ -63,7 +63,7 @@ protected slots:
   void updateVariables(const QString& mode);
 
 private:
-  Q_DISABLE_COPY(pqCalculatorWidget);
+  Q_DISABLE_COPY(pqCalculatorWidget)
 
   class pqInternals;
   pqInternals* Internals;

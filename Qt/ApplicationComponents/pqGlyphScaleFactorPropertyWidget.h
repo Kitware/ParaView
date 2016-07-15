@@ -52,7 +52,7 @@ protected slots:
   virtual void resetButtonClicked();
 
 private:
-  Q_DISABLE_COPY(pqGlyphScaleFactorPropertyWidget);
+  Q_DISABLE_COPY(pqGlyphScaleFactorPropertyWidget)
 };
 
 #endif

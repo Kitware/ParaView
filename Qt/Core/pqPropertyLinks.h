@@ -146,7 +146,7 @@ private:
   bool addNewConnection(pqPropertyLinksConnection*);
 
 private:
-  Q_DISABLE_COPY(pqPropertyLinks);
+  Q_DISABLE_COPY(pqPropertyLinks)
 
   class pqInternals;
   pqInternals* Internals;

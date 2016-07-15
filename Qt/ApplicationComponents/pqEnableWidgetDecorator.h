@@ -54,7 +54,7 @@ public:
   }
 
 private:
-  Q_DISABLE_COPY(pqEnableWidgetDecorator);
+  Q_DISABLE_COPY(pqEnableWidgetDecorator)
 };
 
 #endif

@@ -74,7 +74,7 @@ private slots:
   /// update the data shown in the spreadsheet aka render the spreadsheet.
   void updateSpreadSheet();
 private:
-  Q_DISABLE_COPY(pqFindDataCurrentSelectionFrame);
+  Q_DISABLE_COPY(pqFindDataCurrentSelectionFrame)
 
   class pqInternals;
   friend class pqInternals;

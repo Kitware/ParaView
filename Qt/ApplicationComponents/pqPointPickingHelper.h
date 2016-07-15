@@ -74,7 +74,7 @@ private slots:
   void pickPoint();
 
 private:
-  Q_DISABLE_COPY(pqPointPickingHelper);
+  Q_DISABLE_COPY(pqPointPickingHelper)
   QKeySequence KeySequence;
   QPointer<pqRenderView> View;
   bool PickOnMesh;

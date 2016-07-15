@@ -80,7 +80,7 @@ protected slots:
   void updateLengthLabel();
 
 private:
-  Q_DISABLE_COPY(pqLinePropertyWidget);
+  Q_DISABLE_COPY(pqLinePropertyWidget)
   class pqInternals;
   QScopedPointer<pqInternals> Internals;
   vtkBoundingBox referenceBounds() const;

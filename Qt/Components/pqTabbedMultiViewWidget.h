@@ -174,13 +174,13 @@ protected:
       { return this->ReadOnly;}
 
   private:
-    Q_DISABLE_COPY(pqTabWidget);
+    Q_DISABLE_COPY(pqTabWidget)
     bool ReadOnly;
     friend class pqTabbedMultiViewWidget;
   };
 
 private:
-  Q_DISABLE_COPY(pqTabbedMultiViewWidget);
+  Q_DISABLE_COPY(pqTabbedMultiViewWidget)
 
   class pqInternals;
   pqInternals* Internals;

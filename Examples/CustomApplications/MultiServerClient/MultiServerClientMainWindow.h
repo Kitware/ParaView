@@ -52,7 +52,7 @@ protected slots:
   void applyPipelineFiltering2(int);
 
 private:
-  Q_DISABLE_COPY(MultiServerClientMainWindow);
+  Q_DISABLE_COPY(MultiServerClientMainWindow)
 
   pqPipelineBrowserWidget* pipelineBrowser;
   QComboBox* comboBox;

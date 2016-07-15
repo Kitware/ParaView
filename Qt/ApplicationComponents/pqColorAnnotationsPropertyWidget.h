@@ -103,7 +103,7 @@ private slots:
   /// called when the user edits past the last row.
   void editPastLastRow();
 private:
-  Q_DISABLE_COPY(pqColorAnnotationsPropertyWidget);
+  Q_DISABLE_COPY(pqColorAnnotationsPropertyWidget)
 
   class pqInternals;
   pqInternals* Internals;

@@ -102,7 +102,7 @@ protected:
     return val;
     }
 private:
-  Q_DISABLE_COPY(PropertyLinksConnection);
+  Q_DISABLE_COPY(PropertyLinksConnection)
 };
 
 

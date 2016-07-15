@@ -148,7 +148,7 @@ protected:
   void triggerSignals();
 
 private:
-  Q_DISABLE_COPY(pqActiveObjects);
+  Q_DISABLE_COPY(pqActiveObjects)
 
   /// method used to reset all active items.
   void resetActives();

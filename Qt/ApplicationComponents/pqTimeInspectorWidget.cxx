@@ -238,7 +238,7 @@ private:
     model->update();
     }
 
-  Q_DISABLE_COPY(TimeTrack);
+  Q_DISABLE_COPY(TimeTrack)
 };
 
 class pqTimeInspectorWidget::pqInternals
