@@ -46,7 +46,7 @@ public:
 protected slots:
 
 private:
-  Q_DISABLE_COPY(myMainWindow)  
+  Q_DISABLE_COPY(myMainWindow)
 };
 
 #endif

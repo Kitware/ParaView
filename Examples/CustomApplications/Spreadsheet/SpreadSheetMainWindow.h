@@ -47,7 +47,7 @@ protected slots:
   void showData(pqPipelineSource*);
 
 private:
-  Q_DISABLE_COPY(SpreadSheetMainWindow)  
+  Q_DISABLE_COPY(SpreadSheetMainWindow)
 };
 
 #endif
