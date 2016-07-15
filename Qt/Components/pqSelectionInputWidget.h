@@ -85,8 +85,7 @@ protected:
   pqSMProxy SelectionSource;
 
 private:
-  pqSelectionInputWidget(const pqSelectionInputWidget&) VTK_DELETE_FUNCTION;
-  void operator=(const pqSelectionInputWidget&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqSelectionInputWidget)
 
   class UI;
   UI *ui;

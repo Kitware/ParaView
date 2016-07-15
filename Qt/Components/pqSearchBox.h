@@ -175,8 +175,7 @@ protected slots:
   void updateFromSettings();
 
 private:
-  pqSearchBox(const pqSearchBox&) VTK_DELETE_FUNCTION;
-  void operator=(const pqSearchBox&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqSearchBox)
 
   class pqInternals;
   friend class pqInternals;

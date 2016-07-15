@@ -73,8 +73,7 @@ protected:
   virtual QWidget* createWidget();
 
 private:
-  pqComparativeRenderView(const pqComparativeRenderView&) VTK_DELETE_FUNCTION;
-  void operator=(const pqComparativeRenderView&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqComparativeRenderView)
 
   class pqInternal;
   pqInternal* Internal;

@@ -86,8 +86,7 @@ protected:
   void loadTexture();
   bool loadTexture(const QString& filename);
 private:
-  pqTextureComboBox(const pqTextureComboBox&) VTK_DELETE_FUNCTION;
-  void operator=(const pqTextureComboBox&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqTextureComboBox)
 
   class pqInternal;
   pqInternal* Internal;

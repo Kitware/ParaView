@@ -100,8 +100,7 @@ private slots:
   void sort(int);
 
 private:
-  pqSignalAdaptorTreeWidget(const pqSignalAdaptorTreeWidget&) VTK_DELETE_FUNCTION;
-  void operator=(const pqSignalAdaptorTreeWidget&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqSignalAdaptorTreeWidget)
 
   /// Append an item to the tree.
   void appendItem(QTreeWidgetItem* item);

@@ -106,8 +106,7 @@ private slots:
   void onEnabledModified();
 
 private:
-  pqAnimationCue(const pqAnimationCue&) VTK_DELETE_FUNCTION;
-  void operator=(const pqAnimationCue&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqAnimationCue)
 
   /// Methods used to register/unregister keyframe proxies.
   void addKeyFrameInternal(vtkSMProxy*);

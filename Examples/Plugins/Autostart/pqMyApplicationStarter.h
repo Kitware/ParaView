@@ -48,8 +48,7 @@ public:
   // Callback for startup.
   void onStartup();
 private:
-  pqMyApplicationStarter(const pqMyApplicationStarter&) VTK_DELETE_FUNCTION;
-  void operator=(const pqMyApplicationStarter&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqMyApplicationStarter)
 };
 
 #endif

@@ -142,8 +142,7 @@ protected slots:
   void onHeightEdited();
   void onLockAspectRatio(bool lock);
 private:
-  pqAnimationManager(const pqAnimationManager&) VTK_DELETE_FUNCTION;
-  void operator=(const pqAnimationManager&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqAnimationManager)
 
   class pqInternals;
   pqInternals* Internals;

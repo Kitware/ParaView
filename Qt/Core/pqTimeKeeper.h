@@ -85,8 +85,7 @@ signals:
   void timeRangeChanged();
 
 private:
-  pqTimeKeeper(const pqTimeKeeper&) VTK_DELETE_FUNCTION;
-  void operator=(const pqTimeKeeper&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqTimeKeeper)
 
   class pqInternals;
   pqInternals* Internals;

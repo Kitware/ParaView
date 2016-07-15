@@ -71,8 +71,7 @@ private slots:
   void onWidgetVisibilityChanged(bool visible);
 
 private:
-  pqSphereWidget(const pqSphereWidget&) VTK_DELETE_FUNCTION;
-  void operator=(const pqSphereWidget&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqSphereWidget)
 
   class pqImplementation;
   pqImplementation* Implementation;

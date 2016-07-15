@@ -90,8 +90,7 @@ protected slots:
   /// Create a QWidget for the view's viewport.
   virtual QWidget* createWidget();
 private:
-  pqSpreadSheetView(const pqSpreadSheetView&) VTK_DELETE_FUNCTION;
-  void operator=(const pqSpreadSheetView&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqSpreadSheetView)
 
   class pqInternal;
   pqInternal* Internal;

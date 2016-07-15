@@ -79,8 +79,7 @@ protected slots:
   void setBufferLengthById(int id);
 
 private:
-  pqTimerLogDisplay(const pqTimerLogDisplay &) VTK_DELETE_FUNCTION;
-  void operator=(const pqTimerLogDisplay &) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqTimerLogDisplay)
 
   double LogThreshold;
   pqTimerLogDisplayUi *ui;

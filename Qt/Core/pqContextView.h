@@ -96,8 +96,7 @@ protected:
   command* Command;
 
 private:
-  pqContextView(const pqContextView&) VTK_DELETE_FUNCTION;
-  void operator=(const pqContextView&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqContextView)
 
   class pqInternal;
   pqInternal* Internal;

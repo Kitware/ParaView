@@ -55,8 +55,7 @@ public:
     arguments, bool& error);
 
 private:
-  pqPluginTreeWidgetEventPlayer(const pqPluginTreeWidgetEventPlayer&) VTK_DELETE_FUNCTION;
-  void operator=(const pqPluginTreeWidgetEventPlayer&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqPluginTreeWidgetEventPlayer)
 };
 
 #endif // !_pqPluginTreeWidgetEventPlayer_h

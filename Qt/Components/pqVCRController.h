@@ -103,8 +103,7 @@ protected slots:
   void onEndPlay();
 
 private:
-  pqVCRController(const pqVCRController&) VTK_DELETE_FUNCTION;
-  void operator=(const pqVCRController&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqVCRController)
 
   QPointer<pqAnimationScene> Scene;
 };

@@ -49,8 +49,7 @@ public:
   virtual void stepBy(int steps);
 
 private:
-  pqDoubleSpinBox(const pqDoubleSpinBox&) VTK_DELETE_FUNCTION;
-  void operator=(const pqDoubleSpinBox&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqDoubleSpinBox)
 };
 
 #endif

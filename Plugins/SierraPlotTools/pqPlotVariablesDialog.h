@@ -99,8 +99,7 @@ protected:
   pqServer *Server;
 
 private:
-  pqPlotVariablesDialog(const pqPlotVariablesDialog &) VTK_DELETE_FUNCTION;
-  void operator=(const pqPlotVariablesDialog &) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqPlotVariablesDialog)
 
   pqUI *ui;
 

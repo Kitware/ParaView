@@ -48,8 +48,7 @@ public:
   // Callback for startup.
   void onStartup();
 private:
-  pqRepresentationBehaviorStarter(const pqRepresentationBehaviorStarter&) VTK_DELETE_FUNCTION;
-  void operator=(const pqRepresentationBehaviorStarter&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqRepresentationBehaviorStarter)
 };
 
 #endif

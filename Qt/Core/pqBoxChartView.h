@@ -69,8 +69,7 @@ protected slots:
   void updateRepresentationVisibility(pqRepresentation* repr, bool visible);
 
 private:
-  pqBoxChartView(const pqBoxChartView&) VTK_DELETE_FUNCTION;
-  void operator=(const pqBoxChartView&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqBoxChartView)
 };
 
 #endif

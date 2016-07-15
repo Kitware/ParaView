@@ -101,8 +101,7 @@ protected:
   void triggerTextChangedAndEditingFinished();
 
 private:
-  pqLineEdit(const pqLineEdit&) VTK_DELETE_FUNCTION;
-  void operator=(const pqLineEdit&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqLineEdit)
 
   bool EditingFinishedPending;
   bool ResetCursorPositionOnEditingFinished;

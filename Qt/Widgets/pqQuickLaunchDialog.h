@@ -69,8 +69,7 @@ protected:
   /// Given the user entered text, update the GUI.
   void updateSearch();
 private:
-  pqQuickLaunchDialog(const pqQuickLaunchDialog&) VTK_DELETE_FUNCTION;
-  void operator=(const pqQuickLaunchDialog&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqQuickLaunchDialog)
 
   class pqInternal;
   pqInternal *Internal;

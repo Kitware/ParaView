@@ -199,8 +199,7 @@ protected slots:
   void onConnectionLost(vtkObject*, unsigned long, void*, void*);
 
 private:
-  pqServer(const pqServer&) VTK_DELETE_FUNCTION;
-  pqServer& operator=(const pqServer&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqServer)
 
   pqServerResource Resource;
   vtkIdType ConnectionID;

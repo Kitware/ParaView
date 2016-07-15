@@ -71,8 +71,7 @@ protected:
   pqSpreadSheetView* Spreadsheet;
 
 private:
-  pqSpreadSheetViewDecorator(const pqSpreadSheetViewDecorator&) VTK_DELETE_FUNCTION;
-  void operator=(const pqSpreadSheetViewDecorator&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqSpreadSheetViewDecorator)
 
   class pqInternal;
   pqInternal* Internal;

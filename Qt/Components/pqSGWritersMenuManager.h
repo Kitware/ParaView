@@ -77,8 +77,7 @@ private:
   QString WritersMenuName;
   QString ObjectMenuName;
 
-  pqSGWritersMenuManager(const pqSGWritersMenuManager&) VTK_DELETE_FUNCTION;
-  void operator=(const pqSGWritersMenuManager&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqSGWritersMenuManager)
 
   QTimer Timer;
 };

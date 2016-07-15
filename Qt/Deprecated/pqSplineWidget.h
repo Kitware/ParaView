@@ -70,8 +70,7 @@ protected:
   void createWidget(pqServer*);
 
 private:
-  pqSplineWidget(const pqSplineWidget&) VTK_DELETE_FUNCTION;
-  void operator=(const pqSplineWidget&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqSplineWidget)
 
   class pqInternals;
   pqInternals* Internals;

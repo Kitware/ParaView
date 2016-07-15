@@ -111,8 +111,7 @@ protected:
   bool AllowCaching;
 
 private: 
-  pqRenderViewBase(const pqRenderViewBase&) VTK_DELETE_FUNCTION;
-  void operator=(const pqRenderViewBase&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqRenderViewBase)
 
   class pqInternal;
   pqInternal* Internal;

@@ -72,7 +72,7 @@ protected:
   void buildPortWidgets();
 
 private:
-  Q_DISABLE_COPY(pqChangeInputDialog);
+  Q_DISABLE_COPY(pqChangeInputDialog)
 
   class pqInternals;
   pqInternals* Internals;

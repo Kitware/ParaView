@@ -86,8 +86,7 @@ protected slots:
   void updateSize();
 
 private:
-  pqSaveSnapshotDialog(const pqSaveSnapshotDialog&) VTK_DELETE_FUNCTION;
-  void operator=(const pqSaveSnapshotDialog&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqSaveSnapshotDialog)
 
   class pqInternal;
   pqInternal* Internal;

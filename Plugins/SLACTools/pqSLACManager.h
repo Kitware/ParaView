@@ -134,8 +134,7 @@ private:
   class pqInternal;
   pqInternal *Internal;
 
-  pqSLACManager(const pqSLACManager &) VTK_DELETE_FUNCTION;
-  void operator=(const pqSLACManager &) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqSLACManager)
 };
 
 #endif //pqSLACManager_h

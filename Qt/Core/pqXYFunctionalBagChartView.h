@@ -58,8 +58,7 @@ public:
   virtual ~pqXYFunctionalBagChartView();
 
 private:
-  pqXYFunctionalBagChartView(const pqXYFunctionalBagChartView&) VTK_DELETE_FUNCTION;
-  void operator=(const pqXYFunctionalBagChartView&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqXYFunctionalBagChartView)
 };
 
 #endif

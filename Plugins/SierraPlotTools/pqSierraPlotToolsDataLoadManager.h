@@ -46,8 +46,7 @@ protected:
   pqServer *Server;
 
 private:
-  pqSierraPlotToolsDataLoadManager(const pqSierraPlotToolsDataLoadManager &) VTK_DELETE_FUNCTION;
-  void operator=(const pqSierraPlotToolsDataLoadManager &) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqSierraPlotToolsDataLoadManager)
 
   class pqUI;
   pqUI *ui;

@@ -105,8 +105,7 @@ protected:
   void onMarkClicked(vtkObject*, unsigned long, void*);
 
 private:
-  pqMultiSliceAxisWidget(const pqMultiSliceAxisWidget&) VTK_DELETE_FUNCTION;
-  void operator=(const pqMultiSliceAxisWidget&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqMultiSliceAxisWidget)
 
   class pqInternal;
   pqInternal* Internal;

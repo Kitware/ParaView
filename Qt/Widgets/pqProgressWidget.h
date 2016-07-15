@@ -73,8 +73,7 @@ protected:
   QTime EnableTime;
 
 private:
-  pqProgressWidget(const pqProgressWidget&) VTK_DELETE_FUNCTION;
-  void operator=(const pqProgressWidget&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqProgressWidget)
 };
 
 #endif

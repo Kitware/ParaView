@@ -69,8 +69,7 @@ signals:
   void currentProxyChanged(vtkSMProxy*);
 
 private:
-  pqAnimatableProxyComboBox(const pqAnimatableProxyComboBox&) VTK_DELETE_FUNCTION;
-  void operator=(const pqAnimatableProxyComboBox&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqAnimatableProxyComboBox)
 };
 
 #endif

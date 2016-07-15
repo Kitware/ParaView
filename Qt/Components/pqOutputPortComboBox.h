@@ -97,8 +97,7 @@ protected:
   bool AutoUpdateIndex;
 
 private:
-  pqOutputPortComboBox(const pqOutputPortComboBox&) VTK_DELETE_FUNCTION;
-  void operator=(const pqOutputPortComboBox&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqOutputPortComboBox)
 };
 
 #endif

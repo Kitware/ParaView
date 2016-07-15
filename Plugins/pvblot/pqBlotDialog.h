@@ -55,8 +55,7 @@ protected slots:
   virtual void open(const QStringList &filenames);
 
 private:
-  pqBlotDialog(const pqBlotDialog &) VTK_DELETE_FUNCTION;
-  void operator=(const pqBlotDialog &) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqBlotDialog)
 
   class UI;
   UI *ui;

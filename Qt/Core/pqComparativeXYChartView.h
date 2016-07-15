@@ -49,8 +49,7 @@ public:
   static QString chartViewTypeName() { return "Line Chart View (Comparative)"; }
 
 private:
-  pqComparativeXYChartView(const pqComparativeXYChartView&) VTK_DELETE_FUNCTION;
-  void operator=(const pqComparativeXYChartView&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqComparativeXYChartView)
 };
 
 #endif

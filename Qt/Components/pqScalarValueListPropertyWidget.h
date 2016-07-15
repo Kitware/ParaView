@@ -74,7 +74,7 @@ private slots:
   void removeAll();
   void editPastLastRow();
 private:
-  Q_DISABLE_COPY(pqScalarValueListPropertyWidget);
+  Q_DISABLE_COPY(pqScalarValueListPropertyWidget)
 
   bool getRange(double& range_min, double& range_max);
   bool getRange(int& range_min, int& range_max);

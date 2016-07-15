@@ -143,8 +143,7 @@ private slots:
   void showMousePointer(vtkTypeUInt32 viewId, double x, double y, int ratioToUse);
 
 private:
-  pqCollaborationManager(const pqCollaborationManager&) VTK_DELETE_FUNCTION;
-  pqCollaborationManager& operator=(const pqCollaborationManager&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqCollaborationManager)
 
   class pqInternals;
   pqInternals* Internals;

@@ -60,8 +60,7 @@ public:
   virtual ~pqXYBarChartView();
 
 private:
-  pqXYBarChartView(const pqXYBarChartView&) VTK_DELETE_FUNCTION;
-  void operator=(const pqXYBarChartView&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqXYBarChartView)
 };
 
 #endif

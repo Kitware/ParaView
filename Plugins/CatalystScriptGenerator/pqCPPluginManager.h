@@ -51,8 +51,7 @@ public:
   virtual const char* getObjectMenuName();
 
 private:
-  pqCPPluginManager(const pqCPPluginManager&) VTK_DELETE_FUNCTION;
-  void operator=(const pqCPPluginManager&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqCPPluginManager)
 };
 
 #endif

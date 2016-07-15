@@ -67,8 +67,7 @@ protected:
     { pqSaveDataReaction::saveActiveData(); }
 
 private:
-  pqSaveDataReaction(const pqSaveDataReaction&) VTK_DELETE_FUNCTION;
-  void operator=(const pqSaveDataReaction&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqSaveDataReaction)
 };
 
 #endif

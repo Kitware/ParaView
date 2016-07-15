@@ -43,8 +43,7 @@ public:
   virtual ~pqOrbitWidget();
 
 private:
-  pqOrbitWidget(const pqOrbitWidget&) VTK_DELETE_FUNCTION;
-  void operator=(const pqOrbitWidget&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqOrbitWidget)
 };
 
 #endif

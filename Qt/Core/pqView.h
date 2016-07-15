@@ -290,8 +290,7 @@ protected:
   virtual QWidget* createWidget() = 0;
 
 private:
-  pqView(const pqView&) VTK_DELETE_FUNCTION;
-  void operator=(const pqView&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqView)
 
   pqViewInternal* Internal;
   QString ViewType;

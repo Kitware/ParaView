@@ -46,8 +46,7 @@ protected:
   pqServer *Server;
 
 private:
-  pqSLACDataLoadManager(const pqSLACDataLoadManager &) VTK_DELETE_FUNCTION;
-  void operator=(const pqSLACDataLoadManager &) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqSLACDataLoadManager)
 
   class pqUI;
   pqUI *ui;

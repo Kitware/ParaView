@@ -128,8 +128,7 @@ protected:
   bool EnableProgress;
   bool ReadyEnableProgress;
 private:
-  pqProgressManager(const pqProgressManager&) VTK_DELETE_FUNCTION;
-  void operator=(const pqProgressManager&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqProgressManager)
 };
 
 #endif

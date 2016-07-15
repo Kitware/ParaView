@@ -54,8 +54,7 @@ private:
   class pqInternals;
   pqInternals* Internals;
 
-  pqTransferFunctionDialog(const pqTransferFunctionDialog&) VTK_DELETE_FUNCTION;
-  void operator=(const pqTransferFunctionDialog&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqTransferFunctionDialog)
 };
 
 #endif

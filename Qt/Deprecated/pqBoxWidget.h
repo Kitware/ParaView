@@ -80,8 +80,7 @@ private slots:
   void showHandles();
   void hideHandles();
 private:
-  pqBoxWidget(const pqBoxWidget&) VTK_DELETE_FUNCTION;
-  void operator=(const pqBoxWidget&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqBoxWidget)
 
   class pqImplementation;
   pqImplementation* Implementation;

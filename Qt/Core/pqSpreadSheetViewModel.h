@@ -174,8 +174,7 @@ protected:
 
   vtkSpreadSheetView* GetView() const;
 private:
-  pqSpreadSheetViewModel(const pqSpreadSheetViewModel&) VTK_DELETE_FUNCTION;
-  void operator=(const pqSpreadSheetViewModel&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqSpreadSheetViewModel)
 
   class pqInternal;
   pqInternal* Internal;

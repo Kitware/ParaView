@@ -158,8 +158,7 @@ private slots:
   void updateSelectionCounts();
 
 private:
-  pqSignalAdaptorCompositeTreeWidget(const pqSignalAdaptorCompositeTreeWidget&) VTK_DELETE_FUNCTION;
-  void operator=(const pqSignalAdaptorCompositeTreeWidget&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqSignalAdaptorCompositeTreeWidget)
 
   /// Set up the callback to know when the selection changes, so that we can
   /// update the selected cells/points counts.

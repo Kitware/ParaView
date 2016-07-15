@@ -50,8 +50,7 @@ public:
 
   static const QString &EVENT_NAME();
 private:
-  pqColorButtonEventPlayer(const pqColorButtonEventPlayer&) VTK_DELETE_FUNCTION;
-  void operator=(const pqColorButtonEventPlayer&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqColorButtonEventPlayer)
 };
 
 #endif

@@ -193,8 +193,7 @@ protected:
   pqInternals* Internals;
 
 private:
-  pqVRUIConnection(const pqVRUIConnection&) VTK_DELETE_FUNCTION;
-  void operator=(const pqVRUIConnection&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqVRUIConnection)
 };
 
 #endif

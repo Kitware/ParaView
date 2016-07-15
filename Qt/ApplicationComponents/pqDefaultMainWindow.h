@@ -43,8 +43,7 @@ public:
   ~pqDefaultMainWindow();
 
 private:
-  pqDefaultMainWindow(const pqDefaultMainWindow&) VTK_DELETE_FUNCTION;
-  void operator=(const pqDefaultMainWindow&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqDefaultMainWindow)
 
   class pqInternals;
   pqInternals* Internals;

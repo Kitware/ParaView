@@ -70,8 +70,7 @@ protected:
   void createWidget(pqServer*);
 
 private:
-  pqPolyLineWidget(const pqPolyLineWidget&) VTK_DELETE_FUNCTION;
-  void operator=(const pqPolyLineWidget&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqPolyLineWidget)
 
   class pqInternals;
   pqInternals* Internals;

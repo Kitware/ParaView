@@ -59,8 +59,7 @@ protected slots:
   void showContextMenu(const QPoint&);
 
 private:
-  pqTreeWidgetSelectionHelper(const pqTreeWidgetSelectionHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const pqTreeWidgetSelectionHelper&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqTreeWidgetSelectionHelper)
 
   void setSelectedItemsCheckState(Qt::CheckState state);
 

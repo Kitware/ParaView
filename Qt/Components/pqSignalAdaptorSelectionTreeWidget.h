@@ -101,8 +101,7 @@ private slots:
   void domainChanged();
 
 private:
-  pqSignalAdaptorSelectionTreeWidget(const pqSignalAdaptorSelectionTreeWidget&) VTK_DELETE_FUNCTION;
-  void operator=(const pqSignalAdaptorSelectionTreeWidget&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqSignalAdaptorSelectionTreeWidget)
 
   class pqInternal;
   pqInternal* Internal;

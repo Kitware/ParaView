@@ -123,8 +123,7 @@ protected slots:
   void onSliceClicked(int button, int modifier, double value);
 
 private:
-  pqMultiSliceView(const pqMultiSliceView&) VTK_DELETE_FUNCTION;
-  void operator=(const pqMultiSliceView&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqMultiSliceView)
 };
 
 #endif

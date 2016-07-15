@@ -95,8 +95,7 @@ protected slots:
   void buildPropertyList();
 
 private:
-  pqAnimatablePropertiesComboBox(const pqAnimatablePropertiesComboBox&) VTK_DELETE_FUNCTION;
-  void operator=(const pqAnimatablePropertiesComboBox&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqAnimatablePropertiesComboBox)
 
   void buildPropertyListInternal(vtkSMProxy* proxy, const QString& labelPrefix);
   void addSMPropertyInternal(const QString& label, 

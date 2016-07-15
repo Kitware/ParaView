@@ -89,8 +89,7 @@ private:
   class pqInternals;
   pqInternals* Internals;
 
-  pqTransferFunctionEditor(const pqTransferFunctionEditor&) VTK_DELETE_FUNCTION;
-  void operator=(const pqTransferFunctionEditor&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqTransferFunctionEditor)
 };
 
 #endif

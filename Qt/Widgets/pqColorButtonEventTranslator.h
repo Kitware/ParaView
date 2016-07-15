@@ -56,8 +56,7 @@ private slots:
   void onColorChosen(const QColor&);
 
 private:
-  pqColorButtonEventTranslator(const pqColorButtonEventTranslator&) VTK_DELETE_FUNCTION;
-  void operator=(const pqColorButtonEventTranslator&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqColorButtonEventTranslator)
 };
 
 #endif

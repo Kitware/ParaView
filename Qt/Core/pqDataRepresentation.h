@@ -141,8 +141,7 @@ protected:
     this->onInputChanged();
     }
 private:
-  pqDataRepresentation(const pqDataRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const pqDataRepresentation&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqDataRepresentation)
 
   pqDataRepresentationInternal* Internal;
 };

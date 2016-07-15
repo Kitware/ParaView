@@ -56,8 +56,7 @@ private:
   pqInternals* Internals;
 
 private:
-  pqEditMenu(const pqEditMenu&) VTK_DELETE_FUNCTION;
-  void operator=(const pqEditMenu&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqEditMenu)
 };
 
 #endif

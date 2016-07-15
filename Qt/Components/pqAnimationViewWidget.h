@@ -114,8 +114,7 @@ protected slots:
   void changeDataProxyDialogAccepted();
 
 private:
-  pqAnimationViewWidget(const pqAnimationViewWidget&) VTK_DELETE_FUNCTION;
-  void operator=(const pqAnimationViewWidget&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqAnimationViewWidget)
 
   class pqInternal;
   pqInternal *Internal;

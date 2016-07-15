@@ -59,8 +59,7 @@ protected slots:
   void onItemClicked (QListWidgetItem *item);
   void onItemPressed (QListWidgetItem *item); 
 private:
-  pqListWidgetCheckHelper(const pqListWidgetCheckHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const pqListWidgetCheckHelper&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqListWidgetCheckHelper)
 
   QListWidget* List;
   int PressState;

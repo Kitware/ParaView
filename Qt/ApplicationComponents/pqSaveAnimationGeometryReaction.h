@@ -61,8 +61,7 @@ protected:
     { pqSaveAnimationGeometryReaction::saveAnimationGeometry(); }
 
 private:
-  pqSaveAnimationGeometryReaction(const pqSaveAnimationGeometryReaction&) VTK_DELETE_FUNCTION;
-  void operator=(const pqSaveAnimationGeometryReaction&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqSaveAnimationGeometryReaction)
 };
 
 #endif

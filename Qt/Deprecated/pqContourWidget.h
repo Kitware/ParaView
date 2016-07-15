@@ -110,8 +110,7 @@ protected slots:
   void deleteAllNodes();
 
 private:
-  pqContourWidget(const pqContourWidget&) VTK_DELETE_FUNCTION;
-  void operator=(const pqContourWidget&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqContourWidget)
 
   void updateRepProperty(vtkSMProxy* smProxy,
     const char* propertyName);

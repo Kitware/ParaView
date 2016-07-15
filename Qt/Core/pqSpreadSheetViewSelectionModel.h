@@ -84,8 +84,7 @@ protected:
   bool UpdatingSelection;
 
 private:
-  pqSpreadSheetViewSelectionModel(const pqSpreadSheetViewSelectionModel&) VTK_DELETE_FUNCTION;
-  void operator=(const pqSpreadSheetViewSelectionModel&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqSpreadSheetViewSelectionModel)
 
   class pqInternal;
   pqInternal* Internal;

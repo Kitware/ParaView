@@ -128,8 +128,7 @@ private:
   class pqInternal;
   pqInternal *Internal;
 
-  pqSierraPlotToolsManager(const pqSierraPlotToolsManager &) VTK_DELETE_FUNCTION;
-  void operator=(const pqSierraPlotToolsManager &) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqSierraPlotToolsManager)
 };
 
 #endif //pqSierraPlotToolsManager_h

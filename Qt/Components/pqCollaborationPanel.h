@@ -101,8 +101,7 @@ protected:
   /// Promote a new master
   void promoteToMaster(int masterId);
 
-  pqCollaborationPanel(const pqCollaborationPanel&) VTK_DELETE_FUNCTION;
-  void operator=(const pqCollaborationPanel&) VTK_DELETE_FUNCTION;
+  Q_DISABLE_COPY(pqCollaborationPanel)
 
   pqCollaborationManager* getCollaborationManager();
   vtkSMCollaborationManager* getSMCollaborationManager();
