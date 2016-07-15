@@ -526,6 +526,8 @@ int readSolInfo(int cgioNum, double nodeId,
           baseInfo.CellDataArraySelection.AddArray(cgnsVars[ii].name, false);
           }
         break;
+      default:
+        break;
       }
     }
   for (std::size_t jj = 0; jj < cgnsVectors.size(); ++jj)
@@ -544,6 +546,8 @@ int readSolInfo(int cgioNum, double nodeId,
           {
           baseInfo.CellDataArraySelection.AddArray(cgnsVectors[jj].name, false);
           }
+        break;
+      default:
         break;
       }
     }
