@@ -752,25 +752,7 @@ void vtkSMProxy::CreateVTKObjects()
   this->State->CopyFrom(message);
 
   // Add Empty property into state to keep track of index later on
-  vtkSMProxyInternals::PropertyInfoMap::iterator iter;
-  for (iter = this->Internals->Properties.begin(); iter != this->Internals->Properties.end();
-       ++iter)
-  {
-    vtkSMProperty* property = iter->second.Property;
-    if (property && !property->GetInformationOnly())
-    {
-      if (property->GetIsInternal() || property->IsStateIgnored() ||
-        strcmp(property->GetClassName(), "vtkSMProperty") == 0)
-      {
-        // No state for vtkSMProperty
-      }
-      else
-      {
-        // Write empty property inside state
-        property->WriteTo(this->State);
-      }
-    }
-  }
+  this->RebuildStateForProperties();
 
   // Even if the Proxy was marked as Created, we went so far to build correctly
   // the state and this is the same case for prototype.
@@ -797,6 +779,32 @@ void vtkSMProxy::CreateVTKObjects()
   this->Internals->EnableAnnotationPush = false;
   this->UpdateAndPushAnnotationState();
   this->Internals->EnableAnnotationPush = oldPushState;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::RebuildStateForProperties()
+{
+  this->State->ClearExtension(ProxyState::property);
+
+  vtkSMProxyInternals::PropertyInfoMap::iterator iter;
+  for (iter = this->Internals->Properties.begin(); iter != this->Internals->Properties.end();
+       ++iter)
+  {
+    vtkSMProperty* property = iter->second.Property;
+    if (property && !property->GetInformationOnly())
+    {
+      if (property->GetIsInternal() || property->IsStateIgnored() ||
+        strcmp(property->GetClassName(), "vtkSMProperty") == 0)
+      {
+        // No state for vtkSMProperty
+      }
+      else
+      {
+        // Write empty property inside state
+        property->WriteTo(this->State);
+      }
+    }
+  }
 }
 
 //---------------------------------------------------------------------------
@@ -1552,7 +1560,7 @@ int vtkSMProxy::ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement*
 int vtkSMProxy::CreateSubProxiesAndProperties(
   vtkSMSessionProxyManager* pm, vtkPVXMLElement* element)
 {
-  if (!element || !pm)
+  if (!element)
   {
     return 0;
   }
@@ -1563,7 +1571,7 @@ int vtkSMProxy::CreateSubProxiesAndProperties(
   for (unsigned int i = 0; i < element->GetNumberOfNestedElements(); ++i)
   {
     vtkPVXMLElement* propElement = element->GetNestedElement(i);
-    if (strcmp(propElement->GetName(), "SubProxy") == 0)
+    if (pm != NULL && strcmp(propElement->GetName(), "SubProxy") == 0)
     {
       vtkPVXMLElement* subElement = propElement->GetNestedElement(0);
       if (subElement)

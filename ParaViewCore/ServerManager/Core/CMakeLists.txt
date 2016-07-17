@@ -107,6 +107,7 @@ set (Module_SRCS
   vtkSMSILDomain.cxx
   vtkSMSILModel.cxx
   vtkSMSelectionLink.cxx
+  vtkSMSelfGeneratingSourceProxy.cxx
   vtkSMServerStateLocator.cxx
   vtkSMSession.cxx
   vtkSMSessionClient.cxx

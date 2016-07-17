@@ -124,6 +124,12 @@ public:
    */
   virtual void RecreateVTKObjects();
 
+  /**
+   * Counter part to vtkSMSelfGeneratingSourceProxy::ExtendDefinition(). Called by that
+   * method to let the vtkSIProxy know about the extended definition.
+   */
+  virtual bool ExtendDefinition(const char* xml);
+
 protected:
   vtkSIProxy();
   ~vtkSIProxy();
