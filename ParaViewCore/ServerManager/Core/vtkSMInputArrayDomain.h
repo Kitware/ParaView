@@ -33,8 +33,12 @@
 //                         'vertex', 'edge', 'row', 'none', 'any-except-field', 'any'.
 //                         If not specified, 'any-except-field' is assumed. This
 //                         indicates the attribute type for acceptable arrays.
-// \li \c number_of_components : (optional) 0 by default. If non-zero, indicates
-//                         the component count for acceptable arrays.
+// \li \c number_of_components : (optional) Indicates the number of components 
+//                         required in arrays that are considered acceptable. 
+//                         0 (default) indicates any number of components is acceptable. 
+//                         A comma-separated list (e.g., "1" or "1,3,4") of component counts 
+//                         limits acceptable arrays to those with a number of components that 
+//                         appear in the list. 
 //
 // This domain doesn't support any required properties (to help clean old
 // code, we print a warning if any required properties are specified).
