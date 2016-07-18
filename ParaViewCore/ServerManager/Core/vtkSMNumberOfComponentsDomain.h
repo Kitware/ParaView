@@ -16,7 +16,7 @@
 // components available in a particular data array.
 // .SECTION Description
 // vtkSMNumberOfComponentsDomain is used for properties that allow the user to
-// choose the component number to process for the choosen array.
+// choose the component number (or associated name) to process for the choosen array.
 // It needs two required properties with following functions:
 // * Input -- input property for the filter.
 // * ArraySelection -- string vector property used to select the array.
