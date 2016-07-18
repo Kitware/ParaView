@@ -62,6 +62,7 @@ paraview_test_load_data(""
   tensors.pvti
   Test1.h5
   Test1.xmf
+  TestMultipleNumberOfComponentsPlugin.xml
   tube.exo
   vehicle_data.csv
   )
@@ -79,7 +80,8 @@ SET (TESTS_WITHOUT_BASELINES
 if (PARAVIEW_ENABLE_PYTHON)
   list(APPEND TESTS_WITHOUT_BASELINES
     ${CMAKE_CURRENT_SOURCE_DIR}/TestPythonConsole.xml
-    ${CMAKE_CURRENT_SOURCE_DIR}/TestPopOutWidget.xml) # needs programmable filter
+    ${CMAKE_CURRENT_SOURCE_DIR}/TestPopOutWidget.xml # needs programmable filter
+    ${CMAKE_CURRENT_SOURCE_DIR}/MultipleNumberOfComponents.xml)
 endif()
 
 SET (TESTS_WITH_INLINE_COMPARES
