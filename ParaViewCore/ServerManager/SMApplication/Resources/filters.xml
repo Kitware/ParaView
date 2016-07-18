@@ -10925,6 +10925,14 @@ source.</Documentation>
                          default_values="0"
                          name="Component"
                          number_of_elements="1">
+        <NumberOfComponentsDomain name="comps">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="SelectInputArray" />
+          </RequiredProperties>
+        </NumberOfComponentsDomain>
         <Documentation>
           This property indicates the component of the array to be extracted.
         </Documentation>
