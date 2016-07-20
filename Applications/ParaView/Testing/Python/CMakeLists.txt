@@ -46,6 +46,7 @@ paraview_add_test_python(
   PartialArrayIndication.py
   TestClipCylinder.py
   TestColorHistogram.py
+  TestHoudiniWriter.py
   TestLineChartLabelPrefix.py
   TestPythonViewScript.py
 )
