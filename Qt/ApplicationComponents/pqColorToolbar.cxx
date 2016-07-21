@@ -51,6 +51,7 @@ void pqColorToolbar::constructor()
   new pqEditColorMapReaction(ui.actionEditColorMap);
   new pqResetScalarRangeReaction(ui.actionResetRange);
   new pqRescaleCustomScalarRangeReaction(ui.actionRescaleCustomRange);
+  new pqResetScalarRangeReaction(ui.actionRescaleTemporalRange, true, pqResetScalarRangeReaction::TEMPORAL);
   new pqRescaleVisibleScalarRangeReaction(ui.actionRescaleVisibleRange);
 
   pqDisplayColorWidget* display_color = new pqDisplayColorWidget(this)

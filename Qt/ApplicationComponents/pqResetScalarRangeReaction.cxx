@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -34,12 +34,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
 #include "pqPipelineRepresentation.h"
+#include "pqPropertyLinks.h"
 #include "pqRescaleRange.h"
+#include "pqServerManagerModel.h"
+#include "pqTimeKeeper.h"
 #include "pqUndoStack.h"
 #include "vtkDiscretizableColorTransferFunction.h"
+#include "vtkPVDataInformation.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMTransferFunctionProxy.h"
+#include "vtkSMTimeKeeperProxy.h"
 
 #include <QDebug>
 #include <QMessageBox>
@@ -61,7 +66,7 @@ namespace
 pqResetScalarRangeReaction::pqResetScalarRangeReaction(
   QAction* parentObject, bool track_active_objects, pqResetScalarRangeReaction::Modes mode)
   : Superclass(parentObject),
-  Mode(mode)
+  Mode(mode), Connection(NULL)
 {
   if (track_active_objects)
     {
@@ -69,6 +74,26 @@ pqResetScalarRangeReaction::pqResetScalarRangeReaction(
       SIGNAL(representationChanged(pqDataRepresentation*)),
       this, SLOT(setRepresentation(pqDataRepresentation*)));
     this->setRepresentation(pqActiveObjects::instance().activeRepresentation());
+
+    if (this->Mode == TEMPORAL)
+      {
+      // Get ready to connect timekeepers with the reaction enabled state
+      this->Connection = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+      pqServerManagerModel* model = pqApplicationCore::instance()->getServerManagerModel();
+      this->connect(model, SIGNAL(serverAdded(pqServer*)),
+        SLOT(onServerAdded(pqServer*)));
+      this->connect(model, SIGNAL(aboutToRemoveServer(pqServer*)),
+        SLOT(onAboutToRemoveServer(pqServer*)));
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+pqResetScalarRangeReaction::~pqResetScalarRangeReaction()
+{
+  if (this->Connection)
+    {
+    this->Connection->Disconnect();
     }
 }
 
@@ -82,7 +107,15 @@ void pqResetScalarRangeReaction::setRepresentation(pqDataRepresentation* repr)
 //-----------------------------------------------------------------------------
 void pqResetScalarRangeReaction::updateEnableState()
 {
-  this->parentAction()->setEnabled(this->Representation != NULL);
+  bool enabled = this->Representation != NULL;
+  if (enabled && this->Mode == TEMPORAL)
+    {
+    pqPipelineSource* source = this->Representation->getInput();
+    pqTimeKeeper* timeKeeper = source->getServer()->getTimeKeeper();
+    enabled = (this->Representation->getOutputPortFromInput()->getDataInformation()->GetHasTime() != 0) &&
+      vtkSMTimeKeeperProxy::IsTimeSourceTracked(timeKeeper->getProxy(), source->getProxy());
+    }
+  this->parentAction()->setEnabled(enabled);
 }
 
 //-----------------------------------------------------------------------------
@@ -208,4 +241,28 @@ bool pqResetScalarRangeReaction::resetScalarRangeToDataOverTime(pqPipelineRepres
     return true;
     }
   return false;
+}
+
+//-----------------------------------------------------------------------------
+void pqResetScalarRangeReaction::onServerAdded(pqServer* server)
+{
+  if (server)
+    {
+    // Connect new server timekeeper with the reaction enable state
+    vtkSMProxy* timeKeeper = server->getTimeKeeper()->getProxy();
+    this->Connection->Connect(timeKeeper->GetProperty("SuppressedTimeSources"),
+      vtkCommand::ModifiedEvent, this, SLOT(updateEnableState()));
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqResetScalarRangeReaction::onAboutToRemoveServer(pqServer* server)
+{
+  if (server)
+    {
+    // Disconnect previously connected timekeeper
+    vtkSMProxy* timeKeeper = server->getTimeKeeper()->getProxy();
+    this->Connection->Disconnect(timeKeeper->GetProperty("SuppressedTimeSources"),
+      vtkCommand::ModifiedEvent, this, SLOT(updateEnableState()));
+    }
 }

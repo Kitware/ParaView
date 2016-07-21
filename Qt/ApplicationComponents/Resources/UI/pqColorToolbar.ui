@@ -82,6 +82,24 @@
      <string>Rescale to Custom Data Range</string>
     </property>
    </action>
+   <action name="actionRescaleTemporalRange" >
+    <property name="enabled" >
+     <bool>false</bool>
+    </property>
+    <property name="icon">
+     <iconset resource="../../../Components/Resources/pqComponents.qrc">
+      <normaloff>:/pqWidgets/Icons/pqResetRangeTemporal24.png</normaloff>:/pqWidgets/Icons/pqResetRangeTemporal24.png</iconset>
+    </property>
+    <property name="text" >
+     <string>Rescale Temporal Range</string>
+    </property>
+    <property name="toolTip" >
+     <string>Rescale to data range over all timesteps</string>
+    </property>
+    <property name="statusTip" >
+     <string>Rescale to data range over all timesteps</string>
+    </property>
+   </action>
    <action name="actionRescaleVisibleRange" >
     <property name="enabled" >
      <bool>false</bool>
@@ -103,6 +121,7 @@
    <addaction name="actionEditColorMap" />
    <addaction name="actionResetRange" />
    <addaction name="actionRescaleCustomRange" />
+   <addaction name="actionRescaleTemporalRange" />
    <addaction name="actionRescaleVisibleRange" />
   </widget>
  <resources>
