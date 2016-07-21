@@ -36,6 +36,18 @@
     <string>Delete</string>
    </property>
   </action>
+  <action name="actionPBHideAll">
+   <property name="icon">
+    <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
+     <normaloff>:/pqWidgets/Icons/pqEyeball16.png</normaloff>:/pqWidgets/Icons/pqEyeballd16.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Hide All</string>
+   </property>
+   <property name="statusTip">
+    <string>Hide all source outputs in the pipeline</string>
+   </property>
+  </action>
   <action name="actionPBCopy">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
@@ -121,6 +133,7 @@
   <addaction name="actionPBChangeInput"/>
   <addaction name="actionPBLinkSelection"/>
   <addaction name="actionPBIgnoreTime"/>
+  <addaction name="actionPBHideAll"/>
   <addaction name="actionPBDelete"/>
  </widget>
  <resources>

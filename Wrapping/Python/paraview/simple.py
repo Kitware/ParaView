@@ -451,6 +451,15 @@ def Hide(proxy=None, view=None):
     controller.Hide(proxy, proxy.Port, view)
 
 # -----------------------------------------------------------------------------
+def HideAll(view=None):
+    """Hide all pipeline sources in the given view.
+    If view is not specified, active view is used."""
+    if not view:
+        view = active_objects.view
+    controller = servermanager.ParaViewPipelineController()
+    controller.HideAll(view)
+
+# -----------------------------------------------------------------------------
 def SetDisplayProperties(proxy=None, view=None, **params):
     """Sets one or more display properties of the given pipeline object. If an argument
     is not provided, the active source is used. Pass a list of property_name=value

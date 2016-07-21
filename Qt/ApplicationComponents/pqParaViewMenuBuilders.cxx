@@ -61,6 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqExportReaction.h"
 #include "pqFiltersMenuReaction.h"
 #include "pqHelpReaction.h"
+#include "pqHideAllReaction.h"
 #include "pqIgnoreSourceTimeReaction.h"
 #include "pqLinkSelectionReaction.h"
 #include "pqLoadDataReaction.h"
@@ -153,6 +154,7 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu)
   new pqIgnoreSourceTimeReaction(ui.actionIgnoreTime);
   new pqDeleteReaction(ui.actionDelete);
   new pqDeleteReaction(ui.actionDelete_All, true);
+  new pqHideAllReaction(ui.actionHide_All);
   new pqCopyReaction(ui.actionCopy);
   new pqCopyReaction(ui.actionPaste, true);
   new pqApplicationSettingsReaction(ui.actionEditSettings);
@@ -286,6 +288,7 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QWidget& widget)
   new pqCreateCustomFilterReaction(ui.actionPBCreateCustomFilter);
   new pqIgnoreSourceTimeReaction(ui.actionPBIgnoreTime);
   new pqDeleteReaction(ui.actionPBDelete);
+  new pqHideAllReaction(ui.actionPBHideAll);
   new pqCopyReaction(ui.actionPBCopy);
   new pqCopyReaction(ui.actionPBPaste, true);
 }

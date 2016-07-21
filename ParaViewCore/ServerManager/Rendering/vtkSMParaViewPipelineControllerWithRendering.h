@@ -64,6 +64,10 @@ public:
   virtual void Hide(vtkSMProxy* repr, vtkSMViewProxy* view);
 
   // Description:
+  // Hide all visible sources output ports in provided view
+  virtual void HideAll(vtkSMViewProxy* view);
+
+  // Description:
   // Alternative method to call Show and Hide using a visibility flag.
   vtkSMProxy* SetVisibility(
     vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view, bool visible)
