@@ -269,9 +269,9 @@ class ParaViewWebViewPort(ParaViewWebProtocol):
     def getCamera(self, view_id):
         view = self.getView(view_id)
         return {
-            focal: list(view.CameraFocalPoint),
-            up: list(view.CameraViewUp),
-            position: list(view.CameraPosition)
+            'focal': list(view.CameraFocalPoint),
+            'up': list(view.CameraViewUp),
+            'position': list(view.CameraPosition)
         }
 
     @exportRpc("viewport.size.update")
@@ -720,6 +720,30 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
         pwfProxy.Points = pointArray
 
         simple.Render()
+
+    # RpcName: getOpacityFunctionPoints => pv.color.manager.opacity.points.get
+    @exportRpc("pv.color.manager.opacity.points.get")
+    def getOpacityFunctionPoints(self, arrayName):
+        result = []
+        lutProxy = simple.GetColorTransferFunction(arrayName)
+        pwfProxy = simple.GetOpacityTransferFunction(arrayName)
+
+        # Use whatever the current scalar range is for this array
+        cMin = lutProxy.RGBPoints[0]
+        cMax = lutProxy.RGBPoints[-4]
+        pointArray = pwfProxy.Points
+
+        # Scale and bias the x values, which come in between 0.0 and 1.0, to the
+        # current scalar range
+        for i in range(len(pointArray) / 4):
+            idx = i * 4
+            result.append({
+                'x': (pointArray[idx] - cMin) / (cMax - cMin),
+                'y': pointArray[idx + 1],
+                'x2': pointArray[idx + 2],
+                'y2': pointArray[idx + 3],
+            });
+        return result
 
     # RpcName: getRgbPoints => pv.color.manager.rgb.points.get
     @exportRpc("pv.color.manager.rgb.points.get")
