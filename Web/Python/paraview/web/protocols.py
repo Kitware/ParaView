@@ -201,6 +201,9 @@ class ParaViewWebMouseHandler(ParaViewWebProtocol):
         retVal = self.getApplication().HandleInteractionEvent(view.SMProxy, pvevent)
         del pvevent
 
+        if retVal:
+            self.getApplication().InvokeEvent('PushRender')
+
         return retVal
 
 # =============================================================================
@@ -226,6 +229,7 @@ class ParaViewWebViewPort(ParaViewWebProtocol):
             pass
 
         self.getApplication().InvalidateCache(view.SMProxy)
+        self.getApplication().InvokeEvent('PushRender')
 
         return view.GetGlobalIDAsString()
 
@@ -239,6 +243,7 @@ class ParaViewWebViewPort(ParaViewWebProtocol):
         view.OrientationAxesVisibility = (showAxis if 1 else 0);
 
         self.getApplication().InvalidateCache(view.SMProxy)
+        self.getApplication().InvokeEvent('PushRender')
 
         return view.GetGlobalIDAsString()
 
@@ -252,6 +257,7 @@ class ParaViewWebViewPort(ParaViewWebProtocol):
         view.CenterAxesVisibility = (showAxis if 1 else 0);
 
         self.getApplication().InvalidateCache(view.SMProxy)
+        self.getApplication().InvokeEvent('PushRender')
 
         return view.GetGlobalIDAsString()
 
@@ -264,6 +270,7 @@ class ParaViewWebViewPort(ParaViewWebProtocol):
         view.CameraViewUp = view_up
         view.CameraPosition = position
         self.getApplication().InvalidateCache(view.SMProxy)
+        self.getApplication().InvokeEvent('PushRender')
 
     @exportRpc("viewport.camera.get")
     def getCamera(self, view_id):
@@ -278,6 +285,7 @@ class ParaViewWebViewPort(ParaViewWebProtocol):
     def updateSize(self, view_id, width, height):
         view = self.getView(view_id)
         view.ViewSize = [ width, height ]
+        self.getApplication().InvokeEvent('PushRender')
 
 # =============================================================================
 #
@@ -482,12 +490,17 @@ class ParaViewWebTimeHandler(ParaViewWebProtocol):
         timestep = list(animationScene.TimeKeeper.TimestepValues).index(animationScene.TimeKeeper.Time)
         self.publish("pv.time.change", { 'time': float(view.ViewTime), 'timeStep': timestep } )
 
+        self.getApplication().InvokeEvent('PushRender')
+
         return view.ViewTime
 
     @exportRpc("pv.time.index.set")
     def setTimeStep(self, timeIdx):
         anim = simple.GetAnimationScene()
         anim.TimeKeeper.Time = anim.TimeKeeper.TimestepValues[timeIdx]
+
+        self.getApplication().InvokeEvent('PushRender')
+
         return anim.TimeKeeper.Time
 
     @exportRpc("pv.time.index.get")
@@ -502,6 +515,7 @@ class ParaViewWebTimeHandler(ParaViewWebProtocol):
         try:
             step = list(anim.TimeKeeper.TimestepValues).index(t)
             anim.TimeKeeper.Time = anim.TimeKeeper.TimestepValues[step]
+            self.getApplication().InvokeEvent('PushRender')
         except:
             print 'Try to update time with', t, 'but value not found in the list'
 
@@ -609,6 +623,7 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
 
         # Render to get scalar bars in correct position when doing local rendering (webgl)
         simple.Render()
+        self.getApplication().InvokeEvent('PushRender')
 
         return visibilities
 
@@ -654,6 +669,8 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
             currentRange = self.getCurrentScalarRange(proxyId)
             status['range'] = currentRange
 
+        self.getApplication().InvokeEvent('PushRender')
+
         return status
 
     # RpcName: getCurrentScalarRange => pv.color.manager.scalar.range.get
@@ -698,6 +715,7 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
         self.updateScalarBars()
 
         simple.Render()
+        self.getApplication().InvokeEvent('PushRender')
 
     # RpcName: setOpacityFunctionPoints => pv.color.manager.opacity.points.set
     @exportRpc("pv.color.manager.opacity.points.set")
@@ -720,6 +738,7 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
         pwfProxy.Points = pointArray
 
         simple.Render()
+        self.getApplication().InvokeEvent('PushRender')
 
     # RpcName: getOpacityFunctionPoints => pv.color.manager.opacity.points.get
     @exportRpc("pv.color.manager.opacity.points.get")
@@ -904,6 +923,7 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
             lutProxy.InterpretValuesAsCategories = 1
 
         simple.Render();
+        self.getApplication().InvokeEvent('PushRender')
 
     # RpcName: getLutImage => pv.color.manager.lut.image.get
     @exportRpc("pv.color.manager.lut.image.get")
@@ -991,6 +1011,7 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
         lutProxy.EnableOpacityMapping = enabled
 
         simple.Render()
+        self.getApplication().InvokeEvent('PushRender')
 
     # RpcName: getSurfaceOpacity => pv.color.manager.surface.opacity.get
     @exportRpc("pv.color.manager.surface.opacity.get")
@@ -1014,6 +1035,7 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
             if lutProxy is not None:
                 vtkSMTransferFunctionProxy.ApplyColorMap(lutProxy.SMProxy, colorMapText)
                 simple.Render()
+                self.getApplication().InvokeEvent('PushRender')
                 return { 'result': 'success' }
             else:
                 return { 'result': 'Representation proxy ' + representation + ' is missing lookup table' }
@@ -1720,6 +1742,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         # To make WebGL export work
         simple.Show()
         simple.Render()
+        self.getApplication().InvokeEvent('PushRender')
 
         try:
             self.applyDomains(parentProxy, newProxy.GetGlobalIDAsString())
@@ -1751,6 +1774,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
             simple.LoadState(fileToLoad[0])
             simple.Render()
             simple.ResetCamera()
+            self.getApplication().InvokeEvent('PushRender')
 
             return { 'success': True }
 
@@ -1781,6 +1805,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         simple.Show()
         simple.Render()
         simple.ResetCamera()
+        self.getApplication().InvokeEvent('PushRender')
 
         return { 'success': True, 'id': reader.GetGlobalIDAsString() }
 
@@ -1840,6 +1865,8 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         if len(failureList) > 0:
             return { 'success': False,
                      'errorList': failureList }
+
+        self.getApplication().InvokeEvent('PushRender')
 
         return { 'success': True }
 
@@ -2006,6 +2033,7 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
         simple.Show()
         simple.Render()
         simple.ResetCamera()
+        self.getApplication().InvokeEvent('PushRender')
 
         # Add node to pipeline
         self.pipeline.addNode(pid, newProxy.GetGlobalIDAsString())
@@ -2023,6 +2051,7 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
         proxy = helper.idToProxy(proxy_id)
         simple.Delete(proxy)
         simple.Render()
+        self.getApplication().InvokeEvent('PushRender')
 
     # RpcName: updateDisplayProperty => pv.pipeline.manager.proxy.representation.update
     @exportRpc("pv.pipeline.manager.proxy.representation.update")
@@ -2046,6 +2075,7 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
             vtkSMPVRepresentationProxy.RescaleTransferFunctionToDataRange(dataRepr.SMProxy, name, attr_type, True)
 
         simple.Render()
+        self.getApplication().InvokeEvent('PushRender')
 
     # RpcName: pushState => pv.pipeline.manager.proxy.update
     @exportRpc("pv.pipeline.manager.proxy.update")
@@ -2058,6 +2088,7 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
             proxy = helper.idToProxy(proxy_id);
             helper.updateProxyProperties(proxy, state[proxy_id])
             simple.Render()
+            self.getApplication().InvokeEvent('PushRender')
 
         if proxy_type == 'proxy':
             return helper.getProxyAsPipelineNode(state['proxy'], self.getView(-1))
@@ -2072,6 +2103,7 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
         simple.Show()
         simple.Render()
         simple.ResetCamera()
+        self.getApplication().InvokeEvent('PushRender')
 
         # Add node to pipeline
         self.pipeline.addNode('0', reader.GetGlobalIDAsString())
@@ -2096,6 +2128,7 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
         simple.Show()
         simple.Render()
         simple.ResetCamera()
+        self.getApplication().InvokeEvent('PushRender')
 
         # Add node to pipeline
         self.pipeline.addNode('0', reader.GetGlobalIDAsString())
@@ -2137,6 +2170,9 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
                                         'name': arrayName,
                                         'size': numComps,
                                         'enabled': visibility }
+
+        self.getApplication().InvokeEvent('PushRender')
+
         return lutMap
 
     # RpcName: updateScalarRange => pv.pipeline.manager.scalar.range.rescale
@@ -2145,6 +2181,7 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
         proxy = self.mapIdToProxy(proxyId);
         dataRepr = simple.GetRepresentation(proxy)
         vtkSMPVRepresentationProxy.RescaleTransferFunctionToDataRange(dataRepr.SMProxy, False)
+        self.getApplication().InvokeEvent('PushRender')
 
     # RpcName: setLutDataRange => pv.pipeline.manager.lut.range.update
     @exportRpc("pv.pipeline.manager.lut.range.update")
@@ -2152,6 +2189,7 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
         lut = self.getColorTransferFunction(name)
         vtkSMTransferFunctionProxy.RescaleTransferFunction(lut, customRange[0],
                                                            customRange[1], False)
+        self.getApplication().InvokeEvent('PushRender')
 
     # RpcName: getLutDataRange => pv.pipeline.manager.lut.range.get
     @exportRpc("pv.pipeline.manager.lut.range.get")
@@ -2480,6 +2518,9 @@ class ParaViewWebStateLoader(ParaViewWebProtocol):
         ids = []
         for view in simple.GetRenderViews():
             ids.append(view.GetGlobalIDAsString())
+
+        self.getApplication().InvokeEvent('PushRender')
+
         return ids
 
 # =============================================================================
@@ -2657,6 +2698,7 @@ class ParaViewWebSelectionHandler(ParaViewWebProtocol):
                     extract = simple.ExtractSelection(Input=rep.Input, Selection=selection)
                     simple.Show(extract)
                     simple.Render()
+                    self.getApplication().InvokeEvent('PushRender')
                 else:
                     rep.Input.SMProxy.SetSelectionInput(0, selection.SMProxy, 0)
 
@@ -2702,6 +2744,7 @@ class ParaViewWebTestProtocols(ParaViewWebProtocol):
         view = simple.GetRenderView()
         simple.SetActiveView(view)
         simple.Render()
+        self.getApplication().InvokeEvent('PushRender')
 
     # RpcName: getColoringInfo => pv.test.color.info.get
     @exportRpc("pv.test.color.info.get")
