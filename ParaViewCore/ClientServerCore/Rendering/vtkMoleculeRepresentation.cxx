@@ -19,6 +19,7 @@
 #include "vtkActor.h"
 #include "vtkMolecule.h"
 #include "vtkRenderer.h"
+#include "vtkPVCacheKeeper.h"
 #include "vtkPVRenderView.h"
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
@@ -36,6 +37,9 @@ vtkMoleculeRepresentation::vtkMoleculeRepresentation()
   // setup actor
   this->Actor = vtkActor::New();
   this->Actor->SetMapper(this->Mapper);
+
+  // initialize cache:
+  this->CacheKeeper->SetInputData(this->DummyMolecule.Get());
 }
 
 vtkMoleculeRepresentation::~vtkMoleculeRepresentation()
@@ -65,11 +69,40 @@ void vtkMoleculeRepresentation::SetMoleculeRenderMode(int mode)
     }
 }
 
-int vtkMoleculeRepresentation::ProcessViewRequest(vtkInformationRequestKey *request_type,
-                                                  vtkInformation *input_info,
-                                                  vtkInformation *output_info)
+void vtkMoleculeRepresentation::MarkModified()
 {
-  return this->Superclass::ProcessViewRequest(request_type, input_info, output_info);
+  if (!this->GetUseCache())
+    {
+    // Clear cache when caching is turned off:
+    this->CacheKeeper->RemoveAllCaches();
+    }
+  this->Superclass::MarkModified();
+}
+
+int vtkMoleculeRepresentation::ProcessViewRequest(
+    vtkInformationRequestKey *request_type, vtkInformation *inInfo,
+    vtkInformation *outInfo)
+{
+  if (!this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo))
+    {
+    return 0;
+    }
+
+  if (request_type == vtkPVView::REQUEST_UPDATE())
+    {
+    vtkPVRenderView::SetPiece(inInfo, this, this->CacheKeeper->GetOutput());
+    vtkPVRenderView::SetDeliverToClientAndRenderingProcesses(inInfo, this,
+                                                             true, false);
+    }
+  else if (request_type == vtkPVView::REQUEST_RENDER())
+    {
+    vtkAlgorithmOutput *producerPort =
+        vtkPVRenderView::GetPieceProducer(inInfo, this);
+
+    this->Mapper->SetInputConnection(producerPort);
+    }
+
+  return 1;
 }
 
 void vtkMoleculeRepresentation::SetVisibility(bool value)
@@ -82,6 +115,12 @@ int vtkMoleculeRepresentation::FillInputPortInformation(int vtkNotUsed(port),
                                                         vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMolecule");
+
+  // Saying INPUT_IS_OPTIONAL() is essential, since representations don't have
+  // any inputs on client-side (in client-server, client-render-server mode) and
+  // render-server-side (in client-render-server mode).
+  info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
+
   return 1;
 }
 
@@ -89,13 +128,19 @@ int vtkMoleculeRepresentation::RequestData(vtkInformation *request,
                                            vtkInformationVector **inputVector,
                                            vtkInformationVector *outputVector)
 {
+  this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
+  this->CacheKeeper->SetCacheTime(this->GetCacheKey());
+
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
     {
     vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
     vtkMolecule* input =
       vtkMolecule::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
-    this->Mapper->SetInputData(input);
+    this->DummyMolecule->ShallowCopy(input);
     }
+
+  this->DummyMolecule->Modified();
+  this->CacheKeeper->Update();
 
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }
@@ -120,4 +165,9 @@ bool vtkMoleculeRepresentation::RemoveFromView(vtkView *view)
     return this->Superclass::RemoveFromView(view);
     }
   return false;
+}
+
+bool vtkMoleculeRepresentation::IsCached(double cache_key)
+{
+  return this->CacheKeeper->IsCached(cache_key);
 }

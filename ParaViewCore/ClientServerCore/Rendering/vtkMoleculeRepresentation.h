@@ -19,8 +19,12 @@
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"
 
+#include "vtkNew.h" // For vtkNew.
+
 class vtkActor;
+class vtkMolecule;
 class vtkMoleculeMapper;
+class vtkPVCacheKeeper;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkMoleculeRepresentation : public vtkPVDataRepresentation
 {
@@ -38,6 +42,8 @@ public:
   vtkGetMacro(MoleculeRenderMode, int)
   void SetMoleculeRenderMode(int mode);
 
+  void MarkModified();
+
 protected:
   vtkMoleculeRepresentation();
   ~vtkMoleculeRepresentation();
@@ -47,8 +53,13 @@ protected:
   virtual bool AddToView(vtkView *view);
   virtual bool RemoveFromView(vtkView *view);
 
+  bool IsCached(double cache_key);
+
   vtkActor *Actor;
   vtkMoleculeMapper *Mapper;
+
+  vtkNew<vtkPVCacheKeeper> CacheKeeper;
+  vtkNew<vtkMolecule> DummyMolecule;
 
   int MoleculeRenderMode;
 

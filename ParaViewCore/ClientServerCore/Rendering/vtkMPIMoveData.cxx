@@ -27,6 +27,7 @@
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMolecule.h"
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
@@ -255,6 +256,14 @@ int vtkMPIMoveData::RequestDataObject(vtkInformation*,
       return 1;
       }
     outputCopy = vtkUndirectedGraph::New();
+    }
+  else if (this->OutputDataType == VTK_MOLECULE)
+    {
+    if (output && output->IsA("vtkMolecule"))
+      {
+      return 1;
+      }
+    outputCopy = vtkMolecule::New();
     }
   else if (this->OutputDataType == VTK_MULTIBLOCK_DATA_SET)
     {
