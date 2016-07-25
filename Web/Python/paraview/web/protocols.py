@@ -1888,7 +1888,10 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         if proxy is not None and canDelete is True:
             simple.Delete(proxy)
             self.updateScalarBars()
+            self.getApplication().InvokeEvent('PushRender')
             return { 'success': 1, 'id': pid }
+
+        self.getApplication().InvokeEvent('PushRender')
         return { 'success': 0, 'id': '0' }
 
     @exportRpc("pv.proxy.manager.list")
