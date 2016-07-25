@@ -539,9 +539,11 @@ int vtkMPIMoveData::RequestData(vtkInformation*,
       // In client-server mode without render server.
       if (this->Server == vtkMPIMoveData::DATA_SERVER)
         {
-        this->DataServerGatherToZero(input, output);
-        this->DataServerSendToClient(output);
-        output->Initialize();
+        vtkDataObject *tmp = input->NewInstance();
+        this->DataServerGatherToZero(input, tmp);
+        this->DataServerSendToClient(tmp);
+        tmp->Delete();
+        tmp = NULL;
         output->ShallowCopy(input);
         return 1;
         }
