@@ -112,7 +112,7 @@ public:
     Ui::ProxyWidgetDialog& ui = this->Ui;
     ui.setupUi(self);
     ui.SearchBox->setVisible(this->SearchEnabled);
-    ui.SearchBox->setAdvancedSearchEnabled(this->HideAdvancedProperties);
+    ui.SearchBox->setAdvancedSearchEnabled(!this->HideAdvancedProperties);
     ui.SearchBox->setAdvancedSearchActive(false);
     self->connect(ui.SearchBox, SIGNAL(advancedSearchActivated(bool)), SLOT(filterWidgets()));
     self->connect(ui.SearchBox, SIGNAL(textChanged(const QString&)), SLOT(filterWidgets()));
