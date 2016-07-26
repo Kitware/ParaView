@@ -390,7 +390,7 @@ def make_cinema_store(proxies, ocsfname, forcetime=False, userDefined = {},
         tvalues.append(forcetime)
         tprop = cinema_store.make_parameter('time', tvalues)
         cs.add_parameter('time', tprop)
-        fnp = fnp+"{time}/"
+        fnp = "{time}"
     else:
         #time not specified, try and make them automatically
         times = paraview.simple.GetAnimationScene().TimeKeeper.TimestepValues
@@ -399,12 +399,15 @@ def make_cinema_store(proxies, ocsfname, forcetime=False, userDefined = {},
         else:
             prettytimes = [float_limiter(t) for t in times]
             cs.add_parameter("time", cinema_store.make_parameter('time', prettytimes))
-            fnp = fnp+"{time}/"
+            fnp = "{time}"
 
     if camType == "Spherical":
         cs.add_parameter("phi", cinema_store.make_parameter('phi', phis))
         cs.add_parameter("theta", cinema_store.make_parameter('theta', thetas))
-        fnp = fnp+"{phi}/{theta}"
+        if fnp == "":
+            fnp = "{phi}/{theta}"
+        else:
+            fnp = fnp + "/{phi}/{theta}"
 
     if specLevel == "A":
         for pname in pnames:
