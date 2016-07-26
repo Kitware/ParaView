@@ -143,8 +143,8 @@ private:
   void (ClassT::*Method2)(
     vtkObject* caller, unsigned long event, void* calldata);
 
-  vtkMemberFunctionCommand(const vtkMemberFunctionCommand&); // Not implemented
-  void operator=(const vtkMemberFunctionCommand&); // Not implemented
+  vtkMemberFunctionCommand(const vtkMemberFunctionCommand&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMemberFunctionCommand&) VTK_DELETE_FUNCTION;
 };
 
 // Description:

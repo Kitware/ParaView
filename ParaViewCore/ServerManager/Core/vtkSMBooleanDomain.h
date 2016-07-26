@@ -49,8 +49,8 @@ protected:
   ~vtkSMBooleanDomain();
 
 private:
-  vtkSMBooleanDomain(const vtkSMBooleanDomain&); // Not implemented
-  void operator=(const vtkSMBooleanDomain&); // Not implemented
+  vtkSMBooleanDomain(const vtkSMBooleanDomain&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMBooleanDomain&) VTK_DELETE_FUNCTION;
 };
 
 #endif

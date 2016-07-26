@@ -59,8 +59,7 @@ protected slots:
   void showContextMenu(const QPoint&);
 
 private:
-  pqTreeWidgetSelectionHelper(const pqTreeWidgetSelectionHelper&); // Not implemented.
-  void operator=(const pqTreeWidgetSelectionHelper&); // Not implemented.
+  Q_DISABLE_COPY(pqTreeWidgetSelectionHelper)
 
   void setSelectedItemsCheckState(Qt::CheckState state);
 

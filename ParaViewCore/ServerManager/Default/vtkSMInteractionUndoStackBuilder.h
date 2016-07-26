@@ -88,8 +88,8 @@ protected:
 
   friend class vtkSMInteractionUndoStackBuilderObserver;
 private:
-  vtkSMInteractionUndoStackBuilder(const vtkSMInteractionUndoStackBuilder&); // Not implemented.
-  void operator=(const vtkSMInteractionUndoStackBuilder&); // Not implemented.
+  vtkSMInteractionUndoStackBuilder(const vtkSMInteractionUndoStackBuilder&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMInteractionUndoStackBuilder&) VTK_DELETE_FUNCTION;
 
 
   vtkSMInteractionUndoStackBuilderObserver* Observer;

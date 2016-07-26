@@ -93,8 +93,8 @@ protected :
   ~vtkTwoScalarsToColorsPainter();
 
 private:
-  vtkTwoScalarsToColorsPainter(const vtkTwoScalarsToColorsPainter&); // Not implemented.
-  void operator=(const vtkTwoScalarsToColorsPainter&); // Not implemented.
+  vtkTwoScalarsToColorsPainter(const vtkTwoScalarsToColorsPainter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkTwoScalarsToColorsPainter&) VTK_DELETE_FUNCTION;
 };
 
 #endif

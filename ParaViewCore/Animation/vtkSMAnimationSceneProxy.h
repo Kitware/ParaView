@@ -69,8 +69,8 @@ protected:
   virtual void CreateVTKObjects();
 
 private:
-  vtkSMAnimationSceneProxy(const vtkSMAnimationSceneProxy&); // Not implemented
-  void operator=(const vtkSMAnimationSceneProxy&); // Not implemented
+  vtkSMAnimationSceneProxy(const vtkSMAnimationSceneProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMAnimationSceneProxy&) VTK_DELETE_FUNCTION;
 
   // Called when vtkSMAnimationScene::UpdateStartEndTimesEvent is fired.
   void OnUpdateStartEndTimesEvent(vtkObject*, unsigned long, void*);

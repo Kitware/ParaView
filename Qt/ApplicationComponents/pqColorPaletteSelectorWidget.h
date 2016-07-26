@@ -52,7 +52,7 @@ private slots:
   void setCurrentIndex(int);
 
 private:
-  Q_DISABLE_COPY(pqColorPaletteSelectorWidget);
+  Q_DISABLE_COPY(pqColorPaletteSelectorWidget)
   QPointer<QComboBox> ComboBox;
 };
 

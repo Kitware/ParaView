@@ -65,8 +65,8 @@ protected:
   ~vtkCPLinearScalarFieldFunction();
 
 private:
-  vtkCPLinearScalarFieldFunction(const vtkCPLinearScalarFieldFunction&); // Not implemented
-  void operator=(const vtkCPLinearScalarFieldFunction&); // Not implemented
+  vtkCPLinearScalarFieldFunction(const vtkCPLinearScalarFieldFunction&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCPLinearScalarFieldFunction&) VTK_DELETE_FUNCTION;
 
   // Description:
   // The constant value for the scalar field.

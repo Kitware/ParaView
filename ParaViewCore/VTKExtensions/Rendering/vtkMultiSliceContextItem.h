@@ -123,8 +123,8 @@ protected:
   virtual ~vtkMultiSliceContextItem();
 
 private:
-  vtkMultiSliceContextItem(const vtkMultiSliceContextItem &); // Not implemented.
-  void operator=(const vtkMultiSliceContextItem &);   // Not implemented.
+  vtkMultiSliceContextItem(const vtkMultiSliceContextItem &) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMultiSliceContextItem &) VTK_DELETE_FUNCTION;
 
   struct vtkInternal;
   vtkInternal* Internal;

@@ -113,8 +113,8 @@ protected:
   virtual vtkObject* NewInitializationHelper();
 
 private:
-  vtkCPProcessor(const vtkCPProcessor&); // Not implemented
-  void operator=(const vtkCPProcessor&); // Not implemented
+  vtkCPProcessor(const vtkCPProcessor&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCPProcessor&) VTK_DELETE_FUNCTION;
 
   vtkCPProcessorInternals* Internal;
   vtkObject* InitializationHelper;

@@ -104,8 +104,8 @@ protected:
   virtual int RequestData (vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
 private:
-  vtkAMRFragmentsFilter(const vtkAMRFragmentsFilter&); // Not implemented.
-  void operator=(const vtkAMRFragmentsFilter&); // Not implemented.
+  vtkAMRFragmentsFilter(const vtkAMRFragmentsFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkAMRFragmentsFilter&) VTK_DELETE_FUNCTION;
 };
 
 #endif /* vtkAMRFragmentsFilter_h */

@@ -55,8 +55,8 @@ protected:
 
 private:
 
-  vtkSMArrayRangeDomain(const vtkSMArrayRangeDomain&); // Not implemented
-  void operator=(const vtkSMArrayRangeDomain&); // Not implemented
+  vtkSMArrayRangeDomain(const vtkSMArrayRangeDomain&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMArrayRangeDomain&) VTK_DELETE_FUNCTION;
 };
 
 #endif

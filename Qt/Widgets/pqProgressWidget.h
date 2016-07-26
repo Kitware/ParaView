@@ -73,8 +73,7 @@ protected:
   QTime EnableTime;
 
 private:
-  pqProgressWidget(const pqProgressWidget&); // Not implemented.
-  void operator=(const pqProgressWidget&); // Not implemented.
+  Q_DISABLE_COPY(pqProgressWidget)
 };
 
 #endif

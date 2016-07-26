@@ -48,8 +48,7 @@ public:
   // Callback for startup.
   void onStartup();
 private:
-  pqRepresentationBehaviorStarter(const pqRepresentationBehaviorStarter&); // Not implemented.
-  void operator=(const pqRepresentationBehaviorStarter&); // Not implemented.
+  Q_DISABLE_COPY(pqRepresentationBehaviorStarter)
 };
 
 #endif

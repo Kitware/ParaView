@@ -86,8 +86,7 @@ protected:
   QPointer<QWidget> Widget;
 
 private:
-  pqComparativeContextView(const pqComparativeContextView&); // Not implemented.
-  void operator=(const pqComparativeContextView&); // Not implemented.
+  Q_DISABLE_COPY(pqComparativeContextView)
 
   class pqInternal;
   pqInternal* Internal;

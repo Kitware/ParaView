@@ -114,8 +114,8 @@ private:
   vector<ConfigInfo> Configs;
 
 private:
-  vtkPVSystemConfigInformation(const vtkPVSystemConfigInformation&); // Not implemented
-  void operator=(const vtkPVSystemConfigInformation&); // Not implemented
+  vtkPVSystemConfigInformation(const vtkPVSystemConfigInformation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVSystemConfigInformation&) VTK_DELETE_FUNCTION;
 };
 
 #endif

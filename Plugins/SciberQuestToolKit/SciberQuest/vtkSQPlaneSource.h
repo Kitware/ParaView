@@ -224,8 +224,8 @@ private:
   int LogLevel;
 
 private:
-  vtkSQPlaneSource(const vtkSQPlaneSource&);  // Not implemented.
-  void operator=(const vtkSQPlaneSource&);  // Not implemented.
+  vtkSQPlaneSource(const vtkSQPlaneSource&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQPlaneSource&) VTK_DELETE_FUNCTION;
 };
 
 #endif

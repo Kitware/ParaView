@@ -45,8 +45,8 @@ private:
   vtkInternals* Internals;
   char* FileName;
   vtkMultiProcessController* Controller;
-  vtkPGenericIOMultiBlockWriter(const vtkPGenericIOMultiBlockWriter&); // Not implemented.
-  void operator=(const vtkPGenericIOMultiBlockWriter&); // Not implemented.
+  vtkPGenericIOMultiBlockWriter(const vtkPGenericIOMultiBlockWriter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPGenericIOMultiBlockWriter&) VTK_DELETE_FUNCTION;
 
 };
 

@@ -95,8 +95,8 @@ protected:
   bool CopyArrays;
 
 private:
-  vtkPythonCalculator(const vtkPythonCalculator&);  // Not implemented.
-  void operator=(const vtkPythonCalculator&);  // Not implemented.
+  vtkPythonCalculator(const vtkPythonCalculator&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPythonCalculator&) VTK_DELETE_FUNCTION;
 };
 
 #endif

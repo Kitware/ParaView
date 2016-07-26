@@ -53,8 +53,7 @@ slots:
   void setValues(const QList<QVariant>&);
 
 private:
-  pqSignalAdaptorSILModel(const pqSignalAdaptorSILModel&); // Not implemented.
-  void operator=(const pqSignalAdaptorSILModel&); // Not implemented.
+  Q_DISABLE_COPY(pqSignalAdaptorSILModel)
 
   pqSILModel* Model;
   QString HierarchyName;

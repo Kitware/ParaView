@@ -57,8 +57,8 @@ protected:
   ~vtkPVStreamingPiecesInformation();
 
 private:
-  vtkPVStreamingPiecesInformation(const vtkPVStreamingPiecesInformation&); // Not implemented
-  void operator=(const vtkPVStreamingPiecesInformation&); // Not implemented
+  vtkPVStreamingPiecesInformation(const vtkPVStreamingPiecesInformation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVStreamingPiecesInformation&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;

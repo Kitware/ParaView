@@ -99,8 +99,7 @@ protected:
   pqServer *Server;
 
 private:
-  pqPlotVariablesDialog(const pqPlotVariablesDialog &); // Not implemented
-  void operator=(const pqPlotVariablesDialog &);        // Not implemented
+  Q_DISABLE_COPY(pqPlotVariablesDialog)
 
   pqUI *ui;
 

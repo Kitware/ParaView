@@ -66,8 +66,8 @@ protected:
   ~vtkPointSpriteDefaultPainter();
 
 private:
-  vtkPointSpriteDefaultPainter(const vtkPointSpriteDefaultPainter&); // Not implemented.
-  void operator=(const vtkPointSpriteDefaultPainter&); // Not implemented.
+  vtkPointSpriteDefaultPainter(const vtkPointSpriteDefaultPainter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPointSpriteDefaultPainter&) VTK_DELETE_FUNCTION;
 };
 
 #endif

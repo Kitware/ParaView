@@ -175,8 +175,7 @@ protected slots:
   void onCheckStatusChanged();
 
 private:
-  pqProxySILModel(const pqProxySILModel&); // Not implemented.
-  void operator=(const pqProxySILModel&); // Not implemented.
+  Q_DISABLE_COPY(pqProxySILModel)
 
   pqTimer DelayedValuesChangedSignalTimer;
   QPixmap CheckboxPixmaps[3];

@@ -59,8 +59,8 @@ protected:
   vtkSMProxy* GeometryWriter;
   vtkSMProxy* ViewModule;
 private:
-  vtkSMAnimationSceneGeometryWriter(const vtkSMAnimationSceneGeometryWriter&); // Not implemented.
-  void operator=(const vtkSMAnimationSceneGeometryWriter&); // Not implemented.
+  vtkSMAnimationSceneGeometryWriter(const vtkSMAnimationSceneGeometryWriter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMAnimationSceneGeometryWriter&) VTK_DELETE_FUNCTION;
 };
 
 #endif

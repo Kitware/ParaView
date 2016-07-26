@@ -178,7 +178,7 @@ private:
     vtkSMProperty *property, vtkSMProxy *proxy, QWidget *parentObj);
 
 private:
-  Q_DISABLE_COPY(pqProxyWidget);
+  Q_DISABLE_COPY(pqProxyWidget)
 
   bool ApplyChangesImmediately;
   bool UseDocumentationForLabels;

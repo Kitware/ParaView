@@ -43,8 +43,7 @@ public:
   virtual ~pqOrbitWidget();
 
 private:
-  pqOrbitWidget(const pqOrbitWidget&); // Not implemented.
-  void operator=(const pqOrbitWidget&); // Not implemented.
+  Q_DISABLE_COPY(pqOrbitWidget)
 };
 
 #endif

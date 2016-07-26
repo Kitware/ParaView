@@ -291,8 +291,8 @@ private:
   // Convert from cell fractional unit into length.
   static double ConvertToLength(double interval,int unit,double cellLength);
 
-  vtkSQFieldTracer(const vtkSQFieldTracer&);  // Not implemented.
-  void operator=(const vtkSQFieldTracer&);  // Not implemented.
+  vtkSQFieldTracer(const vtkSQFieldTracer&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQFieldTracer&) VTK_DELETE_FUNCTION;
 
 private:
   int WorldSize;

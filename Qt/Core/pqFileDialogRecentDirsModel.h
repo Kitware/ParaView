@@ -79,8 +79,7 @@ protected:
   QPointer<pqFileDialogModel> FileDialogModel;
 
 private:
-  pqFileDialogRecentDirsModel(const pqFileDialogRecentDirsModel&); // Not implemented.
-  void operator=(const pqFileDialogRecentDirsModel&); // Not implemented.
+  Q_DISABLE_COPY(pqFileDialogRecentDirsModel)
 };
 
 #endif

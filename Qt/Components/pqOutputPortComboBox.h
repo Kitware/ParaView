@@ -97,8 +97,7 @@ protected:
   bool AutoUpdateIndex;
 
 private:
-  pqOutputPortComboBox(const pqOutputPortComboBox&); // Not implemented.
-  void operator=(const pqOutputPortComboBox&); // Not implemented.
+  Q_DISABLE_COPY(pqOutputPortComboBox)
 };
 
 #endif

@@ -72,8 +72,7 @@ protected slots:
   void onItemClicked (QTreeWidgetItem *item, int column);
   void onItemPressed (QTreeWidgetItem *item, int column);
 private:
-  pqTreeWidgetCheckHelper(const pqTreeWidgetCheckHelper&); // Not implemented.
-  void operator=(const pqTreeWidgetCheckHelper&); // Not implemented.
+  Q_DISABLE_COPY(pqTreeWidgetCheckHelper)
 
   QTreeWidget* Tree;
   int CheckableColumn;

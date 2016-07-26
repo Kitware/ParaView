@@ -56,8 +56,7 @@ private:
   pqInternals* Internals;
 
 private:
-  pqEditMenu(const pqEditMenu&); // Not implemented.
-  void operator=(const pqEditMenu&); // Not implemented.
+  Q_DISABLE_COPY(pqEditMenu)
 };
 
 #endif

@@ -69,8 +69,8 @@ protected:
   vtkNew<vtkMatrix4x4> CachedRotMatrix;
 
 private:
-  vtkVRGrabWorldStyle(const vtkVRGrabWorldStyle&); // Not implemented.
-  void operator=(const vtkVRGrabWorldStyle&); // Not implemented.
+  vtkVRGrabWorldStyle(const vtkVRGrabWorldStyle&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkVRGrabWorldStyle&) VTK_DELETE_FUNCTION;
 
   float GetSpeedFactor(vtkCamera *cam);
 };

@@ -46,8 +46,7 @@ protected:
   pqServer *Server;
 
 private:
-  pqSierraPlotToolsDataLoadManager(const pqSierraPlotToolsDataLoadManager &); // Not implemented
-  void operator=(const pqSierraPlotToolsDataLoadManager &);        // Not implemented
+  Q_DISABLE_COPY(pqSierraPlotToolsDataLoadManager)
 
   class pqUI;
   pqUI *ui;

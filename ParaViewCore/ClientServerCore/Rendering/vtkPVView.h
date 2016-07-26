@@ -220,8 +220,8 @@ protected:
   int Position[2];
 
 private:
-  vtkPVView(const vtkPVView&); // Not implemented
-  void operator=(const vtkPVView&); // Not implemented
+  vtkPVView(const vtkPVView&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVView&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
 

@@ -110,8 +110,8 @@ private:
   double Power[3];
 
 private:
-  vtkSQSeedPointLatice(const vtkSQSeedPointLatice&);  // Not implemented.
-  void operator=(const vtkSQSeedPointLatice&);  // Not implemented.
+  vtkSQSeedPointLatice(const vtkSQSeedPointLatice&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQSeedPointLatice&) VTK_DELETE_FUNCTION;
 };
 
 #endif

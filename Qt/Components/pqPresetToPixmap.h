@@ -69,7 +69,7 @@ protected:
   QPixmap renderIndexedColorTransferFunction(vtkScalarsToColors* stc, const QSize& resolution) const;
 
 private:
-  Q_DISABLE_COPY(pqPresetToPixmap);
+  Q_DISABLE_COPY(pqPresetToPixmap)
   class pqInternals;
   QScopedPointer<pqInternals> Internals;
 };

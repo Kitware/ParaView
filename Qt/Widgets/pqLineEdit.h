@@ -101,8 +101,7 @@ protected:
   void triggerTextChangedAndEditingFinished();
 
 private:
-  pqLineEdit(const pqLineEdit&); // Not implemented.
-  void operator=(const pqLineEdit&); // Not implemented.
+  Q_DISABLE_COPY(pqLineEdit)
 
   bool EditingFinishedPending;
   bool ResetCursorPositionOnEditingFinished;

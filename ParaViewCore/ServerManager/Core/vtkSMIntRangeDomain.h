@@ -77,8 +77,8 @@ protected:
   ~vtkSMIntRangeDomain();
 
 private:
-  vtkSMIntRangeDomain(const vtkSMIntRangeDomain&); // Not implemented
-  void operator=(const vtkSMIntRangeDomain&); // Not implemented
+  vtkSMIntRangeDomain(const vtkSMIntRangeDomain&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMIntRangeDomain&) VTK_DELETE_FUNCTION;
 
   typedef vtkSMRangeDomainTemplate<int> RealSuperclass;
 };

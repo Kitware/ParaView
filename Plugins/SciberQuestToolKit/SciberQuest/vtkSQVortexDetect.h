@@ -135,8 +135,8 @@ private:
   int ComputeEigenvalueDiagnostic;
 
 private:
-  vtkSQVortexDetect(const vtkSQVortexDetect&);  // Not implemented.
-  void operator=(const vtkSQVortexDetect&);  // Not implemented.
+  vtkSQVortexDetect(const vtkSQVortexDetect&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQVortexDetect&) VTK_DELETE_FUNCTION;
 };
 
 #endif

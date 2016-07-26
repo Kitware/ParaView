@@ -84,8 +84,8 @@ protected:
   int   IsPackage;
 
 private:
-  vtkPVPythonModule(const vtkPVPythonModule &); // Not implemented
-  void operator=(const vtkPVPythonModule &);    // Not implemented
+  vtkPVPythonModule(const vtkPVPythonModule &) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVPythonModule &) VTK_DELETE_FUNCTION;
 };
 
 #endif //vtkPVPythonModule_h

@@ -105,8 +105,8 @@ protected:
 
 private:
 
-  vtkPVMantaRepresentation(const vtkPVMantaRepresentation&); // Not implemented.
-  void operator=(const vtkPVMantaRepresentation&); // Not implemented.
+  vtkPVMantaRepresentation(const vtkPVMantaRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVMantaRepresentation&) VTK_DELETE_FUNCTION;
 
 };
 

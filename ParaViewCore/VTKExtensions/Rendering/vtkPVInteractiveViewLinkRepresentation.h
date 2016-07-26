@@ -47,8 +47,8 @@ protected:
   virtual void AdjustImageSize(double o[2], double borderSize[2], double imageSize[2]);
 
 private:
-  vtkPVInteractiveViewLinkRepresentation(const vtkPVInteractiveViewLinkRepresentation&); // Not implemented.
-  void operator=(const vtkPVInteractiveViewLinkRepresentation&); // Not implemented.
+  vtkPVInteractiveViewLinkRepresentation(const vtkPVInteractiveViewLinkRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVInteractiveViewLinkRepresentation&) VTK_DELETE_FUNCTION;
 
 };
 

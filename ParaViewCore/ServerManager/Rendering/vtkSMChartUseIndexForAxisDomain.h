@@ -57,8 +57,8 @@ protected:
   ~vtkSMChartUseIndexForAxisDomain();
 
 private:
-  vtkSMChartUseIndexForAxisDomain(const vtkSMChartUseIndexForAxisDomain&); // Not implemented
-  void operator=(const vtkSMChartUseIndexForAxisDomain&); // Not implemented
+  vtkSMChartUseIndexForAxisDomain(const vtkSMChartUseIndexForAxisDomain&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMChartUseIndexForAxisDomain&) VTK_DELETE_FUNCTION;
 
 };
 

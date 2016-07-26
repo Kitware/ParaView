@@ -89,8 +89,7 @@ private:
   class pqInternals;
   pqInternals* Internals;
 
-  pqTransferFunctionEditor(const pqTransferFunctionEditor&); // Not implemented.
-  void operator=(const pqTransferFunctionEditor&); // Not implemented.
+  Q_DISABLE_COPY(pqTransferFunctionEditor)
 };
 
 #endif

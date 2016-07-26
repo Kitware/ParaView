@@ -54,8 +54,8 @@ protected:
   ~vtkPVOpenGLExtensionsInformation();
 
 private:
-  vtkPVOpenGLExtensionsInformation(const vtkPVOpenGLExtensionsInformation&); // Not implemented.
-  void operator=(const vtkPVOpenGLExtensionsInformation&); // Not implemented.
+  vtkPVOpenGLExtensionsInformation(const vtkPVOpenGLExtensionsInformation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVOpenGLExtensionsInformation&) VTK_DELETE_FUNCTION;
 
   vtkPVOpenGLExtensionsInformationInternal* Internal;
 

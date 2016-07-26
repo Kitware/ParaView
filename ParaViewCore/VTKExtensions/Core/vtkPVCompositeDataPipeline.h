@@ -48,8 +48,8 @@ protected:
   virtual void ResetPipelineInformation(int port, vtkInformation*);
 
 private:
-  vtkPVCompositeDataPipeline(const vtkPVCompositeDataPipeline&);  // Not implemented.
-  void operator=(const vtkPVCompositeDataPipeline&);  // Not implemented.
+  vtkPVCompositeDataPipeline(const vtkPVCompositeDataPipeline&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVCompositeDataPipeline&) VTK_DELETE_FUNCTION;
 };
 
 #endif

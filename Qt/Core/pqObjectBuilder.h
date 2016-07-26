@@ -272,8 +272,7 @@ protected:
   virtual void destroyProxyInternal(pqProxy* proxy);
 
 private:
-  pqObjectBuilder(const pqObjectBuilder&); // Not implemented.
-  void operator=(const pqObjectBuilder&); // Not implemented.
+  Q_DISABLE_COPY(pqObjectBuilder)
 
   bool WaitingForConnection;
 

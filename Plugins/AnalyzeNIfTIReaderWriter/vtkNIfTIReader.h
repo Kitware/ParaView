@@ -71,8 +71,8 @@ protected:
   virtual void ExecuteDataWithInformation(vtkDataObject *output, vtkInformation* outInfo);
 
 private:
-  vtkNIfTIReader(const vtkNIfTIReader&);  // Not implemented.
-  void operator=(const vtkNIfTIReader&);  // Not implemented.
+  vtkNIfTIReader(const vtkNIfTIReader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkNIfTIReader&) VTK_DELETE_FUNCTION;
 
   unsigned int numberOfDimensions;
   unsigned int imageSizeInBytes;

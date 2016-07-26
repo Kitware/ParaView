@@ -61,8 +61,8 @@ protected:
 
   int Quality;
 private:
-  vtkLZ4Compressor(const vtkLZ4Compressor&); // Not implemented
-  void operator=(const vtkLZ4Compressor&); // Not implemented
+  vtkLZ4Compressor(const vtkLZ4Compressor&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkLZ4Compressor&) VTK_DELETE_FUNCTION;
 
   // Used when Quality > 1.
   vtkNew<vtkUnsignedCharArray> TemporaryBuffer;

@@ -48,8 +48,7 @@ public:
   // Callback for startup.
   void onStartup();
 private:
-  pqMyApplicationStarter(const pqMyApplicationStarter&); // Not implemented.
-  void operator=(const pqMyApplicationStarter&); // Not implemented.
+  Q_DISABLE_COPY(pqMyApplicationStarter)
 };
 
 #endif

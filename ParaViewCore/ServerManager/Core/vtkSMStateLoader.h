@@ -124,8 +124,8 @@ protected:
   vtkSMProxyLocator* ProxyLocator;
   int KeepIdMapping;
 private:
-  vtkSMStateLoader(const vtkSMStateLoader&); // Not implemented
-  void operator=(const vtkSMStateLoader&); // Not implemented
+  vtkSMStateLoader(const vtkSMStateLoader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMStateLoader&) VTK_DELETE_FUNCTION;
 
   vtkSMStateLoaderInternals* Internal;
 };

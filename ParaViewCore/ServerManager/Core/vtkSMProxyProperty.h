@@ -210,8 +210,8 @@ protected:
   friend class vtkPPInternals;
   vtkPPInternals* PPInternals;
 private:
-  vtkSMProxyProperty(const vtkSMProxyProperty&); // Not implemented
-  void operator=(const vtkSMProxyProperty&); // Not implemented
+  vtkSMProxyProperty(const vtkSMProxyProperty&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMProxyProperty&) VTK_DELETE_FUNCTION;
 
 };
 

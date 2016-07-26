@@ -86,8 +86,7 @@ protected:
   void loadTexture();
   bool loadTexture(const QString& filename);
 private:
-  pqTextureComboBox(const pqTextureComboBox&); // Not implemented.
-  void operator=(const pqTextureComboBox&); // Not implemented.
+  Q_DISABLE_COPY(pqTextureComboBox)
 
   class pqInternal;
   pqInternal* Internal;

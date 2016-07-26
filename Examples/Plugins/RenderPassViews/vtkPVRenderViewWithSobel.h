@@ -41,8 +41,8 @@ protected:
   ~vtkPVRenderViewWithSobel();
 
 private:
-  vtkPVRenderViewWithSobel(const vtkPVRenderViewWithSobel&); // Not implemented
-  void operator=(const vtkPVRenderViewWithSobel&); // Not implemented
+  vtkPVRenderViewWithSobel(const vtkPVRenderViewWithSobel&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVRenderViewWithSobel&) VTK_DELETE_FUNCTION;
 
 };
 

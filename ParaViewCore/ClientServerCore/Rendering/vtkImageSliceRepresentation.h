@@ -185,8 +185,8 @@ protected:
   vtkNew<vtkPExtentTranslator> PExtentTranslator;
   int WholeExtent[6];
 private:
-  vtkImageSliceRepresentation(const vtkImageSliceRepresentation&); // Not implemented
-  void operator=(const vtkImageSliceRepresentation&); // Not implemented
+  vtkImageSliceRepresentation(const vtkImageSliceRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkImageSliceRepresentation&) VTK_DELETE_FUNCTION;
 
 };
 

@@ -70,8 +70,7 @@ protected:
   void createWidget(pqServer*);
 
 private:
-  pqPolyLineWidget(const pqPolyLineWidget&); // Not implemented.
-  void operator=(const pqPolyLineWidget&); // Not implemented.
+  Q_DISABLE_COPY(pqPolyLineWidget)
 
   class pqInternals;
   pqInternals* Internals;

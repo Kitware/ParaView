@@ -87,8 +87,8 @@ protected:
 private:
   vtkSMPropertyIteratorInternals* Internals;
 
-  vtkSMPropertyIterator(const vtkSMPropertyIterator&); // Not implemented
-  void operator=(const vtkSMPropertyIterator&); // Not implemented
+  vtkSMPropertyIterator(const vtkSMPropertyIterator&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMPropertyIterator&) VTK_DELETE_FUNCTION;
 };
 
 #endif

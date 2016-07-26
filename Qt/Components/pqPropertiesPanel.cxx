@@ -141,7 +141,7 @@ namespace
         }
       }
   private:
-    Q_DISABLE_COPY(pqProxyWidgets);
+    Q_DISABLE_COPY(pqProxyWidgets)
     };
 
   unsigned long pqProxyWidgets::Counter = 0;

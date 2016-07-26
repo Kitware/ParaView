@@ -55,8 +55,8 @@ protected:
 
 private:
 
-  vtkPVClipClosedSurface( const vtkPVClipClosedSurface & ); // Not implemented
-  void operator = ( const vtkPVClipClosedSurface & );       // Not implemented
+  vtkPVClipClosedSurface( const vtkPVClipClosedSurface & ) VTK_DELETE_FUNCTION;
+  void operator = ( const vtkPVClipClosedSurface & ) VTK_DELETE_FUNCTION;
 };
 
 #endif

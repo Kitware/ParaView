@@ -173,8 +173,8 @@ protected:
   vtkSetStringMacro(LastOpacityArray);
 
 private:
-  vtkPointGaussianRepresentation(const vtkPointGaussianRepresentation&); // Not implemented
-  void operator=(const vtkPointGaussianRepresentation&); // Not implemented
+  vtkPointGaussianRepresentation(const vtkPointGaussianRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPointGaussianRepresentation&) VTK_DELETE_FUNCTION;
 };
 
 #endif // vtkPointGaussianRepresentation_h

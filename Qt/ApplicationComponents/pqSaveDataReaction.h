@@ -67,8 +67,7 @@ protected:
     { pqSaveDataReaction::saveActiveData(); }
 
 private:
-  pqSaveDataReaction(const pqSaveDataReaction&); // Not implemented.
-  void operator=(const pqSaveDataReaction&); // Not implemented.
+  Q_DISABLE_COPY(pqSaveDataReaction)
 };
 
 #endif

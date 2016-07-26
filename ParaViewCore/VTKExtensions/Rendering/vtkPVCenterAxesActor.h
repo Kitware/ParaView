@@ -50,8 +50,8 @@ protected:
 
 
 private:
-  vtkPVCenterAxesActor(const vtkPVCenterAxesActor&); // Not implemented
-  void operator=(const vtkPVCenterAxesActor&); // Not implemented
+  vtkPVCenterAxesActor(const vtkPVCenterAxesActor&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVCenterAxesActor&) VTK_DELETE_FUNCTION;
 
 };
 

@@ -65,8 +65,8 @@ protected:
   ~vtkCPImplementedTestDriver() {};
 
 private:
-  vtkCPImplementedTestDriver(const vtkCPImplementedTestDriver&); // Not implemented
-  void operator=(const vtkCPImplementedTestDriver&); // Not implemented
+  vtkCPImplementedTestDriver(const vtkCPImplementedTestDriver&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCPImplementedTestDriver&) VTK_DELETE_FUNCTION;
 };
 
 vtkStandardNewMacro(vtkCPImplementedTestDriver);

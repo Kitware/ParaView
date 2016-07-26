@@ -65,8 +65,8 @@ protected:
   bool ArgumentIsArray;
 
 private:
-  vtkSIVectorPropertyTemplate(const vtkSIVectorPropertyTemplate&); // Not implemented
-  void operator=(const vtkSIVectorPropertyTemplate&); // Not implemented
+  vtkSIVectorPropertyTemplate(const vtkSIVectorPropertyTemplate&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSIVectorPropertyTemplate&) VTK_DELETE_FUNCTION;
 
 };
 

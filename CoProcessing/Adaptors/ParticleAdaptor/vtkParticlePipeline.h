@@ -104,8 +104,8 @@ protected:
   vtkPNGWriter* writer;
 
 private:
-  vtkParticlePipeline (const vtkParticlePipeline&); // Not implemented
-  void operator= (const vtkParticlePipeline&); // Not implemented
+  vtkParticlePipeline (const vtkParticlePipeline&) VTK_DELETE_FUNCTION;
+  void operator= (const vtkParticlePipeline&) VTK_DELETE_FUNCTION;
 
 };
 

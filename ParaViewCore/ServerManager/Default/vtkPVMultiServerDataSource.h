@@ -66,8 +66,8 @@ protected:
                           vtkInformationVector *outputVector);
 
 private:
-  vtkPVMultiServerDataSource(const vtkPVMultiServerDataSource&);  // Not implemented.
-  void operator=(const vtkPVMultiServerDataSource&);  // Not implemented.
+  vtkPVMultiServerDataSource(const vtkPVMultiServerDataSource&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVMultiServerDataSource&) VTK_DELETE_FUNCTION;
 
   struct vtkInternal;
   vtkInternal* Internal;

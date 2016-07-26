@@ -47,8 +47,8 @@ protected:
                           vtkInformationVector** inputVector,
                           vtkInformationVector* outputVector);
 private:
-  vtkAppendArcLength(const vtkAppendArcLength&); // Not implemented
-  void operator=(const vtkAppendArcLength&); // Not implemented
+  vtkAppendArcLength(const vtkAppendArcLength&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkAppendArcLength&) VTK_DELETE_FUNCTION;
 
 };
 

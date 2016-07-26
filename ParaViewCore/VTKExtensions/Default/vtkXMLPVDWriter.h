@@ -131,8 +131,8 @@ protected:
   // Garbage collection support.
   virtual void ReportReferences(vtkGarbageCollector*);
 private:
-  vtkXMLPVDWriter(const vtkXMLPVDWriter&);  // Not implemented.
-  void operator=(const vtkXMLPVDWriter&);  // Not implemented.
+  vtkXMLPVDWriter(const vtkXMLPVDWriter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkXMLPVDWriter&) VTK_DELETE_FUNCTION;
 };
 
 #endif

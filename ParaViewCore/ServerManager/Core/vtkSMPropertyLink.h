@@ -115,8 +115,8 @@ private:
   vtkSMPropertyLinkInternals* Internals;
   bool ModifyingProperty;
 
-  vtkSMPropertyLink(const vtkSMPropertyLink&); // Not implemented.
-  void operator=(const vtkSMPropertyLink&); // Not implemented.
+  vtkSMPropertyLink(const vtkSMPropertyLink&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMPropertyLink&) VTK_DELETE_FUNCTION;
 
 };
 

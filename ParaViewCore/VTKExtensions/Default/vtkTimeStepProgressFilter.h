@@ -51,8 +51,8 @@ protected:
   bool    UseTimeRange;
 
 private:
-  vtkTimeStepProgressFilter(const vtkTimeStepProgressFilter&); // Not implemented
-  void operator=(const vtkTimeStepProgressFilter&); // Not implemented
+  vtkTimeStepProgressFilter(const vtkTimeStepProgressFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkTimeStepProgressFilter&) VTK_DELETE_FUNCTION;
 };
 
 #endif

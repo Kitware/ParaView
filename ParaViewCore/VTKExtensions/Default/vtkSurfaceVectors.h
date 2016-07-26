@@ -68,8 +68,8 @@ protected:
   int   ConstraintMode;
 
 private:
-  vtkSurfaceVectors(const vtkSurfaceVectors&);  // Not implemented.
-  void operator=(const vtkSurfaceVectors&);  // Not implemented.
+  vtkSurfaceVectors(const vtkSurfaceVectors&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSurfaceVectors&) VTK_DELETE_FUNCTION;
 };
 
 #endif

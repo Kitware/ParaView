@@ -48,9 +48,9 @@ protected:
   ~vtkCPGridBuilder();
 
 private:
-  vtkCPGridBuilder(const vtkCPGridBuilder&); // Not implemented
+  vtkCPGridBuilder(const vtkCPGridBuilder&) VTK_DELETE_FUNCTION;
 
-  void operator=(const vtkCPGridBuilder&); // Not implemented
+  void operator=(const vtkCPGridBuilder&) VTK_DELETE_FUNCTION;
   // Description:
   // The field builder for creating the input fields to the coprocessing 
   // library.

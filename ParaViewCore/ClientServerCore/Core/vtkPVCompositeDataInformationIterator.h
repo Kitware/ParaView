@@ -74,8 +74,8 @@ protected:
   vtkPVDataInformation* DataInformation;
 
 private:
-  vtkPVCompositeDataInformationIterator(const vtkPVCompositeDataInformationIterator&); // Not implemented
-  void operator=(const vtkPVCompositeDataInformationIterator&); // Not implemented
+  vtkPVCompositeDataInformationIterator(const vtkPVCompositeDataInformationIterator&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVCompositeDataInformationIterator&) VTK_DELETE_FUNCTION;
 
   class vtkInternal;
   vtkInternal* Internal;

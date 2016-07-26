@@ -90,8 +90,8 @@ protected:
   int UseOpenGL;
 
 private:
-  vtkIceTContext(const vtkIceTContext &);       // Not implemented.
-  void operator=(const vtkIceTContext &);       // Not implemented.
+  vtkIceTContext(const vtkIceTContext &) VTK_DELETE_FUNCTION;
+  void operator=(const vtkIceTContext &) VTK_DELETE_FUNCTION;
 
   vtkIceTContextOpaqueHandle *Context;
 };

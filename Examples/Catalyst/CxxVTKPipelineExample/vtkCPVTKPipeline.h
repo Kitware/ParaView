@@ -25,8 +25,8 @@ protected:
   virtual ~vtkCPVTKPipeline();
 
 private:
-  vtkCPVTKPipeline(const vtkCPVTKPipeline&); // Not implemented
-  void operator=(const vtkCPVTKPipeline&); // Not implemented
+  vtkCPVTKPipeline(const vtkCPVTKPipeline&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCPVTKPipeline&) VTK_DELETE_FUNCTION;
 
   int OutputFrequency;
   std::string FileName;

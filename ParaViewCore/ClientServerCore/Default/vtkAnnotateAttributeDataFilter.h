@@ -65,8 +65,8 @@ protected:
   vtkIdType ElementId;
 
 private:
-  vtkAnnotateAttributeDataFilter(const vtkAnnotateAttributeDataFilter&); // Not implemented
-  void operator=(const vtkAnnotateAttributeDataFilter&); // Not implemented
+  vtkAnnotateAttributeDataFilter(const vtkAnnotateAttributeDataFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkAnnotateAttributeDataFilter&) VTK_DELETE_FUNCTION;
 
 };
 

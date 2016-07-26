@@ -56,8 +56,8 @@ protected:
     int outputport);
 
 private:
-  vtkSMNumberOfComponentsDomain(const vtkSMNumberOfComponentsDomain&); // Not implemented
-  void operator=(const vtkSMNumberOfComponentsDomain&); // Not implemented
+  vtkSMNumberOfComponentsDomain(const vtkSMNumberOfComponentsDomain&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMNumberOfComponentsDomain&) VTK_DELETE_FUNCTION;
 
 };
 

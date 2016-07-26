@@ -33,8 +33,8 @@ protected:
   ~vtkSMFileListDomain();
 
 private:
-  vtkSMFileListDomain(const vtkSMFileListDomain&); // Not implemented
-  void operator=(const vtkSMFileListDomain&); // Not implemented
+  vtkSMFileListDomain(const vtkSMFileListDomain&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMFileListDomain&) VTK_DELETE_FUNCTION;
 };
 
 #endif

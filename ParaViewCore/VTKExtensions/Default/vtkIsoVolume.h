@@ -68,8 +68,8 @@ protected:
   double UpperThreshold;
 
 private:
-  vtkIsoVolume(const vtkIsoVolume&);  // Not implemented.
-  void operator=(const vtkIsoVolume&);  // Not implemented.
+  vtkIsoVolume(const vtkIsoVolume&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkIsoVolume&) VTK_DELETE_FUNCTION;
 };
 
 #endif // vtkIsoVolume_h

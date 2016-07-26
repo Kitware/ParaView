@@ -70,8 +70,8 @@ protected:
 
   vtkSMProxy* ActorProxy;
 private:
-  vtkSMScalarBarWidgetRepresentationProxy(const vtkSMScalarBarWidgetRepresentationProxy&); // Not implemented
-  void operator=(const vtkSMScalarBarWidgetRepresentationProxy&); // Not implemented
+  vtkSMScalarBarWidgetRepresentationProxy(const vtkSMScalarBarWidgetRepresentationProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMScalarBarWidgetRepresentationProxy&) VTK_DELETE_FUNCTION;
 
 };
 

@@ -44,8 +44,8 @@ protected:
   void TriggerExecution();
 
 private:
-  vtkPVServerSideAnimationPlayer(const vtkPVServerSideAnimationPlayer&); // Not implemented
-  void operator=(const vtkPVServerSideAnimationPlayer&); // Not implemented
+  vtkPVServerSideAnimationPlayer(const vtkPVServerSideAnimationPlayer&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVServerSideAnimationPlayer&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;

@@ -199,8 +199,7 @@ protected slots:
   void onConnectionLost(vtkObject*, unsigned long, void*, void*);
 
 private:
-  pqServer(const pqServer&);  // Not implemented.
-  pqServer& operator=(const pqServer&); // Not implemented.
+  Q_DISABLE_COPY(pqServer)
 
   pqServerResource Resource;
   vtkIdType ConnectionID;

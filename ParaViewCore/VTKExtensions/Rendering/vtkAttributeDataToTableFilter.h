@@ -106,8 +106,8 @@ protected:
   bool GenerateOriginalIds;
   bool GenerateCellConnectivity;
 private:
-  vtkAttributeDataToTableFilter(const vtkAttributeDataToTableFilter&); // Not implemented
-  void operator=(const vtkAttributeDataToTableFilter&); // Not implemented
+  vtkAttributeDataToTableFilter(const vtkAttributeDataToTableFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkAttributeDataToTableFilter&) VTK_DELETE_FUNCTION;
 
 };
 

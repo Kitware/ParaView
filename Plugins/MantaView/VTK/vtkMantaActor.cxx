@@ -135,8 +135,8 @@ public:
   int DebugCntr;
   static int GlobalCntr;
 private:
-  vtkMantaActorThreadCache(const vtkMantaActorThreadCache&);  // Not implemented.
-  void operator=(const vtkMantaActorThreadCache&);  // Not implemented.
+  vtkMantaActorThreadCache(const vtkMantaActorThreadCache&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMantaActorThreadCache&) VTK_DELETE_FUNCTION;
 };
 
 int vtkMantaActorThreadCache::GlobalCntr = 0;

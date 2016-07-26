@@ -52,8 +52,8 @@ protected:
   virtual vtkExecutive* CreateDefaultExecutive();
 
 private:
-  vtkPVMergeTables(const vtkPVMergeTables&); // Not implemented
-  void operator=(const vtkPVMergeTables&); // Not implemented
+  vtkPVMergeTables(const vtkPVMergeTables&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVMergeTables&) VTK_DELETE_FUNCTION;
 
 };
 

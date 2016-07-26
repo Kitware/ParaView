@@ -75,8 +75,8 @@ protected:
   void SetProcessTypeInt(int ptype);
 
 private:
-  vtkCommandOptionsXMLParser(const vtkCommandOptionsXMLParser&); // Not implemented
-  void operator=(const vtkCommandOptionsXMLParser&); // Not implemented
+  vtkCommandOptionsXMLParser(const vtkCommandOptionsXMLParser&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCommandOptionsXMLParser&) VTK_DELETE_FUNCTION;
   int InPVXTag;
   vtkCommandOptions* PVOptions;
   vtkCommandOptionsXMLParserInternal* Internals;

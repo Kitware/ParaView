@@ -59,8 +59,7 @@ protected slots:
   void onItemClicked (QListWidgetItem *item);
   void onItemPressed (QListWidgetItem *item); 
 private:
-  pqListWidgetCheckHelper(const pqListWidgetCheckHelper&); // Not implemented.
-  void operator=(const pqListWidgetCheckHelper&); // Not implemented.
+  Q_DISABLE_COPY(pqListWidgetCheckHelper)
 
   QListWidget* List;
   int PressState;

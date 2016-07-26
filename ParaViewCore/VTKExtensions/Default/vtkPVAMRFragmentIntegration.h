@@ -65,8 +65,8 @@ public:
                           vtkInformationVector*);
 
 private:
-  vtkPVAMRFragmentIntegration(const vtkPVAMRFragmentIntegration&);  // Not implemented.
-  void operator=(const vtkPVAMRFragmentIntegration&);    // Not implemented.
+  vtkPVAMRFragmentIntegration(const vtkPVAMRFragmentIntegration&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVAMRFragmentIntegration&) VTK_DELETE_FUNCTION;
 
 protected:
   double VolumeFractionSurfaceValue;

@@ -124,8 +124,8 @@ protected:
   int   ConcatenateOutputNameWithInput;
 
 private:
-  vtk1DTransferFunctionFilter(const vtk1DTransferFunctionFilter&); // Not implemented.
-  void operator=(const vtk1DTransferFunctionFilter&); // Not implemented.
+  vtk1DTransferFunctionFilter(const vtk1DTransferFunctionFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtk1DTransferFunctionFilter&) VTK_DELETE_FUNCTION;
 };
 
 #endif /* vtk1DTransferFunctionFilter_h */

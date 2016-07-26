@@ -61,7 +61,7 @@ signals:
   void manipulatorTypesChanged();
 
 private:
-  Q_DISABLE_COPY(pqCameraManipulatorWidget);
+  Q_DISABLE_COPY(pqCameraManipulatorWidget)
   class pqInternals;
   pqInternals* Internals;
   class PropertyLinksConnection;

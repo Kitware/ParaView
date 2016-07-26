@@ -38,8 +38,8 @@ protected:
   ~vtkPEquivalenceSet();
 
 private:
-  vtkPEquivalenceSet(const vtkPEquivalenceSet&);  // Not implemented.
-  void operator=(const vtkPEquivalenceSet&);  // Not implemented.
+  vtkPEquivalenceSet(const vtkPEquivalenceSet&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPEquivalenceSet&) VTK_DELETE_FUNCTION;
 };
 
 #endif /* vtkPEquivalenceSet_h */

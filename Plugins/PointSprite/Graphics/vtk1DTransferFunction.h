@@ -72,8 +72,8 @@ protected:
   int UseScalarRange;
 
 private:
-  vtk1DTransferFunction(const vtk1DTransferFunction&); // Not implemented.
-  void operator=(const vtk1DTransferFunction&); // Not implemented.
+  vtk1DTransferFunction(const vtk1DTransferFunction&) VTK_DELETE_FUNCTION;
+  void operator=(const vtk1DTransferFunction&) VTK_DELETE_FUNCTION;
 };
 
 #endif

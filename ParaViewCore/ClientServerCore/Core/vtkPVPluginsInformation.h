@@ -100,8 +100,8 @@ protected:
   vtkSetStringMacro(SearchPaths);
 
 private:
-  vtkPVPluginsInformation(const vtkPVPluginsInformation&); // Not implemented
-  void operator=(const vtkPVPluginsInformation&); // Not implemented
+  vtkPVPluginsInformation(const vtkPVPluginsInformation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVPluginsInformation&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;

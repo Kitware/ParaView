@@ -89,8 +89,7 @@ protected slots:
   virtual void printStdout(vtkObject *, unsigned long, void *, void *);
 
 private:
-  pqBlotShell(const pqBlotShell &);     // Not implemented
-  void operator=(const pqBlotShell &);  // Not implemented
+  Q_DISABLE_COPY(pqBlotShell)
 };
 
 #endif //pqBlotWidget_h

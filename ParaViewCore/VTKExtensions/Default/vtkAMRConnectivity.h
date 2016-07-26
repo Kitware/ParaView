@@ -113,8 +113,8 @@ protected:
                                   vtkIdTypeArray *array);
 
 private:
-  vtkAMRConnectivity(const vtkAMRConnectivity&);  // Not implemented.
-  void operator=(const vtkAMRConnectivity&);  // Not implemented.
+  vtkAMRConnectivity(const vtkAMRConnectivity&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkAMRConnectivity&) VTK_DELETE_FUNCTION;
 
 };
 

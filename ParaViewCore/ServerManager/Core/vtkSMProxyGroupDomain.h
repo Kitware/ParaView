@@ -92,8 +92,8 @@ protected:
   vtkSMProxyGroupDomainInternals* PGInternals;
 
 private:
-  vtkSMProxyGroupDomain(const vtkSMProxyGroupDomain&); // Not implemented
-  void operator=(const vtkSMProxyGroupDomain&); // Not implemented
+  vtkSMProxyGroupDomain(const vtkSMProxyGroupDomain&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMProxyGroupDomain&) VTK_DELETE_FUNCTION;
 };
 
 #endif

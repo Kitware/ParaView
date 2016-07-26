@@ -45,8 +45,8 @@ protected slots:
   virtual void startPVBlot(const QStringList &filenames);
 
 private:
-  PVBlotPluginActions(const PVBlotPluginActions &);     // Not implemented
-  void operator=(const PVBlotPluginActions &);          // Not implemented
+  PVBlotPluginActions(const PVBlotPluginActions &) VTK_DELETE_FUNCTION;
+  void operator=(const PVBlotPluginActions &) VTK_DELETE_FUNCTION;
 };
 
 #endif //PVBlotPluginActions_h

@@ -76,10 +76,9 @@ protected:
     vtkSMSourceProxy* selection);
 
 private:
-  // Not implemented
   vtkSMPreselectionPipeline(
-    const vtkSMPreselectionPipeline&); // Not implemented
-  void operator=(const vtkSMPreselectionPipeline&); // Not implemented
+    const vtkSMPreselectionPipeline&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMPreselectionPipeline&) VTK_DELETE_FUNCTION;
 
 protected:
   vtkSMSourceProxy* ExtractInteractiveSelection;

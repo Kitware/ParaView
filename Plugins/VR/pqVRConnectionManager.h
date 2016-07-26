@@ -86,7 +86,7 @@ signals:
   void connectionsChanged();
 
 private:
-  Q_DISABLE_COPY(pqVRConnectionManager);
+  Q_DISABLE_COPY(pqVRConnectionManager)
   class pqInternals;
   pqInternals* Internals;
 

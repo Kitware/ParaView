@@ -95,7 +95,7 @@ public:
   virtual ~pqParaViewBehaviors();
 
 private:
-  Q_DISABLE_COPY(pqParaViewBehaviors);
+  Q_DISABLE_COPY(pqParaViewBehaviors)
 
   PQ_BEHAVIOR_DECLARE_FLAG(StandardPropertyWidgets);
   PQ_BEHAVIOR_DECLARE_FLAG(StandardViewFrameActions);

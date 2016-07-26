@@ -166,8 +166,7 @@ protected:
     vtkSMProxy* proxy, const char* propertyname, int index,
     pqAnimationCue* cue);
 private:
-  pqAnimationScene(const pqAnimationScene&); // Not implemented.
-  void operator=(const pqAnimationScene&); // Not implemented.
+  Q_DISABLE_COPY(pqAnimationScene)
 
   class pqInternals;
   pqInternals* Internals;

@@ -77,8 +77,7 @@ private:
   QString WritersMenuName;
   QString ObjectMenuName;
 
-  pqSGWritersMenuManager(const pqSGWritersMenuManager&); // Not implemented.
-  void operator=(const pqSGWritersMenuManager&); // Not implemented.
+  Q_DISABLE_COPY(pqSGWritersMenuManager)
 
   QTimer Timer;
 };

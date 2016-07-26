@@ -531,8 +531,8 @@ private:
 #endif
 
 private:
-  vtkSMSessionProxyManager(const vtkSMSessionProxyManager&); // Not implemented
-  void operator=(const vtkSMSessionProxyManager&); // Not implemented
+  vtkSMSessionProxyManager(const vtkSMSessionProxyManager&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMSessionProxyManager&) VTK_DELETE_FUNCTION;
 
 };
 

@@ -72,8 +72,7 @@ private slots:
   void onTypeChanged();
 
 private:
-  pqSignalAdaptorKeyFrameType(const pqSignalAdaptorKeyFrameType&); // Not implemented.
-  void operator=(const pqSignalAdaptorKeyFrameType&); // Not implemented.
+  Q_DISABLE_COPY(pqSignalAdaptorKeyFrameType)
 
   class pqInternals;
   pqInternals* Internals;

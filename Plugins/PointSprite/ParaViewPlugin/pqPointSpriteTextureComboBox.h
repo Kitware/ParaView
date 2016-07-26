@@ -63,8 +63,7 @@ protected :
   int CachedTextureIndex;
 
 private:
-  pqPointSpriteTextureComboBox(const pqPointSpriteTextureComboBox&); // Not implemented.
-  void operator=(const pqPointSpriteTextureComboBox&); // Not implemented.
+  Q_DISABLE_COPY(pqPointSpriteTextureComboBox)
 };
 
 #endif

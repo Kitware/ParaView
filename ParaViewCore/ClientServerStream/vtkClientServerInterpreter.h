@@ -205,8 +205,8 @@ private:
 
   friend class vtkClientServerInterpreterCommand;
 private:
-  vtkClientServerInterpreter(const vtkClientServerInterpreter&);  // Not implemented.
-  void operator=(const vtkClientServerInterpreter&);  // Not implemented.
+  vtkClientServerInterpreter(const vtkClientServerInterpreter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkClientServerInterpreter&) VTK_DELETE_FUNCTION;
   int NextAvailableId;
 };
 

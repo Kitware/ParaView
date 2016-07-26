@@ -142,8 +142,8 @@ protected:
   double DataBounds[6];
 
 private:
-  vtkUnstructuredGridVolumeRepresentation(const vtkUnstructuredGridVolumeRepresentation&); // Not implemented
-  void operator=(const vtkUnstructuredGridVolumeRepresentation&); // Not implemented
+  vtkUnstructuredGridVolumeRepresentation(const vtkUnstructuredGridVolumeRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkUnstructuredGridVolumeRepresentation&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;

@@ -70,8 +70,8 @@ protected:
   ~vtkSelectionSerializer();
 
 private:
-  vtkSelectionSerializer(const vtkSelectionSerializer&);  // Not implemented.
-  void operator=(const vtkSelectionSerializer&);  // Not implemented.
+  vtkSelectionSerializer(const vtkSelectionSerializer&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSelectionSerializer&) VTK_DELETE_FUNCTION;
 
   static void WriteSelectionData(ostream& os, 
                                  vtkIndent indent, 

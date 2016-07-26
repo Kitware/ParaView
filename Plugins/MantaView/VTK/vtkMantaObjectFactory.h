@@ -83,8 +83,8 @@ protected:
   ~vtkMantaObjectFactory() {}
   
 private:
-  vtkMantaObjectFactory(const vtkMantaObjectFactory&); // Not implemented.
-  void operator=(const vtkMantaObjectFactory&);   // Not implemented.
+  vtkMantaObjectFactory(const vtkMantaObjectFactory&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMantaObjectFactory&) VTK_DELETE_FUNCTION;
 };
 
 #endif /* vtkMantaObjectFactory_h */

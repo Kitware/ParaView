@@ -63,8 +63,7 @@ private slots:
   void onEditingFinished();
 
 private:
-  pqSpinBox(const pqSpinBox&); // Not implemented.
-  void operator=(const pqSpinBox&); // Not implemented.
+  Q_DISABLE_COPY(pqSpinBox)
   bool EditingFinishedPending;
 };
 

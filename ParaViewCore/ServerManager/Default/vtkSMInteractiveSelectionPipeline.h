@@ -44,10 +44,9 @@ protected:
   ~vtkSMInteractiveSelectionPipeline();
 
 private:
-  // Not implemented
   vtkSMInteractiveSelectionPipeline(
-    const vtkSMInteractiveSelectionPipeline&); // Not implemented
-  void operator=(const vtkSMInteractiveSelectionPipeline&); // Not implemented
+    const vtkSMInteractiveSelectionPipeline&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMInteractiveSelectionPipeline&) VTK_DELETE_FUNCTION;
 };
 
 #endif

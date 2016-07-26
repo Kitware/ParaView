@@ -96,8 +96,7 @@ protected:
   command* Command;
 
 private:
-  pqContextView(const pqContextView&); // Not implemented.
-  void operator=(const pqContextView&); // Not implemented.
+  Q_DISABLE_COPY(pqContextView)
 
   class pqInternal;
   pqInternal* Internal;

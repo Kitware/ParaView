@@ -311,8 +311,8 @@ public:
   bool NestedDisplayLists; // boolean
   bool ParallelToCamera;
  private:
-  vtkScatterPlotMapper(const vtkScatterPlotMapper&); // Not implemented.
-  void operator=(const vtkScatterPlotMapper&); // Not implemented.
+  vtkScatterPlotMapper(const vtkScatterPlotMapper&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkScatterPlotMapper&) VTK_DELETE_FUNCTION;
 
 };
 

@@ -52,8 +52,8 @@ protected:
   double EndTime;
   int FrameNo;
 private:
-  vtkSequenceAnimationPlayer(const vtkSequenceAnimationPlayer&); // Not implemented
-  void operator=(const vtkSequenceAnimationPlayer&); // Not implemented
+  vtkSequenceAnimationPlayer(const vtkSequenceAnimationPlayer&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSequenceAnimationPlayer&) VTK_DELETE_FUNCTION;
 
 };
 

@@ -53,8 +53,7 @@ protected slots:
   void showWelcomeDialog();
 
 private:
-  ParaViewMainWindow(const ParaViewMainWindow&); // Not implemented.
-  void operator=(const ParaViewMainWindow&); // Not implemented.
+  Q_DISABLE_COPY(ParaViewMainWindow)
 
   class pqInternals;
   pqInternals* Internals;

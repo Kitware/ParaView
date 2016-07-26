@@ -37,8 +37,8 @@ protected:
   virtual int ForwardUpstream(int i, int j, vtkInformation* request);
   virtual int ForwardUpstream(vtkInformation* request);
 private:
-  vtkPVCacheKeeperPipeline(const vtkPVCacheKeeperPipeline&); // Not implemented
-  void operator=(const vtkPVCacheKeeperPipeline&); // Not implemented
+  vtkPVCacheKeeperPipeline(const vtkPVCacheKeeperPipeline&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVCacheKeeperPipeline&) VTK_DELETE_FUNCTION;
 
 };
 

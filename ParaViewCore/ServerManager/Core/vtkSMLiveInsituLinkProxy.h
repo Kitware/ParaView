@@ -94,8 +94,8 @@ protected:
   bool StateDirty;
   vtkIdType TimeStep;
 private:
-  vtkSMLiveInsituLinkProxy(const vtkSMLiveInsituLinkProxy&); // Not implemented
-  void operator=(const vtkSMLiveInsituLinkProxy&); // Not implemented
+  vtkSMLiveInsituLinkProxy(const vtkSMLiveInsituLinkProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMLiveInsituLinkProxy&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;

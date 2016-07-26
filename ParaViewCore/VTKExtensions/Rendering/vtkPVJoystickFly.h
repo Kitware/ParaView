@@ -64,8 +64,8 @@ protected:
            double scale, double speed);
   void ComputeCameraAxes(vtkRenderer*);
 
-  vtkPVJoystickFly(const vtkPVJoystickFly&); // Not implemented
-  void operator=(const vtkPVJoystickFly&); // Not implemented
+  vtkPVJoystickFly(const vtkPVJoystickFly&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVJoystickFly&) VTK_DELETE_FUNCTION;
 };
 
 #endif

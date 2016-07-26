@@ -248,8 +248,8 @@ protected:
   bool IsAutoMPI;
 
 private:
-  vtkSMSession(const vtkSMSession&); // Not implemented
-  void operator=(const vtkSMSession&); // Not implemented
+  vtkSMSession(const vtkSMSession&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMSession&) VTK_DELETE_FUNCTION;
 
   // AutoMPI helper class
   static vtkSmartPointer<vtkProcessModuleAutoMPI> AutoMPI;

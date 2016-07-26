@@ -99,8 +99,8 @@ protected:
     int global_ids);
 
 private:
-  vtkSMSelectionHelper(const vtkSMSelectionHelper&); // Not implemented.
-  void operator=(const vtkSMSelectionHelper&); // Not implemented.
+  vtkSMSelectionHelper(const vtkSMSelectionHelper&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMSelectionHelper&) VTK_DELETE_FUNCTION;
 
   static vtkSMProxy* NewSelectionSourceFromSelectionInternal(
     vtkSMSession*, vtkSelectionNode* selection, vtkSMProxy* selSource,

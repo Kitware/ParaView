@@ -142,8 +142,7 @@ protected slots:
   void onHeightEdited();
   void onLockAspectRatio(bool lock);
 private:
-  pqAnimationManager(const pqAnimationManager&); // Not implemented.
-  void operator=(const pqAnimationManager&); // Not implemented.
+  Q_DISABLE_COPY(pqAnimationManager)
 
   class pqInternals;
   pqInternals* Internals;

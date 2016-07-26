@@ -174,8 +174,7 @@ protected:
 
   vtkSpreadSheetView* GetView() const;
 private:
-  pqSpreadSheetViewModel(const pqSpreadSheetViewModel&); // Not implemented.
-  void operator=(const pqSpreadSheetViewModel&); // Not implemented.
+  Q_DISABLE_COPY(pqSpreadSheetViewModel)
 
   class pqInternal;
   pqInternal* Internal;

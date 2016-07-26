@@ -80,8 +80,7 @@ protected:
   bool AllowCaching;
 
 private: 
-  pqPythonView(const pqPythonView&); // Not implemented.
-  void operator=(const pqPythonView&); // Not implemented.
+  Q_DISABLE_COPY(pqPythonView)
 
   class pqInternal;
   pqInternal* Internal;

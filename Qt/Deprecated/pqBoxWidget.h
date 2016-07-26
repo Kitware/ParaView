@@ -80,8 +80,7 @@ private slots:
   void showHandles();
   void hideHandles();
 private:
-  pqBoxWidget(const pqBoxWidget&); // Not implemented.
-  void operator=(const pqBoxWidget&); // Not implemented.
+  Q_DISABLE_COPY(pqBoxWidget)
 
   class pqImplementation;
   pqImplementation* Implementation;

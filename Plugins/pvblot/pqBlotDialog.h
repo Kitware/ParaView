@@ -55,8 +55,7 @@ protected slots:
   virtual void open(const QStringList &filenames);
 
 private:
-  pqBlotDialog(const pqBlotDialog &);   // Not implemented
-  void operator=(const pqBlotDialog &); // Not implemented
+  Q_DISABLE_COPY(pqBlotDialog)
 
   class UI;
   UI *ui;

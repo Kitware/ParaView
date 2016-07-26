@@ -62,8 +62,8 @@ protected:
   vtkTransform *AbsoluteTransform;
 
 private:
-  vtkPVTransform(const vtkPVTransform&); // Not implemented
-  void operator=(const vtkPVTransform&); // Not implemented
+  vtkPVTransform(const vtkPVTransform&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVTransform&) VTK_DELETE_FUNCTION;
 
 };
 

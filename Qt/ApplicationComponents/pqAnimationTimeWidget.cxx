@@ -91,7 +91,7 @@ protected:
     }
 
 private:
-  Q_DISABLE_COPY(pqAnimationTimeWidgetLinks);
+  Q_DISABLE_COPY(pqAnimationTimeWidgetLinks)
   };
 }
 

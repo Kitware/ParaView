@@ -62,8 +62,8 @@ protected:
   void Update(vtkSMProxyProperty *pp);
 
 private:
-  vtkSMExtentDomain(const vtkSMExtentDomain&); // Not implemented
-  void operator=(const vtkSMExtentDomain&); // Not implemented
+  vtkSMExtentDomain(const vtkSMExtentDomain&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMExtentDomain&) VTK_DELETE_FUNCTION;
 };
 
 #endif

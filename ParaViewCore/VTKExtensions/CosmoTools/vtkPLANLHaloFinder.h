@@ -282,8 +282,8 @@ class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPLANLHaloFinder :
   cosmotk::CosmoHaloFinderP *HaloFinder;
 
  private:
-  vtkPLANLHaloFinder(const vtkPLANLHaloFinder&);  // Not implemented.
-  void operator=(const vtkPLANLHaloFinder&);  // Not implemented.
+  vtkPLANLHaloFinder(const vtkPLANLHaloFinder&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPLANLHaloFinder&) VTK_DELETE_FUNCTION;
 
 };
 

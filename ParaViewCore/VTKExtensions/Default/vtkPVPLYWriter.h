@@ -69,8 +69,8 @@ protected:
   vtkNew<vtkPLYWriter> Writer;
   vtkSmartPointer<vtkScalarsToColors> LookupTable;
 private:
-  vtkPVPLYWriter(const vtkPVPLYWriter&); // Not implemented
-  void operator=(const vtkPVPLYWriter&); // Not implemented
+  vtkPVPLYWriter(const vtkPVPLYWriter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVPLYWriter&) VTK_DELETE_FUNCTION;
 
 };
 

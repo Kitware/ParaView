@@ -57,8 +57,8 @@ protected:
   double Factor;
   vtkTimerLog* Timer;
 private:
-  vtkRealtimeAnimationPlayer(const vtkRealtimeAnimationPlayer&); // Not implemented
-  void operator=(const vtkRealtimeAnimationPlayer&); // Not implemented
+  vtkRealtimeAnimationPlayer(const vtkRealtimeAnimationPlayer&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkRealtimeAnimationPlayer&) VTK_DELETE_FUNCTION;
 
 };
 

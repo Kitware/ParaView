@@ -103,8 +103,8 @@ protected:
   ExporterModes Mode;
 
 private:
-  vtkCSVExporter(const vtkCSVExporter&); // Not implemented
-  void operator=(const vtkCSVExporter&); // Not implemented
+  vtkCSVExporter(const vtkCSVExporter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCSVExporter&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;

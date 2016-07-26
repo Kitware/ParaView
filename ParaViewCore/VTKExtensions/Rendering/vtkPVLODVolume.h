@@ -103,8 +103,8 @@ protected:
   vtkTimeStamp BoundsMTime;
   virtual void UpdateLODProperty();
 private:
-  vtkPVLODVolume(const vtkPVLODVolume&); // Not implemented.
-  void operator=(const vtkPVLODVolume&); // Not implemented.
+  vtkPVLODVolume(const vtkPVLODVolume&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVLODVolume&) VTK_DELETE_FUNCTION;
 };
 
 #endif

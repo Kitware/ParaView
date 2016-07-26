@@ -75,7 +75,7 @@ signals:
   void filterWidgets(bool showAdvanced, const QString& text);
 
 private:
-  Q_DISABLE_COPY(pqSettingsDialog);
+  Q_DISABLE_COPY(pqSettingsDialog)
   class pqInternals;
   pqInternals* Internals;
 

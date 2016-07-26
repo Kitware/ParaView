@@ -114,8 +114,8 @@ protected:
   vtkEHInternals* Internal;
   
 private:
-  void operator=(const vtkExtractHistogram&); // Not implemented
-  vtkExtractHistogram(const vtkExtractHistogram&); // Not implemented
+  void operator=(const vtkExtractHistogram&) VTK_DELETE_FUNCTION;
+  vtkExtractHistogram(const vtkExtractHistogram&) VTK_DELETE_FUNCTION;
   
   int GetInputFieldAssociation();
   vtkFieldData* GetInputFieldData(vtkDataObject* input);

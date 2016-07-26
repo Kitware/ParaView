@@ -133,8 +133,8 @@ protected:
   // Records the time when the meta-file was read.
   vtkTimeStamp MetaFileReadTime;
 private:
-  vtkMetaReader(const vtkMetaReader&); // Not implemented
-  void operator=(const vtkMetaReader&); // Not implemented
+  vtkMetaReader(const vtkMetaReader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMetaReader&) VTK_DELETE_FUNCTION;
 };
 
 #endif

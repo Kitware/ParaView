@@ -78,8 +78,8 @@ protected:
   vtkGetMacro(CompositeDataSupported, int);
 
 private:
-  vtkSMDataTypeDomain(const vtkSMDataTypeDomain&); // Not implemented
-  void operator=(const vtkSMDataTypeDomain&); // Not implemented
+  vtkSMDataTypeDomain(const vtkSMDataTypeDomain&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMDataTypeDomain&) VTK_DELETE_FUNCTION;
 
 };
 

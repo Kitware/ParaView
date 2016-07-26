@@ -44,8 +44,8 @@ protected:
   ~vtkSMStateVersionController();
 
 private:
-  vtkSMStateVersionController(const vtkSMStateVersionController&); // Not implemented
-  void operator=(const vtkSMStateVersionController&); // Not implemented
+  vtkSMStateVersionController(const vtkSMStateVersionController&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMStateVersionController&) VTK_DELETE_FUNCTION;
 
 };
 

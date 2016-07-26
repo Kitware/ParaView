@@ -81,8 +81,8 @@ protected:
   int Interpolation;
 
 private:
-  vtk1DLookupTableTransferFunction(const vtk1DLookupTableTransferFunction&); // Not implemented.
-  void operator=(const vtk1DLookupTableTransferFunction&); // Not implemented.
+  vtk1DLookupTableTransferFunction(const vtk1DLookupTableTransferFunction&) VTK_DELETE_FUNCTION;
+  void operator=(const vtk1DLookupTableTransferFunction&) VTK_DELETE_FUNCTION;
 };
 
 #endif

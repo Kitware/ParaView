@@ -47,8 +47,8 @@ protected:
   vtkClientServerMoveData* DeliveryFilter;
 
 private:
-  vtkSelectionDeliveryFilter(const vtkSelectionDeliveryFilter&); // Not implemented
-  void operator=(const vtkSelectionDeliveryFilter&); // Not implemented
+  vtkSelectionDeliveryFilter(const vtkSelectionDeliveryFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSelectionDeliveryFilter&) VTK_DELETE_FUNCTION;
 
 };
 

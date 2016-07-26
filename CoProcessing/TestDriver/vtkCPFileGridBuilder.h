@@ -66,9 +66,9 @@ protected:
   virtual void SetGrid(vtkDataObject*);
 
 private:
-  vtkCPFileGridBuilder(const vtkCPFileGridBuilder&); // Not implemented
+  vtkCPFileGridBuilder(const vtkCPFileGridBuilder&) VTK_DELETE_FUNCTION;
 
-  void operator=(const vtkCPFileGridBuilder&); // Not implemented
+  void operator=(const vtkCPFileGridBuilder&) VTK_DELETE_FUNCTION;
 
   // Description:
   // The name of the VTK file to be read.

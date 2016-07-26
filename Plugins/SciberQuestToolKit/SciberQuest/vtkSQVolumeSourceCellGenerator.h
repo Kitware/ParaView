@@ -115,8 +115,8 @@ protected:
   virtual ~vtkSQVolumeSourceCellGenerator(){};
 
 private:
-  vtkSQVolumeSourceCellGenerator(const vtkSQVolumeSourceCellGenerator&); // Not implemented
-  void operator=(const vtkSQVolumeSourceCellGenerator&); // Not implemented
+  vtkSQVolumeSourceCellGenerator(const vtkSQVolumeSourceCellGenerator&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQVolumeSourceCellGenerator&) VTK_DELETE_FUNCTION;
 
 private:
   int Resolution[6];

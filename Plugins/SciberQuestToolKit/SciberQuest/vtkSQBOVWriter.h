@@ -164,8 +164,8 @@ protected:
   ~vtkSQBOVWriter();
 
 private:
-  vtkSQBOVWriter(const vtkSQBOVWriter &); // Not implemented
-  void operator=(const vtkSQBOVWriter &); // Not implemented
+  vtkSQBOVWriter(const vtkSQBOVWriter &) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQBOVWriter &) VTK_DELETE_FUNCTION;
   //
   void Clear();
   //

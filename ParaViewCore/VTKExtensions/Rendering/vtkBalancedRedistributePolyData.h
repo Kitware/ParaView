@@ -44,8 +44,8 @@ protected:
   void MakeSchedule (vtkPolyData*, vtkCommSched*);
 
 private:
-  vtkBalancedRedistributePolyData(const vtkBalancedRedistributePolyData&); // Not implemented
-  void operator=(const vtkBalancedRedistributePolyData&); // Not implemented
+  vtkBalancedRedistributePolyData(const vtkBalancedRedistributePolyData&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkBalancedRedistributePolyData&) VTK_DELETE_FUNCTION;
 };
 
 //****************************************************************

@@ -48,8 +48,8 @@ protected:
   int ProcessId;
   
 private:
-  vtkPVEnSightMasterServerTranslator(const vtkPVEnSightMasterServerTranslator&); // Not implemented
-  void operator=(const vtkPVEnSightMasterServerTranslator&); // Not implemented
+  vtkPVEnSightMasterServerTranslator(const vtkPVEnSightMasterServerTranslator&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVEnSightMasterServerTranslator&) VTK_DELETE_FUNCTION;
 };
 
 #endif

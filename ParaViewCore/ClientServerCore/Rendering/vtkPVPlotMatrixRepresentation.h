@@ -118,8 +118,8 @@ protected:
   virtual bool RemoveFromView(vtkView *view);
 
 private:
-  vtkPVPlotMatrixRepresentation(const vtkPVPlotMatrixRepresentation&); // Not implemented
-  void operator=(const vtkPVPlotMatrixRepresentation&); // Not implemented
+  vtkPVPlotMatrixRepresentation(const vtkPVPlotMatrixRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVPlotMatrixRepresentation&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;

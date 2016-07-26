@@ -97,8 +97,8 @@ protected:
   int OutputType;
 
 private:
-  vtkPVDataSetAlgorithmSelectorFilter(const vtkPVDataSetAlgorithmSelectorFilter&);  // Not implemented.
-  void operator=(const vtkPVDataSetAlgorithmSelectorFilter&);  // Not implemented.
+  vtkPVDataSetAlgorithmSelectorFilter(const vtkPVDataSetAlgorithmSelectorFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVDataSetAlgorithmSelectorFilter&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internal;

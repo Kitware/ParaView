@@ -48,8 +48,8 @@ protected:
   virtual int FillInputPortInformation(int port, vtkInformation* info);
 
 private:
-  vtkMergeArrays(const vtkMergeArrays&);  // Not implemented.
-  void operator=(const vtkMergeArrays&);  // Not implemented.
+  vtkMergeArrays(const vtkMergeArrays&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMergeArrays&) VTK_DELETE_FUNCTION;
 };
 
 

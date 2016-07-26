@@ -72,8 +72,8 @@ protected:
   vtkTimeStamp DeliveryTimestamps[4];
 
 private:
-  vtkSMDataDeliveryManager(const vtkSMDataDeliveryManager&); // Not implemented
-  void operator=(const vtkSMDataDeliveryManager&); // Not implemented
+  vtkSMDataDeliveryManager(const vtkSMDataDeliveryManager&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMDataDeliveryManager&) VTK_DELETE_FUNCTION;
 
 };
 

@@ -170,8 +170,7 @@ protected:
   int PortNumber;
 
 private:
-  pqOutputPort(const pqOutputPort&); // Not implemented.
-  void operator=(const pqOutputPort&); // Not implemented.
+  Q_DISABLE_COPY(pqOutputPort)
 
   class pqInternal;
   pqInternal* Internal;

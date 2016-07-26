@@ -188,7 +188,7 @@ protected slots:
   void updateButtonEnableState();
 
 private:
-  Q_DISABLE_COPY(pqColorOpacityEditorWidget);
+  Q_DISABLE_COPY(pqColorOpacityEditorWidget)
 
   class pqInternals;
   pqInternals* Internals;

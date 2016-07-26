@@ -192,7 +192,7 @@ protected:
     return this->convert(curVal);
     }
 private:
-  Q_DISABLE_COPY(PropertyLinksConnection);
+  Q_DISABLE_COPY(PropertyLinksConnection)
 };
 
 //=============================================================================

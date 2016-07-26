@@ -82,8 +82,7 @@ private slots:
   void changeCurrentPage();
 
 private:
-  pqCameraKeyFrameWidget(const pqCameraKeyFrameWidget&); // Not implemented.
-  void operator=(const pqCameraKeyFrameWidget&); // Not implemented.
+  Q_DISABLE_COPY(pqCameraKeyFrameWidget)
 
   class pqInternal;
   pqInternal* Internal;

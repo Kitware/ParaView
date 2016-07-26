@@ -111,8 +111,8 @@ protected:
 
   bool AbortPendingConnectionFlag;
 private:
-  vtkTCPNetworkAccessManager(const vtkTCPNetworkAccessManager&); // Not implemented
-  void operator=(const vtkTCPNetworkAccessManager&); // Not implemented
+  vtkTCPNetworkAccessManager(const vtkTCPNetworkAccessManager&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkTCPNetworkAccessManager&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;

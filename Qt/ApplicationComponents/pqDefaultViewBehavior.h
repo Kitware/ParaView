@@ -55,7 +55,7 @@ protected slots:
 
   void showWarnings();
 private:
-  Q_DISABLE_COPY(pqDefaultViewBehavior);
+  Q_DISABLE_COPY(pqDefaultViewBehavior)
 
   enum WarningModes
     {

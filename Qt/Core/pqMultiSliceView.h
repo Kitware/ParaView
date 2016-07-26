@@ -123,8 +123,7 @@ protected slots:
   void onSliceClicked(int button, int modifier, double value);
 
 private:
-  pqMultiSliceView(const pqMultiSliceView&); // Not implemented.
-  void operator=(const pqMultiSliceView&); // Not implemented.
+  Q_DISABLE_COPY(pqMultiSliceView)
 };
 
 #endif

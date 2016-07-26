@@ -88,7 +88,7 @@ private slots:
   void onSelectionModeChanged(bool frustum);
 
 private:
-  Q_DISABLE_COPY(pqFindDataSelectionDisplayFrame);
+  Q_DISABLE_COPY(pqFindDataSelectionDisplayFrame)
 
   void updateInteractiveSelectionLabelProperties();
 

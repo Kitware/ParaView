@@ -61,8 +61,8 @@ protected:
   virtual int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element);
 
 private:
-  vtkSMPointSpriteRepresentationProxy(const vtkSMPointSpriteRepresentationProxy&); // Not implemented
-  void operator=(const vtkSMPointSpriteRepresentationProxy&); // Not implemented
+  vtkSMPointSpriteRepresentationProxy(const vtkSMPointSpriteRepresentationProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMPointSpriteRepresentationProxy&) VTK_DELETE_FUNCTION;
 };
 
 #endif

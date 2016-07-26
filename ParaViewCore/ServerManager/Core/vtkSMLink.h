@@ -145,8 +145,8 @@ protected:
   // Cached version of State
   vtkSMMessage* State;
 private:
-  vtkSMLink(const vtkSMLink&); // Not implemented.
-  void operator=(const vtkSMLink&); // Not implemented.
+  vtkSMLink(const vtkSMLink&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMLink&) VTK_DELETE_FUNCTION;
 
 };
 

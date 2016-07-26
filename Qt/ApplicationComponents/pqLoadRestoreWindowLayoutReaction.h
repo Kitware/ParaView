@@ -52,7 +52,7 @@ protected:
   virtual void onTriggered();
 
 private:
-  Q_DISABLE_COPY(pqLoadRestoreWindowLayoutReaction);
+  Q_DISABLE_COPY(pqLoadRestoreWindowLayoutReaction)
   bool Load;
 };
 

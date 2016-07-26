@@ -51,7 +51,7 @@ public:
   virtual QWidget* widget() const = 0;
   virtual void setUrl(const QUrl& url) = 0;
 private:
-  Q_DISABLE_COPY(pqBrowser);
+  Q_DISABLE_COPY(pqBrowser)
 };
 
 template <class T>

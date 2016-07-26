@@ -134,8 +134,7 @@ private:
   class pqInternal;
   pqInternal *Internal;
 
-  pqSLACManager(const pqSLACManager &);         // Not implemented
-  void operator=(const pqSLACManager &);        // Not implemented
+  Q_DISABLE_COPY(pqSLACManager)
 };
 
 #endif //pqSLACManager_h

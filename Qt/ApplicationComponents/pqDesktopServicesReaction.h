@@ -62,7 +62,7 @@ protected:
     { pqDesktopServicesReaction::openUrl(this->URL); }
 
 private:
-  Q_DISABLE_COPY(pqDesktopServicesReaction);
+  Q_DISABLE_COPY(pqDesktopServicesReaction)
   QUrl URL;
 };
 

@@ -61,8 +61,8 @@ protected:
   virtual bool AddToView(vtkView* view);
   virtual bool RemoveFromView(vtkView* view);
 private:
-  vtkGeometrySliceRepresentation(const vtkGeometrySliceRepresentation&); // Not implemented
-  void operator=(const vtkGeometrySliceRepresentation&); // Not implemented
+  vtkGeometrySliceRepresentation(const vtkGeometrySliceRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkGeometrySliceRepresentation&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;

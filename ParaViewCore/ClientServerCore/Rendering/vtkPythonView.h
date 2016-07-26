@@ -173,8 +173,8 @@ protected:
   bool IsLocalDataAvailable();
 
 private:
-  vtkPythonView(const vtkPythonView&); // Not implemented
-  void operator=(const vtkPythonView&); // Not implemented
+  vtkPythonView(const vtkPythonView&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPythonView&) VTK_DELETE_FUNCTION;
 
   // Run Python code with custom local dictionary
   int RunSimpleStringWithCustomLocals(const char* code);

@@ -83,8 +83,8 @@ protected:
   int PlayMode;
 
 private:
-  vtkCompositeAnimationPlayer(const vtkCompositeAnimationPlayer&); // Not implemented
-  void operator=(const vtkCompositeAnimationPlayer&); // Not implemented
+  vtkCompositeAnimationPlayer(const vtkCompositeAnimationPlayer&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCompositeAnimationPlayer&) VTK_DELETE_FUNCTION;
 
   class vtkInternal;
   vtkInternal* Internal;

@@ -82,8 +82,8 @@ protected:
   void EquateInternal(int id1, int id2);
 
 private:
-  vtkEquivalenceSet(const vtkEquivalenceSet&);  // Not implemented.
-  void operator=(const vtkEquivalenceSet&);  // Not implemented.
+  vtkEquivalenceSet(const vtkEquivalenceSet&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkEquivalenceSet&) VTK_DELETE_FUNCTION;
 };
 
 #endif

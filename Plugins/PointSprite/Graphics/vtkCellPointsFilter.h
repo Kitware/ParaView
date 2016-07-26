@@ -90,8 +90,8 @@ class VTKPOINTSPRITEGRAPHICS_EXPORT vtkCellPointsFilter : public vtkPolyDataAlgo
     int CurrentGroup;
 
 private:
-  vtkCellPointsFilter(const vtkCellPointsFilter&); // Not implemented.
-  void operator=(const vtkCellPointsFilter&); // Not implemented.
+  vtkCellPointsFilter(const vtkCellPointsFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCellPointsFilter&) VTK_DELETE_FUNCTION;
 };
 
 #endif

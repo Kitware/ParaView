@@ -59,8 +59,7 @@ public slots:
   virtual void unlock();
 
 private:
-  pqLockViewSizeCustomDialog(const pqLockViewSizeCustomDialog &); // Not implemented
-  void operator=(const pqLockViewSizeCustomDialog &);   // Not implemented
+  Q_DISABLE_COPY(pqLockViewSizeCustomDialog)
 
   class pqUI;
   pqUI *ui;

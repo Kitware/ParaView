@@ -101,8 +101,7 @@ private slots:
   void domainChanged();
 
 private:
-  pqSignalAdaptorSelectionTreeWidget(const pqSignalAdaptorSelectionTreeWidget&); // Not implemented.
-  void operator=(const pqSignalAdaptorSelectionTreeWidget&); // Not implemented.
+  Q_DISABLE_COPY(pqSignalAdaptorSelectionTreeWidget)
 
   class pqInternal;
   pqInternal* Internal;

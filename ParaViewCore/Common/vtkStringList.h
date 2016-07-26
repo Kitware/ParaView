@@ -74,8 +74,8 @@ protected:
   void Reallocate(int num);
   void DeleteStrings();
 
-  vtkStringList(const vtkStringList&); // Not implemented
-  void operator=(const vtkStringList&); // Not implemented
+  vtkStringList(const vtkStringList&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkStringList&) VTK_DELETE_FUNCTION;
 };
 
 #endif

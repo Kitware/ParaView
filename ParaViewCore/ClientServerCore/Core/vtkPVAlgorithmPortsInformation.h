@@ -61,8 +61,8 @@ protected:
 
   vtkSetMacro(NumberOfOutputs, int);
 private:
-  vtkPVAlgorithmPortsInformation(const vtkPVAlgorithmPortsInformation&); // Not implemented
-  void operator=(const vtkPVAlgorithmPortsInformation&); // Not implemented
+  vtkPVAlgorithmPortsInformation(const vtkPVAlgorithmPortsInformation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVAlgorithmPortsInformation&) VTK_DELETE_FUNCTION;
 };
 
 #endif

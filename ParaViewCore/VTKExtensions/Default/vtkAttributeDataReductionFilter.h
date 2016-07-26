@@ -100,8 +100,8 @@ protected:
   int ReductionType;
   int AttributeType;
 private:
-  vtkAttributeDataReductionFilter(const vtkAttributeDataReductionFilter&); // Not implemented.
-  void operator=(const vtkAttributeDataReductionFilter&); // Not implemented.
+  vtkAttributeDataReductionFilter(const vtkAttributeDataReductionFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkAttributeDataReductionFilter&) VTK_DELETE_FUNCTION;
 };
 
 #endif

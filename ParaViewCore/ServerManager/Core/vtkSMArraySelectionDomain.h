@@ -60,8 +60,8 @@ protected:
   static bool LoadAllVariables;
 
 private:
-  vtkSMArraySelectionDomain(const vtkSMArraySelectionDomain&); // Not implemented
-  void operator=(const vtkSMArraySelectionDomain&); // Not implemented
+  vtkSMArraySelectionDomain(const vtkSMArraySelectionDomain&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMArraySelectionDomain&) VTK_DELETE_FUNCTION;
 };
 
 #endif

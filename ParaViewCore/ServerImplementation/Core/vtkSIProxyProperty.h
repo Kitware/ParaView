@@ -102,8 +102,8 @@ protected:
   bool IsValidNull(vtkTypeUInt32 globalId);
 
 private:
-  vtkSIProxyProperty(const vtkSIProxyProperty&); // Not implemented
-  void operator=(const vtkSIProxyProperty&); // Not implemented
+  vtkSIProxyProperty(const vtkSIProxyProperty&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSIProxyProperty&) VTK_DELETE_FUNCTION;
   class InternalCache;
   InternalCache *Cache;
 

@@ -74,7 +74,7 @@ protected:
   virtual void keyPressEvent(QKeyEvent * event);
 
 private:
-  Q_DISABLE_COPY(pqExpandableTableView);
+  Q_DISABLE_COPY(pqExpandableTableView)
   bool MoveToNextEditableItem;
 };
 

@@ -57,8 +57,7 @@ private slots:
   void onFinished(int);
 
 private:
-  pqColorDialogEventTranslator(const pqColorDialogEventTranslator&); // Not implemented.
-  void operator=(const pqColorDialogEventTranslator&); // Not implemented.
+  Q_DISABLE_COPY(pqColorDialogEventTranslator)
 };
 
 #endif

@@ -155,8 +155,8 @@ protected:
   double Spacing[3];
   int WholeExtent[6];
 private:
-  vtkImageVolumeRepresentation(const vtkImageVolumeRepresentation&); // Not implemented
-  void operator=(const vtkImageVolumeRepresentation&); // Not implemented
+  vtkImageVolumeRepresentation(const vtkImageVolumeRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkImageVolumeRepresentation&) VTK_DELETE_FUNCTION;
 
 };
 

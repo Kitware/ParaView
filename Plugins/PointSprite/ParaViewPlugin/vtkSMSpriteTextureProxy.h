@@ -53,8 +53,8 @@ protected:
   ~vtkSMSpriteTextureProxy();
 
 private:
-  vtkSMSpriteTextureProxy(const vtkSMSpriteTextureProxy&); // Not implemented
-  void operator=(const vtkSMSpriteTextureProxy&); // Not implemented
+  vtkSMSpriteTextureProxy(const vtkSMSpriteTextureProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMSpriteTextureProxy&) VTK_DELETE_FUNCTION;
 
 };
 

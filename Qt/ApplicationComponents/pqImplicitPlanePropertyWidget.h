@@ -91,7 +91,7 @@ private slots:
   void setOrigin(double x, double y, double z);
 
 private:
-  Q_DISABLE_COPY(pqImplicitPlanePropertyWidget);
+  Q_DISABLE_COPY(pqImplicitPlanePropertyWidget)
 
   void setNormal(double x, double y, double z);
 };

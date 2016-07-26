@@ -79,8 +79,8 @@ protected:
   vtkPVKeyFrameInternals* Internals;
 
 private:
-  vtkPVKeyFrame(const vtkPVKeyFrame&); // Not implemented.
-  void operator=(const vtkPVKeyFrame&); // Not implemented.
+  vtkPVKeyFrame(const vtkPVKeyFrame&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVKeyFrame&) VTK_DELETE_FUNCTION;
 };
 
 #endif

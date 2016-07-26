@@ -57,7 +57,7 @@ protected slots:
   virtual void resetButtonClicked();
 
 private:
-  Q_DISABLE_COPY(pqFileNamePropertyWidget);
+  Q_DISABLE_COPY(pqFileNamePropertyWidget)
 };
 
 #endif

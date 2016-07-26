@@ -83,8 +83,8 @@ protected:
   virtual int AssessData( vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model );
 
 private:
-  vtkPSciVizMultiCorrelativeStats( const vtkPSciVizMultiCorrelativeStats& ); // Not implemented.
-  void operator = ( const vtkPSciVizMultiCorrelativeStats& ); // Not implemented.
+  vtkPSciVizMultiCorrelativeStats( const vtkPSciVizMultiCorrelativeStats& ) VTK_DELETE_FUNCTION;
+  void operator = ( const vtkPSciVizMultiCorrelativeStats& ) VTK_DELETE_FUNCTION;
 };
 
 #endif // vtkPSciVizMultiCorrelativeStats_h

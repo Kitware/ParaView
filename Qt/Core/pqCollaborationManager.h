@@ -143,8 +143,7 @@ private slots:
   void showMousePointer(vtkTypeUInt32 viewId, double x, double y, int ratioToUse);
 
 private:
-  pqCollaborationManager(const pqCollaborationManager&);  // Not implemented.
-  pqCollaborationManager& operator=(const pqCollaborationManager&); // Not implemented.
+  Q_DISABLE_COPY(pqCollaborationManager)
 
   class pqInternals;
   pqInternals* Internals;

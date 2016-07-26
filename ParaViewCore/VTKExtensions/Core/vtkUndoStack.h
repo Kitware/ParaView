@@ -162,8 +162,8 @@ protected:
   int StackDepth;
 
 private:
-  vtkUndoStack(const vtkUndoStack&); // Not implemented.
-  void operator=(const vtkUndoStack&); // Not implemented.
+  vtkUndoStack(const vtkUndoStack&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkUndoStack&) VTK_DELETE_FUNCTION;
 
   bool InUndo;
   bool InRedo;

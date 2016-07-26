@@ -96,8 +96,8 @@ protected:
   int BackfaceRepresentation;
 
 private:
-  vtkGeometryRepresentationWithFaces(const vtkGeometryRepresentationWithFaces&); // Not implemented
-  void operator=(const vtkGeometryRepresentationWithFaces&); // Not implemented
+  vtkGeometryRepresentationWithFaces(const vtkGeometryRepresentationWithFaces&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkGeometryRepresentationWithFaces&) VTK_DELETE_FUNCTION;
 
 };
 

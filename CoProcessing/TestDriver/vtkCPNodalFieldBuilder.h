@@ -39,8 +39,8 @@ protected:
   ~vtkCPNodalFieldBuilder();
 
 private:
-  vtkCPNodalFieldBuilder(const vtkCPNodalFieldBuilder&); // Not implemented
-  void operator=(const vtkCPNodalFieldBuilder&); // Not implemented
+  vtkCPNodalFieldBuilder(const vtkCPNodalFieldBuilder&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCPNodalFieldBuilder&) VTK_DELETE_FUNCTION;
 };
 
 #endif

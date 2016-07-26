@@ -232,8 +232,8 @@ protected:
                                  void* calldata);
 
 private:
-  vtkSMSessionClient(const vtkSMSessionClient&); // Not implemented
-  void operator=(const vtkSMSessionClient&); // Not implemented
+  vtkSMSessionClient(const vtkSMSessionClient&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMSessionClient&) VTK_DELETE_FUNCTION;
 
   int NotBusy;
   vtkTypeUInt32 LastGlobalID;

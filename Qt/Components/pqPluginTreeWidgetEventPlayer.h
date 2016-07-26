@@ -55,8 +55,7 @@ public:
     arguments, bool& error);
 
 private:
-  pqPluginTreeWidgetEventPlayer(const pqPluginTreeWidgetEventPlayer&); // Not implemented.
-  void operator=(const pqPluginTreeWidgetEventPlayer&); // Not implemented.
+  Q_DISABLE_COPY(pqPluginTreeWidgetEventPlayer)
 };
 
 #endif // !_pqPluginTreeWidgetEventPlayer_h

@@ -54,8 +54,8 @@ protected:
   int MultiProcessNumberOfProcesses;
 
 private:
-  vtkPGenericEnSightReader(const vtkPGenericEnSightReader&);  // Not implemented.
-  void operator=(const vtkPGenericEnSightReader&);  // Not implemented.
+  vtkPGenericEnSightReader(const vtkPGenericEnSightReader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPGenericEnSightReader&) VTK_DELETE_FUNCTION;
 };
 
 #endif

@@ -70,8 +70,8 @@ protected:
   int Append;
 
 private:
-  vtkVRMLSource(const vtkVRMLSource&);  // Not implemented.
-  void operator=(const vtkVRMLSource&);  // Not implemented.
+  vtkVRMLSource(const vtkVRMLSource&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkVRMLSource&) VTK_DELETE_FUNCTION;
 };
 
 #endif

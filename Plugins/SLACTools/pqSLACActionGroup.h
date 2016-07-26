@@ -33,8 +33,7 @@ public:
   pqSLACActionGroup(QObject *p);
 
 private:
-  pqSLACActionGroup(const pqSLACActionGroup &);     // Not implemented
-  void operator=(const pqSLACActionGroup &);        // Not implemented
+  Q_DISABLE_COPY(pqSLACActionGroup)
 };
 
 #endif //pqSLACActionGroup_h

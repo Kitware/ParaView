@@ -233,8 +233,8 @@ protected:
   friend class vtkPVXMLParser;
 
 private:
-  vtkPVXMLElement(const vtkPVXMLElement&);  // Not implemented.
-  void operator=(const vtkPVXMLElement&);  // Not implemented.
+  vtkPVXMLElement(const vtkPVXMLElement&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVXMLElement&) VTK_DELETE_FUNCTION;
 };
 
 #endif

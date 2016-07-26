@@ -43,8 +43,8 @@ protected:
   virtual void CreateVTKObjects();
 
 private:
-  vtkSMBoxRepresentationProxy(const vtkSMBoxRepresentationProxy&); // Not implemented
-  void operator=(const vtkSMBoxRepresentationProxy&); // Not implemented
+  vtkSMBoxRepresentationProxy(const vtkSMBoxRepresentationProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMBoxRepresentationProxy&) VTK_DELETE_FUNCTION;
 
 };
 

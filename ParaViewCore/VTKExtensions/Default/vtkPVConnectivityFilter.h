@@ -38,8 +38,8 @@ protected:
   ~vtkPVConnectivityFilter() {};
 
 private:
-  vtkPVConnectivityFilter(const vtkPVConnectivityFilter&);  // Not implemented
-  void operator=(const vtkPVConnectivityFilter&);  // Not implemented
+  vtkPVConnectivityFilter(const vtkPVConnectivityFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVConnectivityFilter&) VTK_DELETE_FUNCTION;
 };
 
 #endif

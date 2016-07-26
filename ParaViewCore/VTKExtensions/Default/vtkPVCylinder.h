@@ -48,8 +48,8 @@ protected:
   double Axis[3];
 
 private:
-  vtkPVCylinder(const vtkPVCylinder&); // Not implemented
-  void operator=(const vtkPVCylinder&); // Not implemented
+  vtkPVCylinder(const vtkPVCylinder&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVCylinder&) VTK_DELETE_FUNCTION;
 };
 
 inline void vtkPVCylinder::SetAxis(double x, double y, double z)

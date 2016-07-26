@@ -64,8 +64,8 @@ protected:
   virtual ~vtkPVMacFileInformationHelper();
 
 private:
-  vtkPVMacFileInformationHelper(const vtkPVMacFileInformationHelper&); // Not implemented.
-  void operator=(const vtkPVMacFileInformationHelper&); // Not implemented.
+  vtkPVMacFileInformationHelper(const vtkPVMacFileInformationHelper&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVMacFileInformationHelper&) VTK_DELETE_FUNCTION;
 };
 
 #endif

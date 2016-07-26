@@ -52,7 +52,7 @@ protected slots:
   void onViewAdded(pqView*);
 
 private:
-  Q_DISABLE_COPY(pqSurfaceRepresentationBehavior);
+  Q_DISABLE_COPY(pqSurfaceRepresentationBehavior)
 };
 
 #endif

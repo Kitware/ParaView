@@ -68,8 +68,8 @@ protected:
   int NumberOfConnections;
   vtkMPIMToNSocketConnectionPortInformationInternals* Internals;
 private:
-  vtkMPIMToNSocketConnectionPortInformation(const vtkMPIMToNSocketConnectionPortInformation&); // Not implemented
-  void operator=(const vtkMPIMToNSocketConnectionPortInformation&); // Not implemented
+  vtkMPIMToNSocketConnectionPortInformation(const vtkMPIMToNSocketConnectionPortInformation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMPIMToNSocketConnectionPortInformation&) VTK_DELETE_FUNCTION;
 };
 
 #endif

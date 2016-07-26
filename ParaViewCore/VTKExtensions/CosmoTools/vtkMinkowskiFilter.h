@@ -47,8 +47,8 @@ class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkMinkowskiFilter :
   int FillOutputPortInformation(int, vtkInformation*);
 
  private:
-  vtkMinkowskiFilter(const vtkMinkowskiFilter&);  // Not implemented.
-  void operator=(const vtkMinkowskiFilter&);  // Not implemented.
+  vtkMinkowskiFilter(const vtkMinkowskiFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMinkowskiFilter&) VTK_DELETE_FUNCTION;
 
   void compute_mf(vtkUnstructuredGrid *ugrid, vtkDoubleArray *S, vtkDoubleArray *V, vtkDoubleArray *C, vtkDoubleArray *X, vtkDoubleArray *G, vtkDoubleArray *T, vtkDoubleArray *B, vtkDoubleArray *L, vtkDoubleArray *P, vtkDoubleArray *F);
   double compute_S(vtkPolyhedron *cell); // surface area

@@ -50,8 +50,8 @@ protected:
   virtual void SetPropertyModifiedFlag(const char* name, int flag);
 
 private:
-  vtkSMChartRepresentationProxy(const vtkSMChartRepresentationProxy&); // Not implemented
-  void operator=(const vtkSMChartRepresentationProxy&); // Not implemented
+  vtkSMChartRepresentationProxy(const vtkSMChartRepresentationProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMChartRepresentationProxy&) VTK_DELETE_FUNCTION;
 
 };
 

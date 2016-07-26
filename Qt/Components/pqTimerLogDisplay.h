@@ -79,8 +79,7 @@ protected slots:
   void setBufferLengthById(int id);
 
 private:
-  pqTimerLogDisplay(const pqTimerLogDisplay &); // Not implemented
-  void operator=(const pqTimerLogDisplay &);    // Not implemented
+  Q_DISABLE_COPY(pqTimerLogDisplay)
 
   double LogThreshold;
   pqTimerLogDisplayUi *ui;

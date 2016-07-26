@@ -155,8 +155,8 @@ protected:
   vtkTypeUInt32 GetFilteredLocation();
 
 private:
-  vtkSMRemoteObject(const vtkSMRemoteObject&); // Not implemented
-  void operator=(const vtkSMRemoteObject&);       // Not implemented
+  vtkSMRemoteObject(const vtkSMRemoteObject&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMRemoteObject&) VTK_DELETE_FUNCTION;
 
   char* GlobalIDString;
 

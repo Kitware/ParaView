@@ -111,8 +111,7 @@ protected:
   bool AllowCaching;
 
 private: 
-  pqRenderViewBase(const pqRenderViewBase&); // Not implemented.
-  void operator=(const pqRenderViewBase&); // Not implemented.
+  Q_DISABLE_COPY(pqRenderViewBase)
 
   class pqInternal;
   pqInternal* Internal;

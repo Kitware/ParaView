@@ -74,7 +74,7 @@ protected:
       this->propertySM(), value.value<QList<QVariant> >(),
       (use_unchecked? pqSMAdaptor::UNCHECKED : pqSMAdaptor::CHECKED));
     }
-  Q_DISABLE_COPY(pqYoungsMaterialPropertyLinksConnection);
+  Q_DISABLE_COPY(pqYoungsMaterialPropertyLinksConnection)
   };
 }
 

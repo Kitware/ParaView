@@ -71,8 +71,7 @@ protected:
   pqSpreadSheetView* Spreadsheet;
 
 private:
-  pqSpreadSheetViewDecorator(const pqSpreadSheetViewDecorator&); // Not implemented.
-  void operator=(const pqSpreadSheetViewDecorator&); // Not implemented.
+  Q_DISABLE_COPY(pqSpreadSheetViewDecorator)
 
   class pqInternal;
   pqInternal* Internal;

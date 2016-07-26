@@ -70,8 +70,7 @@ protected:
   void createWidget(pqServer*);
 
 private:
-  pqSplineWidget(const pqSplineWidget&); // Not implemented.
-  void operator=(const pqSplineWidget&); // Not implemented.
+  Q_DISABLE_COPY(pqSplineWidget)
 
   class pqInternals;
   pqInternals* Internals;

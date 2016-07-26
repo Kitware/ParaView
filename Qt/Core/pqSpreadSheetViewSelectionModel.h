@@ -84,8 +84,7 @@ protected:
   bool UpdatingSelection;
 
 private:
-  pqSpreadSheetViewSelectionModel(const pqSpreadSheetViewSelectionModel&); // Not implemented.
-  void operator=(const pqSpreadSheetViewSelectionModel&); // Not implemented.
+  Q_DISABLE_COPY(pqSpreadSheetViewSelectionModel)
 
   class pqInternal;
   pqInternal* Internal;

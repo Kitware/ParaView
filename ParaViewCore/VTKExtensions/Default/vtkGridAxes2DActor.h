@@ -229,8 +229,8 @@ protected:
   vtkTimeStamp UpdateLabelTextPropertiesMTime;
 
 private:
-  vtkGridAxes2DActor(const vtkGridAxes2DActor&); // Not implemented.
-  void operator=(const vtkGridAxes2DActor&); // Not implemented.
+  vtkGridAxes2DActor(const vtkGridAxes2DActor&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkGridAxes2DActor&) VTK_DELETE_FUNCTION;
 
   class vtkLabels;
   vtkLabels* Labels;

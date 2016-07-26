@@ -65,7 +65,7 @@ public:
     const QString& type, vtkPVXMLElement* config, pqPropertyWidget* widget);
 
 private:
-  Q_DISABLE_COPY(@name@Implementation);
+  Q_DISABLE_COPY(@name@Implementation)
 };
 
 #endif

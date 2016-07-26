@@ -123,8 +123,8 @@ protected:
   void CollectFacesAndArraysToRootProcess(int* fragmentIdMap, int* fragmentNumFaces);
 
 private:
-  vtkGridConnectivity(const vtkGridConnectivity&);  // Not implemented.
-  void operator=(const vtkGridConnectivity&);  // Not implemented.
+  vtkGridConnectivity(const vtkGridConnectivity&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkGridConnectivity&) VTK_DELETE_FUNCTION;
 };
 
 #endif

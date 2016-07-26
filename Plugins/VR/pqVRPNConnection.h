@@ -202,8 +202,7 @@ protected:
   pqInternals* Internals;
 
 private:
-  pqVRPNConnection(const pqVRPNConnection&); // Not implemented.
-  void operator=(const pqVRPNConnection&); // Not implemented.
+  Q_DISABLE_COPY(pqVRPNConnection)
 };
 
 #endif

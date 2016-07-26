@@ -48,8 +48,8 @@ protected:
 
   vtkPVXMLElement* RootElement;
 private:
-  vtkSMCompoundProxyDefinitionLoader(const vtkSMCompoundProxyDefinitionLoader&); // Not implemented
-  void operator=(const vtkSMCompoundProxyDefinitionLoader&); // Not implemented
+  vtkSMCompoundProxyDefinitionLoader(const vtkSMCompoundProxyDefinitionLoader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMCompoundProxyDefinitionLoader&) VTK_DELETE_FUNCTION;
 };
 
 #endif

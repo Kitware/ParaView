@@ -156,8 +156,8 @@ protected:
   void SetImageWriter(vtkImageWriter*);
   void SetMovieWriter(vtkGenericMovieWriter*);
 private:
-  vtkSMAnimationSceneImageWriter(const vtkSMAnimationSceneImageWriter&); // Not implemented.
-  void operator=(const vtkSMAnimationSceneImageWriter&); // Not implemented.
+  vtkSMAnimationSceneImageWriter(const vtkSMAnimationSceneImageWriter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMAnimationSceneImageWriter&) VTK_DELETE_FUNCTION;
 };
 
 

@@ -161,8 +161,8 @@ protected:
   bool RenderEmptyImages;
   bool DataReplicatedOnAllProcesses;
 private:
-  vtkPVSynchronizedRenderer(const vtkPVSynchronizedRenderer&); // Not implemented
-  void operator=(const vtkPVSynchronizedRenderer&); // Not implemented
+  vtkPVSynchronizedRenderer(const vtkPVSynchronizedRenderer&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVSynchronizedRenderer&) VTK_DELETE_FUNCTION;
 
 };
 

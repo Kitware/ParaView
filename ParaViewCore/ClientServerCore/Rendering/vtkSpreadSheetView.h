@@ -157,8 +157,8 @@ protected:
     FETCH_BLOCK_TAG = 394732
     };
 private:
-  vtkSpreadSheetView(const vtkSpreadSheetView&); // Not implemented
-  void operator=(const vtkSpreadSheetView&); // Not implemented
+  vtkSpreadSheetView(const vtkSpreadSheetView&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSpreadSheetView&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   friend class vtkInternals;

@@ -111,8 +111,8 @@ private:
   char *FileExtension;
 
 private:
-  vtkSMProxyConfigurationReader(const vtkSMProxyConfigurationReader&);  // Not implemented.
-  void operator=(const vtkSMProxyConfigurationReader&);  // Not implemented.
+  vtkSMProxyConfigurationReader(const vtkSMProxyConfigurationReader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMProxyConfigurationReader&) VTK_DELETE_FUNCTION;
 };
 
 #endif

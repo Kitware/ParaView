@@ -62,8 +62,8 @@ protected:
   ~vtkSQPlaneSourceConfigurationWriter();
 
 private:
-  vtkSQPlaneSourceConfigurationWriter(const vtkSQPlaneSourceConfigurationWriter&);  // Not implemented.
-  void operator=(const vtkSQPlaneSourceConfigurationWriter&);  // Not implemented.
+  vtkSQPlaneSourceConfigurationWriter(const vtkSQPlaneSourceConfigurationWriter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQPlaneSourceConfigurationWriter&) VTK_DELETE_FUNCTION;
 };
 
 #endif

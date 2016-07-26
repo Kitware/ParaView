@@ -723,8 +723,8 @@ protected:
 #endif
 
 private:
-  vtkMaterialInterfaceFilter(const vtkMaterialInterfaceFilter&);  // Not implemented.
-  void operator=(const vtkMaterialInterfaceFilter&);  // Not implemented.
+  vtkMaterialInterfaceFilter(const vtkMaterialInterfaceFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMaterialInterfaceFilter&) VTK_DELETE_FUNCTION;
 
 };
 

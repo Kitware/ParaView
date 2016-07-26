@@ -414,8 +414,8 @@ protected:
   bool HideTimeMarker;
 
 private:
-  vtkPVXYChartView(const vtkPVXYChartView&); // Not implemented
-  void operator=(const vtkPVXYChartView&); // Not implemented
+  vtkPVXYChartView(const vtkPVXYChartView&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVXYChartView&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;

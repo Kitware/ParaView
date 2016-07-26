@@ -170,8 +170,8 @@ protected:
   int PointLabelVisibility;
   int CellLabelVisibility;
 private:
-  vtkDataLabelRepresentation(const vtkDataLabelRepresentation&); // Not implemented
-  void operator=(const vtkDataLabelRepresentation&); // Not implemented
+  vtkDataLabelRepresentation(const vtkDataLabelRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkDataLabelRepresentation&) VTK_DELETE_FUNCTION;
 
 };
 

@@ -264,8 +264,8 @@ protected:
 
   bool ReportInterpreterErrors;
 private:
-  vtkProcessModule(const vtkProcessModule&); // Not implemented.
-  void operator=(const vtkProcessModule&); // Not implemented.
+  vtkProcessModule(const vtkProcessModule&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkProcessModule&) VTK_DELETE_FUNCTION;
 
   void DetermineExecutablePath(int argc, char** argv);
 

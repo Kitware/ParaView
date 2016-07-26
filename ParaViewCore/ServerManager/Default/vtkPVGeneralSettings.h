@@ -180,8 +180,8 @@ protected:
   bool LockPanels;
 
 private:
-  vtkPVGeneralSettings(const vtkPVGeneralSettings&); // Not implemented
-  void operator=(const vtkPVGeneralSettings&); // Not implemented
+  vtkPVGeneralSettings(const vtkPVGeneralSettings&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVGeneralSettings&) VTK_DELETE_FUNCTION;
 
   static vtkSmartPointer<vtkPVGeneralSettings> Instance;
 

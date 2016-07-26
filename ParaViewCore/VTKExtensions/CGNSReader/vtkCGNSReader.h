@@ -151,8 +151,8 @@ protected:
   vtkIdType ProcSize;
 
 private:
-  vtkCGNSReader(const vtkCGNSReader&);  // Not implemented.
-  void operator=(const vtkCGNSReader&);  // Not implemented.
+  vtkCGNSReader(const vtkCGNSReader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCGNSReader&) VTK_DELETE_FUNCTION;
 
   CGNSRead::vtkCGNSMetaData *Internal;  // Metadata
 

@@ -78,8 +78,8 @@ protected:
 
   std::vector<SystemInformationType> SystemInformations;
 private:
-  vtkPVSystemInformation(const vtkPVSystemInformation&); // Not implemented
-  void operator=(const vtkPVSystemInformation&); // Not implemented
+  vtkPVSystemInformation(const vtkPVSystemInformation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVSystemInformation&) VTK_DELETE_FUNCTION;
 
 };
 

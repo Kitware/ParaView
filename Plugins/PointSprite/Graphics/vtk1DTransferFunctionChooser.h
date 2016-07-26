@@ -98,8 +98,8 @@ protected:
   vtk1DGaussianTransferFunction* GaussianTransferFunction;
 
 private:
-  vtk1DTransferFunctionChooser(const vtk1DTransferFunctionChooser&); // Not implemented.
-  void operator=(const vtk1DTransferFunctionChooser&); // Not implemented.
+  vtk1DTransferFunctionChooser(const vtk1DTransferFunctionChooser&) VTK_DELETE_FUNCTION;
+  void operator=(const vtk1DTransferFunctionChooser&) VTK_DELETE_FUNCTION;
 };
 
 #endif

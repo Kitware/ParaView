@@ -310,8 +310,8 @@ protected:
   bool UseNonOverlappingAMRMetaDataForOutlines;
 
 private:
-  vtkPVGeometryFilter(const vtkPVGeometryFilter&); // Not implemented
-  void operator=(const vtkPVGeometryFilter&); // Not implemented
+  vtkPVGeometryFilter(const vtkPVGeometryFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVGeometryFilter&) VTK_DELETE_FUNCTION;
 
   void AddCompositeIndex(vtkPolyData* pd, unsigned int index);
   // Description:

@@ -178,8 +178,8 @@ protected :
   char* RadiusArrayName;
 
 private:
-  vtkPointSpriteProperty(const vtkPointSpriteProperty&); // Not implemented.
-  void operator=(const vtkPointSpriteProperty&); // Not implemented.
+  vtkPointSpriteProperty(const vtkPointSpriteProperty&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPointSpriteProperty&) VTK_DELETE_FUNCTION;
 
   class vtkInternal;
   vtkInternal* Internal;

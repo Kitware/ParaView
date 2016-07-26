@@ -69,8 +69,7 @@ signals:
   void currentProxyChanged(vtkSMProxy*);
 
 private:
-  pqAnimatableProxyComboBox(const pqAnimatableProxyComboBox&); // Not implemented.
-  void operator=(const pqAnimatableProxyComboBox&); // Not implemented.
+  Q_DISABLE_COPY(pqAnimatableProxyComboBox)
 };
 
 #endif

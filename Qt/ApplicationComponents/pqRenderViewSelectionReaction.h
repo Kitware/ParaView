@@ -136,7 +136,7 @@ private:
   void UpdateTooltip();
 
 private:
-  Q_DISABLE_COPY(pqRenderViewSelectionReaction);
+  Q_DISABLE_COPY(pqRenderViewSelectionReaction)
   QPointer<pqRenderView> View;
   SelectionMode Mode;
   bool DisableSelectionModifiers;

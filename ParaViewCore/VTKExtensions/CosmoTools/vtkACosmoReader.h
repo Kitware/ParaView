@@ -185,8 +185,8 @@ protected:
   std::set<std::string> FileNames;
 
 private:
-  vtkACosmoReader(const vtkACosmoReader&);  // Not implemented.
-  void operator=(const vtkACosmoReader&);  // Not implemented.
+  vtkACosmoReader(const vtkACosmoReader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkACosmoReader&) VTK_DELETE_FUNCTION;
 };
 
 #endif

@@ -75,8 +75,8 @@ protected:
   void SetUnstructuredGrid(vtkUnstructuredGrid* grid);
 
 private:
-  vtkCPUnstructuredGridBuilder(const vtkCPUnstructuredGridBuilder&); // Not implemented
-  void operator=(const vtkCPUnstructuredGridBuilder&); // Not implemented
+  vtkCPUnstructuredGridBuilder(const vtkCPUnstructuredGridBuilder&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCPUnstructuredGridBuilder&) VTK_DELETE_FUNCTION;
 
   // Description:
   // The unstructured grid that is created.

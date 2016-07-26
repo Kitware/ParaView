@@ -143,8 +143,8 @@ private:
     };
 
 private:
-  vtkSQFieldTopologySelect(const vtkSQFieldTopologySelect&);  // Not implemented.
-  void operator=(const vtkSQFieldTopologySelect&);  // Not implemented.
+  vtkSQFieldTopologySelect(const vtkSQFieldTopologySelect&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQFieldTopologySelect&) VTK_DELETE_FUNCTION;
 };
 
 #endif

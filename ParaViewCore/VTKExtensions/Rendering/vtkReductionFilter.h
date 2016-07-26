@@ -123,8 +123,8 @@ protected:
   int GenerateProcessIds;
 
 private:
-  vtkReductionFilter(const vtkReductionFilter&); // Not implemented.
-  void operator=(const vtkReductionFilter&); // Not implemented.
+  vtkReductionFilter(const vtkReductionFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkReductionFilter&) VTK_DELETE_FUNCTION;
 
 };
 

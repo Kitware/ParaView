@@ -48,8 +48,8 @@ protected:
   ~vtkCPBaseFieldBuilder();
 
 private:
-  vtkCPBaseFieldBuilder(const vtkCPBaseFieldBuilder&); // Not implemented
-  void operator=(const vtkCPBaseFieldBuilder&); // Not implemented
+  vtkCPBaseFieldBuilder(const vtkCPBaseFieldBuilder&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCPBaseFieldBuilder&) VTK_DELETE_FUNCTION;
 };
 
 #endif

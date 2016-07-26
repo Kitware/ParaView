@@ -43,8 +43,8 @@ protected:
   char* Variable;
 
 private:
-  vtkPVEnvironmentInformationHelper(const vtkPVEnvironmentInformationHelper&); // Not implemented.
-  void operator=(const vtkPVEnvironmentInformationHelper&); // Not implemented.
+  vtkPVEnvironmentInformationHelper(const vtkPVEnvironmentInformationHelper&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVEnvironmentInformationHelper&) VTK_DELETE_FUNCTION;
 };
 
 

@@ -54,8 +54,8 @@ protected:
   vtkSetStringMacro(Variable);
 
 private:
-  vtkPVEnvironmentInformation(const vtkPVEnvironmentInformation&); // Not implemented.
-  void operator=(const vtkPVEnvironmentInformation&); // Not implemented.
+  vtkPVEnvironmentInformation(const vtkPVEnvironmentInformation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVEnvironmentInformation&) VTK_DELETE_FUNCTION;
 };
 
 

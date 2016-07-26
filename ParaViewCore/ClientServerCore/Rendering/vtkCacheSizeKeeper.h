@@ -81,8 +81,8 @@ protected:
   unsigned long CacheLimit;
   int CacheFull;
 private:
-  vtkCacheSizeKeeper(const vtkCacheSizeKeeper&); // Not implemented.
-  void operator=(const vtkCacheSizeKeeper&); // Not implemented.
+  vtkCacheSizeKeeper(const vtkCacheSizeKeeper&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCacheSizeKeeper&) VTK_DELETE_FUNCTION;
 };
 
 #endif

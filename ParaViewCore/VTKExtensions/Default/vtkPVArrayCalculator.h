@@ -60,8 +60,8 @@ protected:
   void    UpdateArrayAndVariableNames( vtkDataObject        * theInputObj, 
                                        vtkDataSetAttributes * inDataAttrs );
 private:
-  vtkPVArrayCalculator( const vtkPVArrayCalculator & ); // Not implemented.
-  void operator = ( const vtkPVArrayCalculator & );     // Not implemented.
+  vtkPVArrayCalculator( const vtkPVArrayCalculator & ) VTK_DELETE_FUNCTION;
+  void operator = ( const vtkPVArrayCalculator & ) VTK_DELETE_FUNCTION;
 };
 
 #endif

@@ -120,7 +120,7 @@ namespace
       this->Widget->setProperty(this->PropertyName.toLatin1().data(), value);
       }
   private:
-    Q_DISABLE_COPY(pqWidget);
+    Q_DISABLE_COPY(pqWidget)
     };
 
   class pqWidgetForComboBox : public pqWidget
@@ -142,7 +142,7 @@ namespace
       }
 
   private:
-    Q_DISABLE_COPY(pqWidgetForComboBox);
+    Q_DISABLE_COPY(pqWidgetForComboBox)
     };
 
   class pqWidgetForCheckbox : public pqWidget
@@ -165,7 +165,7 @@ namespace
       checkbox->setChecked(value.toString() == this->TrueValue);
       }
   private:
-    Q_DISABLE_COPY(pqWidgetForCheckbox);
+    Q_DISABLE_COPY(pqWidgetForCheckbox)
     };
 
   /// Returns pre-defined run-time environment. This includes the environement

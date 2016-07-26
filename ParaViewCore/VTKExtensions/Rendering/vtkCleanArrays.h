@@ -59,8 +59,8 @@ protected:
 
   bool FillPartialArrays;
 private:
-  vtkCleanArrays(const vtkCleanArrays&); // Not implemented
-  void operator=(const vtkCleanArrays&); // Not implemented
+  vtkCleanArrays(const vtkCleanArrays&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCleanArrays&) VTK_DELETE_FUNCTION;
 
 public:
   class vtkArrayData;

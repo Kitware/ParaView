@@ -116,7 +116,7 @@ private slots:
   void triggerRestartRequired();
 
 private:
-  Q_DISABLE_COPY(pqProxiesWidget);
+  Q_DISABLE_COPY(pqProxiesWidget)
 
   class pqInternals;
   const QScopedPointer<pqInternals> Internals;

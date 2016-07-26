@@ -97,8 +97,8 @@ protected:
   vtk3DWidgetRepresentation* ProgressBarWidgetRepresentation;
 
 private:
-  vtkProgressBarSourceRepresentation(const vtkProgressBarSourceRepresentation&); // Not implemented
-  void operator=(const vtkProgressBarSourceRepresentation&); // Not implemented
+  vtkProgressBarSourceRepresentation(const vtkProgressBarSourceRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkProgressBarSourceRepresentation&) VTK_DELETE_FUNCTION;
 //ETX
 };
 

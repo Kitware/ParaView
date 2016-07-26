@@ -40,8 +40,8 @@ protected:
   virtual void SetProcessType(const char* ptype);
 
 private:
-  vtkPVOptionsXMLParser(const vtkPVOptionsXMLParser&); // Not implemented
-  void operator=(const vtkPVOptionsXMLParser&); // Not implemented
+  vtkPVOptionsXMLParser(const vtkPVOptionsXMLParser&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVOptionsXMLParser&) VTK_DELETE_FUNCTION;
 };
 
 #endif // #ifndef vtkPVOptionsXMLParser_h

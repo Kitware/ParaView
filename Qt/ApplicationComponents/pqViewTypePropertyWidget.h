@@ -63,7 +63,7 @@ signals:
   void valueChanged();
 
 private:
-  Q_DISABLE_COPY(pqViewTypePropertyWidget);
+  Q_DISABLE_COPY(pqViewTypePropertyWidget)
   QPointer<QComboBox> ComboBox;
 };
 

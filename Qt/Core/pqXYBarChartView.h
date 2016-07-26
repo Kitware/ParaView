@@ -60,8 +60,7 @@ public:
   virtual ~pqXYBarChartView();
 
 private:
-  pqXYBarChartView(const pqXYBarChartView&); // Not implemented.
-  void operator=(const pqXYBarChartView&); // Not implemented.
+  Q_DISABLE_COPY(pqXYBarChartView)
 };
 
 #endif

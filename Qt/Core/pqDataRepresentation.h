@@ -141,8 +141,7 @@ protected:
     this->onInputChanged();
     }
 private:
-  pqDataRepresentation(const pqDataRepresentation&); // Not implemented.
-  void operator=(const pqDataRepresentation&); // Not implemented.
+  Q_DISABLE_COPY(pqDataRepresentation)
 
   pqDataRepresentationInternal* Internal;
 };

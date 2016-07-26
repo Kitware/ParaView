@@ -95,8 +95,8 @@ protected:
   int RequestData(vtkInformation *req, vtkInformationVector **input, vtkInformationVector *output);
 
 private:
-  vtkSQBinaryThreshold(const vtkSQBinaryThreshold&);  // Not implemented.
-  void operator=(const vtkSQBinaryThreshold&);  // Not implemented.
+  vtkSQBinaryThreshold(const vtkSQBinaryThreshold&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQBinaryThreshold&) VTK_DELETE_FUNCTION;
 
 private:
   double Threshold;

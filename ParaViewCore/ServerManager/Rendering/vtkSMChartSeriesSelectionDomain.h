@@ -136,8 +136,8 @@ protected:
   bool FlattenTable;
 
 private:
-  vtkSMChartSeriesSelectionDomain(const vtkSMChartSeriesSelectionDomain&); // Not implemented
-  void operator=(const vtkSMChartSeriesSelectionDomain&); // Not implemented
+  vtkSMChartSeriesSelectionDomain(const vtkSMChartSeriesSelectionDomain&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMChartSeriesSelectionDomain&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;

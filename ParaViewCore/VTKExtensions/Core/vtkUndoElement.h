@@ -90,8 +90,8 @@ protected:
   vtkCollection *UndoSetWorkingContext;
 
 private:
-  vtkUndoElement(const vtkUndoElement&); // Not implemented.
-  void operator=(const vtkUndoElement&); // Not implemented.
+  vtkUndoElement(const vtkUndoElement&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkUndoElement&) VTK_DELETE_FUNCTION;
 
 };
 

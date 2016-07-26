@@ -137,8 +137,8 @@ protected:
                                 vtkPVXMLElement* element);
 
 private:
-  vtkSMVectorProperty(const vtkSMVectorProperty&); // Not implemented
-  void operator=(const vtkSMVectorProperty&); // Not implemented
+  vtkSMVectorProperty(const vtkSMVectorProperty&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMVectorProperty&) VTK_DELETE_FUNCTION;
 };
 
 #endif

@@ -33,8 +33,7 @@ public:
   pqSierraPlotToolsActionGroup(QObject *p);
 
 private:
-  pqSierraPlotToolsActionGroup(const pqSierraPlotToolsActionGroup &);     // Not implemented
-  void operator=(const pqSierraPlotToolsActionGroup &);        // Not implemented
+  Q_DISABLE_COPY(pqSierraPlotToolsActionGroup)
 };
 
 #endif //pqSierraPlotToolsActionGroup_h

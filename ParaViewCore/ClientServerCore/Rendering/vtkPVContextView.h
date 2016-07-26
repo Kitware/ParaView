@@ -156,8 +156,8 @@ protected:
   bool UseOffscreenRenderingForScreenshots;
   bool UseOffscreenRendering;
 private:
-  vtkPVContextView(const vtkPVContextView&); // Not implemented
-  void operator=(const vtkPVContextView&); // Not implemented
+  vtkPVContextView(const vtkPVContextView&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVContextView&) VTK_DELETE_FUNCTION;
 
   // Used in GetSelection to avoid modifying the selection obtained from the
   // annotation link.

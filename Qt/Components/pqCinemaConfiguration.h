@@ -93,7 +93,7 @@ private:
 
   Ui::CinemaConfiguration* Ui;
 
-  Q_DISABLE_COPY(pqCinemaConfiguration);
+  Q_DISABLE_COPY(pqCinemaConfiguration)
 };
 
 #endif

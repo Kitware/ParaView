@@ -100,8 +100,7 @@ private slots:
   void sort(int);
 
 private:
-  pqSignalAdaptorTreeWidget(const pqSignalAdaptorTreeWidget&); // Not implemented.
-  void operator=(const pqSignalAdaptorTreeWidget&); // Not implemented.
+  Q_DISABLE_COPY(pqSignalAdaptorTreeWidget)
 
   /// Append an item to the tree.
   void appendItem(QTreeWidgetItem* item);

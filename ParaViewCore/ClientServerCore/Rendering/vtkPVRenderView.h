@@ -835,8 +835,8 @@ protected:
 
   bool LockBounds;
 private:
-  vtkPVRenderView(const vtkPVRenderView&); // Not implemented
-  void operator=(const vtkPVRenderView&); // Not implemented
+  vtkPVRenderView(const vtkPVRenderView&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVRenderView&) VTK_DELETE_FUNCTION;
 
   bool MakingSelection;
   int PreviousSwapBuffers;

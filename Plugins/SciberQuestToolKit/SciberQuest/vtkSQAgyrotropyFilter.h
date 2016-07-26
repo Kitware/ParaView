@@ -79,8 +79,8 @@ protected:
   int RequestData(vtkInformation *req, vtkInformationVector **input, vtkInformationVector *output);
 
 private:
-  vtkSQAgyrotropyFilter(const vtkSQAgyrotropyFilter&);  // Not implemented.
-  void operator=(const vtkSQAgyrotropyFilter&);  // Not implemented.
+  vtkSQAgyrotropyFilter(const vtkSQAgyrotropyFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQAgyrotropyFilter&) VTK_DELETE_FUNCTION;
 
 private:
   double NoiseThreshold;

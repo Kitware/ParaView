@@ -95,8 +95,8 @@ protected:
   vtkWeakPointer<vtkUndoStack> UndoStack;
 
 private:
-  vtkSMStateLocator(const vtkSMStateLocator&); // Not implemented
-  void operator=(const vtkSMStateLocator&); // Not implemented
+  vtkSMStateLocator(const vtkSMStateLocator&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMStateLocator&) VTK_DELETE_FUNCTION;
 
   class vtkInternal;
   vtkInternal* Internals;

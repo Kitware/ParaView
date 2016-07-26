@@ -62,8 +62,8 @@ protected:
   double BoundingBox[6];
   int Resolution;
 private:
-  vtkBoundedPlaneSource(const vtkBoundedPlaneSource&); // Not implemented
-  void operator=(const vtkBoundedPlaneSource&); // Not implemented
+  vtkBoundedPlaneSource(const vtkBoundedPlaneSource&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkBoundedPlaneSource&) VTK_DELETE_FUNCTION;
 
 };
 

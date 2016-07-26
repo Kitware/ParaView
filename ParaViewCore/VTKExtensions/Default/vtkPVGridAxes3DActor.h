@@ -92,8 +92,8 @@ protected:
   vtkNew<vtkMatrix4x4> ModelTransformMatrix;
 
 private:
-  vtkPVGridAxes3DActor(const vtkPVGridAxes3DActor&); // Not implemented
-  void operator=(const vtkPVGridAxes3DActor&); // Not implemented
+  vtkPVGridAxes3DActor(const vtkPVGridAxes3DActor&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVGridAxes3DActor&) VTK_DELETE_FUNCTION;
 
   vtkTimeStamp BoundsUpdateTime;
 

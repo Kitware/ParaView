@@ -95,8 +95,8 @@ protected:
   vtkPVExponentialKeyFrame* ExponentialKeyFrame;
   vtkPVSinusoidKeyFrame* SinusoidKeyFrame;
 private:
-  vtkPVCompositeKeyFrame(const vtkPVCompositeKeyFrame&); // Not implemented.
-  void operator=(const vtkPVCompositeKeyFrame&); // Not implemented.
+  vtkPVCompositeKeyFrame(const vtkPVCompositeKeyFrame&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVCompositeKeyFrame&) VTK_DELETE_FUNCTION;
 };
 
 #endif

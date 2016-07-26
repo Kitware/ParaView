@@ -89,8 +89,8 @@ protected:
   ~vtkMantaCamera();
   
 private:
-  vtkMantaCamera(const vtkMantaCamera&);  // Not implemented.
-  void operator=(const vtkMantaCamera&);  // Not implemented.
+  vtkMantaCamera(const vtkMantaCamera&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMantaCamera&) VTK_DELETE_FUNCTION;
 
   void OrientMantaCamera(vtkRenderer *);
   

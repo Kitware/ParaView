@@ -63,8 +63,7 @@ protected slots:
   void resetBounds();
 
 private:
-  pqOrbitCreatorDialog(const pqOrbitCreatorDialog&); // Not implemented.
-  void operator=(const pqOrbitCreatorDialog&); // Not implemented.
+  Q_DISABLE_COPY(pqOrbitCreatorDialog)
 
   class pqInternals;
   pqInternals* Internals;

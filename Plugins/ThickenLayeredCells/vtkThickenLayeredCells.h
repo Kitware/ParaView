@@ -46,8 +46,8 @@ protected:
 
   bool EnableThickening;
 private:
-  vtkThickenLayeredCells(const vtkThickenLayeredCells&); // Not implemented.
-  void operator=(const vtkThickenLayeredCells&); // Not implemented.
+  vtkThickenLayeredCells(const vtkThickenLayeredCells&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkThickenLayeredCells&) VTK_DELETE_FUNCTION;
 
 };
 

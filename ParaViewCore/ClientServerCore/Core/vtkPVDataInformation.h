@@ -273,8 +273,8 @@ protected:
   friend class vtkPVDataInformationHelper;
   friend class vtkPVCompositeDataInformation;
 private:
-  vtkPVDataInformation(const vtkPVDataInformation&); // Not implemented
-  void operator=(const vtkPVDataInformation&); // Not implemented
+  vtkPVDataInformation(const vtkPVDataInformation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVDataInformation&) VTK_DELETE_FUNCTION;
 
   int PortNumber;
 };

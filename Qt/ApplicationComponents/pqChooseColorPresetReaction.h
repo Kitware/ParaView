@@ -106,7 +106,7 @@ protected:
   virtual void onTriggered();
 
 private:
-  Q_DISABLE_COPY(pqChooseColorPresetReaction);
+  Q_DISABLE_COPY(pqChooseColorPresetReaction)
   QPointer<pqDataRepresentation> Representation;
   vtkWeakPointer<vtkSMProxy> TransferFunctionProxy;
 };

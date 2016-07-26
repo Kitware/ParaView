@@ -98,10 +98,8 @@ public:
   }
 
 private:
-  vtkMantaTextureThreadCache(const vtkMantaTextureThreadCache&);
-  // Not implemented.
-  void operator=(const vtkMantaTextureThreadCache&);
-  // Not implemented.
+  vtkMantaTextureThreadCache(const vtkMantaTextureThreadCache&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMantaTextureThreadCache&) VTK_DELETE_FUNCTION;
 
   Manta::Texture<Manta::Color> *MantaTexture;
 };

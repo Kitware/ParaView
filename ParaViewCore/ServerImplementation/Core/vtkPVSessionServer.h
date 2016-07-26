@@ -127,8 +127,8 @@ protected:
   friend class vtkInternals;
 
 private:
-  vtkPVSessionServer(const vtkPVSessionServer&); // Not implemented
-  void operator=(const vtkPVSessionServer&); // Not implemented
+  vtkPVSessionServer(const vtkPVSessionServer&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVSessionServer&) VTK_DELETE_FUNCTION;
 
 };
 

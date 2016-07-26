@@ -38,8 +38,8 @@ protected:
   virtual vtkSMProxy* NewProxy(vtkTypeUInt32 id, vtkSMProxyLocator* locator);
 
 private:
-  vtkSMInsituStateLoader(const vtkSMInsituStateLoader&); // Not implemented
-  void operator=(const vtkSMInsituStateLoader&); // Not implemented
+  vtkSMInsituStateLoader(const vtkSMInsituStateLoader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMInsituStateLoader&) VTK_DELETE_FUNCTION;
 
 };
 

@@ -197,8 +197,8 @@ private:
   int LogLevel;
 
 private:
-  vtkSQMedianFilter(const vtkSQMedianFilter &); // Not implemented
-  void operator=(const vtkSQMedianFilter &); // Not implemented
+  vtkSQMedianFilter(const vtkSQMedianFilter &) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQMedianFilter &) VTK_DELETE_FUNCTION;
 };
 
 #endif

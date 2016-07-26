@@ -69,8 +69,7 @@ protected:
   /// Given the user entered text, update the GUI.
   void updateSearch();
 private:
-  pqQuickLaunchDialog(const pqQuickLaunchDialog&); // Not implemented.
-  void operator=(const pqQuickLaunchDialog&); // Not implemented.
+  Q_DISABLE_COPY(pqQuickLaunchDialog)
 
   class pqInternal;
   pqInternal *Internal;

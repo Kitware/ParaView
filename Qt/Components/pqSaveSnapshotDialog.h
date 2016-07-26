@@ -86,8 +86,7 @@ protected slots:
   void updateSize();
 
 private:
-  pqSaveSnapshotDialog(const pqSaveSnapshotDialog&); // Not implemented.
-  void operator=(const pqSaveSnapshotDialog&); // Not implemented.
+  Q_DISABLE_COPY(pqSaveSnapshotDialog)
 
   class pqInternal;
   pqInternal* Internal;

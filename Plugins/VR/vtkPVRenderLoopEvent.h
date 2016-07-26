@@ -44,8 +44,8 @@ protected:
 
 private:
   vtkPVRenderLoopEventInternal *Internal;
-  vtkPVRenderLoopEvent(const vtkPVRenderLoopEvent&); // Not implemented.
-  void operator=(const vtkPVRenderLoopEvent&); // Not implemented.
+  vtkPVRenderLoopEvent(const vtkPVRenderLoopEvent&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVRenderLoopEvent&) VTK_DELETE_FUNCTION;
 
 
 

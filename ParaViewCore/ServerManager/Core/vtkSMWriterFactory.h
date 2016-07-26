@@ -112,8 +112,8 @@ protected:
   ~vtkSMWriterFactory();
 
 private:
-  vtkSMWriterFactory(const vtkSMWriterFactory&); // Not implemented
-  void operator=(const vtkSMWriterFactory&); // Not implemented
+  vtkSMWriterFactory(const vtkSMWriterFactory&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMWriterFactory&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;

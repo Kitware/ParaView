@@ -103,8 +103,8 @@ protected:
   int* PieceAvailable;
 
 private:
-  vtkTableExtentTranslator(const vtkTableExtentTranslator&);  // Not implemented.
-  void operator=(const vtkTableExtentTranslator&);  // Not implemented.
+  vtkTableExtentTranslator(const vtkTableExtentTranslator&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkTableExtentTranslator&) VTK_DELETE_FUNCTION;
 };
 
 #endif

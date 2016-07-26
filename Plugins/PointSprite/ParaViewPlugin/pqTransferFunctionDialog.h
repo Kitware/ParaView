@@ -54,8 +54,7 @@ private:
   class pqInternals;
   pqInternals* Internals;
 
-  pqTransferFunctionDialog(const pqTransferFunctionDialog&); // Not implemented.
-  void operator=(const pqTransferFunctionDialog&); // Not implemented.
+  Q_DISABLE_COPY(pqTransferFunctionDialog)
 };
 
 #endif

@@ -158,8 +158,7 @@ private slots:
   void updateSelectionCounts();
 
 private:
-  pqSignalAdaptorCompositeTreeWidget(const pqSignalAdaptorCompositeTreeWidget&); // Not implemented.
-  void operator=(const pqSignalAdaptorCompositeTreeWidget&); // Not implemented.
+  Q_DISABLE_COPY(pqSignalAdaptorCompositeTreeWidget)
 
   /// Set up the callback to know when the selection changes, so that we can
   /// update the selected cells/points counts.

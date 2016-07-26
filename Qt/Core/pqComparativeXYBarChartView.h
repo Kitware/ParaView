@@ -49,8 +49,7 @@ public:
   static QString chartViewTypeName() { return "Bar Chart View (Comparative)"; }
 
 private:
-  pqComparativeXYBarChartView(const pqComparativeXYBarChartView&); // Not implemented.
-  void operator=(const pqComparativeXYBarChartView&); // Not implemented.
+  Q_DISABLE_COPY(pqComparativeXYBarChartView)
 };
 
 #endif

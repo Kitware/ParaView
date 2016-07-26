@@ -51,8 +51,7 @@ public:
   virtual const char* getObjectMenuName();
 
 private:
-  pqTPPluginManager(const pqTPPluginManager&); // Not implemented.
-  void operator=(const pqTPPluginManager&); // Not implemented.
+  Q_DISABLE_COPY(pqTPPluginManager)
 };
 
 #endif

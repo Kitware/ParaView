@@ -105,8 +105,7 @@ protected:
   void onMarkClicked(vtkObject*, unsigned long, void*);
 
 private:
-  pqMultiSliceAxisWidget(const pqMultiSliceAxisWidget&); // Not implemented.
-  void operator=(const pqMultiSliceAxisWidget&); // Not implemented.
+  Q_DISABLE_COPY(pqMultiSliceAxisWidget)
 
   class pqInternal;
   pqInternal* Internal;

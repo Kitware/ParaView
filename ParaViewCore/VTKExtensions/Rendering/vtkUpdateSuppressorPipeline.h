@@ -48,8 +48,8 @@ protected:
 
   bool Enabled;
 private:
-  vtkUpdateSuppressorPipeline(const vtkUpdateSuppressorPipeline&);  // Not implemented.
-  void operator=(const vtkUpdateSuppressorPipeline&);  // Not implemented.
+  vtkUpdateSuppressorPipeline(const vtkUpdateSuppressorPipeline&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkUpdateSuppressorPipeline&) VTK_DELETE_FUNCTION;
 };
 
 #endif

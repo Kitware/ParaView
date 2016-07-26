@@ -139,8 +139,8 @@ protected:
   virtual void ResetCameraClippingRange();
 
 private:
-  vtkPVRenderViewForAssembly(const vtkPVRenderViewForAssembly&); // Not implemented
-  void operator=(const vtkPVRenderViewForAssembly&); // Not implemented
+  vtkPVRenderViewForAssembly(const vtkPVRenderViewForAssembly&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVRenderViewForAssembly&) VTK_DELETE_FUNCTION;
 
   bool InRender;
 

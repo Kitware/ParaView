@@ -69,8 +69,8 @@ protected:
   double Scale[3];
 
 private:
-  vtkPVBox(const vtkPVBox&); // Not implemented
-  void operator=(const vtkPVBox&); // Not implemented
+  vtkPVBox(const vtkPVBox&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVBox&) VTK_DELETE_FUNCTION;
 
 };
 

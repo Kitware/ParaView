@@ -70,8 +70,7 @@ protected:
   QCheckBox *OrientWidget;
 
 private:
-  pqGlyphPanel(const pqGlyphPanel&); // Not implemented.
-  void operator=(const pqGlyphPanel&); // Not implemented.
+  Q_DISABLE_COPY(pqGlyphPanel)
 };
 
 #endif

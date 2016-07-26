@@ -68,8 +68,8 @@ protected:
   vtkNew<vtkMatrix4x4> NewModelMatrix;
 
 private:
-  vtkVRVirtualHandStyle(const vtkVRVirtualHandStyle&); // Not implemented.
-  void operator=(const vtkVRVirtualHandStyle&); // Not implemented.
+  vtkVRVirtualHandStyle(const vtkVRVirtualHandStyle&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkVRVirtualHandStyle&) VTK_DELETE_FUNCTION;
 
 };
 

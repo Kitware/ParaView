@@ -170,8 +170,8 @@ private:
   int LogLevel;
 
 private:
-  vtkSQVortexFilter(const vtkSQVortexFilter &); // Not implemented
-  void operator=(const vtkSQVortexFilter &); // Not implemented
+  vtkSQVortexFilter(const vtkSQVortexFilter &) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQVortexFilter &) VTK_DELETE_FUNCTION;
 };
 
 #endif

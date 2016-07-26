@@ -36,8 +36,8 @@ protected:
   ~vtkPVNullSource();
 
 private:
-  vtkPVNullSource(const vtkPVNullSource&); // Not implemented
-  void operator=(const vtkPVNullSource&); // Not implemented
+  vtkPVNullSource(const vtkPVNullSource&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVNullSource&) VTK_DELETE_FUNCTION;
 
 };
 

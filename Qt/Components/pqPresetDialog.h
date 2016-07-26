@@ -115,7 +115,7 @@ protected slots:
   void exportPresets();
 
 private:
-  Q_DISABLE_COPY(pqPresetDialog);
+  Q_DISABLE_COPY(pqPresetDialog)
   class pqInternals;
   const QScopedPointer<pqInternals> Internals;
 };

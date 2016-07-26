@@ -98,8 +98,8 @@ namespace
     }
 
   private:
-    vtkCPTestPipeline(const vtkCPTestPipeline&); // Not implemented
-    void operator=(const vtkCPTestPipeline&); // Not implemented
+    vtkCPTestPipeline(const vtkCPTestPipeline&) VTK_DELETE_FUNCTION;
+    void operator=(const vtkCPTestPipeline&) VTK_DELETE_FUNCTION;
   };
 
   vtkStandardNewMacro(vtkCPTestPipeline);

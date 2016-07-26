@@ -102,8 +102,8 @@ protected:
   virtual void CreateVTKObjects();
 
 private:
-  vtkSMComparativeViewProxy(const vtkSMComparativeViewProxy&); // Not implemented
-  void operator=(const vtkSMComparativeViewProxy&); // Not implemented
+  vtkSMComparativeViewProxy(const vtkSMComparativeViewProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMComparativeViewProxy&) VTK_DELETE_FUNCTION;
 };
 
 #endif

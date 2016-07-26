@@ -194,7 +194,7 @@ public:
     return QVariant();
     }
 private:
-  Q_DISABLE_COPY(pqPresetDialogTableModel);
+  Q_DISABLE_COPY(pqPresetDialogTableModel)
 };
 
 class pqPresetDialogProxyModel : public QSortFilterProxyModel
@@ -235,7 +235,7 @@ protected:
      return false;
      }
 private:
-  Q_DISABLE_COPY(pqPresetDialogProxyModel);
+  Q_DISABLE_COPY(pqPresetDialogProxyModel)
 };
 
 class pqPresetDialog::pqInternals

@@ -290,8 +290,7 @@ protected:
   virtual QWidget* createWidget() = 0;
 
 private:
-  pqView(const pqView&); // Not implemented.
-  void operator=(const pqView&); // Not implemented.
+  Q_DISABLE_COPY(pqView)
 
   pqViewInternal* Internal;
   QString ViewType;

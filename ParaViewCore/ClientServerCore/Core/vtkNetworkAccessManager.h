@@ -84,8 +84,8 @@ protected:
   ~vtkNetworkAccessManager();
 
 private:
-  vtkNetworkAccessManager(const vtkNetworkAccessManager&); // Not implemented
-  void operator=(const vtkNetworkAccessManager&); // Not implemented
+  vtkNetworkAccessManager(const vtkNetworkAccessManager&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkNetworkAccessManager&) VTK_DELETE_FUNCTION;
 
 };
 

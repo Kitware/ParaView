@@ -75,7 +75,7 @@ protected:
   void hideInputIfRequired(pqPipelineFilter* filter, pqView* view);
 
 private:
-  Q_DISABLE_COPY(pqApplyBehavior);
+  Q_DISABLE_COPY(pqApplyBehavior)
   class pqInternals;
   const QScopedPointer<pqInternals> Internals;
 };

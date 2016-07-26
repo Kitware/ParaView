@@ -56,7 +56,7 @@ protected:
   void ComputeCellCentroid(vtkGenericCell* cell, double xyz[3]);
 
 private:
-  vtkCustomUnstructuredGridBuilder(const vtkCustomUnstructuredGridBuilder&); // Not implemented
-  void operator=(const vtkCustomUnstructuredGridBuilder&); // Not implemented
+  vtkCustomUnstructuredGridBuilder(const vtkCustomUnstructuredGridBuilder&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCustomUnstructuredGridBuilder&) VTK_DELETE_FUNCTION;
 };
 #endif

@@ -97,8 +97,8 @@ protected:
 
   virtual void ReportReferences(vtkGarbageCollector*);
 private:
-  vtkPVExtractVOI(const vtkPVExtractVOI&);  // Not implemented.
-  void operator=(const vtkPVExtractVOI&);  // Not implemented.
+  vtkPVExtractVOI(const vtkPVExtractVOI&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVExtractVOI&) VTK_DELETE_FUNCTION;
 };
 
 #endif

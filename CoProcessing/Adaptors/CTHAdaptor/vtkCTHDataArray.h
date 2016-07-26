@@ -276,8 +276,8 @@ protected:
   // A writeable version of this array, delegated.
   vtkDoubleArray *Fallback;
 private:
-  vtkCTHDataArray (const vtkCTHDataArray&); // Not implemented
-  void operator= (const vtkCTHDataArray&); // Not implemented
+  vtkCTHDataArray (const vtkCTHDataArray&) VTK_DELETE_FUNCTION;
+  void operator= (const vtkCTHDataArray&) VTK_DELETE_FUNCTION;
 };
 
 #endif /* vtkCTHDataArray_h */

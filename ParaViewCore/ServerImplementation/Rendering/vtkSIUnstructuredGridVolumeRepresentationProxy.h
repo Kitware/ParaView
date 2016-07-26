@@ -41,8 +41,8 @@ protected:
 
 
 private:
-  vtkSIUnstructuredGridVolumeRepresentationProxy(const vtkSIUnstructuredGridVolumeRepresentationProxy&); // Not implemented
-  void operator=(const vtkSIUnstructuredGridVolumeRepresentationProxy&); // Not implemented
+  vtkSIUnstructuredGridVolumeRepresentationProxy(const vtkSIUnstructuredGridVolumeRepresentationProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSIUnstructuredGridVolumeRepresentationProxy&) VTK_DELETE_FUNCTION;
 
 };
 

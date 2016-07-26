@@ -62,7 +62,7 @@ private slots:
   void upperChanged(double);
 
 private:
-  Q_DISABLE_COPY(pqDoubleRangeSliderPropertyWidget);
+  Q_DISABLE_COPY(pqDoubleRangeSliderPropertyWidget)
 
   class pqInternals;
   pqInternals* Internals;

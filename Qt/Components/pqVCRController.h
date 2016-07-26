@@ -103,8 +103,7 @@ protected slots:
   void onEndPlay();
 
 private:
-  pqVCRController(const pqVCRController&); // Not implemented.
-  void operator=(const pqVCRController&); // Not implemented.
+  Q_DISABLE_COPY(pqVCRController)
 
   QPointer<pqAnimationScene> Scene;
 };

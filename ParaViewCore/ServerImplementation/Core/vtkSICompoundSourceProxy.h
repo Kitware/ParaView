@@ -51,8 +51,8 @@ protected:
   virtual bool CreateOutputPorts();
 
 private:
-  vtkSICompoundSourceProxy(const vtkSICompoundSourceProxy&); // Not implemented
-  void operator=(const vtkSICompoundSourceProxy&); // Not implemented
+  vtkSICompoundSourceProxy(const vtkSICompoundSourceProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSICompoundSourceProxy&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;

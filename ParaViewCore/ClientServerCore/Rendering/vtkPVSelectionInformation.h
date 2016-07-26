@@ -62,8 +62,8 @@ protected:
   vtkSelection* Selection;
 
 private:
-  vtkPVSelectionInformation(const vtkPVSelectionInformation&); // Not implemented
-  void operator=(const vtkPVSelectionInformation&); // Not implemented
+  vtkPVSelectionInformation(const vtkPVSelectionInformation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVSelectionInformation&) VTK_DELETE_FUNCTION;
 };
 
 #endif

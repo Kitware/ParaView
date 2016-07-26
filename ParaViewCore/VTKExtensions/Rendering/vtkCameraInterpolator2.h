@@ -113,8 +113,8 @@ protected:
   vtkParametricSpline* PositionSpline;
 
 private:
-  vtkCameraInterpolator2(const vtkCameraInterpolator2&); // Not implemented
-  void operator=(const vtkCameraInterpolator2&); // Not implemented
+  vtkCameraInterpolator2(const vtkCameraInterpolator2&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCameraInterpolator2&) VTK_DELETE_FUNCTION;
 
 };
 

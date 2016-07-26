@@ -193,8 +193,7 @@ protected:
   pqInternals* Internals;
 
 private:
-  pqVRUIConnection(const pqVRUIConnection&); // Not implemented.
-  void operator=(const pqVRUIConnection&); // Not implemented.
+  Q_DISABLE_COPY(pqVRUIConnection)
 };
 
 #endif

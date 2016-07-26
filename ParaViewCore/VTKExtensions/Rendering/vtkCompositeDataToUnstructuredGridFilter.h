@@ -75,8 +75,8 @@ protected:
   unsigned int SubTreeCompositeIndex;
   bool MergePoints;
 private:
-  vtkCompositeDataToUnstructuredGridFilter(const vtkCompositeDataToUnstructuredGridFilter&); // Not implemented
-  void operator=(const vtkCompositeDataToUnstructuredGridFilter&); // Not implemented
+  vtkCompositeDataToUnstructuredGridFilter(const vtkCompositeDataToUnstructuredGridFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCompositeDataToUnstructuredGridFilter&) VTK_DELETE_FUNCTION;
 
 };
 

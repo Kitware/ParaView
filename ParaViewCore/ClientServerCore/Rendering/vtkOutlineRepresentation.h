@@ -48,8 +48,8 @@ protected:
     { this->Superclass::SetRepresentation(WIREFRAME); }
 
 private:
-  vtkOutlineRepresentation(const vtkOutlineRepresentation&); // Not implemented
-  void operator=(const vtkOutlineRepresentation&); // Not implemented
+  vtkOutlineRepresentation(const vtkOutlineRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkOutlineRepresentation&) VTK_DELETE_FUNCTION;
 
 };
 

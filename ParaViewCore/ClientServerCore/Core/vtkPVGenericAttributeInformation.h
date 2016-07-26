@@ -43,8 +43,8 @@ protected:
   vtkPVGenericAttributeInformation();
   ~vtkPVGenericAttributeInformation();
 
-  vtkPVGenericAttributeInformation(const vtkPVGenericAttributeInformation&); // Not implemented
-  void operator=(const vtkPVGenericAttributeInformation&); // Not implemented
+  vtkPVGenericAttributeInformation(const vtkPVGenericAttributeInformation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVGenericAttributeInformation&) VTK_DELETE_FUNCTION;
 };
 
 #endif

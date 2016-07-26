@@ -41,8 +41,8 @@ protected:
   ~vtkSMCameraProxy();
 
 private:
-  vtkSMCameraProxy(const vtkSMCameraProxy&); // Not implemented.
-  void operator=(const vtkSMCameraProxy&); // Not implemented.
+  vtkSMCameraProxy(const vtkSMCameraProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMCameraProxy&) VTK_DELETE_FUNCTION;
 };
 
 #endif

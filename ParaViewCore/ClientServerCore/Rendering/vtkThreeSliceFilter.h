@@ -107,8 +107,8 @@ protected:
   void Process(vtkDataSet* input, vtkPolyData* outputs[4], unsigned int compositeIndex);
 
 private:
-  vtkThreeSliceFilter(const vtkThreeSliceFilter&);  // Not implemented.
-  void operator=(const vtkThreeSliceFilter&);  // Not implemented.
+  vtkThreeSliceFilter(const vtkThreeSliceFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkThreeSliceFilter&) VTK_DELETE_FUNCTION;
 };
 
 #endif

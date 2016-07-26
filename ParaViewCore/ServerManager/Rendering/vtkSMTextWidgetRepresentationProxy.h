@@ -43,8 +43,8 @@ protected:
   friend class vtkSMTextSourceRepresentationProxy;
 
 private:
-  vtkSMTextWidgetRepresentationProxy(const vtkSMTextWidgetRepresentationProxy&); // Not implemented
-  void operator=(const vtkSMTextWidgetRepresentationProxy&); // Not implemented
+  vtkSMTextWidgetRepresentationProxy(const vtkSMTextWidgetRepresentationProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMTextWidgetRepresentationProxy&) VTK_DELETE_FUNCTION;
 
 };
 

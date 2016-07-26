@@ -40,8 +40,8 @@ protected:
   virtual bool Pull(vtkSMMessage*);
 
 private:
-  vtkSIArraySelectionProperty(const vtkSIArraySelectionProperty&); // Not implemented
-  void operator=(const vtkSIArraySelectionProperty&); // Not implemented
+  vtkSIArraySelectionProperty(const vtkSIArraySelectionProperty&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSIArraySelectionProperty&) VTK_DELETE_FUNCTION;
 
 };
 

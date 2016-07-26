@@ -247,8 +247,8 @@ protected:
   double Theta;
 
 private:
-  vtkSQTubeFilter(const vtkSQTubeFilter&);  // Not implemented.
-  void operator=(const vtkSQTubeFilter&);  // Not implemented.
+  vtkSQTubeFilter(const vtkSQTubeFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQTubeFilter&) VTK_DELETE_FUNCTION;
 };
 
 #endif

@@ -142,8 +142,8 @@ protected:
   double Scalar;
 
 private:
-  vtkPointHandleRepresentationSphere(const vtkPointHandleRepresentationSphere&);  //Not implemented
-  void operator=(const vtkPointHandleRepresentationSphere&);  //Not implemented
+  vtkPointHandleRepresentationSphere(const vtkPointHandleRepresentationSphere&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPointHandleRepresentationSphere&) VTK_DELETE_FUNCTION;
 };
 
 #endif

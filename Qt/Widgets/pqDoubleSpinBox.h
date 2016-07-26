@@ -49,8 +49,7 @@ public:
   virtual void stepBy(int steps);
 
 private:
-  pqDoubleSpinBox(const pqDoubleSpinBox&); // Not implemented.
-  void operator=(const pqDoubleSpinBox&); // Not implemented.
+  Q_DISABLE_COPY(pqDoubleSpinBox)
 };
 
 #endif

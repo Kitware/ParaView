@@ -90,8 +90,8 @@ protected:
   mutable double  EndDirection[3];
 
 private:
-  Segment(const vtkObject&);  // Not implemented.
-  void operator=(const Segment&);  // Not implemented.
+  Segment(const vtkObject&) VTK_DELETE_FUNCTION;
+  void operator=(const Segment&) VTK_DELETE_FUNCTION;
 };
 
 
@@ -120,8 +120,8 @@ protected:
   vtkCollection* Segments;
 
 private:
-  Node(const vtkObject&);  // Not implemented.
-  void operator=(const Node&);  // Not implemented.
+  Node(const vtkObject&) VTK_DELETE_FUNCTION;
+  void operator=(const Node&) VTK_DELETE_FUNCTION;
 };
 
 

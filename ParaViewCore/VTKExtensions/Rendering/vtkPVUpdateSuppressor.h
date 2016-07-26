@@ -67,8 +67,8 @@ protected:
   // Create a default executive.
   virtual vtkExecutive* CreateDefaultExecutive();
 private:
-  vtkPVUpdateSuppressor(const vtkPVUpdateSuppressor&);  // Not implemented.
-  void operator=(const vtkPVUpdateSuppressor&);  // Not implemented.
+  vtkPVUpdateSuppressor(const vtkPVUpdateSuppressor&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVUpdateSuppressor&) VTK_DELETE_FUNCTION;
 
 };
 

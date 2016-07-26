@@ -33,8 +33,8 @@ protected:
   ~vtkMySpecialRepresentation();
 
 private:
-  vtkMySpecialRepresentation(const vtkMySpecialRepresentation&); // Not implemented
-  void operator=(const vtkMySpecialRepresentation&); // Not implemented
+  vtkMySpecialRepresentation(const vtkMySpecialRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMySpecialRepresentation&) VTK_DELETE_FUNCTION;
 
 };
 

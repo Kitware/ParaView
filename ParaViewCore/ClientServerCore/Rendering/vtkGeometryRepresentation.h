@@ -298,8 +298,8 @@ protected:
 
   vtkPiecewiseFunction *PWF;
 private:
-  vtkGeometryRepresentation(const vtkGeometryRepresentation&); // Not implemented
-  void operator=(const vtkGeometryRepresentation&); // Not implemented
+  vtkGeometryRepresentation(const vtkGeometryRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkGeometryRepresentation&) VTK_DELETE_FUNCTION;
 
   friend class vtkSelectionRepresentation;
   char* DebugString;

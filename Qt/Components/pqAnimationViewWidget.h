@@ -114,8 +114,7 @@ protected slots:
   void changeDataProxyDialogAccepted();
 
 private:
-  pqAnimationViewWidget(const pqAnimationViewWidget&); // Not implemented.
-  void operator=(const pqAnimationViewWidget&); // Not implemented.
+  Q_DISABLE_COPY(pqAnimationViewWidget)
 
   class pqInternal;
   pqInternal *Internal;

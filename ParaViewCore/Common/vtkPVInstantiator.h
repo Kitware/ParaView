@@ -44,8 +44,8 @@ protected:
   ~vtkPVInstantiator();
 
 private:
-  vtkPVInstantiator(const vtkPVInstantiator&); // Not implemented
-  void operator=(const vtkPVInstantiator&); // Not implemented
+  vtkPVInstantiator(const vtkPVInstantiator&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVInstantiator&) VTK_DELETE_FUNCTION;
 
 };
 

@@ -43,8 +43,7 @@ public:
   ~pqDefaultMainWindow();
 
 private:
-  pqDefaultMainWindow(const pqDefaultMainWindow&); // Not implemented.
-  void operator=(const pqDefaultMainWindow&); // Not implemented.
+  Q_DISABLE_COPY(pqDefaultMainWindow)
 
   class pqInternals;
   pqInternals* Internals;

@@ -40,8 +40,8 @@ protected:
   ~vtkPVBooleanKeyFrame();
 
 private:
-  vtkPVBooleanKeyFrame(const vtkPVBooleanKeyFrame&); // Not implemented.
-  void operator=(const vtkPVBooleanKeyFrame&); // Not implemented.
+  vtkPVBooleanKeyFrame(const vtkPVBooleanKeyFrame&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVBooleanKeyFrame&) VTK_DELETE_FUNCTION;
 
 };
 #endif

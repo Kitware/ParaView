@@ -55,8 +55,8 @@ protected:
                          bool traverse_cross_edges);
 
 private:
-  vtkSISILProperty(const vtkSISILProperty&); // Not implemented
-  void operator=(const vtkSISILProperty&); // Not implemented
+  vtkSISILProperty(const vtkSISILProperty&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSISILProperty&) VTK_DELETE_FUNCTION;
 
   char* SubTree;
   int OutputPort;

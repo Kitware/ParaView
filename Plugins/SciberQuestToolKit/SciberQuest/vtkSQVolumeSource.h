@@ -106,8 +106,8 @@ private:
   int LogLevel;
 
 private:
-  vtkSQVolumeSource(const vtkSQVolumeSource&);  // Not implemented.
-  void operator=(const vtkSQVolumeSource&);  // Not implemented.
+  vtkSQVolumeSource(const vtkSQVolumeSource&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQVolumeSource&) VTK_DELETE_FUNCTION;
 };
 
 #endif

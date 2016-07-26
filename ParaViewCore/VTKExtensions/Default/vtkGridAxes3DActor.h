@@ -249,8 +249,8 @@ protected:
 
   vtkTuple<vtkNew<vtkGridAxes2DActor>, 6> GridAxes2DActors;
 private:
-  vtkGridAxes3DActor(const vtkGridAxes3DActor&); // Not implemented.
-  void operator=(const vtkGridAxes3DActor&); // Not implemented.
+  vtkGridAxes3DActor(const vtkGridAxes3DActor&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkGridAxes3DActor&) VTK_DELETE_FUNCTION;
 
   unsigned long GetBoundsMTime;
 

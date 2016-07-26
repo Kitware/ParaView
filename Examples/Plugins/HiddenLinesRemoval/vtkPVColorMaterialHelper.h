@@ -65,8 +65,8 @@ protected:
   eMaterialParamater Mode;
 
 private:
-  vtkPVColorMaterialHelper(const vtkPVColorMaterialHelper&); // Not implemented.
-  void operator=(const vtkPVColorMaterialHelper&); // Not implemented.
+  vtkPVColorMaterialHelper(const vtkPVColorMaterialHelper&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVColorMaterialHelper&) VTK_DELETE_FUNCTION;
 
 };
 

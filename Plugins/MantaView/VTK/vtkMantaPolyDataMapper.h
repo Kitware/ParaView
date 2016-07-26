@@ -126,8 +126,8 @@ protected:
                    vtkMantaTexture *);
 
 private:
-  vtkMantaPolyDataMapper(const vtkMantaPolyDataMapper&); // Not implemented.
-  void operator=(const vtkMantaPolyDataMapper&); // Not implemented.
+  vtkMantaPolyDataMapper(const vtkMantaPolyDataMapper&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMantaPolyDataMapper&) VTK_DELETE_FUNCTION;
 
   vtkMantaManager *MantaManager;
 

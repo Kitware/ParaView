@@ -85,8 +85,7 @@ protected:
   pqSMProxy SelectionSource;
 
 private:
-  pqSelectionInputWidget(const pqSelectionInputWidget&); // Not implemented.
-  void operator=(const pqSelectionInputWidget&); // Not implemented.
+  Q_DISABLE_COPY(pqSelectionInputWidget)
 
   class UI;
   UI *ui;

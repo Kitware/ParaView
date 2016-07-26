@@ -161,8 +161,8 @@ protected:
   vtkSMMessage* State;
 
 private:
-  vtkSMProxySelectionModel(const  vtkSMProxySelectionModel&); // Not implemented
-  void operator = (const  vtkSMProxySelectionModel&); // Not implemented
+  vtkSMProxySelectionModel(const  vtkSMProxySelectionModel&) VTK_DELETE_FUNCTION;
+  void operator = (const  vtkSMProxySelectionModel&) VTK_DELETE_FUNCTION;
 
   class vtkInternal;
   friend class vtkInternal;

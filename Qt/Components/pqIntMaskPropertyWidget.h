@@ -86,7 +86,7 @@ signals:
   void maskChanged();
 
 private:
-  Q_DISABLE_COPY(pqIntMaskPropertyWidget);
+  Q_DISABLE_COPY(pqIntMaskPropertyWidget)
 
   class pqInternals;
   QScopedPointer<pqInternals> Internals;

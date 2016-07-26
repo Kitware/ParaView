@@ -61,8 +61,8 @@ protected:
   vtkTypeUInt32 ProxySourceGlobalId;
   bool Reverse;
 private:
-  pqProxyModifiedStateUndoElement(const pqProxyModifiedStateUndoElement&); // Not implemented
-  void operator=(const pqProxyModifiedStateUndoElement&); // Not implemented
+  pqProxyModifiedStateUndoElement(const pqProxyModifiedStateUndoElement&) VTK_DELETE_FUNCTION;
+  void operator=(const pqProxyModifiedStateUndoElement&) VTK_DELETE_FUNCTION;
 };
 
 #endif

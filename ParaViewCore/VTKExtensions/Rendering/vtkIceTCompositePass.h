@@ -251,8 +251,8 @@ protected:
   vtkSynchronizedRenderers::vtkRawImage* LastRenderedEyes[2];
 
 private:
-  vtkIceTCompositePass(const vtkIceTCompositePass&); // Not implemented
-  void operator=(const vtkIceTCompositePass&); // Not implemented
+  vtkIceTCompositePass(const vtkIceTCompositePass&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkIceTCompositePass&) VTK_DELETE_FUNCTION;
 
 };
 

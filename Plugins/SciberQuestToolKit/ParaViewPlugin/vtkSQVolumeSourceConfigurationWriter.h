@@ -62,8 +62,8 @@ protected:
   ~vtkSQVolumeSourceConfigurationWriter();
 
 private:
-  vtkSQVolumeSourceConfigurationWriter(const vtkSQVolumeSourceConfigurationWriter&);  // Not implemented.
-  void operator=(const vtkSQVolumeSourceConfigurationWriter&);  // Not implemented.
+  vtkSQVolumeSourceConfigurationWriter(const vtkSQVolumeSourceConfigurationWriter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQVolumeSourceConfigurationWriter&) VTK_DELETE_FUNCTION;
 };
 
 #endif

@@ -51,8 +51,7 @@ protected slots:
   void updateDistance();
 
 private:
-  pqDistanceWidget(const pqDistanceWidget&); // Not implemented.
-  void operator=(const pqDistanceWidget&); // Not implemented.
+  Q_DISABLE_COPY(pqDistanceWidget)
   QLabel* Label;
 };
 

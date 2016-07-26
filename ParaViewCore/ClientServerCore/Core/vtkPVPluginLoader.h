@@ -140,8 +140,8 @@ protected:
   bool DebugPlugin;
   bool Loaded;
 private:
-  vtkPVPluginLoader(const vtkPVPluginLoader&); // Not implemented.
-  void operator=(const vtkPVPluginLoader&); // Not implemented.
+  vtkPVPluginLoader(const vtkPVPluginLoader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVPluginLoader&) VTK_DELETE_FUNCTION;
 
   static vtkPluginLoadFunction StaticPluginLoadFunction;
 };

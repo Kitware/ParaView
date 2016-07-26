@@ -57,8 +57,8 @@ protected:
   virtual void HandleTracker( const vtkVREventData& data );
 
 private:
-  vtkVRTrackStyle(const vtkVRTrackStyle&); // Not implemented.
-  void operator=(const vtkVRTrackStyle&); // Not implemented.
+  vtkVRTrackStyle(const vtkVRTrackStyle&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkVRTrackStyle&) VTK_DELETE_FUNCTION;
 };
 
 #endif //vtkVRTrackStyle.h_

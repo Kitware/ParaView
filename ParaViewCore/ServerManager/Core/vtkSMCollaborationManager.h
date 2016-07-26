@@ -154,8 +154,8 @@ private:
   class vtkInternal;
   vtkInternal* Internal;
 
-  vtkSMCollaborationManager(const vtkSMCollaborationManager&); // Not implemented
-  void operator=(const vtkSMCollaborationManager&);       // Not implemented
+  vtkSMCollaborationManager(const vtkSMCollaborationManager&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMCollaborationManager&) VTK_DELETE_FUNCTION;
 
 };
 #endif // #ifndef vtkSMCollaborationManager_h

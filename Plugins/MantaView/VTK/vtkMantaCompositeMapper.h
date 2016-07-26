@@ -47,8 +47,8 @@ protected:
   virtual vtkPolyDataMapper * MakeAMapper();
 
 private:
-  vtkMantaCompositeMapper(const vtkMantaCompositeMapper&);  // Not implemented.
-  void operator=(const vtkMantaCompositeMapper&);    // Not implemented.
+  vtkMantaCompositeMapper(const vtkMantaCompositeMapper&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMantaCompositeMapper&) VTK_DELETE_FUNCTION;
 };
 
 #endif

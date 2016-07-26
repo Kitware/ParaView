@@ -66,7 +66,7 @@ private slots:
   void updateState();
 
 private:
-  Q_DISABLE_COPY(pqGenericPropertyWidgetDecorator);
+  Q_DISABLE_COPY(pqGenericPropertyWidgetDecorator)
 
   class pqInternals;
   const QScopedPointer<pqInternals> Internals;

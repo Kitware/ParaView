@@ -56,8 +56,8 @@ protected:
   
   vtkPVXMLElement* DocumentationElement;
 private:
-  vtkSMDocumentation(const vtkSMDocumentation&); // Not implemented.
-  void operator=(const vtkSMDocumentation&); // Not implemented.
+  vtkSMDocumentation(const vtkSMDocumentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMDocumentation&) VTK_DELETE_FUNCTION;
 };
 
 

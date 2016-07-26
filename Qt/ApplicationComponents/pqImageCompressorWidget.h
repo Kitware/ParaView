@@ -61,7 +61,7 @@ private slots:
   void setConfigurationDefault(int);
 
 private:
-  Q_DISABLE_COPY(pqImageCompressorWidget);
+  Q_DISABLE_COPY(pqImageCompressorWidget)
   class pqInternals;
   pqInternals* Internals;
 };

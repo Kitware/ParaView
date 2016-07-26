@@ -190,8 +190,8 @@ protected:
   bool IsOptional;
   vtkSMDomainInternals* Internals;
 private:
-  vtkSMDomain(const vtkSMDomain&); // Not implemented
-  void operator=(const vtkSMDomain&); // Not implemented
+  vtkSMDomain(const vtkSMDomain&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMDomain&) VTK_DELETE_FUNCTION;
 };
 
 #endif

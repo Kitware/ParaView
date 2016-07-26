@@ -56,7 +56,7 @@ public:
   virtual ~pqParallelCoordinatesChartView();
 
 private:
-  Q_DISABLE_COPY(pqParallelCoordinatesChartView);
+  Q_DISABLE_COPY(pqParallelCoordinatesChartView)
 };
 
 #endif

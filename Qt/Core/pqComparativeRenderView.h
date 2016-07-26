@@ -73,8 +73,7 @@ protected:
   virtual QWidget* createWidget();
 
 private:
-  pqComparativeRenderView(const pqComparativeRenderView&); // Not implemented.
-  void operator=(const pqComparativeRenderView&); // Not implemented.
+  Q_DISABLE_COPY(pqComparativeRenderView)
 
   class pqInternal;
   pqInternal* Internal;

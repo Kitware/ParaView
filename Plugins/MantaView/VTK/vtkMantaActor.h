@@ -143,8 +143,8 @@ public:
   ~vtkMantaActor();
   
  private:
-  vtkMantaActor(const vtkMantaActor&);  // Not implemented.
-  void operator=(const vtkMantaActor&);  // Not implemented.
+  vtkMantaActor(const vtkMantaActor&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMantaActor&) VTK_DELETE_FUNCTION;
 
   void UpdateObjects(vtkRenderer *);
   vtkTimeStamp MeshMTime;

@@ -122,9 +122,9 @@ protected:
 #endif
 
 private:
-  vtkVRUIPipe(); // Not implemented.
-  vtkVRUIPipe(const vtkVRUIPipe&); // Not implemented.
-  void operator=(const vtkVRUIPipe&); // Not implemented.
+  vtkVRUIPipe() VTK_DELETE_FUNCTION;
+  vtkVRUIPipe(const vtkVRUIPipe&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkVRUIPipe&) VTK_DELETE_FUNCTION;
 };
 
 #endif // #ifndef vtkVRUIPipe_h

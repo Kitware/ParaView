@@ -512,7 +512,7 @@ public:
     }
 
 private:
-  Q_DISABLE_COPY(pqSeriesParametersModel);
+  Q_DISABLE_COPY(pqSeriesParametersModel)
 };
 
 //=============================================================================

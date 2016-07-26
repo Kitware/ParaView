@@ -285,8 +285,7 @@ protected slots:
   virtual void onStateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*);
 
 private:
-  pqServerManagerModel(const pqServerManagerModel&); // Not implemented.
-  void operator=(const pqServerManagerModel&); // Not implemented.
+  Q_DISABLE_COPY(pqServerManagerModel)
 
   /// Process the QSettings-only settings, setting the values in the
   /// various settings proxies.

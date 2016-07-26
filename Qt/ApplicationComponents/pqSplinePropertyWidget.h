@@ -78,7 +78,7 @@ private slots:
   void removePoints();
   void pick(double x, double y, double z);
 private:
-  Q_DISABLE_COPY(pqSplinePropertyWidget);
+  Q_DISABLE_COPY(pqSplinePropertyWidget)
   class pqInternals;
   QScopedPointer<pqInternals> Internals;
 };

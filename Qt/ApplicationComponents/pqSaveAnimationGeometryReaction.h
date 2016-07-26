@@ -61,8 +61,7 @@ protected:
     { pqSaveAnimationGeometryReaction::saveAnimationGeometry(); }
 
 private:
-  pqSaveAnimationGeometryReaction(const pqSaveAnimationGeometryReaction&); // Not implemented.
-  void operator=(const pqSaveAnimationGeometryReaction&); // Not implemented.
+  Q_DISABLE_COPY(pqSaveAnimationGeometryReaction)
 };
 
 #endif

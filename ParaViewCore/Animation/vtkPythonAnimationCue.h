@@ -63,8 +63,8 @@ protected:
   char* Script;
 
 private:
-  vtkPythonAnimationCue(const vtkPythonAnimationCue&); // Not implemented
-  void operator=(const vtkPythonAnimationCue&); // Not implemented
+  vtkPythonAnimationCue(const vtkPythonAnimationCue&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPythonAnimationCue&) VTK_DELETE_FUNCTION;
 
 };
 

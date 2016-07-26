@@ -56,8 +56,7 @@ private slots:
   void onColorChosen(const QColor&);
 
 private:
-  pqColorButtonEventTranslator(const pqColorButtonEventTranslator&); // Not implemented.
-  void operator=(const pqColorButtonEventTranslator&); // Not implemented.
+  Q_DISABLE_COPY(pqColorButtonEventTranslator)
 };
 
 #endif

@@ -87,8 +87,8 @@ private:
   int Mode;
 
 private:
-  vtkSQEdgeFilter(const vtkSQEdgeFilter &); // Not implemented
-  void operator=(const vtkSQEdgeFilter &); // Not implemented
+  vtkSQEdgeFilter(const vtkSQEdgeFilter &) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQEdgeFilter &) VTK_DELETE_FUNCTION;
 };
 
 #endif

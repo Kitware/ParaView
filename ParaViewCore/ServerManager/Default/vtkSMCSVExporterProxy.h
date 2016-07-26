@@ -45,8 +45,8 @@ protected:
   ~vtkSMCSVExporterProxy();
 
 private:
-  vtkSMCSVExporterProxy(const vtkSMCSVExporterProxy&); // Not implemented
-  void operator=(const vtkSMCSVExporterProxy&); // Not implemented
+  vtkSMCSVExporterProxy(const vtkSMCSVExporterProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMCSVExporterProxy&) VTK_DELETE_FUNCTION;
 
 };
 

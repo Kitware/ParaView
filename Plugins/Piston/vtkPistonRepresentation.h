@@ -93,8 +93,8 @@ protected:
   vtkActor* Actor;
 
 private:
-  vtkPistonRepresentation(const vtkPistonRepresentation&); // Not implemented
-  void operator=(const vtkPistonRepresentation&); // Not implemented
+  vtkPistonRepresentation(const vtkPistonRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPistonRepresentation&) VTK_DELETE_FUNCTION;
 
   char* DebugString;
   vtkSetStringMacro(DebugString);

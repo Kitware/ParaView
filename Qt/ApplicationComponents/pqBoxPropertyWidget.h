@@ -66,7 +66,7 @@ protected slots:
   virtual void placeWidget();
 
 private:
-  Q_DISABLE_COPY(pqBoxPropertyWidget);
+  Q_DISABLE_COPY(pqBoxPropertyWidget)
   pqPropertyLinks WidgetLinks;
 };
 

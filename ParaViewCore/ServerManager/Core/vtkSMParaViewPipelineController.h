@@ -251,8 +251,8 @@ protected:
   // calls those initialization helpers, if any.
   void ProcessInitializationHelper(vtkSMProxy*, unsigned long initializationTimeStamp);
 private:
-  vtkSMParaViewPipelineController(const vtkSMParaViewPipelineController&); // Not implemented
-  void operator=(const vtkSMParaViewPipelineController&); // Not implemented
+  vtkSMParaViewPipelineController(const vtkSMParaViewPipelineController&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMParaViewPipelineController&) VTK_DELETE_FUNCTION;
 
   // Description:
   // We added support for LZ4 in ParaView 5.0.1. LZ4 is a good default

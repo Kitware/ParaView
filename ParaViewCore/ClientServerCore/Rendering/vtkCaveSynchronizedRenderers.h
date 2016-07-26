@@ -76,8 +76,8 @@ protected:
   int once;
 
 private:
-  vtkCaveSynchronizedRenderers(const vtkCaveSynchronizedRenderers&); // Not implemented
-  void operator=(const vtkCaveSynchronizedRenderers&); // Not implemented
+  vtkCaveSynchronizedRenderers(const vtkCaveSynchronizedRenderers&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCaveSynchronizedRenderers&) VTK_DELETE_FUNCTION;
 
 };
 

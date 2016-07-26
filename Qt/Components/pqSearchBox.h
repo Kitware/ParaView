@@ -175,8 +175,7 @@ protected slots:
   void updateFromSettings();
 
 private:
-  pqSearchBox(const pqSearchBox&); // Not implemented.
-  void operator=(const pqSearchBox&); // Not implemented.
+  Q_DISABLE_COPY(pqSearchBox)
 
   class pqInternals;
   friend class pqInternals;

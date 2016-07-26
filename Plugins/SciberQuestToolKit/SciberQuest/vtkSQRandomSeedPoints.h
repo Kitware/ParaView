@@ -73,8 +73,8 @@ protected:
   double Bounds[6];
 
 private:
-  vtkSQRandomSeedPoints(const vtkSQRandomSeedPoints&);  // Not implemented.
-  void operator=(const vtkSQRandomSeedPoints&);  // Not implemented.
+  vtkSQRandomSeedPoints(const vtkSQRandomSeedPoints&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQRandomSeedPoints&) VTK_DELETE_FUNCTION;
 };
 
 #endif

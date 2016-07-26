@@ -106,8 +106,7 @@ private slots:
   void onEnabledModified();
 
 private:
-  pqAnimationCue(const pqAnimationCue&); // Not implemented.
-  void operator=(const pqAnimationCue&); // Not implemented.
+  Q_DISABLE_COPY(pqAnimationCue)
 
   /// Methods used to register/unregister keyframe proxies.
   void addKeyFrameInternal(vtkSMProxy*);

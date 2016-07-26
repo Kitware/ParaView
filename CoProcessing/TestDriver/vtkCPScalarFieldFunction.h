@@ -43,8 +43,8 @@ protected:
   ~vtkCPScalarFieldFunction();
 
 private:
-  vtkCPScalarFieldFunction(const vtkCPScalarFieldFunction&); // Not implemented
-  void operator=(const vtkCPScalarFieldFunction&); // Not implemented
+  vtkCPScalarFieldFunction(const vtkCPScalarFieldFunction&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCPScalarFieldFunction&) VTK_DELETE_FUNCTION;
 };
 
 #endif

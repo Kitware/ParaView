@@ -45,8 +45,8 @@ protected:
   vtkPVKeyFrameCueManipulator* GetKeyFrameManipulator();
 
 private:
-  vtkPVKeyFrameAnimationCue(const vtkPVKeyFrameAnimationCue&); // Not implemented
-  void operator=(const vtkPVKeyFrameAnimationCue&); // Not implemented
+  vtkPVKeyFrameAnimationCue(const vtkPVKeyFrameAnimationCue&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVKeyFrameAnimationCue&) VTK_DELETE_FUNCTION;
 
 };
 

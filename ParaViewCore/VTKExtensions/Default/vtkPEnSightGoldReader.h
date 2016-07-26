@@ -172,8 +172,8 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPEnSightGoldReader : public vtkPEnSigh
   int ElementIdsListed;
 
  private:
-  vtkPEnSightGoldReader(const vtkPEnSightGoldReader&);  // Not implemented.
-  void operator=(const vtkPEnSightGoldReader&);  // Not implemented.
+  vtkPEnSightGoldReader(const vtkPEnSightGoldReader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPEnSightGoldReader&) VTK_DELETE_FUNCTION;
 };
 
 #endif

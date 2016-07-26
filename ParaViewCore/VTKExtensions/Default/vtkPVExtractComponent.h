@@ -51,8 +51,8 @@ protected:
   char* OutputArrayName;
 
 private:
-  vtkPVExtractComponent(const vtkPVExtractComponent&);  // Not implemented.
-  void operator=(const vtkPVExtractComponent&);  // Not implemented.
+  vtkPVExtractComponent(const vtkPVExtractComponent&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVExtractComponent&) VTK_DELETE_FUNCTION;
 };
 
 #endif

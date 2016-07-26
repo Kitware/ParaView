@@ -50,8 +50,7 @@ public:
 
   static const QString &EVENT_NAME();
 private:
-  pqColorButtonEventPlayer(const pqColorButtonEventPlayer&); // Not implemented.
-  void operator=(const pqColorButtonEventPlayer&); // Not implemented.
+  Q_DISABLE_COPY(pqColorButtonEventPlayer)
 };
 
 #endif

@@ -106,8 +106,8 @@ protected:
   vtkTimeStamp   LoadTime;
 
 private:
-  vtkMantaTexture(const vtkMantaTexture&);  // Not implemented.
-  void operator=(const vtkMantaTexture&);  // Not implemented.
+  vtkMantaTexture(const vtkMantaTexture&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMantaTexture&) VTK_DELETE_FUNCTION;
 
   void DeleteMantaTexture();
 

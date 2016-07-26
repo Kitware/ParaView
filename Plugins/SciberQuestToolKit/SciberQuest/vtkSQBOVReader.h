@@ -83,8 +83,8 @@ protected:
   virtual void Clear();
 
 private:
-  vtkSQBOVReader(const vtkSQBOVReader &); // Not implemented
-  void operator=(const vtkSQBOVReader &); // Not implemented
+  vtkSQBOVReader(const vtkSQBOVReader &) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQBOVReader &) VTK_DELETE_FUNCTION;
 
 private:
 

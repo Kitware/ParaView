@@ -45,8 +45,8 @@ protected:
   virtual void UpdateFromInformation(vtkPVDataInformation* information);
 
 private:
-  vtkSMCustomBoundsDomain(const vtkSMCustomBoundsDomain&); // Not implemented
-  void operator=(const vtkSMCustomBoundsDomain&); // Not implemented
+  vtkSMCustomBoundsDomain(const vtkSMCustomBoundsDomain&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMCustomBoundsDomain&) VTK_DELETE_FUNCTION;
 
 };
 

@@ -55,8 +55,7 @@ protected slots:
   void saveSelection();
 
 private:
-  pqTreeViewSelectionHelper(const pqTreeViewSelectionHelper&); // Not implemented.
-  void operator=(const pqTreeViewSelectionHelper&); // Not implemented.
+  Q_DISABLE_COPY(pqTreeViewSelectionHelper)
 
   void setSelectedItemsCheckState(Qt::CheckState state);
 

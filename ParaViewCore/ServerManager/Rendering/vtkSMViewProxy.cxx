@@ -451,8 +451,8 @@ public:
   const double Green;
   const double Blue;
 private:
-  vtkRendererSaveInfo(const vtkRendererSaveInfo&); // Not implemented
-  void operator=(const vtkRendererSaveInfo&); // Not implemented
+  vtkRendererSaveInfo(const vtkRendererSaveInfo&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkRendererSaveInfo&) VTK_DELETE_FUNCTION;
 };
 
 //----------------------------------------------------------------------------

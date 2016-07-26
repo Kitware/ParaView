@@ -65,8 +65,8 @@ protected:
   int SequenceIndex;
   char * SequenceName;
 private:
-  vtkFileSequenceParser(const vtkFileSequenceParser&); // Not implemented.
-  void operator=(const vtkFileSequenceParser&); // Not implemented.
+  vtkFileSequenceParser(const vtkFileSequenceParser&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkFileSequenceParser&) VTK_DELETE_FUNCTION;
 };
 
 #endif

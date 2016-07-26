@@ -37,8 +37,8 @@ protected:
   ~vtkPVLastSelectionInformation();
 
 private:
-  vtkPVLastSelectionInformation(const vtkPVLastSelectionInformation&); // Not implemented
-  void operator=(const vtkPVLastSelectionInformation&); // Not implemented
+  vtkPVLastSelectionInformation(const vtkPVLastSelectionInformation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVLastSelectionInformation&) VTK_DELETE_FUNCTION;
 
 };
 

@@ -76,7 +76,7 @@ signals:
   void representationTextChanged(const QString&);
 
 private:
-  Q_DISABLE_COPY(pqDisplayRepresentationWidget);
+  Q_DISABLE_COPY(pqDisplayRepresentationWidget)
 
   class pqInternals;
   pqInternals* Internal;

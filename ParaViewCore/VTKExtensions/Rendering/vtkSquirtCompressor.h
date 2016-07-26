@@ -90,8 +90,8 @@ protected:
   int SquirtLevel;
 
 private:
-  vtkSquirtCompressor(const vtkSquirtCompressor&); // Not implemented.
-  void operator=(const vtkSquirtCompressor&); // Not implemented.
+  vtkSquirtCompressor(const vtkSquirtCompressor&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSquirtCompressor&) VTK_DELETE_FUNCTION;
 };
 
 

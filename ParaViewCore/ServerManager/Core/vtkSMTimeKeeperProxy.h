@@ -98,8 +98,8 @@ protected:
   virtual void CreateVTKObjects();
 
 private:
-  vtkSMTimeKeeperProxy(const vtkSMTimeKeeperProxy&); // Not implemented
-  void operator=(const vtkSMTimeKeeperProxy&); // Not implemented
+  vtkSMTimeKeeperProxy(const vtkSMTimeKeeperProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMTimeKeeperProxy&) VTK_DELETE_FUNCTION;
 
 };
 

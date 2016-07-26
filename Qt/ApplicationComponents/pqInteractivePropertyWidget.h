@@ -134,7 +134,7 @@ private:
   void handleUserEvent(vtkObject*, unsigned long, void*);
 
 private:
-  Q_DISABLE_COPY(pqInteractivePropertyWidget);
+  Q_DISABLE_COPY(pqInteractivePropertyWidget)
 
   class pqInternals;
   QScopedPointer<pqInternals> Internals;

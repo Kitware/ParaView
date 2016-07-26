@@ -71,8 +71,7 @@ private slots:
   void onWidgetVisibilityChanged(bool visible);
 
 private:
-  pqSphereWidget(const pqSphereWidget&); // Not implemented.
-  void operator=(const pqSphereWidget&); // Not implemented.
+  Q_DISABLE_COPY(pqSphereWidget)
 
   class pqImplementation;
   pqImplementation* Implementation;

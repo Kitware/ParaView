@@ -89,8 +89,8 @@ protected:
 
   vtkTypeUInt32 GlobalID;
 private:
-  vtkSIObject(const vtkSIObject&);    // Not implemented
-  void operator=(const vtkSIObject&); // Not implemented
+  vtkSIObject(const vtkSIObject&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSIObject&) VTK_DELETE_FUNCTION;
 
 };
 

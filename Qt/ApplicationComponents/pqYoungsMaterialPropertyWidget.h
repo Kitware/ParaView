@@ -74,7 +74,7 @@ private slots:
   void updateComboBoxes();
 
 private:
-  Q_DISABLE_COPY(pqYoungsMaterialPropertyWidget);
+  Q_DISABLE_COPY(pqYoungsMaterialPropertyWidget)
 
   class pqInternals;
   QScopedPointer<pqInternals> Internals;

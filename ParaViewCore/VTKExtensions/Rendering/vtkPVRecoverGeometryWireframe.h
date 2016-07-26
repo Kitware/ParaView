@@ -67,8 +67,8 @@ protected:
                           vtkInformationVector *outputVector);
 
 private:
-  vtkPVRecoverGeometryWireframe(const vtkPVRecoverGeometryWireframe &); // Not implemented
-  void operator=(const vtkPVRecoverGeometryWireframe &); // Not implemented
+  vtkPVRecoverGeometryWireframe(const vtkPVRecoverGeometryWireframe &) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVRecoverGeometryWireframe &) VTK_DELETE_FUNCTION;
 };
 
 #endif //vtkPVRecoverGeometryWireframe_h

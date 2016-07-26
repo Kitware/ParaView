@@ -78,7 +78,7 @@ protected:
     END_UNDO_SET();
     }
 private:
-  Q_DISABLE_COPY(PropertyLinksConnection);
+  Q_DISABLE_COPY(PropertyLinksConnection)
 };
 
 

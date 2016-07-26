@@ -132,7 +132,7 @@ protected:
     vtkObject* caller, unsigned long eventid, void* calldata);
 
 private:
-  Q_DISABLE_COPY(pqPythonShell);
+  Q_DISABLE_COPY(pqPythonShell)
 
   bool Prompted;
   bool Executing;

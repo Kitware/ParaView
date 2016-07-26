@@ -84,8 +84,8 @@ private:
   class CachedTables;
   CachedTables *CachedOutput;
 
-  vtkSpyPlotHistoryReader(const vtkSpyPlotHistoryReader&);  // Not implemented.
-  void operator=(const vtkSpyPlotHistoryReader&);  // Not implemented.
+  vtkSpyPlotHistoryReader(const vtkSpyPlotHistoryReader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSpyPlotHistoryReader&) VTK_DELETE_FUNCTION;
 };
 
 #endif

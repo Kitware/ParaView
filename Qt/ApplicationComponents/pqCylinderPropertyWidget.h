@@ -83,7 +83,7 @@ protected slots:
   void resetBounds();
 
 private:
-  Q_DISABLE_COPY(pqCylinderPropertyWidget);
+  Q_DISABLE_COPY(pqCylinderPropertyWidget)
 
   void setAxis(double x, double y, double z);
   void updateWidget(bool showing_advanced_properties);

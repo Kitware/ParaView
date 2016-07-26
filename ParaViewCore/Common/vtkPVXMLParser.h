@@ -93,8 +93,8 @@ protected:
   virtual void ReportXmlParseError();
 
 private:
-  vtkPVXMLParser(const vtkPVXMLParser&);  // Not implemented.
-  void operator=(const vtkPVXMLParser&);  // Not implemented.
+  vtkPVXMLParser(const vtkPVXMLParser&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVXMLParser&) VTK_DELETE_FUNCTION;
 };
 
 #endif

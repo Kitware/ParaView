@@ -46,8 +46,7 @@ protected:
   pqServer *Server;
 
 private:
-  pqSLACDataLoadManager(const pqSLACDataLoadManager &); // Not implemented
-  void operator=(const pqSLACDataLoadManager &);        // Not implemented
+  Q_DISABLE_COPY(pqSLACDataLoadManager)
 
   class pqUI;
   pqUI *ui;

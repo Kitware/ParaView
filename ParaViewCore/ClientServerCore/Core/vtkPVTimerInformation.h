@@ -74,8 +74,8 @@ protected:
   int NumberOfLogs;
   char** Logs;
 
-  vtkPVTimerInformation(const vtkPVTimerInformation&); // Not implemented
-  void operator=(const vtkPVTimerInformation&); // Not implemented
+  vtkPVTimerInformation(const vtkPVTimerInformation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVTimerInformation&) VTK_DELETE_FUNCTION;
 };
 
 #endif

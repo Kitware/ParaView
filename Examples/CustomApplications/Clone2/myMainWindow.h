@@ -47,8 +47,7 @@ protected slots:
   void showHelpForProxy(const QString& proxyname);
 
 private:
-  myMainWindow(const myMainWindow&); // Not implemented.
-  void operator=(const myMainWindow&); // Not implemented.
+  Q_DISABLE_COPY(myMainWindow)
 
   class pqInternals;
   pqInternals* Internals;

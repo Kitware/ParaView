@@ -68,8 +68,8 @@ protected:
   vtkPlane* Plane;
 
 private:
-  vtkPVPlane(const vtkPVPlane&); // Not implemented
-  void operator=(const vtkPVPlane&); // Not implemented
+  vtkPVPlane(const vtkPVPlane&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVPlane&) VTK_DELETE_FUNCTION;
 
 };
 

@@ -85,8 +85,7 @@ signals:
   void timeRangeChanged();
 
 private:
-  pqTimeKeeper(const pqTimeKeeper&); // Not implemented.
-  void operator=(const pqTimeKeeper&); // Not implemented.
+  Q_DISABLE_COPY(pqTimeKeeper)
 
   class pqInternals;
   pqInternals* Internals;

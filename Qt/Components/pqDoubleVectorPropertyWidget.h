@@ -69,7 +69,7 @@ protected slots:
   void propertyDomainModified(vtkObject* domain);
 
 private:
-  Q_DISABLE_COPY(pqDoubleVectorPropertyWidget);
+  Q_DISABLE_COPY(pqDoubleVectorPropertyWidget)
 };
 
 #endif // _pqDoubleVectorPropertyWidget_h

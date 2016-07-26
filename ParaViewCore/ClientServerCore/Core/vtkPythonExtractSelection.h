@@ -56,8 +56,8 @@ protected:
   void InitializeOutput(vtkDataObject* output, vtkDataObject* input);
 
 private:
-  vtkPythonExtractSelection(const vtkPythonExtractSelection&); // Not implemented
-  void operator=(const vtkPythonExtractSelection&); // Not implemented
+  vtkPythonExtractSelection(const vtkPythonExtractSelection&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPythonExtractSelection&) VTK_DELETE_FUNCTION;
 
 };
 

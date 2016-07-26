@@ -136,8 +136,8 @@ public:
   /// \@}
 
 private:
-  vtkSQOOCReader(const vtkSQOOCReader&); // Not implemented
-  void operator=(const vtkSQOOCReader&); // Not implemented
+  vtkSQOOCReader(const vtkSQOOCReader&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQOOCReader&) VTK_DELETE_FUNCTION;
 
 protected:
   vtkSQOOCReader()

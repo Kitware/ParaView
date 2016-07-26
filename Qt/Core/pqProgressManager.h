@@ -128,8 +128,7 @@ protected:
   bool EnableProgress;
   bool ReadyEnableProgress;
 private:
-  pqProgressManager(const pqProgressManager&); // Not implemented.
-  void operator=(const pqProgressManager&); // Not implemented.
+  Q_DISABLE_COPY(pqProgressManager)
 };
 
 #endif

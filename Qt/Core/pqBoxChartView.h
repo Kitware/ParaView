@@ -69,8 +69,7 @@ protected slots:
   void updateRepresentationVisibility(pqRepresentation* repr, bool visible);
 
 private:
-  pqBoxChartView(const pqBoxChartView&); // Not implemented.
-  void operator=(const pqBoxChartView&); // Not implemented.
+  Q_DISABLE_COPY(pqBoxChartView)
 };
 
 #endif

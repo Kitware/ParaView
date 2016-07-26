@@ -100,8 +100,8 @@ private:
   int LogLevel;
 
 private:
-  vtkSQFTLE(const vtkSQFTLE&);  // Not implemented.
-  void operator=(const vtkSQFTLE&);  // Not implemented.
+  vtkSQFTLE(const vtkSQFTLE&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSQFTLE&) VTK_DELETE_FUNCTION;
 };
 
 #endif
