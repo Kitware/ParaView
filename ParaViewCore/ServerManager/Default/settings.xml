@@ -90,8 +90,7 @@
       <IntVectorProperty name="LoadAllVariables"
         number_of_elements="1"
         default_values="0"
-        command="SetLoadAllVariables"
-        panel_visibility="advanced">
+        command="SetLoadAllVariables">
         <Documentation>
           Load all variables when loading a data set.
         </Documentation>
