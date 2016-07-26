@@ -90,6 +90,7 @@ set (Module_SRCS
   vtkPVView.cxx
   vtkPVXYChartView.cxx
   vtkQuartileChartRepresentation.cxx
+  vtkRulerSourceRepresentation.cxx
   vtkSelectionDeliveryFilter.cxx
   vtkSelectionRepresentation.cxx
   vtkSpreadSheetRepresentation.cxx

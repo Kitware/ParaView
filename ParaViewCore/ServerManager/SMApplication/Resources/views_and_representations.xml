@@ -7030,6 +7030,111 @@
       <!-- End of TextSourceRepresentation -->
     </RepresentationProxy>
     <!-- =================================================================== -->
+    <RepresentationProxy class="vtkRulerSourceRepresentation"
+                         name="RulerSourceRepresentation"
+                         processes="client|dataserver|renderserver"
+                         si_class="vtkSIProxy">
+      <Documentation>Representation proxy used to show a ruler.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <Documentation>Data input for the representation.</Documentation>
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <StringVectorProperty command="SetLabelFormat"
+                            default_values="%6.3g"
+                            name="LabelFormat"
+                            number_of_elements="1">
+        <Documentation>
+          This should be a printf-style format string. You can do things
+          like limit the number of significant digits, add prefixes/suffixes,
+          basically anything that printf can do. An empty string or a string
+          without the % symbol results in no label.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="RulerMode"
+        command="SetRulerMode"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Check to enable "ruler mode", where ticks are placed at increments
+          defined by the parameter "ruler distance".
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="NumberOfTicks"
+        command="SetNumberOfRulerTicks"
+        number_of_elements="1"
+        default_values="5">
+        <Documentation>
+          Specify the number of major ruler ticks. Note: the number of ticks is the
+          number between the two handle endpoints.
+        </Documentation>
+        <IntRangeDomain name="range" min="1" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="RulerMode"
+                                   value="0" />
+        </Hints>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="Graduation"
+        command="SetRulerDistance"
+        number_of_elements="1"
+        default_values="1.">
+        <Documentation>
+          Specify the graduation, which indicates the spacing of the major ticks.
+        </Documentation>
+        <DoubleRangeDomain name="range" min="0" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="RulerMode"
+                                   value="1" />
+        </Hints>
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="Label Properties">
+        <Property function="RulerMode" name="RulerMode" />
+        <Property function="LabelFormat" name="LabelFormat" />
+        <Property function="NumberOfTicks" name="NumberOfTicks" />
+        <Property function="Graduation" name="Graduation" />
+      </PropertyGroup>
+
+      <SubProxy command="SetTextProperty">
+        <Proxy name="TextProperty"
+               proxygroup="properties"
+               proxyname="TextProperty"></Proxy>
+        <ExposedProperties>
+          <PropertyGroup label="Font Properties" panel_widget="FontEditor">
+            <Property name="Color" function="Color"/>
+            <Property name="Opacity" function="Opacity"/>
+            <Property name="FontFamily" function="Family"/>
+            <Property name="Bold" function="Bold"/>
+            <Property name="Italic" function="Italics" />
+            <Property name="Shadow" function="Shadow"/>
+            <Property name="FontSize" function="Size"/>
+            <Property name="Justification" function="Justification"/>
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+
+      <!-- End of RulerSourceRepresentation -->
+    </RepresentationProxy>
+    <!-- =================================================================== -->
     <RepresentationProxy class="vtkProgressBarSourceRepresentation"
                          name="ProgressBarSourceRepresentation"
                          processes="client|dataserver|renderserver"
