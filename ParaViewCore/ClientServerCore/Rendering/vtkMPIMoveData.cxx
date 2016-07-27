@@ -27,6 +27,7 @@
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMolecule.h"
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
@@ -255,6 +256,14 @@ int vtkMPIMoveData::RequestDataObject(vtkInformation*,
       return 1;
       }
     outputCopy = vtkUndirectedGraph::New();
+    }
+  else if (this->OutputDataType == VTK_MOLECULE)
+    {
+    if (output && output->IsA("vtkMolecule"))
+      {
+      return 1;
+      }
+    outputCopy = vtkMolecule::New();
     }
   else if (this->OutputDataType == VTK_MULTIBLOCK_DATA_SET)
     {
@@ -539,9 +548,11 @@ int vtkMPIMoveData::RequestData(vtkInformation*,
       // In client-server mode without render server.
       if (this->Server == vtkMPIMoveData::DATA_SERVER)
         {
-        this->DataServerGatherToZero(input, output);
-        this->DataServerSendToClient(output);
-        output->Initialize();
+        vtkDataObject *tmp = input->NewInstance();
+        this->DataServerGatherToZero(input, tmp);
+        this->DataServerSendToClient(tmp);
+        tmp->Delete();
+        tmp = NULL;
         output->ShallowCopy(input);
         return 1;
         }
