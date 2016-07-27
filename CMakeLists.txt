@@ -136,9 +136,6 @@ endif()
 if(NOT VTK_MODULES_DIR)
   set(VTK_MODULES_DIR "${ParaView_BINARY_DIR}/${VTK_INSTALL_PACKAGE_DIR}/Modules")
 endif()
-if(NOT PARAVIEW_WWW_DIR)
-  set(PARAVIEW_WWW_DIR "${ParaView_BINARY_DIR}/www")
-endif()
 set(PARAVIEW_MODULES_DIR ${VTK_MODULES_DIR})
 
 if (NOT DEFINED VTK_CUSTOM_LIBRARY_SUFFIX)
@@ -246,7 +243,7 @@ mark_as_advanced(PARAVIEW_USE_QTWEBKIT)
 
 # This option controls the behavior of the build_help_project function.  If it is
 # on then the .qch file will be generated, if not then the function does nothing.
-cmake_dependent_option(PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION 
+cmake_dependent_option(PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION
        "Build the ParaView help menu documentation for ParaView and its plugins" ON
        "PARAVIEW_BUILD_QT_GUI" ON)
 mark_as_advanced(PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION)
@@ -395,14 +392,6 @@ mark_as_advanced(PARAVIEW_ENABLE_WEB)
 if (PARAVIEW_ENABLE_WEB)
   # Request vtkParaViewWeb module
   list(APPEND vtkParaViewWeb_REQUEST_BY "Option PARAVIEW_ENABLE_WEB")
-endif()
-
-option(PARAVIEW_BUILD_WEB_DOCUMENTATION "Enable/Disable web documentation" OFF)
-mark_as_advanced(PARAVIEW_BUILD_WEB_DOCUMENTATION)
-
-if (PARAVIEW_BUILD_WEB_DOCUMENTATION)
-  # Request vtkParaViewWebDocumentation module.
-  list(APPEND vtkParaViewWebDocumentation_REQUEST_BY "Option PARAVIEW_BUILD_WEB_DOCUMENTATION")
 endif()
 
 option(PARAVIEW_ENABLE_CATALYST "Enable Catalyst CoProcessing modules" ON)
@@ -630,24 +619,6 @@ list (APPEND PARAVIEW_MODULE_ROOTS
              CoProcessing/TestDriver)
 
 add_custom_target(ParaViewDoc)
-
-if (PARAVIEW_ENABLE_WEB)
-  list (APPEND PARAVIEW_MODULE_ROOTS Web)
-
-  set (vtkWeb_WWW_DEST ${PARAVIEW_WWW_DIR})
-
-  if (PARAVIEW_BUILD_WEB_DOCUMENTATION)
-    list (APPEND ParaViewModulesDirs Web/Documentation)
-  endif()
-
-  # Setup install rules for Web Applications
-  install(
-     DIRECTORY "${PARAVIEW_WWW_DIR}"
-     DESTINATION "${VTK_INSTALL_DATA_DIR}"
-     USE_SOURCE_PERMISSIONS
-     COMPONENT Runtime
-  )
-endif()
 
 include(ParaViewModuleTop)
 
