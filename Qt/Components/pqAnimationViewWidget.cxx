@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -241,16 +241,16 @@ public:
       pqSMAdaptor::getEnumerationProperty(pxy->GetProperty("PlayMode")).toString();
 
     int num = 0;
-    
+
     if(mode == "Sequence")
       {
-      num = 
+      num =
         pqSMAdaptor::getElementProperty(
           pxy->GetProperty("NumberOfFrames")).toInt();
       }
     else if(mode == "Snap To TimeSteps")
       {
-      num = this->Scene->getTimeSteps().size(); 
+      num = this->Scene->getTimeSteps().size();
       }
     return num;
     }
@@ -262,7 +262,7 @@ public:
       pqSMAdaptor::getEnumerationProperty(pxy->GetProperty("PlayMode")).toString();
     if(mode == "Snap To TimeSteps")
       {
-      return this->Scene->getTimeSteps(); 
+      return this->Scene->getTimeSteps();
       }
     return QList<double>();
     }
@@ -372,17 +372,17 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent) : QWidget(_parent
   QObject::connect(this->Internal->AnimationWidget,
                    SIGNAL(createTrackClicked()),
                    this, SLOT(createTrack()));
-  
+
   QObject::connect(this->Internal->AnimationWidget->animationModel(),
                    SIGNAL(currentTimeSet(double)),
                    this, SLOT(setCurrentTime(double)));
   QObject::connect(this->Internal->AnimationWidget->animationModel(),
                    SIGNAL(keyFrameTimeChanged(pqAnimationTrack*, pqAnimationKeyFrame*, int, double)),
                    this, SLOT(setKeyFrameTime(pqAnimationTrack*, pqAnimationKeyFrame*, int, double)));
-  
+
   QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
     this, SLOT(setActiveView(pqView*)));
-  
+
   QObject::connect(
     &pqActiveObjects::instance(), SIGNAL(sourceChanged(pqPipelineSource*)),
     this, SLOT(setCurrentSelection(pqPipelineSource*)));
@@ -413,14 +413,14 @@ void pqAnimationViewWidget::setScene(pqAnimationScene* scene)
     {
     this->Internal->Links.removeAllPropertyLinks();
     QObject::disconnect(this->Internal->Scene, 0, this, 0);
-    
+
     pqComboBoxDomain* d0 =
       this->Internal->PlayMode->findChild<pqComboBoxDomain*>("ComboBoxDomain");
     if(d0)
       {
       delete d0;
       }
-    pqSignalAdaptorComboBox* adaptor = 
+    pqSignalAdaptorComboBox* adaptor =
       this->Internal->PlayMode->findChild<pqSignalAdaptorComboBox*>("ComboBoxAdaptor");
     if(adaptor)
       {
@@ -433,22 +433,22 @@ void pqAnimationViewWidget::setScene(pqAnimationScene* scene)
     pqComboBoxDomain* d0 = new pqComboBoxDomain(this->Internal->PlayMode,
       scene->getProxy()->GetProperty("PlayMode"));
     d0->setObjectName("ComboBoxDomain");
-    pqSignalAdaptorComboBox* adaptor = 
+    pqSignalAdaptorComboBox* adaptor =
       new pqSignalAdaptorComboBox(this->Internal->PlayMode);
     adaptor->setObjectName("ComboBoxAdaptor");
     this->Internal->Links.addPropertyLink<TPL>(adaptor, "currentText",
       SIGNAL(currentTextChanged(const QString&)), scene->getProxy(),
       scene->getProxy()->GetProperty("PlayMode"));
-   
-    // connect time 
+
+    // connect time
     this->Internal->Links.addPropertyLink<TPL>(this->Internal->Time, "text",
       SIGNAL(editingFinished()), scene->getProxy(),
       scene->getProxy()->GetProperty("AnimationTime"));
-    // connect start time 
+    // connect start time
     this->Internal->Links.addPropertyLink<TPL>(this->Internal->StartTime, "text",
       SIGNAL(editingFinished()), scene->getProxy(),
       scene->getProxy()->GetProperty("StartTime"));
-    // connect end time 
+    // connect end time
     this->Internal->Links.addPropertyLink<TPL>(this->Internal->EndTime, "text",
       SIGNAL(editingFinished()), scene->getProxy(),
       scene->getProxy()->GetProperty("EndTime"));
@@ -460,7 +460,7 @@ void pqAnimationViewWidget::setScene(pqAnimationScene* scene)
       "checked", SIGNAL(toggled(bool)), scene->getProxy(),
       scene->getProxy()->GetProperty("LockEndTime"));
 
-    QObject::connect(scene, SIGNAL(cuesChanged()), 
+    QObject::connect(scene, SIGNAL(cuesChanged()),
       this, SLOT(onSceneCuesChanged()));
     QObject::connect(scene, SIGNAL(clockTimeRangesChanged()),
             this, SLOT(updateSceneTimeRange()));
@@ -470,11 +470,11 @@ void pqAnimationViewWidget::setScene(pqAnimationScene* scene)
             this, SLOT(updateTicks()));
     QObject::connect(scene, SIGNAL(animationTime(double)),
             this, SLOT(updateSceneTime()));
-    QObject::connect(scene, SIGNAL(playModeChanged()), 
+    QObject::connect(scene, SIGNAL(playModeChanged()),
       this, SLOT(updatePlayMode()));
-    QObject::connect(scene, SIGNAL(playModeChanged()), 
+    QObject::connect(scene, SIGNAL(playModeChanged()),
       this, SLOT(updateTicks()));
-    QObject::connect(scene, SIGNAL(playModeChanged()), 
+    QObject::connect(scene, SIGNAL(playModeChanged()),
       this, SLOT(updateSceneTime()));
     QObject::connect(scene, SIGNAL(timeLabelChanged()),
       this, SLOT(onTimeLabelChanged()));
@@ -499,7 +499,7 @@ void pqAnimationViewWidget::onSceneCuesChanged()
   QSet<pqAnimationCue*> cues = this->Internal->Scene->getCues();
   pqAnimationModel* animModel =
     this->Internal->AnimationWidget->animationModel();
-    
+
   pqInternal::TrackMapType oldCues = this->Internal->TrackMap;
   pqInternal::TrackMapType::iterator iter;
 
@@ -555,7 +555,7 @@ void pqAnimationViewWidget::onSceneCuesChanged()
     }
 
 }
-  
+
 //-----------------------------------------------------------------------------
 void pqAnimationViewWidget::keyFramesChanged(QObject* cueObject)
 {
@@ -577,7 +577,7 @@ void pqAnimationViewWidget::keyFramesChanged(QObject* cueObject)
     QIcon icon;
     QVariant startValue;
     QVariant endValue;
-      
+
     double startTime =
       pqSMAdaptor::getElementProperty(keyFrames[j]->GetProperty("KeyTime")).toDouble();
     double endTime =
@@ -594,7 +594,7 @@ void pqAnimationViewWidget::keyFramesChanged(QObject* cueObject)
       QString iconstr =
         QString(":pqWidgets/Icons/pq%1%2.png").arg(interpolation.toString()).arg(16);
       icon = QIcon(iconstr);
-      
+
       startValue =
         pqSMAdaptor::getElementProperty(keyFrames[j]->GetProperty("KeyValues"));
       endValue =
@@ -638,10 +638,10 @@ void pqAnimationViewWidget::setCurrentTime(double t)
     this->Internal->Scene->getProxy(), "AnimationTime").Set(t);
   this->Internal->Scene->getProxy()->UpdateVTKObjects();
 }
-  
+
 //-----------------------------------------------------------------------------
-void pqAnimationViewWidget::setKeyFrameTime(pqAnimationTrack* track, 
-                                            pqAnimationKeyFrame* kf, 
+void pqAnimationViewWidget::setKeyFrameTime(pqAnimationTrack* track,
+                                            pqAnimationKeyFrame* kf,
                                             int edge, double time)
 {
   pqAnimationCue* cue = this->Internal->findCue(track);
@@ -667,7 +667,7 @@ void pqAnimationViewWidget::setKeyFrameTime(pqAnimationTrack* track,
     {
     QPair<double, double> timeRange = this->Internal->Scene->getClockTimeRange();
     double normTime = (time - timeRange.first) / (timeRange.second - timeRange.first);
-    pqSMAdaptor::setElementProperty(keyFrames[i]->GetProperty("KeyTime"), 
+    pqSMAdaptor::setElementProperty(keyFrames[i]->GetProperty("KeyTime"),
                                     normTime);
     keyFrames[i]->UpdateVTKObjects();
     }
@@ -690,7 +690,7 @@ void pqAnimationViewWidget::trackSelected(pqAnimationTrack* track)
 
   if(track->property().toString().startsWith("TimeKeeper"))
     {
-    this->Internal->Editor = 
+    this->Internal->Editor =
       new pqPipelineTimeKeyFrameEditor(this->Internal->Scene, cue, NULL);
     this->Internal->Editor->resize(600, 400);
     }
@@ -772,7 +772,7 @@ void pqAnimationViewWidget::trackSelected(pqAnimationTrack* track)
 
   this->Internal->Editor->show();
 }
-  
+
 //-----------------------------------------------------------------------------
 void pqAnimationViewWidget::updatePlayMode()
 {
@@ -784,18 +784,28 @@ void pqAnimationViewWidget::updatePlayMode()
 
   QString mode = pqSMAdaptor::getEnumerationProperty(
     pxy->GetProperty("PlayMode")).toString();
-    
+
   this->Internal->DurationLink.removeAllPropertyLinks();
 
   if(mode == "Real Time")
     {
     animModel->setMode(pqAnimationModel::Real);
+
+    this->Internal->Duration->setVisible(true);
+    this->Internal->DurationLabel->setVisible(true);
+    this->Internal->StartTime->setVisible(true);
+    this->Internal->StartTimeLabel->setVisible(true);
+    this->Internal->EndTime->setVisible(true);
+    this->Internal->EndTimeLabel->setVisible(true);
+    this->Internal->LockStartTime->setVisible(true);
+    this->Internal->LockEndTime->setVisible(true);
+
     this->Internal->StartTime->setEnabled(true);
     this->Internal->EndTime->setEnabled(true);
     this->Internal->Time->setEnabled(true);
     this->Internal->Duration->setEnabled(true);
     this->Internal->DurationLabel->setEnabled(true);
-    this->Internal->DurationLabel->setText("Duration:");
+    this->Internal->DurationLabel->setText("Duration (s):");
     this->Internal->DurationLink.addPropertyLink<TPL>(
       this->Internal->Duration, "text",
       SIGNAL(editingFinished()), this->Internal->Scene->getProxy(),
@@ -804,6 +814,16 @@ void pqAnimationViewWidget::updatePlayMode()
   else if(mode == "Sequence")
     {
     animModel->setMode(pqAnimationModel::Sequence);
+
+    this->Internal->Duration->setVisible(true);
+    this->Internal->DurationLabel->setVisible(true);
+    this->Internal->StartTime->setVisible(true);
+    this->Internal->StartTimeLabel->setVisible(true);
+    this->Internal->EndTime->setVisible(true);
+    this->Internal->EndTimeLabel->setVisible(true);
+    this->Internal->LockStartTime->setVisible(true);
+    this->Internal->LockEndTime->setVisible(true);
+
     this->Internal->StartTime->setEnabled(true);
     this->Internal->EndTime->setEnabled(true);
     this->Internal->Time->setEnabled(true);
@@ -818,6 +838,16 @@ void pqAnimationViewWidget::updatePlayMode()
   else if(mode == "Snap To TimeSteps")
     {
     animModel->setMode(pqAnimationModel::Custom);
+
+    this->Internal->Duration->setVisible(false);
+    this->Internal->DurationLabel->setVisible(false);
+    this->Internal->StartTime->setVisible(false);
+    this->Internal->StartTimeLabel->setVisible(false);
+    this->Internal->EndTime->setVisible(false);
+    this->Internal->EndTimeLabel->setVisible(false);
+    this->Internal->LockStartTime->setVisible(false);
+    this->Internal->LockEndTime->setVisible(false);
+
     this->Internal->Duration->setEnabled(false);
     this->Internal->DurationLabel->setEnabled(false);
     this->Internal->StartTime->setEnabled(false);
@@ -830,7 +860,7 @@ void pqAnimationViewWidget::updatePlayMode()
     }
 
 }
-  
+
 //-----------------------------------------------------------------------------
 void pqAnimationViewWidget::updateTicks()
 {
@@ -972,7 +1002,7 @@ void pqAnimationViewWidget::createTrack()
       return;
       }
     }
-  
+
   pqOrbitCreatorDialog creator(this);
 
   // if mode=="orbit" show up a dialog allowing the user to customize the
