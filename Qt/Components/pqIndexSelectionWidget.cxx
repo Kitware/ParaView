@@ -87,9 +87,6 @@ struct Widgets
   void setCurrentEdit(int current);
   void setSize(int size);
 
-  int current();
-  int size();
-
   QHBoxLayout *layout;
   QLabel *label;
   QSlider *slider;
@@ -176,18 +173,6 @@ void Widgets::setSize(int sz)
   bool oldBlock = this->slider->blockSignals(true);
   this->slider->setRange(0, sz - 1);
   this->slider->blockSignals(oldBlock);
-}
-
-//------------------------------------------------------------------------------
-int Widgets::current()
-{
-  return this->slider->value();
-}
-
-//------------------------------------------------------------------------------
-int Widgets::size()
-{
-  return this->slider->maximum() + 1;
 }
 
 } // end anon namespace
