@@ -4038,6 +4038,7 @@ array.
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
+          <DataType value="vtkGraph" />
         </DataTypeDomain>
         <Documentation>This property specifies the input to the Outline
         filter.</Documentation>
