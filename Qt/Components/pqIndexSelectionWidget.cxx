@@ -186,6 +186,16 @@ public:
   {
   }
 
+  ~pqInternals()
+  {
+    typedef WidgetMap::const_iterator Iter;
+    const WidgetMap &map = this->widgetMap;
+    for (Iter it = map.begin(), itEnd = map.end(); it != itEnd; ++it)
+      {
+      delete it.value();
+      }
+  }
+
   // If obj is an input widget tied to a particular dimension, return the
   // Widgets instance for that dimension. Handy for determining which dimension
   // triggered a slot execution with QObject::sender().
