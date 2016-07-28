@@ -99,6 +99,12 @@ public:
   vtkSetStringMacro(PythonPath);
   vtkGetStringMacro(PythonPath);
 
+  // Description:
+  // Set the number of input ports
+  // This function is explicitly exposed to enable a vtkClientServerInterpreter to call it
+  void SetNumberOfInputPorts(int numberOfInputPorts)
+    { this->Superclass::SetNumberOfInputPorts(numberOfInputPorts); }
+
 protected:
   vtkPythonProgrammableFilter();
   ~vtkPythonProgrammableFilter();
