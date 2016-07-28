@@ -26,6 +26,11 @@ set(PLUGIN_NAME PointSprite_Plugin)
 
 IF(PARAVIEW_BUILD_QT_GUI)
 
+  find_package_qt(qt_targets REQUIRED QUIET
+    QT4_COMPONENTS QtGui
+    QT5_COMPONENTS Widgets)
+
+
   set(UI_FORMS
     Resources/pqPointSpriteControls.ui
     Resources/pqTransferFunctionDialog.ui

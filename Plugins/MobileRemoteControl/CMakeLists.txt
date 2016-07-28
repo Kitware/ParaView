@@ -4,8 +4,14 @@ if(PARAVIEW_BUILD_QT_GUI)
   set(srcs
     pqRemoteControl.cxx
     pqRemoteControlThread.cxx)
-  QT_WRAP_CPP(MOC_SRCS pqRemoteControl.h pqRemoteControlThread.h)
-  QT_WRAP_UI(UI_SRCS pqRemoteControl.ui)
+
+  find_package_qt(qt_targets REQUIRED QUIET
+    QT4_COMPONENTS QtGui QtNetwork
+    QT5_COMPONENTS Widgets Network)
+
+  qt_wrap_cpp(MOC_SRCS pqRemoteControl.h pqRemoteControlThread.h)
+  qt_wrap_ui(UI_SRCS pqRemoteControl.ui)
+
   ADD_PARAVIEW_DOCK_WINDOW(
     OUTIFACES
     OUTSRCS
@@ -19,5 +25,6 @@ if(PARAVIEW_BUILD_QT_GUI)
                         LINK_PRIVATE
                           pqApplicationComponents
                           vtkPVClientServerCoreRendering
-                          vtkPVServerManagerRendering)
+                          vtkPVServerManagerRendering
+                          ${qt_targets})
 endif()
