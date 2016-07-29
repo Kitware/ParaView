@@ -42,6 +42,9 @@ public:
   vtkGetMacro(MoleculeRenderMode, int)
   void SetMoleculeRenderMode(int mode);
 
+  vtkGetMacro(UseCustomRadii, bool)
+  void SetUseCustomRadii(bool val);
+
   void MarkModified();
 
 protected:
@@ -55,6 +58,8 @@ protected:
 
   bool IsCached(double cache_key);
 
+  void SyncMapper();
+
   vtkActor *Actor;
   vtkMoleculeMapper *Mapper;
 
@@ -62,6 +67,8 @@ protected:
   vtkNew<vtkMolecule> DummyMolecule;
 
   int MoleculeRenderMode;
+  bool UseCustomRadii;
+
   double DataBounds[6];
 
 private:

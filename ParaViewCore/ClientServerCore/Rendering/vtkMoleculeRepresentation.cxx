@@ -32,6 +32,8 @@ vtkStandardNewMacro(vtkMoleculeRepresentation)
 
 //------------------------------------------------------------------------------
 vtkMoleculeRepresentation::vtkMoleculeRepresentation()
+  : MoleculeRenderMode(0),
+    UseCustomRadii(false)
 {
   // setup mapper
   this->Mapper = vtkMoleculeMapper::New();
@@ -63,17 +65,22 @@ void vtkMoleculeRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 //------------------------------------------------------------------------------
 void vtkMoleculeRepresentation::SetMoleculeRenderMode(int mode)
 {
-  if(mode == 0)
+  if (mode != this->MoleculeRenderMode)
     {
-    this->Mapper->UseBallAndStickSettings();
+    this->MoleculeRenderMode = mode;
+    this->SyncMapper();
+    this->Modified();
     }
-  else if(mode == 1)
+}
+
+//------------------------------------------------------------------------------
+void vtkMoleculeRepresentation::SetUseCustomRadii(bool val)
+{
+  if (val != this->UseCustomRadii)
     {
-    this->Mapper->UseVDWSpheresSettings();
-    }
-  else if(mode == 2)
-    {
-    this->Mapper->UseLiquoriceStickSettings();
+    this->UseCustomRadii = val;
+    this->SyncMapper();
+    this->Modified();
     }
 }
 
@@ -190,4 +197,35 @@ bool vtkMoleculeRepresentation::RemoveFromView(vtkView *view)
 bool vtkMoleculeRepresentation::IsCached(double cache_key)
 {
   return this->CacheKeeper->IsCached(cache_key);
+}
+
+//------------------------------------------------------------------------------
+void vtkMoleculeRepresentation::SyncMapper()
+{
+  switch (this->MoleculeRenderMode)
+    {
+    case 0:
+      this->Mapper->UseBallAndStickSettings();
+      break;
+
+    case 1:
+      this->Mapper->UseVDWSpheresSettings();
+      break;
+
+    case 2:
+      this->Mapper->UseLiquoriceStickSettings();
+      break;
+
+    default:
+      vtkWarningMacro("Unknown MoleculeRenderMode: "
+                      << this->MoleculeRenderMode);
+      break;
+    }
+
+  // Changing the render mode can clobber the custom array setting. Set it
+  // back to what the user requested:
+  if (this->UseCustomRadii)
+    {
+    this->Mapper->SetAtomicRadiusType(vtkMoleculeMapper::CustomArrayRadius);
+    }
 }

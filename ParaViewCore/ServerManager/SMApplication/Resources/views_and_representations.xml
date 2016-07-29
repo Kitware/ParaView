@@ -5174,6 +5174,14 @@
                  value="2" />
         </EnumerationDomain>
       </IntVectorProperty>
+      <IntVectorProperty command="SetUseCustomRadii"
+                         default_values="0"
+                         name="Use 'radii' Array For Atomic Radii"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If true, the 'radii' array in the input VertexData will
+        be used to determine the atomic radii.</Documentation>
+      </IntVectorProperty>
       <!-- End of MoleculeRepresentation -->
     </RepresentationProxy>
     <!-- =================================================================== -->
