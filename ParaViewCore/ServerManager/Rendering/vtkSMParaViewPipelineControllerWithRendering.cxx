@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 
+#include "vtkCollection.h"
 #include "vtkErrorCode.h"
 #include "vtkImageData.h"
 #include "vtkNew.h"
@@ -448,6 +449,30 @@ void vtkSMParaViewPipelineControllerWithRendering::Hide(
     if (vtkSMParaViewPipelineControllerWithRendering::HideScalarBarOnHide)
       {
       vtkSMPVRepresentationProxy::HideScalarBarIfNotNeeded(repr, view);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMParaViewPipelineControllerWithRendering::HideAll(vtkSMViewProxy* view)
+{
+  if (view == NULL)
+    {
+    return;
+    }
+
+  SM_SCOPED_TRACE(CallFunction)
+    .arg("HideAll")
+    .arg(view);
+
+  vtkSMPropertyHelper helper(view, "Representations");
+  for (unsigned int i = 0; i < helper.GetNumberOfElements(); i++)
+    {
+    vtkSMProxy* repr = helper.GetAsProxy(i);
+    vtkSMProperty* input = repr->GetProperty("Input");
+    if (input)
+      {
+      this->Hide(repr, view);
       }
     }
 }

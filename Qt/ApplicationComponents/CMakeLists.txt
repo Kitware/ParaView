@@ -158,6 +158,8 @@ set (Module_SRCS
   pqHandlePropertyWidget.h
   pqHelpReaction.cxx
   pqHelpReaction.h
+  pqHideAllReaction.cxx
+  pqHideAllReaction.h
   pqIgnoreSourceTimeReaction.cxx
   pqIgnoreSourceTimeReaction.h
   pqImageCompressorWidget.cxx
@@ -387,6 +389,7 @@ set (Module_MOC_HDRS
   pqGlyphScaleFactorPropertyWidget.h
   pqHandlePropertyWidget.h
   pqHelpReaction.h
+  pqHideAllReaction.h
   pqIgnoreSourceTimeReaction.h
   pqImageCompressorWidget.h
   pqImplicitPlanePropertyWidget.h
