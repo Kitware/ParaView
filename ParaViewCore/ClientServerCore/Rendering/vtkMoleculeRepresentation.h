@@ -62,6 +62,7 @@ protected:
   vtkNew<vtkMolecule> DummyMolecule;
 
   int MoleculeRenderMode;
+  double DataBounds[6];
 
 private:
   vtkMoleculeRepresentation(const vtkMoleculeRepresentation&) VTK_DELETE_FUNCTION;

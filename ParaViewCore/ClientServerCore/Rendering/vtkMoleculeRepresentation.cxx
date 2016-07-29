@@ -17,6 +17,7 @@
 
 #include "vtkView.h"
 #include "vtkActor.h"
+#include "vtkMath.h"
 #include "vtkMolecule.h"
 #include "vtkRenderer.h"
 #include "vtkPVCacheKeeper.h"
@@ -40,6 +41,8 @@ vtkMoleculeRepresentation::vtkMoleculeRepresentation()
 
   // initialize cache:
   this->CacheKeeper->SetInputData(this->DummyMolecule.Get());
+
+  vtkMath::UninitializeBounds(this->DataBounds);
 }
 
 vtkMoleculeRepresentation::~vtkMoleculeRepresentation()
@@ -90,6 +93,8 @@ int vtkMoleculeRepresentation::ProcessViewRequest(
 
   if (request_type == vtkPVView::REQUEST_UPDATE())
     {
+    vtkPVRenderView::SetGeometryBounds(inInfo, this->DataBounds,
+                                       this->Actor->GetMatrix());
     vtkPVRenderView::SetPiece(inInfo, this, this->CacheKeeper->GetOutput());
     vtkPVRenderView::SetDeliverToClientAndRenderingProcesses(inInfo, this,
                                                              true, false);
@@ -128,6 +133,7 @@ int vtkMoleculeRepresentation::RequestData(vtkInformation *request,
                                            vtkInformationVector **inputVector,
                                            vtkInformationVector *outputVector)
 {
+  vtkMath::UninitializeBounds(this->DataBounds);
   this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
   this->CacheKeeper->SetCacheTime(this->GetCacheKey());
 
@@ -137,6 +143,7 @@ int vtkMoleculeRepresentation::RequestData(vtkInformation *request,
     vtkMolecule* input =
       vtkMolecule::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
     this->DummyMolecule->ShallowCopy(input);
+    this->DummyMolecule->GetBounds(this->DataBounds);
     }
 
   this->DummyMolecule->Modified();
