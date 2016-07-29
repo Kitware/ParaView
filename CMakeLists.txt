@@ -620,6 +620,10 @@ list (APPEND PARAVIEW_MODULE_ROOTS
 
 add_custom_target(ParaViewDoc)
 
+if (PARAVIEW_ENABLE_WEB)
+  list (APPEND PARAVIEW_MODULE_ROOTS Web)
+endif()
+
 include(ParaViewModuleTop)
 
 #----------------------------------------------------------------------------------
