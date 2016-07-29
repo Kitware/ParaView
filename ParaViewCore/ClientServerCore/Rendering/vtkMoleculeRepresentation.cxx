@@ -15,20 +15,22 @@
 
 #include "vtkMoleculeRepresentation.h"
 
-#include "vtkView.h"
 #include "vtkActor.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 #include "vtkMath.h"
 #include "vtkMolecule.h"
-#include "vtkRenderer.h"
+#include "vtkMoleculeMapper.h"
+#include "vtkObjectFactory.h"
 #include "vtkPVCacheKeeper.h"
 #include "vtkPVRenderView.h"
-#include "vtkInformation.h"
-#include "vtkObjectFactory.h"
-#include "vtkMoleculeMapper.h"
-#include "vtkInformationVector.h"
+#include "vtkRenderer.h"
+#include "vtkView.h"
 
+//------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkMoleculeRepresentation)
 
+//------------------------------------------------------------------------------
 vtkMoleculeRepresentation::vtkMoleculeRepresentation()
 {
   // setup mapper
@@ -45,17 +47,20 @@ vtkMoleculeRepresentation::vtkMoleculeRepresentation()
   vtkMath::UninitializeBounds(this->DataBounds);
 }
 
+//------------------------------------------------------------------------------
 vtkMoleculeRepresentation::~vtkMoleculeRepresentation()
 {
   this->Actor->Delete();
   this->Mapper->Delete();
 }
 
+//------------------------------------------------------------------------------
 void vtkMoleculeRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
 
+//------------------------------------------------------------------------------
 void vtkMoleculeRepresentation::SetMoleculeRenderMode(int mode)
 {
   if(mode == 0)
@@ -72,6 +77,7 @@ void vtkMoleculeRepresentation::SetMoleculeRenderMode(int mode)
     }
 }
 
+//------------------------------------------------------------------------------
 void vtkMoleculeRepresentation::MarkModified()
 {
   if (!this->GetUseCache())
@@ -82,6 +88,7 @@ void vtkMoleculeRepresentation::MarkModified()
   this->Superclass::MarkModified();
 }
 
+//------------------------------------------------------------------------------
 int vtkMoleculeRepresentation::ProcessViewRequest(
     vtkInformationRequestKey *request_type, vtkInformation *inInfo,
     vtkInformation *outInfo)
@@ -110,12 +117,14 @@ int vtkMoleculeRepresentation::ProcessViewRequest(
   return 1;
 }
 
+//------------------------------------------------------------------------------
 void vtkMoleculeRepresentation::SetVisibility(bool value)
 {
   this->Superclass::SetVisibility(value);
   this->Actor->SetVisibility(value);
 }
 
+//------------------------------------------------------------------------------
 int vtkMoleculeRepresentation::FillInputPortInformation(int vtkNotUsed(port),
                                                         vtkInformation* info)
 {
@@ -129,6 +138,7 @@ int vtkMoleculeRepresentation::FillInputPortInformation(int vtkNotUsed(port),
   return 1;
 }
 
+//------------------------------------------------------------------------------
 int vtkMoleculeRepresentation::RequestData(vtkInformation *request,
                                            vtkInformationVector **inputVector,
                                            vtkInformationVector *outputVector)
@@ -152,6 +162,7 @@ int vtkMoleculeRepresentation::RequestData(vtkInformation *request,
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }
 
+//------------------------------------------------------------------------------
 bool vtkMoleculeRepresentation::AddToView(vtkView *view)
 {
   vtkPVRenderView* rview = vtkPVRenderView::SafeDownCast(view);
@@ -163,6 +174,7 @@ bool vtkMoleculeRepresentation::AddToView(vtkView *view)
   return false;
 }
 
+//------------------------------------------------------------------------------
 bool vtkMoleculeRepresentation::RemoveFromView(vtkView *view)
 {
   vtkPVRenderView* rview = vtkPVRenderView::SafeDownCast(view);
@@ -174,6 +186,7 @@ bool vtkMoleculeRepresentation::RemoveFromView(vtkView *view)
   return false;
 }
 
+//------------------------------------------------------------------------------
 bool vtkMoleculeRepresentation::IsCached(double cache_key)
 {
   return this->CacheKeeper->IsCached(cache_key);
