@@ -33,10 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqResetScalarRangeReaction_h
 
 #include "pqReaction.h"
+#include "vtkSmartPointer.h"
+
 #include <QPointer>
 
 class pqPipelineRepresentation;
 class pqDataRepresentation;
+class pqServer;
+class vtkEventQtSlotConnect;
 
 /// @ingroup Reactions
 /// Reaction to reset the active lookup table's range to match the active
@@ -58,6 +62,7 @@ public:
   /// if \c track_active_objects is false, then the reaction will not track
   /// pqActiveObjects automatically.
   pqResetScalarRangeReaction(QAction* parent, bool track_active_objects=true , Modes mode=DATA);
+  ~pqResetScalarRangeReaction();
 
 
   /// @deprecated Use resetScalarRangeToData().
@@ -85,10 +90,15 @@ protected:
   /// Called when the action is triggered.
   virtual void onTriggered();
 
+protected slots:
+  virtual void onServerAdded(pqServer* server);  
+  virtual void onAboutToRemoveServer(pqServer* server);  
+
 private:
   Q_DISABLE_COPY(pqResetScalarRangeReaction)
   QPointer<pqPipelineRepresentation> Representation;
   Modes Mode;
+  vtkSmartPointer<vtkEventQtSlotConnect> Connection;
 };
 
 #endif
