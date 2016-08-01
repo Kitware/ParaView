@@ -87,9 +87,6 @@ struct Widgets
   void setCurrentEdit(int current);
   void setSize(int size);
 
-  int current();
-  int size();
-
   QHBoxLayout *layout;
   QLabel *label;
   QSlider *slider;
@@ -178,18 +175,6 @@ void Widgets::setSize(int sz)
   this->slider->blockSignals(oldBlock);
 }
 
-//------------------------------------------------------------------------------
-int Widgets::current()
-{
-  return this->slider->value();
-}
-
-//------------------------------------------------------------------------------
-int Widgets::size()
-{
-  return this->slider->maximum() + 1;
-}
-
 } // end anon namespace
 
 class pqIndexSelectionWidget::pqInternals
@@ -199,6 +184,16 @@ public:
 
   pqInternals()
   {
+  }
+
+  ~pqInternals()
+  {
+    typedef WidgetMap::const_iterator Iter;
+    const WidgetMap &map = this->widgetMap;
+    for (Iter it = map.begin(), itEnd = map.end(); it != itEnd; ++it)
+      {
+      delete it.value();
+      }
   }
 
   // If obj is an input widget tied to a particular dimension, return the
