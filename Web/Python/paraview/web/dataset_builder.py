@@ -202,8 +202,9 @@ class DataProberDataSetBuilder(DataSetBuilder):
                 print 'Compress', root
                 for name in files:
                     if '.array' in name and '.gz' not in name:
-                        with open(os.path.join(root, name), 'rb') as f_in, gzip.open(os.path.join(root, name + '.gz'), 'wb') as f_out:
-                            shutil.copyfileobj(f_in, f_out)
+                        with open(os.path.join(root, name), 'rb') as f_in:
+                            with gzip.open(os.path.join(root, name + '.gz'), 'wb') as f_out:
+                                shutil.copyfileobj(f_in, f_out)
                         os.remove(os.path.join(root, name))
 
 
@@ -322,8 +323,9 @@ class LayerDataSetBuilder(DataSetBuilder):
                 print 'Compress', root
                 for name in files:
                     if '.array' in name and '.gz' not in name:
-                        with open(os.path.join(root, name), 'rb') as f_in, gzip.open(os.path.join(root, name + '.gz'), 'wb') as f_out:
-                            shutil.copyfileobj(f_in, f_out)
+                        with open(os.path.join(root, name), 'rb') as f_in:
+                            with gzip.open(os.path.join(root, name + '.gz'), 'wb') as f_out:
+                                shutil.copyfileobj(f_in, f_out)
                         os.remove(os.path.join(root, name))
 
 
@@ -478,8 +480,9 @@ class CompositeDataSetBuilder(DataSetBuilder):
                 print 'Compress', root
                 for name in files:
                     if ('.float32' in name or '.uint8' in name) and '.gz' not in name:
-                        with open(os.path.join(root, name), 'rb') as f_in, gzip.open(os.path.join(root, name + '.gz'), 'wb') as f_out:
-                            shutil.copyfileobj(f_in, f_out)
+                        with open(os.path.join(root, name), 'rb') as f_in:
+                            with gzip.open(os.path.join(root, name + '.gz'), 'wb') as f_out:
+                                shutil.copyfileobj(f_in, f_out)
                         os.remove(os.path.join(root, name))
 
     def writeData(self):
@@ -832,6 +835,7 @@ class GeometryDataSetBuilder(DataSetBuilder):
                     print 'Compress', root
                     for name in files:
                         if 'Array' in name and '.gz' not in name:
-                            with open(os.path.join(root, name), 'rb') as f_in, gzip.open(os.path.join(root, name + '.gz'), 'wb') as f_out:
-                                shutil.copyfileobj(f_in, f_out)
+                            with open(os.path.join(root, name), 'rb') as f_in:
+                                with gzip.open(os.path.join(root, name + '.gz'), 'wb') as f_out:
+                                    shutil.copyfileobj(f_in, f_out)
                             os.remove(os.path.join(root, name))
