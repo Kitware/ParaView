@@ -1348,6 +1348,32 @@ vtkFloatArray* vtkSMRenderViewProxy::CaptureDepthBuffer()
 }
 
 //----------------------------------------------------------------------------
+vtkFloatArray* vtkSMRenderViewProxy::GetValuesFloat()
+{
+  this->InvokeCommand("CaptureValuesFloat");
+  vtkPVRenderView* view =
+    vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
+  vtkFloatArray* capture = view->GetCapturedValuesFloat();
+  return capture;
+}
+
+//------------------------------------------------------------------------------
+int vtkSMRenderViewProxy::GetValueRenderingMode()
+{
+  vtkPVRenderView* view =
+    vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
+  return view->GetValueRenderingMode();
+}
+
+//------------------------------------------------------------------------------
+void vtkSMRenderViewProxy::SetValueRenderingMode(int mode)
+{
+  vtkPVRenderView* view =
+    vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
+  view->SetValueRenderingMode(mode);
+}
+
+//----------------------------------------------------------------------------
 double vtkSMRenderViewProxy::GetZBufferValue(int x, int y)
 {
   this->Session->Activate();

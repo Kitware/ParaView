@@ -648,6 +648,21 @@ public:
   void StopCaptureValues();
 
   // Description:
+  // Current rendering mode of vtkValuePass (float or invertible RGB).
+  void SetValueRenderingMode(int mode);
+  int GetValueRenderingMode();
+
+  // Description:
+  // Access to vtkValuePass::FLOATING_POINT mode rendered image. vtkValuePass's
+  // internal FBO is accessed directly when rendering locally. When rendering in 
+  // parallel, IceT composites the intermediate results from vtkValuePass and the
+  // final result is accessed through vtkIceTCompositePass. Float value rendering
+  // is only supported in BATCH mode and in CLIENT mode (local rendering). These methods
+  // do nothing if INVERTIBLE_LUT mode is active.
+  void CaptureValuesFloat();
+  vtkFloatArray* GetCapturedValuesFloat();
+
+  // Description:
   // Tells views that it should draw the lighting contributions to the
   // framebuffer.
   void StartCaptureLuminance();

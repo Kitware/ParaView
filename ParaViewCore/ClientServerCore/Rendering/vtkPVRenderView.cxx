@@ -278,6 +278,26 @@ private:
   bool RenderOnLocalProcess;
   };
   vtkStandardNewMacro(vtkPVRendererCuller);
+
+#if defined(VTKGL2) && defined(PARAVIEW_USE_ICE_T)
+//------------------------------------------------------------------------------
+  // vtkIceTCompositePass needs to know the set RenderPass will read from its
+  // internal float FBO in order to setup an adequate context.
+  void IceTPassEnableFloatPass(bool enable, vtkPVSynchronizedRenderer* sr)
+  {
+    vtkIceTSynchronizedRenderers *iceTRen =
+      vtkIceTSynchronizedRenderers::SafeDownCast(sr->GetParallelSynchronizer());
+
+    if (iceTRen)
+      {
+      vtkIceTCompositePass* iceTPass = iceTRen->GetIceTCompositePass();
+      if (iceTPass)
+        {
+        iceTPass->SetEnableFloatValuePass(enable);
+        }
+      }
+  };
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -538,7 +558,7 @@ vtkPVRenderView::~vtkPVRenderView()
     }
 
   this->Internals->SavedRenderPass = NULL;
-  
+
   delete this->Internals;
   this->Internals = NULL;
 }
@@ -2658,6 +2678,72 @@ void vtkPVRenderView::SetArrayNumberToDraw(int fieldAttributeType)
 }
 
 // ----------------------------------------------------------------------------
+void vtkPVRenderView::SetValueRenderingMode(int mode)
+{
+#ifdef VTKGL2
+  // Fixes issue with the background (black) when comming back from FLOATING_POINT
+  // mode. FLOATING_POINT mode is only supported in BATCH mode and single process
+  // CLIENT.
+  if (this->GetUseDistributedRenderingForStillRender() &&
+    vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_CLIENT)
+    {
+    vtkWarningMacro("vtkValuePass::FLOATING_POINT mode is only supported in BATCH"
+      " mode. The result is only available in the root node.");
+    return;
+    }
+
+  // Rendering mode can only be changed while capturing. TODO while in client mode?
+  if (!this->Internals->IsInCapture)
+    {
+    return;
+    }
+
+  switch(mode)
+    {
+    case vtkValuePass::FLOATING_POINT:
+      {
+  #ifdef PARAVIEW_USE_ICE_T
+      IceTPassEnableFloatPass(true, this->SynchronizedRenderers);
+      this->Internals->ValuePasses->SetRenderingMode(mode);
+  #else
+      vtkWarningMacro("vtkValuePass::FLOATING_POINT mode is only supported in IceT"
+        " enabled builds. Falling back to INVERTIBLE_LUT.");
+
+      this->Internals->ValuePasses->SetRenderingMode(vtkValuePass::INVERTIBLE_LUT);
+  #endif
+      }
+      break;
+
+    case vtkValuePass::INVERTIBLE_LUT:
+    default:
+      {
+  #ifdef PARAVIEW_USE_ICE_T
+      IceTPassEnableFloatPass(false, this->SynchronizedRenderers);
+  #endif
+      this->Internals->ValuePasses->SetRenderingMode(mode);
+      }
+      break;
+    }
+
+    this->Modified();
+#endif
+}
+
+//-----------------------------------------------------------------------------
+int vtkPVRenderView::GetValueRenderingMode()
+{
+#ifdef VTKGL2
+  #ifdef PARAVIEW_USE_ICE_T
+  return this->Internals->ValuePasses->GetRenderingMode();
+  #else
+  return vtkValuePass::INVERTIBLE_LUT;
+  #endif
+#else
+  return 1; // vtkValuePass::INVERTIBLE_LUT
+#endif
+}
+
+// ----------------------------------------------------------------------------
 void vtkPVRenderView::SetArrayComponentToDraw(int comp)
 {
   if (this->Internals->Component != comp)
@@ -2686,6 +2772,14 @@ void vtkPVRenderView::StartCaptureValues()
 {
   if (!this->Internals->IsInCapture)
     {
+#if defined(VTKGL2) && defined(PARAVIEW_USE_ICE_T)
+   if (vtkValuePass::FLOATING_POINT == this->Internals->ValuePasses->GetRenderingMode())
+    {
+    // Let the IceTPass know FLOATING_POINT is already enabled.
+    IceTPassEnableFloatPass(true, this->SynchronizedRenderers);
+    }
+#endif
+
     this->Internals->SavedRenderPass = this->SynchronizedRenderers->GetRenderPass();
     this->Internals->SavedOrientationState = (this->OrientationWidget->GetEnabled() != 0);
     this->Internals->SavedAnnotationState = this->ShowAnnotation;
@@ -2711,6 +2805,14 @@ void vtkPVRenderView::StartCaptureValues()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::StopCaptureValues()
 {
+#if defined(VTKGL2) && defined(PARAVIEW_USE_ICE_T)
+   if (vtkValuePass::FLOATING_POINT == this->Internals->ValuePasses->GetRenderingMode())
+    {
+    // Let the IceTPass know vtkValuePass will be removed.
+    IceTPassEnableFloatPass(false, this->SynchronizedRenderers);
+    }
+#endif
+
   this->Internals->IsInCapture = false;
   this->SynchronizedRenderers->SetRenderPass(this->Internals->SavedRenderPass);
   this->Internals->SavedRenderPass = NULL;
@@ -2781,6 +2883,65 @@ void vtkPVRenderView::CaptureZBuffer()
 vtkFloatArray * vtkPVRenderView::GetCapturedZBuffer()
 {
   return this->Internals->ArrayHolder.GetPointer();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::CaptureValuesFloat()
+{
+#ifdef VTKGL2
+  #ifdef PARAVIEW_USE_ICE_T
+  vtkIceTSynchronizedRenderers *IceTSynchronizedRenderers =
+    vtkIceTSynchronizedRenderers::SafeDownCast(
+    this->SynchronizedRenderers->GetParallelSynchronizer());
+
+  vtkFloatArray* values = NULL;
+  if (IceTSynchronizedRenderers)
+    {
+    vtkIceTCompositePass* iceTPass = IceTSynchronizedRenderers->GetIceTCompositePass();
+    if (iceTPass && iceTPass->GetLastRenderedRGBA32F())
+      {
+      values = iceTPass->GetLastRenderedRGBA32F();
+      }
+    }
+  else
+    {
+    if (this->GetUseDistributedRenderingForStillRender() &&
+      vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_CLIENT)
+      {
+      vtkWarningMacro("vtkValuePass::FLOATING_POINT result is only available in the root"
+        " node.");
+      return;
+      }
+
+    // Non-distributed case
+    values = this->Internals->ValuePasses->GetFloatImageDataArray(
+      this->RenderView->GetRenderer());
+    }
+
+  if (values)
+    {
+    // IceT requires the image format to be RGBA (R32F not supported). Component 0 is
+    // enough from here on so a single component is exposed (components 1-3 hold the same
+    // data).
+    this->Internals->ArrayHolder->SetNumberOfComponents(1);
+    this->Internals->ArrayHolder->SetNumberOfTuples(values->GetNumberOfTuples());
+    this->Internals->ArrayHolder->CopyComponent(0, values, 0);
+    }
+  #else
+  vtkErrorMacro("vtkValuePass::FLOATING_POINT mode is only supported in IceT enabled"
+    " builds.");
+  #endif
+#endif
+}
+
+//-----------------------------------------------------------------------------
+vtkFloatArray* vtkPVRenderView::GetCapturedValuesFloat()
+{
+#if defined(VTKGL2) && defined(PARAVIEW_USE_ICE_T)
+  return this->Internals->ArrayHolder.GetPointer();
+#else
+  return NULL;
+#endif
 }
 
 //----------------------------------------------------------------------------

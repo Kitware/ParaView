@@ -2309,6 +2309,13 @@
         <DoubleRangeDomain name="range" />
         <Documentation>Set the most conservative clipping range.</Documentation>
       </DoubleVectorProperty>
+      <Property
+          name="CaptureValuesFloat"
+          command="CaptureValuesFloat"
+          >
+        <Documentation>A helper function to get the FLOATING_POINT value
+        buffer from the vtkValuePass.</Documentation>
+      </Property>
       <IntVectorProperty
           name="LockBounds"
           command="SetLockBounds"
@@ -2358,6 +2365,17 @@
         <IntRangeDomain name="range" />
         <Documentation>RGB colors will come directly from the numbered
         array.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty
+          name="ValueRenderingMode"
+          command="SetValueRenderingMode"
+          default_values="1"
+          animateable="0"
+          number_of_elements="1"
+          >
+        <IntRangeDomain name="range" />
+        <Documentation>Select rendering mode of the value pass (either INVERTIBLE_LUT (1) or
+        FLOATING_POINT (2)).</Documentation>
       </IntVectorProperty>
       <IntVectorProperty
           name="ArrayComponentToDraw"
@@ -2541,6 +2559,7 @@
       </PropertyGroup>
       <PropertyGroup label="Cinema Export"
                      panel_visibility="never">
+        <Property name="ValueRenderingMode"/>
         <Property name="CaptureZBuffer"/>
         <Property name="MaxClipBounds"/>
         <Property name="LockBounds"/>
@@ -2551,6 +2570,7 @@
         <Property name="ArrayComponentToDraw"/>
         <Property name="ScalarRange"/>
         <Property name="StopCaptureValues" />
+        <Property name="CaptureValuesFloat" />
         <Property name="StartCaptureLuminance" />
         <Property name="StopCaptureLuminance" />
       </PropertyGroup>

@@ -191,6 +191,16 @@ public:
   // Access to the Z buffer.
   vtkFloatArray* CaptureDepthBuffer();
 
+  // Description:
+  // Access to value-rendered array. Used for deferred color mapping during 
+  // in-situ visualization (Cinema).
+  vtkFloatArray* GetValuesFloat();
+
+  // Description:
+  // Access to the current vtkValuePass rendering mode.
+  int GetValueRenderingMode();
+  void SetValueRenderingMode(int mode);
+
 protected:
   vtkSMRenderViewProxy();
   ~vtkSMRenderViewProxy();
