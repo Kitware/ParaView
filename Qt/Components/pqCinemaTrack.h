@@ -59,8 +59,6 @@ public:
 
 public slots:
 
-  void toggleTrack(bool checked);
-
   void setFilterName(QString const & name);
 
 private:

@@ -151,8 +151,7 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
     {
     // Format as defined in cpstate.py
     QString format("'%1' : ['%2', %3, '%4', '%5', '%6', '%7', '%8']");
-    rendering_info = this->Internals->wViewSelection->getSelectionAsString(format,
-      this->Internals->chbComposite->isChecked());
+    rendering_info = this->Internals->wViewSelection->getSelectionAsString(format);
     }
 
   QString cinema_tracks;

@@ -141,7 +141,7 @@ QList<pqImageOutputInfo*> pqExportViewSelection::getImageOutputInfos()
   return infos;
 }
 
-void pqExportViewSelection::setCinemaVisible(bool status, bool specASupport)
+void pqExportViewSelection::setCinemaVisible(bool status)
 {
   typedef pqImageOutputInfo* InfoPtr;
 
@@ -150,12 +150,12 @@ void pqExportViewSelection::setCinemaVisible(bool status, bool specASupport)
     {
     if (InfoPtr info = qobject_cast<InfoPtr>(this->Ui->swViews->widget(i)))
       {
-        info->setCinemaVisible(status, specASupport);
+        info->setCinemaVisible(status);
       }
     }
 }
 
-QString pqExportViewSelection::getSelectionAsString(QString const & scriptFormat, bool isComposite)
+QString pqExportViewSelection::getSelectionAsString(QString const & scriptFormat)
 {
   QString rendering_info;
 
@@ -166,6 +166,7 @@ QString pqExportViewSelection::getSelectionAsString(QString const & scriptFormat
   for(int index = 0; index < allViews.count(); index++)
     {
     pqImageOutputInfo* const & viewInfo = allViews.at(index);
+    bool isComposite = viewInfo->getComposite();
     pqView* view = viewInfo->getView();
     QSize viewSize = view->getSize();
     vtkSMViewProxy* viewProxy = view->getViewProxy();
@@ -182,6 +183,10 @@ QString pqExportViewSelection::getSelectionAsString(QString const & scriptFormat
       if (isComposite)
         {
         cinemaCam += "\"composite\":True, ";
+        }
+      else
+        {
+        cinemaCam += "\"composite\":False, ";
         }
       cinemaCam += "\"camera\":\"";
       cinemaCam += camType;

@@ -67,7 +67,7 @@ def record_visibility():
         listElt['scalar_bar_visibility'] = False
         listElt['color_array_name'] = None
         listElt['color_array_association'] = None
-        rep = paraview.simple.GetDisplayProperties(proxy)
+        rep = paraview.servermanager.GetRepresentation(proxy, view_proxy)
         if rep != None:
             listElt['visibility'] = rep.Visibility
             listElt['scalar_bar_visibility'] = rep.IsScalarBarVisible(view_proxy)
@@ -93,7 +93,7 @@ def restore_visibility(proxies):
             proxy = listElt['proxy']
             vis = listElt['visibility']
             if vis != None:
-                rep = paraview.simple.GetDisplayProperties(proxy)
+                rep = paraview.servermanager.GetRepresentation(proxy, view_proxy)
                 if rep != None:
                     rep.Visibility = listElt['visibility']
                     if listElt['color_array_association']:
@@ -112,6 +112,7 @@ def inspect(skip_invisible=True):
     Thanks Scott Wittenburg and the pv mailing list for this gem
     """
     source_proxies = paraview.servermanager.ProxyManager().GetProxiesInGroup("sources")
+    view_proxy = paraview.simple.GetActiveView()
     proxies = []
     proxybyId = {}
     for key in source_proxies:
@@ -121,11 +122,10 @@ def inspect(skip_invisible=True):
         proxy = source_proxies[key]
 
         #skip the invisible
-        rep = paraview.simple.GetDisplayProperties(proxy)
+        rep = paraview.servermanager.GetRepresentation(proxy, view_proxy)
         if skip_invisible:
             if rep == None:
                 #for example, writers in catalyst pipeline
-                #todo: is it possible for these to have decendents that are visible?
                 continue
 
         listElt['visibility'] = 0 if (rep == None) else rep.Visibility
@@ -144,6 +144,8 @@ def inspect(skip_invisible=True):
         #reparent upward over invisible parents
         for l in proxies:
             pid = l['parent']
+            if not pid in proxybyId:
+                pid = '0'
             while pid != '0' and proxybyId[pid]['visibility'] == 0:
                 pid = proxybyId[pid]['parent']
             l['parent'] = pid
@@ -196,74 +198,55 @@ def add_filter_value(name, cs, userDefinedValues):
     """creates controls for the filters that we know how to manipulate"""
     source = paraview.simple.FindSource(name)
 
-    # plane offset generator (for Slice or Clip)
-    def generate_offset_values():
-        bounds = source.Input.GetDataInformation().DataInformation.GetBounds()
-        minPoint = np.array([bounds[0], bounds[2], bounds[4]])
-        maxPoint = np.array([bounds[1], bounds[3], bounds[5]])
-        scaleVec = maxPoint - minPoint
-
-        # adjust offset size depending on the plane orientation
-        if hasattr(source, 'SliceType'):
-            n = source.SliceType.Normal
-        elif hasattr(source, 'ClipType'):
-            n = source.ClipType.Normal
-
-        sNormal = np.array([n[0] * scaleVec[0], n[1] * scaleVec[1], n[2] * scaleVec[2]])
-
-        steps = 3 # generate N slice offsets
-        offsetStep = np.linalg.norm(sNormal) / steps
-        values = np.arange(-(steps/2), steps/2) * offsetStep
-        return values.tolist()
-
     # generate values depending on the type of filter
     if isinstance(source, paraview.simple.servermanager.filters.Clip):
-        # grab values from ui or generate defaults
+        # grab values from ui
         values = []
         if (source in userDefinedValues):
             if ("OffsetValues" in userDefinedValues[source]):
                 values = userDefinedValues[source]["OffsetValues"]
 
         if len(values) == 0:
-             values = generate_offset_values()
+            #nothing asked for just leave as is
+            return False
 
         # add sublayer and create the appropriate track
         cs.add_control(name, cinema_store.make_parameter(name, values, typechoice='hidden'))
         explorerDir[name] = pv_explorers.Clip(name, source)
+        return True
 
     elif isinstance(source, paraview.simple.servermanager.filters.Slice):
-        # grab values from ui or generate defaults
+        # grab values from ui
         values = []
         if (source in userDefinedValues):
             if ("SliceOffsetValues" in userDefinedValues[source]):
                 values = userDefinedValues[source]["SliceOffsetValues"]
 
         if len(values) == 0:
-            values = generate_offset_values()
+            #nothing asked for just leave as is
+            return False
 
         # add sublayer and create the appropriate track
         cs.add_control(name, cinema_store.make_parameter(name, values, typechoice='hidden'))
         explorerDir[name] = pv_explorers.Slice(name, source)
+        return True
 
     elif isinstance(source, paraview.simple.servermanager.filters.Contour):
 
-        def generate_contour_values():
-            # grab values from ui or generate defaults
-            vRange = source.Input.GetDataInformation().DataInformation.GetPointDataInformation().GetArrayInformation(0).GetComponentRange(0)
-            return np.linspace(vRange[0], vRange[1], 5).tolist() # generate 5 contour values
-
-        # grab values from ui or generate defaults
+        # grab values from ui
         values = []
         if (source in userDefinedValues):
             if ("Isosurfaces" in userDefinedValues[source]):
                 values = userDefinedValues[source]["Isosurfaces"]
 
         if len(values) == 0:
-             values = generate_contour_values()
+            #nothing asked for just leave as is
+            return False
 
         # add sublayer and create the appropriate track
         cs.add_control(name, cinema_store.make_parameter(name, values, typechoice='hidden'))
         explorerDir[name] = pv_explorers.Contour(name, source)
+        return True
 
 def filter_has_parameters(name):
     """see if this proxy is one we know how to make controls for"""
@@ -281,7 +264,7 @@ def add_control_and_colors(name, cs, userDefined):
     ranges = {}
     defaultName = None
     view_proxy = paraview.simple.GetActiveView()
-    rep = paraview.simple.GetRepresentation(source, view_proxy)
+    rep = paraview.servermanager.GetRepresentation(source, view_proxy)
 
     # select value arrays
     if rep.Representation != 'Outline':
@@ -333,10 +316,11 @@ def add_customized_array_selection(sourceName, source, fields, ranges, userDefin
                 defaultName = fName
     return defaultName
 
-def make_cinema_store(proxies, ocsfname, forcetime=False, userDefined = {}):
+def make_cinema_store(proxies, ocsfname, forcetime=False, userDefined = {},
+                      specLevel = "A", camType = "Spherical"):
     """
     Takes in the pipeline, structured as a tree, and makes a cinema store definition
-    containing all the parameters we might will vary.
+    containing all the parameters we will vary.
     """
 
     if "phi" in userDefined:
@@ -362,18 +346,28 @@ def make_cinema_store(proxies, ocsfname, forcetime=False, userDefined = {}):
     except IOError, KeyError:
         pass
 
-    cs.add_metadata({'type':'composite-image-stack'})
+    if specLevel == "A":
+        cs.add_metadata({'type':'parametric-image-stack'})
+        cs.add_metadata({'version':'0.0'})
+    if specLevel == "B":
+        cs.add_metadata({'type':'composite-image-stack'})
+        cs.add_metadata({'version':'0.1'})
     cs.add_metadata({'store_type':'FS'})
-    cs.add_metadata({'version':'0.1'})
     pipeline = get_pipeline()
     cs.add_metadata({'pipeline':pipeline})
 
     vis = [proxy['name'] for proxy in proxies]
-    cs.add_layer("vis",cinema_store.make_parameter('vis', vis))
+    if specLevel == "A":
+        pass
+    else:
+        cs.add_layer("vis",cinema_store.make_parameter('vis', vis))
 
+    pnames = []
     for proxy in proxies:
         proxy_name = proxy['name']
-        add_filter_value(proxy_name, cs, userDefined)
+        ret = add_filter_value(proxy_name, cs, userDefined)
+        if specLevel == "A" and ret:
+            pnames.append(proxy_name)
         dependency_set = set([proxy['id']])
         repeat = True
         while repeat:
@@ -383,9 +377,12 @@ def make_cinema_store(proxies, ocsfname, forcetime=False, userDefined = {}):
                 dependency_set = dependency_set.union(deps)
                 repeat = True
         dependency_list = [proxy['name'] for proxy in proxies if proxy['id'] in dependency_set]
-        cs.assign_parameter_dependence(proxy_name,'vis',dependency_list)
-        add_control_and_colors(proxy_name, cs, userDefined)
-        cs.assign_parameter_dependence("color"+proxy_name,'vis',[proxy_name])
+        if specLevel == "A":
+            pass
+        else:
+            cs.assign_parameter_dependence(proxy_name,'vis',dependency_list)
+            add_control_and_colors(proxy_name, cs, userDefined)
+            cs.assign_parameter_dependence("color"+proxy_name,'vis',[proxy_name])
 
     fnp = ""
     if forcetime:
@@ -393,7 +390,7 @@ def make_cinema_store(proxies, ocsfname, forcetime=False, userDefined = {}):
         tvalues.append(forcetime)
         tprop = cinema_store.make_parameter('time', tvalues)
         cs.add_parameter('time', tprop)
-        fnp = fnp+"{time}_"
+        fnp = "{time}"
     else:
         #time not specified, try and make them automatically
         times = paraview.simple.GetAnimationScene().TimeKeeper.TimestepValues
@@ -402,42 +399,33 @@ def make_cinema_store(proxies, ocsfname, forcetime=False, userDefined = {}):
         else:
             prettytimes = [float_limiter(t) for t in times]
             cs.add_parameter("time", cinema_store.make_parameter('time', prettytimes))
-            fnp = fnp+"{time}_"
-    cs.add_parameter("phi", cinema_store.make_parameter('phi', phis))
-    cs.add_parameter("theta", cinema_store.make_parameter('theta', thetas))
-    fnp = fnp+"{phi}_{theta}.png"
+            fnp = "{time}"
+
+    if camType == "Spherical":
+        cs.add_parameter("phi", cinema_store.make_parameter('phi', phis))
+        cs.add_parameter("theta", cinema_store.make_parameter('theta', thetas))
+        if fnp == "":
+            fnp = "{phi}/{theta}"
+        else:
+            fnp = fnp + "/{phi}/{theta}"
+
+    if specLevel == "A":
+        for pname in pnames:
+            if fnp == "":
+                fnp = "{"+pname+"}"
+            else:
+                fnp = fnp+"/{"+pname+"}"
+
+    if fnp == "":
+        fnp = "image"
+
+    fnp = fnp+".png"
 
     cs.filename_pattern = fnp
     return cs
 
-
-def testexplore(cs):
-    """
-    For debugging, takes in the cinema store and prints out everything that we'll take snapshots off
-    """
-    import explorers
-    import copy
-    class printer(explorers.Explorer):
-        def execute(self, desc):
-            p = copy.deepcopy(desc)
-            x = 'phi'
-            if x in p.keys():
-                print x, ":", desc[x], ",",
-                del p[x]
-            x = 'theta'
-            if x in p.keys():
-                print x, ":", desc[x], ",",
-                del p[x]
-            for x in sorted(p.keys()):
-                print x, ":", p[x], ",",
-            print
-
-    params = cs.parameter_list.keys()
-    e = printer(cs, params, [])
-    e.explore()
-
-
-def explore(cs, proxies, iSave=True, currentTime=None, userDefined = {}):
+def explore(cs, proxies, iSave=True, currentTime=None, userDefined = {},
+            specLevel = "A", camType = "Spherical"):
     """
     Runs a pipeline through all the changes we know how to make and saves off
     images into the store for each one.
@@ -449,20 +437,19 @@ def explore(cs, proxies, iSave=True, currentTime=None, userDefined = {}):
     dist = paraview.simple.GetActiveCamera().GetDistance()
 
     #associate control points wlth parameters of the data store
-    up = [math.fabs(x) for x in view_proxy.CameraViewUp]
-    uppest = 0
-    if up[1]>up[uppest]: uppest = 1
-    if up[2]>up[uppest]: uppest = 2
-    cinup = [0,0,0]
-    cinup[uppest]=1
-    cam = pv_explorers.Camera(view_proxy.CameraFocalPoint, cinup, dist, view_proxy)
-
     params = cs.parameter_list.keys()
-
-    tracks = []
-    tracks.append(cam)
-
     cols = []
+    tracks = []
+    if camType == "Spherical":
+        up = [math.fabs(x) for x in view_proxy.CameraViewUp]
+        uppest = 0
+        if up[1]>up[uppest]: uppest = 1
+        if up[2]>up[uppest]: uppest = 2
+        cinup = [0,0,0]
+        cinup[uppest]=1
+        cam = pv_explorers.Camera(view_proxy.CameraFocalPoint, cinup, dist, view_proxy)
+        tracks.append(cam)
+
 
     ctime_float=None
     if currentTime:
@@ -486,30 +473,37 @@ def explore(cs, proxies, iSave=True, currentTime=None, userDefined = {}):
 
                 #visibility of the layer
                 sp = paraview.simple.FindSource(name)
-                rep = paraview.simple.GetRepresentation(sp, view_proxy)
+                if specLevel == "A":
+                    pass
+                else:
+                    rep = paraview.servermanager.GetRepresentation(sp, view_proxy)
 
-                #hide all annotations
-                if rep.LookupTable:
-                    rep.SetScalarBarVisibility(view_proxy, False)
-                tc1 = pv_explorers.SourceProxyInLayer(name, rep)
-                lt = explorers.Layer('vis', [tc1])
-                tracks.append(lt)
+                    #hide all annotations
+                    if rep.LookupTable:
+                        rep.SetScalarBarVisibility(view_proxy, False)
+                    tc1 = pv_explorers.SourceProxyInLayer(name, rep)
+                    lt = explorers.Layer('vis', [tc1])
+                    tracks.append(lt)
 
-                #fields for the layer
-                cC = pv_explorers.ColorList()
-                cC.AddDepth('depth')
-                cC.AddLuminance('luminance')
+                    #fields for the layer
+                    cC = pv_explorers.ColorList()
+                    cC.AddDepth('depth')
+                    cC.AddLuminance('luminance')
+
                 sp.UpdatePipeline(ctime_float)
 
-                numVals = 0
-                if rep.Representation != 'Outline':
+                if specLevel == "A":
+                    pass
+                else:
+                    numVals = 0
+                    if rep.Representation != 'Outline':
                         numVals = explore_customized_array_selection(name, sp, cC, userDefined)
 
-                if numVals == 0:
-                    cC.AddSolidColor('white', [1,1,1])
-                col = pv_explorers.Color("color"+name, cC, rep)
-                tracks.append(col)
-                cols.append(col)
+                    if numVals == 0:
+                        cC.AddSolidColor('white', [1,1,1])
+                    col = pv_explorers.Color("color"+name, cC, rep)
+                    tracks.append(col)
+                    cols.append(col)
 
     e = pv_explorers.ImageExplorer(cs, params,
                                    tracks,
@@ -596,8 +590,22 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
         # check if this view was selected to export as spec b
         cinemaParams = viewParams[6]
         if len(cinemaParams) == 0:
-            print "Skipping view: Not selected to export as cinema spherical."
+            print "Skipping view: Not selected to export to cinema."
             continue
+
+        camType = "None"
+        if "camera" in cinemaParams and cinemaParams["camera"] != "None":
+            if cinemaParams["camera"] == "Static":
+                camType = "Static"
+            if cinemaParams["camera"] == "Spherical":
+                camType = "Spherical"
+        if camType == "None":
+            print "Skipping view: Not selected to export to cinema."
+            continue
+
+        specLevel = "A"
+        if "composite" in cinemaParams and cinemaParams["composite"] == True:
+            specLevel = "B"
 
         # get the view and save the initial status
         view = paraview.simple.FindView(viewName)
@@ -635,16 +643,20 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
 
         p = inspect()
         cs = make_cinema_store(p, filePath, forcetime = False,\
-          userDefined = userDefValues)
+                               userDefined = userDefValues,
+                               specLevel = specLevel,
+                               camType = camType)
 
-        explore(cs, p, userDefined = userDefValues)
+        explore(cs, p, userDefined = userDefValues,
+                specLevel = specLevel,
+                camType = camType)
 
         view.LockBounds = 0
         cs.save()
         atLeastOneViewExported = True
 
     if not atLeastOneViewExported:
-        print "No view was selected to export as cinema spherical."
+        print "No view was selected to export to cinema."
         return
 
     # restore initial state

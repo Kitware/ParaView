@@ -65,7 +65,7 @@ pqCinemaConfiguration::pqCinemaConfiguration(vtkSMProxy* proxy_,  vtkSMPropertyG
 
   // update ui with current views and filters and connect signals
   this->populateElements();
-  this->Ui->wViewSelection->setCinemaVisible(true, false);
+  this->Ui->wViewSelection->setCinemaVisible(true);
 }
 
 // ----------------------------------------------------------------------------
@@ -86,7 +86,7 @@ QString pqCinemaConfiguration::viewSelection()
   // Parameter format pv_introspect.export_scene expects for each view.
   // (see pv_introspect.py and pqExportViewSelection for more details.
   QString format("'%1' : ['%2', %3, %4, %5, %6, %7, %8]");
-  QString script = this->Ui->wViewSelection->getSelectionAsString(format, true);
+  QString script = this->Ui->wViewSelection->getSelectionAsString(format);
 
   return script;
 }

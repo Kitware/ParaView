@@ -178,15 +178,12 @@ pqSGExportStateWizard::pqSGExportStateWizard(
   QObject::connect(this->Internals->outputRendering, SIGNAL(toggled(bool)),
                    this->Internals->laRescaleDataRange, SLOT(setVisible(bool)));
 
-  this->Internals->chbComposite->hide();
   this->Internals->wCinemaTrackSelection->hide();
 
   QObject::connect(this->Internals->outputCinema, SIGNAL(toggled(bool)),
                    this->Internals->outputRendering, SLOT(setChecked(bool)));
   QObject::connect(this->Internals->outputCinema, SIGNAL(toggled(bool)),
                    this->Internals->wCinemaTrackSelection, SLOT(setVisible(bool)));
-  QObject::connect(this->Internals->outputCinema, SIGNAL(toggled(bool)),
-                   this->Internals->chbComposite, SLOT(setVisible(bool)));
   QObject::connect(this->Internals->outputCinema, SIGNAL(toggled(bool)),
                    this, SLOT(toggleCinema(bool)));
 

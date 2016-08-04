@@ -72,9 +72,9 @@ endif()
 
 if("${TEST_NAME}" STREQUAL "CoProcessingFullWorkflowCinemaComposite")
   if(NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_image/info.json" OR
-     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_image/phi=0/theta=0/time=0/vis=0/colorinput=0.im" OR
-     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_image/phi=0/theta=0/time=0/vis=0/colorinput=1.png" OR
-     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_image/phi=0/theta=0/time=0/vis=0/colorinput=2.png")
+     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=0.im" OR
+     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=1.png" OR
+     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=2.png")
     message(FATAL_ERROR "Catalyst did not generate a composite cinema store!")
   endif()
   return()
