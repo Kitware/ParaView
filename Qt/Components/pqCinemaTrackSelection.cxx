@@ -322,12 +322,6 @@ QList<pqCinemaTrack*> pqCinemaTrackSelection::getTracks()
 //------------------------------------------------------------------------------
 QString pqCinemaTrackSelection::getTrackSelectionAsString(QString const & format)
 {
-  if (!this->Ui->gbTrackSelection->isChecked())
-    {
-    // An empty string will be handled by the cinema python scripts as default values
-    return QString();
-    }
-
   QString cinema_tracks;
   QList<pqCinemaTrack*> tracks = this->getTracks();
 
@@ -376,12 +370,6 @@ QString pqCinemaTrackSelection::getTrackSelectionAsString(QString const & format
 // -----------------------------------------------------------------------------
 QString pqCinemaTrackSelection::getArraySelectionAsString(QString const & format)
 {
-  if (!this->Ui->gbTrackSelection->isChecked())
-    {
-    // Defaults to empty selection.
-    return QString("");
-    }
-
   bool allArraysUnchecked = true;
   QString array_selection("");
   ItemValuesMap const & valuesMap = this->PipelineItemValues;

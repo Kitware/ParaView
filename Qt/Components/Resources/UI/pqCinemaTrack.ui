@@ -26,7 +26,7 @@
    <string>Form</string>
   </property>
   <property name="toolTip">
-   <string>Specify values that the viewew app exposes here. </string>
+   <string>Specify values that viewer can change here. Empty for not changeable.</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
@@ -45,13 +45,6 @@
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="chbIncludeTrack">
-       <property name="text">
-        <string>Include Track</string>
        </property>
       </widget>
      </item>

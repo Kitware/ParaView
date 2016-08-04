@@ -87,10 +87,6 @@ pqCinemaTrack::pqCinemaTrack(
     if (dom)
       {
       this->Track->label->setText(filter->getSMName());
-      this->Track->chbIncludeTrack->setEnabled(true);
-      this->Track->chbIncludeTrack->setChecked(false);
-      QObject::connect(this->Track->chbIncludeTrack, SIGNAL(toggled(bool)),
-                       this, SLOT(toggleTrack(bool)));
 
       pqScalarValueListPropertyWidget *vals = new pqScalarValueListPropertyWidget(prop, prox, this);
       vals->setRangeDomain(dom);
@@ -100,6 +96,7 @@ pqCinemaTrack::pqCinemaTrack(
       vals->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
       this->layout()->addWidget(vals);
       this->valsWidget = vals;
+      this->valsWidget->setEnabled(true);
       }
     }
 };
@@ -110,16 +107,9 @@ pqCinemaTrack::~pqCinemaTrack()
 }
 
 //-----------------------------------------------------------------------------
-void pqCinemaTrack::toggleTrack(bool checked)
-{
-  this->valsWidget->setEnabled(checked);
-}
-
-//-----------------------------------------------------------------------------
 bool pqCinemaTrack::explore() const
 {
-  return (this->Track->chbIncludeTrack->isChecked() &&
-          this->valsWidget &&
+  return (this->valsWidget &&
           !this->valsWidget->scalars().isEmpty());
 }
 

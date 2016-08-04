@@ -200,7 +200,7 @@ def add_filter_value(name, cs, userDefinedValues):
 
     # generate values depending on the type of filter
     if isinstance(source, paraview.simple.servermanager.filters.Clip):
-        # grab values from ui or generate defaults
+        # grab values from ui
         values = []
         if (source in userDefinedValues):
             if ("OffsetValues" in userDefinedValues[source]):
@@ -216,7 +216,7 @@ def add_filter_value(name, cs, userDefinedValues):
         return True
 
     elif isinstance(source, paraview.simple.servermanager.filters.Slice):
-        # grab values from ui or generate defaults
+        # grab values from ui
         values = []
         if (source in userDefinedValues):
             if ("SliceOffsetValues" in userDefinedValues[source]):
@@ -233,7 +233,7 @@ def add_filter_value(name, cs, userDefinedValues):
 
     elif isinstance(source, paraview.simple.servermanager.filters.Contour):
 
-        # grab values from ui or generate defaults
+        # grab values from ui
         values = []
         if (source in userDefinedValues):
             if ("Isosurfaces" in userDefinedValues[source]):
@@ -423,33 +423,6 @@ def make_cinema_store(proxies, ocsfname, forcetime=False, userDefined = {},
 
     cs.filename_pattern = fnp
     return cs
-
-
-def testexplore(cs):
-    """
-    For debugging, takes in the cinema store and prints out everything that we'll take snapshots off
-    """
-    import explorers
-    import copy
-    class printer(explorers.Explorer):
-        def execute(self, desc):
-            p = copy.deepcopy(desc)
-            x = 'phi'
-            if x in p.keys():
-                print x, ":", desc[x], ",",
-                del p[x]
-            x = 'theta'
-            if x in p.keys():
-                print x, ":", desc[x], ",",
-                del p[x]
-            for x in sorted(p.keys()):
-                print x, ":", p[x], ",",
-            print
-
-    params = cs.parameter_list.keys()
-    e = printer(cs, params, [])
-    e.explore()
-
 
 def explore(cs, proxies, iSave=True, currentTime=None, userDefined = {},
             specLevel = "A", camType = "Spherical"):
