@@ -109,7 +109,7 @@ def _wrap_property(proxy, smproperty):
                 property = VectorProperty(proxy, smproperty)
     elif smproperty.IsA("vtkSMVectorProperty"):
         if smproperty.IsA("vtkSMIntVectorProperty") and \
-          smproperty.GetDomain("enum"):
+          (smproperty.GetDomain("enum") or smproperty.GetDomain("comps")):
             property = EnumerationProperty(proxy, smproperty)
         else:
             property = VectorProperty(proxy, smproperty)
@@ -881,6 +881,8 @@ class EnumerationProperty(VectorProperty):
         the numerical values otherwise."""
         val = self.SMProperty.GetElement(index)
         domain = self.SMProperty.GetDomain("enum")
+        if not domain:
+          domain = self.SMProperty.GetDomain("comps")
         for i in range(domain.GetNumberOfEntries()):
             if domain.GetEntryValue(i) == val:
                 return domain.GetEntryText(i)
@@ -890,6 +892,8 @@ class EnumerationProperty(VectorProperty):
         """Converts value to type suitable for vtSMProperty::SetElement()"""
         if type(value) == str:
             domain = self.SMProperty.GetDomain("enum")
+            if not domain:
+              domain = self.SMProperty.GetDomain("comps")
             if domain.HasEntryText(value):
                 return domain.GetEntryValueForText(value)
             else:
@@ -900,6 +904,8 @@ class EnumerationProperty(VectorProperty):
         "Returns the list of available values for the property."
         retVal = []
         domain = self.SMProperty.GetDomain("enum")
+        if not domain:
+          domain = self.SMProperty.GetDomain("comps")
         for i in range(domain.GetNumberOfEntries()):
             retVal.append(domain.GetEntryText(i))
         return retVal
