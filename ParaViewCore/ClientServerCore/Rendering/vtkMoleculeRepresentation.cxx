@@ -85,6 +85,12 @@ void vtkMoleculeRepresentation::SetUseCustomRadii(bool val)
 }
 
 //------------------------------------------------------------------------------
+void vtkMoleculeRepresentation::SetLookupTable(vtkScalarsToColors *lut)
+{
+  this->Mapper->SetLookupTable(lut);
+}
+
+//------------------------------------------------------------------------------
 void vtkMoleculeRepresentation::MarkModified()
 {
   if (!this->GetUseCache())
@@ -119,6 +125,7 @@ int vtkMoleculeRepresentation::ProcessViewRequest(
         vtkPVRenderView::GetPieceProducer(inInfo, this);
 
     this->Mapper->SetInputConnection(producerPort);
+    this->UpdateColoringParameters();
     }
 
   return 1;
@@ -228,4 +235,14 @@ void vtkMoleculeRepresentation::SyncMapper()
     {
     this->Mapper->SetAtomicRadiusType(vtkMoleculeMapper::CustomArrayRadius);
     }
+}
+
+//------------------------------------------------------------------------------
+void vtkMoleculeRepresentation::UpdateColoringParameters()
+{
+  vtkInformation *info = this->GetInputArrayInformation(0);
+  vtkInformation *mInfo = this->Mapper->GetInputArrayInformation(0);
+
+  mInfo->CopyEntry(info, vtkDataObject::FIELD_ASSOCIATION());
+  mInfo->CopyEntry(info, vtkDataObject::FIELD_NAME());
 }

@@ -491,7 +491,7 @@ const char* vtkSMRenderViewProxy::GetRepresentationType(
     "StructuredGridRepresentation",
     "UniformGridRepresentation",
     "AMRRepresentation",
-    "MoleculeRepresentation",
+    "PVMoleculeRepresentation",
     "GeometryRepresentation",
     NULL
     };

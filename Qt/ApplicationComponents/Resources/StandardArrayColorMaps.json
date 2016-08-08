@@ -1,5 +1,6 @@
 {
   "standard_presets" : {
-    "vtkBlockColors" : "KAAMS"
+    "vtkBlockColors" : "KAAMS",
+    "AtomicNumbers" : "BlueObeliskElements"
   }
 }

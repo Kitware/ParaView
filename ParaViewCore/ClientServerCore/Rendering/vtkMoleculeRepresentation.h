@@ -25,6 +25,7 @@ class vtkActor;
 class vtkMolecule;
 class vtkMoleculeMapper;
 class vtkPVCacheKeeper;
+class vtkScalarsToColors;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkMoleculeRepresentation : public vtkPVDataRepresentation
 {
@@ -45,6 +46,13 @@ public:
   vtkGetMacro(UseCustomRadii, bool)
   void SetUseCustomRadii(bool val);
 
+  void SetLookupTable(vtkScalarsToColors *lut);
+
+  // Description:
+  // No-op. For compatibility with vtkPVCompositeRepresentation, which calls
+  // SetRepresentation on it's subproxies.
+  void SetRepresentation(const char *) {}
+
   void MarkModified();
 
 protected:
@@ -59,6 +67,7 @@ protected:
   bool IsCached(double cache_key);
 
   void SyncMapper();
+  void UpdateColoringParameters();
 
   vtkActor *Actor;
   vtkMoleculeMapper *Mapper;
