@@ -828,6 +828,40 @@
       <!-- End of PSTLWriter -->
     </PSWriterProxy>
     <!-- ================================================================= -->
+    <PSWriterProxy class="vtkHoudiniPolyDataWriter"
+                   file_name_method="SetFileName"
+                   name="HoudiniWriter">
+      <Documentation short_help="Write polygonal data in Houdini .geo format.">
+      Writer to write polygonal data in ASCII Houdini .geo (pre-v12.0)
+      format. </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <Property name="Input"
+                  show="0" />
+        <Property name="FileName"
+                  show="0" />
+        <WriterFactory extensions="geo" file_description="Houdini File Format" />
+        <UseDocumentationForLabels />
+      </Hints>
+      <!-- End of HoudiniWriter -->
+    </PSWriterProxy>
+    <!-- ================================================================= -->
     <WriterProxy class="vtkMetaImageWriter"
                  name="MetaImageWriter">
       <Documentation short_help="Write a binary UNC meta image data.">Writer to
