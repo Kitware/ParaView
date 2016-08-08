@@ -41,7 +41,7 @@ if(PARAVIEW_ENABLE_QT_SUPPORT)
     # nothing to do. the module system handles it properly.
   else()
     set(QT_QMAKE_EXECUTABLE "${PARAVIEW_QT_QMAKE_EXECUTABLE}" CACHE FILEPATH "Qt4 qmake executable")
-    find_package_qt(__tmp_qt_targets QT4_COMPONENTS QtGui)
+    pv_find_package_qt(__tmp_qt_targets QT4_COMPONENTS QtGui)
     unset(__tmp_qt_targets)
   endif()
 endif()

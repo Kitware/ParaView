@@ -20,14 +20,14 @@ SET (CP_SOURCES
   pqCPPluginManager.h
 )
 include(ParaViewQt)
-find_package_qt(qt_targets REQUIRED QT4_COMPONENTS QtGui QT5_COMPONENTS Widgets)
+pv_find_package_qt(qt_targets REQUIRED QT4_COMPONENTS QtGui QT5_COMPONENTS Widgets)
 
-qt_wrap_cpp(MOC_SRCS
+pv_qt_wrap_cpp(MOC_SRCS
     pqCPExportStateWizard.h
     pqCPActionsGroup.h
     pqCPPluginManager.h
   )
-qt_wrap_ui(UI_SRCS ${UI_RESOURCES})
+pv_qt_wrap_ui(UI_SRCS ${UI_RESOURCES})
 
 #------------------------------------------------------------------------------
 SET (PARAVIEW_PLUGIN_IFACES)

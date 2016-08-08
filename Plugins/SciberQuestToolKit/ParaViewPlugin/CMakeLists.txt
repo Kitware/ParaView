@@ -6,7 +6,7 @@ set(CXX_SOURCES
   vtkSQVolumeSourceConfigurationWriter.cxx
   vtkSQVolumeSourceConfigurationReader.cxx
   )
-find_package_qt(qt_targets REQUIRED QUIET
+pv_find_package_qt(qt_targets REQUIRED QUIET
   QT4_COMPONENTS QtGui
   QT5_COMPONENTS Widgets)
 
@@ -19,9 +19,9 @@ if(PARAVIEW_BUILD_QT_GUI)
   set(_IFACE_SRCS)
 
   macro(sciberquest_wrap_qt name)
-    qt_wrap_cpp(MOC_SRCS "${name}.h")
+    pv_qt_wrap_cpp(MOC_SRCS "${name}.h")
     if (EXISTS "${CMAKE_CURRENT_LIST_DIR}/${name}Form.ui")
-      qt_wrap_ui(UI_SRCS "${name}Form.ui")
+      pv_qt_wrap_ui(UI_SRCS "${name}Form.ui")
     endif ()
   endmacro()
 

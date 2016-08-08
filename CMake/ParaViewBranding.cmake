@@ -236,10 +236,10 @@ FUNCTION(build_paraview_client BPC_NAME)
   ENDIF ()
 
   INCLUDE(ParaViewQt)
-  FIND_PACKAGE_QT(qt_targets REQUIRED QUIET
+  pv_find_package_qt(qt_targets REQUIRED QUIET
     QT4_COMPONENTS QtGui
     QT5_COMPONENTS Widgets)
-  QT_ADD_RESOURCES(rcs_sources ${ui_resources})
+  pv_qt_add_resources(rcs_sources ${ui_resources})
 
   SOURCE_GROUP("Resources" FILES
     ${ui_resources}

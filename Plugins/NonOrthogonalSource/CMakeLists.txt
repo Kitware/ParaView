@@ -6,10 +6,10 @@ include_directories(${VTK_INCLUDE_DIRS})
 set(sources)
 
 if(PARAVIEW_BUILD_QT_GUI)
-  find_package_qt(qt_targets REQUIRED QUIET
+  pv_find_package_qt(qt_targets REQUIRED QUIET
     QT4_COMPONENTS QtGui
     QT5_COMPONENTS Widgets)
-  qt_wrap_cpp(MOC_SRCS pqNonOrthogonalAutoStart.h)
+  pv_qt_wrap_cpp(MOC_SRCS pqNonOrthogonalAutoStart.h)
   add_paraview_auto_start(IFACES IFACE_SRCS
     CLASS_NAME pqNonOrthogonalAutoStart
     STARTUP startup

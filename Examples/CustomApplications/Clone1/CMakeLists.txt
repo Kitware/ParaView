@@ -19,7 +19,7 @@ endif()
 
 # include rules for creating custom applications.
 include(ParaViewBranding)
-find_package_qt(qt_targets
+pv_find_package_qt(qt_targets
   QT4_COMPONENTS QtGui
   QT5_COMPONENTS Widgets)
 

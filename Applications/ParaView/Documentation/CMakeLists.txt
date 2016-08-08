@@ -46,7 +46,7 @@ set_source_files_properties(
   PROPERTIES OBJECT_DEPENDS
   "${CMAKE_CURRENT_BINARY_DIR}/paraview.qch")
 
-QT_ADD_RESOURCES(rcs_sources
+pv_qt_add_resources(rcs_sources
   "${CMAKE_CURRENT_BINARY_DIR}/paraview_documentation.qrc")
 
 add_library(vtkParaViewDocumentation STATIC

@@ -5,12 +5,12 @@ if(PARAVIEW_BUILD_QT_GUI)
     pqRemoteControl.cxx
     pqRemoteControlThread.cxx)
 
-  find_package_qt(qt_targets REQUIRED QUIET
+  pv_find_package_qt(qt_targets REQUIRED QUIET
     QT4_COMPONENTS QtGui QtNetwork
     QT5_COMPONENTS Widgets Network)
 
-  qt_wrap_cpp(MOC_SRCS pqRemoteControl.h pqRemoteControlThread.h)
-  qt_wrap_ui(UI_SRCS pqRemoteControl.ui)
+  pv_qt_wrap_cpp(MOC_SRCS pqRemoteControl.h pqRemoteControlThread.h)
+  pv_qt_wrap_ui(UI_SRCS pqRemoteControl.ui)
 
   ADD_PARAVIEW_DOCK_WINDOW(
     OUTIFACES

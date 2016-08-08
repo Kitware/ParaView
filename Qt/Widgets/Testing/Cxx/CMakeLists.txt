@@ -15,10 +15,10 @@ if(NOT ${CMAKE_Cxx_Fortran_COMPILER_ID} STREQUAL "Intel")
 endif()
 
 include(ParaViewQt)
-find_package_qt(qt_targets REQUIRED QUIET
+pv_find_package_qt(qt_targets REQUIRED QUIET
                 QT4_COMPONENTS QtCore QtGui QtTest
                 QT5_COMPONENTS Core Widgets Test)
-QT_WRAP_CPP(Tests_MOC_SOURCES ${MocSources})
+pv_qt_wrap_cpp(Tests_MOC_SOURCES ${MocSources})
 
 ADD_DEFINITIONS(-DQT_GUI_LIB)
 INCLUDE_DIRECTORIES(${QtWidgets_SOURCE_DIR} ${QtWidgets_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})

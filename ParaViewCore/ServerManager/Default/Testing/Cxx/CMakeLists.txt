@@ -2,7 +2,7 @@
 # ParaView ServerManager Unit Tests
 if (PARAVIEW_ENABLE_QT_SUPPORT)
   include(ParaViewQt)
-  find_package_qt(qt_targets REQUIRED QT4_COMPONENTS QtTest QT5_COMPONENTS Test)
+  pv_find_package_qt(qt_targets REQUIRED QT4_COMPONENTS QtTest QT5_COMPONENTS Test)
   set(UNITTESTS
     SMProxy
     SMProxyLink
@@ -13,7 +13,7 @@ if (PARAVIEW_ENABLE_QT_SUPPORT)
     SMPropertyHelper
   )
   foreach(name IN LISTS UNITTESTS)
-    qt_wrap_cpp(${name}_MOC_SOURCES vtk${name}Test.h)
+    pv_qt_wrap_cpp(${name}_MOC_SOURCES vtk${name}Test.h)
     list(APPEND test_sources Test${name}.cxx)
     list(APPEND extra_sources vtk${name}Test.cxx ${${name}_MOC_SOURCES})
   endforeach()

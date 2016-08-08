@@ -945,7 +945,7 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
             "${QRC_RESOURCES_INIT}Q_INIT_RESOURCE(${rc_name});\n")
         endforeach()
       endif()
-      qt_add_resources(QT_RCS ${ARG_GUI_RESOURCES})
+      pv_qt_add_resources(QT_RCS ${ARG_GUI_RESOURCES})
       SET(GUI_SRCS ${GUI_SRCS} ${QT_RCS})
     ENDIF()
 

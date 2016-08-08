@@ -10,7 +10,7 @@ IF(PARAVIEW_BUILD_QT_GUI)
     )
   SET (MantaView_SRCS
     MantaView.h)
-  QT_WRAP_CPP(MOC_SRCS ${MantaView_SRCS} pqLightsWidget.h)
+  pv_qt_wrap_cpp(MOC_SRCS ${MantaView_SRCS} pqLightsWidget.h)
   add_paraview_property_group_widget(IFACES IFACE_SRCS
     TYPE "extra_lights"
     CLASS_NAME pqLightsWidget)

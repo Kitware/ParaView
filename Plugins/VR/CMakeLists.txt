@@ -12,7 +12,7 @@ else()
 endif()
 
 include(ParaViewQt)
-find_package_qt(qt_targets REQUIRED
+pv_find_package_qt(qt_targets REQUIRED
                 QT4_COMPONENTS QtGui QtNetwork
                 QT5_COMPONENTS Widgets Network)
 
@@ -58,7 +58,7 @@ if(PARAVIEW_USE_VRUI)
     vtkVRUITrackerState.cxx)
 endif()
 
-QT_WRAP_CPP(MOC_SRCS
+pv_qt_wrap_cpp(MOC_SRCS
   pqVRAddConnectionDialog.h
   pqVRAddStyleDialog.h
   pqVRConnectionManager.h
@@ -69,7 +69,7 @@ QT_WRAP_CPP(MOC_SRCS
   ${VRUI_MOC_SRC}
   )
 
-QT_WRAP_UI(UI_SRCS
+pv_qt_wrap_ui(UI_SRCS
   pqVRDockPanel.ui
   pqVRAddConnectionDialog.ui
   pqVRAddStyleDialog.ui

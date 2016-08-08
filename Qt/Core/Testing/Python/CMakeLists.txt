@@ -1,8 +1,8 @@
 include(ParaViewQt)
-find_package_qt(qt_targets REQUIRED QUIET
+pv_find_package_qt(qt_targets REQUIRED QUIET
                 QT4_COMPONENTS QtCore QtGui
                 QT5_COMPONENTS Core Widgets)
-QT_WRAP_CPP(MOC_SRCS pqFileDialogTest.h)
+pv_qt_wrap_cpp(MOC_SRCS pqFileDialogTest.h)
 vtk_module_test_executable(pqFileDialogTest
   pqFileDialogTest.cxx pqFileDialogTest.h ${MOC_SRCS})
 target_link_libraries(pqFileDialogTest LINK_PRIVATE ${qt_targets})

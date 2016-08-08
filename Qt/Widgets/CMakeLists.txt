@@ -197,14 +197,14 @@ if(APPLE)
   list(APPEND qt5_private_comps PrintSupport)
 endif()
 
-find_package_qt(qt_public_targets REQUIRED
+pv_find_package_qt(qt_public_targets REQUIRED
   QT4_COMPONENTS ${qt4_public_comps}
   QT5_COMPONENTS ${qt5_public_comps})
-find_package_qt(qt_private_targets REQUIRED
+pv_find_package_qt(qt_private_targets REQUIRED
   QT4_COMPONENTS ${qt4_private_comps}
   QT5_COMPONENTS ${qt5_private_comps})
 
-QT_WRAP_CPP(QtWidgets_MOC_SOURCES ${QtWidgets_SRCS})
+pv_qt_wrap_cpp(QtWidgets_MOC_SOURCES ${QtWidgets_SRCS})
 
 ##########################################################################
 ## Add *.ui files to be uic processed.
@@ -214,7 +214,7 @@ SET(QtWidgets_UI_FORMS
   Resources/UI/pqQuickLaunchDialog.ui
 )
 
-QT_WRAP_UI(QtWidgets_UI_BUILT_SOURCES ${QtWidgets_UI_FORMS})
+pv_qt_wrap_ui(QtWidgets_UI_BUILT_SOURCES ${QtWidgets_UI_FORMS})
 
 ##########################################################################
 ## Add resources.
@@ -222,7 +222,7 @@ SET(UI_RESOURCES
   Resources/QtWidgets.qrc
 )
 
-QT_ADD_RESOURCES(RCS_SOURCES ${UI_RESOURCES})
+pv_qt_add_resources(RCS_SOURCES ${UI_RESOURCES})
 
 SOURCE_GROUP("Resources" FILES
   ${UI_RESOURCES}

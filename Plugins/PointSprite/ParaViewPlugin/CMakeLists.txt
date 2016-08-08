@@ -26,7 +26,7 @@ set(PLUGIN_NAME PointSprite_Plugin)
 
 IF(PARAVIEW_BUILD_QT_GUI)
 
-  find_package_qt(qt_targets REQUIRED QUIET
+  pv_find_package_qt(qt_targets REQUIRED QUIET
     QT4_COMPONENTS QtGui
     QT5_COMPONENTS Widgets)
 
@@ -45,8 +45,8 @@ IF(PARAVIEW_BUILD_QT_GUI)
       pqTransferFunctionDialog.h
       pqTransferFunctionEditor.h
       )
-    qt_wrap_ui(UI_SRCS ${UI_FORMS})
-    qt_wrap_cpp(MOC_SRCS ${PLUGIN_MOC_SRCS})
+    pv_qt_wrap_ui(UI_SRCS ${UI_FORMS})
+    pv_qt_wrap_cpp(MOC_SRCS ${PLUGIN_MOC_SRCS})
 
     set(Plugin_SRCS
       pqDisplayArrayWidget.cxx

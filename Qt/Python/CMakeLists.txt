@@ -71,11 +71,11 @@ include_directories(
 set(${vtk-module}_NO_HeaderTest 1)
 
 include(ParaViewQt)
-find_package_qt(qt_private_targets REQUIRED
+pv_find_package_qt(qt_private_targets REQUIRED
                 QT4_COMPONENTS QtGui
                 QT5_COMPONENTS Widgets)
-qt_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
-qt_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
+pv_qt_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
+pv_qt_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
 
 SOURCE_GROUP("Resources" FILES
   ${Module_UI_FILES}

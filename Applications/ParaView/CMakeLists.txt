@@ -4,11 +4,11 @@ include(ParaViewQt)
 set(qt5_comps Widgets)
 set(qt4_comps QtGui)
 
-find_package_qt(qt_targets REQUIRED QUIET
+pv_find_package_qt(qt_targets REQUIRED QUIET
                 QT4_COMPONENTS ${qt4_comps}
                 QT5_COMPONENTS ${qt5_comps})
-qt_wrap_cpp(MOC_BUILT_SOURCES ParaViewMainWindow.h)
-qt_wrap_ui(UI_BUILT_SOURCES ParaViewMainWindow.ui)
+pv_qt_wrap_cpp(MOC_BUILT_SOURCES ParaViewMainWindow.h)
+pv_qt_wrap_ui(UI_BUILT_SOURCES ParaViewMainWindow.ui)
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}

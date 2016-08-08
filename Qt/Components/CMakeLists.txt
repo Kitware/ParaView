@@ -561,12 +561,12 @@ set (Module_RESOURCE_FILES
 )
 
 include(ParaViewQt)
-find_package_qt(qt_private_targets REQUIRED QUIET
+pv_find_package_qt(qt_private_targets REQUIRED QUIET
   QT4_COMPONENTS QtNetwork
   QT5_COMPONENTS Widgets Network)
-qt_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
-qt_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
-qt_add_resources(__Module_RESOURCE_SRCS ${Module_RESOURCE_FILES})
+pv_qt_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
+pv_qt_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
+pv_qt_add_resources(__Module_RESOURCE_SRCS ${Module_RESOURCE_FILES})
 
 SOURCE_GROUP("Resources" FILES
   ${Module_UI_FILES}

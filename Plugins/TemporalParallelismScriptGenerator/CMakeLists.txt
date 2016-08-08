@@ -27,9 +27,9 @@ SET (TP_MOC_SOURCES
   pqTPPluginManager.h
   )
 include(ParaViewQt)
-find_package_qt(qt_targets REQUIRED QT4_COMPONENTS QtGui QT5_COMPONENTS Widgets)
-QT_WRAP_CPP(MOC_SRCS ${TP_MOC_SOURCES})
-QT_WRAP_UI(UI_SRCS ${UI_RESOURCES})
+pv_find_package_qt(qt_targets REQUIRED QT4_COMPONENTS QtGui QT5_COMPONENTS Widgets)
+pv_qt_wrap_cpp(MOC_SRCS ${TP_MOC_SOURCES})
+pv_qt_wrap_ui(UI_SRCS ${UI_RESOURCES})
 
 #------------------------------------------------------------------------------
 SET (PARAVIEW_PLUGIN_IFACES)

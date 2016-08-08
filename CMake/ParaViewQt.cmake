@@ -13,7 +13,7 @@
 # - Do not use COMPONENTS or OPTIONAL_COMPONENTS instead, use QT4_COMPONENTS,
 #   QT4_OPTIONAL_COMPONENTS and QT5_COMPONENTS, QT5_COMPONENTS to separately
 #   specify the components to use for Qt4 and Qt5.
-macro(find_package_qt out_targets_var)
+macro(pv_find_package_qt out_targets_var)
   if(NOT DEFINED PARAVIEW_QT_VERSION)
     set(PARAVIEW_QT_VERSION "5")
   endif()
@@ -102,7 +102,7 @@ macro(find_package_qt out_targets_var)
   set(${out_targets_var} ${_qt_targets})
 endmacro()
 
-macro(qt_wrap_cpp)
+macro(pv_qt_wrap_cpp)
   if(PARAVIEW_QT_VERSION VERSION_GREATER "4")
     qt5_wrap_cpp(${ARGN})
   else()
@@ -110,7 +110,7 @@ macro(qt_wrap_cpp)
   endif()
 endmacro()
 
-macro(qt_wrap_ui)
+macro(pv_qt_wrap_ui)
   if(PARAVIEW_QT_VERSION VERSION_GREATER "4")
     qt5_wrap_ui(${ARGN})
   else()
@@ -118,7 +118,7 @@ macro(qt_wrap_ui)
   endif()
 endmacro()
 
-macro(qt_add_resources)
+macro(pv_qt_add_resources)
   if(PARAVIEW_QT_VERSION VERSION_GREATER "4")
     qt5_add_resources(${ARGN})
   else()
