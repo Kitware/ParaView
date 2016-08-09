@@ -236,6 +236,7 @@ void pqSpreadSheetViewWidget::onHeaderDataChanged()
       this->model()->headerData(cc, Qt::Horizontal).toString();
     this->setColumnHidden(cc, !shModel->isVisible(cc) || pqIsColumnInternal(headerTitle));
     }
+  this->resizeColumnsToContents();
 }
 
 //-----------------------------------------------------------------------------

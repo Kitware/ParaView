@@ -64,6 +64,7 @@ protected slots:
   void showing(pqDataRepresentation*);
   void displayPrecisionChanged(int);
   void showToggleColumnPopupMenu();
+  void resetColumnVisibility();
   void updateColumnVisibility();
   void toggleCellConnectivity();
 

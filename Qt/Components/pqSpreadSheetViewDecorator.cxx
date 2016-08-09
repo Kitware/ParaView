@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSpreadSheetView.h"
 #include "pqSpreadSheetViewModel.h"
 #include "vtkNew.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMViewProxy.h"
@@ -133,6 +134,9 @@ pqSpreadSheetViewDecorator::~pqSpreadSheetViewDecorator()
 //-----------------------------------------------------------------------------
 void pqSpreadSheetViewDecorator::showing(pqDataRepresentation* repr)
 {
+  QObject::disconnect(this->Internal->AttributeAdaptor,
+    SIGNAL(currentTextChanged(const QString&)),
+    this, SLOT(resetColumnVisibility()));
   this->Internal->Links.removeAllPropertyLinks();
   delete this->Internal->AttributeDomain;
   this->Internal->AttributeDomain = 0;
@@ -151,6 +155,9 @@ void pqSpreadSheetViewDecorator::showing(pqDataRepresentation* repr)
       "checked", SIGNAL(toggled(bool)),
       this->Spreadsheet->getProxy(),
       this->Spreadsheet->getProxy()->GetProperty("SelectionOnly"));
+    QObject::connect(this->Internal->AttributeAdaptor,
+      SIGNAL(currentTextChanged(const QString&)),
+      this, SLOT(resetColumnVisibility()));
     }
   else
     {
@@ -185,12 +192,17 @@ void pqSpreadSheetViewDecorator::currentIndexChanged(pqOutputPort* port)
         }
       }
     }
+  this->resetColumnVisibility();
 }
 
 //-----------------------------------------------------------------------------
 void pqSpreadSheetViewDecorator::displayPrecisionChanged(int precision)
 {
   this->Spreadsheet->getViewModel()->setDecimalPrecision(precision);
+  for(int i=0; i < this->Spreadsheet->getViewModel()->columnCount(); i++)
+    {
+    this->Spreadsheet->getViewModel()->setVisible(i, true);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -235,14 +247,72 @@ void pqSpreadSheetViewDecorator::updateColumnVisibility()
         this->Spreadsheet->getViewModel()->headerData(i, Qt::Horizontal).toString());
     }
 
+  QList<QPair<QString, bool> > visibilities;
   foreach(QAction* a, this->Internal->ColumnToggleMenu.findChildren<QAction*>())
     {
     int index = headers.indexOf(a->text());
     if(index >= 0)
       {
       this->Spreadsheet->getViewModel()->setVisible(index, a->isChecked());
+
+      // Recover actual name to update ColumnVisibility in vtkSpreadsheetView
+      // for a potential export. This property has no effect on actual 
+      // table generation for the view in paraview.
+      QString actualName = a->text();
+      if (actualName == "Point ID" || actualName == "Cell ID" || actualName == "Row ID"
+          || actualName == "Vertex ID" || actualName == "Edge ID")
+        {
+        actualName = "vtkOriginalIndices";
+        }
+      if (actualName == "Block Number")
+        {
+        actualName = "vtkCompositeIndexArray";
+        }
+      if (actualName == "Process ID")
+        {
+        actualName = "vtkOriginalProcessIds";
+        }
+      visibilities.push_back(QPair<QString, bool>(actualName, a->isChecked()));
       }
     }
+
+  // Add Already hidden columns
+  for(int i=0; i < this->Spreadsheet->getViewModel()->columnCount(); i++)
+    {
+    QString name =
+      this->Spreadsheet->getViewModel()->headerData(i, Qt::Horizontal).toString();
+    if(name.startsWith("__"))
+      {
+      visibilities.push_back(QPair<QString, bool>(name, false));
+      }
+    }
+
+  // If no AttributeDomain is present, it means there is no data to work with. 
+  if (this->Internal->AttributeDomain)
+    {
+    int index = 0;
+    vtkSMPropertyHelper columnVisiHelper(this->Spreadsheet->getProxy(), "ColumnVisibility");
+    columnVisiHelper.SetNumberOfElements(visibilities.size() * 3);
+    int fieldAssociation = vtkSMIntVectorProperty::SafeDownCast(
+      this->Internal->AttributeDomain->getProperty())->GetElement(0);
+    QPair<QString, bool> pair;
+    foreach(pair, visibilities)
+      {
+      columnVisiHelper.Set(index, fieldAssociation);
+      columnVisiHelper.Set(index+1, pair.first.toAscii().data());
+      columnVisiHelper.Set(index+2, pair.second);
+      index += 3;
+      }
+    this->Spreadsheet->getProxy()->UpdateVTKObjects();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqSpreadSheetViewDecorator::resetColumnVisibility()
+{
+  this->Internal->ColumnToggleMenu.clear();
+  this->Spreadsheet->getViewModel()->clearVisible();
+  this->updateColumnVisibility();
 }
 
 //-----------------------------------------------------------------------------
@@ -261,8 +331,8 @@ void pqSpreadSheetViewDecorator::toggleCellConnectivity()
       }
     this->Spreadsheet->render();
     }
+  this->resetColumnVisibility();
 }
-
 
 //-----------------------------------------------------------------------------
 bool pqSpreadSheetViewDecorator::allowChangeOfSource() const
