@@ -1,6 +1,6 @@
 # This plugin demonstrates creating new types pqPropertyWidget and
 # pqPropertyWidgetDecorator instances for customizing the Properties panel.
-cmake_minimum_required(VERSION 2.8.8)
+cmake_minimum_required(VERSION 3.3)
 
 if (NOT ParaView_BINARY_DIR)
   find_package(ParaView REQUIRED)

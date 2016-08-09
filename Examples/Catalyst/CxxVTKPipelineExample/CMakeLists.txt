@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.8)
+cmake_minimum_required(VERSION 3.3)
 project(CatalystCxxVTKPipelineExample)
 
 set(USE_CATALYST ON CACHE BOOL "Link the simulator with Catalyst")

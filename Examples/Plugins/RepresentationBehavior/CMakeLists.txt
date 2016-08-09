@@ -3,7 +3,7 @@
 # Typicialy when a representation will be created, the behavior will
 # try to set it representation to Surface and pick on of the scalar data array
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+cmake_minimum_required(VERSION 3.3)
 
 IF(NOT ParaView_BINARY_DIR)
   FIND_PACKAGE(ParaView REQUIRED)

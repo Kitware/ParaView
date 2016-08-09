@@ -2,7 +2,7 @@
 # Example plugin demonstrating how to add a dock panel to ParaView.
 # This plugin adds the panel ExampleDockPanel to the client.
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
+cmake_minimum_required(VERSION 3.3)
 
 IF(NOT ParaView_BINARY_DIR)
   FIND_PACKAGE(ParaView REQUIRED)

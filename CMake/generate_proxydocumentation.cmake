@@ -1,6 +1,6 @@
 # This file is used by generate_htmls_from_xmls function in ParaViewMacros.cmake
 # to split a file consisting of multiple htmls into multiple files.
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.3)
 
 # INPUT VARIABLES:
 # xmlpatterns       :- xmlpatterns executable.

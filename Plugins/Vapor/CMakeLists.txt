@@ -2,7 +2,7 @@ PROJECT(VDFReader)
 
 # Plugin that uses the Vapor libraries to read VDF files into ParaView
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.3)
 
 IF (ParaView_SOURCE_DIR)
   #building within the ParaView source tree

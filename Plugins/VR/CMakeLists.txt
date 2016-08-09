@@ -1,7 +1,7 @@
 # Create an auto-start plugin. Auto start plugins provide callbacks that get
 # called when the plugin is loaded and when the application shutsdown.
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
+cmake_minimum_required(VERSION 3.3)
 
 # Find and Include ParaView
 if(NOT ParaView_SOURCE_DIR)

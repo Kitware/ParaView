@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.8 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.3)
 project(Clone1)
 
 FIND_PACKAGE(ParaView REQUIRED)

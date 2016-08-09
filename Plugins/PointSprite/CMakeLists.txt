@@ -1,5 +1,5 @@
 project(PointSpritePlugin)
-cmake_minimum_required(VERSION 2.8.8)
+cmake_minimum_required(VERSION 3.3)
 
 # -----------------------------------------------------------------------------
 # Disable deprecation warnings for standard C and STL functions in VS2005 and
