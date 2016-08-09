@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -89,13 +89,13 @@ pqSpreadSheetViewDecorator::pqSpreadSheetViewDecorator(pqSpreadSheetView* view):
 
   QWidget* header = new QWidget(container);
   QVBoxLayout* layout = qobject_cast<QVBoxLayout*>(container->layout());
-  
+
   this->Internal = new pqInternal();
   this->Internal->setupUi(header);
   this->Internal->Source->setAutoUpdateIndex(false);
   this->Internal->Source->addCustomEntry("None", NULL);
   this->Internal->Source->fillExistingPorts();
-  this->Internal->AttributeAdaptor = 
+  this->Internal->AttributeAdaptor =
     new pqSignalAdaptorComboBox(this->Internal->Attribute);
   this->Internal->spinBoxPrecision->setValue(
     this->Spreadsheet->getViewModel()->getDecimalPrecision());
@@ -103,7 +103,7 @@ pqSpreadSheetViewDecorator::pqSpreadSheetViewDecorator(pqSpreadSheetView* view):
     this->Internal->spinBoxPrecision);
   QObject::connect(this->Internal->spinBoxPrecision, SIGNAL(valueChanged(int)),
     this, SLOT(displayPrecisionChanged(int)));
-    
+
   this->Internal->AttributeDomain = 0;
 
   QObject::connect(&this->Internal->Links, SIGNAL(smPropertyChanged()),
@@ -256,7 +256,7 @@ void pqSpreadSheetViewDecorator::updateColumnVisibility()
       this->Spreadsheet->getViewModel()->setVisible(index, a->isChecked());
 
       // Recover actual name to update ColumnVisibility in vtkSpreadsheetView
-      // for a potential export. This property has no effect on actual 
+      // for a potential export. This property has no effect on actual
       // table generation for the view in paraview.
       QString actualName = a->text();
       if (actualName == "Point ID" || actualName == "Cell ID" || actualName == "Row ID"
@@ -287,7 +287,7 @@ void pqSpreadSheetViewDecorator::updateColumnVisibility()
       }
     }
 
-  // If no AttributeDomain is present, it means there is no data to work with. 
+  // If no AttributeDomain is present, it means there is no data to work with.
   if (this->Internal->AttributeDomain)
     {
     int index = 0;
