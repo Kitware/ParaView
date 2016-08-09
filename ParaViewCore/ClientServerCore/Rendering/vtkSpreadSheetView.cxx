@@ -608,7 +608,8 @@ bool vtkSpreadSheetView::Export(vtkCSVExporter* exporter)
   vtkIdType numBlocks = (this->GetNumberOfRows() / blockSize) + 1;
   for (vtkIdType cc=0; cc < numBlocks; cc++)
     {
-    vtkTable* block = this->FetchBlock(cc, true);
+    vtkTable* block = this->FetchBlock(cc, 
+      exporter->GetFilterColumnsByVisibility());
     if (cc==0)
       {
       exporter->WriteHeader(block->GetRowData());

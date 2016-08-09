@@ -3312,7 +3312,7 @@
                             element_types="0 2 0"
                             name="ColumnVisibility"
                             number_of_elements_per_command="3"
-                            panel_visibility="default"
+                            panel_visibility="never"
                             repeat_command="1"/>
         <Documentation>Set the current column visibility in the spreadsheet view
         to be used for export.</Documentation>
