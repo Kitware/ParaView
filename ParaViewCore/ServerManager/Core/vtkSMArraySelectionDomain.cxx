@@ -50,7 +50,7 @@ int vtkSMArraySelectionDomain::SetDefaultValues(vtkSMProperty* prop, bool use_un
     if (vtkSMArraySelectionDomain::LoadAllVariables == true)
       {
       vtkSMPropertyHelper helper(vprop);
-      for (vtkIdType i=0;i<this->GetNumberOfStrings();i++)
+      for (unsigned int i=0;i<this->GetNumberOfStrings();i++)
         {
         helper.SetStatus(this->GetString(i),1);
         }
