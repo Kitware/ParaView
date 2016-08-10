@@ -281,8 +281,6 @@ set (Module_SRCS
   pqSILWidget.h
   pqSMSignalAdaptors.cxx
   pqSMSignalAdaptors.h
-  pqSpreadSheetViewDecorator.cxx
-  pqSpreadSheetViewDecorator.h
   pqStandardLegacyCustomPanels.cxx
   pqStandardLegacyCustomPanels.h
   pqStringVectorPropertyWidget.cxx
@@ -440,7 +438,6 @@ set (Module_MOC_HDRS
   pqSILModel.h
   pqSILWidget.h
   pqSMSignalAdaptors.h
-  pqSpreadSheetViewDecorator.h
   pqStandardLegacyCustomPanels.h
   pqStringVectorPropertyWidget.h
   pqTabbedMultiViewWidget.h
@@ -513,7 +510,6 @@ set (Module_UI_FILES
   Resources/UI/pqServerLauncherDialog.ui
   Resources/UI/pqSetBreakpointDialog.ui
   Resources/UI/pqSettingsDialog.ui
-  Resources/UI/pqSpreadSheetViewDecorator.ui
   Resources/UI/pqTimerLogDisplay.ui
   Resources/UI/pqViewFrame.ui
 )

@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Includes.
 #include "pqComboBoxDomain.h"
 #include "pqDataRepresentation.h"
+#include "pqExportReaction.h"
 #include "pqOutputPort.h"
 #include "pqPropertyLinks.h"
 #include "pqSignalAdaptors.h"
@@ -119,6 +120,9 @@ pqSpreadSheetViewDecorator::pqSpreadSheetViewDecorator(pqSpreadSheetView* view):
     this, SLOT(currentIndexChanged(pqOutputPort*)));
   QObject::connect(this->Spreadsheet, SIGNAL(showing(pqDataRepresentation*)),
     this, SLOT(showing(pqDataRepresentation*)));
+
+  this->Internal->ExportSpreadsheet->setDefaultAction(this->Internal->actionExport);
+  new pqExportReaction(this->Internal->ExportSpreadsheet->defaultAction());
 
   layout->insertWidget(0, header);
   this->showing(0); //TODO: get the actual repr currently shown by the view.
