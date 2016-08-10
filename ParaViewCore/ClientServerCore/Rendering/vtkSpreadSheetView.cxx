@@ -482,6 +482,12 @@ vtkTable* vtkSpreadSheetView::FetchBlock(vtkIdType blockindex, bool filterColumn
 //----------------------------------------------------------------------------
 vtkTable* vtkSpreadSheetView::FetchBlockCallback(vtkIdType blockindex, bool filterColumn)
 {
+  // Sanity Check
+  if (!this->Internals->ActiveRepresentation)
+    {
+    return NULL;
+    }
+
   //cout << "FetchBlockCallback" << endl;
   vtkMultiProcessStream stream;
   stream << this->Identifier << static_cast<int>(blockindex);
@@ -610,11 +616,14 @@ bool vtkSpreadSheetView::Export(vtkCSVExporter* exporter)
     {
     vtkTable* block = this->FetchBlock(cc, 
       exporter->GetFilterColumnsByVisibility());
-    if (cc==0)
+    if (block)
       {
-      exporter->WriteHeader(block->GetRowData());
+      if (cc==0)
+        {
+        exporter->WriteHeader(block->GetRowData());
+        }
+      exporter->WriteData(block->GetRowData());
       }
-    exporter->WriteData(block->GetRowData());
     }
   exporter->Close();
   return true;
