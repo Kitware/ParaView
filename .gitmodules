@@ -12,4 +12,4 @@
 	url = https://gitlab.kitware.com/paraview/protobuf.git
 [submodule "ThirdParty/QtTesting/vtkqttesting"]
 	path = ThirdParty/QtTesting/vtkqttesting
-	url = https://github.com/Kitware/QtTesting.git
+	url = https://gitlab.kitware.com/paraview/qttesting.git
