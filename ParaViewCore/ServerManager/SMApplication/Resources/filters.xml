@@ -273,7 +273,38 @@
         <Documentation> A convenient way to reload the data file </Documentation>
       </Property>
     </SourceProxy>
-      <!-- End of AdditionalFieldReader -->
+    <!-- End of AdditionalFieldReader -->
+    <SourceProxy class="vtkCountFaces"
+                 label="Count Cell Faces"
+                 name="CountCellFaces">
+      <Documentation long_help="Counts the number of faces on each cell and appends a new cell data array."
+                     short_help="Adds a new cell data array containing the number of faces per cell.">
+        Adds a new cell data array containing the number of faces per cell.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>The input.</Documentation>
+      </InputProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetOutputArrayName"
+                            name="OutputArrayName"
+                            label="Faces Array Name"
+                            default_values="Face Count"
+                            number_of_elements="1"
+                            panel_visibility="always">
+        <Documentation>
+          This is the name of the array in the output containing the face counts.
+        </Documentation>
+      </StringVectorProperty>
+    </SourceProxy>
+    <!-- End of CountFaces -->
     <SourceProxy class="vtkEnvironmentAnnotationFilter"
                  label="Environment Annotation"
                  name="EnvironmentAnnotation">

@@ -150,6 +150,7 @@
   <Proxy group="filters" name="Clip" />
   <Proxy group="filters" name="ClipClosedSurface" />
   <Proxy group="filters" name="Contour" />
+  <Proxy group="filters" name="CountCellFaces" />
   <Proxy group="filters" name="Curvatures" />
   <Proxy group="filters" name="Cut" />
   <Proxy group="filters" name="CutEverything" />
