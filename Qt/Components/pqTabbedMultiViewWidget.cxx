@@ -351,11 +351,15 @@ void pqTabbedMultiViewWidget::proxyAdded(pqProxy* proxy)
         }
       }
 
-    // FIXME: we may want to give server-manager the opportunity to place the
-    // view after creation, if it wants. The GUI should try to find a place for
-    // it, only if the server-manager (through undo-redo, or loading state or
-    // Python or collaborative-client).
-    this->assignToFrame(view, true);
+    if (!(proxy->getProxy()->HasAnnotation("ParaView::DetachedFromLayout") &&
+        strcmp(proxy->getProxy()->GetAnnotation("ParaView::DetachedFromLayout"),"true") == 0))
+      {
+      // FIXME: we may want to give server-manager the opportunity to place the
+      // view after creation, if it wants. The GUI should try to find a place for
+      // it, only if the server-manager (through undo-redo, or loading state or
+      // Python or collaborative-client).
+      this->assignToFrame(view, true);
+      }
     }
 }
 

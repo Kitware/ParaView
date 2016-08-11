@@ -118,7 +118,7 @@ public:
 
   /// Creates a new view module of the given type on the given server.
   virtual pqView* createView(const QString& type,
-    pqServer* server);
+    pqServer* server, bool detachedFromLayout = false);
 
   /// Destroys the view module. This destroys the view module
   /// as well as all the displays in the view module.

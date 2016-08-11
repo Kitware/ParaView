@@ -116,9 +116,11 @@ def SetActiveConnection(connection=None, ns=None):
 #==============================================================================
 # Views and Layout methods
 #==============================================================================
-
-def CreateView(view_xml_name, **params):
-    "Creates and returns the specified proxy view based on its name/label."
+def CreateView(view_xml_name, detachedFromLayout=False, **params):
+    """Creates and returns the specified proxy view based on its name/label.
+    If detachedFromLayout is true, the view will no be grabbed by the layout
+    hence not visible unless it is attached after. This also set params keywords
+    arguments as view properties."""
     view = servermanager._create_view(view_xml_name)
     if not view:
         raise RuntimeError, "Failed to create requested view", view_xml_name
@@ -137,6 +139,8 @@ def CreateView(view_xml_name, **params):
     controller.PreInitializeProxy(view)
     SetProperties(view, **params)
     controller.PostInitializeProxy(view)
+    if detachedFromLayout:
+      view.SMProxy.SetAnnotation("ParaView::DetachedFromLayout", "true")
     controller.RegisterViewProxy(view, registrationName)
 
     # setup an interactor if current process support interaction if an
@@ -147,50 +151,58 @@ def CreateView(view_xml_name, **params):
 
 # -----------------------------------------------------------------------------
 
-def CreateRenderView(**params):
-    """"Create standard 3D render view"""
-    return CreateView("RenderView", **params)
+def CreateRenderView(detachedFromLayout=False, **params):
+    """"Create standard 3D render view.
+    See CreateView for arguments documentation"""
+    return CreateView("RenderView", detachedFromLayout, **params)
 
 # -----------------------------------------------------------------------------
 
-def CreateXYPlotView(**params):
-    """Create XY plot Chart view"""
-    return CreateView("XYChartView", **params)
+def CreateXYPlotView(detachedFromLayout=False, **params):
+    """Create XY plot Chart view.
+    See CreateView for arguments documentation"""
+    return CreateView("XYChartView", detachedFromLayout=False, **params)
 
 # -----------------------------------------------------------------------------
 
-def CreateBarChartView(**params):
-    """"Create Bar Chart view"""
-    return CreateView("XYBarChartView", **params)
+def CreateBarChartView(detachedFromLayout=False, **params):
+    """"Create Bar Chart view.
+    See CreateView for arguments documentation"""
+    return CreateView("XYBarChartView", detachedFromLayout, **params)
 
 # -----------------------------------------------------------------------------
 
-def CreateComparativeRenderView(**params):
-    """"Create Comparative view"""
-    return CreateView("ComparativeRenderView", **params)
+def CreateComparativeRenderView(detachedFromLayout=False, **params):
+    """"Create Comparative view.
+    See CreateView for arguments documentation"""
+    return CreateView("ComparativeRenderView", detachedFromLayout, **params)
 
 # -----------------------------------------------------------------------------
 
-def CreateComparativeXYPlotView(**params):
-    """"Create comparative XY plot Chart view"""
-    return CreateView("ComparativeXYPlotView", **params)
+def CreateComparativeXYPlotView(detachedFromLayout=False, **params):
+    """"Create comparative XY plot Chart view.
+    See CreateView for arguments documentation"""
+    return CreateView("ComparativeXYPlotView", detachedFromLayout, **params)
 
 # -----------------------------------------------------------------------------
 
-def CreateComparativeBarChartView(**params):
-    """"Create comparative Bar Chart view"""
-    return CreateView("ComparativeBarChartView", **params)
+def CreateComparativeBarChartView(detachedFromLayout=False, **params):
+    """"Create comparative Bar Chart view.
+    See CreateView for arguments documentation"""
+    return CreateView("ComparativeBarChartView", detachedFromLayout, **params)
 
 # -----------------------------------------------------------------------------
 
-def CreateParallelCoordinatesChartView(**params):
-    """"Create Parallele coordinate Chart view"""
+def CreateParallelCoordinatesChartView(detachedFromLayout=False, **params):
+    """"Create Parallele coordinate Chart view.
+    See CreateView for arguments documentation"""
     return CreateView("ParallelCoordinatesChartView", **params)
 
 # -----------------------------------------------------------------------------
 
-def Create2DRenderView(**params):
-    """"Create the standard 3D render view with the 2D interaction mode turned ON"""
+def Create2DRenderView(detachedFromLayout=False, **params):
+    """"Create the standard 3D render view with the 2D interaction mode turned ON.
+    See CreateView for arguments documentation"""
     return CreateView("2DRenderView", **params)
 
 # -----------------------------------------------------------------------------

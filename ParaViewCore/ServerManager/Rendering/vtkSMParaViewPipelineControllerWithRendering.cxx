@@ -674,6 +674,13 @@ bool vtkSMParaViewPipelineControllerWithRendering::RegisterViewProxy(
     {
     return false;
     }
+      
+  bool retval = this->Superclass::RegisterViewProxy(proxy, proxyname);
+  if(proxy->HasAnnotation("ParaView::DetachedFromLayout") && 
+    strcmp(proxy->GetAnnotation("ParaView::DetachedFromLayout"), "true") == 0)
+    {
+    return retval;
+    }
 
   vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
 
@@ -694,7 +701,6 @@ bool vtkSMParaViewPipelineControllerWithRendering::RegisterViewProxy(
       activeLayout->FastDelete();
       }
     }
-  bool retval = this->Superclass::RegisterViewProxy(proxy, proxyname);
   if (activeLayout)
     {
     vtkSMProxy* layoutAssigned = vtkSMViewLayoutProxy::FindLayout(vtkSMViewProxy::SafeDownCast(proxy));
