@@ -3567,21 +3567,21 @@
             <Property name="MeshVisibility"
                       panel_visibility="never" />
             <Property name="Orient"
-                      panel_visibility="never" />
+                      panel_visibility="advanced" />
             <Property name="OrientationMode"
-                      panel_visibility="never" />
-            <Property name="ScaleFactor"
-                      panel_visibility="never" />
-            <Property name="ScaleMode"
-                      panel_visibility="never" />
+                      panel_visibility="advanced" />
+            <Property name="SelectOrientationVectors"
+                      panel_visibility="advanced" />
             <Property name="Scaling"
-                      panel_visibility="never" />
+                      panel_visibility="advanced" />
+            <Property name="ScaleMode"
+                      panel_visibility="advanced" />
+            <Property name="ScaleFactor"
+                      panel_visibility="advanced" />
             <Property name="SelectMaskArray"
                       panel_visibility="never" />
-            <Property name="SelectOrientationVectors"
-                      panel_visibility="never" />
             <Property name="SelectScaleArray"
-                      panel_visibility="never" />
+                      panel_visibility="advanced" />
             <Property name="GlyphType"
                       panel_visibility="advanced"
                       panel_visibility_default_for_representation="3d glyphs"/>
@@ -4560,14 +4560,19 @@
                             number_of_elements="1"></StringVectorProperty>
       <StringVectorProperty command="SetScaleArray"
                             default_values=""
-                            label="Scale"
+                            label="Scale Array"
                             name="SelectScaleArray"
-                            number_of_elements="1"></StringVectorProperty>
-      <StringVectorProperty command="SetOrientationArray"
-                            default_values=""
-                            label="Orientation Vectors"
-                            name="SelectOrientationVectors"
-                            number_of_elements="1"></StringVectorProperty>
+                            number_of_elements="1">
+        <ArrayListDomain attribute_type="any"
+                         input_domain_name="input_array_point"
+                         name="array_list"
+                         none_string="None">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
       <IntVectorProperty command="SetScaling"
                          default_values="0"
                          name="Scaling"
@@ -4589,6 +4594,21 @@
                  value="2" />
         </EnumerationDomain>
       </IntVectorProperty>
+      <StringVectorProperty command="SetOrientationArray"
+                            default_values=""
+                            label="Orientation Vectors"
+                            name="SelectOrientationVectors"
+                            number_of_elements="1">
+        <ArrayListDomain attribute_type="Vectors"
+                         input_domain_name="input_array_point"
+                         name="array_list"
+                         none_string="None">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
       <DoubleVectorProperty command="SetScaleFactor"
                             default_values="1.0"
                             name="ScaleFactor"
