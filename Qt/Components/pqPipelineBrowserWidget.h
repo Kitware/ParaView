@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqPipelineModel;
 class pqPipelineAnnotationFilterModel;
 class pqPipelineSource;
+class pqOutputPort;
 class pqView;
 class vtkSession;
 
@@ -77,6 +78,9 @@ public:
   /// @note Moved from proteced
   const QModelIndex pipelineModelIndex(const QModelIndex& index) const;
   const pqPipelineModel* getPipelineModel(const QModelIndex& index) const;
+
+  /// static method to sets the visibility of a pqOutputPort
+  static void setVisibility(bool visible, pqOutputPort* port);
 
 signals:
   /// Fired when the delete key is pressed.
