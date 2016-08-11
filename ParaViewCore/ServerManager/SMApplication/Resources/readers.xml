@@ -5825,6 +5825,16 @@
         reconstructed mesh should be read</Documentation>
       </IntVectorProperty>
       <IntVectorProperty animateable="0"
+                         command="SetUse64BitLabels"
+                         default_values="0"
+                         label="Expect 64-bit Labels"
+                         name="Use64BitLabels"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Expect the openFOAM case to use 64-bit label values.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
                          command="SetCreateCellToPoint"
                          default_values="1"
                          label="Create cell-to-point filtered data"
