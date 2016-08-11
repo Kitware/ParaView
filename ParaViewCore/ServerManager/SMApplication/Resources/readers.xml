@@ -7589,6 +7589,38 @@ series.
       </Hints>
     </SourceProxy>
     <!-- End VASPAnimationReader -->
+    <SourceProxy class="vtkVASPTessellationReader"
+                 label="VASP Tessellation Reader"
+                 name="VASPTessellationReader">
+      <Documentation long_help="Reads a VASP NPT_Z_TESSELLATE.out file."
+                     short_help="Read a VASP tessellation file.">
+      </Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>The name of the file to load.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>
+          Reports time values to the GUI.
+        </Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="out"
+                       file_description="VASP Tessellation Files" />
+      </Hints>
+      <OutputPort index="0"
+                  name="Molecule" />
+      <OutputPort index="1"
+                  name="Voronoi Tessellation" />
+    </SourceProxy>
+    <!-- End VASPTessellationReader -->
     <!-- Begin Ensemble Data Reader -->
     <EnsembleDataReaderProxy class="vtkEnsembleDataReader"
                              label="Ensemble Data Reader"
