@@ -57,7 +57,7 @@ If you have found a bug:
 3. Finally, if the issue is not resolved by the above steps, open
    an entry in the [ParaView Issue Tracker][].
 
-[ParaView Issue Tracker]: http://www.paraview.org/Bug
+[ParaView Issue Tracker]: https://gitlab.kitware.com/paraview/paraview/issues
 
 Contributing
 ============
