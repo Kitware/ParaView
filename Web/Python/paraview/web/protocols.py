@@ -131,7 +131,17 @@ class ParaViewWebProtocol(vtk_protocols.vtkWebProtocol):
         else:
             absolutePath = os.path.join(self.baseDirectory, relativePath)
 
-        return os.path.normpath(absolutePath)
+        cleanedPath = os.path.normpath(absolutePath)
+
+        # Make sure the cleanedPath is part of the allowed ones
+        if self.multiRoot:
+            for key, value in self.baseDirectoryMap.iteritems():
+                if cleanedPath.startswith(value):
+                    return cleanedPath
+        elif cleanedPath.startswith(self.baseDirectory):
+            return cleanedPath
+
+        return None
 
     def updateScalarBars(self, view=None, mode=1):
         """
@@ -1761,9 +1771,16 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         fileToLoad = []
         if type(relativePath) == list:
             for file in relativePath:
-               fileToLoad.append(self.getAbsolutePath(file))
+                validPath = self.getAbsolutePath(file)
+                if validPath:
+                    fileToLoad.append(validPath)
         else:
-            fileToLoad.append(self.getAbsolutePath(relativePath))
+            validPath = self.getAbsolutePath(relativePath)
+            if validPath:
+                fileToLoad.append(validPath)
+
+        if len(fileToLoad) == 0:
+            return { 'success': False, 'reason': 'No valid path name' }
 
         # Get file extension and look for configured reader
         idx = fileToLoad[0].rfind('.')
