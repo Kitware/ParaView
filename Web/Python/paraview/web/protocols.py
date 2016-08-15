@@ -131,7 +131,17 @@ class ParaViewWebProtocol(vtk_protocols.vtkWebProtocol):
         else:
             absolutePath = os.path.join(self.baseDirectory, relativePath)
 
-        return os.path.normpath(absolutePath)
+        cleanedPath = os.path.normpath(absolutePath)
+
+        # Make sure the cleanedPath is part of the allowed ones
+        if self.multiRoot:
+            for key, value in self.baseDirectoryMap.iteritems():
+                if cleanedPath.startswith(value):
+                    return cleanedPath
+        elif cleanedPath.startswith(self.baseDirectory):
+            return cleanedPath
+
+        return None
 
     def updateScalarBars(self, view=None, mode=1):
         """
@@ -1761,9 +1771,16 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         fileToLoad = []
         if type(relativePath) == list:
             for file in relativePath:
-               fileToLoad.append(self.getAbsolutePath(file))
+                validPath = self.getAbsolutePath(file)
+                if validPath:
+                    fileToLoad.append(validPath)
         else:
-            fileToLoad.append(self.getAbsolutePath(relativePath))
+            validPath = self.getAbsolutePath(relativePath)
+            if validPath:
+                fileToLoad.append(validPath)
+
+        if len(fileToLoad) == 0:
+            return { 'success': False, 'reason': 'No valid path name' }
 
         # Get file extension and look for configured reader
         idx = fileToLoad[0].rfind('.')
@@ -1970,241 +1987,6 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
 
 # =============================================================================
 #
-# Pipeline manager
-#
-# =============================================================================
-
-class ParaViewWebPipelineManager(ParaViewWebProtocol):
-
-    def __init__(self, baseDir=None, fileToLoad=None):
-        super(ParaViewWebPipelineManager, self).__init__()
-        # Setup global variables
-        self.pipeline = helper.Pipeline('Kitware')
-        self.view = simple.GetRenderView()
-        self.baseDir = baseDir;
-        simple.SetActiveView(self.view)
-        simple.Render()
-        if fileToLoad and fileToLoad[-5:] != '.pvsm':
-            try:
-                self.openFile(fileToLoad)
-            except:
-                print "error loading..."
-
-    def getColorTransferFunction(self, arrayName):
-        proxyMgr = vtkSMProxyManager.GetProxyManager()
-        sessionProxyMgr = proxyMgr.GetActiveSessionProxyManager()
-        lutMgr = vtkSMTransferFunctionManager()
-        return lutMgr.GetColorTransferFunction(arrayName, sessionProxyMgr)
-
-    # RpcName: reloadPipeline => pv.pipeline.manager.reload
-    @exportRpc("pv.pipeline.manager.reload")
-    def reloadPipeline(self):
-        self.pipeline.clear()
-        pxm = simple.servermanager.ProxyManager()
-
-        # Fill tree structure (order-less)
-        for proxyInfo in pxm.GetProxiesInGroup("sources"):
-            id = str(proxyInfo[1])
-            proxy = helper.idToProxy(id)
-            parentId = helper.getParentProxyId(proxy)
-            self.pipeline.addNode(parentId, id)
-
-        return self.pipeline.getRootNode(self.getView(-1))
-
-    # RpcName: getPipeline => pv.pipeline.manager.pipeline.get
-    @exportRpc("pv.pipeline.manager.pipeline.get")
-    def getPipeline(self):
-        if self.pipeline.isEmpty():
-            return self.reloadPipeline()
-        return self.pipeline.getRootNode(self.getView(-1))
-
-    # RpcName: addSource => pv.pipeline.manager.proxy.add
-    @exportRpc("pv.pipeline.manager.proxy.add")
-    def addSource(self, algo_name, parent):
-        pid = str(parent)
-        parentProxy = helper.idToProxy(parent)
-        if parentProxy:
-            simple.SetActiveSource(parentProxy)
-        else:
-            pid = '0'
-
-        # Create new source/filter
-        cmdLine = 'simple.' + algo_name + '()'
-        newProxy = eval(cmdLine)
-
-        # Create its representation and render
-        simple.Show()
-        simple.Render()
-        simple.ResetCamera()
-        self.getApplication().InvokeEvent('PushRender')
-
-        # Add node to pipeline
-        self.pipeline.addNode(pid, newProxy.GetGlobalIDAsString())
-
-        # Handle domains
-        helper.apply_domains(parentProxy, newProxy.GetGlobalIDAsString())
-
-        # Return the newly created proxy pipeline node
-        return helper.getProxyAsPipelineNode(newProxy.GetGlobalIDAsString(), self.getView(-1))
-
-    # RpcName: deleteSource => pv.pipeline.manager.proxy.delete
-    @exportRpc("pv.pipeline.manager.proxy.delete")
-    def deleteSource(self, proxy_id):
-        self.pipeline.removeNode(proxy_id)
-        proxy = helper.idToProxy(proxy_id)
-        simple.Delete(proxy)
-        simple.Render()
-        self.getApplication().InvokeEvent('PushRender')
-
-    # RpcName: updateDisplayProperty => pv.pipeline.manager.proxy.representation.update
-    @exportRpc("pv.pipeline.manager.proxy.representation.update")
-    def updateDisplayProperty(self, options):
-        proxy = helper.idToProxy(options['proxy_id'])
-        rep = simple.GetDisplayProperties(proxy)
-        helper.updateProxyProperties(rep, options)
-
-        if options.has_key('ColorArrayName') and len(options['ColorArrayName']) > 0:
-            name = options['ColorArrayName']
-            type = options['ColorAttributeType']
-
-            if type == 'POINT_DATA':
-                attr_type = vtkDataObject.POINT
-            elif type == 'CELL_DATA':
-                attr_type = vtkDataObject.CELL
-
-            dataRepr = simple.GetRepresentation(proxy)
-
-            vtkSMPVRepresentationProxy.SetScalarColoring(dataRepr.SMProxy, name, attr_type)
-            vtkSMPVRepresentationProxy.RescaleTransferFunctionToDataRange(dataRepr.SMProxy, name, attr_type, True)
-
-        simple.Render()
-        self.getApplication().InvokeEvent('PushRender')
-
-    # RpcName: pushState => pv.pipeline.manager.proxy.update
-    @exportRpc("pv.pipeline.manager.proxy.update")
-    def pushState(self, state):
-        proxy_type = None
-        for proxy_id in state:
-            if proxy_id in ['proxy', 'widget_source']:
-                proxy_type = proxy_id
-                continue
-            proxy = helper.idToProxy(proxy_id);
-            helper.updateProxyProperties(proxy, state[proxy_id])
-            simple.Render()
-            self.getApplication().InvokeEvent('PushRender')
-
-        if proxy_type == 'proxy':
-            return helper.getProxyAsPipelineNode(state['proxy'], self.getView(-1))
-        elif proxy_type == 'widget_source':
-            proxy.UpdateWidget(proxy.Observed)
-
-    # RpcName: openFile => pv.pipeline.manager.file.open
-    @exportRpc("pv.pipeline.manager.file.open")
-    def openFile(self, path):
-        reader = simple.OpenDataFile(path)
-        simple.RenameSource( path.split("/")[-1], reader)
-        simple.Show()
-        simple.Render()
-        simple.ResetCamera()
-        self.getApplication().InvokeEvent('PushRender')
-
-        # Add node to pipeline
-        self.pipeline.addNode('0', reader.GetGlobalIDAsString())
-
-        return helper.getProxyAsPipelineNode(reader.GetGlobalIDAsString(), self.getView(-1))
-
-    # RpcName: openRelativeFile => pv.pipeline.manager.file.ropen
-    @exportRpc("pv.pipeline.manager.file.ropen")
-    def openRelativeFile(self, relativePath):
-        fileToLoad = []
-        if type(relativePath) == list:
-            for file in relativePath:
-               fileToLoad.append(os.path.join(self.baseDir, file))
-        else:
-            fileToLoad.append(os.path.join(self.baseDir, relativePath))
-
-        reader = simple.OpenDataFile(fileToLoad)
-        name = fileToLoad[0].split("/")[-1]
-        if len(name) > 15:
-            name = name[:15] + '*'
-        simple.RenameSource(name, reader)
-        simple.Show()
-        simple.Render()
-        simple.ResetCamera()
-        self.getApplication().InvokeEvent('PushRender')
-
-        # Add node to pipeline
-        self.pipeline.addNode('0', reader.GetGlobalIDAsString())
-
-        return helper.getProxyAsPipelineNode(reader.GetGlobalIDAsString(), self.getView(-1))
-
-    # RpcName: updateScalarbarVisibility => pv.pipeline.manager.scalarbar.visibility.update
-    @exportRpc("pv.pipeline.manager.scalarbar.visibility.update")
-    def updateScalarbarVisibility(self, options):
-        lutMgr = vtkSMTransferFunctionManager()
-        lutMap = {}
-        view = self.getView(-1)
-        if options:
-            for key, lut in options.iteritems():
-                visibility = lut['enabled']
-                if type(lut['name']) == unicode:
-                    lut['name'] = str(lut['name'])
-                parts = key.split('_')
-                arrayName = parts[0]
-                numComps = int(parts[1])
-
-                lutProxy = self.getColorTransferFunction(arrayName)
-                barRep = servermanager._getPyProxy(lutMgr.GetScalarBarRepresentation(lutProxy, view.SMProxy))
-
-                if visibility == 1:
-                    barRep.Visibility = 1
-                    barRep.Enabled = 1
-                    barRep.Title = arrayName
-                    if numComps > 1:
-                        barRep.ComponentTitle = 'Magnitude'
-                    else:
-                        barRep.ComponentTitle = ''
-                    vtkSMScalarBarWidgetRepresentationProxy.PlaceInView(barRep.SMProxy, view.SMProxy)
-                else:
-                    barRep.Visibility = 0
-                    barRep.Enabled = 0
-
-                lutMap[key] = { 'lutId': lut['name'],
-                                        'name': arrayName,
-                                        'size': numComps,
-                                        'enabled': visibility }
-
-        self.getApplication().InvokeEvent('PushRender')
-
-        return lutMap
-
-    # RpcName: updateScalarRange => pv.pipeline.manager.scalar.range.rescale
-    @exportRpc("pv.pipeline.manager.scalar.range.rescale")
-    def updateScalarRange(self, proxyId):
-        proxy = self.mapIdToProxy(proxyId);
-        dataRepr = simple.GetRepresentation(proxy)
-        vtkSMPVRepresentationProxy.RescaleTransferFunctionToDataRange(dataRepr.SMProxy, False)
-        self.getApplication().InvokeEvent('PushRender')
-
-    # RpcName: setLutDataRange => pv.pipeline.manager.lut.range.update
-    @exportRpc("pv.pipeline.manager.lut.range.update")
-    def setLutDataRange(self, name, number_of_components, customRange):
-        lut = self.getColorTransferFunction(name)
-        vtkSMTransferFunctionProxy.RescaleTransferFunction(lut, customRange[0],
-                                                           customRange[1], False)
-        self.getApplication().InvokeEvent('PushRender')
-
-    # RpcName: getLutDataRange => pv.pipeline.manager.lut.range.get
-    @exportRpc("pv.pipeline.manager.lut.range.get")
-    def getLutDataRange(self, name, number_of_components):
-        lut = self.getColorTransferFunction(name)
-        rgbPoints = lut.GetProperty('RGBPoints')
-        return [ rgbPoints.GetElement(0),
-                 rgbPoints.GetElement(rgbPoints.GetNumberOfElements() - 4) ]
-
-
-# =============================================================================
-#
 # Key/Value Store Protocol
 #
 # =============================================================================
@@ -2316,92 +2098,6 @@ class ParaViewWebSaveData(ParaViewWebProtocol):
             return { 'success': False, 'message': msg }
 
         return { 'success': True }
-
-
-# =============================================================================
-#
-# Filter list
-#
-# =============================================================================
-
-class ParaViewWebFilterList(ParaViewWebProtocol):
-
-    def __init__(self, filtersFile=None):
-        super(ParaViewWebFilterList, self).__init__()
-        self.filterFile = filtersFile
-
-    # RpcName: listFilters => pv.filters.list
-    @exportRpc("pv.filters.list")
-    def listFilters(self):
-        filterSet = []
-        if self.filterFile is None :
-            filterSet = [{
-                        'name': 'Cone',
-                        'icon': 'dataset',
-                        'category': 'source'
-                    },{
-                        'name': 'Sphere',
-                        'icon': 'dataset',
-                        'category': 'source'
-                    },{
-                        'name': 'Wavelet',
-                        'icon': 'dataset',
-                        'category': 'source'
-                    },{
-                        'name': 'Clip',
-                        'icon': 'clip',
-                        'category': 'filter'
-                    },{
-                        'name': 'Slice',
-                        'icon': 'slice',
-                        'category': 'filter'
-                    },{
-                        'name': 'Contour',
-                        'icon': 'contour',
-                        'category': 'filter'
-                    },{
-                        'name': 'Threshold',
-                        'icon': 'threshold',
-                        'category': 'filter'
-                    },{
-                        'name': 'StreamTracer',
-                        'icon': 'stream',
-                        'category': 'filter'
-                    },{
-                        'name': 'WarpByScalar',
-                        'icon': 'filter',
-                        'category': 'filter'
-                    }]
-        else :
-            with open(self.filterFile, 'r') as fd:
-                filterSet = json.loads(fd.read())
-
-        if servermanager.ActiveConnection.GetNumberOfDataPartitions() > 1:
-            filterSet.append({ 'name': 'D3', 'icon': 'filter', 'category': 'filter' })
-
-        return filterSet
-
-
-# =============================================================================
-#
-# Remote file list @DEPRECATED
-#
-# =============================================================================
-
-class ParaViewWebFileManager(ParaViewWebProtocol):
-
-    def __init__(self, defaultDirectoryToList):
-        super(ParaViewWebFileManager, self).__init__()
-        self.directory = defaultDirectoryToList
-        self.dirCache = None
-
-    # RpcName: listFiles => pv.files.list
-    @exportRpc("pv.files.list")
-    def listFiles(self):
-        if not self.dirCache:
-            self.dirCache = helper.listFiles(self.directory)
-        return self.dirCache
-
 
 # =============================================================================
 #
