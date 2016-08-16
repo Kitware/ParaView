@@ -1,6 +1,6 @@
 project(Eigen)
 
-cmake_minimum_required(VERSION 2.6.2)
+cmake_minimum_required(VERSION 3.3)
 
 # guard against in-source builds
 
@@ -352,8 +352,6 @@ if(NOT MSVC)
 endif()
 
 add_subdirectory(unsupported)
-
-add_subdirectory(demos EXCLUDE_FROM_ALL)
 
 # must be after test and unsupported, for configuring buildtests.in
 add_subdirectory(scripts EXCLUDE_FROM_ALL)

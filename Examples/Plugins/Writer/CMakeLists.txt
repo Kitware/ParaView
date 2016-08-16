@@ -2,7 +2,7 @@
 # create a plugin that adds a reader to the ParaView GUI
 # it is added in the file dialog when doing opens/saves.
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
+cmake_minimum_required(VERSION 3.3)
 
 IF(NOT ParaView_BINARY_DIR)
   FIND_PACKAGE(ParaView REQUIRED)

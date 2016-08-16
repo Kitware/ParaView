@@ -2,7 +2,7 @@ configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/index.html.in"
     "${CMAKE_CURRENT_BINARY_DIR}/index.html"
     @ONLY)
-    
+
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/about.html.in"
     "${CMAKE_CURRENT_BINARY_DIR}/about.html"
@@ -46,22 +46,13 @@ set_source_files_properties(
   PROPERTIES OBJECT_DEPENDS
   "${CMAKE_CURRENT_BINARY_DIR}/paraview.qch")
 
-if(PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  QT5_ADD_RESOURCES(rcs_sources
-    "${CMAKE_CURRENT_BINARY_DIR}/paraview_documentation.qrc")
-else()
-  QT4_ADD_RESOURCES(rcs_sources
-    "${CMAKE_CURRENT_BINARY_DIR}/paraview_documentation.qrc")
-endif()
+pv_qt_add_resources(rcs_sources
+  "${CMAKE_CURRENT_BINARY_DIR}/paraview_documentation.qrc")
 
 add_library(vtkParaViewDocumentation STATIC
   ParaViewDocumentationInitializer.cxx
   ${rcs_sources})
-target_link_libraries(vtkParaViewDocumentation ${QT_LIBRARIES})
-if(PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  set_target_properties(vtkParaViewDocumentation PROPERTIES
-    COMPILE_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
-endif()
+target_link_libraries(vtkParaViewDocumentation LINK_PRIVATE ${qt_targets})
 
 IF (NOT VTK_INSTALL_NO_DEVELOPMENT)
   # We install the qch file only when installing development files since the

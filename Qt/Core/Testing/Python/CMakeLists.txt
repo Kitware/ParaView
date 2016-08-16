@@ -1,14 +1,11 @@
-if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  QT5_WRAP_CPP(MOC_SRCS pqFileDialogTest.h)
-else ()
-  QT4_WRAP_CPP(MOC_SRCS pqFileDialogTest.h)
-endif ()
+include(ParaViewQt)
+pv_find_package_qt(qt_targets REQUIRED QUIET
+                QT4_COMPONENTS QtCore QtGui
+                QT5_COMPONENTS Core Widgets)
+pv_qt_wrap_cpp(MOC_SRCS pqFileDialogTest.h)
 vtk_module_test_executable(pqFileDialogTest
   pqFileDialogTest.cxx pqFileDialogTest.h ${MOC_SRCS})
-if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  set_target_properties(pqFileDialogTest PROPERTIES
-    COMPILE_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
-endif ()
+target_link_libraries(pqFileDialogTest LINK_PRIVATE ${qt_targets})
 
 add_test(
   NAME pqFileDialogTest

@@ -4,6 +4,34 @@ Major API Changes             {#MajorAPIChanges}
 This page documents major API/design changes between different versions since we
 started tracking these (starting after version 4.2).
 
+
+Changes in 5.2
+--------------
+
+###Qt dependencies###
+
+Starting with 5.2, ParaView natively supports Qt 4 and Qt 5. To simplify writing
+code with either dependency, we now have a new CMake file `ParaViewQt.cmake`
+that gets included by `PARAVIEW_USE_FILE`. This provides new macros that be used
+to find qt (`pv_find_package_qt`), wrap cpp (`pv_qt_wrap_cpp`), ui
+(`pv_qt_wrap_ui`), or add resources (`pv_qt_add_resources`) instead of using
+`qt4_` or `qt4_` specific versions based on whether the app is being built with
+Qt4 or Qt5. `pv_find_package_qt` accepts optional `QT5_COMPONENTS` and
+`QT4_COMPONENTS` which can be used to list the Qt component dependencies for
+each of the versions. e.g.
+
+    include(ParaViewQt) # generally not needed, since auto-included
+    pv_find_package_qt(qt_targets
+      QT4_COMPONENTS QtGui
+      QT5_COMPONENTS Widgets)
+
+    pv_qt_wrap_cpp(moc_files ${headers})
+    pv_qt_wrap_ui(ui_files ${uis})
+
+    ...
+    target_link_libraries(${target} LINK_PRIVATE ${qt_targets})
+
+
 Changes in 5.1
 --------------
 

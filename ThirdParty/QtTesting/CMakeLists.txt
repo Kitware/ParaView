@@ -40,19 +40,10 @@ set (QtTesting_INSTALL_NO_DEVELOPMENT ${VTK_INSTALL_NO_DEVELOPMENT})
 set (QtTesting_QT_VERSION ${PARAVIEW_QT_VERSION})
 ##########################################################################
 # import Qt build settings
-if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  set (Qt5_FIND_COMPONENTS Test)
-  set (${vtk-module}_INCLUDE_DIRS ${Qt5Test_INCLUDE_DIRS})
-  include (ParaViewQt5)
-else ()
-  find_package (Qt4 REQUIRED QUIET)
-  include (${QT_USE_FILE})
-endif ()
 vtk_module_third_party(qttesting
   INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/vtkqttesting
     ${CMAKE_CURRENT_BINARY_DIR}/vtkqttesting
   LIBRARIES QtTesting
 )
-
 vtk_target_export(QtTesting)

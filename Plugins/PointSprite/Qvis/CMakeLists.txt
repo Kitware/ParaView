@@ -1,12 +1,5 @@
-if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  set (Qt5_FIND_COMPONENTS Widgets)
-  include (ParaViewQt5)
-  include_directories(${Qt5Core_INCLUDE_DIRS})
-else ()
-  include (${QT_USE_FILE})
-  include_directories(${QT_INCLUDES})
-endif ()
-
+include(ParaViewQt)
+pv_find_package_qt(qt_targets REQUIRED QT4_COMPONENTS QtGui QT5_COMPONENTS Widgets)
 set(Qvis_SRCS
   QvisAbstractOpacityBar.cpp
   QvisGaussianOpacityBar.cpp
@@ -37,15 +30,7 @@ set(Qvis_MOC_SRCS
   QvisColorGridWidget.h
 )
 
-if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  qt5_wrap_cpp(MOC_SRCS
-    ${Qvis_MOC_SRCS})
-else ()
-  qt4_wrap_cpp(MOC_SRCS
-    ${Qvis_MOC_SRCS})
-endif ()
-
+pv_qt_wrap_cpp(MOC_SRCS ${Qvis_MOC_SRCS})
 set(vtkQvis_NO_HeaderTest 1)
-
 vtk_module_library(vtkQvis ${Qvis_SRCS} ${MOC_SRCS})
-target_link_libraries(vtkQvis LINK_PRIVATE ${QT_LIBRARIES})
+target_link_libraries(vtkQvis LINK_PRIVATE ${qt_targets})

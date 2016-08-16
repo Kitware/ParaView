@@ -29,7 +29,7 @@
 #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #========================================================================
-cmake_minimum_required(VERSION 2.8.8)
+cmake_minimum_required(VERSION 3.3)
 project(MultiServerClient)
 
 find_package(ParaView REQUIRED)

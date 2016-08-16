@@ -1,13 +1,10 @@
-if(PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  QT5_WRAP_CPP(MOC_SRCS FilteredPipelineBrowserApp.h)
-else()
-  QT4_WRAP_CPP(MOC_SRCS FilteredPipelineBrowserApp.h)
-endif()
+include(ParaViewQt)
+pv_find_package_qt(qt_targets REQUIRED QUIET
+                QT4_COMPONENTS QtCore QtGui
+                QT5_COMPONENTS Core Widgets)
+pv_qt_wrap_cpp(MOC_SRCS FilteredPipelineBrowserApp.h)
 vtk_module_test_executable(pqPipelineApp FilteredPipelineBrowserApp.cxx FilteredPipelineBrowserApp.h ${MOC_SRCS})
-if(PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  set_target_properties(pqPipelineApp PROPERTIES
-    COMPILE_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
-endif()
+target_link_libraries(pqPipelineApp LINK_PRIVATE ${qt_targets})
 
 #ADD_TEST(pqPipelineApp "${EXECUTABLE_OUTPUT_PATH}/pqPipelineApp" -dr "--test-directory=${PARAVIEW_TEST_DIR}")
 #set_tests_properties(pqPipelineApp PROPERTIES LABELS "PARAVIEW")

@@ -156,34 +156,28 @@ FUNCTION(build_paraview_client BPC_NAME)
         ${BPC_BUNDLE_ICON}
         PROPERTIES
         MACOSX_PACKAGE_LOCATION Resources
-      )
+        )
+    ENDIF ()
+    IF (IS_DIRECTORY "${QT_QTGUI_LIBRARY_RELEASE}")
+      GET_FILENAME_COMPONENT(qt_menu_nib
+        "${QT_QTGUI_LIBRARY_RELEASE}/Resources/qt_menu.nib"
+        REALPATH)
+    ELSE ()
+      GET_FILENAME_COMPONENT(qt_menu_nib
+        "${QT_LIBRARY_DIR}/Resources/qt_menu.nib"
+        REALPATH)
     ENDIF ()
 
-    IF(QT_MAC_USE_COCOA)
-      IF (IS_DIRECTORY "${QT_QTGUI_LIBRARY_RELEASE}")
-            GET_FILENAME_COMPONENT(qt_menu_nib
-              "${QT_QTGUI_LIBRARY_RELEASE}/Resources/qt_menu.nib"
-              REALPATH)
-      ELSE ()
-        GET_FILENAME_COMPONENT(qt_menu_nib
-          "${QT_LIBRARY_DIR}/Resources/qt_menu.nib"
-          REALPATH)
-      ENDIF ()
-
-      set(qt_menu_nib_sources
-        "${qt_menu_nib}/classes.nib"
-        "${qt_menu_nib}/info.nib"
-        "${qt_menu_nib}/keyedobjects.nib"
-        )
-      SET_SOURCE_FILES_PROPERTIES(
-        ${qt_menu_nib_sources}
-        PROPERTIES
-        MACOSX_PACKAGE_LOCATION Resources/qt_menu.nib
+    set(qt_menu_nib_sources
+      "${qt_menu_nib}/classes.nib"
+      "${qt_menu_nib}/info.nib"
+      "${qt_menu_nib}/keyedobjects.nib"
       )
-    ELSE()
-      set(qt_menu_nib_sources)
-    ENDIF()
-
+    SET_SOURCE_FILES_PROPERTIES(
+      ${qt_menu_nib_sources}
+      PROPERTIES
+      MACOSX_PACKAGE_LOCATION Resources/qt_menu.nib
+      )
     SET(executable_flags MACOSX_BUNDLE)
   ENDIF ()
 
@@ -241,25 +235,19 @@ FUNCTION(build_paraview_client BPC_NAME)
       "${ui_resource_init}  Q_INIT_RESOURCE(${BPC_NAME}_help);\n")
   ENDIF ()
 
-  IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    QT5_ADD_RESOURCES(rcs_sources
-      ${ui_resources}
-      )
-  ELSE ()
-    QT4_ADD_RESOURCES(rcs_sources
-      ${ui_resources}
-      )
-  ENDIF ()
+  INCLUDE(ParaViewQt)
+  pv_find_package_qt(qt_targets REQUIRED QUIET
+    QT4_COMPONENTS QtGui
+    QT5_COMPONENTS Widgets)
+  pv_qt_add_resources(rcs_sources ${ui_resources})
 
   SOURCE_GROUP("Resources" FILES
     ${ui_resources}
     ${exe_icon}
     )
-
   SOURCE_GROUP("Generated" FILES
     ${rcs_sources}
     )
-
   CONFIGURE_FILE(${branding_source_dir}/branded_paraview_main.cxx.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${BPC_NAME}_main.cxx @ONLY)
   CONFIGURE_FILE(${branding_source_dir}/branded_paraview_initializer.cxx.in
@@ -283,8 +271,8 @@ FUNCTION(build_paraview_client BPC_NAME)
       LINK_PRIVATE
         pqApplicationComponents
         vtkPVServerManagerApplication
-        ${QT_QTMAIN_LIBRARY}
         ${BPC_EXTRA_DEPENDENCIES}
+        ${qt_targets}
       )
 
     IF (PV_INSTALL_LIB_DIR)
@@ -313,7 +301,7 @@ FUNCTION(build_paraview_client BPC_NAME)
         pqApplicationComponents
         vtkPVServerManagerApplication
         vtksys
-        ${QT_QTMAIN_LIBRARY}
+        ${qt_targets}
         ${BPC_EXTRA_DEPENDENCIES}
     )
 
@@ -351,10 +339,5 @@ FUNCTION(build_paraview_client BPC_NAME)
       set_target_properties("${BPC_NAME}" PROPERTIES
         INSTALL_RPATH "@executable_path/../Libraries;@executable_path/../Plugins")
     endif ()
-  ENDIF ()
-
-  IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    SET_TARGET_PROPERTIES(${BPC_NAME} PROPERTIES
-      COMPILE_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
   ENDIF ()
 ENDFUNCTION()

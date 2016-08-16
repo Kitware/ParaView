@@ -6,6 +6,9 @@ set(CXX_SOURCES
   vtkSQVolumeSourceConfigurationWriter.cxx
   vtkSQVolumeSourceConfigurationReader.cxx
   )
+pv_find_package_qt(qt_targets REQUIRED QUIET
+  QT4_COMPONENTS QtGui
+  QT5_COMPONENTS Widgets)
 
 if(PARAVIEW_BUILD_QT_GUI)
   vtk_module_load(pqComponents)
@@ -16,17 +19,9 @@ if(PARAVIEW_BUILD_QT_GUI)
   set(_IFACE_SRCS)
 
   macro(sciberquest_wrap_qt name)
-    if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-      qt5_wrap_cpp(MOC_SRCS "${name}.h")
-    else ()
-      qt4_wrap_cpp(MOC_SRCS "${name}.h")
-    endif ()
+    pv_qt_wrap_cpp(MOC_SRCS "${name}.h")
     if (EXISTS "${CMAKE_CURRENT_LIST_DIR}/${name}Form.ui")
-      if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-        qt5_wrap_ui(UI_SRCS "${name}Form.ui")
-      else ()
-        qt4_wrap_ui(UI_SRCS "${name}Form.ui")
-      endif ()
+      pv_qt_wrap_ui(UI_SRCS "${name}Form.ui")
     endif ()
   endmacro()
 
@@ -106,7 +101,7 @@ target_link_libraries(SciberQuestToolKit
   LINK_PRIVATE vtksys)
 if(PARAVIEW_BUILD_QT_GUI)
   target_link_libraries(SciberQuestToolKit
-    LINK_PRIVATE pqComponents)
+    LINK_PRIVATE pqComponents ${qt_targets})
 endif()
 
 install(TARGETS SciberQuestToolKit

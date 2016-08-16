@@ -14,14 +14,6 @@ ENDIF()
 # Find and Use ParaView
 #--------------------------------------------------
 INCLUDE_DIRECTORIES(${VTK_INCLUDE_DIRS})
-IF(PARAVIEW_BUILD_QT_GUI)
-  IF(PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    SET (Qt5_FIND_COMPONENTS Widgets)
-    INCLUDE(ParaViewQt5)
-  ELSE()
-    INCLUDE(${QT_USE_FILE})
-  ENDIF()
-ENDIF()
 
 # -----------------------------------------------------------------------------
 # Where are gmvread.c, gmvread.h and gmvrayread.h stored?

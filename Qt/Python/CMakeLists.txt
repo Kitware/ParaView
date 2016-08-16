@@ -70,13 +70,12 @@ include_directories(
 #-------------------------------------------------------------------------
 set(${vtk-module}_NO_HeaderTest 1)
 
-if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  qt5_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
-  qt5_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
-else ()
-  qt4_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
-  qt4_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
-endif ()
+include(ParaViewQt)
+pv_find_package_qt(qt_private_targets REQUIRED
+                QT4_COMPONENTS QtGui
+                QT5_COMPONENTS Widgets)
+pv_qt_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
+pv_qt_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
 
 SOURCE_GROUP("Resources" FILES
   ${Module_UI_FILES}
@@ -92,6 +91,7 @@ vtk_module_library(${vtk-module}
   ${Module_SRCS}
   ${__Module_MOC_SRCS}
   ${__Module_UI_SRCS})
+target_link_libraries(${vtk-module} LINK_PRIVATE ${qt_private_targets})
 
 ## Install
 ##--------------------------------------------------------------------------------------------------

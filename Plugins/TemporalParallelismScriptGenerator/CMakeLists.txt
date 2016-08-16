@@ -26,21 +26,10 @@ SET (TP_MOC_SOURCES
   pqTPActionsGroup.h
   pqTPPluginManager.h
   )
-IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  SET (Qt5_FIND_COMPONENTS Widgets)
-  INCLUDE (ParaViewQt5)
-  QT5_WRAP_CPP(MOC_SRCS
-    ${TP_MOC_SOURCES})
-  QT5_WRAP_UI(UI_SRCS
-    ${UI_RESOURCES})
-ELSE ()
-  INCLUDE (${QT_USE_FILE})
-  QT4_WRAP_CPP(MOC_SRCS
-    ${TP_MOC_SOURCES})
-  QT4_WRAP_UI(UI_SRCS
-    ${UI_RESOURCES})
-ENDIF ()
-
+include(ParaViewQt)
+pv_find_package_qt(qt_targets REQUIRED QT4_COMPONENTS QtGui QT5_COMPONENTS Widgets)
+pv_qt_wrap_cpp(MOC_SRCS ${TP_MOC_SOURCES})
+pv_qt_wrap_ui(UI_SRCS ${UI_RESOURCES})
 
 #------------------------------------------------------------------------------
 SET (PARAVIEW_PLUGIN_IFACES)
@@ -84,6 +73,7 @@ ADD_PARAVIEW_PLUGIN(
     ${PARAVIEW_PLUGIN_SRCS2}
     tp_export_py.cxx
 )
+TARGET_LINK_LIBRARIES(TemporalParallelismScriptGenerator LINK_PRIVATE ${qt_targets})
 
 IF (BUILD_TESTING AND BUILD_SHARED_LIBS)
   include(ParaViewTestingMacros)

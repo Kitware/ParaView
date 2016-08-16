@@ -1,28 +1,14 @@
 #------------------------------------------------------------------------------
 # Add extra library containing custom code for the client.
-if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  QT5_WRAP_CPP(MOC_BUILT_SOURCES
-    ParaViewMainWindow.h)
-  QT5_WRAP_UI(UI_BUILT_SOURCES
-    ParaViewMainWindow.ui)
-  list( APPEND Qt5_FIND_COMPONENTS Network )
-  if (APPLE)
-    # XXX: The Qt5 plugin for Cocoa (Plugins/platforms/libqcocoa.dylib in the
-    # dmg file) links to QtPrintSupport.framework, but is not brought into the
-    # package by fixup_bundle. Link to it from ParaView so that it gets brought
-    # in properly.
-    list( APPEND Qt5_FIND_COMPONENTS PrintSupport )
-  endif ()
-  include( ParaViewQt5 )
-else ()
-  QT4_WRAP_CPP(MOC_BUILT_SOURCES
-    ParaViewMainWindow.h)
-  QT4_WRAP_UI(UI_BUILT_SOURCES
-    ParaViewMainWindow.ui)
-  set (QT_USE_QTNETWORK TRUE)
-  include (${QT_USE_FILE})
-endif ()
+include(ParaViewQt)
+set(qt5_comps Widgets)
+set(qt4_comps QtGui)
 
+pv_find_package_qt(qt_targets REQUIRED QUIET
+                QT4_COMPONENTS ${qt4_comps}
+                QT5_COMPONENTS ${qt5_comps})
+pv_qt_wrap_cpp(MOC_BUILT_SOURCES ParaViewMainWindow.h)
+pv_qt_wrap_ui(UI_BUILT_SOURCES ParaViewMainWindow.ui)
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
@@ -101,13 +87,7 @@ build_paraview_client(paraview
     INSTALL_ARCHIVE_DIR "${VTK_INSTALL_ARCHIVE_DIR}"
     )
 
-# Set appropriate compile flags.
-if( PARAVIEW_QT_VERSION VERSION_GREATER "4" )
-  set_target_properties(paraview PROPERTIES
-    COMPILE_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
-  target_link_libraries(paraview
-    LINK_PRIVATE ${QT_LIBRARIES})
-endif()
+target_link_libraries(paraview LINK_PRIVATE ${qt_targets})
 
 if (PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION)
   # Link against the documentation module.

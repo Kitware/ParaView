@@ -2,28 +2,15 @@ PROJECT(VDFReader)
 
 # Plugin that uses the Vapor libraries to read VDF files into ParaView
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.3)
 
 IF (ParaView_SOURCE_DIR)
   #building within the ParaView source tree
-
   INCLUDE_DIRECTORIES(${VTK_INCLUDE_DIRS})
-  IF(PARAVIEW_BUILD_QT_GUI)
-    IF(PARAVIEW_QT_VERSION VERSION_GREATER "4")
-      SET(Qt5_FIND_COMPONENTS Widgets)
-      INCLUDE(ParaViewQt5)
-    ELSE()
-      INCLUDE(${QT_USE_FILE})
-    ENDIF()
-    INCLUDE_DIRECTORIES(${PARAVIEW_GUI_INCLUDE_DIRS})
-  ENDIF()
-
 ELSE ()
   #building outside of the source tree
-
   FIND_PACKAGE(ParaView REQUIRED)
   INCLUDE(${PARAVIEW_USE_FILE})
-
 ENDIF ()
 
 #find where all vapor header files live (especially vaporinternal/common.h)
@@ -56,10 +43,10 @@ ADD_PARAVIEW_PLUGIN(VDFReaderPlugin "1.0"
   SERVER_MANAGER_SOURCES vtkVDFReader.cxx
   REQUIRED_ON_SERVER
 )
-
 target_link_libraries(VDFReaderPlugin
   LINK_PRIVATE
   ${VAPOR_VDF_LIB}
   ${VAPOR_COMMON_LIB}
   ${EXPAT_LIBRARIES}
-  ${VAPOR_NETCDF_LIB} )
+  ${VAPOR_NETCDF_LIB}
+  )

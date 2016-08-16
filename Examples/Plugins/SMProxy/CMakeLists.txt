@@ -6,7 +6,7 @@
 # the low and high point of the elevation filter can be initialized
 # in the z-direction
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
+cmake_minimum_required(VERSION 3.3)
 
 IF(NOT ParaView_BINARY_DIR)
   FIND_PACKAGE(ParaView REQUIRED)

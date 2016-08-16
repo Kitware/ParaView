@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.8 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.3)
 project(Clone1)
 
 FIND_PACKAGE(ParaView REQUIRED)
@@ -19,6 +19,9 @@ endif()
 
 # include rules for creating custom applications.
 include(ParaViewBranding)
+pv_find_package_qt(qt_targets
+  QT4_COMPONENTS QtGui
+  QT5_COMPONENTS Widgets)
 
 #------------------------------------------------------------------------------
 # Add extra library containing custom code for the client.
@@ -64,3 +67,4 @@ build_paraview_client(paraview_revised
     ${CMAKE_CURRENT_SOURCE_DIR}/ParaViewWriters.xml
   SOURCES ${ParaView_SOURCE_FILES}
 )
+target_link_libraries(paraview_revised LINK_PRIVATE ${qt_targets})

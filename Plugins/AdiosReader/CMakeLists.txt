@@ -13,15 +13,6 @@ ELSE ()
   INCLUDE(${PARAVIEW_USE_FILE})
 ENDIF ()
 
-IF(PARAVIEW_BUILD_QT_GUI)
-  IF(PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    SET (Qt5_FIND_COMPONENTS Widgets)
-    INCLUDE (ParaViewQt5)
-  ELSE()
-    INCLUDE(${QT_USE_FILE})
-  ENDIF()
-ENDIF()
-
 #------------------------------------------------------------------------------
 # Create client side plugin for any platform
 #------------------------------------------------------------------------------
