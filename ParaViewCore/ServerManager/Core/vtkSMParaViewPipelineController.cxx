@@ -190,7 +190,13 @@ bool vtkSMParaViewPipelineController::CreateProxiesForProxyListDomains(
       pld->CreateProxies(proxy->GetSessionProxyManager());
       for (unsigned int cc=0, max=pld->GetNumberOfProxies(); cc < max; cc++)
         {
-        this->PreInitializeProxy(pld->GetProxy(cc));
+        if (vtkSMProxy* dproxy = pld->GetProxy(cc))
+          {
+          // it makes sense to have all proxies in the ProxyListDomain have the
+          // same location as the parent proxy.
+          dproxy->SetLocation(proxy->GetLocation());
+          this->PreInitializeProxy(dproxy);
+          }
         }
       // this is unnecessary here. only done for CompoundSourceProxy instances.
       // those proxies, we generally skip calling "reset" on in
