@@ -29,9 +29,23 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 
 #include <sstream>
+#include <string>
 #include <vtksys/SystemTools.hxx>
 
-#include <string>
+namespace
+{
+  bool vtkIsEmpty(vtkDataObject* dobj)
+    {
+    for (int cc=0; (dobj != NULL) && (cc < vtkDataObject::NUMBER_OF_ASSOCIATIONS); ++cc)
+      {
+      if (dobj->GetNumberOfElements(cc) > 0)
+        {
+        return false;
+        }
+      }
+    return true;
+    }
+}
 
 vtkStandardNewMacro(vtkParallelSerialWriter);
 vtkCxxSetObjectMacro(vtkParallelSerialWriter, Writer, vtkAlgorithm);
@@ -247,8 +261,7 @@ void vtkParallelSerialWriter::WriteAFile(const char* filename, vtkDataObject* in
   if (controller->GetLocalProcessId() == 0)
     {
     vtkDataObject* output = reductionFilter->GetOutputDataObject(0);
-    if (vtkDataSet::SafeDownCast(output) == 0 ||
-      vtkDataSet::SafeDownCast(output)->GetNumberOfCells() != 0)
+    if (vtkIsEmpty(output) == false)
       {
       std::ostringstream fname;
       if (this->WriteAllTimeSteps)
