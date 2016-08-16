@@ -226,13 +226,13 @@ void vtkParallelSerialWriter::WriteAFile(const char* filename, vtkDataObject* in
   vtkMultiProcessController* controller =
     vtkMultiProcessController::GetGlobalController();
 
-  vtkSmartPointer<vtkReductionFilter> md = vtkSmartPointer<vtkReductionFilter>::New();
-  md->SetController(controller);
-  md->SetPreGatherHelper(this->PreGatherHelper);
-  md->SetPostGatherHelper(this->PostGatherHelper);
-  md->SetInputDataObject(input);
-  md->UpdateInformation();
-  vtkInformation* outInfo = md->GetExecutive()->GetOutputInformation(0);
+  vtkSmartPointer<vtkReductionFilter> reductionFilter = vtkSmartPointer<vtkReductionFilter>::New();
+  reductionFilter->SetController(controller);
+  reductionFilter->SetPreGatherHelper(this->PreGatherHelper);
+  reductionFilter->SetPostGatherHelper(this->PostGatherHelper);
+  reductionFilter->SetInputDataObject(input);
+  reductionFilter->UpdateInformation();
+  vtkInformation* outInfo = reductionFilter->GetExecutive()->GetOutputInformation(0);
   outInfo->Set(
     vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER(),
     this->Piece);
@@ -242,11 +242,11 @@ void vtkParallelSerialWriter::WriteAFile(const char* filename, vtkDataObject* in
   outInfo->Set(
     vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(),
     this->GhostLevel);
-  md->Update();
+  reductionFilter->Update();
 
   if (controller->GetLocalProcessId() == 0)
     {
-    vtkDataObject* output = md->GetOutputDataObject(0);
+    vtkDataObject* output = reductionFilter->GetOutputDataObject(0);
     if (vtkDataSet::SafeDownCast(output) == 0 ||
       vtkDataSet::SafeDownCast(output)->GetNumberOfCells() != 0)
       {
