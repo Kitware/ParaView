@@ -27,7 +27,6 @@
 #include "vtkReductionFilter.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkTrivialProducer.h"
 
 #include <sstream>
 #include <vtksys/SystemTools.hxx>
@@ -231,13 +230,7 @@ void vtkParallelSerialWriter::WriteAFile(const char* filename, vtkDataObject* in
   md->SetController(controller);
   md->SetPreGatherHelper(this->PreGatherHelper);
   md->SetPostGatherHelper(this->PostGatherHelper);
-  if (input)
-    {
-    vtkTrivialProducer* tp = vtkTrivialProducer::New();
-    tp->SetOutput(input);
-    md->SetInputConnection(0, tp->GetOutputPort());
-    tp->Delete();
-    }
+  md->SetInputDataObject(input);
   md->UpdateInformation();
   vtkInformation* outInfo = md->GetExecutive()->GetOutputInformation(0);
   outInfo->Set(
@@ -257,10 +250,6 @@ void vtkParallelSerialWriter::WriteAFile(const char* filename, vtkDataObject* in
     if (vtkDataSet::SafeDownCast(output) == 0 ||
       vtkDataSet::SafeDownCast(output)->GetNumberOfCells() != 0)
       {
-      vtkSmartPointer<vtkDataObject> outputCopy;
-      outputCopy.TakeReference(output->NewInstance());
-      outputCopy->ShallowCopy(output);
-
       std::ostringstream fname;
       if (this->WriteAllTimeSteps)
         {
@@ -276,10 +265,7 @@ void vtkParallelSerialWriter::WriteAFile(const char* filename, vtkDataObject* in
         {
         fname << filename;
         }
-      vtkTrivialProducer* tp = vtkTrivialProducer::New();
-      tp->SetOutput(outputCopy);
-      this->Writer->SetInputConnection(tp->GetOutputPort());
-      tp->Delete();
+      this->Writer->SetInputDataObject(output);
       this->SetWriterFileName(fname.str().c_str());
       this->WriteInternal();
       this->Writer->SetInputConnection(0);
