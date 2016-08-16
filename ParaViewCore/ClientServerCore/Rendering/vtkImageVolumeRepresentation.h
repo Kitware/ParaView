@@ -136,6 +136,11 @@ protected:
   // Passes on parameters to the active volume mapper
   virtual void UpdateMapperParameters();
 
+  // Description:
+  // Used in ConvertSelection to locate the rendered prop.
+  virtual vtkPVLODVolume* GetRenderedProp()
+    { return this->Actor; };
+
   vtkImageData* Cache;
   vtkPVCacheKeeper* CacheKeeper;
   vtkSmartVolumeMapper* VolumeMapper;

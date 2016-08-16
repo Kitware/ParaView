@@ -302,6 +302,9 @@ bool vtkImageVolumeRepresentation::AddToView(vtkView* view)
   if (rview)
     {
     rview->GetRenderer()->AddActor(this->Actor);
+    // Indicate that this is a prop to be rendered during hardware selection.
+    rview->RegisterPropForHardwareSelection(this, this->GetRenderedProp());
+
     return this->Superclass::AddToView(view);
     }
   return false;

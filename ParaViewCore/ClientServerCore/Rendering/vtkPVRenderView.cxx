@@ -1932,7 +1932,7 @@ bool vtkPVRenderView::GetUseOrderedCompositing()
     return false;
     }
 
-  if (!this->NeedsOrderedCompositing || this->MakingSelection)
+  if (!this->NeedsOrderedCompositing)
     {
     return false;
     }
