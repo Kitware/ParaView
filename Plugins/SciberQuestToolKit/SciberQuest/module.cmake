@@ -6,6 +6,7 @@ vtk_module(vtkSciberQuest
     vtkParallelCore
     vtkPVVTKExtensionsCore
     vtksys
+    vtkFiltersSources
   COMPILE_DEPENDS
     vtkFiltersFlowPaths
     vtkFiltersParallel

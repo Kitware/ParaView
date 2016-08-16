@@ -28,6 +28,9 @@ vtk_module(vtkPVClientServerCoreCore
     vtkPVVTKExtensionsCore
     vtkPVCommon
     ${__dependencies}
+    vtkCommonSystem
+    vtkIOLegacy
+    vtkCommonCore
   PRIVATE_DEPENDS
     vtksys
   COMPILE_DEPENDS

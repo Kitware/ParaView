@@ -2,6 +2,7 @@ set (__dependencies)
 if (PARAVIEW_USE_MPI)
   set (__dependencies
     vtkFiltersParallelMPI
+    vtkParallelMPI
     )
   if (PARAVIEW_USE_ICE_T)
     list(APPEND __dependencies vtkicet)
@@ -54,6 +55,9 @@ vtk_module(vtkPVVTKExtensionsRendering
     vtkIOExport${VTK_RENDERING_BACKEND}
     ${__dependencies}
     vtkRenderingVolumeAMR
+    vtkCommonComputationalGeometry
+    vtkCommonSystem
+    vtkIOImage
   PRIVATE_DEPENDS
     vtkzlib
     vtklz4
