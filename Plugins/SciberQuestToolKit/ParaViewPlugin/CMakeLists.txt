@@ -6,11 +6,12 @@ set(CXX_SOURCES
   vtkSQVolumeSourceConfigurationWriter.cxx
   vtkSQVolumeSourceConfigurationReader.cxx
   )
-pv_find_package_qt(qt_targets REQUIRED QUIET
-  QT4_COMPONENTS QtGui
-  QT5_COMPONENTS Widgets)
-
 if(PARAVIEW_BUILD_QT_GUI)
+  pv_find_package_qt(qt_targets REQUIRED QUIET
+    QT4_COMPONENTS QtGui
+    QT5_COMPONENTS Widgets)
+
+
   vtk_module_load(pqComponents)
   include_directories(${pqComponents_INCLUDE_DIRS})
 
