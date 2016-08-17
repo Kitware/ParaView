@@ -5174,9 +5174,6 @@
                  value="2" />
         </EnumerationDomain>
       </IntVectorProperty>
-      <!-- This property is hardcoded to atomic numbers and not visible.
-           At the moment, vtkMoleculeMapper is unable to change the color array.
-           This is only here to make the scalar bar stuff work properly. -->
       <StringVectorProperty command="SetInputArrayToProcess"
                             element_types="0 0 0 0 2"
                             name="ColorArrayName"
@@ -5304,8 +5301,6 @@
                       panel_visibility="default" />
             <Property name="UseCustomRadii"
                       panel_visibility="default" />
-            <!-- Dummy property, has no effect. Only here to make the scalar
-                 bar work properly. -->
             <Property name="ColorArrayName"
                       panel_visibility="never" />
             <Property name="LookupTable"
