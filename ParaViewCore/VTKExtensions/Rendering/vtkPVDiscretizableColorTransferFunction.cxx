@@ -213,7 +213,16 @@ void vtkPVDiscretizableColorTransferFunction::SetNumberOfIndexedColorsInFullSet(
 {
   if (n != this->IndexedColorsInFullSet->GetNumberOfTuples())
     {
+    vtkIdType old = this->IndexedColorsInFullSet->GetNumberOfTuples();
     this->IndexedColorsInFullSet->SetNumberOfTuples(n);
+    if (old < n)
+      {
+      double rgb[3] = {0, 0, 0};
+      for (int i = old; i < n; ++i)
+        {
+        this->IndexedColorsInFullSet->SetTypedTuple(i, rgb);
+        }
+      }
     this->Modified();
     }
 }
