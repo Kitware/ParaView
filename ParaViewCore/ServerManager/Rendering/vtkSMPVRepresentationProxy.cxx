@@ -485,6 +485,19 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToVisibleRange(
 //----------------------------------------------------------------------------
 bool vtkSMPVRepresentationProxy::SetScalarColoring(const char* arrayname, int attribute_type)
 {
+  return this->SetScalarColoringInternal(arrayname, attribute_type, false, -1);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMPVRepresentationProxy::SetScalarColoring(const char* arrayname, int attribute_type, int component)
+{
+  return this->SetScalarColoringInternal(arrayname, attribute_type, true, component);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMPVRepresentationProxy::SetScalarColoringInternal(const char* arrayname, int attribute_type, 
+  bool useComponent, int component)
+{
   if (!this->GetUsingScalarColoring() && (arrayname==NULL ||arrayname[0]==0))
     {
     // scalar coloring already off. Nothing to do.
@@ -498,10 +511,21 @@ bool vtkSMPVRepresentationProxy::SetScalarColoring(const char* arrayname, int at
     return false;
     }
 
-  SM_SCOPED_TRACE(SetScalarColoring)
-    .arg("display", this)
-    .arg("arrayname", arrayname)
-    .arg("attribute_type", attribute_type);
+  if (useComponent)
+    {
+    SM_SCOPED_TRACE(SetScalarColoring)
+      .arg("display", this)
+      .arg("arrayname", arrayname)
+      .arg("attribute_type", attribute_type)
+      .arg("component", component);
+    }
+  else
+    {
+    SM_SCOPED_TRACE(SetScalarColoring)
+      .arg("display", this)
+      .arg("arrayname", arrayname)
+      .arg("attribute_type", attribute_type);
+    }
 
   vtkSMPropertyHelper colorArrayHelper(colorArray);
   colorArrayHelper.SetInputArrayToProcess(attribute_type, arrayname);
@@ -520,6 +544,21 @@ bool vtkSMPVRepresentationProxy::SetScalarColoring(const char* arrayname, int at
     {
     vtkSMProxy* lutProxy =
       mgr->GetColorTransferFunction(arrayname, this->GetSessionProxyManager());
+    if (useComponent)
+      {
+      if (component >= 0)
+        {
+        vtkSMPropertyHelper(lutProxy, "VectorMode").Set("Component");
+        vtkSMPropertyHelper(lutProxy, "VectorComponent").Set(component);
+        lutProxy->UpdateVTKObjects();
+        }
+      else 
+        {
+        vtkSMPropertyHelper(lutProxy, "VectorMode").Set("Magnitude");
+        lutProxy->UpdateVTKObjects();
+        }
+      }
+
     vtkSMPropertyHelper(lutProperty).Set(lutProxy);
 
     // Get the array information for the color array to determine transfer function properties

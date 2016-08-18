@@ -902,27 +902,41 @@ class Hide(TraceItem):
 
 class SetScalarColoring(TraceItem):
     """Trace vtkSMPVRepresentationProxy.SetScalarColoring"""
-    def __init__(self, display, arrayname, attribute_type):
+    def __init__(self, display, arrayname, attribute_type, component=None, lut=None):
         TraceItem.__init__(self)
 
         self.Display = sm._getPyProxy(display)
         self.ArrayName = arrayname
         self.AttributeType = attribute_type
+        self.Component = component
+        self.Lut = sm._getPyProxy(lut)
 
     def finalize(self):
         TraceItem.finalize(self)
 
         if self.ArrayName:
-            Trace.Output.append_separated([\
-                "# set scalar coloring",
-                "ColorBy(%s, ('%s', '%s'))" % (\
-                    str(Trace.get_accessor(self.Display)),
-                    sm.GetAssociationAsString(self.AttributeType),
-                    self.ArrayName)])
+            if self.Component is None:
+              Trace.Output.append_separated([\
+                  "# set scalar coloring",
+                  "ColorBy(%s, ('%s', '%s'))" % (\
+                      str(Trace.get_accessor(self.Display)),
+                      sm.GetAssociationAsString(self.AttributeType),
+                      self.ArrayName)])
+            else:
+              Trace.Output.append_separated([\
+                  "# set scalar coloring",
+                  "ColorBy(%s, ('%s', '%s', '%s'))" % (\
+                      str(Trace.get_accessor(self.Display)),
+                      sm.GetAssociationAsString(self.AttributeType),
+                      self.ArrayName, self.Component)])
         else:
             Trace.Output.append_separated([\
                 "# turn off scalar coloring",
                 "ColorBy(%s, None)" % str(Trace.get_accessor(self.Display))])
+
+        # only for "Fully Trace Supplemental Proxies" support
+        if self.Lut:
+          Trace.get_accessor(self.Lut)
 
 class RegisterViewProxy(TraceItem):
     """Traces creation of a new view (vtkSMParaViewPipelineController::RegisterViewProxy)."""
