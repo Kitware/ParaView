@@ -543,6 +543,7 @@ set (Contour_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (Calculator_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (LogColorMap_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ColorOpacityTableEditing_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (SimpleInteraction_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (FindWidget_FORCE_SERIAL TRUE) # Uses inline edit popups
 set (PropertyLink_FORCE_SERIAL TRUE)
 set (TestPythonView_FORCE_SERIAL TRUE) # Seems to work better in serial.
