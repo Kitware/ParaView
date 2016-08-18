@@ -320,6 +320,10 @@ namespace pqCoreTestUtilityInternal{
         this->Widget = widget;
         widget->resize(size);
         }
+      else
+        {
+        this->Widget = NULL;
+        }
       }
     ~WidgetSizer()
       {
