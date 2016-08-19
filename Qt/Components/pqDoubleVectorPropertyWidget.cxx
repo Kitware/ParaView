@@ -188,29 +188,36 @@ void pqDoubleVectorPropertyWidget::propertyDomainModified(vtkObject* domainObjec
     showLabels = hints->FindNestedElementByName("ShowComponentLabels");
     }
 
-  if(vtkSMDoubleRangeDomain *range = vtkSMDoubleRangeDomain::SafeDownCast(domain))
+  vtkSMDoubleRangeDomain *range = vtkSMDoubleRangeDomain::SafeDownCast(domain);
+  if(this->property()->GetRepeatable())
     {
-    if((vtkSMBoundsDomain::SafeDownCast(range) ||
-      vtkSMArrayRangeDomain::SafeDownCast(range))
-      && this->property()->GetRepeatable())
+    pqScalarValueListPropertyWidget *widget =
+      new pqScalarValueListPropertyWidget(smProperty, this->proxy(), this);
+    widget->setObjectName("ScalarValueList");
+    widget->setRangeDomain(range);
+    this->addPropertyLink(widget, "scalars", SIGNAL(scalarsChanged()), smProperty);
+    
+    this->setChangeAvailableAsChangeFinished(true);
+    layoutLocal->addWidget(widget);
+    this->setShowLabel(false);
+    
+    if (range)
       {
-      pqScalarValueListPropertyWidget *widget =
-        new pqScalarValueListPropertyWidget(smProperty, this->proxy(), this);
-      widget->setObjectName("ScalarValueList");
-      widget->setRangeDomain(range);
-      this->addPropertyLink(widget, "scalars", SIGNAL(scalarsChanged()), smProperty);
-
-      this->setChangeAvailableAsChangeFinished(true);
-      layoutLocal->addWidget(widget);
-      this->setShowLabel(false);
-
       PV_DEBUG_PANELS() << "pqScalarValueListPropertyWidget for a repeatable "
-                    << "DoubleVectorProperty with a BoundsDomain ("
-                    << pqPropertyWidget::getXMLName(range) << ") ";
+                        << "DoubleVectorProperty with a BoundsDomain ("
+                        << pqPropertyWidget::getXMLName(range) << ") ";
       }
-    else if(dvp->GetNumberOfElements() == 1 &&
-            range->GetMinimumExists(0) &&
-            range->GetMaximumExists(0))
+    else
+      {
+      PV_DEBUG_PANELS() << "pqScalarValueListPropertyWidget for a repeatable "
+                        << "DoubleVectorProperty without a BoundsDomain";
+      }
+    }
+  else if (range)
+    {
+    if(dvp->GetNumberOfElements() == 1 &&
+       range->GetMinimumExists(0) &&
+       range->GetMaximumExists(0))
       {
       // bounded ranges are represented with a slider and a spin box
       pqDoubleRangeWidget *widget = new pqDoubleRangeWidget(this);
