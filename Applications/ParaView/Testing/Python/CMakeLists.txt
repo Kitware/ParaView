@@ -56,12 +56,17 @@ paraview_add_test_pvbatch(
   CinemaTest.py
 )
 
-# these tests could run safely in serial and
-# in parallel.
+# These tests could run safely in serial and parallel (and with both GL backends).
 set(PVBATCH_TESTS
   StructuredGridVolumeRendering.py
   PLYWriter.py
   )
+
+# Tests only concerning GL2.
+if ("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
+  list(APPEND PVBATCH_TESTS VolumeCellSelection.py)
+endif ()
+
 foreach (tfile IN LISTS PVBATCH_TESTS)
   get_filename_component(test ${tfile} NAME_WE)
   set(${test}_ARGS
