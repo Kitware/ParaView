@@ -4,7 +4,6 @@ Major API Changes             {#MajorAPIChanges}
 This page documents major API/design changes between different versions since we
 started tracking these (starting after version 4.2).
 
-
 Changes in 5.2
 --------------
 
@@ -31,6 +30,21 @@ each of the versions. e.g.
     ...
     target_link_libraries(${target} LINK_PRIVATE ${qt_targets})
 
+###Multiple input ports with vtkPythonProgrammableFilter###
+
+vtkPythonProgrammableFilter can now accept multiple input ports if the number
+of input ports is defined in the XML plugin file with the *input_ports* attribute.
+The different input ports are then defined with InputProperty having each a
+different *port_index*:
+
+   <SourceProxy name="Name" class="vtkPythonProgrammableFilter" label="label" input_ports="2">
+      <InputProperty name="Source" command="SetInputConnection" port_index="0">
+        [...]
+      </InputProperty>
+      <InputProperty name="Target" command="SetInputConnection" port_index="1">
+        [...]
+      </InputProperty>
+   </SourceProxy>
 
 Changes in 5.1
 --------------

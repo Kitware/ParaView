@@ -370,6 +370,21 @@ bool vtkSIProxy::CreateVTKObjects(vtkSMMessage* message)
   // before properties are created.
   this->OnCreateVTKObjects();
 
+  // Set the number of input ports
+  // This will only work for vtkAlgorithm subclasses that explicitly expose the
+  // otherwise protected method SetNumberOfInputPorts
+  int numberOfInputPorts=0;
+  if (element->GetScalarAttribute("input_ports", &numberOfInputPorts))
+    {
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << this->GetVTKObject()
+           << "SetNumberOfInputPorts"
+           << numberOfInputPorts
+           << vtkClientServerStream::End;
+    this->Interpreter->ProcessStream(stream);
+    }
+
   // Execute post-creation if any
   if(this->PostCreation != NULL)
     {
