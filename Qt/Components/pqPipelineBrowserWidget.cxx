@@ -227,11 +227,6 @@ void pqPipelineBrowserWidget::setSelectionVisibility(bool visible)
 void pqPipelineBrowserWidget::setVisibility(bool visible,
   const QModelIndexList& indexes)
 {
-  vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
-  pqView* activeView = pqActiveObjects::instance().activeView();
-  vtkSMViewProxy* viewProxy = activeView? activeView->getViewProxy() : NULL;
-  int scalarBarMode = vtkPVGeneralSettings::GetInstance()->GetScalarBarMode();
-
   bool begun_undo_set = false;
 
   foreach (QModelIndex index_, indexes)
@@ -261,41 +256,7 @@ void pqPipelineBrowserWidget::setVisibility(bool visible,
           BEGIN_UNDO_SET(QString("%1 Selected").arg(visible? "Show" : "Hide"));
           }
         }
-      if (pqLiveInsituManager::isInsituServer(port->getServer()))
-        {
-        // we don't need to add an extract for writer parameters proxies.
-        if (! pqLiveInsituManager::isWriterParametersProxy(
-              port->getSourceProxy()))
-          {
-          pqLiveInsituVisualizationManager* mgr =
-            pqLiveInsituManager::managerFromInsitu(port->getServer());
-          if (mgr && mgr->addExtract(port))
-            {
-            // refresh the pipeline browser icon.
-            }
-          }
-        }
-      else
-        {
-        if(visible)
-          {
-          // Make sure the given port is selected specially if we are in
-          // multi-server / catalyst configuration type
-          pqActiveObjects::instance().setActivePort(port);
-          }
-        vtkSMProxy* repr = controller->SetVisibility(
-          port->getSourceProxy(), port->getPortNumber(),
-          viewProxy, visible);
-        // update scalar bars: show new ones if needed. Hiding of scalar bars is
-        // taken care of by vtkSMParaViewPipelineControllerWithRendering (I still
-        // wonder if that's the best thing to do).
-        if (repr && visible &&
-          scalarBarMode == vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS &&
-          vtkSMPVRepresentationProxy::GetUsingScalarColoring(repr))
-          {
-          vtkSMPVRepresentationProxy::SetScalarBarVisibility(repr, viewProxy, true);
-          }
-        }
+      pqPipelineBrowserWidget::setVisibility(visible, port);
       }
     }
   if (begun_undo_set)
@@ -309,6 +270,36 @@ void pqPipelineBrowserWidget::setVisibility(bool visible,
       view->resetDisplay();
       }
     pqActiveObjects::instance().activeView()->render();
+    }
+}
+
+//----------------------------------------------------------------------------
+void pqPipelineBrowserWidget::setVisibility(bool visible, pqOutputPort* port)
+{
+  if (port)
+    {
+    vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
+    pqView* activeView = pqActiveObjects::instance().activeView();
+    vtkSMViewProxy* viewProxy = activeView? activeView->getViewProxy() : NULL;
+    int scalarBarMode = vtkPVGeneralSettings::GetInstance()->GetScalarBarMode();
+    if(visible)
+      {
+      // Make sure the given port is selected specially if we are in
+      // multi-server / catalyst configuration type
+      pqActiveObjects::instance().setActivePort(port);
+      }
+    vtkSMProxy* repr = controller->SetVisibility(
+      port->getSourceProxy(), port->getPortNumber(),
+      viewProxy, visible);
+    // update scalar bars: show new ones if needed. Hiding of scalar bars is
+    // taken care of by vtkSMParaViewPipelineControllerWithRendering (I still
+    // wonder if that's the best thing to do).
+    if (repr && visible &&
+      scalarBarMode == vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS &&
+      vtkSMPVRepresentationProxy::GetUsingScalarColoring(repr))
+      {
+      vtkSMPVRepresentationProxy::SetScalarBarVisibility(repr, viewProxy, true);
+      }
     }
 }
 

@@ -96,6 +96,9 @@ public:
   void setPanelMode(int val);
   int panelMode() const { return this->PanelMode; }
 
+  /// Update the panel to show the widgets for the given pair.
+  void updatePanel(pqOutputPort* port);
+
 public slots:
   /// Apply the changes properties to the proxies.
   ///
@@ -151,6 +154,20 @@ public slots:
   /// save icon next to the view button.
   void viewSaveAsDefaults();
 
+  /// Set the view currently managed by the
+  /// panel, should be called automatically 
+  /// when the active view changes.
+  void setView(pqView*);
+
+  /// Set the output port currently managed by the
+  /// panel, should be called automatically 
+  /// when the active output port changes.
+  void setOutputPort(pqOutputPort*);
+
+  /// Set the representation currently managed by the
+  /// panel, should be called automatically 
+  /// when the active representation changes.
+  void setRepresentation(pqDataRepresentation*);
 signals:
   /// This signal is emitted after the user clicks the apply button.
   void applied();
@@ -168,10 +185,6 @@ signals:
   void deleteRequested(pqPipelineSource* source);
 
 private slots:
-  void setView(pqView*);
-  void setOutputPort(pqOutputPort*);
-  void setRepresentation(pqDataRepresentation*);
-
   /// This is called when the user clicks the "Delete" button on the
   /// properties panel. This triggers the deleteRequested() signal with proper
   /// arguments.
@@ -214,8 +227,6 @@ private slots:
   void pasteView();
 
 protected:
-  /// Update the panel to show the widgets for the given pair.
-  void updatePanel(pqOutputPort* port);
   void updatePropertiesPanel(pqPipelineSource* source);
   void updateDisplayPanel(pqDataRepresentation* repr);
   void updateViewPanel (pqView* view);
