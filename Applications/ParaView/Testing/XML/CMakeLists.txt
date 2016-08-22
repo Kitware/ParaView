@@ -79,6 +79,7 @@ SET (TESTS_WITHOUT_BASELINES
 
 if (PARAVIEW_ENABLE_PYTHON)
   list(APPEND TESTS_WITHOUT_BASELINES
+    ${CMAKE_CURRENT_SOURCE_DIR}/DetachedFromLayoutIndirect.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/TestPythonConsole.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/TestPopOutWidget.xml # needs programmable filter
     ${CMAKE_CURRENT_SOURCE_DIR}/MultipleNumberOfComponents.xml)

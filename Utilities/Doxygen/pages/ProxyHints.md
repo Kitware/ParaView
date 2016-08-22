@@ -1,5 +1,5 @@
-Proxy Hints {#ProxyHints}
-===========
+Proxy Hints And Annotations {#ProxyHints}
+===========================
 
 This page documents *Proxy Hints*, which are XML tags accepted under *Hints*
 for a *Proxy* element in the Server-Manager configuration XMLs.
@@ -145,3 +145,8 @@ possible values are:
       <Hints>
         <ShowProxyDocumentationInPanel type="description"/>
       </Hints>
+
+View Annotations
+----------------
+Views support the following annotations.
+ * "ParaView::DetachedFromLayout" : If Set to True, this Annotation will prevent the Layout to grab the view, enabling CustomApplication developpers to assign or position the view themselves. Use `pqObjectBuilder::createView(viewType, server, true)` to set the annotation.

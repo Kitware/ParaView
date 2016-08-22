@@ -330,7 +330,7 @@ void pqObjectBuilder::destroy(pqPipelineSource* source)
 }
 
 //-----------------------------------------------------------------------------
-pqView* pqObjectBuilder::createView(const QString& type, pqServer* server)
+pqView* pqObjectBuilder::createView(const QString& type, pqServer* server, bool detachedFromLayout)
 {
   if (!server)
     {
@@ -346,6 +346,10 @@ pqView* pqObjectBuilder::createView(const QString& type, pqServer* server)
     qDebug() << "Failed to create a proxy for the requested view type:"
              << type;
     return NULL;
+    }
+  if (detachedFromLayout)
+    {
+    proxy->SetAnnotation("ParaView::DetachedFromLayout", "true");
     }
 
   // notify the world that we may create a new view. applications may handle
