@@ -91,6 +91,18 @@ void vtkMoleculeRepresentation::SetLookupTable(vtkScalarsToColors *lut)
 }
 
 //------------------------------------------------------------------------------
+vtkDataObject *vtkMoleculeRepresentation::GetRenderedDataObject(int)
+{
+  // Bounds are only valid when we have valid input. Test for them before
+  // returning cached object.
+  if (vtkMath::AreBoundsInitialized(this->DataBounds))
+    {
+    return this->CacheKeeper->GetOutputDataObject(0);
+    }
+  return NULL;
+}
+
+//------------------------------------------------------------------------------
 void vtkMoleculeRepresentation::MarkModified()
 {
   if (!this->GetUseCache())

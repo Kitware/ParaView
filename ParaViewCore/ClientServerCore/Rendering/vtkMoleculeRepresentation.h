@@ -53,6 +53,10 @@ public:
   // SetRepresentation on it's subproxies.
   void SetRepresentation(const char *) {}
 
+  // Description:
+  // Returns the data object that is rendered from the given input port.
+  virtual vtkDataObject* GetRenderedDataObject(int port);
+
   void MarkModified();
 
 protected:
