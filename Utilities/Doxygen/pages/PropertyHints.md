@@ -156,3 +156,39 @@ or <AcceptAnyFile/> to accept any filename to export data.
         <FileChooser extensions="q" file_description="Solution files" />
       </Hints>
     </StringVectorProperty>
+
+OmitFromLoadAllVariables
+------------
+Specify that a dataset property be excluded when "Load All Variables" toggle is selected.
+
+ParaView has a global toggle named "Load All Variables" that
+automatically selects all variables in a dataset when loading a
+file. This hint allows certain values to be omitted from that list
+(e.g. sidesets, edgesets) so they will not be included by default. The
+user can still manually select these values to be loaded.
+
+    <StringVectorProperty command="SetSideSetArrayStatus"
+                            element_types="2 0"
+                            information_property="SideSetInfo"
+                            name="SideSetArrayStatus"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="SideSetInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>An Exodus II file may define subsets of all the
+        <i>boundaries</i>of all the elements in a file as sets in their own
+        right. This property specifies which of those sets should be loaded.
+        Variables, such as boundary conditions, may then be defined over these
+        sets by specifying a single number per side. For example, a hexahedron
+        has 18 sides: 6 faces and 12 edges. Any of these sides may be
+        individually called out in a set and assigned a result value. The
+        accompanying SideSetResultArrayStatus property specifies which
+        variables defined over those sets should be loaded.</Documentation>
+        <Hints>
+          <OmitFromLoadAllVariables />
+        </Hints>
+      </StringVectorProperty>

@@ -15,6 +15,7 @@
 #include "vtkSMArraySelectionDomain.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMVectorProperty.h"
 
@@ -50,9 +51,16 @@ int vtkSMArraySelectionDomain::SetDefaultValues(vtkSMProperty* prop, bool use_un
     if (vtkSMArraySelectionDomain::LoadAllVariables == true)
       {
       vtkSMPropertyHelper helper(vprop);
+
       for (unsigned int i=0;i<this->GetNumberOfStrings();i++)
         {
-        helper.SetStatus(this->GetString(i),1);
+        vtkPVXMLElement* omitFromLoadAllVariablesHint =
+          (prop->GetHints() ? prop->GetHints()->
+           FindNestedElementByName("OmitFromLoadAllVariables") : NULL);
+        if (!omitFromLoadAllVariablesHint)
+          {
+          helper.SetStatus(this->GetString(i),1);
+          }
         }
       }
     return 1;

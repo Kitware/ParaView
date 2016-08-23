@@ -1675,6 +1675,9 @@
         the edge blocks of a file) from their offset in the file to some
         arbitrary integers, usually specifying a unique global ID across a set
         of files.</Documentation>
+        <Hints>
+          <OmitFromLoadAllVariables />
+        </Hints>
       </StringVectorProperty>
       <StringVectorProperty information_only="1"
                             name="FaceMapInfo">
@@ -1697,6 +1700,9 @@
         face blocks of a file) from their offset in the file to some arbitrary
         integers, usually specifying a unique global ID across a set of
         files.</Documentation>
+        <Hints>
+          <OmitFromLoadAllVariables />
+        </Hints>
       </StringVectorProperty>
       <StringVectorProperty information_only="1"
                             name="ElementMapInfo">
@@ -1721,6 +1727,9 @@
         ID across a set of files. These are sometimes called new-style maps
         because they are specified differently than in older Exodus files,
         which only allowed a single element map.</Documentation>
+        <Hints>
+          <OmitFromLoadAllVariables />
+        </Hints>
       </StringVectorProperty>
       <StringVectorProperty information_only="1"
                             name="NodeSetInfo">
@@ -1745,6 +1754,9 @@
         should be loaded. The accompanying NodeSetResultArrayStatus property
         specifies which variables defined over those sets should be
         loaded.</Documentation>
+        <Hints>
+          <OmitFromLoadAllVariables />
+        </Hints>
       </StringVectorProperty>
       <StringVectorProperty information_only="1"
                             name="SideSetInfo">
@@ -1771,6 +1783,9 @@
         individually called out in a set and assigned a result value. The
         accompanying SideSetResultArrayStatus property specifies which
         variables defined over those sets should be loaded.</Documentation>
+        <Hints>
+          <OmitFromLoadAllVariables />
+        </Hints>
       </StringVectorProperty>
       <StringVectorProperty information_only="1"
                             name="FaceSetInfo">
@@ -1795,6 +1810,9 @@
         specifying a single number per face. The accompanying
         FaceSetResultArrayStatus property specifies which variables defined
         over those sets should be loaded.</Documentation>
+        <Hints>
+          <OmitFromLoadAllVariables />
+        </Hints>
       </StringVectorProperty>
       <StringVectorProperty information_only="1"
                             name="EdgeSetInfo">
@@ -1819,6 +1837,9 @@
         specifying a single number per edge. The accompanying
         EdgeSetResultArrayStatus property specifies which variables defined
         over those sets should be loaded.</Documentation>
+        <Hints>
+          <OmitFromLoadAllVariables />
+        </Hints>
       </StringVectorProperty>
       <StringVectorProperty information_only="1"
                             name="ElementSetInfo">
@@ -1843,6 +1864,9 @@
         specifying a single number per element. The accompanying
         ElementSetResultArrayStatus property specifies which variables defined
         over those sets should be loaded.</Documentation>
+        <Hints>
+          <OmitFromLoadAllVariables />
+        </Hints>
       </StringVectorProperty>
       <StringVectorProperty information_only="1"
                             name="ElementSetResultArrayInfo">
@@ -1867,6 +1891,9 @@
         which of those variables should be loaded. The corresponding set must
         also be loaded using the ElementSetArrayStatus property in order for
         the variable to appear.</Documentation>
+        <Hints>
+          <OmitFromLoadAllVariables />
+        </Hints>
       </StringVectorProperty>
       <StringVectorProperty information_only="1"
                             name="SideSetResultArrayInfo">
@@ -1893,6 +1920,9 @@
         property specifies which of those variables should be loaded. The
         corresponding set must also be loaded using the SideSetArrayStatus
         property in order for the variable to appear.</Documentation>
+        <Hints>
+          <OmitFromLoadAllVariables />
+        </Hints>
       </StringVectorProperty>
       <StringVectorProperty information_only="1"
                             name="FaceSetResultArrayInfo">
@@ -1917,6 +1947,9 @@
         which of those variables should be loaded. The corresponding set must
         also be loaded using the FaceSetArrayStatus property in order for the
         variable to appear.</Documentation>
+        <Hints>
+          <OmitFromLoadAllVariables />
+        </Hints>
       </StringVectorProperty>
       <StringVectorProperty information_only="1"
                             name="EdgeSetResultArrayInfo">
@@ -1941,6 +1974,9 @@
         which of those variables should be loaded. The corresponding set must
         also be loaded using the EdgeSetArrayStatus property in order for the
         variable to appear.</Documentation>
+        <Hints>
+          <OmitFromLoadAllVariables />
+        </Hints>
       </StringVectorProperty>
       <StringVectorProperty information_only="1"
                             name="NodeSetResultArrayInfo">
@@ -1965,6 +2001,9 @@
         variables should be loaded. The corresponding set must also be loaded
         using the NodeSetArrayStatus property in order for the variable to
         appear.</Documentation>
+        <Hints>
+          <OmitFromLoadAllVariables />
+        </Hints>
       </StringVectorProperty>
       <IntVectorProperty command="SetApplyDisplacements"
                          default_values="1"
