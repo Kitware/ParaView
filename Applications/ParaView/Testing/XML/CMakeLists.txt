@@ -368,7 +368,6 @@ if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
   list(APPEND TESTS_WITH_BASELINES
     # This test makes use of "Point Gaussian" representation, only available with OpenGL2
     ${CMAKE_CURRENT_SOURCE_DIR}/BackgroundColorCheck.xml
-    ${CMAKE_CURRENT_SOURCE_DIR}/VolumeCellSelection.xml
 
     # PlotMatrixView is bugging in OpenGL1
     ${CMAKE_CURRENT_SOURCE_DIR}/PlotMatrixViewArraySelection.xml
@@ -521,7 +520,6 @@ set(MultiSliceWavelet_DISABLE_CRS TRUE)
 set(MultiSliceMultiBlock_DISABLE_CRS TRUE)
 set(PolygonCellSelection_DISABLE_CRS TRUE)
 set(PolygonPointSelection_DISABLE_CRS TRUE)
-set(VolumeCellSelection_DISABLE_CRS TRUE)
 set(NonlinearSubdivisionDisplay_DISABLE_CRS TRUE)
 set(InteractiveSelection_DISABLE_CRS TRUE)
 set(NonConvexPolygon_DISABLE_CRS TRUE)
@@ -543,7 +541,6 @@ set (AnimatePipelineTime_FORCE_SERIAL TRUE)
 set (ProbePicking_FORCE_SERIAL TRUE)
 set (PolygonCellSelection_FORCE_SERIAL TRUE)
 set (PolygonPointSelection_FORCE_SERIAL TRUE)
-set (VolumeCellSelection_FORCE_SERIAL TRUE)
 set (Contour_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (Calculator_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (LogColorMap_FORCE_SERIAL TRUE) # since this uses popup-menu
