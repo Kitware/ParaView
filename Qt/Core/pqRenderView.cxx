@@ -853,7 +853,7 @@ void pqRenderView::updateInteractionMode(pqOutputPort* opPort)
   // Update camera infos
   for(int i=0; i<3; i++)
     {
-    if(bounds[i*2+1]-bounds[i*2] == 0)
+    if (bounds[i*2+1]-bounds[i*2] == 0 && !is2DDataSet)
       {
       position[i] = focal[i] + 10000;
       viewUp[(i+2)%3] = 1;
