@@ -27,12 +27,25 @@
 #include "vtkReductionFilter.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkTrivialProducer.h"
 
 #include <sstream>
+#include <string>
 #include <vtksys/SystemTools.hxx>
 
-#include <string>
+namespace
+{
+  bool vtkIsEmpty(vtkDataObject* dobj)
+    {
+    for (int cc=0; (dobj != NULL) && (cc < vtkDataObject::NUMBER_OF_ASSOCIATIONS); ++cc)
+      {
+      if (dobj->GetNumberOfElements(cc) > 0)
+        {
+        return false;
+        }
+      }
+    return true;
+    }
+}
 
 vtkStandardNewMacro(vtkParallelSerialWriter);
 vtkCxxSetObjectMacro(vtkParallelSerialWriter, Writer, vtkAlgorithm);
@@ -227,19 +240,13 @@ void vtkParallelSerialWriter::WriteAFile(const char* filename, vtkDataObject* in
   vtkMultiProcessController* controller =
     vtkMultiProcessController::GetGlobalController();
 
-  vtkSmartPointer<vtkReductionFilter> md = vtkSmartPointer<vtkReductionFilter>::New();
-  md->SetController(controller);
-  md->SetPreGatherHelper(this->PreGatherHelper);
-  md->SetPostGatherHelper(this->PostGatherHelper);
-  if (input)
-    {
-    vtkTrivialProducer* tp = vtkTrivialProducer::New();
-    tp->SetOutput(input);
-    md->SetInputConnection(0, tp->GetOutputPort());
-    tp->Delete();
-    }
-  md->UpdateInformation();
-  vtkInformation* outInfo = md->GetExecutive()->GetOutputInformation(0);
+  vtkSmartPointer<vtkReductionFilter> reductionFilter = vtkSmartPointer<vtkReductionFilter>::New();
+  reductionFilter->SetController(controller);
+  reductionFilter->SetPreGatherHelper(this->PreGatherHelper);
+  reductionFilter->SetPostGatherHelper(this->PostGatherHelper);
+  reductionFilter->SetInputDataObject(input);
+  reductionFilter->UpdateInformation();
+  vtkInformation* outInfo = reductionFilter->GetExecutive()->GetOutputInformation(0);
   outInfo->Set(
     vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER(),
     this->Piece);
@@ -249,18 +256,13 @@ void vtkParallelSerialWriter::WriteAFile(const char* filename, vtkDataObject* in
   outInfo->Set(
     vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(),
     this->GhostLevel);
-  md->Update();
+  reductionFilter->Update();
 
   if (controller->GetLocalProcessId() == 0)
     {
-    vtkDataObject* output = md->GetOutputDataObject(0);
-    if (vtkDataSet::SafeDownCast(output) == 0 ||
-      vtkDataSet::SafeDownCast(output)->GetNumberOfCells() != 0)
+    vtkDataObject* output = reductionFilter->GetOutputDataObject(0);
+    if (vtkIsEmpty(output) == false)
       {
-      vtkSmartPointer<vtkDataObject> outputCopy;
-      outputCopy.TakeReference(output->NewInstance());
-      outputCopy->ShallowCopy(output);
-
       std::ostringstream fname;
       if (this->WriteAllTimeSteps)
         {
@@ -276,10 +278,7 @@ void vtkParallelSerialWriter::WriteAFile(const char* filename, vtkDataObject* in
         {
         fname << filename;
         }
-      vtkTrivialProducer* tp = vtkTrivialProducer::New();
-      tp->SetOutput(outputCopy);
-      this->Writer->SetInputConnection(tp->GetOutputPort());
-      tp->Delete();
+      this->Writer->SetInputDataObject(output);
       this->SetWriterFileName(fname.str().c_str());
       this->WriteInternal();
       this->Writer->SetInputConnection(0);

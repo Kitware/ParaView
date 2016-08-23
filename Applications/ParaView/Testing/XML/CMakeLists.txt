@@ -382,6 +382,9 @@ if (PARAVIEW_USE_MPI)
 
     # Test uses D3 which is available in MPI only builds.
     ${CMAKE_CURRENT_SOURCE_DIR}/GridConnectivity.xml
+
+    # Test uses D3 which is available in MPI only builds.
+    ${CMAKE_CURRENT_SOURCE_DIR}/ExportSelectionToCSV.xml
   )
 
   # Test uses GhostCellsGenerator which is available in MPI only builds.
@@ -534,6 +537,7 @@ set(SelectionLinkInitial_DISABLE_CRS TRUE)
 set(SelectionLinkMultiple_DISABLE_CRS TRUE)
 set(SelectionLinkRemove_DISABLE_CRS TRUE)
 set(SelectionLinkReaction_DISABLE_CRS TRUE)
+set(ExportSelectionToCSV_DISABLE_CRS TRUE)
 
 # These tests cannot be run using ctest -j since they are affected by focus
 # changed events.
