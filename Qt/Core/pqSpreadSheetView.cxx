@@ -216,6 +216,7 @@ void pqSpreadSheetView::onEndRender()
   //this->Internal->Model.forceUpdate();
   //this->Internal->Model->update();
   this->Internal->Table->viewport()->update();
+  emit this->viewportUpdated();
 }
 
 //-----------------------------------------------------------------------------

@@ -53,7 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqExportReaction::pqExportReaction(QAction* parentObject)
-  : Superclass(parentObject)
+  : Superclass(parentObject), ConnectedView(NULL)
 {
   // load state enable state depends on whether we are connected to an active
   // server or not and whether
@@ -68,13 +68,44 @@ void pqExportReaction::updateEnableState()
 {
   // this results in firing of exportable(bool) signal which updates the
   // QAction's state.
-  bool enabled = false;
-  if (pqView* view = pqActiveObjects::instance().activeView())
+  pqView* view = pqActiveObjects::instance().activeView();
+  if (this->ConnectedView != view)
     {
-    vtkSMViewProxy* viewProxy = view->getViewProxy();
+    if (this->ConnectedView)
+      {
+      QObject::disconnect(this->ConnectedView, 
+        SIGNAL(representationVisibilityChanged(pqRepresentation*, bool)),
+        this, SLOT(updateEnableState()));
+      }
+    this->ConnectedView = view;
+    if (view)
+      {
+      QObject::connect(this->ConnectedView, 
+        SIGNAL(representationVisibilityChanged(pqRepresentation*, bool)),
+        this, SLOT(updateEnableState()));
+      }
+    }
+  
+  bool enabled = false;
+  if (view)
+    {
+    bool visibleRepresentation = false;
+    QList<pqRepresentation*> representations = view->getRepresentations();
+    foreach(pqRepresentation* repr, representations)
+      {
+      if (repr->isVisible())
+        {
+          visibleRepresentation = true;
+          break;
+        }
+      }
 
-    vtkNew<vtkSMViewExportHelper> helper;
-    enabled = (helper->GetSupportedFileTypes(viewProxy).size() > 0);
+    if (visibleRepresentation)
+      {
+      vtkSMViewProxy* viewProxy = view->getViewProxy();
+      vtkNew<vtkSMViewExportHelper> helper;
+      enabled = (helper->GetSupportedFileTypes(viewProxy).size() > 0);
+      }
     }
   this->parentAction()->setEnabled(enabled);
 }

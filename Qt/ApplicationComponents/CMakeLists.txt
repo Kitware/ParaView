@@ -280,6 +280,8 @@ set (Module_SRCS
   pqSpherePropertyWidget.h
   pqSplinePropertyWidget.cxx
   pqSplinePropertyWidget.h
+  pqSpreadSheetViewDecorator.cxx
+  pqSpreadSheetViewDecorator.h
   pqSpreadSheetVisibilityBehavior.cxx
   pqSpreadSheetVisibilityBehavior.h
   pqStandardArrayColorMapsBehavior.cxx
@@ -449,6 +451,7 @@ set (Module_MOC_HDRS
   pqSourcesMenuReaction.h
   pqSpherePropertyWidget.h
   pqSplinePropertyWidget.h
+  pqSpreadSheetViewDecorator.h
   pqSpreadSheetVisibilityBehavior.h
   pqStandardArrayColorMapsBehavior.h
   pqStandardPropertyWidgetInterface.h
@@ -516,6 +519,7 @@ set (Module_UI_FILES
   Resources/UI/pqSeriesEditorPropertyWidget.ui
   Resources/UI/pqSpherePropertyWidget.ui
   Resources/UI/pqSplinePropertyWidget.ui
+  Resources/UI/pqSpreadSheetViewDecorator.ui
   Resources/UI/pqTextLocationWidget.ui
   Resources/UI/pqTimeInspectorWidget.ui
   Resources/UI/pqTransferFunctionWidgetPropertyWidgetDialog.ui

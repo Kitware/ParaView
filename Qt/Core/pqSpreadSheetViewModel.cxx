@@ -805,6 +805,13 @@ bool pqSpreadSheetViewModel::setData ( const QModelIndex&, const QVariant&, int)
 }
 
 //-----------------------------------------------------------------------------
+void pqSpreadSheetViewModel::clearVisible()
+{
+  this->Internal->ColumnVisibility.clear();
+  emit this->headerDataChanged(Qt::Horizontal, 0, this->columnCount());
+}
+
+//-----------------------------------------------------------------------------
 void pqSpreadSheetViewModel::setVisible ( int section, bool visibility )
 {
   while(this->Internal->ColumnVisibility.size() <= section)

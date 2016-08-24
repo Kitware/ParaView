@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 class pqProxyWidget;
+class pqView;
 
 /// @ingroup Reactions
 /// Reaction for exporting a view. Uses pqViewExporterManager for actual
@@ -65,6 +66,8 @@ protected:
 private:
   /// Creates a dialog widget containing the predefined proxyWidget.
   QDialog* createConfigurationDialog(pqProxyWidget* proxyWidget);
+
+  pqView* ConnectedView;
 
   Q_DISABLE_COPY(pqExportReaction)
 };

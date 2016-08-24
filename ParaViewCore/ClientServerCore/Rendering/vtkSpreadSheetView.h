@@ -25,9 +25,12 @@
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVView.h"
 
-class vtkClientServerMoveData;
+#include <map> // For Column Visibilities
+
 class vtkCSVExporter;
+class vtkClientServerMoveData;
 class vtkMarkSelectedRows;
+class vtkPassArrays;
 class vtkReductionFilter;
 class vtkSortedTableStreamer;
 class vtkTable;
@@ -62,6 +65,11 @@ public:
   void SetShowExtractedSelection(bool);
   vtkBooleanMacro(ShowExtractedSelection, bool);
   vtkGetMacro(ShowExtractedSelection, bool);
+
+  // Description
+  // Manage column visibilities, used only for export
+  void SetColumnVisibility(int fieldAssociation, const char* column, int visibility);
+  void ClearColumnVisibilities();
 
   // Description:
   // Get the number of columns.
@@ -126,8 +134,8 @@ public:
   void ClearCache();
 
   // INTERNAL METHOD. Don't call directly.
-  void FetchBlockCallback(vtkIdType blockindex);
-
+  vtkTable* FetchBlockCallback(vtkIdType blockindex, 
+    bool filterColumnForExport = false);
 protected:
   vtkSpreadSheetView();
   ~vtkSpreadSheetView();
@@ -142,13 +150,14 @@ protected:
 
   void OnRepresentationUpdated();
 
-  vtkTable* FetchBlock(vtkIdType blockindex);
+  vtkTable* FetchBlock(vtkIdType blockindex, bool filterColumnForExport = false);
 
   bool ShowExtractedSelection;
   vtkSortedTableStreamer* TableStreamer;
   vtkMarkSelectedRows* TableSelectionMarker;
   vtkReductionFilter* ReductionFilter;
   vtkClientServerMoveData* DeliveryFilter;
+  vtkPassArrays* PassFilter;
 
   vtkIdType NumberOfRows;
 
@@ -164,6 +173,7 @@ private:
   friend class vtkInternals;
   vtkInternals* Internals;
 
+  std::map<std::pair<int, std::string>, int> ColumnVisibilities;
   bool SomethingUpdated;
 
   unsigned long RMICallbackTag;

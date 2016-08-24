@@ -58,6 +58,12 @@ public:
   vtkSetStringMacro(FieldDelimiter);
   vtkGetStringMacro(FieldDelimiter);
 
+  // Description:
+  // Get/Set to filter by column or not
+  vtkSetMacro(FilterColumnsByVisibility, bool);
+  vtkGetMacro(FilterColumnsByVisibility, bool);
+
+
   enum ExporterModes
     {
     STREAM_ROWS,
@@ -99,6 +105,7 @@ protected:
 
   char* FileName;
   char* FieldDelimiter;
+  bool FilterColumnsByVisibility;
   ofstream *FileStream;
   ExporterModes Mode;
 

@@ -26,6 +26,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
+#include "vtkPassArrays.h"
 #include "vtkProcessModule.h"
 #include "vtkPVMergeTables.h"
 #include "vtkPVSynchronizedRenderWindows.h"
@@ -277,6 +278,12 @@ vtkSpreadSheetView::vtkSpreadSheetView()
   this->DeliveryFilter = vtkClientServerMoveData::New();
   this->DeliveryFilter->SetOutputDataType(VTK_TABLE);
 
+  this->PassFilter = vtkPassArrays::New();
+  this->PassFilter->UseFieldTypesOff();
+  this->PassFilter->RemoveArraysOn();
+  this->PassFilter->SetInputConnection(
+    this->DeliveryFilter->GetOutputPort());
+
   this->ReductionFilter->SetInputConnection(
     this->TableStreamer->GetOutputPort());
 
@@ -309,6 +316,7 @@ vtkSpreadSheetView::~vtkSpreadSheetView()
   this->TableSelectionMarker->Delete();
   this->ReductionFilter->Delete();
   this->DeliveryFilter->Delete();
+  this->PassFilter->Delete();
 
   this->Internals->Observer->Delete();
   delete this->Internals;
@@ -324,6 +332,18 @@ void vtkSpreadSheetView::SetShowExtractedSelection(bool val)
     this->ClearCache();
     this->Modified();
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkSpreadSheetView::SetColumnVisibility(int fieldAssociation, const char* column, int visibility)
+{
+  this->ColumnVisibilities[std::make_pair(fieldAssociation, column)] = visibility;
+}
+
+//----------------------------------------------------------------------------
+void vtkSpreadSheetView::ClearColumnVisibilities()
+{
+  this->ColumnVisibilities.clear();
 }
 
 //----------------------------------------------------------------------------
@@ -438,24 +458,36 @@ void vtkSpreadSheetView::OnRepresentationUpdated()
 }
 
 //----------------------------------------------------------------------------
-vtkTable* vtkSpreadSheetView::FetchBlock(vtkIdType blockindex)
+vtkTable* vtkSpreadSheetView::FetchBlock(vtkIdType blockindex, bool filterColumnForExport)
 {
-  vtkTable* block = this->Internals->GetDataObject(blockindex);
-  if (!block)
+  vtkTable* block;
+  // Do not use cache with filtered columns
+  if (filterColumnForExport)
     {
-    this->FetchBlockCallback(blockindex);
-    block = vtkTable::SafeDownCast(
-      this->DeliveryFilter->GetOutputDataObject(0));
-    this->Internals->AddToCache(blockindex, block, 10);
-    this->InvokeEvent(vtkCommand::UpdateEvent, &blockindex);
+    block = this->FetchBlockCallback(blockindex, filterColumnForExport);
     }
-
+  else
+    {
+    block = this->Internals->GetDataObject(blockindex);
+    if (!block)
+      {
+      block = this->FetchBlockCallback(blockindex);
+      this->Internals->AddToCache(blockindex, block, 10);
+      this->InvokeEvent(vtkCommand::UpdateEvent, &blockindex);
+      }
+    }
   return block;
 }
 
 //----------------------------------------------------------------------------
-void vtkSpreadSheetView::FetchBlockCallback(vtkIdType blockindex)
+vtkTable* vtkSpreadSheetView::FetchBlockCallback(vtkIdType blockindex, bool filterColumn)
 {
+  // Sanity Check
+  if (!this->Internals->ActiveRepresentation)
+    {
+    return NULL;
+    }
+
   //cout << "FetchBlockCallback" << endl;
   vtkMultiProcessStream stream;
   stream << this->Identifier << static_cast<int>(blockindex);
@@ -468,6 +500,25 @@ void vtkSpreadSheetView::FetchBlockCallback(vtkIdType blockindex)
   this->ReductionFilter->Modified();
   this->DeliveryFilter->Modified();
   this->DeliveryFilter->Update();
+
+  vtkTable* ret = vtkTable::SafeDownCast(this->DeliveryFilter->GetOutput());
+  if (filterColumn)
+    {
+    this->PassFilter->ClearArrays();
+    std::map<std::pair<int, std::string>, int>::iterator mapItem; 
+    for (int i = 0; i < ret->GetNumberOfColumns(); i++)
+      {
+      mapItem = this->ColumnVisibilities.find(
+        std::make_pair(this->Internals->ActiveRepresentation->GetFieldAssociation(), ret->GetColumnName(i)));
+      if (mapItem != this->ColumnVisibilities.end() && mapItem->second == 0)
+        {
+        this->PassFilter->AddArray(vtkDataObject::ROW, ret->GetColumnName(i)); 
+        }
+      }
+    this->PassFilter->Update();
+    ret = vtkTable::SafeDownCast(this->PassFilter->GetOutput());
+    }
+  return ret;
 }
 
 //----------------------------------------------------------------------------
@@ -563,12 +614,16 @@ bool vtkSpreadSheetView::Export(vtkCSVExporter* exporter)
   vtkIdType numBlocks = (this->GetNumberOfRows() / blockSize) + 1;
   for (vtkIdType cc=0; cc < numBlocks; cc++)
     {
-    vtkTable* block = this->FetchBlock(cc);
-    if (cc==0)
+    vtkTable* block = this->FetchBlock(cc, 
+      exporter->GetFilterColumnsByVisibility());
+    if (block)
       {
-      exporter->WriteHeader(block->GetRowData());
+      if (cc==0)
+        {
+        exporter->WriteHeader(block->GetRowData());
+        }
+      exporter->WriteData(block->GetRowData());
       }
-    exporter->WriteData(block->GetRowData());
     }
   exporter->Close();
   return true;

@@ -165,6 +165,9 @@
     </widget>
    </item>
    <item>
+    <widget class="QToolButton" name="ExportSpreadsheet"/>
+   </item>
+   <item>
     <spacer>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -178,6 +181,15 @@
     </spacer>
    </item>
   </layout>
+  <action name="actionExport">
+   <property name="toolTip">
+    <string>Export Spreadsheet</string>
+   </property>
+   <property name="icon">
+    <iconset resource="../pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqSaveTable32.png</normaloff>:/pqWidgets/Icons/pqSaveTable32.png</iconset>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

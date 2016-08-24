@@ -61,6 +61,7 @@ signals:
   /// Fired when the currently shown representation changes. \c repr may be
   /// NULL.
   void showing(pqDataRepresentation* repr);
+  void viewportUpdated();
 
 public slots:
   /// Called when a new repr is added.

@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqSpreadSheetViewDecorator_h
 
 #include <QObject>
-#include "pqComponentsModule.h"
+#include "pqApplicationComponentsModule.h"
 
 class pqSpreadSheetView;
 class pqOutputPort;
@@ -43,7 +43,7 @@ class pqDataRepresentation;
 /// includes widgets that allows changing the currently shown source/field etc.
 /// To use the decorator, simply instantiate a new decorator for every new
 /// instance of pqSpreadSheetView.
-class PQCOMPONENTS_EXPORT pqSpreadSheetViewDecorator : public QObject
+class PQAPPLICATIONCOMPONENTS_EXPORT pqSpreadSheetViewDecorator : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
@@ -64,6 +64,7 @@ protected slots:
   void showing(pqDataRepresentation*);
   void displayPrecisionChanged(int);
   void showToggleColumnPopupMenu();
+  void resetColumnVisibility();
   void updateColumnVisibility();
   void toggleCellConnectivity();
 
@@ -78,5 +79,3 @@ private:
 };
 
 #endif
-
-

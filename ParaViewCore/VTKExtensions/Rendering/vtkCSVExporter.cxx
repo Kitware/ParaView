@@ -71,6 +71,7 @@ vtkCSVExporter::vtkCSVExporter()
 {
   this->FileStream = 0;
   this->FileName=0;
+  this->FilterColumnsByVisibility = false;
   this->FieldDelimiter =0;
   this->SetFieldDelimiter(",");
   this->Internals = new vtkInternals();
