@@ -12,10 +12,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkChartSelectionRepresentation - representation for a cube-axes.
+// .NAME vtkChartSelectionRepresentation - representation for showing selections
+// in chart views.
 // .SECTION Description
-// vtkChartSelectionRepresentation is a representation for the Cube-Axes that shows a
-// bounding box with labels around any input dataset.
+// vtkChartSelectionRepresentation is a representation showing selections in
+// chart views. It works with vtkChartSelectionRepresentation (namely
+// vtkChartSelectionRepresentation::MapSelectionToView) to map the input
+// vtkSelection to selection form that the view can understand and then passes
+// it alone to the vtkPVContextView.
+// For client-server cases, this class also handles delivering of the selection
+// to all "rendering" nodes.
 
 #ifndef vtkChartSelectionRepresentation_h
 #define vtkChartSelectionRepresentation_h
