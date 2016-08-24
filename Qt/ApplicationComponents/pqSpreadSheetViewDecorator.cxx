@@ -303,7 +303,7 @@ void pqSpreadSheetViewDecorator::updateColumnVisibility()
     foreach(pair, visibilities)
       {
       columnVisiHelper.Set(index, fieldAssociation);
-      columnVisiHelper.Set(index+1, pair.first.toAscii().data());
+      columnVisiHelper.Set(index+1, pair.first.toLatin1().data());
       columnVisiHelper.Set(index+2, pair.second);
       index += 3;
       }
