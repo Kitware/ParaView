@@ -119,8 +119,25 @@ class pqAnimationViewWidget::pqInternal
 {
 public:
   pqInternal()
-    {
-    }
+    : AnimationWidget(NULL),
+    PlayMode(NULL),
+    Time(NULL),
+    TimeLabel(NULL),
+    StartTime(NULL),
+    StartTimeLabel(NULL),
+    EndTime(NULL),
+    EndTimeLabel(NULL),
+    DurationLabel(NULL),
+    Duration(NULL),
+    CreateSource(NULL),
+    CreateProperty(NULL),
+    LockEndTime(NULL),
+    LockStartTime(NULL),
+    SelectedCueProxy(NULL),
+    SelectedDataProxy(NULL)
+  {
+  }
+
   ~pqInternal()
     {
     }
@@ -733,11 +750,10 @@ void pqAnimationViewWidget::trackSelected(pqAnimationTrack* track)
       pqAnimatableProxyComboBox *comboBox =
         new pqAnimatableProxyComboBox(this->Internal->Editor);
       this->Internal->SelectedCueProxy = cue->getProxy();
+      this->Internal->SelectedDataProxy =
+        vtkSMPropertyHelper(cue->getProxy(), "DataSource").GetAsProxy();
       comboBox->setCurrentIndex(
-        comboBox->findProxy(
-          vtkSMPropertyHelper(cue->getProxy(), "DataSource").GetAsProxy()
-        )
-      );
+        comboBox->findProxy(this->Internal->SelectedDataProxy));
       connect(comboBox, SIGNAL(currentProxyChanged(vtkSMProxy*)),
               this, SLOT(selectedDataProxyChanged(vtkSMProxy*)));
       connect(this->Internal->Editor, SIGNAL(accepted()),
