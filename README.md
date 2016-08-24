@@ -4,13 +4,13 @@ Introduction
 ============
 [ParaView][] is an open-source, multi-platform data analysis and
 visualization application based on
-[Visualization Toolkit (VTK)](VTK).
+[Visualization Toolkit (VTK)][VTK].
 
 The first public release was announced in October 2002. Since then, the project
-has grown through collaborative efforts between [Kitware Inc.](Kitware),
-[Sandia National Laboratories](Sandia),
-[Los Alamos National Laboratory](LANL),
-[Army Research Laboratory](ARL), and various other
+has grown through collaborative efforts between [Kitware Inc.][Kitware],
+[Sandia National Laboratories][Sandia],
+[Los Alamos National Laboratory][LANL],
+[Army Research Laboratory][ARL], and various other
 government and commercial institutions, and acedemic partners.
 
 [ParaView]: http://www.paraview.org
@@ -25,7 +25,7 @@ Learning Resources
 
 * General information is available at the [ParaView Homepage][].
 
-* **The ParaView Guide** can be downloaded (as PDF) or purchased (in print) [online][Guide].
+* [The ParaView Guide][Guide] can be downloaded (as PDF) or purchased (in print).
 
 * Community discussion takes place on the [ParaView Mailing Lists][].
 
