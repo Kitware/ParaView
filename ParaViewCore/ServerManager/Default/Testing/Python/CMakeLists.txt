@@ -44,6 +44,7 @@ set(PY_TESTS
   ColorAttributeTypeBackwardsCompatibility.py,NO_VALID
   RepresentationTypeHint.py,NO_VALID
   PythonProgrammableFilterParameters.py,NO_VALID
+  ProxyBackwardsCompatibilityTest.py,NO_VALID
   )
 
 include(FindPythonModules)

@@ -292,6 +292,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/ReadXMLPolyDataFileSeries.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RectilinearFractal.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RepresentationSelector.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ResampleWithDataset.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RescaleToTemporal.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RotateCamera90.xml
 #  ${CMAKE_CURRENT_SOURCE_DIR}/SaveAnimationGeometry.xml
