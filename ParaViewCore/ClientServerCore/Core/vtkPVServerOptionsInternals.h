@@ -111,8 +111,14 @@ public:
           }
         }
     }
+
   std::vector<MachineInformation> MachineInformationVector; // store the vector of machines
   double EyeSeparation;		// Store Eye Separation information required for VR module
+
+  vtkPVServerOptionsInternals()
+    : EyeSeparation(0.06)
+    {
+    }
 };
 
 #endif
