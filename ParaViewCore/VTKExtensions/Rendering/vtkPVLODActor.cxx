@@ -177,6 +177,11 @@ int vtkPVLODActor::RenderOpaqueGeometry(vtkViewport *vp)
     this->Render(ren,this->Mapper);
     this->Property->PostRender(this, ren);
 
+    if (this->Texture)
+      {
+      this->Texture->PostRender(ren);
+      }
+
     renderedSomething = 1;
     }
 
