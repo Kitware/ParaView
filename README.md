@@ -64,6 +64,15 @@ Contributing
 
 See [CONTRIBUTING.md][] for instructions to contribute.
 
+For Github users
+----------------
+
+[Github][] is a mirror of the [official repository][repo]. We do not actively monitor issues or
+pull requests on Github. Please use the [official repository][repo] to report issues or contribute
+fixes.
+
+[Github]: https://github.com/Kitware/ParaView
+[repo]: https://gitlab.kitware.com/paraview/paraview
 [CONTRIBUTING.md]: CONTRIBUTING.md
 
 License
