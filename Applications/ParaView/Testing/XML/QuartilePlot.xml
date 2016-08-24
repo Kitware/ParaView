@@ -25,14 +25,17 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/OnlyReportSelectionStatistics/CheckBox" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow" command="process_events" arguments="5000" />
 
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.5/TitleBar/Maximize" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow" command="process_events" arguments="1000" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.5/CentralWidgetFrame/Viewport"
     baseline="$PARAVIEW_DATA_ROOT/Baseline/QuartilePlotArea.png" width="300" height="300" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.5/TitleBar/Minimize" command="activate" arguments="" />
-
+  <pqevent object="pqClientMainWindow" command="process_events" arguments="1000" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.6/TitleBar/Maximize" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow" command="process_events" arguments="1000" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.6/CentralWidgetFrame/Viewport"
     baseline="$PARAVIEW_DATA_ROOT/Baseline/QuartilePlotLines.png" width="300" height="300" />
