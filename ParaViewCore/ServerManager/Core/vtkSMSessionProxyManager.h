@@ -302,6 +302,11 @@ public:
   vtkSMLink* GetRegisteredLink(const char* linkname);
 
   // Description:
+  // Get the name of the given registered link. If no such link exists,
+  // returns NULL.
+  const char* GetRegisteredLinkName(vtkSMLink* link);
+
+  // Description:
   // Unregister all registered proxy/property links.
   void UnRegisterAllLinks();
 
