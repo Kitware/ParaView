@@ -1393,8 +1393,8 @@ public:
     }
   // --------------------------------------------------------------------------
 private:
-  unsigned long int InputMTime; // Keep the original input MTime
-  unsigned long int DataMTime;  // Keep the original data MTime
+  vtkMTimeType InputMTime; // Keep the original input MTime
+  vtkMTimeType DataMTime;  // Keep the original data MTime
   vtkDataArray* DataToSort;   // DataArray to sort
   ArraySorter* LocalSorter;   // Local ArraySorter based on global range
   Histogram* GlobalHistogram; // Globaly merged Histogram based on global range

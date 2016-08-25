@@ -323,7 +323,7 @@ namespace
   class vtkEnsureMTime
     {
     vtkObject* Object;
-    unsigned long MTime;
+    vtkMTimeType MTime;
   public:
     vtkEnsureMTime(vtkObject* object):
       Object(object),
@@ -348,9 +348,9 @@ namespace
   class vtkRecordMTime
     {
     vtkObject* Object;
-    unsigned long &MTime;
+    vtkMTimeType &MTime;
   public:
-    vtkRecordMTime(vtkObject* obj, unsigned long &mtime):
+    vtkRecordMTime(vtkObject* obj, vtkMTimeType &mtime):
       Object(obj), MTime(mtime)
     {
     this->MTime = 0;

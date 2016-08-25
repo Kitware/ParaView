@@ -105,9 +105,9 @@ int vtkPolyDataGeodesicDistance::Compute()
 }
 
 //----------------------------------------------------------------------------
-unsigned long vtkPolyDataGeodesicDistance::GetMTime()
+vtkMTimeType vtkPolyDataGeodesicDistance::GetMTime()
 {
-  unsigned long mTime = this->Superclass::GetMTime(), time;
+  vtkMTimeType mTime = this->Superclass::GetMTime(), time;
 
   if ( this->Seeds )
     {

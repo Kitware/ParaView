@@ -91,10 +91,10 @@ vtkArrowGlyphFilter::~vtkArrowGlyphFilter()
 }
 
 //----------------------------------------------------------------------------
-unsigned long vtkArrowGlyphFilter::GetMTime()
+vtkMTimeType vtkArrowGlyphFilter::GetMTime()
 {
-  unsigned long mTime=this->Superclass::GetMTime();
-  unsigned long time;
+  vtkMTimeType mTime=this->Superclass::GetMTime();
+  vtkMTimeType time;
   if ( this->ArrowSourceObject != NULL )
     {
     time = this->ArrowSourceObject ->GetMTime();
@@ -141,7 +141,7 @@ vtkIdType vtkArrowGlyphFilter::GatherTotalNumberOfPoints(vtkIdType localNumPts)
   // Although this is not perfectly process invariant, it is better
   // than we had before (divide by number of processes).
   vtkIdType totalNumPts = localNumPts;
-  vtkMultiProcessController *controller = 
+  vtkMultiProcessController *controller =
     vtkMultiProcessController::GetGlobalController();
   if (controller)
     {
@@ -159,15 +159,15 @@ vtkIdType vtkArrowGlyphFilter::GatherTotalNumberOfPoints(vtkIdType localNumPts)
       // Send results back to all processes.
       for (i = 1; i < controller->GetNumberOfProcesses(); ++i)
         {
-        controller->Send(&totalNumPts, 1, 
+        controller->Send(&totalNumPts, 1,
                          i, GlyphNPointsScatter);
         }
       }
     else
       {
-      controller->Send(&localNumPts, 1, 
+      controller->Send(&localNumPts, 1,
                        0, GlyphNPointsGather);
-      controller->Receive(&totalNumPts, 1, 
+      controller->Receive(&totalNumPts, 1,
                           0, GlyphNPointsScatter);
       }
     }
@@ -259,7 +259,7 @@ int vtkArrowGlyphFilter::MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts,
     outInfo->Get(
       vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS()));
   this->MaskPoints->Update();
-  
+
   // How many points will we be glyphing (in this process)
   vtkPoints *maskedpoints = this->MaskPoints->GetOutput()->GetPoints();
   vtkIdType numMaskedPoints = maskedpoints->GetNumberOfPoints();
@@ -289,7 +289,7 @@ int vtkArrowGlyphFilter::MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts,
   this->ArrowSourceObject->Update();
 
   //
-  // We won't modify the arrow source provided (that the users sees in the GUI), 
+  // We won't modify the arrow source provided (that the users sees in the GUI),
   // we'll use a private copy for our work.
   //
   vtkSmartPointer<vtkArrowSource> internalArrow = this->ArrowSourceObject->NewInstance();
@@ -301,8 +301,8 @@ int vtkArrowGlyphFilter::MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts,
   internalArrow->SetInvert(this->ArrowSourceObject->GetInvert());
   internalArrow->Update();
 
-  double Ashaftradius = this->ArrowSourceObject->GetShaftRadius(); 
-  double   Atipradius = this->ArrowSourceObject->GetTipRadius(); 
+  double Ashaftradius = this->ArrowSourceObject->GetShaftRadius();
+  double   Atipradius = this->ArrowSourceObject->GetTipRadius();
   // Not used: double   Atiplength = this->ArrowSourceObject->GetTipLength();
 
   // and get useful information from it
@@ -310,7 +310,7 @@ int vtkArrowGlyphFilter::MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts,
   vtkPoints *arrowpoints = arrow->GetPoints();
   vtkIdType numArrowPoints = arrowpoints->GetNumberOfPoints();
 
-  // 
+  //
   // Find the arrays to be used for Scale/ShaftRadius/etc
   // if not present, we will use default values based on particle size
   //
@@ -331,7 +331,7 @@ int vtkArrowGlyphFilter::MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts,
   }
   if (tipradiusdata && tipradiusdata->GetNumberOfComponents()==3) {
     tipradiusMagnitude = true;
-  }  
+  }
   if (scaledata && scaledata->GetNumberOfComponents()==3) {
     scaleMagnitude = true;
   }
@@ -353,11 +353,11 @@ int vtkArrowGlyphFilter::MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts,
   vtkSmartPointer<vtkIdList> pts = vtkSmartPointer<vtkIdList>::New();
   pts->Allocate(VTK_CELL_SIZE);
 
-  // 
+  //
   // Loop over all our points and do the actual glyphing
   //
   for (vtkIdType i=0; i<numMaskedPoints; i++) {
-    
+
     // The variables we use to control each individual glyph
     double   sradius = 1.0;
     double   tradius = 1.0;
@@ -376,11 +376,11 @@ int vtkArrowGlyphFilter::MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts,
 /* // @TODO fix parallel ghost cell skipping of points
 
     // Check ghost points.
-    // If we are processing a piece, we do not want to duplicate 
+    // If we are processing a piece, we do not want to duplicate
     // glyphs on the borders.  The corrct check here is:
     // ghostLevel > 0.  I am leaving this over glyphing here because
-    // it make a nice example (sphereGhost.tcl) to show the 
-    // point ghost levels with the glyph filter.  I am not certain 
+    // it make a nice example (sphereGhost.tcl) to show the
+    // point ghost levels with the glyph filter.  I am not certain
     // of the usefullness of point ghost levels over 1, but I will have
     // to think about it.
     if (inGhostLevels && inGhostLevels[inPtId] > requestedGhostLevel) {

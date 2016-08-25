@@ -184,8 +184,8 @@ protected:
   vtkTuple<vtkVector2d, 4> ViewportNormals;
   bool Backface;
 
-  unsigned long GetPointsMTime;
-  unsigned long GetTransformedPointsMTime;
+  vtkMTimeType GetPointsMTime;
+  vtkMTimeType GetTransformedPointsMTime;
 
 private:
   vtkGridAxesHelper(const vtkGridAxesHelper&) VTK_DELETE_FUNCTION;

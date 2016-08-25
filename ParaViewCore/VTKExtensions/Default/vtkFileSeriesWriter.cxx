@@ -219,12 +219,12 @@ void vtkFileSeriesWriter::WriteATimestep(vtkDataObject* input,
 //----------------------------------------------------------------------------
 // Overload standard modified time function. If the internal reader is
 // modified, then this object is modified as well.
-unsigned long vtkFileSeriesWriter::GetMTime()
+vtkMTimeType vtkFileSeriesWriter::GetMTime()
 {
   return this->Superclass::GetMTime();
   /*
-  unsigned long mTime=this->vtkObject::GetMTime();
-  unsigned long readerMTime;
+  vtkMTimeType mTime=this->vtkObject::GetMTime();
+  vtkMTimeType readerMTime;
 
   if ( this->Writer )
     {

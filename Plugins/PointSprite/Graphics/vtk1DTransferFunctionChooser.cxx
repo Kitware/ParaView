@@ -126,9 +126,9 @@ void vtk1DTransferFunctionChooser::BuildDefaultTransferFunctions()
     this->LookupTableTransferFunction->BuildDefaultTable();
 }
 
-unsigned long vtk1DTransferFunctionChooser::GetMTime()
+vtkMTimeType vtk1DTransferFunctionChooser::GetMTime()
 {
-  unsigned long mtime = this->Superclass::GetMTime();
+  vtkMTimeType mtime = this->Superclass::GetMTime();
 
   if (this->LookupTableTransferFunction && mtime
       < this->LookupTableTransferFunction->GetMTime())
@@ -177,4 +177,3 @@ void vtk1DTransferFunctionChooser::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-

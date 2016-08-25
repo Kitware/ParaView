@@ -145,10 +145,10 @@ int vtk1DTransferFunctionFilter::RequestData(vtkInformation* vtkNotUsed(request)
   return 1;
 }
 
-unsigned long vtk1DTransferFunctionFilter::GetMTime()
+vtkMTimeType vtk1DTransferFunctionFilter::GetMTime()
 {
-  unsigned long tfmtime = 0;
-  unsigned long supermtime = 0;
+  vtkMTimeType tfmtime = 0;
+  vtkMTimeType supermtime = 0;
 
   if(this->TransferFunction != NULL)
     {
@@ -297,4 +297,3 @@ void    vtk1DTransferFunctionFilter::PrintSelf(ostream& os, vtkIndent indent)
     this->TransferFunction->PrintSelf(os, indent.GetNextIndent());
     }
 }
-

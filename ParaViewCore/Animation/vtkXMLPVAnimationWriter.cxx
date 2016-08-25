@@ -48,7 +48,7 @@ public:
 
   // The modified time when each input was last written in a previous
   // animation step.
-  typedef std::vector<unsigned long> InputMTimesType;
+  typedef std::vector<vtkMTimeType> InputMTimesType;
   InputMTimesType InputMTimes;
 
   // The number of times each input has changed during this animation

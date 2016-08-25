@@ -260,7 +260,7 @@ public:
 
   // Description:
   // Return the mtime also considering the locator and clip function.
-  unsigned long GetMTime();
+  vtkMTimeType GetMTime();
 
 protected:
   vtkMaterialInterfaceFilter();

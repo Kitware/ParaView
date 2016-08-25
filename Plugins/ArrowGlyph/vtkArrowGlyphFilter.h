@@ -77,7 +77,7 @@ public:
   // Limit the number of points to glyph
   vtkSetMacro(MaximumNumberOfPoints, int);
   vtkGetMacro(MaximumNumberOfPoints, int);
-  
+
   // Description:
   // Set/get whether to mask points
   void SetUseMaskPoints(int useMaskPoints);
@@ -97,7 +97,7 @@ public:
 
   // Description:
   // Overridden to include ArrowSourceObject's MTime.
-  virtual unsigned long GetMTime();
+  virtual vtkMTimeType GetMTime();
 
 protected:
   vtkArrowGlyphFilter();

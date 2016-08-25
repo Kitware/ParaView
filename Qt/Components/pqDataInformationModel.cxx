@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -63,7 +63,7 @@ struct pqSourceInfo
 
   QString DataTypeName;
 
-  unsigned long MTime;
+  vtkMTimeType MTime;
   pqSourceInfo()
     {
     this->Init();
@@ -246,7 +246,7 @@ struct pqSourceInfo
 };
 
 //-----------------------------------------------------------------------------
-class pqDataInformationModelInternal 
+class pqDataInformationModelInternal
 {
 public:
   QPointer<pqView> View;
@@ -324,7 +324,7 @@ int pqDataInformationModel::columnCount(
 
 
 //-----------------------------------------------------------------------------
-QVariant pqDataInformationModel::data(const QModelIndex&idx, 
+QVariant pqDataInformationModel::data(const QModelIndex&idx,
   int role /*= Qt::DisplayRole*/) const
 {
   if (!idx.isValid() || idx.model() != this)
@@ -334,7 +334,7 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
 
   if (idx.row() >= this->Internal->Sources.size())
     {
-    qDebug() << "pqDataInformationModel::data called with invalid index: " 
+    qDebug() << "pqDataInformationModel::data called with invalid index: "
       << idx.row();
     return QVariant();
     }
@@ -376,7 +376,7 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
       {
     case Qt::DisplayRole:
     case Qt::EditRole:
-      return info.getNumberOfCells(); 
+      return info.getNumberOfCells();
 
     case Qt::DecorationRole:
       return QVariant(QIcon(":/pqWidgets/Icons/pqCellData16.png"));
@@ -389,7 +389,7 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
       {
     case Qt::DisplayRole:
     case Qt::EditRole:
-      return info.getNumberOfPoints(); 
+      return info.getNumberOfPoints();
 
     case Qt::DecorationRole:
       return QVariant(QIcon(":/pqWidgets/Icons/pqPointData16.png"));
@@ -441,7 +441,7 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
 }
 
 //-----------------------------------------------------------------------------
-QVariant pqDataInformationModel::headerData(int section, 
+QVariant pqDataInformationModel::headerData(int section,
   Qt::Orientation orientation, int role /*=Qt::DisplayRole*/) const
 {
   if (orientation == Qt::Horizontal)
@@ -486,17 +486,17 @@ void pqDataInformationModel::dataUpdated(pqPipelineSource* changedSource)
 {
   QList<pqSourceInfo>::iterator iter;
   int row_no = 0;
-  for (iter = this->Internal->Sources.begin(); 
+  for (iter = this->Internal->Sources.begin();
     iter != this->Internal->Sources.end(); ++iter, row_no++)
     {
     pqOutputPort* port = iter->OutputPort;
     pqPipelineSource* source = port->getSource();
-    
+
     if (source != changedSource)
       {
       continue;
       }
-    
+
     vtkPVDataInformation* dataInfo = port->getDataInformation();
     if (!iter->DataInformationValid || dataInfo->GetMTime() > iter->MTime)
       {
@@ -510,14 +510,14 @@ void pqDataInformationModel::dataUpdated(pqPipelineSource* changedSource)
       iter->NumberOfCells = dataInfo->GetNumberOfCells();
       iter->NumberOfPoints =dataInfo->GetNumberOfPoints();
       iter->MemorySize = dataInfo->GetMemorySize()/1000.0;
-      dataInfo->GetBounds(iter->Bounds);      
+      dataInfo->GetBounds(iter->Bounds);
       dataInfo->GetTimeSpan(iter->TimeSpan);
       iter->DataInformationValid = true;
-  
+
       emit this->dataChanged(this->index(row_no, Name),
         this->index(row_no, pqDataInformationModel::Max_Columns-1));
       }
-    }  
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -537,7 +537,7 @@ void pqDataInformationModel::addSource(pqPipelineSource* source)
     this->Internal->Sources.push_back(source->getOutputPort(cc));
     }
   this->endInsertRows();
-  
+
   QObject::connect(source, SIGNAL(dataUpdated(pqPipelineSource*)),
       this, SLOT(dataUpdated(pqPipelineSource*)));
 }
@@ -558,7 +558,7 @@ void pqDataInformationModel::removeSource(pqPipelineSource* source)
       }
     this->endRemoveRows();
     }
-  
+
   QObject::disconnect(source, 0, this, 0);
 }
 
@@ -617,7 +617,7 @@ void pqDataInformationModel::refreshGeometrySizes()
   // Must be called only after endRender() when we are assured that all
   // representations are up-to-date.
   QList<pqSourceInfo>::iterator iter;
-  for (iter = this->Internal->Sources.begin(); 
+  for (iter = this->Internal->Sources.begin();
     iter != this->Internal->Sources.end(); ++iter)
     {
     pqSourceInfo& sourceInfo = (*iter);

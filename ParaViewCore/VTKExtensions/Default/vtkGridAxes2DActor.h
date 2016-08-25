@@ -197,7 +197,7 @@ public:
 
   // Description:
   // Overridden to include the mtime for the text properties.
-  unsigned long GetMTime();
+  vtkMTimeType GetMTime();
 
 protected:
   vtkGridAxes2DActor();

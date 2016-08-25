@@ -39,7 +39,7 @@ public:
 
   // Description:
   // Return the MTime also considering the internal writer.
-  virtual unsigned long GetMTime();
+  virtual vtkMTimeType GetMTime();
 
   // Description:
   // Name of the method used to set the file name of the internal
@@ -92,7 +92,7 @@ protected:
 private:
   vtkFileSeriesWriter(const vtkFileSeriesWriter&) VTK_DELETE_FUNCTION;
   void operator=(const vtkFileSeriesWriter&) VTK_DELETE_FUNCTION;
-  
+
   void SetWriterFileName(const char* fname);
   void WriteATimestep(vtkDataObject*, vtkInformation* inInfo);
   void WriteInternal();
@@ -112,4 +112,3 @@ private:
 };
 
 #endif
-

@@ -94,9 +94,9 @@ int vtkMetaReader::ReaderCanReadFile(const char *filename)
 }
 
 //----------------------------------------------------------------------------
-unsigned long vtkMetaReader::GetMTime()
+vtkMTimeType vtkMetaReader::GetMTime()
 {
-  unsigned long mTime=this->vtkObject::GetMTime();
+  vtkMTimeType mTime=this->vtkObject::GetMTime();
 
   if ( this->Reader )
     {
@@ -107,7 +107,7 @@ unsigned long vtkMetaReader::GetMTime()
     // this->BeforeFileNameMTime and capture the resulting MTime in
     // this->FileNameMTime.  If we run into that modification,
     // suppress it by reporting the saved modification.
-    unsigned long readerMTime;
+    vtkMTimeType readerMTime;
     if (this->Reader->GetMTime() == this->FileNameMTime)
       {
       readerMTime = this->BeforeFileNameMTime;

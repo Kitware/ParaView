@@ -350,7 +350,7 @@ int vtkIntersectFragments::Intersect()
       this->Cutter->SetInputData(fragment);
       this->Cutter->Update();
       vtkPolyData *intersection=this->Cutter->GetOutput();
-      
+
       if (intersection->GetNumberOfPoints()>0)
         {
         ids.push_back(globalId);
@@ -1409,10 +1409,10 @@ vtkCxxSetObjectMacro(vtkIntersectFragments,CutFunction,vtkImplicitFunction);
 //----------------------------------------------------------------------------
 // Overload standard modified time function. If cut function is modified,
 // then this object is modified as well.
-unsigned long vtkIntersectFragments::GetMTime()
+vtkMTimeType vtkIntersectFragments::GetMTime()
 {
-  unsigned long mTime=this->Superclass::GetMTime();
-  unsigned long time;
+  vtkMTimeType mTime=this->Superclass::GetMTime();
+  vtkMTimeType time;
 
   if ( this->CutFunction != NULL )
     {

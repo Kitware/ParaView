@@ -44,7 +44,7 @@ public:
   static vtkScatterPlotPainter* New();
   vtkTypeMacro(vtkScatterPlotPainter, vtkPainter);
   void PrintSelf(ostream& os, vtkIndent indent);
-  virtual unsigned long GetMTime();
+  virtual vtkMTimeType GetMTime();
 
   // Description:
   // See vtkScatterPlotMapper::ArrayIndex
@@ -61,10 +61,10 @@ public:
   static vtkInformationIntegerKey* ORIENTATION_MODE();
   static vtkInformationIntegerKey* NESTED_DISPLAY_LISTS();
   static vtkInformationIntegerKey* PARALLEL_TO_CAMERA();
-  
+
   virtual void SetSourceGlyphMappers(vtkCollection*);
   vtkGetObjectMacro(SourceGlyphMappers, vtkCollection);
-  
+
 protected:
   // Description:
   // Enable or not the third (z) coordinate for 3D rendering (instead of 2D).
@@ -92,13 +92,13 @@ protected:
   //vtkBooleanMacro(GlyphMode,int);
 
   // Description:
-  // If the GlyphMode has ScaledGlyph turned on, ScalingArrayMode describes 
+  // If the GlyphMode has ScaledGlyph turned on, ScalingArrayMode describes
   // how to data in the different GLYPH_[X,Y,Z]_SCALE arrays
   vtkSetMacro(ScalingArrayMode,int);
   vtkGetMacro(ScalingArrayMode,int);
 
   // Description:
-  // If the GlyphMode has ScaledGlyph turned on, decide how to scale the 
+  // If the GlyphMode has ScaledGlyph turned on, decide how to scale the
   // glyph. By Magnitude or components.
   vtkSetMacro(ScaleMode,int);
   vtkGetMacro(ScaleMode,int);
@@ -114,7 +114,7 @@ protected:
 
 
   // Description:
-  // If immediate mode is off, if Glyphs are in use and if NestedDisplayLists 
+  // If immediate mode is off, if Glyphs are in use and if NestedDisplayLists
   // is false, only the mappers of each glyph use display lists. If true,
   // in addition, matrices transforms and color per glyph are also
   // in a parent display list.
@@ -127,7 +127,7 @@ protected:
   vtkSetMacro(ParallelToCamera, int);
   vtkGetMacro(ParallelToCamera, int);
   vtkBooleanMacro(ParallelToCamera, int);
-  
+
   virtual void SetLookupTable(vtkScalarsToColors*);
   vtkGetObjectMacro(LookupTable, vtkScalarsToColors);
 
@@ -146,11 +146,11 @@ public:
   vtkInformation *GetInputArrayInformation(int idx);
 protected:
   // Description:
-  // Method initiates the mapping process. Generally sent by the actor 
+  // Method initiates the mapping process. Generally sent by the actor
   // as each frame is rendered.
   // Its behavior depends on the value of SelectMode.
   //virtual void Render(vtkRenderer *ren, vtkActor *a);
-  virtual void RenderInternal(vtkRenderer *renderer, vtkActor *actor, 
+  virtual void RenderInternal(vtkRenderer *renderer, vtkActor *actor,
                        unsigned long typeflags, bool forceCompileOnly);
 
 protected:
@@ -162,7 +162,7 @@ protected:
   virtual void ReportReferences(vtkGarbageCollector *collector);
   virtual void ProcessInformation(vtkInformation* info);
   // Description:
-  // Called when the PainterInformation becomes obsolete. 
+  // Called when the PainterInformation becomes obsolete.
   // It is called before the Render is initiated on the Painter.
   virtual void UpdatePainterInformation();
 
@@ -171,7 +171,7 @@ protected:
   vtkUnsignedCharArray* GetColors();
 
   virtual void PrepareForRendering(vtkRenderer* renderer, vtkActor* actor);
-  void RenderPoints(vtkRenderer* renderer, vtkActor* actor, 
+  void RenderPoints(vtkRenderer* renderer, vtkActor* actor,
                     unsigned long typeflags, bool forceCompileOnly);
   void RenderGlyphs(vtkRenderer* renderer, vtkActor* actor,
                     unsigned long typeflags, bool forceCompileOnly);
@@ -191,7 +191,7 @@ protected:
   int            NestedDisplayLists; // boolean
   unsigned int   DisplayListId; // GLuint
   int            ParallelToCamera;
-  
+
   //vtkScatterPlotPainterArray* SourceGlyphMappers; // array of mappers
   vtkCollection* SourceGlyphMappers; // array of mappers
 
