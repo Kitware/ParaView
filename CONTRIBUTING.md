@@ -66,7 +66,7 @@ For every issue, project managers can assign:
 2. **Milestone** to indicate which release this issue fix is planned for.
 3. `priority:...` label to indicate how critical is this issue for the specific
    milestone, ranging from `priority:required`, `priority:important`,
-   `priority:nice-to-have`, and `priority:moonshot`. Only one priority label makes
+   `priority:nice-to-have`, and `priority:low`. Only one priority label makes
    sense at a time.
 
 Notes for developers

@@ -30,11 +30,10 @@ this issue for that milestone.
 | `priority:required` | x | | issue is **required** for a milestone (highest priority) |
 | `priority:important` | x | | issue is **important** for a milestone but may be okay if missed |
 | `priority:nice-to-have` | x | | issue is **nice-to-have**, but not critical or important |
-| `priority:moonshot` | x | | lowest priority issues for a particular milestone |
+| `priority:low` | x | | low priority issues for a particular milestone |
 
-If an issue targeted for a milestone has no priority label, then a level between
-`priority:nice-to-have` and `priority:moonshot` may be assumed.
-
+If an issue targeted for a milestone has no priority label, then it is assumed
+the least priority.
 
 `project:...`
 ---------------
