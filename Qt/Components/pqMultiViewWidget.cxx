@@ -692,7 +692,7 @@ void pqMultiViewWidget::reload()
 //-----------------------------------------------------------------------------
 void pqMultiViewWidget::standardButtonPressed(int button)
 {
-  QWidget* frame = qobject_cast<QWidget*>(this->sender());
+  pqViewFrame* frame = qobject_cast<pqViewFrame*>(this->sender());
   QVariant index = frame? frame->property("FRAME_INDEX") : QVariant();
   if (!index.isValid() || this->layoutManager() == NULL)
     {
@@ -716,10 +716,14 @@ void pqMultiViewWidget::standardButtonPressed(int button)
     break;
 
   case pqViewFrame::Maximize:
+    // ensure that the frame being maximized is active.
+    this->makeActive(frame);
     this->layoutManager()->MaximizeCell(index.toInt());
     break;
 
   case pqViewFrame::Restore:
+    // ensure that the frame being minimized is active.
+    this->makeActive(frame);
     this->layoutManager()->RestoreMaximizedState();
     break;
 

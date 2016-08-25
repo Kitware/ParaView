@@ -373,9 +373,9 @@ void vtkPVOrthographicSliceView::SetSlicePosition(double x, double y, double z)
   this->SetNumberOfZSlices(1);
   this->SetZSlices(&z);
 
-  this->SlicePositionAxes2D[YZ_PLANE]->SetPosition(x+0.0001, y, z);
-  this->SlicePositionAxes2D[ZX_PLANE]->SetPosition(x, y+0.0001, z);
-  this->SlicePositionAxes2D[XY_PLANE]->SetPosition(x, y, z+0.0001);
+  this->SlicePositionAxes2D[YZ_PLANE]->SetPosition(x+0.01, y, z);
+  this->SlicePositionAxes2D[ZX_PLANE]->SetPosition(x, y+0.01, z);
+  this->SlicePositionAxes2D[XY_PLANE]->SetPosition(x, y, z+0.01);
   this->SlicePositionAxes3D->SetPosition(x, y, z);
 
   this->SlicePosition[0] = x;
