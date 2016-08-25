@@ -893,6 +893,11 @@ public:
   void SetLightScale(double);
   double GetLightScale();
   //@}
+  /**
+   * Set the OSPRay renderer to use.
+   * May be either scivis (default) or pathtracer.
+   */
+  void SetOSPRayRendererType(std::string);
 
   //@{
   /**

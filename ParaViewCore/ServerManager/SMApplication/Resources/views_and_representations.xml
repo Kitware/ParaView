@@ -2568,6 +2568,20 @@
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
         </Hints>
       </IntVectorProperty>
+      <StringVectorProperty name="OSPRayRendererType"
+          command="SetOSPRayRendererType"
+          label="OSPRay Renderer"
+          default_values="scivis"
+          number_of_elements="1">
+        <StringListDomain name="list">
+          <String value="scivis" />
+          <String value="pathtracer" />
+        </StringListDomain>
+        <Documentation>Set the OSPRay renderer to use.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+        </Hints>
+      </StringVectorProperty>
       <IntVectorProperty
           name="AmbientSamples"
           command="SetAmbientOcclusionSamples"
@@ -2703,6 +2717,7 @@
                      panel_visibility="advanced">
         <Property name="EnableOSPRay"/>
         <Property name="Shadows"/>
+        <Property name="OSPRayRendererType"/>
         <Property name="AmbientSamples"/>
         <Property name="SamplesPerPixel"/>
         <Property name="MaxFrames"/>

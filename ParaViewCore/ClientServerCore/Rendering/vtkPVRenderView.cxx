@@ -34,6 +34,7 @@
 #include "vtkInformationIntegerKey.h"
 #include "vtkInformationObjectBaseKey.h"
 #include "vtkInformationRequestKey.h"
+#include "vtkInformationStringKey.h"
 #include "vtkInformationVector.h"
 #include "vtkIntArray.h"
 #include "vtkInteractorStyleDrawPolygon.h"
@@ -3110,6 +3111,17 @@ void vtkPVRenderView::SendToOpenVR()
   renWin->Delete();
 #else
   vtkWarningMacro("Refusing to switch to OpenVR since it is not built into this copy of ParaView");
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetOSPRayRendererType(std::string name)
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  vtkRenderer* ren = this->GetRenderer();
+  vtkOSPRayRendererNode::SetRendererType(name, ren);
+#else
+  (void)name;
 #endif
 }
 
