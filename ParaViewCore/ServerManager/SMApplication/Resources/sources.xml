@@ -751,7 +751,7 @@
       <!-- End Line -->
     </SourceProxy>
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkPVNullSource"
+    <SourceProxy class="vtkLineSource"
                  label="Ruler"
                  name="Ruler">
       <Documentation long_help="This is a line source that can be used to measure distance between two points"
@@ -763,14 +763,16 @@
                      key shortcut.</Documentation>
       <DoubleVectorProperty default_values="-0.5 0.0 0.0"
                             name="Point1"
-                            number_of_elements="3">
+                            number_of_elements="3"
+                            command="SetPoint1">
         <DoubleRangeDomain name="range" />
         <Documentation>This property controls the coordinates of the first
         endpoint of the line.</Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty default_values="0.5 0.0 0.0"
                             name="Point2"
-                            number_of_elements="3" >
+                            number_of_elements="3"
+                            command="SetPoint2">
         <DoubleRangeDomain name="range" />
         <Documentation>This property controls the coordinates of the second
         endpoint of the line.</Documentation>
@@ -779,7 +781,9 @@
         <Property function="Point1WorldPosition" name="Point1" />
         <Property function="Point2WorldPosition" name="Point2" />
       </PropertyGroup>
-      <!-- End Line -->
+      <Hints>
+        <Representation view="RenderView" type="RulerSourceRepresentation" />
+      </Hints>
     </SourceProxy>
     <!-- ==================================================================== -->
     <SourceProxy class="vtkImageMandelbrotSource"
