@@ -144,6 +144,15 @@ bool vtkSMCoreUtilities::AdjustRangeForLog(double range[2])
 namespace
 {
 
+template<typename T> struct MinDelta{};
+// This value seems to work well for float ranges we have tested
+template<> struct MinDelta<float> { static const int value = 65536; };
+// There are 29 more bits in a double's mantissa compared to a float.  Shift the
+// offset so that the 65536 is in the same position relative to the beginning of
+// the mantissa.  This causes the modified range to still be valid when it is
+// downcast to float later on.
+template<> struct MinDelta<double> { static const vtkTypeInt64 value = static_cast<vtkTypeInt64>(65536) << 29; };
+
 //----------------------------------------------------------------------------
 template<typename T, typename EquivSizeIntT>
 bool AdjustTRange(T range[2], EquivSizeIntT)
@@ -166,7 +175,7 @@ bool AdjustTRange(T range[2], EquivSizeIntT)
   //needs to be a memcpy to avoid strict aliasing issues, doing a count
   //of 2*sizeof(T) to couple both values at the same time
   std::memcpy(irange, range, sizeof(T)*2 );
-  const EquivSizeIntT minDelta = 65536;
+  const EquivSizeIntT minDelta = MinDelta<T>::value;
 
   //determine the absolute delta between these two numbers.
   EquivSizeIntT delta = std::abs(irange[1] - irange[0]);
