@@ -32,3 +32,8 @@ The upstream ParaView repository has the following branches:
 * `nightly-master`: Follows `master`, updated at `01:00 UTC`
 * `hooks`: Local commit hooks
    ([placed](http://public.kitware.com/Wiki/Git/Hooks#Local) in `.git/hooks`)
+
+Labels
+------
+
+See [Labels](labels.md) for information on labels for Issues and Merge Requests.
