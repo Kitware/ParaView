@@ -33,7 +33,7 @@
 #include <cstdlib>
 #include <vector>
 
-vtkStandardNewMacro(vtkSMStateLoader);
+vtkObjectFactoryNewMacro(vtkSMStateLoader);
 vtkCxxSetObjectMacro(vtkSMStateLoader, ProxyLocator, vtkSMProxyLocator);
 //---------------------------------------------------------------------------
 struct vtkSMStateLoaderRegistrationInfo
