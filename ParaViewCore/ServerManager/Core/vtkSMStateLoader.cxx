@@ -50,6 +50,12 @@ struct vtkSMStateLoaderInternals
   typedef std::map<int, VectorOfRegInfo> RegInfoMapType;
   RegInfoMapType RegistrationInformation;
   std::vector<vtkTypeUInt32> AlignedMappingIdTable;
+
+  /// Vector filled up in CreatedNewProxy() to keep order in which the proxies
+  /// are created.
+  typedef std::pair<vtkTypeUInt32, vtkWeakPointer<vtkSMProxy> > ProxyCreationOrderItem;
+  typedef std::vector<ProxyCreationOrderItem> ProxyCreationOrderType;
+  ProxyCreationOrderType ProxyCreationOrder;
 };
 
 //---------------------------------------------------------------------------
@@ -162,13 +168,14 @@ void vtkSMStateLoader::CreatedNewProxy(vtkTypeUInt32 id, vtkSMProxy* proxy)
     proxy->SetGlobalID(id);
     }
 
-
+  // Calling UpdateVTKObjects() will assign the proxy a GlobalId, if needed.
   proxy->UpdateVTKObjects();
   if (proxy->IsA("vtkSMSourceProxy"))
     {
     vtkSMSourceProxy::SafeDownCast(proxy)->UpdatePipelineInformation();
     }
-  this->RegisterProxy(id, proxy);
+  this->Internal->ProxyCreationOrder.push_back(
+    vtkSMStateLoaderInternals::ProxyCreationOrderItem(id, proxy));
 }
 
 //---------------------------------------------------------------------------
@@ -518,6 +525,8 @@ int vtkSMStateLoader::LoadStateInternal(vtkPVXMLElement* parent)
       }
     }
 
+  // Iterate over all proxy collections to create all proxies. None are
+  // registered at this point, just created.
   for (i=0; i<numElems; i++)
     {
     vtkPVXMLElement* currentElement = rootElement->GetNestedElement(i);
@@ -531,10 +540,26 @@ int vtkSMStateLoader::LoadStateInternal(vtkPVXMLElement* parent)
           return 0;
           }
         }
-      else if (strcmp(name, "Links") == 0)
-        {
-        this->HandleLinks(currentElement);
-        }
+      }
+    }
+
+  // Register proxies in order they were created (as that's a good dependency
+  // order).
+  for (vtkSMStateLoaderInternals::ProxyCreationOrderType::const_iterator
+    iter = this->Internal->ProxyCreationOrder.begin();
+    iter != this->Internal->ProxyCreationOrder.end(); ++iter)
+    {
+    this->RegisterProxy(iter->first, iter->second);
+    }
+
+  // Process link elements.
+  for (i=0; i<numElems; i++)
+    {
+    vtkPVXMLElement* currentElement = rootElement->GetNestedElement(i);
+    const char* name = currentElement->GetName();
+    if (name && strcmp(name, "Links") == 0)
+      {
+      this->HandleLinks(currentElement);
       }
     }
 
@@ -559,6 +584,7 @@ int vtkSMStateLoader::LoadStateInternal(vtkPVXMLElement* parent)
     }
 
   // Clear internal data structures.
+  this->Internal->ProxyCreationOrder.clear();
   this->Internal->RegistrationInformation.clear();
   this->ServerManagerStateElement = 0; 
   return 1;

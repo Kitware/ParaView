@@ -75,8 +75,15 @@ protected:
   virtual int LoadStateInternal(vtkPVXMLElement* rootElement);
 
   // Description:
-  // Called after a new proxy is created.
-  // We register all created proxies.
+  // Called after a new proxy is created. The main responsibility of this method
+  // is to ensure that proxy gets a GlobalId (either automatically or using the
+  // id from the state if LoadState() was called with \c keepOriginalId set to
+  // true). It also called vtkSMProxy::UpdateVTKObjects() and
+  // vtkSMProxy::UpdatePipelineInformation() (if applicable) to ensure that the
+  // state loaded on the proxy is "pushed" and any info properties updated.
+  // We also create a list to track the order in which proxies are created.
+  // This order is a dependency order too and hence helps us register proxies in
+  // order of dependencies.
   virtual void CreatedNewProxy(vtkTypeUInt32 id, vtkSMProxy* proxy);
 
   // Description:
