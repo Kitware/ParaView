@@ -26,6 +26,7 @@
 #include "vtkSMDeserializerXML.h"
 
 #include <map> // needed for API
+#include <string> // needed for API
 
 class vtkPVXMLElement;
 class vtkSMProxy;
@@ -106,6 +107,17 @@ protected:
   virtual void RegisterProxy(vtkTypeUInt32 id, vtkSMProxy* proxy);
   virtual void RegisterProxyInternal(const char* group, 
     const char* name, vtkSMProxy* proxy);
+
+  // Description:
+  // Update a proxy's registration group and name before it gets registered.
+  // Default implementation handles helper group group names.
+  // Returns false to skip registering the proxy.
+  // @param[in,out] group  proxy registration group
+  // @param[in,out] name   proxy registration name
+  // @param[in]     proxy  proxy being registered
+  // @returns true to continue registering the proxy, false to skip registering it.
+  virtual bool UpdateRegistrationInfo(
+    std::string& group, std::string& name, vtkSMProxy* proxy);
 
   // Description:
   // Return the xml element for the state of the proxy with the given id.
