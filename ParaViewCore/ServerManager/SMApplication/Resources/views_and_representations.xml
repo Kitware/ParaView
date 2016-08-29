@@ -5174,8 +5174,147 @@
                  value="2" />
         </EnumerationDomain>
       </IntVectorProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="ColorArrayName"
+                            no_custom_default="1"
+                            default_values_delimiter=";"
+                            default_values="0;0;0;4;Atomic Numbers"
+                            panel_visibility="never"
+                            number_of_elements="5">
+        <Documentation>
+          Set the array to color with. One must specify the field association and
+          the array name of the array. If the array is missing, scalar coloring will
+          automatically be disabled.
+        </Documentation>
+        <RepresentedArrayListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </RepresentedArrayListDomain>
+        <FieldDataDomain name="field_list"
+                         disable_update_domain_entries="1">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
+      </StringVectorProperty>
+      <ProxyProperty command="SetLookupTable"
+                     name="LookupTable">
+        <Documentation>Set the lookup-table to use to map data array to colors.
+        Lookuptable is only used with MapScalars to ON.</Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <IntVectorProperty command="SetUseCustomRadii"
+                         default_values="0"
+                         name="UseCustomRadii"
+                         label="Use 'radii' Array For Atomic Radii"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If true, the 'radii' array in the input VertexData will
+        be used to determine the atomic radii.</Documentation>
+      </IntVectorProperty>
       <!-- End of MoleculeRepresentation -->
     </RepresentationProxy>
+    <PVRepresentationProxy class="vtkPVCompositeRepresentation"
+                           name="PVMoleculeRepresentation"
+                           processes="client|renderserver|dataserver">
+      <Documentation>PVRepresentationProxy for vtkMolecule.</Documentation>
+      <IntVectorProperty command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the visibility for this
+        representation.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetForceUseCache"
+                         default_values="0"
+                         is_internal="1"
+                         name="ForceUseCache"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetForcedCacheKey"
+                            default_values="none"
+                            is_internal="1"
+                            name="ForcedCacheKey"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </DoubleVectorProperty>
+      <RepresentationType subproxy="MoleculeRepresentation"
+                          subtype="Molecule"
+                          text="Molecule" />
+      <StringVectorProperty command="GetRepresentationTypes"
+                            information_only="1"
+                            name="RepresentationTypesInfo"
+                            si_class="vtkSIDataArrayProperty">
+        <Documentation>Property that lists the available representation types.
+        This is used by the domain for "Representation" to setup the list of
+        types available correctly.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetActiveRepresentation"
+                            default_values="Molecule"
+                            name="Representation"
+                            number_of_elements="1"
+                            panel_visibility="default"
+                            panel_widget="display_representation_selector" >
+        <Documentation>Choose the type for the representation.</Documentation>
+        <RepresentationTypeDomain name="list">
+          <RequiredProperties>
+            <Property function="StringList"
+                      name="RepresentationTypesInfo" />
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </RepresentationTypeDomain>
+      </StringVectorProperty>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkMolecule" />
+        </DataTypeDomain>
+        <Documentation>Set the input to the representation.</Documentation>
+      </InputProperty>
+      <SubProxy>
+        <Proxy name="MoleculeRepresentation"
+               proxygroup="representations"
+               proxyname="MoleculeRepresentation" />
+        <ExposedProperties>
+          <PropertyGroup label="Molecule">
+            <Property name="MoleculeRenderMode"
+                      panel_visibility="default" />
+            <Property name="UseCustomRadii"
+                      panel_visibility="default" />
+            <Property name="ColorArrayName"
+                      panel_visibility="never" />
+            <Property name="LookupTable"
+                      panel_visibility="never" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="SelectionRepresentation"
+               proxygroup="representations"
+               proxyname="SelectionRepresentation" />
+      </SubProxy>
+    </PVRepresentationProxy>
+
     <!-- =================================================================== -->
     <ChartRepresentationProxy base_proxygroup="representations"
                               class="vtkXYChartRepresentation"

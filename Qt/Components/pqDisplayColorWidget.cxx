@@ -57,6 +57,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QIcon>
 #include <QtDebug>
 
+namespace {
+
+// Returns true if assoc is a field association that is supported by this class.
+bool supportedAssociation(int assoc)
+{
+  switch (assoc)
+    {
+    case vtkDataObject::POINT:
+    case vtkDataObject::CELL:
+    case vtkDataObject::FIELD:
+    case vtkDataObject::VERTEX:
+      return true;
+
+    default:
+      break;
+    }
+  return false;
+}
+
+} // end anon namespace
 
 //=============================================================================
 /// This class makes it possible to add custom logic when updating the
@@ -95,11 +115,11 @@ public:
     }
   static QVariant convert(const ValueType& value)
     {
-    if (value.first < vtkDataObject::POINT || value.first > vtkDataObject::FIELD ||
-      value.second.isEmpty())
+    if (!supportedAssociation(value.first))
       {
       return QVariant();
       }
+
     QStringList val;
     val << QString::number(value.first)
         << value.second;
@@ -366,9 +386,9 @@ void pqDisplayColorWidget::setArraySelection(
   int association = value.first;
   const QString& arrayName = value.second;
 
-  if (association < vtkDataObject::POINT || association > vtkDataObject::FIELD)
+  if (!supportedAssociation(association))
     {
-    qCritical("Only cell/point/field data coloring is currently supported by this widget.");
+    qCritical("Unsupported field association.");
     association = vtkDataObject::POINT;
     }
 
