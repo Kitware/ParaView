@@ -26,6 +26,7 @@
 #include "vtkSMDeserializerXML.h"
 
 #include <map> // needed for API
+#include <string> // needed for API
 
 class vtkPVXMLElement;
 class vtkSMProxy;
@@ -75,8 +76,15 @@ protected:
   virtual int LoadStateInternal(vtkPVXMLElement* rootElement);
 
   // Description:
-  // Called after a new proxy is created.
-  // We register all created proxies.
+  // Called after a new proxy is created. The main responsibility of this method
+  // is to ensure that proxy gets a GlobalId (either automatically or using the
+  // id from the state if LoadState() was called with \c keepOriginalId set to
+  // true). It also called vtkSMProxy::UpdateVTKObjects() and
+  // vtkSMProxy::UpdatePipelineInformation() (if applicable) to ensure that the
+  // state loaded on the proxy is "pushed" and any info properties updated.
+  // We also create a list to track the order in which proxies are created.
+  // This order is a dependency order too and hence helps us register proxies in
+  // order of dependencies.
   virtual void CreatedNewProxy(vtkTypeUInt32 id, vtkSMProxy* proxy);
 
   // Description:
@@ -99,6 +107,17 @@ protected:
   virtual void RegisterProxy(vtkTypeUInt32 id, vtkSMProxy* proxy);
   virtual void RegisterProxyInternal(const char* group, 
     const char* name, vtkSMProxy* proxy);
+
+  // Description:
+  // Update a proxy's registration group and name before it gets registered.
+  // Default implementation handles helper group group names.
+  // Returns false to skip registering the proxy.
+  // @param[in,out] group  proxy registration group
+  // @param[in,out] name   proxy registration name
+  // @param[in]     proxy  proxy being registered
+  // @returns true to continue registering the proxy, false to skip registering it.
+  virtual bool UpdateRegistrationInfo(
+    std::string& group, std::string& name, vtkSMProxy* proxy);
 
   // Description:
   // Return the xml element for the state of the proxy with the given id.

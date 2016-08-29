@@ -29,12 +29,11 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStateVersionController.h"
 
-#include <map>
-#include <string>
+#include <cassert>
+#include <cstdlib>
 #include <vector>
-#include <assert.h>
 
-vtkStandardNewMacro(vtkSMStateLoader);
+vtkObjectFactoryNewMacro(vtkSMStateLoader);
 vtkCxxSetObjectMacro(vtkSMStateLoader, ProxyLocator, vtkSMProxyLocator);
 //---------------------------------------------------------------------------
 struct vtkSMStateLoaderRegistrationInfo
@@ -50,6 +49,18 @@ struct vtkSMStateLoaderInternals
   typedef std::map<int, VectorOfRegInfo> RegInfoMapType;
   RegInfoMapType RegistrationInformation;
   std::vector<vtkTypeUInt32> AlignedMappingIdTable;
+
+  /// Vector filled up in CreatedNewProxy() to keep order in which the proxies
+  /// are created.
+  typedef std::pair<vtkTypeUInt32, vtkWeakPointer<vtkSMProxy> > ProxyCreationOrderItem;
+  typedef std::vector<ProxyCreationOrderItem> ProxyCreationOrderType;
+  ProxyCreationOrderType ProxyCreationOrder;
+  bool DeferProxyRegistration;
+
+  vtkSMStateLoaderInternals()
+    : KeepOriginalId(false), DeferProxyRegistration(false)
+    {
+    }
 };
 
 //---------------------------------------------------------------------------
@@ -162,13 +173,21 @@ void vtkSMStateLoader::CreatedNewProxy(vtkTypeUInt32 id, vtkSMProxy* proxy)
     proxy->SetGlobalID(id);
     }
 
-
+  // Calling UpdateVTKObjects() will assign the proxy a GlobalId, if needed.
   proxy->UpdateVTKObjects();
   if (proxy->IsA("vtkSMSourceProxy"))
     {
     vtkSMSourceProxy::SafeDownCast(proxy)->UpdatePipelineInformation();
     }
-  this->RegisterProxy(id, proxy);
+  if (this->Internal->DeferProxyRegistration)
+    {
+    this->Internal->ProxyCreationOrder.push_back(
+      vtkSMStateLoaderInternals::ProxyCreationOrderItem(id, proxy));
+    }
+  else
+    {
+    this->RegisterProxy(id, proxy);
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -189,18 +208,44 @@ void vtkSMStateLoader::RegisterProxy(vtkTypeUInt32 id, vtkSMProxy* proxy)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMStateLoader::RegisterProxyInternal(const char* group,
-  const char* name, vtkSMProxy* proxy)
+void vtkSMStateLoader::RegisterProxyInternal(const char* cgroup,
+  const char* cname, vtkSMProxy* proxy)
 {
-  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
-  assert(pxm != NULL);
+  assert(cgroup != NULL && cname != NULL);
 
-  if (pxm->GetProxyName(group, proxy))
+  std::string group(cgroup);
+  std::string name(cname);
+  if (this->UpdateRegistrationInfo(group, name, proxy))
     {
-    // Don't re-register a proxy in the same group.
-    return;
+    vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
+    assert(pxm != NULL);
+    if (pxm->GetProxyName(group.c_str(), proxy))
+      {
+      // Don't re-register a proxy in the same group.
+      return;
+      }
+    pxm->RegisterProxy(group.c_str(), name.c_str(), proxy);
     }
-  pxm->RegisterProxy(group, name, proxy);
+}
+
+//---------------------------------------------------------------------------
+bool vtkSMStateLoader::UpdateRegistrationInfo(
+  std::string& group, std::string& vtkNotUsed(name), vtkSMProxy* vtkNotUsed(proxy))
+{
+  static const char* helper_proxies_prefix = "pq_helper_proxies.";
+  static size_t len = strlen(helper_proxies_prefix);
+  if (group.compare(0, len, helper_proxies_prefix) == 0)
+    {
+    // a helper proxy groupname, must update it.
+    std::string pid = group.substr(len);
+    vtkTypeUInt32 gid = static_cast<vtkTypeUInt32>(std::atoi(pid.c_str()));
+    if (vtkSMProxy* helpedProxy = this->ProxyLocator->LocateProxy(gid))
+      {
+      group = helper_proxies_prefix;
+      group += helpedProxy->GetGlobalIDAsString();
+      }
+    }
+  return true;
 }
 
 //---------------------------------------------------------------------------
@@ -303,7 +348,7 @@ int vtkSMStateLoader::HandleProxyCollection(vtkPVXMLElement* collectionElement)
   const char* groupName = collectionElement->GetAttribute("name");
   if (!groupName)
     {
-    vtkErrorMacro("Requied attribute name is missing.");
+    vtkErrorMacro("Required attribute name is missing.");
     return 0;
     }
   unsigned int numElems = collectionElement->GetNumberOfNestedElements();
@@ -333,8 +378,6 @@ int vtkSMStateLoader::HandleProxyCollection(vtkPVXMLElement* collectionElement)
         proxy->Delete();
         continue;
         }
-      // No need to register
-      //pm->RegisterProxy(groupName, name, proxy);
       }
     }
 
@@ -355,7 +398,7 @@ int vtkSMStateLoader::HandleLinks(vtkPVXMLElement* element)
 {
   vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
   assert(pxm != NULL);
-  
+
   unsigned int numElems = element->GetNumberOfNestedElements();
   for (unsigned int cc=0; cc < numElems; cc++)
     {
@@ -518,23 +561,66 @@ int vtkSMStateLoader::LoadStateInternal(vtkPVXMLElement* parent)
       }
     }
 
+  // Iterate over all proxy collections to create all proxies. None are
+  // registered at this point, just created. Since we don't register proxies
+  // here, we have to take special care for loading state of proxies that are
+  // already registered. These include "TimeKeeper", "AnimationScene", and
+  // "TimeAnimationCue". We simply defer creation of proxies in "animation"
+  // and "timekeeper" group until all other proxies have been created and
+  // registered. That way, when properties on TimeKeeper or AnimationScene
+  // start getting modified, the proxies they may refer to are already
+  // present and registered.
+  std::vector<vtkSmartPointer<vtkPVXMLElement> > deferredCollections;
+  this->Internal->DeferProxyRegistration = true;
   for (i=0; i<numElems; i++)
     {
     vtkPVXMLElement* currentElement = rootElement->GetNestedElement(i);
     const char* name = currentElement->GetName();
-    if (name)
+    if (name != NULL && strcmp(name, "ProxyCollection") == 0)
       {
-      if (strcmp(name, "ProxyCollection") == 0)
+      const char* group_name = currentElement->GetAttributeOrEmpty("name");
+      if (strcmp(group_name, "animation") == 0
+        || strcmp(group_name, "timekeeper") == 0)
         {
-        if (!this->HandleProxyCollection(currentElement))
-          {
-          return 0;
-          }
+        deferredCollections.push_back(currentElement);
         }
-      else if (strcmp(name, "Links") == 0)
+      else if (!this->HandleProxyCollection(currentElement))
         {
-        this->HandleLinks(currentElement);
+        return 0;
         }
+      }
+    }
+
+  // Register proxies in order they were created (as that's a good dependency
+  // order).
+  for (vtkSMStateLoaderInternals::ProxyCreationOrderType::const_iterator
+    iter = this->Internal->ProxyCreationOrder.begin();
+    iter != this->Internal->ProxyCreationOrder.end(); ++iter)
+    {
+    this->RegisterProxy(iter->first, iter->second);
+    }
+  this->Internal->ProxyCreationOrder.clear();
+
+  // Now handle animation and timekeeper collections. This time, we let the
+  // proxies be registered as needed.
+  this->Internal->DeferProxyRegistration = false;
+  for (size_t cc=0; cc < deferredCollections.size(); ++cc)
+    {
+    if (!this->HandleProxyCollection(deferredCollections[cc]))
+      {
+      return 0;
+      }
+    }
+  assert(this->Internal->ProxyCreationOrder.size() == 0);
+
+  // Process link elements.
+  for (i=0; i<numElems; i++)
+    {
+    vtkPVXMLElement* currentElement = rootElement->GetNestedElement(i);
+    const char* name = currentElement->GetName();
+    if (name && strcmp(name, "Links") == 0)
+      {
+      this->HandleLinks(currentElement);
       }
     }
 
@@ -559,8 +645,9 @@ int vtkSMStateLoader::LoadStateInternal(vtkPVXMLElement* parent)
     }
 
   // Clear internal data structures.
+  this->Internal->ProxyCreationOrder.clear();
   this->Internal->RegistrationInformation.clear();
-  this->ServerManagerStateElement = 0; 
+  this->ServerManagerStateElement = 0;
   return 1;
 }
 
