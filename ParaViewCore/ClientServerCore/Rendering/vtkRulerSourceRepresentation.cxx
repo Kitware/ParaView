@@ -27,6 +27,7 @@
 #include "vtkPointHandleRepresentation2D.h"
 #include "vtkPointSource.h"
 #include "vtkPolyData.h"
+#include "vtkProperty2D.h"
 #include "vtkPVCacheKeeper.h"
 #include "vtkPVRenderView.h"
 #include "vtkRenderer.h"
@@ -49,6 +50,8 @@ vtkRulerSourceRepresentation::vtkRulerSourceRepresentation()
   this->DistanceRepresentation->InstantiateHandleRepresentation();
 
   this->CacheKeeper->SetInputData(this->Clone.Get());
+
+  this->RulerDistanceScale = 1.0;
 }
 
 //----------------------------------------------------------------------------
@@ -121,6 +124,19 @@ void vtkRulerSourceRepresentation::SetTextProperty(vtkTextProperty* prop)
 }
 
 //----------------------------------------------------------------------------
+void vtkRulerSourceRepresentation::SetAxisLineWidth(float width)
+{
+  this->DistanceRepresentation->GetAxisProperty()->SetLineWidth(width);
+}
+
+//----------------------------------------------------------------------------
+void vtkRulerSourceRepresentation::SetAxisColor(double red, double green, double blue)
+{
+  this->DistanceRepresentation->GetAxisProperty()->
+  SetColor(red, green, blue);
+}
+
+//----------------------------------------------------------------------------
 void vtkRulerSourceRepresentation::SetLabelFormat(char* labelFormat)
 {
   this->DistanceRepresentation->SetLabelFormat(labelFormat);
@@ -135,7 +151,16 @@ void vtkRulerSourceRepresentation::SetRulerMode(int choice)
 //----------------------------------------------------------------------------
 void vtkRulerSourceRepresentation::SetRulerDistance(double distance)
 {
-  this->DistanceRepresentation->SetRulerDistance(distance);
+  this->DistanceRepresentation->SetRulerDistance(
+    distance*this->RulerDistanceScale);
+}
+
+//----------------------------------------------------------------------------
+void vtkRulerSourceRepresentation::ScaleRulerDistance(double scale)
+{
+  this->RulerDistanceScale = scale;
+  this->SetRulerDistance(
+    this->DistanceRepresentation->GetRulerDistance()*scale);
 }
 
 //----------------------------------------------------------------------------
