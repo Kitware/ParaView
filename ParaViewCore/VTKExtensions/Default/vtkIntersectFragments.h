@@ -54,7 +54,7 @@ public:
   void SetStatisticsInputConnection(vtkAlgorithmOutput* algOutput);
   // Description:
   // Override GetMTime because we refer to vtkImplicitFunction.
-  unsigned long GetMTime();
+  vtkMTimeType GetMTime();
 
 protected:
   vtkIntersectFragments();

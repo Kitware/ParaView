@@ -200,16 +200,16 @@ vtkAlgorithm *vtkPVDataSetAlgorithmSelectorFilter::SetActiveFilter(int index)
 //----------------------------------------------------------------------------
 // Overload standard modified time function. If cut functions is modified,
 // or contour values modified, then this object is modified as well.
-unsigned long vtkPVDataSetAlgorithmSelectorFilter::GetMTime()
+vtkMTimeType vtkPVDataSetAlgorithmSelectorFilter::GetMTime()
 {
-  unsigned long maxMTime = this->Superclass::GetMTime(); // My MTime
+  vtkMTimeType maxMTime = this->Superclass::GetMTime(); // My MTime
 
   // let's check internals MTimes
   std::vector<vtkSmartPointer<vtkAlgorithm> >::iterator filterIter =
       this->Internal->RegisteredFilters.begin();
   while(filterIter != this->Internal->RegisteredFilters.end())
     {
-    unsigned long filterMTime = filterIter->GetPointer()->GetMTime();
+    vtkMTimeType filterMTime = filterIter->GetPointer()->GetMTime();
     maxMTime = (maxMTime > filterMTime) ? maxMTime : filterMTime;
 
     // Move forward

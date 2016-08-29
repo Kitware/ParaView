@@ -95,7 +95,7 @@ public:
   // Description:
   // Return this object's modified time.
   // overloaded to reflect the TransferFunction MTime too.
-  virtual unsigned long GetMTime();
+  virtual vtkMTimeType GetMTime();
 
 protected:
   vtk1DTransferFunctionFilter();

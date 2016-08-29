@@ -82,7 +82,7 @@ public:
   virtual double  MapValue(double value, double* range);
 
   // overloaded to take into account the sub Transfet functions
-  virtual unsigned long  GetMTime();
+  virtual vtkMTimeType  GetMTime();
 
   virtual void SetInputRange(double*);
   virtual void SetInputRange(double, double);
@@ -103,4 +103,3 @@ private:
 };
 
 #endif
-

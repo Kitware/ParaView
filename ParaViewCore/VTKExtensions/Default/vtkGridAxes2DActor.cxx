@@ -188,9 +188,9 @@ vtkGridAxes2DActor::~vtkGridAxes2DActor()
 }
 
 //----------------------------------------------------------------------------
-unsigned long vtkGridAxes2DActor::GetMTime()
+vtkMTimeType vtkGridAxes2DActor::GetMTime()
 {
-  unsigned long mtime = this->Superclass::GetMTime();
+  vtkMTimeType mtime = this->Superclass::GetMTime();
   for (int cc=0; cc < 3; cc++)
     {
     mtime = std::max(mtime, this->LabelTextProperty[cc]->GetMTime());

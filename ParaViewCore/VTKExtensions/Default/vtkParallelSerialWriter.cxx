@@ -289,10 +289,10 @@ void vtkParallelSerialWriter::WriteAFile(const char* filename, vtkDataObject* in
 //----------------------------------------------------------------------------
 // Overload standard modified time function. If the internal reader is
 // modified, then this object is modified as well.
-unsigned long vtkParallelSerialWriter::GetMTime()
+vtkMTimeType vtkParallelSerialWriter::GetMTime()
 {
-  unsigned long mTime=this->vtkObject::GetMTime();
-  unsigned long readerMTime;
+  vtkMTimeType mTime=this->vtkObject::GetMTime();
+  vtkMTimeType readerMTime;
 
   if ( this->Writer )
     {

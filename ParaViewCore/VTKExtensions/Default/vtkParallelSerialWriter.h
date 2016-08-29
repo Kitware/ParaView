@@ -43,7 +43,7 @@ public:
 
   // Description:
   // Return the MTime also considering the internal writer.
-  virtual unsigned long GetMTime();
+  virtual vtkMTimeType GetMTime();
 
   // Description:
   // Name of the method used to set the file name of the internal
@@ -65,19 +65,19 @@ public:
   // for all inputs.
   vtkGetMacro(Piece, int);
   vtkSetMacro(Piece, int);
-  
+
   // Description:
   // Get/Set the number of pieces into which the inputs are split.
   vtkGetMacro(NumberOfPieces, int);
   vtkSetMacro(NumberOfPieces, int);
-  
+
   // Description:
   // Get/Set the number of ghost levels to be written.
   vtkGetMacro(GhostLevel, int);
   vtkSetMacro(GhostLevel, int);
 
   // Description:
-  // Get/Set the pre-reduction helper. Pre-Reduction helper is an algorithm 
+  // Get/Set the pre-reduction helper. Pre-Reduction helper is an algorithm
   // that runs on each node's data before it is sent to the root.
   void SetPreGatherHelper(vtkAlgorithm*);
   vtkGetObjectMacro(PreGatherHelper, vtkAlgorithm);
@@ -119,7 +119,7 @@ protected:
 private:
   vtkParallelSerialWriter(const vtkParallelSerialWriter&) VTK_DELETE_FUNCTION;
   void operator=(const vtkParallelSerialWriter&) VTK_DELETE_FUNCTION;
-  
+
   void WriteATimestep(vtkDataObject* input);
   void WriteAFile(const char* fname, vtkDataObject* input);
 
@@ -147,4 +147,3 @@ private:
 };
 
 #endif
-

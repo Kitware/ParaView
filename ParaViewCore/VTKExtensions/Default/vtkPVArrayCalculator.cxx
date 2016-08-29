@@ -71,8 +71,8 @@ vtkPVArrayCalculator::~vtkPVArrayCalculator()
 // ----------------------------------------------------------------------------
 void vtkPVArrayCalculator::UpdateArrayAndVariableNames
    ( vtkDataObject * vtkNotUsed(theInputObj), vtkDataSetAttributes * inDataAttrs )
-{ 
-  unsigned long mtime = this->GetMTime();
+{
+  vtkMTimeType mtime = this->GetMTime();
 
   // Make sure we reparse the function based on the current array order
   this->FunctionParser->InvalidateFunction();
@@ -82,13 +82,13 @@ void vtkPVArrayCalculator::UpdateArrayAndVariableNames
   // It's safe to call these methods in RequestData() since they don't call
   // this->Modified().
   this->RemoveAllVariables();
-  
+
   // Add coordinate scalar and vector variables
   this->AddCoordinateScalarVariable( "coordsX", 0 );
   this->AddCoordinateScalarVariable( "coordsY", 1 );
   this->AddCoordinateScalarVariable( "coordsZ", 2 );
   this->AddCoordinateVectorVariable( "coords",  0, 1, 2 );
-  
+
   // add non-coordinate scalar and vector variables
   int numberArays = inDataAttrs->GetNumberOfArrays(); // the input
   for (int j = 0; j < numberArays; j ++ )
@@ -144,12 +144,12 @@ int vtkPVArrayCalculator::RequestData
 {
   vtkDataObject  * input  = inputVector[0]->GetInformationObject( 0 )
                             ->Get( vtkDataObject::DATA_OBJECT() );
-  
+
   vtkIdType    numTuples  = 0;
   vtkGraph   * graphInput = vtkGraph::SafeDownCast( input );
   vtkDataSet * dsInput    = vtkDataSet::SafeDownCast( input );
   vtkDataSetAttributes *  dataAttrs = NULL;
- 
+
   if ( dsInput )
     {
     if ( this->AttributeMode == VTK_ATTRIBUTE_MODE_DEFAULT ||
@@ -164,7 +164,7 @@ int vtkPVArrayCalculator::RequestData
       numTuples = dsInput->GetNumberOfCells();
       }
     }
-  else 
+  else
   if ( graphInput )
     {
     if ( this->AttributeMode == VTK_ATTRIBUTE_MODE_DEFAULT ||
@@ -179,7 +179,7 @@ int vtkPVArrayCalculator::RequestData
       numTuples = graphInput->GetNumberOfEdges();
       }
     }
-  
+
   if ( numTuples > 0 )
     {
     // Let's update the (scalar and vector arrays / variables) names  to make
@@ -189,12 +189,12 @@ int vtkPVArrayCalculator::RequestData
     // the input of a downstream calculator.
     this->UpdateArrayAndVariableNames( input, dataAttrs );
     }
-  
+
   input      = NULL;
   dsInput    = NULL;
   dataAttrs  = NULL;
   graphInput = NULL;
-  
+
   return this->Superclass::RequestData( request, inputVector, outputVector );
 }
 

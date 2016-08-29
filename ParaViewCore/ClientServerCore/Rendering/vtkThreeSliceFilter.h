@@ -52,7 +52,7 @@ public:
 
   // Description:
   // Override GetMTime because we rely on internal filters that have their own MTime
-  unsigned long GetMTime();
+  vtkMTimeType GetMTime();
 
   // Description:
   // Set a Slice Normal for a given cutter

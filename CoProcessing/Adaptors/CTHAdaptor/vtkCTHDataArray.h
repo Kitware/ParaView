@@ -264,7 +264,7 @@ protected:
   int Dy;
   int Dz;
 
-  unsigned long PointerTime;
+  vtkMTimeType PointerTime;
 
   double ***Data;
   double *CopiedData;

@@ -80,7 +80,7 @@ public:
 
   // Description:
   // Return the MTime of the last array exported by StillRenderToString.
-  vtkGetMacro(LastStillRenderToStringMTime, unsigned long);
+  vtkGetMacro(LastStillRenderToStringMTime, vtkMTimeType);
 
   // Description:
   // Return the Meta data description of the input scene in JSON format.
@@ -104,7 +104,7 @@ protected:
 
   int ImageEncoding;
   int ImageCompression;
-  unsigned long LastStillRenderToStringMTime;
+  vtkMTimeType LastStillRenderToStringMTime;
   int LastStillRenderImageSize[3];
 
 private:

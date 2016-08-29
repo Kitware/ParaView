@@ -69,7 +69,7 @@ public:
 
   // Description:
   // Override GetMTime because we delegate to other filters to do the real work
-  unsigned long GetMTime();
+  vtkMTimeType GetMTime();
 
   // Description:
   // Forward those methods to the underneath filters
@@ -105,5 +105,3 @@ private:
 };
 
 #endif
-
-

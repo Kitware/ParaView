@@ -76,7 +76,7 @@ public:
 
   // Description:
   // Return the MTime when also considering the internal reader.
-  virtual unsigned long GetMTime();
+  virtual vtkMTimeType GetMTime();
 
   // Description:
   // Name of the method used to set the file name of the internal
@@ -112,15 +112,15 @@ protected:
   vtkAlgorithm* Reader;
   // Reader modification time after changing the Reader's FileName
   // Used to ignore changing the FileName for the reader when reporting MTime
-  unsigned long FileNameMTime;
+  vtkMTimeType FileNameMTime;
   // Reader modification time before changing the Reader's FileName
   // Used to ignore changing the FileName for the reader when reporting MTime
-  unsigned long BeforeFileNameMTime;
+  vtkMTimeType BeforeFileNameMTime;
   // Method name used to set the file name for the Reader
   char* FileNameMethod;
   // The index of the file to read.
   vtkIdType _FileIndex;
-  unsigned long FileIndexMTime;
+  vtkMTimeType FileIndexMTime;
   // Range for the file index
   vtkIdType FileIndexRange[2];
 
@@ -128,7 +128,7 @@ protected:
   // File name for the meta-reader
   char *_MetaFileName;
   // File name modification time
-  unsigned long MetaFileNameMTime;
+  vtkMTimeType MetaFileNameMTime;
   // Description:
   // Records the time when the meta-file was read.
   vtkTimeStamp MetaFileReadTime;

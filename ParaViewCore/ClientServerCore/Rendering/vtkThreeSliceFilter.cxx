@@ -110,10 +110,10 @@ void vtkThreeSliceFilter::SetToDefaultSettings()
 }
 
 //----------------------------------------------------------------------------
-unsigned long vtkThreeSliceFilter::GetMTime()
+vtkMTimeType vtkThreeSliceFilter::GetMTime()
 {
-  unsigned long mTime=this->Superclass::GetMTime();
-  unsigned long internalMTime = 0;
+  vtkMTimeType mTime=this->Superclass::GetMTime();
+  vtkMTimeType internalMTime = 0;
 
   // Test Append filter
   internalMTime = this->CombinedFilteredInput->GetMTime();

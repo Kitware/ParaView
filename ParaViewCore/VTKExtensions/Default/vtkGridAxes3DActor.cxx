@@ -399,7 +399,7 @@ int vtkGridAxes3DActor::GetForegroundLayer()
 //----------------------------------------------------------------------------
 double *vtkGridAxes3DActor::GetBounds()
 {
-  unsigned long mtime = this->GetMTime();
+  vtkMTimeType mtime = this->GetMTime();
   if (mtime == this->GetBoundsMTime)
     {
     return this->Bounds;
@@ -587,7 +587,7 @@ void vtkGridAxes3DActor::Update(vtkViewport* viewport)
         }
       // edge_count is 1 for no sharing, 2 for sharing between faces and
       // 3 if there is both sharing between faces and within the same face
-      // (for instance for rendering a box aligned with the ortoghonal 
+      // (for instance for rendering a box aligned with the ortoghonal
       // axes in parallel projection
       if (edge_count[EdgeType(viewportPoints[me], viewportPoints[next])] == 2)
         {

@@ -377,18 +377,17 @@ double *vtkPVAxesActor::GetBounds()
 }
 
 //-----------------------------------------------------------------------------
-unsigned long int vtkPVAxesActor::GetMTime()
+vtkMTimeType vtkPVAxesActor::GetMTime()
 {
-  unsigned long mTime=this->Superclass::GetMTime();
-
+  vtkMTimeType mTime=this->Superclass::GetMTime();
 
   return mTime;
 }
 
 //-----------------------------------------------------------------------------
-unsigned long int vtkPVAxesActor::GetRedrawMTime()
+vtkMTimeType vtkPVAxesActor::GetRedrawMTime()
 {
-  unsigned long mTime=this->GetMTime();
+  vtkMTimeType mTime=this->GetMTime();
 
   return mTime;
 }

@@ -68,7 +68,7 @@ vtkGridAxesHelper::~vtkGridAxesHelper()
 //----------------------------------------------------------------------------
 vtkTuple<vtkVector3d, 4> vtkGridAxesHelper::GetPoints()
 {
-  unsigned long mtime = this->GetMTime();
+  vtkMTimeType mtime = this->GetMTime();
   if (mtime == this->GetPointsMTime)
     {
     return this->Points;
@@ -188,7 +188,7 @@ vtkTuple<bool, 4> vtkGridAxesHelper::GetLabelVisibilities()
 vtkTuple<vtkVector3d, 4> vtkGridAxesHelper::GetTransformedPoints()
 {
   const vtkTuple<vtkVector3d, 4> &points = this->GetPoints();
-  unsigned long mtime =
+  vtkMTimeType mtime =
     std::max(this->GetPointsMTime, (this->Matrix? this->Matrix->GetMTime() : 0));
 
   if (mtime == this->GetTransformedPointsMTime)
