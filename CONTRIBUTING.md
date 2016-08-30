@@ -94,8 +94,7 @@ Typically, one addresses issues by writing code. To start contributing to ParaVi
 
 2.  [Fork ParaView][] into your user's namespace on GitLab.
 
-3.  Follow the [download instructions][] to create a
-    local clone of the main ParaView repository.  Optionally configure
+3.  Create a local clone of the main ParaView repository. Optionally configure
     Git to [use SSH instead of HTTPS][].
     Then clone:
 
@@ -103,18 +102,20 @@ Typically, one addresses issues by writing code. To start contributing to ParaVi
         $ cd ParaView
     The main repository will be configured as your `origin` remote.
 
-    For more information see: [Setup][]
+    For more information see: [Setup][] and [download instructions][]
 
 4.  Run the [developer setup script][] to prepare your ParaView work
     tree and create Git command aliases used below:
 
         $ ./Utilities/SetupForDevelopment.sh
     This will prompt for your GitLab user name and configure a remote
-    called `gitlab` to refer to it.
+    called `gitlab` to refer to it. Choose the defaults for ParaView Data questions.
 
     For more information see: [Setup][]
 
-5.  Edit files and create commits (repeat as needed):
+5.  [Build Paraview] and run it.
+
+6.  Edit files and create commits (repeat as needed):
 
         $ edit file1 file2 file3
         $ git add file1 file2 file3
@@ -127,13 +128,15 @@ Typically, one addresses issues by writing code. To start contributing to ParaVi
 
     For more information see: [Create a Topic][]
 
-6.  Push commits in your topic branch to your fork in GitLab:
+7.  Push commits in your topic branch to your fork in GitLab:
 
         $ git gitlab-push
 
     For more information see: [Share a Topic][]
 
-7.  Visit your fork in GitLab, browse to the "**Merge Requests**" link on the
+8.  Run tests with ctest, or use the dashboard
+
+9.  Visit your fork in GitLab, browse to the "**Merge Requests**" link on the
     left, and use the "**New Merge Request**" button in the upper right to
     create a Merge Request.
 
@@ -163,6 +166,7 @@ to provide support.
 [download instructions]: Documentation/dev/git/download.md#clone
 [developer setup script]: /Utilities/SetupForDevelopment.sh
 [Setup]: Documentation/dev/git/develop.md#Setup
+[Build Paraview]: http://www.paraview.org/Wiki/ParaView:Build_And_Install
 [Create a Topic]: Documentation/dev/git/develop.md#create-a-topic
 [Share a Topic]: Documentation/dev/git/develop.md#share-a-topic
 [Create a Merge Request]: Documentation/dev/git/develop.md#create-a-merge-request
