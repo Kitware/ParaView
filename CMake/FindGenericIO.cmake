@@ -18,6 +18,9 @@ if (NOT GenericIO_FOUND)
       NAMES GenericIO
       PATHS /usr/lib
       )
+else ()
+    get_property(GENERIC_IO_INCLUDE_DIR TARGET GenericIO PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
+    set(GENERIC_IO_LIBRARIES "GenericIO")
 endif ()
 
 include(FindPackageHandleStandardArgs)
