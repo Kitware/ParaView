@@ -305,6 +305,37 @@
       </StringVectorProperty>
     </SourceProxy>
     <!-- End of CountFaces -->
+    <SourceProxy class="vtkCountVertices"
+                 label="Count Cell Vertices"
+                 name="CountCellVertices">
+      <Documentation long_help="Counts the number of vertices on each cell and appends a new cell data array."
+                     short_help="Adds a new cell data array containing the number of vertices per cell.">
+        Adds a new cell data array containing the number of vertices per cell.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>The input.</Documentation>
+      </InputProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetOutputArrayName"
+                            name="OutputArrayName"
+                            label="Vertices Array Name"
+                            default_values="Vertex Count"
+                            number_of_elements="1"
+                            panel_visibility="always">
+        <Documentation>
+          This is the name of the array in the output containing the vertex counts.
+        </Documentation>
+      </StringVectorProperty>
+    </SourceProxy>
+    <!-- End of CountVertices -->
     <SourceProxy class="vtkEnvironmentAnnotationFilter"
                  label="Environment Annotation"
                  name="EnvironmentAnnotation">
