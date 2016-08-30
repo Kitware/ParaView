@@ -589,6 +589,10 @@ if (PARAVIEW_ENABLE_WEB)
   list (APPEND PARAVIEW_MODULE_ROOTS Web)
 endif()
 
+# Paths to external module roots.
+set(PARAVIEW_EXTERNAL_MODULE_ROOTS "" CACHE STRING
+  "Semicolon separated absolute paths to external directories containing extra VTK/ParaView modules.")
+mark_as_advanced(PARAVIEW_EXTERNAL_MODULE_ROOTS)
 include(ParaViewModuleTop)
 
 #----------------------------------------------------------------------------------

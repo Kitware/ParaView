@@ -48,6 +48,38 @@ foreach (source_dir IN LISTS PARAVIEW_MODULE_ROOTS)
   endforeach()
 endforeach()
 
+# If we are provided a collection of external directories to process for
+# modules, do those.
+if(PARAVIEW_EXTERNAL_MODULE_ROOTS)
+  file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/ExternalModules)
+  foreach (source_dir IN LISTS PARAVIEW_EXTERNAL_MODULE_ROOTS)
+    if(NOT IS_DIRECTORY "${source_dir}")
+      message(WARNING
+        "'${source_dir}' specified in PARAVIEW_EXTERNAL_MODULE_ROOTS is not a directory!")
+    else()
+      file(GLOB_RECURSE files "${source_dir}/module.cmake")
+      foreach (module_cmake IN LISTS files)
+        get_filename_component(base "${module_cmake}" DIRECTORY)
+        get_filename_component(basename "${base}" NAME)
+        string(MD5 baseMD5 "${base}")
+        string(SUBSTRING "${baseMD5}" 0 7 baseMD5)
+        if (PARAVIEW_USING_EXTERNAL_VTK)
+          vtk_add_module(
+            "${base}"
+            module.cmake
+            "${CMAKE_CURRENT_BINARY_DIR}/ExternalModules/${baseMD5}"
+            ${_test_languages})
+        else()
+          # Simply add to module-search paths for VTK and let VTK deal with it.
+          vtk_add_to_module_search_path(
+            "${base}"
+            "${CMAKE_CURRENT_BINARY_DIR}/ExternalModules/${baseMD5}")
+        endif()
+      endforeach()
+    endif()
+  endforeach()
+endif()
+
 if (NOT PARAVIEW_USING_EXTERNAL_VTK)
   # include VTK
   set (old_build_examples ${BUILD_EXAMPLES})
