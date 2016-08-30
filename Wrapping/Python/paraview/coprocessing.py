@@ -559,7 +559,7 @@ class CoProcessor(object):
         #figure out what we show now
         pxystate= pv_introspect.record_visibility()
         # a conservative global bounds for consistent z scaling
-        minbds, maxbds  = max_bounds()
+        minbds, maxbds  = pv_introspect.max_bounds()
 
         #make sure depth rasters are consistent
         view.MaxClipBounds = [minbds, maxbds, minbds, maxbds, minbds, maxbds]
@@ -569,7 +569,8 @@ class CoProcessor(object):
             p = pv_introspect.inspect(skip_invisible=True)
         else:
             p = pv_introspect.inspect(skip_invisible=False)
-        fs = pv_introspect.make_cinema_store(p, fname, forcetime = formatted_time,
+        fs = pv_introspect.make_cinema_store(p, fname, view,
+                                             forcetime = formatted_time,
                                              userDefined = self.__CinemaTracks,
                                              specLevel = specLevel,
                                              camType = camType)

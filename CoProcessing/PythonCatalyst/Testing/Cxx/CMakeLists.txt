@@ -183,10 +183,7 @@ if (PARAVIEW_BUILD_QT_GUI)
         -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
       set_tests_properties(CoProcessingFullWorkflowCinema PROPERTIES RUN_SERIAL ON)
       set_tests_properties(CoProcessingFullWorkflowCinema PROPERTIES LABELS "${CP_LABELS}")
-    endif()
 
-    find_python_module(numpy numpy_found)
-    if (numpy_found)
       add_test(NAME CoProcessingFullWorkflowCinemaComposite
         COMMAND ${CMAKE_COMMAND}
         -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:paraview>
@@ -198,6 +195,7 @@ if (PARAVIEW_BUILD_QT_GUI)
         -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
       set_tests_properties(CoProcessingFullWorkflowCinemaComposite PROPERTIES RUN_SERIAL ON)
       set_tests_properties(CoProcessingFullWorkflowCinemaComposite PROPERTIES LABELS "${CP_LABELS}")
+
     endif()
 
   ENDIF ()

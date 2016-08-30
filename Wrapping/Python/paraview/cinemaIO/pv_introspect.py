@@ -380,9 +380,12 @@ def make_cinema_store(proxies,
         cs.load()
         tprop = cs.get_parameter('time')
         tvalues = tprop['values']
-        eye_values = cs.metadata['camera_eye']
-        at_values = cs.metadata['camera_at']
-        up_values = cs.metadata['camera_up']
+        if 'camera_eye' in cs.metadata:
+            eye_values = cs.metadata['camera_eye']
+        if 'camera_at' in cs.metadata:
+            at_values = cs.metadata['camera_at']
+        if 'camera_up' in cs.metadata:
+            up_values = cs.metadata['camera_up']
 
         #start with clean slate, other than time
         cs = cinema_store.FileStore(ocsfname)

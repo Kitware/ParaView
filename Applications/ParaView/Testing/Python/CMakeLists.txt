@@ -24,6 +24,7 @@ if (numpy_found)
     TestPythonAnnotationFilter.py
     TestPythonAnnotationFilterNoMerge.py
     TestAnnotateAttributeData.py
+    CinemaAERTest.py
     )
   set(PARAVIEW_PYTHON_ARGS)
 
