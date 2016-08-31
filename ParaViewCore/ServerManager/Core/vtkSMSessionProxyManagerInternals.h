@@ -44,7 +44,7 @@
 class vtkSMProxyManagerProxyInfo : public vtkObjectBase
 {
 public:
-  vtkTypeMacro(vtkSMProxyManagerProxyInfo, vtkObjectBase);
+  vtkBaseTypeMacro(vtkSMProxyManagerProxyInfo, vtkObjectBase);
 
   vtkSmartPointer<vtkSMProxy> Proxy;
   unsigned long ModifiedObserverTag;
