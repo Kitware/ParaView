@@ -115,7 +115,7 @@ public:
     }
   static QVariant convert(const ValueType& value)
     {
-    if (!supportedAssociation(value.first))
+    if (!supportedAssociation(value.first) || value.second.isEmpty())
       {
       return QVariant();
       }
