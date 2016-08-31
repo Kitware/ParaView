@@ -115,3 +115,11 @@ def getattr(proxy, pname):
                     'Cube Axes and related properties are now obsolete. Please '\
                     'remove them from your script.')
     raise Continue()
+
+def GetProxy(module, key):
+    version = paraview.compatibility.GetVersion()
+    if version < 5.2:
+      if key == "ResampleWithDataset":
+        return module.__dict__["LegacyResampleWithDataset"]()
+
+    return module.__dict__[key]()

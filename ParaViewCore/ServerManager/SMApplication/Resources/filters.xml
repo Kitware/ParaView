@@ -8227,7 +8227,7 @@ source.</Documentation>
     </CompoundSourceProxy>
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPProbeFilter"
-                 label="Resample With Dataset"
+                 label="Legacy Resample With Dataset"
                  name="Probe">
       <Documentation long_help="Sample data attributes at the points of a dataset."
                      short_help="Sample data values at the points of a dataset.">
@@ -8242,7 +8242,13 @@ source.</Documentation>
                      on in which Input cell each Source point is. If an array
                      of the same name exists both in Input's point and cell
                      data, only the one from the point data is
-                     probed.</Documentation>
+                     probed. This is the implementation of the
+                     'Resample With Dataset' filter available in ParaView
+                     version 5.1 and earlier. </Documentation>
+      <Deprecated deprecated_in="5.2" to_remove_in="5.3">
+        This has been replaced by 'Resample With Dataset'. Please consider
+        using that instead.
+      </Deprecated>
       <InputProperty command="SetSourceConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -14805,6 +14811,43 @@ source.</Documentation>
                                    value="0" />
         </Hints>
       </DoubleVectorProperty>
+      <!-- End vtkResampleToImage -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkResampleWithDataSet"
+                 label="Resample With Dataset"
+                 name="ResampleWithDataset">
+      <Documentation short_help="Sample data attributes at the points of a dataset.">
+          This filter takes two inputs - Input and Source, and samples the
+          point and cell values of Input on to the point locations of Source.
+          The output has the same structure as Source but its point data
+          have the resampled values from Input."
+      </Documentation>
+      <InputProperty command="SetSourceConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkCompositeDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the dataset from which to obtain
+        probe values. The data attributes come from this dataset.</Documentation>
+      </InputProperty>
+      <InputProperty command="SetInputConnection" name="Source">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkCompositeDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the dataset whose geometry will
+        be used in determining positions to probe. The mesh comes from this
+        dataset.</Documentation>
+      </InputProperty>
       <!-- End vtkResampleToImage -->
     </SourceProxy>
   </ProxyGroup>

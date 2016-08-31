@@ -185,7 +185,6 @@
   <Proxy group="filters" name="ImageDataToPointSet" />
   <Proxy group="filters" name="IntegrateAttributes" />
   <Proxy group="filters" name="IntegrateFlowThroughSurface" />
-  <Proxy group="filters" name="LegacyGlyph" />
   <!--  <Proxy group="filters" name="LevelIdScalars" /> -->
   <Proxy group="filters" name="LinearExtrusionFilter" />
   <Proxy group="filters" name="LoopSubdivisionFilter" />
@@ -205,7 +204,6 @@
   <Proxy group="filters" name="PlotOnSortedLines" />
   <Proxy group="filters" name="PointDataToCellData" />
   <Proxy group="filters" name="PolyDataNormals" />
-  <Proxy group="filters" name="Probe" />
   <Proxy group="filters" name="ProbeLine" />
   <Proxy group="filters" name="ProbePoint" />
   <Proxy group="filters" name="ProcessIdScalars" />
@@ -219,6 +217,7 @@
   <Proxy group="filters" name="RectilinearGridToPointSet" />
   <Proxy group="filters" name="ReflectionFilter" />
   <Proxy group="filters" name="ResampleToImage" />
+  <Proxy group="filters" name="ResampleWithDataset" />
   <Proxy group="filters" name="RibbonFilter" />
   <Proxy group="filters" name="RotationalExtrusionFilter" />
   <Proxy group="filters" name="ScatterPlot"/>

@@ -37,6 +37,7 @@ A simple example::
 
 import paraview
 import servermanager
+import paraview._backwardscompatibilityhelper
 
 # Bring OutputPort in our namespace.
 from servermanager import OutputPort
@@ -1605,7 +1606,7 @@ def _create_func(key, module, skipRegisteration=False):
 
 
         # Instantiate the actual object from the given module.
-        px = module.__dict__[key]()
+        px = paraview._backwardscompatibilityhelper.GetProxy(module, key)
 
         # preinitialize the proxy.
         controller.PreInitializeProxy(px)
