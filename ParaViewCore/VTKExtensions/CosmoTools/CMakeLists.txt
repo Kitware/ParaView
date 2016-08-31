@@ -39,6 +39,8 @@ set(Module_SRCS
   vtkPMergeConnected.cxx
   )
 
+vtk_module_export_code_find_package(GenericIO)
+
 set_source_files_properties(
   vtkGenericIOUtilities.cxx
   WRAP_EXCLUDE
