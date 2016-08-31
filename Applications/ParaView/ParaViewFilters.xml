@@ -70,6 +70,7 @@
     <Proxy group="filters" name="TemporalStatistics" />
     <Proxy group="filters" name="TimeStepProgressFilter" />
     <Proxy group="filters" name="TimeToTextConvertor" />
+    <Proxy group="filters" name="GroupDataSetsOverTime" />
   </Category>
 
   <Category name="Material Analysis" menu_label="&amp;Material Analysis">
