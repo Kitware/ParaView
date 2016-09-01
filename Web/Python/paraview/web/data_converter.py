@@ -159,7 +159,7 @@ class ConvertCompositeSpriteToSortedStack(object):
     def convert(self):
         for root, dirs, files in os.walk(self.basePath):
             if 'rgb.png' in files:
-                print 'Process', root
+                print ('Process', root)
                 self.processDirectory(root)
 
     def processDirectory(self, directory):
@@ -242,7 +242,7 @@ class ConvertCompositeSpriteToSortedStack(object):
                     if not math.isnan(vect[0]) and not math.isnan(vect[1]) and not math.isnan(vect[2]):
                         sortedNormal.SetTuple3(idx, int(127.5 * (vect[0] + 1)), int(127.5 * (vect[1] + 1)), int(255 * vect[2]))
                     else:
-                        print 'WARNING: encountered NaN in normal of layer ',layerIdx,': [',vect[0],',',vect[1],',',vect[2],']'
+                        print ('WARNING: encountered NaN in normal of layer ',layerIdx,': [',vect[0],',',vect[1],',',vect[2],']')
                         sortedNormal.SetTuple3(idx, 128, 128, 255)
 
             # Write the sorted data
@@ -328,7 +328,7 @@ class ConvertCompositeDataToSortedStack(object):
     def convert(self):
         for root, dirs, files in os.walk(self.basePath):
             if 'depth_0.float32' in files:
-                print 'Process', root
+                print ('Process', root)
                 self.processDirectory(root)
 
     def processDirectory(self, directory):
@@ -448,7 +448,7 @@ class ConvertCompositeDataToSortedStack(object):
                     if not math.isnan(vect[0]) and not math.isnan(vect[1]) and not math.isnan(vect[2]):
                         sortedNormal.SetTuple3(idx, int(127.5 * (vect[0] + 1)), int(127.5 * (vect[1] + 1)), int(255 * vect[2]))
                     else:
-                        print 'WARNING: encountered NaN in normal of layer ',layerIdx,': [',vect[0],',',vect[1],',',vect[2],']'
+                        print ('WARNING: encountered NaN in normal of layer ',layerIdx,': [',vect[0],',',vect[1],',',vect[2],']')
                         sortedNormal.SetTuple3(idx, 128, 128, 255)
 
             # Write the sorted data

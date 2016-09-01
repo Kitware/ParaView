@@ -64,4 +64,4 @@ fooplyDisplay.MapScalars = 0
 renderView1.ResetCamera()
 
 if not smtesting.DoRegressionTesting(renderView1.SMProxy):
-    raise smtesting.TestError, 'Test failed.'
+    raise smtesting.TestError ('Test failed.')

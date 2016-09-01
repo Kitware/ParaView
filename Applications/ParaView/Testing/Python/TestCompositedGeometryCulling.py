@@ -3,7 +3,7 @@ from paraview import simple as smp
 from paraview import smtesting
 
 # Make sure the test driver know that process has properly started
-print "Process started"
+print ("Process started")
 
 def getHost(url):
    return url.split(':')[1][2:]
@@ -33,6 +33,6 @@ def runTest():
 
     smtesting.ProcessCommandLineArguments()
     if not smtesting.DoRegressionTesting(r.SMProxy):
-        raise smtesting.TestError, "Test failed!!!"
-    print "Test Passed"
+        raise smtesting.TestError ("Test failed!!!")
+    print ("Test Passed")
 runTest()

@@ -243,9 +243,9 @@ class WriterAccessor(smtrace.RealProxyAccessor):
             # writer that's not available in this build but is available
             # with the build used by the simulation code (probably through a plugin)
             # this stub must have the proper name in the coprocessing hints
-            print "WARNING: Could not find", xmlname, "writer in", xmlgroup, \
-                "XML group. This is not a problem as long as the writer is available with " \
-                "the ParaView build used by the simulation code."
+            print ("WARNING: Could not find", xmlname, "writer in", xmlgroup, \
+                   "XML group. This is not a problem as long as the writer is available with " \
+                   "the ParaView build used by the simulation code.")
             ctor = servermanager._make_name_valid(xmlname)
         else:
             ctor = servermanager._make_name_valid(prototype.GetXMLLabel())
@@ -419,9 +419,9 @@ def run(filename=None):
         f.write(script)
         f.close()
     else:
-        print "# *** Generated Script Begin ***"
-        print script
-        print "# *** Generated Script End ***"
+        print ("# *** Generated Script Begin ***")
+        print (script)
+        print ("# *** Generated Script End ***")
 
 if __name__ == "__main__":
     run()

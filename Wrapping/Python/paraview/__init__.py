@@ -126,15 +126,15 @@ class options:
 
 def print_warning(text):
    """Print text"""
-   print text
+   print(text)
 
 def print_error(text):
    """Print text"""
-   print text
+   print(text)
 
 def print_debug_info(text):
    """Print text"""
-   print text
+   print(text)
 
 """This variable is set whenever Python is initialized within a ParaView
 Qt-based application. Modules within the 'paraview' package often use this to

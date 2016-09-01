@@ -3,20 +3,19 @@
 import os
 import re
 import sys
-import exceptions
 from vtk.vtkPVServerManagerDefault import *
 
 # we get different behavior based on how we import servermanager
 # so we want to import servermanager the same way in this module
 # as we do in any module that is importing this
 SMModuleName = 'paraview.servermanager'
-if sys.modules.has_key('paraview.simple'):
+if 'paraview.simple' in sys.modules:
   SMModuleName = 'paraview.simple'
 
 sm = __import__(SMModuleName)
 servermanager = sm.servermanager
 
-class TestError(exceptions.Exception):
+class TestError(Exception):
   pass
 
 __ProcessedCommandLineArguments__ = False
@@ -29,7 +28,7 @@ StateXMLFileName = ""
 UseSavedStateForRegressionTests = False
 
 def Error(message):
-  print "ERROR: %s" % message
+  print ("ERROR: %s" % message)
   return False
 
 def ProcessCommandLineArguments():

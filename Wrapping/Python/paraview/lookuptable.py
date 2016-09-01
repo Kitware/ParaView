@@ -16,7 +16,7 @@ This module is intended for use with by simple.py."""
 #==============================================================================
 
 import paraview.simple
-import servermanager
+from paraview import servermanager
 import os
 from math import sqrt
 
@@ -57,11 +57,11 @@ class _vtkPVLUTData:
     # in preparation to map onto
     # an arbitrary scalar range
     nCoords = len(self.Coords)
-    minCoord = min(self.Coords)
-    maxCoord = max(self.Coords)
+    minCoord = float(min(self.Coords))
+    maxCoord = float(max(self.Coords))
     deltaCoord = maxCoord - minCoord
     if (minCoord>=maxCoord):
-      print 'ERROR: in coordinate values'
+      print ('ERROR: in coordinate values')
       return
     i=0
     while i<nCoords:
@@ -74,10 +74,10 @@ class _vtkPVLUTData:
     return self.Coords;
 
   def PrintSelf(self):
-    print self.Name
-    print self.Space
-    print self.Values
-    print self.Coords
+    print (self.Name)
+    print (self.Space)
+    print (self.Values)
+    print (self.Coords)
 
 
 # -----------------------------------------------------------------------------
@@ -143,7 +143,7 @@ class vtkPVLUTReader:
     if (os.path.exists(defaultLUTFile)):
       self.Read(defaultLUTFile)
     else:
-      print 'WARNING: default LUTs not found at %s'%(defaultLUTFile)
+      print ('WARNING: default LUTs not found at %s'%(defaultLUTFile))
     return
 
   def Clear(self):
@@ -162,12 +162,12 @@ class vtkPVLUTReader:
     parser=servermanager.vtkPVXMLParser()
     parser.SetFileName(aFileName)
     if (not parser.Parse()):
-      print 'ERROR: parsing lut file %s'%(aFileName)
+      print ('ERROR: parsing lut file %s'%(aFileName))
       return
     root=parser.GetRootElement()
     if root.GetName()!='ColorMaps':
-      print 'ERROR: parsing LUT file %s'%(aFileName)
-      print 'ERROR: root element must be <ColorMaps>'
+      print ('ERROR: parsing LUT file %s'%(aFileName))
+      print ('ERROR: root element must be <ColorMaps>')
       return
     nElems=root.GetNumberOfNestedElements()
     i=0
@@ -204,7 +204,7 @@ class vtkPVLUTReader:
       i=i+1
 
     if nFound==0:
-      print 'ERROR: No ColorMaps were found in %s'%(aFileName)
+      print ('ERROR: No ColorMaps were found in %s'%(aFileName))
     else:
       if self.DefaultLUT is None:
         names=self.LUTS.keys()
@@ -224,10 +224,10 @@ class vtkPVLUTReader:
       self.LUTS[aLutName]
     except KeyError:
       if self.DefaultLUT is not None:
-        print 'ERROR: No LUT named %s using %s'%(aLutName,self.DefaultLUT)
+        print ('ERROR: No LUT named %s using %s'%(aLutName,self.DefaultLUT))
         aLutName = self.DefaultLUT
       else:
-        print 'ERROR: No LUT named %s and no default available.'%(aLutName)
+        print ('ERROR: No LUT named %s and no default available.'%(aLutName))
         return None
     range = self.__GetRange(aArray,aRangeOveride)
     return self.__GetLookupTableForArray(aArray,
@@ -255,7 +255,7 @@ class vtkPVLUTReader:
       if ((i%6)==5):
         names+="\n"
       i+=1
-    print names
+    print (names)
     return
   # end of public interface
 

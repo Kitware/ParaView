@@ -40,8 +40,8 @@ exrEnabled = False
 try:
     import OexrHelper as exr
     exrEnabled = True
-    print "Imported OpenEXR, will default to *.exr for float images (z-buffer, \
-    value, etc.)."
+    print ("Imported OpenEXR, will default to *.exr for float images (z-buffer, "
+    "value, etc.).")
 except ImportError:
     pass
 
@@ -135,7 +135,7 @@ class RasterWrangler(object):
         if len(parts) > 1:
             extension = parts[-1]
         else:
-            raise RuntimeError, "Filename has no extension, cannot guess writer to use"
+            raise RuntimeError ("Filename has no extension, cannot guess writer to use")
 
         if extension == 'png':
             return vtkPNGWriter()
@@ -150,7 +150,7 @@ class RasterWrangler(object):
         elif extension == 'vti':
             return vtkXMLImageDataWriter()
         else:
-            raise RuntimeError, "Cannot infer filetype from extension:", extension
+            raise RuntimeError ("Cannot infer filetype from extension:", extension)
 
     def _make_reader(self,filename):
         "Internal function."
@@ -159,7 +159,7 @@ class RasterWrangler(object):
         if len(parts) > 1:
             extension = parts[-1]
         else:
-            raise RuntimeError, "Filename has no extension, please guess reader to use"
+            raise RuntimeError ("Filename has no extension, please guess reader to use")
 
         if extension == 'png':
             return vtkPNGReader()
@@ -174,7 +174,7 @@ class RasterWrangler(object):
         elif extension == 'vti':
             return vtkXMLImageDataReader()
         else:
-            raise RuntimeError, "Cannot infer filetype from extension:", extension
+            raise RuntimeError ("Cannot infer filetype from extension:", extension)
 
     def genericreader(self, fname):
         """read generic binary data dump"""
@@ -205,14 +205,14 @@ class RasterWrangler(object):
         elif "PIL" in self.backends:
             try:
                 im = PIL.Image.open(fname)
-                #print "read", fname
+                #print ("read", fname)
                 return numpy.array(im, numpy.uint8).reshape(im.size[1],im.size[0],3)
             except:
-                #print "no such file", fname
+                #print ("no such file", fname)
                 return None
 
         else:
-            print "Warning: need PIL or VTK to read from " + fname
+            print ("Warning: need PIL or VTK to read from " + fname)
 
     def rgbwriter(self, imageslice, fname):
         """takes in a color buffer and writes it as an image file"""
@@ -236,7 +236,7 @@ class RasterWrangler(object):
             pimg.save(fname)
 
         else:
-            print "Warning: need PIL or VTK to write to " + fname
+            print ("Warning: need PIL or VTK to write to " + fname)
 
     def valuewriter(self, imageSlice, fname, vrange):
         """ Takes in either a (1C) float or a RGB (3C) buffer and writes it as

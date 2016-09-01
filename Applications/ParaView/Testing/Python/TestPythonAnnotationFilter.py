@@ -4,7 +4,7 @@ from paraview import servermanager
 import time
 
 # Make sure the test driver know that process has properly started
-print "Process started"
+print ("Process started")
 errors = 0
 
 #-------------------- Comparison helper ----------------------
@@ -27,7 +27,7 @@ def equal(a, b):
 
 #-------------------- Start testing --------------------------
 
-print "Start PythonAnnotationFilter testing"
+print ("Start PythonAnnotationFilter testing")
 
 options = servermanager.vtkProcessModule.GetProcessModule().GetOptions()
 dataToLoad = options.GetParaViewDataName()
@@ -66,7 +66,7 @@ expected = "0.012132 0.001378 -1158.252808"
 
 if not equal(value, expected):
   errors += 1
-  print "Error: Expected ", expected, " and got ", value
+  print ("Error: Expected ", expected, " and got ", value)
 
 # Update time and trigger pipeline execution
 time = timesteps[7]
@@ -78,7 +78,7 @@ expected = "0.013970 0.001319 -1141.020020"
 
 if not equal(value, expected):
   errors += 1
-  print "Error: Expected ", expected, " and got ", value
+  print ("Error: Expected ", expected, " and got ", value)
 
 # Check time infos
 annotation.Expression = '"%i %f %s" % (t_index, t_value, str(t_range))'
@@ -93,7 +93,7 @@ expected = "7 0.000700 (0.0, 0.004299988504499197)"
 
 if not equal(value, expected):
   errors += 1
-  print "Error: Expected ", expected, " and got ", value
+  print ("Error: Expected ", expected, " and got ", value)
 
 # Update time and trigger pipeline execution
 time = timesteps[27]
@@ -105,7 +105,7 @@ expected = "27 0.002700 (0.0, 0.004299988504499197)"
 
 if not equal(value, expected):
   errors += 1
-  print "Error: Expected ", expected, " and got ", value
+  print ("Error: Expected ", expected, " and got ", value)
 
 # Update time and trigger pipeline execution
 time = timesteps[len(timesteps)-1]
@@ -117,10 +117,10 @@ expected = "43 0.004300 (0.0, 0.004299988504499197)"
 
 if not equal(value, expected):
   errors += 1
-  print "Error: Expected ", expected, " and got ", value
+  print ("Error: Expected ", expected, " and got ", value)
 
 # Disconnect and quit application...
 Disconnect()
 
 if errors > 0:
-  raise RuntimeError, "An error occured during the execution"
+  raise RuntimeError ("An error occured during the execution")

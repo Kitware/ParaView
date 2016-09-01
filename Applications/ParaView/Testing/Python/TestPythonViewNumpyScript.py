@@ -32,7 +32,7 @@ try:
   baselineIndex = sys.argv.index('-B')+1
   baselinePath = sys.argv[baselineIndex]
 except:
-  print "Could not get baseline directory. Test failed."
+  print ("Could not get baseline directory. Test failed.")
 
 import os
 baseline_file = os.path.join(baselinePath, "TestPythonViewNumpyScript.png")

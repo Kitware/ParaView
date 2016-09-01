@@ -493,7 +493,12 @@ int vtkPythonView::RunSimpleStringWithCustomLocals(const char* code)
     }
 
   result = NULL;
-  if (Py_FlushLine())
+  PyObject *f = PySys_GetObject("stdout");
+  if (f == NULL)
+    {
+    return 0;
+    }
+  if (PyFile_WriteString("\n", f))
     {
     PyErr_Clear();
     }

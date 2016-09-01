@@ -13,10 +13,10 @@ paraview.simple._DisableFirstRenderCameraReset()
 
 def CreateTimeCompartments(globalController, timeCompartmentSize):
     if globalController.GetNumberOfProcesses() == 1:
-        print 'single process'
+        print ('single process')
         return
     elif globalController.GetNumberOfProcesses() % timeCompartmentSize != 0:
-        print 'number of processes must be an integer multiple of time compartment size'
+        print ('number of processes must be an integer multiple of time compartment size')
         return
     elif timeCompartmentSize == globalController.GetNumberOfProcesses():
         return globalController
@@ -28,17 +28,17 @@ def CreateTimeCompartments(globalController, timeCompartmentSize):
     if newController.GetReferenceCount() > 1:
         newController.UnRegister(None)
 
-    #print gid, ' of global comm is ', newController.GetLocalProcessId()
+    #print (gid, ' of global comm is ', newController.GetLocalProcessId())
     globalController.SetGlobalController(newController)
     return newController
 
 def CheckReader(reader):
     if hasattr(reader, "FileName") == False:
-        print "ERROR: Don't know how to set file name for ", reader.SMProxy.GetXMLName()
+        print ("ERROR: Don't know how to set file name for ", reader.SMProxy.GetXMLName())
         sys.exit(-1)
 
     if hasattr(reader, "TimestepValues") == False:
-        print "ERROR: ", reader.SMProxy.GetXMLName(), " doesn't have time information"
+        print ("ERROR: ", reader.SMProxy.GetXMLName(), " doesn't have time information")
         sys.exit(-1)
 
 def CreateControllers(timeCompartmentSize):
@@ -66,7 +66,7 @@ def WriteFiles(currentTimeStep, currentTime, writers):
 
 def IterateOverTimeSteps(globalController, timeCompartmentSize, timeSteps, writers, views):
     numProcs = globalController.GetNumberOfProcesses()
-    numTimeCompartments = numProcs/timeCompartmentSize
+    numTimeCompartments = numProcs//timeCompartmentSize
     tpp = len(timeSteps)/numTimeCompartments
     remainder = len(timeSteps)%numTimeCompartments
     timeCompartmentIndex = int(globalController.GetLocalProcessId()/timeCompartmentSize)
@@ -80,7 +80,7 @@ def IterateOverTimeSteps(globalController, timeCompartmentSize, timeSteps, write
         myEndTimeStep = myStartTimeStep+tpp
 
     for currentTimeStep in range(myStartTimeStep,myEndTimeStep):
-        #print globalController.GetLocalProcessId(), " is working on ", currentTimeStep
+        #print (globalController.GetLocalProcessId(), " is working on ", currentTimeStep)
         WriteImages(currentTimeStep, timeSteps[currentTimeStep], views)
         WriteFiles(currentTimeStep, timeSteps[currentTimeStep], writers)
 

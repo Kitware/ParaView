@@ -23,6 +23,6 @@ val = QtTesting.getProperty(object5, 'scalars')
 
 if val != "120":
     import exceptions
-    raise exceptions.RuntimeError, "Expecting 120, received: " + val
+    raise exceptions.RuntimeError ("Expecting 120, received: " + val)
 else:
-    print "Value comparison successful -- Test passed."
+    print ("Value comparison successful -- Test passed.")

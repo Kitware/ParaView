@@ -10,6 +10,7 @@ Do that like so:
 3. Call print_logs() to print out the logs in raw format
 """
 
+from __future__ import print_function
 from paraview.simple import *
 import paraview
 
@@ -37,13 +38,13 @@ class OneLog :
         self.lines = []
 
     def print_log(self, showlines=False):
-        print "#RunMode:", self.runmode,
-        print "ServerType:", self.servertype,
-        print "Component:", self.component,
-        print "processor#:", self.rank
+        print ("#RunMode:", self.runmode, end="")
+        print ("ServerType:", self.servertype, end="")
+        print ("Component:", self.component, end="")
+        print ("processor#:", self.rank)
         if showlines:
             for i in self.lines:
-                print i
+                print (i)
 
     def toString(self, showlines=False):
         result = "#RunMode: " + self.runmode + " ServerType: " + self.servertype + " processor#: " + str(self.rank) + "\n"
@@ -210,7 +211,7 @@ def print_logs() :
                 logSize = int(logSize)
                 logTxt = " " * logSize
                 ctrl.Receive(logTxt, logSize, otherProc, 987456)
-                print logTxt
+                print (logTxt)
         else:
             # Extract logs text
             logTxt = ""

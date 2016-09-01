@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkPythonInterpreter.h>
 #include <vtkSmartPyObject.h>
+#include <vtkPythonCompatibility.h>
 
 class pqPythonSyntaxHighlighter::pqInternal {
 public:

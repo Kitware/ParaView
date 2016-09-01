@@ -29,7 +29,7 @@ def render(view, width, height):
   image = vtk.vtkImageData()
   image.DeepCopy(canvas.GetOutput())
 
-  print image
+  print (image)
 
   return image
 """
@@ -43,7 +43,7 @@ try:
   baselineIndex = sys.argv.index('-B')+1
   baselinePath = sys.argv[baselineIndex]
 except:
-  print "Could not get baseline directory. Test failed."
+  print ("Could not get baseline directory. Test failed.")
 
 import os
 baseline_file = os.path.join(baselinePath, "TestPythonViewScript.png")

@@ -92,13 +92,13 @@ def start():
 
 def start_thread():
     thread = threading.Thread(target=start)
-    print "Starting thread"
+    print ("Starting thread")
     thread.start()
     for i in range(20):
-        print "Working... %ds" % (i*5)
+        print ("Working... %ds" % (i*5))
         time.sleep(5)
     thread.join()
-    print "Done"
+    print ("Done")
 
 #------------------------------------------------------------------------------
 # Main
