@@ -1,3 +1,8 @@
+##
+## Test validates the cinema's Azimuth-Elevation-Roll
+## camera model export functions.
+##
+
 #### import the simple module from the paraview
 from paraview.simple import *
 #### disable automatic camera reset on 'Show'
@@ -26,18 +31,6 @@ renderView1.ViewSize = [300, 300]
 timeSource1Display = Show(timeSource1, renderView1)
 # trace defaults for the display properties.
 timeSource1Display.ColorArrayName = [None, '']
-timeSource1Display.OSPRayScaleArray = 'Point Label'
-timeSource1Display.OSPRayScaleFunction = 'PiecewiseFunction'
-timeSource1Display.SelectOrientationVectors = 'None'
-timeSource1Display.ScaleFactor = 0.1
-timeSource1Display.SelectScaleArray = 'None'
-timeSource1Display.GlyphType = 'Arrow'
-timeSource1Display.ScalarOpacityUnitDistance = 1.7320508075688772
-timeSource1Display.GaussianRadius = 0.05
-timeSource1Display.SetScaleArray = ['POINTS', 'Point Label']
-timeSource1Display.ScaleTransferFunction = 'PiecewiseFunction'
-timeSource1Display.OpacityArray = ['POINTS', 'Point Label']
-timeSource1Display.OpacityTransferFunction = 'PiecewiseFunction'
 
 # reset view to fit data
 renderView1.ResetCamera()
