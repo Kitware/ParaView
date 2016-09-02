@@ -428,3 +428,26 @@ void vtkIceTSynchronizedRenderers::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
+
+//----------------------------------------------------------------------------
+void vtkIceTSynchronizedRenderers::SlaveStartRender()
+{
+  this->Superclass::SlaveStartRender();
+
+#ifdef VTKGL2
+  int x,y;
+  this->IceTCompositePass->GetTileDimensions(x,y);
+  if (!(x==1 && y==1))
+    {
+    //Don't mess with tile mode behavior.
+    return;
+    }
+  //Otherwise ensure that every node starts with a black background
+  //to blend onto. This is somewhat redundant, we do the same elsewhere
+  //with a glClear call, but OSPRay can't see that one.
+  //see also vtkPVClientServerSynchronizedRenderers
+  this->Renderer->SetBackground(0, 0, 0);
+  this->Renderer->SetGradientBackground(false);
+  this->Renderer->SetTexturedBackground(false);
+#endif
+}
