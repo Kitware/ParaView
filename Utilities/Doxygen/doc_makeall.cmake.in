@@ -246,6 +246,10 @@ execute_process(COMMAND ${PERL}
   RESULT_VARIABLE rv
 )
 
+if (rv)
+  message(FATAL_ERROR "Step failed: ${rv}")
+endif()
+
 # ----------------------------------------------------------------------------
 # Build the Events invocation list.
 
@@ -268,6 +272,10 @@ execute_process(COMMAND ${PERL}
   RESULT_VARIABLE rv
 )
 
+if (rv)
+  message(FATAL_ERROR "Step failed: ${rv}")
+endif()
+
 # ----------------------------------------------------------------------------
 # Build the full-text index.
 
@@ -281,6 +289,10 @@ execute_process(COMMAND ${PERL}
   ${SOURCE_DIRECTORIES}
   RESULT_VARIABLE rv
 )
+
+if (rv)
+  message(FATAL_ERROR "Step failed: ${rv}")
+endif()
 
 # ----------------------------------------------------------------------------
 # Extract the VTK version and create the main page.
@@ -375,6 +387,9 @@ file(MAKE_DIRECTORY "${OUTPUT_DIRECTORY}")
 execute_process(COMMAND ${DOXYGEN} ${DOXYFILE}
   RESULT_VARIABLE rv
 )
+if (rv)
+  message(FATAL_ERROR "Doxygen command failed: ${rv}")
+endif()
 
 # ----------------------------------------------------------------------------
 # Clean the HTML pages to remove the path to the intermediate Doxygen dir.
@@ -387,6 +402,10 @@ execute_process(COMMAND ${PERL}
   RESULT_VARIABLE rv
 )
 
+if (rv)
+  message(FATAL_ERROR "Step failed: ${rv}")
+endif()
+
 # ----------------------------------------------------------------------------
 # clean the HTML pages to remove layout problems
 
@@ -396,6 +415,10 @@ execute_process(COMMAND ${PERL}
   --html "${OUTPUT_DIRECTORY}/html"
   RESULT_VARIABLE rv
 )
+
+if (rv)
+  message(FATAL_ERROR "Step failed: ${rv}")
+endif()
 
 # ----------------------------------------------------------------------------
 # Create the *.chm file
@@ -409,6 +432,10 @@ if(COMPILE_HTML_HELP AND HTML_HELP_COMPILER)
         WORKING_DIRECTORY "${OUTPUT_DIRECTORY}/html"
         RESULT_VARIABLE rv
       )
+
+      if (rv)
+        message(FATAL_ERROR "Command failed: ${rv}")
+      endif()
     else()
       message(STATUS "warning: no index.hhp file, not running HTML Help Compiler...")
     endif()
@@ -439,6 +466,10 @@ if(CREATE_HTML_TARZ_ARCHIVE)
       WORKING_DIRECTORY ${OUTPUT_DIRECTORY}
       RESULT_VARIABLE rv
     )
+
+    if (rv)
+      message(FATAL_ERROR "Command failed: ${rv}")
+    endif()
   endif()
 endif()
 
