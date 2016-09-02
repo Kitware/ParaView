@@ -178,15 +178,17 @@
   <addaction name="actionEditCameraUndo"/>
   <addaction name="actionEditCameraRedo"/>
   <addaction name="separator"/>
-  <addaction name="actionQuery"/>
-  <addaction name="actionChangeInput"/>
   <addaction name="actionCopy"/>
   <addaction name="actionPaste"/>
-  <addaction name="actionIgnoreTime"/>
+  <addaction name="separator"/>
   <addaction name="actionHide_All"/>
   <addaction name="actionDelete"/>
   <addaction name="actionDelete_All"/>
   <addaction name="separator"/>
+  <addaction name="actionChangeInput"/>
+  <addaction name="actionIgnoreTime"/>
+  <addaction name="separator"/>
+  <addaction name="actionQuery"/>
   <addaction name="actionEditSettings"/>
  </widget>
  <resources>
