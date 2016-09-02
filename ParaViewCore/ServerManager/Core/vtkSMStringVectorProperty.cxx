@@ -23,6 +23,7 @@
 #include "vtkStringList.h"
 #include "vtkSMStateLocator.h"
 
+#include <algorithm>
 #include <sstream>
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
@@ -224,6 +225,14 @@ int vtkSMStringVectorProperty::SetElements(const char* values[], unsigned int co
 }
 
 //---------------------------------------------------------------------------
+int vtkSMStringVectorProperty::SetElements(const std::vector<std::string>& values)
+{
+  std::vector<vtkStdString> svalues(values.size() + 1);
+  std::copy(values.begin(), values.end(), svalues.begin());
+  return this->Internals->SetElements(&svalues[0], static_cast<unsigned int>(values.size()));
+}
+
+//---------------------------------------------------------------------------
 int vtkSMStringVectorProperty::SetUncheckedElements(const char* values[], unsigned int count)
 {
   vtkStdString* std_values = new vtkStdString[count+1];
@@ -235,6 +244,15 @@ int vtkSMStringVectorProperty::SetUncheckedElements(const char* values[], unsign
   delete[] std_values;
   return ret_val;
 }
+
+//---------------------------------------------------------------------------
+int vtkSMStringVectorProperty::SetUncheckedElements(const std::vector<std::string>& values)
+{
+  std::vector<vtkStdString> svalues(values.size() + 1);
+  std::copy(values.begin(), values.end(), svalues.begin());
+  return this->Internals->SetUncheckedElements(&svalues[0], static_cast<unsigned int>(values.size()));
+}
+
 
 //---------------------------------------------------------------------------
 int vtkSMStringVectorProperty::SetElement(unsigned int idx, const char* value)
