@@ -45,6 +45,7 @@ set(PY_TESTS
   RepresentationTypeHint.py,NO_VALID
   PythonProgrammableFilterParameters.py,NO_VALID
   ProxyBackwardsCompatibilityTest.py,NO_VALID
+  ReaderReload.py,NO_VALID
   )
 
 include(FindPythonModules)
