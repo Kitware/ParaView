@@ -19,8 +19,8 @@
 // rendering vtkStructuredGrid datasets with one caveat: it assumes that the
 // structured grid is not "curved" i.e. bounding boxes of non-intersecting
 // extents don't intersect (or intersect negligibly). This is the default (and
-// faster) method. Alternatively, one can set UseDataParititions to
-// off and the representation will simply reply on the view to build the sorting
+// faster) method. Alternatively, one can set UseDataPartitions to
+// off and the representation will simply rely on the view to build the sorting
 // order using the unstructured grid. In which case, however data will be
 // transferred among processing.
 
@@ -44,8 +44,8 @@ public:
   // partitioning information from the input structured grid for ordered
   // compositing. When off we let the view build its own ordering and
   // redistribute data as needed.
-  void SetUseDataParititions(bool);
-  vtkGetMacro(UseDataParititions, bool);
+  void SetUseDataPartitions(bool);
+  vtkGetMacro(UseDataPartitions, bool);
 
   // Description:
   // vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is
@@ -67,7 +67,7 @@ protected:
   virtual int RequestData(vtkInformation*,
     vtkInformationVector**, vtkInformationVector*);
 
-  bool UseDataParititions;
+  bool UseDataPartitions;
   vtkTableExtentTranslator* TableExtentTranslator;
 private:
   vtkStructuredGridVolumeRepresentation(const vtkStructuredGridVolumeRepresentation&) VTK_DELETE_FUNCTION;

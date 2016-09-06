@@ -78,6 +78,7 @@ vtkUnstructuredGridVolumeRepresentation::vtkUnstructuredGridVolumeRepresentation
   this->Actor->SetMapper(this->DefaultMapper);
   this->Actor->SetLODMapper(this->LODMapper);
   vtkMath::UninitializeBounds(this->DataBounds);
+  this->UseDataPartitions = false;
 }
 
 //----------------------------------------------------------------------------
@@ -207,7 +208,19 @@ int vtkUnstructuredGridVolumeRepresentation::ProcessViewRequest(
 
     vtkPVRenderView::SetPiece(inInfo, this,
       this->CacheKeeper->GetOutputDataObject(0));
-    vtkPVRenderView::MarkAsRedistributable(inInfo, this);
+
+    if(this->UseDataPartitions == true)
+      {
+      // Pass partitioning information to the render view.
+      vtkPVRenderView::SetOrderedCompositingInformation(
+        inInfo, this->DataBounds);
+      }
+    else
+      {
+      vtkPVRenderView::MarkAsRedistributable(inInfo, this);
+      }
+
+    vtkPVRenderView::SetRequiresDistributedRendering(inInfo, this, true);
 
     vtkNew<vtkMatrix4x4> matrix;
     this->Actor->GetMatrix(matrix.GetPointer());

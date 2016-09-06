@@ -27,7 +27,7 @@
 #include "vtkOpenGLCamera.h"
 #include "vtkOpenGLError.h"
 #include "vtkOpenGLRenderWindow.h"
-#include "vtkPKdTree.h"
+#include "vtkPartitionOrderingInterface.h"
 #include "vtkPixelBufferObject.h"
 #include "vtkRenderState.h"
 #include "vtkRenderWindow.h"
@@ -111,7 +111,7 @@ namespace
 
 vtkStandardNewMacro(vtkIceTCompositePass);
 vtkCxxSetObjectMacro(vtkIceTCompositePass, RenderPass, vtkRenderPass);
-vtkCxxSetObjectMacro(vtkIceTCompositePass, KdTree, vtkPKdTree);
+vtkCxxSetObjectMacro(vtkIceTCompositePass, PartitionOrdering, vtkPartitionOrderingInterface);
 vtkCxxSetObjectMacro(vtkIceTCompositePass, Controller,
   vtkMultiProcessController);
 //----------------------------------------------------------------------------
@@ -124,7 +124,7 @@ vtkIceTCompositePass::vtkIceTCompositePass()
   this->IceTContext->UseOpenGLOn();
   this->Controller = 0;
   this->RenderPass = 0;
-  this->KdTree = 0;
+  this->PartitionOrdering = 0;
   this->TileMullions[0] = this->TileMullions[1] = 0;
   this->TileDimensions[0] = 1;
   this->TileDimensions[1] = 1;
@@ -174,7 +174,7 @@ vtkIceTCompositePass::~vtkIceTCompositePass()
     this->Program = 0;
     }
 
-  this->SetKdTree(0);
+  this->SetPartitionOrdering(0);
   this->SetRenderPass(0);
   this->SetController(0);
   this->IceTContext->Delete();
@@ -256,8 +256,8 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
     }
 
   bool use_ordered_compositing =
-    (this->KdTree && this->UseOrderedCompositing && !this->DepthOnly &&
-     this->KdTree->GetNumberOfRegions() >=
+    (this->PartitionOrdering && this->UseOrderedCompositing && !this->DepthOnly &&
+     this->PartitionOrdering->GetNumberOfRegions() >=
      this->IceTContext->GetController()->GetNumberOfProcesses());
 
   if(this->DepthOnly)
@@ -308,7 +308,7 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
   icetEnable(ICET_FLOATING_VIEWPORT);
   if (use_ordered_compositing)
     {
-    // if ordered compositing is enabled, pass the process order from the kdtree
+    // if ordered compositing is enabled, pass the process order from the partition ordering
     // to icet.
 
     // Setup IceT context for correct sorting.
@@ -319,13 +319,13 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
     vtkCamera *camera = render_state->GetRenderer()->GetActiveCamera();
     if (camera->GetParallelProjection())
       {
-      this->KdTree->ViewOrderAllProcessesInDirection(
+      this->PartitionOrdering->ViewOrderAllProcessesInDirection(
         camera->GetDirectionOfProjection(),
         orderedProcessIds);
       }
     else
       {
-      this->KdTree->ViewOrderAllProcessesFromPosition(
+      this->PartitionOrdering->ViewOrderAllProcessesFromPosition(
         camera->GetPosition(), orderedProcessIds);
       }
 
@@ -1242,7 +1242,7 @@ void vtkIceTCompositePass::PrintSelf(ostream& os, vtkIndent indent)
      << this->DataReplicatedOnAllProcesses << endl;
   os << indent << "ImageReductionFactor: "
      << this->ImageReductionFactor << endl;
-  os << indent << "KdTree: " << this->KdTree << endl;
+  os << indent << "PartitionOrdering: " << this->PartitionOrdering << endl;
   os << indent << "UseOrderedCompositing: "
      << this->UseOrderedCompositing << endl;
   os << indent << "DepthOnly: " << this->DepthOnly << endl;

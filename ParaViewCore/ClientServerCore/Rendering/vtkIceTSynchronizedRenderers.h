@@ -74,16 +74,16 @@ public:
     { this->IceTCompositePass->SetDataReplicatedOnAllProcesses(val); }
 
   // Description:
-  // kd tree that gives processes ordering. Initial value is a NULL pointer.
+  // partition ordering that gives processes ordering. Initial value is a NULL pointer.
   // This is used only when UseOrderedCompositing is true.
-  void SetKdTree(vtkPKdTree *kdtree)
-    { this->IceTCompositePass->SetKdTree(kdtree); }
+  void SetPartitionOrdering(vtkPartitionOrderingInterface *partitionOrdering)
+    { this->IceTCompositePass->SetPartitionOrdering(partitionOrdering); }
 
   // Description:
   // Set this to true, if compositing must be done in a specific order. This is
   // necessary when rendering volumes or translucent geometries. When
-  // UseOrderedCompositing is set to true, it is expected that the KdTree is set as
-  // well. The KdTree is used to decide the process-order for compositing.
+  // UseOrderedCompositing is set to true, it is expected that the PartitionOrdering is set as
+  // well. The PartitionOrdering is used to decide the process-order for compositing.
   void SetUseOrderedCompositing(bool uoc)
     { this->IceTCompositePass->SetUseOrderedCompositing(uoc); }
 

@@ -172,6 +172,14 @@
           </RequiredProperties>
         </BoundsDomain>
       </DoubleVectorProperty>
+      <IntVectorProperty command="SetUseDataPartitions"
+                         default_values="0"
+                         name="UseDataPartitions"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Specify whether or not to redistribute the data when actor is translucent.
+        Default is false.</Documentation>
+      </IntVectorProperty>
       <SubProxy>
         <Proxy name="VolumeDummyMapper"
                proxygroup="mappers"

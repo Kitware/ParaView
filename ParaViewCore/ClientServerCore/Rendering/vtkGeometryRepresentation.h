@@ -216,6 +216,14 @@ public:
   virtual void SetScalingArrayName(const char*);
   virtual void SetScalingFunction(vtkPiecewiseFunction *pwf);
 
+  // Description:
+  // Specify whether or not to redistribute the data. The default is false
+  // since that is the only way in general to guarantee correct rendering.
+  // Can set to true if all rendered data sets are based on the same
+  // data partitioning in order to save on the data redistribution.
+  vtkSetMacro(UseDataPartitions, bool);
+  vtkGetMacro(UseDataPartitions, bool);
+
 protected:
   vtkGeometryRepresentation();
   ~vtkGeometryRepresentation();
@@ -297,6 +305,9 @@ protected:
   double DataBounds[6];
 
   vtkPiecewiseFunction *PWF;
+
+  bool UseDataPartitions;
+
 private:
   vtkGeometryRepresentation(const vtkGeometryRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkGeometryRepresentation&) VTK_DELETE_FUNCTION;
@@ -308,4 +319,3 @@ private:
 };
 
 #endif
-
