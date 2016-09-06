@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqLineEdit::pqLineEdit(QWidget *_parent) :Superclass(_parent),
-  EditingFinishedPending(false)
+  EditingFinishedPending(false), ResetCursorPositionOnEditingFinished(true)
 {
   this->connect(this, SIGNAL(editingFinished()),
     this, SLOT(onEditingFinished()));
