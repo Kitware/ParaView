@@ -25,6 +25,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkPVCompositeDataPipeline.h"
 #include "vtkPVInstantiator.h"
 #include "vtkPVPostFilter.h"
 #include "vtkPVXMLElement.h"
@@ -35,15 +36,13 @@
 
 #include <vector>
 #include <sstream>
-
-#include <assert.h>
+#include <cassert>
 
 //*****************************************************************************
 class vtkSISourceProxy::vtkInternals
 {
 public:
   std::vector<vtkSmartPointer<vtkAlgorithmOutput> > OutputPorts;
-  std::vector<vtkSmartPointer<vtkAlgorithm> > ExtractPieces;
   std::vector<vtkSmartPointer<vtkPVPostFilter> > PostFilters;
 };
 
@@ -79,14 +78,10 @@ vtkAlgorithmOutput* vtkSISourceProxy::GetOutputPort(int port)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSISourceProxy::CreateVTKObjects(vtkSMMessage* message)
+bool vtkSISourceProxy::CreateVTKObjects()
 {
-  if (this->ObjectsCreated)
-    {
-    return true;
-    }
-
-  if (!this->Superclass::CreateVTKObjects(message))
+  assert(this->ObjectsCreated == false);
+  if (!this->Superclass::CreateVTKObjects())
     {
     return false;
     }
@@ -97,6 +92,7 @@ bool vtkSISourceProxy::CreateVTKObjects(vtkSMMessage* message)
     return true;
     }
 
+  // Create the right kind of executive.
   if (this->ExecutiveName &&
     !this->GetVTKObject()->IsA("vtkPVDataRepresentation"))
     {
@@ -135,47 +131,55 @@ bool vtkSISourceProxy::CreateOutputPorts()
     return true;
     }
 
+  vtkInternals& internals = (*this->Internals);
   int ports = algo->GetNumberOfOutputPorts();
-  this->Internals->OutputPorts.resize(ports);
-  this->Internals->ExtractPieces.resize(ports);
-  this->Internals->PostFilters.resize(ports);
+  internals.OutputPorts.resize(ports);
+  internals.PostFilters.resize(ports);
 
   for (int cc=0; cc < ports; cc++)
     {
-    if (!this->InitializeOutputPort(algo, cc))
+    internals.OutputPorts[cc] = algo->GetOutputPort(cc);
+    if (vtkPVCompositeDataPipeline::SafeDownCast(algo->GetExecutive()) != NULL)
       {
-      return false;
+      // add the post filters to the source proxy
+      // so that we can do automatic conversion of properties.
+      if (internals.PostFilters[cc] == NULL)
+        {
+        internals.PostFilters[cc] = vtkSmartPointer<vtkPVPostFilter>::New();
+        }
+      internals.PostFilters[cc]->SetInputConnection(internals.OutputPorts[cc]);
+      internals.OutputPorts[cc] = internals.PostFilters[cc]->GetOutputPort(0);
       }
     }
   return true;
 }
 
 //----------------------------------------------------------------------------
-bool vtkSISourceProxy::InitializeOutputPort(vtkAlgorithm* algo, int port)
+void vtkSISourceProxy::RecreateVTKObjects()
 {
-  // Save the output port in internal data-structure.
-  this->Internals->OutputPorts[port] = algo->GetOutputPort(port);
-
-  if (strcmp("vtkPVCompositeDataPipeline", this->ExecutiveName) == 0)
+  // If a proxy has no PostFilters, the original algorithm's vtkAlgorithmOutput
+  // may be used in pipeline connections. Since we don't have access to those,
+  // we cannot recreated those pipelines after the VTK object has been
+  // recreated. Hence we warn and ignore the request.
+  // I don't anticipate a whole lot of use-cases where we'll encounter those
+  // since all public-facing ParaView proxies will employ a PostFilter.
+  if (this->PortsCreated
+    && this->Internals->PostFilters.size() == 0)
     {
-    //add the post filters to the source proxy
-    //so that we can do automatic conversion of properties.
-    this->InsertPostFilterIfNecessary(algo, port);
+    vtkWarningMacro(
+      "You have encountered a proxy that currently does not support call to "
+      "RecreateVTKObjects() properly. Please contact the ParaView developers."
+      "This request will be ignored.");
+    return;
     }
-  return true;
-}
 
-//----------------------------------------------------------------------------
-void vtkSISourceProxy::InsertPostFilterIfNecessary(vtkAlgorithm*, int port)
-{
-  vtkPVPostFilter* postFilter = vtkPVPostFilter::New();
-  this->Internals->PostFilters[port] = postFilter;
-  postFilter->FastDelete();
-
-  postFilter->SetInputConnection(this->Internals->OutputPorts[port]);
-
-  // Now substitute port to point to the post-filter.
-  this->Internals->OutputPorts[port] = postFilter->GetOutputPort(0);
+  this->Superclass::RecreateVTKObjects();
+  if (this->PortsCreated)
+    {
+    assert(this->Internals->PostFilters.size() > 0);
+    this->PortsCreated = false;
+    this->CreateOutputPorts();
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -1,14 +1,14 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqEditMenu.h
+   Module:  pqReloadFilesReaction.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -29,36 +29,40 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef pqEditMenu_h
-#define pqEditMenu_h
+#ifndef pqReloadFilesReaction_h
+#define pqReloadFilesReaction_h
 
-#include <QMenu>
-#include "pqApplicationComponentsModule.h"
+#include "pqReaction.h"
+class vtkSMSourceProxy;
 
-class PQAPPLICATIONCOMPONENTS_EXPORT pqEditMenu : public QMenu
+/// @ingroup Reactions
+///
+/// pqReloadFilesReaction adds handler code to reload the active reader.
+/// It calls the "reload" property, identified by hints, if present, or calls
+/// vtkSMProxy::RecreateVTKObjects().
+class PQAPPLICATIONCOMPONENTS_EXPORT pqReloadFilesReaction : public pqReaction
 {
   Q_OBJECT
-  typedef QMenu Superclass;
+  typedef pqReaction Superclass;
 public:
-  pqEditMenu(QWidget* parent=0);
-  pqEditMenu(const QString& title, QWidget* parent=0);
-  virtual ~pqEditMenu();
+  pqReloadFilesReaction(QAction* parent=0);
+  virtual ~pqReloadFilesReaction();
 
-public slots:
-  /// Updates the enable state for all the actions. One does not need to connect
-  /// to this slot explicitly, it is called automatically when anything that
-  /// affects the enable state changes.
-  void updateEnableState();
+  /// reload the active proxy if it supports reload. Returns true on success.
+  static bool reload();
+
+  /// reload the \c proxy if it supports reload. Returns true on success.
+  static bool reload(vtkSMSourceProxy* proxy);
+
+protected:
+  virtual void onTriggered()
+    {
+    this->reload();
+    }
+  virtual void updateEnableState();
 
 private:
-  void constructor();
-  class pqInternals;
-  pqInternals* Internals;
-
-private:
-  Q_DISABLE_COPY(pqEditMenu)
+  Q_DISABLE_COPY(pqReloadFilesReaction)
 };
 
 #endif
-
-

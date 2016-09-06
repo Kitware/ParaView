@@ -49,8 +49,9 @@ protected:
   ~vtkSIWriterProxy();
 
   // Description:
-  // Creates the VTKObjects. Overridden to add post-filters to the pipeline.
-  virtual bool CreateVTKObjects(vtkSMMessage* message);
+  // Overridden to setup stuff on the writer e.g piece request, gather helpers
+  // etc.
+  void OnCreateVTKObjects() VTK_OVERRIDE;
 
   // Description:
   // Read xml-attributes.

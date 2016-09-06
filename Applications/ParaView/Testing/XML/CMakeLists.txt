@@ -32,6 +32,8 @@ paraview_test_load_data(""
   comb.q
   combxyz.bin
   CubeStringArray.vtk
+  cylinder_run1.e
+  cylinder_run2.e
   disk_out_ref.ex2
   dualSphereAnimation4.pvd
   dualSphereAnimation.clone.pvd
@@ -101,6 +103,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/Molecule.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/NonlinearSubdivisionDisplay.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/QuartilePlot.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ReloadExodusFile.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RemoteRendering.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RenderNan.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ResetToVisibleRange.xml

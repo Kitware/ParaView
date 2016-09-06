@@ -2,6 +2,7 @@ paraview_add_test_cxx(${vtk-module}CxxTests tests
   NO_DATA NO_OUTPUT NO_VALID
   TestSessionProxyManager.cxx
   TestSettings.cxx
+  TestRecreateVTKObjects.cxx
   )
 
 if(NOT PARAVIEW_BUILD_QT_GUI)

@@ -42,21 +42,17 @@ vtkSIMetaReaderProxy::~vtkSIMetaReaderProxy()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSIMetaReaderProxy::CreateVTKObjects(vtkSMMessage* message)
+void vtkSIMetaReaderProxy::OnCreateVTKObjects()
 {
-  if(!this->Superclass::CreateVTKObjects(message))
-    {
-    return false;
-    }
+  this->Superclass::OnCreateVTKObjects();
 
   // Connect reader and set filename method
   vtkObjectBase *reader = this->GetSubSIProxy("Reader")->GetVTKObject();
   if (!reader)
     {
     vtkErrorMacro("Missing subproxy: Reader");
-    return false;
+    return;
     }
-
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
          << this->GetVTKObject() << "SetReader" << reader
@@ -69,11 +65,7 @@ bool vtkSIMetaReaderProxy::CreateVTKObjects(vtkSMMessage* message)
            << this->GetFileNameMethod()
            << vtkClientServerStream::End;
     }
-  if (!this->Interpreter->ProcessStream(stream))
-    {
-    return false;
-    }
-  return true;
+  this->Interpreter->ProcessStream(stream);
 }
 
 //----------------------------------------------------------------------------

@@ -1443,12 +1443,6 @@
         <Documentation>Specify which mode shape to animate when HasModeShapes
         is on.</Documentation>
       </IntVectorProperty>
-      <Property command="UpdateTimeInformation"
-                name="Refresh">
-        <Documentation>Read in additional time steps that have been written to
-        the file since it was first opened in ParaView. Useful for monitoring a
-        simulation while it is running.</Documentation>
-      </Property>
       <StringVectorProperty information_only="1"
                             name="EdgeBlocksInfo">
         <ArraySelectionInformationHelper attribute_name="EdgeBlock" />
@@ -5541,7 +5535,6 @@
             <Property name="XMLFileNameInfo" />
           </PropertyGroup>
           <Property name="GenerateFileIdArray" />
-          <Property name="Refresh" />
         </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"
@@ -5683,7 +5676,6 @@
             <Property name="XMLFileNameInfo" />
           </PropertyGroup>
           <Property name="GenerateFileIdArray" />
-          <Property name="Refresh" />
         </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"
@@ -6025,7 +6017,8 @@
       </IntVectorProperty>
       <Hints>
         <ReaderFactory extensions="foam"
-                       file_description="OpenFOAM" />
+          file_description="OpenFOAM" />
+        <ReloadFiles property="Refresh" />
       </Hints>
     </SourceProxy>
     <!-- End of OpenFOAM Reader -->

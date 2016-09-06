@@ -5,11 +5,11 @@ vtk_module(pqApplicationComponents
     pqComponents
     vtkGUISupportQt
   PRIVATE_DEPENDS
+    vtkjsoncpp
     vtkPVAnimation
     vtkPVServerManagerDefault
     vtkPVServerManagerRendering
     vtksys
-    vtkjsoncpp
   COMPILE_DEPENDS
     # doesn't really depend on this, but a good way to enable this
     # tool when ParaView UI is being built.

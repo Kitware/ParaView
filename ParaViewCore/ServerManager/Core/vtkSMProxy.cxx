@@ -2538,8 +2538,8 @@ const char* vtkSMProxy::GetAnnotationKeyAt(int index)
     }
   return NULL;
 }
-//---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
 void vtkSMProxy::UpdateAndPushAnnotationState()
 {
   if (!this->ObjectsCreated)
@@ -2578,4 +2578,29 @@ void vtkSMProxy::UpdateAndPushAnnotationState()
     {
     this->PushState(&localAnnotationState);
     }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::RecreateVTKObjects()
+{
+  vtkSMProxyInternals::ProxyMap::iterator it2 =
+    this->Internals->SubProxies.begin();
+  for( ; it2 != this->Internals->SubProxies.end(); it2++)
+    {
+    it2->second.GetPointer()->RecreateVTKObjects();
+    }
+
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << SIPROXY(this)
+         << "RecreateVTKObjects"
+         << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
+
+  // Since VTK objects were recreated, we know that pipeline's dirty.
+  this->MarkModified(this);
+
+  // Push our full state over to the server. This is akin to loading the
+  // state on the newly created VTK object.
+  this->PushState(this->State);
 }

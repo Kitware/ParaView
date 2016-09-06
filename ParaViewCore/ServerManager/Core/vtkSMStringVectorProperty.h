@@ -29,6 +29,9 @@
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMVectorProperty.h"
 
+#include <vector> // needed for std::vector
+#include <string> // needed for std::string
+
 class vtkStringList;
 class vtkSMStateLocator;
 
@@ -61,10 +64,12 @@ public:
   // Description:
   // Sets multiple elements. The size of the property is changed to match count.
   int SetElements(vtkStringList* newvalue);
+  int SetElements(const std::vector<std::string>& newvalue);
 
   // Description:
   // Sets the values of all the unchecked elements.
   int SetUncheckedElements(const char* values[], unsigned int count);
+  int SetUncheckedElements(const std::vector<std::string>& newvalue);
 
   // Description:
   // Fills up the vtkStringList instance with the current value.

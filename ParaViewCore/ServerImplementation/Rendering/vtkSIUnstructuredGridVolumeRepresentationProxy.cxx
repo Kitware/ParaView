@@ -31,9 +31,12 @@ vtkSIUnstructuredGridVolumeRepresentationProxy::~vtkSIUnstructuredGridVolumeRepr
 }
 
 //----------------------------------------------------------------------------
-void vtkSIUnstructuredGridVolumeRepresentationProxy::OnCreateVTKObjects()
+bool vtkSIUnstructuredGridVolumeRepresentationProxy::CreateVTKObjects()
 {
-  this->Superclass::OnCreateVTKObjects();
+  if (!this->Superclass::CreateVTKObjects())
+    {
+    return false;
+    }
 
   vtkObjectBase* self = this->GetVTKObject();
   vtkClientServerStream stream;
@@ -63,7 +66,7 @@ void vtkSIUnstructuredGridVolumeRepresentationProxy::OnCreateVTKObjects()
          << "Bunyk ray cast"
          << this->GetSubSIProxy("VolumeBunykMapper")->GetVTKObject()
          << vtkClientServerStream::End;
-  this->Interpreter->ProcessStream(stream);
+  return this->Interpreter->ProcessStream(stream) ? true : false;
 }
 
 #ifdef FIXME_COLLABORATION

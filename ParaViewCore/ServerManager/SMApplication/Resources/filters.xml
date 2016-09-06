@@ -10695,39 +10695,7 @@ source.</Documentation>
       </StringVectorProperty>
       <!-- End OrderedCompositeDistributor -->
     </SourceProxy>
-    <!-- ==================================================================== -->
-    <SourceProxy class="vtkPVCacheKeeper"
-                 executive="vtkPVCacheKeeperPipeline"
-                 name="CacheKeeper">
-      <Documentation>vtkPVCacheKeeper manages data cache for flip book
-      animations. When caching is disabled, this simply acts as a pass through
-      filter. When caching is enabled, is the current time step has been
-      previously cached then this filter shuts the update request, otherwise
-      propagates the update and then cache the result for later use. The
-      current time step is set using SetCacheTime().</Documentation>
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <Documentation>Set the input to the Update Suppressor
-        filter.</Documentation>
-      </InputProperty>
-      <Property command="RemoveAllCaches"
-                name="RemoveAllCaches" />
-      <DoubleVectorProperty command="SetCacheTime"
-                            default_values="0.0"
-                            name="CacheTime"
-                            number_of_elements="1">
-        <DoubleRangeDomain name="range" />
-      </DoubleVectorProperty>
-      <IntVectorProperty command="SetCachingEnabled"
-                         default_values="1"
-                         is_internal="1"
-                         name="CachingEnabled"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Toggle whether the caching is enabled.</Documentation>
-      </IntVectorProperty>
-      <!-- End of CacheKeeper -->
-    </SourceProxy>
+
     <!-- ==================================================================== -->
     <SourceProxy class="vtkMPIMoveData"
                  name="MPIMoveData">

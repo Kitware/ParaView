@@ -48,6 +48,7 @@ set (Module_SRCS
   vtkSMProxyConfigurationReader.cxx
   vtkSMProxyConfigurationWriter.cxx
   vtkSMPSWriterProxy.cxx
+  vtkSMReaderReloadHelper.cxx
   vtkSMRenderViewExporterProxy.cxx
   vtkSMTesting.cxx
   vtkSMTooltipSelectionPipeline.cxx

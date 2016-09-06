@@ -831,7 +831,24 @@ def OpenDataFile(filename, **extraArgs):
     return reader
 
 # -----------------------------------------------------------------------------
+def ReloadFiles(proxy=None):
+    """Forces the `proxy` to reload the data files. If no `proxy` is provided,
+    active source is used."""
+    if not proxy:
+        proxy = GetActiveSource()
+    helper = servermanager.vtkSMReaderReloadHelper()
+    return helper.ReloadFiles(proxy.SMProxy)
 
+def ExtendFileSeries(proxy=None):
+    """For a reader `proxy` that supports reading files series, detect any new files
+    added to the series and update the reader's filename property.
+    If no `proxy` is provided, active source is used."""
+    if not proxy:
+        proxy = GetActiveSource()
+    helper = servermanager.vtkSMReaderReloadHelper()
+    return helper.ExtendFileSeries(proxy.SMProxy)
+
+# -----------------------------------------------------------------------------
 def CreateWriter(filename, proxy=None, **extraArgs):
     """Creates a writer that can write the data produced by the source proxy in
        the given file format (identified by the extension). If no source is

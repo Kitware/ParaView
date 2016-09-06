@@ -85,6 +85,7 @@ vtkSIProxy::vtkSIProxy()
   this->VTKClassName = 0;
   this->PostPush = 0;
   this->PostCreation = 0;
+  this->NumberOfInputPorts = -1;
 }
 
 //----------------------------------------------------------------------------
@@ -112,7 +113,9 @@ void vtkSIProxy::SetVTKObject(vtkObjectBase* obj)
 //----------------------------------------------------------------------------
 void vtkSIProxy::Push(vtkSMMessage* message)
 {
-  if (!this->CreateVTKObjects(message))
+  // Push() is the trigger to get the SIProxy initialized. Let's ensure that
+  // it's properly initialized before proceeding further.
+  if (!this->InitializeAndCreateVTKObjects(message))
     {
     return;
     }
@@ -255,7 +258,7 @@ void vtkSIProxy::AddSIProperty(const char* name, vtkSIProperty* property)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSIProxy::CreateVTKObjects(vtkSMMessage* message)
+bool vtkSIProxy::InitializeAndCreateVTKObjects(vtkSMMessage* message)
 {
   if (this->ObjectsCreated)
     {
@@ -296,42 +299,9 @@ bool vtkSIProxy::CreateVTKObjects(vtkSMMessage* message)
     return false;
     }
 
-  // Create and setup the VTK object, if needed before parsing the property
-  // helpers. This is needed so that the property helpers can push their default
-  // values as they are reading the xml-attributes.
-  const char* className = element->GetAttribute("class");
-  if (className && className[0])
-    {
-    this->SetVTKClassName(className);
-    vtkObjectBase* obj = this->Interpreter->NewInstance(className);
-    if (!obj)
-      {
-      vtkErrorMacro("Failed to create " << className
-        << ". Aborting for debugging purposes.");
-      abort();
-      }
-    this->VTKObject.TakeReference(obj);
-    }
-
-  if (this->VTKClassName && this->VTKClassName[0] != '\0')
-    {
-    vtkClientServerStream substream;
-    substream << vtkClientServerStream::Invoke
-              << vtkClientServerID(1)
-              << "GetActiveProgressHandler"
-              << vtkClientServerStream::End;
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-           << substream
-           << "RegisterProgressEvent"
-           << this->VTKObject
-           << static_cast<int>(this->GetGlobalID())
-           << vtkClientServerStream::End;
-    this->Interpreter->ProcessStream(stream);
-    }
-
   this->SetXMLGroup(message->GetExtension(ProxyState::xml_group).c_str());
   this->SetXMLName(message->GetExtension(ProxyState::xml_name).c_str());
+  this->SetVTKClassName(element->GetAttribute("class"));
 
   // Locate sub-proxies.
   for (int cc=0; cc < message->ExtensionSize(ProxyState::subproxy); cc++)
@@ -365,43 +335,29 @@ bool vtkSIProxy::CreateVTKObjects(vtkSMMessage* message)
   // ReadXMLAttributes() is even called.
   this->SetPostPush(element->GetAttribute("post_push"));
   this->SetPostCreation(element->GetAttribute("post_creation"));
-
-  // Allow subclasses to do some initialization if needed. Note this is called
-  // before properties are created.
-  this->OnCreateVTKObjects();
-
-  // Set the number of input ports
-  // This will only work for vtkAlgorithm subclasses that explicitly expose the
-  // otherwise protected method SetNumberOfInputPorts
-  int numberOfInputPorts=0;
-  if (element->GetScalarAttribute("input_ports", &numberOfInputPorts))
+  if (!element->GetScalarAttribute("input_ports", &this->NumberOfInputPorts))
     {
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-           << this->GetVTKObject()
-           << "SetNumberOfInputPorts"
-           << numberOfInputPorts
-           << vtkClientServerStream::End;
-    this->Interpreter->ProcessStream(stream);
+    this->NumberOfInputPorts = -1;
     }
 
-  // Execute post-creation if any
-  if(this->PostCreation != NULL)
+  // Create the VTK object(s) for this SIProxy.
+  if (!this->CreateVTKObjects())
     {
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-           << this->GetVTKObject()
-           << this->PostCreation
-           << vtkClientServerStream::End;
-    this->Interpreter->ProcessStream(stream);
+    return false;
     }
 
   // Process the XML and update properties etc.
+  // This needs be called after the VTK ojects have been created since the default values
+  // for all properties are read (and pushed) from when reading the XML attributes
+  // themselves.
   if (!this->ReadXMLAttributes(element))
     {
     this->DeleteVTKObjects();
     return false;
     }
+
+  // Handle post-creation actions.
+  this->OnCreateVTKObjects();
 
   this->ObjectsCreated = true;
   return true;
@@ -411,11 +367,98 @@ bool vtkSIProxy::CreateVTKObjects(vtkSMMessage* message)
 void vtkSIProxy::DeleteVTKObjects()
 {
   this->VTKObject =  NULL;
+  this->ObjectsCreated = false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSIProxy::CreateVTKObjects()
+{
+  assert(this->ObjectsCreated == false);
+  if (this->VTKClassName && this->VTKClassName[0])
+    {
+    vtkObjectBase* obj = this->Interpreter->NewInstance(this->VTKClassName);
+    if (!obj)
+      {
+      vtkErrorMacro("Failed to create '" << this->VTKClassName << "'. "
+        "This typically means that ParaView does not know about the request class "
+        "to create an instance of if. Ensure that it has been correctly wrapped "
+        "using the client-server wrappers and the wrapping has been initialized. "
+        "Note class names are case-sensitive. Check for typos. "
+        "Aborting for debugging purposes.");
+      abort();
+      }
+    this->VTKObject.TakeReference(obj);
+    }
+  else
+    {
+    return true;
+    }
+
+  assert(this->VTKObject != NULL);
+
+  // Setup progress handler
+    {
+    vtkClientServerStream substream;
+    substream << vtkClientServerStream::Invoke
+              << vtkClientServerID(1)
+              << "GetActiveProgressHandler"
+              << vtkClientServerStream::End;
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << substream
+           << "RegisterProgressEvent"
+           << this->VTKObject
+           << static_cast<int>(this->GetGlobalID())
+           << vtkClientServerStream::End;
+    this->Interpreter->ProcessStream(stream);
+    }
+
+  // Set the number of input ports
+  // This will only work for vtkAlgorithm subclasses that explicitly expose the
+  // otherwise protected method SetNumberOfInputPorts
+  if (this->NumberOfInputPorts != -1)
+    {
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << this->GetVTKObject()
+           << "SetNumberOfInputPorts"
+           << this->NumberOfInputPorts
+           << vtkClientServerStream::End;
+    this->Interpreter->ProcessStream(stream);
+    }
+
+  // Handle any PostCreation method invocation request.
+  if (this->PostCreation != NULL)
+    {
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << this->VTKObject
+           << this->PostCreation
+           << vtkClientServerStream::End;
+    this->Interpreter->ProcessStream(stream);
+    }
+
+  return true;
 }
 
 //----------------------------------------------------------------------------
 void vtkSIProxy::OnCreateVTKObjects()
 {
+}
+
+//----------------------------------------------------------------------------
+void vtkSIProxy::RecreateVTKObjects()
+{
+  if (this->ObjectsCreated)
+    {
+    this->DeleteVTKObjects();
+    if (!this->CreateVTKObjects())
+      {
+      vtkErrorMacro("Recreation failed!!"); //TODO: better error!
+      }
+    this->OnCreateVTKObjects();
+    this->ObjectsCreated = true;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -457,17 +500,20 @@ bool vtkSIProxy::ReadXMLAttributes(vtkPVXMLElement* element)
       }
     }
 
-  for (unsigned int i=0; i < element->GetNumberOfNestedElements(); ++i)
+  if (this->Internals->SIProperties.size() == 0)
     {
-    vtkPVXMLElement* propElement = element->GetNestedElement(i);
-    // read property xml
-    const char* name = propElement->GetAttribute("name");
-    std::string tagName = propElement->GetName();
-    if (name && tagName.find("Property") == (tagName.size()-8))
+    for (unsigned int i=0; i < element->GetNumberOfNestedElements(); ++i)
       {
-      if (!this->ReadXMLProperty(propElement))
+      vtkPVXMLElement* propElement = element->GetNestedElement(i);
+      // read property xml
+      const char* name = propElement->GetAttribute("name");
+      std::string tagName = propElement->GetName();
+      if (name && tagName.find("Property") == (tagName.size()-8))
         {
-        return false;
+        if (!this->ReadXMLProperty(propElement))
+          {
+          return false;
+          }
         }
       }
     }

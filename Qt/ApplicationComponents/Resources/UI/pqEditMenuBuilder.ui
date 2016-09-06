@@ -172,21 +172,38 @@
     <string>V</string>
    </property>
   </action>
+  <action name="actionReloadFiles">
+   <property name="text">
+     <string>Reload Files</string>
+   </property>
+   <property name="iconText">
+    <string>Reload Files</string>
+   </property>
+   <property name="toolTip">
+    <string>Reload data files in case they were changed externally.</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
+   </property>
+  </action>
   <addaction name="actionEditUndo"/>
   <addaction name="actionEditRedo"/>
   <addaction name="separator"/>
   <addaction name="actionEditCameraUndo"/>
   <addaction name="actionEditCameraRedo"/>
   <addaction name="separator"/>
-  <addaction name="actionQuery"/>
-  <addaction name="actionChangeInput"/>
   <addaction name="actionCopy"/>
   <addaction name="actionPaste"/>
+  <addaction name="separator"/>
+  <addaction name="actionChangeInput"/>
+  <addaction name="actionReloadFiles"/>
   <addaction name="actionIgnoreTime"/>
-  <addaction name="actionHide_All"/>
   <addaction name="actionDelete"/>
+  <addaction name="separator"/>
+  <addaction name="actionHide_All"/>
   <addaction name="actionDelete_All"/>
   <addaction name="separator"/>
+  <addaction name="actionQuery"/>
   <addaction name="actionEditSettings"/>
  </widget>
  <resources>

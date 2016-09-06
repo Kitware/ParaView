@@ -55,13 +55,16 @@ bool pqFileDialogEventPlayer::playEvent(QObject* Object, const QString& Command,
   pqFileDialog* object = 0;
   for(QObject* o = Object; o; o = o->parent())
     {
-    object = qobject_cast<pqFileDialog*>(o);
-    if(object)
+    if ((object = qobject_cast<pqFileDialog*>(o)))
+      {
       break;
+      }
     }
-  if(!object)
+  if (!object)
+    {
     return false;
-  
+    }
+
   QString fileString = Arguments;
 
   const QString data_directory = pqCoreTestUtility::DataRoot();
@@ -80,11 +83,10 @@ bool pqFileDialogEventPlayer::playEvent(QObject* Object, const QString& Command,
     return true;
     }
 
+  fileString.replace("$PARAVIEW_DATA_ROOT", data_directory);
+  fileString.replace("$PARAVIEW_TEST_ROOT", test_directory);
   if(Command == "filesSelected")
     {
-    fileString.replace("$PARAVIEW_DATA_ROOT", data_directory);
-    fileString.replace("$PARAVIEW_TEST_ROOT", test_directory);
-
     if(object->selectFile(fileString))
       {
       pqEventDispatcher::processEventsAndWait(0);
@@ -97,7 +99,7 @@ bool pqFileDialogEventPlayer::playEvent(QObject* Object, const QString& Command,
 
     return true;
     }
-    
+
   if(Command == "cancelled")
     {
     object->reject();
@@ -106,12 +108,24 @@ bool pqFileDialogEventPlayer::playEvent(QObject* Object, const QString& Command,
   if (Command == "remove")
     {
     // Delete the file.
-    fileString.replace("$PARAVIEW_DATA_ROOT", data_directory);
-    fileString.replace("$PARAVIEW_TEST_ROOT", test_directory);
     vtksys::SystemTools::RemoveFile(fileString.toLatin1().data());
     return true;
     }
-
+  if (Command == "copy")
+    {
+    QStringList parts = fileString.split(';', QString::SkipEmptyParts);
+    if (parts.size() != 2)
+      {
+      qCritical() << "Invalid argument to `copy`. Expecting paths separated by `;`.";
+      Error = true;
+      }
+    if (!QFile::copy(parts[0], parts[1]))
+      {
+      qCritical() << "Failed to copy `" << parts[0] << "` to `" << parts[1] << "`.";
+      Error = true;
+      }
+    return true;
+    }
   if (!this->Superclass::playEvent(Object, Command, Arguments, Error))
     {
     qCritical() << "Unknown pqFileDialog command: " << Object << " " << Command << " " << Arguments;
