@@ -12,8 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVHistogramChartRepresentation
+// .NAME vtkPVHistogramChartRepresentation - representation for "Histogram
+// View".
 // .SECTION Description
+// vtkPVHistogramChartRepresentation is the vtkPVDataRepresentation subclass for
+// showing an data in the "Histogram View". The representation pipeline extracts
+// histogram from the input dataset and then shows that in the view.
 
 #ifndef vtkPVHistogramChartRepresentation_h
 #define vtkPVHistogramChartRepresentation_h
