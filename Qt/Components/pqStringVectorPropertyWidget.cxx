@@ -207,26 +207,32 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
       chooser->setAcceptAnyFile(true);
     }
 
-    if (vtkPVXMLElement* fileChooserHints =
-          hints ? hints->FindNestedElementByName("FileChooser") : NULL)
+    QStringList supportedExtensions;
+    for (unsigned int cc = 0, max = (hints ? hints->GetNumberOfNestedElements() : 0); cc < max;
+         ++cc)
     {
-      // We could also support multiple FileChooser hints. For now, we will only
-      // support 1.
-      const char* extensions = fileChooserHints->GetAttribute("extensions");
-      const char* file_description = fileChooserHints->GetAttribute("file_description");
-      if (!extensions || !file_description)
+      vtkPVXMLElement* childXML = hints->GetNestedElement(cc);
+      if (childXML && childXML->GetName() && strcmp(childXML->GetName(), "FileChooser") == 0)
       {
-        PV_DEBUG_PANELS() << "Incomplete 'FileChooser' hints specified. Skipping them.";
+        const char* extensions = childXML->GetAttribute("extensions");
+        const char* file_description = childXML->GetAttribute("file_description");
+        if (!extensions || !file_description)
+        {
+          PV_DEBUG_PANELS() << "Incomplete 'FileChooser' hints specified. Skipping them.";
+        }
+        else
+        {
+          QStringList lextensions =
+            QString(extensions).split(QRegExp("\\s+"), QString::SkipEmptyParts);
+          supportedExtensions.push_back(
+            QString("%1 (*.%2)").arg(file_description).arg(lextensions.join(" *.")));
+        }
       }
-      else
-      {
-        PV_DEBUG_PANELS() << "'FileChooser' hints specified. Will use them to limit entries listed "
-                          << "in file chooser widget.";
-        QStringList lextensions =
-          QString(extensions).split(QRegExp("\\s+"), QString::SkipEmptyParts);
-        chooser->setExtension(
-          QString("%1 (*.%2)").arg(file_description).arg(lextensions.join(" *.")));
-      }
+    }
+    if (supportedExtensions.size() > 0)
+    {
+      PV_DEBUG_PANELS() << "Using extensions specified using FileChooser hints.";
+      chooser->setExtension(supportedExtensions.join(";;"));
     }
 
     pqServerManagerModel* smm = pqApplicationCore::instance()->getServerManagerModel();
