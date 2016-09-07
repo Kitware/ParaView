@@ -26,6 +26,7 @@
 
 class vtkDistanceRepresentation2D;
 class vtkPolyData;
+class vtkProperty2D;
 class vtkPVCacheKeeper;
 class vtkTextProperty;
 
@@ -44,6 +45,14 @@ public:
   // Description:
   // Set the text property for the printed distance.
   void SetTextProperty(vtkTextProperty* prop);
+
+  // Description:
+  // Set the line width for the displayed axis in screen units.
+  void SetAxisLineWidth(float width);
+
+  // Description:
+  // Set the color for the displayed axis.
+  void SetAxisColor(double red, double green, double blue);
 
   // Description:
   virtual void MarkModified();
@@ -70,6 +79,10 @@ public:
   // Specify the RulerDistance which indicates the spacing of the major ticks.
   // This ivar only has effect when the RulerMode is on.
   void SetRulerDistance(double distance);
+
+  // Description:
+  // Scale the ruler distance by a constant.
+  void ScaleRulerDistance(double scale);
 
   // Description:
   // Specify the number of major ruler ticks. Note: the number of ticks is the
@@ -116,6 +129,7 @@ protected:
   vtkDistanceRepresentation2D* DistanceRepresentation;
   vtkNew<vtkPVCacheKeeper> CacheKeeper;
   vtkNew<vtkPolyData> Clone;
+  double RulerDistanceScale;
 
 private:
   vtkRulerSourceRepresentation(const vtkRulerSourceRepresentation&) VTK_DELETE_FUNCTION;

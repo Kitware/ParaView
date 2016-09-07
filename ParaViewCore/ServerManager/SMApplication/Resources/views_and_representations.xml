@@ -7246,11 +7246,52 @@
         </Hints>
       </DoubleVectorProperty>
 
+      <DoubleVectorProperty name="Scale"
+        command="ScaleRulerDistance"
+        number_of_elements="1"
+        default_values="1.">
+        <Documentation>
+          Specify the graduation scale with respect to the global coordinate scale.
+        </Documentation>
+        <DoubleRangeDomain name="range" min="0" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="RulerMode"
+                                   value="1" />
+        </Hints>
+      </DoubleVectorProperty>
+
       <PropertyGroup label="Label Properties">
-        <Property function="RulerMode" name="RulerMode" />
-        <Property function="LabelFormat" name="LabelFormat" />
-        <Property function="NumberOfTicks" name="NumberOfTicks" />
-        <Property function="Graduation" name="Graduation" />
+        <Property name="RulerMode" />
+        <Property name="LabelFormat" />
+        <Property name="NumberOfTicks" />
+        <Property name="Graduation" />
+        <Property name="Scale" />
+      </PropertyGroup>
+
+      <DoubleVectorProperty command="SetAxisColor"
+                            default_values="0 1 0"
+                            name="AxisColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector_with_palette">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Documentation>Set the color of the ruler.</Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetAxisLineWidth"
+                            default_values="2"
+                            name="AxisLineWidth"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0" name="range" />
+        <Documentation>Set the line width of the ruler in screen units.</Documentation>
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="Axis Display Properties">
+        <Property name="AxisColor" />
+        <Property name="AxisLineWidth" />
       </PropertyGroup>
 
       <SubProxy command="SetTextProperty">

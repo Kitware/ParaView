@@ -1,4 +1,9 @@
 <ParaViewSources>
+  <Category name="MeasurementTools" menu_label="&amp;MeasurementTools" preserve_order="1"
+    show_in_toolbar="1">
+    <Proxy group="sources" name="Ruler" icon=":/pqWidgets/Icons/pqRuler16.png"/>
+  </Category>
+
   <Proxy group="sources" name="GlyphSource2D" />
   <Proxy group="sources" name="VectorText" />
   <Proxy group="sources" name="TimeToTextConvertorSource" />
@@ -24,7 +29,6 @@
   <Proxy group="sources" name="SuperquadricSource" />
   <Proxy group="sources" name="TextSource" />
   <Proxy group="sources" name="TimeSource" />
-  <Proxy group="sources" name="Ruler" />
   <Proxy group="sources" name="RTAnalyticSource" />
   <Proxy group="sources" name="AMRGaussianPulseSource" />
 </ParaViewSources>
