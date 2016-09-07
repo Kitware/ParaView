@@ -33,8 +33,8 @@ class AnalysisManager(object):
             "description": description,
             "analysis": []
         }
-        for key, value in kwargs.iteritems():
-            self.analysis[key] = value
+        for key in kwargs:
+            self.analysis[key] = kwargs[key]
         self.begin()
 
 
@@ -190,7 +190,8 @@ class FileNameGenerator(object):
         """
         Update active arguments and extend arguments range.
         """
-        for key, value in kwargs.iteritems():
+        for key in kwargs:
+            value = kwargs[key]
             value_str = "{value}".format(value=value)
             self.active_arguments[key] = value_str
             if store_value:
@@ -214,7 +215,8 @@ class FileNameGenerator(object):
         """
         Update label arguments, but argument must exist first
         """
-        for key, value in kwargs.iteritems():
+        for key in kwargs:
+            value = kwargs[key]
             if key in self.arguments:
                 self.arguments[key]["label"] = value
 
@@ -697,7 +699,7 @@ class ImageResampler(object):
         if custom_probing_bounds:
             self.resampler.UseInputBounds = 0
             self.resampler.CustomSamplingBounds = custom_probing_bounds
-        field = array_colors.keys()[0]
+        field = list(array_colors.keys())[0]
         self.color = simple.ColorByArray(Input=self.resampler, LookupTable=array_colors[field], RGBANaNColor=nanColor, ColorBy=field )
 
         self.file_name_generator.add_image_width(sampling_dimesions[0])

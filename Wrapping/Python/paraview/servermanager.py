@@ -3056,8 +3056,8 @@ def GetAssociationAsString(val):
     global ASSOCIATIONS
     if not type(val) == int:
         raise ValueError ("argument must be of type 'int'")
-    for k, v in ASSOCIATIONS.iteritems():
-        if v == val:
+    for k in ASSOCIATIONS:
+        if ASSOCIATIONS[k] == val:
             return k
     raise RuntimeError ("invalid association type '%d'" % val)
 
