@@ -1,9 +1,4 @@
 <ParaViewSources>
-  <Category name="MeasurementTools" menu_label="&amp;MeasurementTools" preserve_order="1"
-    show_in_toolbar="1">
-    <Proxy group="sources" name="Ruler" icon=":/pqWidgets/Icons/pqRuler16.png"/>
-  </Category>
-
   <Proxy group="sources" name="GlyphSource2D" />
   <Proxy group="sources" name="VectorText" />
   <Proxy group="sources" name="TimeToTextConvertorSource" />
@@ -24,6 +19,7 @@
   <Proxy group="sources" name="PointSource" />
   <Proxy group="sources" name="PolyLineSource" />
   <Proxy group="sources" name="ProgrammableSource" />
+  <Proxy group="sources" name="Ruler" />
   <Proxy group="sources" name="SphereSource" />
   <Proxy group="sources" name="SplineSource" />
   <Proxy group="sources" name="SuperquadricSource" />
