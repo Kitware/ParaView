@@ -97,6 +97,16 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
+      <IntVectorProperty name="LoadNoChartVariables"
+        number_of_elements="1"
+        default_values="0"
+        command="SetLoadNoChartVariables">
+        <Documentation>
+          Do not load any variables when loading a 2D chart.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
       <IntVectorProperty name="PropertiesPanelMode"
         command="SetPropertiesPanelMode"
         number_of_elements="1"
@@ -347,6 +357,7 @@
         <Property name="AutoApply" />
         <Property name="AutoApplyActiveOnly" />
         <Property name="LoadAllVariables" />
+        <Property name="LoadNoChartVariables" />
       </PropertyGroup>
 
       <PropertyGroup label="Color/Opacity Map Range Options">

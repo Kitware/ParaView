@@ -163,6 +163,11 @@ public:
   void SetLoadAllVariables(bool val);
   bool GetLoadAllVariables();
 
+  // Description:
+  // Load no variables when showing a 2D chart.
+  void SetLoadNoChartVariables(bool val);
+  bool GetLoadNoChartVariables();
+
 protected:
   vtkPVGeneralSettings();
   ~vtkPVGeneralSettings();

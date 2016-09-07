@@ -19,6 +19,7 @@
 #include "vtkProcessModuleAutoMPI.h"
 #include "vtkSISourceProxy.h"
 #include "vtkSMArraySelectionDomain.h"
+#include "vtkSMChartSeriesSelectionDomain.h"
 #include "vtkSMInputArrayDomain.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMTrace.h"
@@ -220,6 +221,22 @@ void vtkPVGeneralSettings::SetLoadAllVariables(bool val)
 bool vtkPVGeneralSettings::GetLoadAllVariables()
 {
   return vtkSMArraySelectionDomain::GetLoadAllVariables();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeneralSettings::SetLoadNoChartVariables(bool val)
+{
+  if (val != vtkSMChartSeriesSelectionDomain::GetLoadNoChartVariables())
+    {
+    vtkSMChartSeriesSelectionDomain::SetLoadNoChartVariables(val);
+    this->Modified();
+    }
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVGeneralSettings::GetLoadNoChartVariables()
+{
+  return vtkSMChartSeriesSelectionDomain::GetLoadNoChartVariables();
 }
 
 //----------------------------------------------------------------------------

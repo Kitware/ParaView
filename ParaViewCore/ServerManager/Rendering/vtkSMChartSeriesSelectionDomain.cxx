@@ -118,6 +118,9 @@ public:
     }
 };
 
+//---------------------------------------------------------------------------
+bool vtkSMChartSeriesSelectionDomain::LoadNoVariables = false;
+
 //----------------------------------------------------------------------------
 vtkSMChartSeriesSelectionDomain::vtkSMChartSeriesSelectionDomain() :
   Internals(new vtkSMChartSeriesSelectionDomain::vtkInternals())
@@ -484,6 +487,10 @@ void vtkSMChartSeriesSelectionDomain::AddSeriesVisibilityDefault(
 bool vtkSMChartSeriesSelectionDomain::GetDefaultSeriesVisibility(const char* name)
 {
   bool result;
+  if (vtkSMChartSeriesSelectionDomain::LoadNoVariables)
+    {
+    return false;
+    }
   if (::GetSeriesVisibilityDefault(name, result))
     {
     return result;
