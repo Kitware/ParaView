@@ -167,8 +167,10 @@ void pqCinemaTrackSelection::initializePipelineBrowser()
   // As before, the track selection will be applied to all of the views.  If necessary,
   // the models/tracks can be stored per view to keep selections separate.
   QList<pqRenderViewBase*> views = smModel->findItems<pqRenderViewBase*>();
-  plBrowser->setActiveView(views[0]);
-
+  if(views.isEmpty() == false)
+    {
+    plBrowser->setActiveView(views[0]);
+    }
   this->initializePipelineItemValues(smModel->findItems<pqPipelineSource*>());
 }
 

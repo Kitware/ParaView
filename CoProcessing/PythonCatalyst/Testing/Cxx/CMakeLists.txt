@@ -170,6 +170,22 @@ if (PARAVIEW_BUILD_QT_GUI)
     set_tests_properties(CoProcessingFullWorkflowWithPlots PROPERTIES RUN_SERIAL ON)
     set_tests_properties(CoProcessingFullWorkflowWithPlots PROPERTIES LABELS "${CP_LABELS}")
 
+    ExternalData_add_test(ParaViewData NAME CoProcessingFullWorkflowWithOnlyPlots
+      COMMAND ${CMAKE_COMMAND}
+      -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:paraview>
+      -DCOPROCESSING_TEST_DIR:PATH=${PARAVIEW_TEST_DIR}
+      -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Plugins/CatalystScriptGenerator/Testing/CatalystGUIOnlyPlots.xml
+      -DPVBATCH_EXECUTABLE:FILEPATH=$<TARGET_FILE:pvbatch>
+      -DCOPROCESSING_DRIVER_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/waveletdriver.py
+      -DCOPROCESSING_IMAGE_TESTER:FILEPATH=$<TARGET_FILE:CoProcessingCompareImagesTester>
+      -DCOPROCESSING_DATA_DIR:PATH=${PARAVIEW_TEST_OUTPUT_BASELINE_DIR}
+      -DCOPROCESSING_OUTPUTCHECK_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/outputcheck.py
+      -DTEST_NAME:STRING=CoProcessingFullWorkflowWithOnlyPlots
+      -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake
+      DATA{${PARAVIEW_TEST_BASELINE_DIR}/CPFullWorkflowPlot2.png} )
+    set_tests_properties(CoProcessingFullWorkflowWithOnlyPlots PROPERTIES RUN_SERIAL ON)
+    set_tests_properties(CoProcessingFullWorkflowWithOnlyPlots PROPERTIES LABELS "${CP_LABELS}")
+
     find_python_module(numpy numpy_found)
     if (numpy_found)
       add_test(NAME CoProcessingFullWorkflowCinema

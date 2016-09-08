@@ -126,3 +126,15 @@ if("${TEST_NAME}" STREQUAL "CoProcessingFullWorkflowWithPlots")
     message(FATAL_ERROR "CoProcessingCompareImageTester second image return value was = '${rv}' ")
   endif()
 endif("${TEST_NAME}" STREQUAL "CoProcessingFullWorkflowWithPlots")
+
+if("${TEST_NAME}" STREQUAL "CoProcessingFullWorkflowWithOnlyPlots")
+  message("${COPROCESSING_IMAGE_TESTER} ${COPROCESSING_TEST_DIR}/image_0.png -V
+  ${COPROCESSING_DATA_DIR}/CPFullWorkflowPlot2.png -T
+  ${COPROCESSING_TEST_DIR}")
+  execute_process_with_echo(COMMAND
+    ${COPROCESSING_IMAGE_TESTER} ${COPROCESSING_TEST_DIR}/image_0.png 40 -V ${COPROCESSING_DATA_DIR}/CPFullWorkflowPlot2.png -T ${COPROCESSING_TEST_DIR}
+    RESULT_VARIABLE rv)
+  if(rv)
+    message(FATAL_ERROR "CoProcessingCompareImageTester second image return value was = '${rv}' ")
+  endif()
+endif("${TEST_NAME}" STREQUAL "CoProcessingFullWorkflowWithPlots")
