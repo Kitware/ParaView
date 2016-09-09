@@ -395,6 +395,7 @@ vtkPVRenderView::vtkPVRenderView()
     observer);
   observer->FastDelete();
 
+  this->GetRenderer()->SetUseHiddenLineRemoval(0);
   this->GetRenderer()->SetUseDepthPeeling(1);
   this->GetRenderer()->AddCuller(this->Culler);
 
@@ -2275,6 +2276,12 @@ void vtkPVRenderView::SetMaintainLuminance(int val)
 
 //*****************************************************************
 // Forward to 3D renderer.
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetUseHiddenLineRemoval(int val)
+{
+  this->GetRenderer()->SetUseHiddenLineRemoval(val);
+}
+
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetUseDepthPeeling(int val)
 {

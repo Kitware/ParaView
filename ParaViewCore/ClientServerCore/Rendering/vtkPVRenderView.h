@@ -503,6 +503,7 @@ public:
 
   //*****************************************************************
   // Forward to 3D renderer.
+  virtual void SetUseHiddenLineRemoval(int val);
   virtual void SetUseDepthPeeling(int val);
   virtual void SetMaximumNumberOfPeels(int val);
   virtual void SetBackground(double r, double g, double b);
