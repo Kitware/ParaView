@@ -287,22 +287,26 @@
            </sizepolicy>
           </property>
           <layout class="QGridLayout" name="gridLayout_2">
-           <item row="0" column="1">
-            <widget class="QLabel" name="thetaLabel">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>20</height>
-              </size>
-             </property>
+           <item row="0" column="2">
+            <widget class="QLabel" name="rollLabel">
              <property name="text">
-              <string>Theta</string>
+              <string>Roll</string>
              </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <widget class="QSpinBox" name="rollResolution">
+             <property name="toolTip">
+              <string>The number of camera positions in the roll direction.</string>
+             </property>
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>64</number>
+             </property>
+             <property name="value">
+              <number>1</number>
              </property>
             </widget>
            </item>
@@ -337,7 +341,7 @@
               <number>1</number>
              </property>
              <property name="maximum">
-              <number>30</number>
+              <number>64</number>
              </property>
              <property name="value">
               <number>12</number>
@@ -356,10 +360,29 @@
               <number>1</number>
              </property>
              <property name="maximum">
-              <number>30</number>
+              <number>32</number>
              </property>
              <property name="value">
-              <number>12</number>
+              <number>7</number>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLabel" name="thetaLabel">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>20</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Theta</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
              </property>
             </widget>
            </item>
@@ -372,7 +395,7 @@
            <bool>true</bool>
           </property>
           <property name="text">
-           <string>Export Type</string>
+           <string>Camera Type</string>
           </property>
          </widget>
         </item>
@@ -388,23 +411,50 @@
            </size>
           </property>
           <property name="toolTip">
-           <string>Mode for the cinema store of this view: None=no cinema export, Static=Stationary Camera, Spherical=Phi*Theta camera positions around center of rotation.</string>
+           <string>Mode for the cinema store of this view: none=don't export, static=fixed camera, phi-theta=Phi*Theta camera positions around focal point, AER=camera rotates arbitrarily around focal point, YPR=camera rotates arbitrarily from vantage point.</string>
           </property>
           <item>
            <property name="text">
-            <string>None</string>
+            <string>none</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>Static</string>
+            <string>static</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>Spherical</string>
+            <string>phi-theta</string>
            </property>
           </item>
+          <item>
+           <property name="text">
+            <string>azimuth-elevation-roll</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>yaw-pitch-roll</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QLineEdit" name="trackObjectName">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter name from Pipeline Browser for camera to track over time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="text">
+           <string>None</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="trackObjectLabel">
+          <property name="text">
+           <string>Track Object</string>
+          </property>
          </widget>
         </item>
        </layout>
@@ -414,6 +464,17 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>imageType</tabstop>
+  <tabstop>imageFileName</tabstop>
+  <tabstop>imageWriteFrequency</tabstop>
+  <tabstop>imageMagnification</tabstop>
+  <tabstop>fitToScreen</tabstop>
+  <tabstop>cinemaExport</tabstop>
+  <tabstop>phiResolution</tabstop>
+  <tabstop>thetaResolution</tabstop>
+  <tabstop>rollResolution</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

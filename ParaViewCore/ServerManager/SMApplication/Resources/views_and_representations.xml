@@ -2298,6 +2298,17 @@
         <Documentation>A helper function to get the Z buffer from
         a RenderView.</Documentation>
       </Property>
+      <DoubleVectorProperty
+          command="SetMaxClipBounds"
+          default_values="0.0 -1.0 0.0 -1.0 0.0 -1.0"
+          name="MaxClipBounds"
+          number_of_elements="6"
+          argument_is_array="1"
+          animateable="0"
+          >
+        <DoubleRangeDomain name="range" />
+        <Documentation>Set the most conservative clipping range.</Documentation>
+      </DoubleVectorProperty>
       <IntVectorProperty
           name="LockBounds"
           command="SetLockBounds"
@@ -2531,6 +2542,7 @@
       <PropertyGroup label="Cinema Export"
                      panel_visibility="never">
         <Property name="CaptureZBuffer"/>
+        <Property name="MaxClipBounds"/>
         <Property name="LockBounds"/>
         <Property name="StartCaptureValues" />
         <Property name="DrawCells"/>

@@ -71,6 +71,8 @@ public:
   const QString getCameraType();
   double getPhi();
   double getTheta();
+  double getRoll();
+  QString getTrackObjectName();
   void setView(pqView* const view);
 
 public slots:

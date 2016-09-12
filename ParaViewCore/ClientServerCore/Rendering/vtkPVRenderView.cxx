@@ -322,7 +322,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->RemoteRenderingAvailable = true;
 
   this->LockBounds = false;
-  
+
   this->StillRenderProcesses = vtkPVSession::NONE;
   this->InteractiveRenderProcesses = vtkPVSession::NONE;
   this->UsedLODForLastRender = false;
@@ -989,6 +989,14 @@ void vtkPVRenderView::SetLockBounds(bool nv)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::SetMaxClipBounds(double *bounds)
+{
+  this->GeometryBounds.SetBounds(bounds);
+  this->GetRenderer()->ResetCameraClippingRange(bounds);
+  this->GetNonCompositedRenderer()->ResetCameraClippingRange(bounds);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::ResetCameraClippingRange()
 {
   if (this->GeometryBounds.IsValid() && !this->LockBounds)
@@ -1083,7 +1091,10 @@ void vtkPVRenderView::ResetCamera()
   // vtkRenderer::ResetCameraClippingPlanes() with the given bounds.
   double bounds[6];
   this->GeometryBounds.GetBounds(bounds);
-  this->RenderView->GetRenderer()->ResetCamera(bounds);
+  if (!this->LockBounds)
+    {
+    this->RenderView->GetRenderer()->ResetCamera(bounds);
+    }
 
   this->InvokeEvent(vtkCommand::ResetCameraEvent);
 }
@@ -1094,7 +1105,10 @@ void vtkPVRenderView::ResetCamera(double bounds[6])
 {
   // Remember, vtkRenderer::ResetCamera() calls
   // vtkRenderer::ResetCameraClippingPlanes() with the given bounds.
-  this->RenderView->GetRenderer()->ResetCamera(bounds);
+  if (!this->LockBounds)
+    {
+    this->RenderView->GetRenderer()->ResetCamera(bounds);
+    }
   this->InvokeEvent(vtkCommand::ResetCameraEvent);
 }
 

@@ -247,18 +247,14 @@ void pqImageOutputInfo::setCinemaVisible(bool status)
 {
   if (status)
     {
-    this->Ui->gbCinemaOptions->show();
     this->updateSpherical();
+    this->Ui->gbCinemaOptions->show();
     }
   else
     {
     this->Ui->gbCinemaOptions->hide();
     }
 
-  this->Ui->cinemaExport->clear();
-  QStringList items;
-  items << "None" << "Static" << "Spherical";
-  this->Ui->cinemaExport->addItems(items);
 }
 
 //-----------------------------------------------------------------------------
@@ -273,15 +269,29 @@ void pqImageOutputInfo::updateSpherical()
 {
   const QString& exportChoice =
     this->Ui->cinemaExport->currentText();
-  if (exportChoice == "Spherical")
+  if (exportChoice != "none" && exportChoice != "static")
     {
-    //this->Ui->wCameraOptions->show();
     this->Ui->wCameraOptions->setEnabled(true);
     }
   else
     {
-    //this->Ui->wCameraOptions->hide();
     this->Ui->wCameraOptions->setEnabled(false);
+    }
+  if (exportChoice == "none" ||
+      exportChoice == "static" ||
+      exportChoice == "phi-theta")
+    {
+    this->Ui->rollLabel->setEnabled(false);
+    this->Ui->rollResolution->setEnabled(false);
+    this->Ui->trackObjectLabel->setEnabled(false);
+    this->Ui->trackObjectName->setEnabled(false);
+    }
+  else
+    {
+    this->Ui->rollLabel->setEnabled(true);
+    this->Ui->rollResolution->setEnabled(true);
+    this->Ui->trackObjectLabel->setEnabled(true);
+    this->Ui->trackObjectName->setEnabled(true);
     }
 }
 
@@ -301,4 +311,16 @@ double pqImageOutputInfo::getPhi()
 double pqImageOutputInfo::getTheta()
 {
   return this->Ui->thetaResolution->value();
+}
+
+//------------------------------------------------------------------------------
+double pqImageOutputInfo::getRoll()
+{
+  return this->Ui->rollResolution->value();
+}
+
+//-----------------------------------------------------------------------------
+QString pqImageOutputInfo::getTrackObjectName()
+{
+  return this->Ui->trackObjectName->displayText();
 }

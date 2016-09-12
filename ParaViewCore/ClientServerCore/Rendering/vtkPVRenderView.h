@@ -386,9 +386,17 @@ public:
   static vtkDataObject* GetCurrentStreamedPiece(
     vtkInformation* info, vtkPVDataRepresentation* repr);
 
+  // Description:
+  // Used by Cinema to enforce a consistent depth scaling.
+  // Called with the global (visible and invisible) bounds at start of export.
+  void SetMaxClipBounds(double bds[6]);
+
+  // Description:
+  // Used by Cinema to enforce a consistent viewpoint and depth scaling.
+  // Prevents ParaView from changing depth scaling over course of an export.
   void SetLockBounds(bool nv);
   vtkGetMacro(LockBounds, bool);
-  
+
   // Description:
   // Requests the view to deliver the pieces produced by the \c repr to all
   // processes after a gather to the root node to merge the datasets generated
