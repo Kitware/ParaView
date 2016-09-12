@@ -23,6 +23,7 @@
   <pqevent object="pqSelectReaderDialog/listWidget" command="currentChangedbyItemName" arguments="GMV Binary/ASCII Files (Plugin)" />
   <pqevent object="pqSelectReaderDialog/okButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
 
   <pqevent object="outputDialog/closeButton" command="activate" arguments="" />
 

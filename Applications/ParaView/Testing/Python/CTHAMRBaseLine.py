@@ -18,6 +18,8 @@ object6 = 'pqClientMainWindow/cameraToolbar/actionNegativeY'
 QtTesting.playCommand(object6, 'activate', '')
 object7 = 'pqClientMainWindow/variableToolbar/displayColor/Variables'
 QtTesting.playCommand(object7, 'set_string', 'Pressure (dynes/cm^2^)')
+object8 = 'pqClientMainWindow/variableToolbar/actionScalarBarVisibility'
+QtTesting.playCommand(object8, 'set_boolean', 'false')
 # DO_IMAGE_COMPARE
 snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport'
 QtTestingImage.compareImage(snapshotWidget, 'CTHAMRBaseline.png', 300, 300)
