@@ -61,10 +61,10 @@ endif()
 
 if("${TEST_NAME}" STREQUAL "CoProcessingFullWorkflowCinema")
   if(NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/image/info.json" OR
-     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/image/0.000000e+00/-180/-180.png" OR
-     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/image/0.000000e+00/-180/60.png" OR
-     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/image/0.000000e+00/60/-180.png" OR
-     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/image/0.000000e+00/60/60.png")
+     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/image/0.000000e+00/-180/-90.png" OR
+     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/image/0.000000e+00/-180/30.png" OR
+     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/image/0.000000e+00/60/-90.png" OR
+     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/image/0.000000e+00/60/30.png")
     message(FATAL_ERROR "Catalyst did not generate a cinema store")
   endif()
   return()
