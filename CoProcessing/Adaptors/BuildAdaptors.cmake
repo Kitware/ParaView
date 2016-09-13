@@ -74,15 +74,13 @@ endfunction()
 # Adaptors
 #------------------------------------------------------------------------------
 build_adaptor(NPICAdaptor
-  "-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
-  "-DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}"
+  "\"-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}\";\"-DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}\""
   COMMENT "Building NPIC Adaptor"
   DEPENDS vtkPVCatalyst)
 
 if (PARAVIEW_USE_MPI)
   build_adaptor(ParticleAdaptor
-    "-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
-    "-DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}"
+    "\"-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}\";\"-DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}\""
     COMMENT "Building Particle Adaptor"
     DEPENDS vtkPVCatalyst)
 endif()
@@ -98,9 +96,7 @@ if (CMAKE_Fortran_COMPILER_WORKS)
   mark_as_advanced(BUILD_PHASTA_ADAPTOR)
   if(BUILD_PHASTA_ADAPTOR)
     build_adaptor(PhastaAdaptor
-      "-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
-      "-DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}"
-      "-DCMAKE_Fortran_COMPILER:FILEPATH=${CMAKE_Fortran_COMPILER}"
+      "\"-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}\";\"-DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}\";\"-DCMAKE_Fortran_COMPILER:FILEPATH=${CMAKE_Fortran_COMPILER}\""
       COMMENT "Building Phasta Adaptor"
       DEPENDS vtkPVCatalyst)
   endif()
@@ -112,13 +108,13 @@ endif()
 if (PARAVIEW_ENABLE_PYTHON AND NOT WIN32)
   # Add CTHAdaptor if Python is enabled.
   build_adaptor(CTHAdaptor
-    "-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
-    "-DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}"
+    "\"-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}\";\"-DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}\""
     COMMENT "Building CTH Adaptor"
     DEPENDS vtkPVPythonCatalyst)
 
   if (PARAVIEW_USE_MPI)
       build_adaptor(CamAdaptor
+                    ""
                     COMMENT "Building Cam Adaptor"
                     DEPENDS vtkPVCatalyst)
   endif()
