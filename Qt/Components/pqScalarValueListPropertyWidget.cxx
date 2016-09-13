@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMVectorProperty.h"
 #include "vtkWeakPointer.h"
 
+
 namespace
 {
 class pqTableModel : public QAbstractTableModel
@@ -475,6 +476,41 @@ void pqScalarValueListPropertyWidget::addRange()
 
     QVariantList value = this->Internals->Model.value().toList();
     value += dialog.getRange();
+
+    this->Internals->Model.setValue(value);
+    emit this->scalarsChanged();
+    }
+  else if (this->Internals->Mode == pqInternals::MODE_INT)
+    {
+    int range_min, range_max;
+    if(!this->getRange(range_min, range_max))
+      {
+      range_min=0;
+      range_max=10;
+      }
+
+    pqSampleScalarAddRangeDialog dialog(range_min, range_max, 10, false);
+    if (dialog.exec() != QDialog::Accepted)
+      {
+      return;
+      }
+
+    QVariantList range = dialog.getRange();
+    QVariantList intRange;
+    for (QVariantList::iterator i = range.begin(); i != range.end(); ++i)
+      {
+      double val = i->toDouble();
+      int ival = static_cast<int>(((val - std::floor(val)) < 0.5) ?
+                                  std::floor(val) :
+                                  std::ceil(val));
+      if (intRange.empty() || (intRange.back().toInt() != ival))
+        {
+        intRange.push_back(ival);
+        }
+      }
+
+    QVariantList value = this->Internals->Model.value().toList();
+    value += intRange;
 
     this->Internals->Model.setValue(value);
     emit this->scalarsChanged();

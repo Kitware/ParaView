@@ -171,6 +171,7 @@
   <Proxy group="filters" name="ExtractHistogram" />
   <Proxy group="filters" name="ExtractSelection" />
   <Proxy group="filters" name="ExtractSelectionOverTime" />
+  <Proxy group="filters" name="ExtractTimeSteps" />
   <Proxy group="filters" name="FeatureEdges" />
   <Proxy group="filters" name="FFTSelectionOverTime" />
   <Proxy group="filters" name="GaussianSplatter"/>

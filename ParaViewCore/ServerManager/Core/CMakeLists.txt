@@ -122,6 +122,7 @@ set (Module_SRCS
   vtkSMStringVectorProperty.cxx
   vtkSMTimeKeeper.cxx
   vtkSMTimeKeeperProxy.cxx
+  vtkSMTimeStepIndexDomain.cxx
   vtkSMTrace.cxx
   vtkSMUncheckedPropertyHelper.cxx
   vtkSMUndoElement.cxx

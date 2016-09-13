@@ -14851,5 +14851,52 @@ source.</Documentation>
       </IntVectorProperty>
       <!-- End vtkResampleToImage -->
     </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkExtractTimeSteps"
+                 name="ExtractTimeSteps"
+                 label="Extract Time Steps">
+      <Documentation short_help="Extract time steps from data.">
+        This filter extracts specified time steps from its input.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+      </InputProperty>
+
+      <IntVectorProperty animateable="1"
+                         command="AddTimeStepIndex"
+                         clean_command="ClearTimeStepIndices"
+                         label="Time Step Indices"
+                         name="TimeStepIndices"
+                         number_of_elements="0"
+                         number_of_elements_per_command="1"
+                         repeat_command="1">
+        <TimeStepIndexDomain name="timestep_index_range" default_mode="min">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+          </RequiredProperties>
+        </TimeStepIndexDomain>
+        <Documentation>
+          This property specifies the indices of the time steps to extract.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="Time Step Indices">
+        <Property name="TimeStepIndices" />
+      </PropertyGroup>
+
+      <!-- End ExtractTimeSteps -->
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

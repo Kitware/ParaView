@@ -91,6 +91,7 @@ vtkPVDataInformation::vtkPVDataInformation()
   this->TimeSpan[1] = -VTK_DOUBLE_MAX;
   this->HasTime = 0;
   this->Time = 0.0;
+  this->NumberOfTimeSteps = 0;
   this->TimeLabel = NULL;
 
   this->PortNumber = -1;
@@ -197,6 +198,7 @@ void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "TimeSpan: "
      << this->TimeSpan[0] << ", " << this->TimeSpan[1]
      << endl;
+  os << indent << "NumberOfTimeSteps: " << this->NumberOfTimeSteps << endl;
 
   if(this->TimeLabel)
     {
@@ -262,6 +264,7 @@ void vtkPVDataInformation::Initialize()
   this->TimeSpan[1] = -VTK_DOUBLE_MAX;
   this->HasTime = 0;
   this->Time = 0.0;
+  this->NumberOfTimeSteps = 0;
   this->SetTimeLabel(NULL);
 }
 
@@ -317,6 +320,7 @@ void vtkPVDataInformation::DeepCopy(vtkPVDataInformation *dataInfo,
   timespan = dataInfo->GetTimeSpan();
   this->TimeSpan[0] = timespan[0];
   this->TimeSpan[1] = timespan[1];
+  this->NumberOfTimeSteps = dataInfo->GetNumberOfTimeSteps();
   this->SetTimeLabel(dataInfo->GetTimeLabel());
 }
 
@@ -400,11 +404,19 @@ void vtkPVDataInformation::CopyFromCompositeDataSet(vtkCompositeDataSet* data)
 void vtkPVDataInformation::CopyCommonMetaData(vtkDataObject* data, vtkInformation* pinfo)
 {
   // Gather some common stuff
-  if (pinfo && pinfo->Has(vtkStreamingDemandDrivenPipeline::TIME_RANGE()))
+  if (pinfo)
     {
-    double *times = pinfo->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
-    this->TimeSpan[0] = times[0];
-    this->TimeSpan[1] = times[1];
+    if (pinfo->Has(vtkStreamingDemandDrivenPipeline::TIME_RANGE()))
+      {
+      double *times = pinfo->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
+      this->TimeSpan[0] = times[0];
+      this->TimeSpan[1] = times[1];
+      }
+    if (pinfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
+      {
+      this->NumberOfTimeSteps =
+          pinfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+      }
     }
 
   this->SetTimeLabel(
@@ -981,6 +993,12 @@ void vtkPVDataInformation::AddInformation(
     this->TimeSpan[1] = times[1];
     }
 
+  int numTimeSteps = info->GetNumberOfTimeSteps();
+  if (numTimeSteps > this->NumberOfTimeSteps)
+    {
+    this->NumberOfTimeSteps = numTimeSteps;
+    }
+
   if (!this->HasTime && info->GetHasTime())
     {
     this->Time = info->GetTime();
@@ -1221,6 +1239,7 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css)
        << this->PolygonCount
        << this->Time
        << this->HasTime
+       << this->NumberOfTimeSteps
        << this->TimeLabel
        << vtkClientServerStream::InsertArray(this->Bounds, 6)
        << vtkClientServerStream::InsertArray(this->Extent, 6);
@@ -1359,6 +1378,11 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
   if(!CSS_GET_NEXT_ARGUMENT(css, 0, &this->HasTime))
     {
     vtkErrorMacro("Error parsing has-time.");
+    return;
+    }
+  if(!CSS_GET_NEXT_ARGUMENT(css, 0, &this->NumberOfTimeSteps))
+    {
+    vtkErrorMacro("Error parsing number of time steps.");
     return;
     }
   const char* timeLabel = 0;
