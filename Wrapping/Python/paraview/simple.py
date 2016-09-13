@@ -1013,6 +1013,16 @@ def HideUnusedScalarBars(view=None):
     tfmgr = servermanager.vtkSMTransferFunctionManager()
     return tfmgr.UpdateScalarBars(view.SMProxy, tfmgr.HIDE_UNUSED_SCALAR_BARS)
 
+def HideScalarBarIfNotNeeded(lut, view=None):
+    """Hides the given scalar bar if it is not used by any of the displayed data."""
+    if not view:
+        view = active_objects.view
+    if not view:
+        raise ValueError, "'view' argument cannot be None with no active present."
+    tfmgr = servermanager.vtkSMTransferFunctionManager()
+    return tfmgr.HideScalarBarIfNotNeeded(lut.SMProxy, view.SMProxy)
+
+
 def UpdateScalarBars(view=None):
     """Hides all unused scalar bar and shows used scalar bars. A scalar bar is used
     if some data is shown in that view that is coloring using the transfer function
