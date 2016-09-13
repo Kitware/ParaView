@@ -204,6 +204,13 @@ function(generate_header name)
 endfunction()
 
 
+# NOTE: coded-separator lists
+#
+# Workaround for inability to pass ';'-separated lists via command-line.
+# From caller: replace '_'  -> '_u' and ';'  -> '_s'
+# On receiver: replace '_s' -> ';'  and '_u' -> '_'
+
+
 # GENERATE_HTMLS_FROM_XMLS can be used to generate HTML files for
 # from a given list of xml files that correspond to server manager xmls.
 # ARGUMENTS:
@@ -214,19 +221,25 @@ endfunction()
 function (generate_htmls_from_xmls output_files xmls gui_xmls output_dir)
   # create a string from the xmls list to pass
   # since this list needs to be passed as an argument, we cannot escape the ";".
-  # generate_proxydocumentation.cmake has code to convert these strings back to
-  # lists.
+  # generate_proxydocumentation.cmake and generate_qhp.cmake have code to convert
+  # these strings back to lists.
   set (xmls_string "")
   foreach (xml ${xmls})
     get_filename_component(xml "${xml}" ABSOLUTE)
-    set (xmls_string "${xmls_string}${xml}+")
+    set (xmls_string "${xmls_string}${xml};")
   endforeach()
   
   set (gui_xmls_string "")
   foreach (gui_xml ${gui_xmls})
     get_filename_component(gui_xml "${gui_xml}" ABSOLUTE)
-    set (gui_xmls_string "${gui_xmls_string}${gui_xml}+")
+    set (gui_xmls_string "${gui_xmls_string}${gui_xml};")
   endforeach()
+
+  # Escape ';' in lists
+  string(REPLACE "_" "_u"  xmls_string "${xmls_string}")
+  string(REPLACE ";" "_s"  xmls_string "${xmls_string}")
+  string(REPLACE "_" "_u"  gui_xmls_string "${gui_xmls_string}")
+  string(REPLACE ";" "_s"  gui_xmls_string "${gui_xmls_string}")
 
   set (all_xmls ${xmls} ${gui_xmls})
   list (GET all_xmls 0 first_xml)
@@ -363,7 +376,10 @@ function(build_help_project name)
 
   if (NOT DEFINED arg_TABLE_OF_CONTENTS)
     # sanitize arg_FILEPATTERNS since we pass it as a command line argument.
-    string (REPLACE ";" "+" arg_FILEPATTERNS "${arg_FILEPATTERNS}")
+    # Escape ';' in lists
+    string(REPLACE "_" "_u"  arg_FILEPATTERNS "${arg_FILEPATTERNS}")
+    string(REPLACE ";" "_s"  arg_FILEPATTERNS "${arg_FILEPATTERNS}")
+
     set (extra_args ${extra_args}
 
     # generate the toc at run-time.

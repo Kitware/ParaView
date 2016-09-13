@@ -1,12 +1,16 @@
 # Used by build_help_project CMake function to generate the qhp file.
 # The WORKING_DIRECTORY for this script must be the same as the location for the
 # qhp file otherwise the toc won't be generated correctly.
-# Input environment:
-# output_file :-
-# file_patterns :-
-# namespace :-
-# folder :-
-# name :-
+
+# INPUT VARIABLES:
+# output_file       :-
+# file_patterns     :- coded-separator list of patterns
+# namespace         :-
+# folder            :-
+# name              :-
+#
+# see ParaViewMacros.cmake for information about coded-separator lists
+
 
 if (POLICY CMP0053)
   cmake_policy(SET CMP0053 NEW)
@@ -44,7 +48,9 @@ if (NOT output_file OR NOT file_patterns OR NOT namespace OR NOT folder OR NOT n
   message(FATAL_ERROR "Missing one of the required arguments!!")
 endif ()
 
-string (REPLACE "+" ";" file_patterns "${file_patterns}")
+# Recover original ';' separated list.
+string(REPLACE "_s" ";"  file_patterns "${file_patterns}")
+string(REPLACE "_u" "_"  file_patterns "${file_patterns}")
 
 get_filename_component(working_dir "${output_file}" PATH)
 
