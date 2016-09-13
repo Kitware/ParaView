@@ -164,7 +164,8 @@ protected:
       {
       // we could now respect some application setting to determine if the LUT is
       // to be reset.
-      vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(reprProxy, true);
+      vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
+        reprProxy, /*extend*/ true, /*force*/false);
 
       /// BUG #0011858. Users often do silly things!
       bool reprVisibility =
@@ -566,7 +567,8 @@ void pqDisplayColorWidget::componentNumberChanged()
     // to be reset.
     vtkSMProxy* reprProxy = this->Representation?
       this->Representation->getProxy() : NULL;
-    vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(reprProxy);
+    vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
+      reprProxy, /*extend*/false, /*force*/false);
 
     // Update scalar bars.
     vtkSMTransferFunctionProxy::UpdateScalarBarsComponentTitle(

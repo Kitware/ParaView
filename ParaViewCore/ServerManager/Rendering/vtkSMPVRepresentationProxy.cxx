@@ -192,7 +192,7 @@ bool vtkSMPVRepresentationProxy::GetUsingScalarColoring()
 
 //----------------------------------------------------------------------------
 bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
-  bool extend)
+  bool extend, bool force)
 {
   if (!this->GetUsingScalarColoring())
     {
@@ -204,17 +204,18 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
     .arg(this)
     .arg("RescaleTransferFunctionToDataRange")
     .arg(extend)
+    .arg(force)
     .arg("comment",
       (extend?
        "rescale color and/or opacity maps used to include current data range" :
        "rescale color and/or opacity maps used to exactly fit the current data range"));
   return this->RescaleTransferFunctionToDataRange(
-    this->GetArrayInformationForColorArray(), extend);
+    this->GetArrayInformationForColorArray(), extend, force);
 }
 
 //----------------------------------------------------------------------------
 bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
-  const char* arrayname, int attribute_type, bool extend)
+  const char* arrayname, int attribute_type, bool extend, bool force)
 {
   vtkSMPropertyHelper inputHelper(this->GetProperty("Input"));
   vtkSMSourceProxy* inputProxy =
@@ -237,7 +238,7 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
     info = representedDataInfo->GetArrayInformation(arrayname, attribute_type);
     }
 
-  return this->RescaleTransferFunctionToDataRange(info, extend);
+  return this->RescaleTransferFunctionToDataRange(info, extend, force);
 }
 
 //----------------------------------------------------------------------------
@@ -279,7 +280,7 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRangeOverTime(
 
 //----------------------------------------------------------------------------
 bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
-  vtkPVArrayInformation* info, bool extend)
+  vtkPVArrayInformation* info, bool extend, bool force)
 {
   if (!info)
     {
@@ -297,6 +298,13 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
 
   vtkSMProxy* lut = vtkSMPropertyHelper(lutProperty).GetAsProxy();
   vtkSMProxy* sof = vtkSMPropertyHelper(sofProperty).GetAsProxy();
+
+  if (force == false &&
+    vtkSMPropertyHelper(lut, "LockScalarRange", true).GetAsInt() != 0)
+    {
+    // nothing to change, range is locked.
+    return true;
+    }
 
   // We need to determine the component number to use from the lut.
   int component = -1;
