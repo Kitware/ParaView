@@ -585,8 +585,8 @@ target_link_libraries(${vtk-module} LINK_PRIVATE ${qt_private_targets})
 
 #the pqSGExportStateWizard has subclasses that directly access
 #the UI file, and currently we don't have a clean way to break this hard
-#dependency, so for no we install this ui file.
-if(PARAVIEW_INSTALL_DEVELOPMENT_FILES)
+#dependency, so for now we manually install this ui file.
+if(PARAVIEW_INSTALL_DEVELOPMENT_FILES AND PARAVIEW_ENABLE_PYTHON)
   install(FILES "${CMAKE_CURRENT_BINARY_DIR}/ui_pqExportStateWizard.h"
           DESTINATION "${VTK_INSTALL_INCLUDE_DIR}")
 endif()
