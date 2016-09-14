@@ -24,6 +24,7 @@
 #include "vtkSMScalarBarWidgetRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSettings.h"
+#include "vtkSMTrace.h"
 #include "vtkSMTransferFunctionProxy.h"
 
 #include <assert.h>
@@ -339,6 +340,12 @@ bool vtkSMTransferFunctionManager::HideScalarBarIfNotNeeded(
     {
     return false;
     }
+
+  SM_SCOPED_TRACE(CallFunction)
+    .arg("HideScalarBarIfNotNeeded")
+    .arg(lutProxy)
+    .arg(view)
+    .arg("comment", "Hide the scalar bar for this color map if no visible data is colored by it.");
 
   vtkSMProxy* sbProxy = vtkSMTransferFunctionProxy::FindScalarBarRepresentation(
     lutProxy, view);
