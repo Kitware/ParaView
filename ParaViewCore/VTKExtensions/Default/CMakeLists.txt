@@ -85,6 +85,7 @@ set(Module_SRCS
   vtkPEnSightReader.cxx
   vtkPEquivalenceSet.cxx
   vtkPExtractHistogram.cxx
+  vtkPExtractTemporalFieldData.cxx
   vtkPGenericEnSightReader.cxx
   vtkPhastaReader.cxx
   vtkPlotEdges.cxx
