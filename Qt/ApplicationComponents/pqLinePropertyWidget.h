@@ -75,6 +75,8 @@ protected slots:
 
   /// Called when user picks a point using the pick shortcut keys.
   void pick(double x, double y, double z);
+  void pickPoint1(double x, double y, double z);
+  void pickPoint2(double x, double y, double z);
 
   /// Updates the length label.
   void updateLengthLabel();

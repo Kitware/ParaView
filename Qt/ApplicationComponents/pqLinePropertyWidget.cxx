@@ -133,6 +133,26 @@ pqLinePropertyWidget::pqLinePropertyWidget(
   pickHelper2->connect(this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
   this->connect(pickHelper2, SIGNAL(pick(double, double, double)), SLOT(pick(double, double, double)));
 
+  pqPointPickingHelper* pickHelper3 = new pqPointPickingHelper(QKeySequence(tr("1")), false, this);
+  pickHelper3->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
+  pickHelper3->connect(this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
+  this->connect(pickHelper3, SIGNAL(pick(double, double, double)), SLOT(pickPoint1(double, double, double)));
+
+  pqPointPickingHelper* pickHelper4 = new pqPointPickingHelper(QKeySequence(tr("Ctrl+1")), true, this);
+  pickHelper4->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
+  pickHelper4->connect(this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
+  this->connect(pickHelper4, SIGNAL(pick(double, double, double)), SLOT(pickPoint1(double, double, double)));
+
+  pqPointPickingHelper* pickHelper5 = new pqPointPickingHelper(QKeySequence(tr("2")), false, this);
+  pickHelper5->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
+  pickHelper5->connect(this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
+  this->connect(pickHelper5, SIGNAL(pick(double, double, double)), SLOT(pickPoint2(double, double, double)));
+
+  pqPointPickingHelper* pickHelper6 = new pqPointPickingHelper(QKeySequence(tr("Ctrl+2")), true, this);
+  pickHelper6->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
+  pickHelper6->connect(this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
+  this->connect(pickHelper6, SIGNAL(pick(double, double, double)), SLOT(pickPoint2(double, double, double)));
+
   pqCoreUtilities::connect(this->widgetProxy(), vtkCommand::PropertyModifiedEvent,
     this, SLOT(updateLengthLabel()));
   this->updateLengthLabel();
@@ -272,29 +292,34 @@ void pqLinePropertyWidget::setLineColor(const QColor& color)
 //-----------------------------------------------------------------------------
 void pqLinePropertyWidget::pick(double wx, double wy, double wz)
 {
-  Ui::LinePropertyWidget &ui = this->Internals->Ui;
-  bool pick_point1;
-  switch (ui.pickPoint->currentIndex())
+  if (this->Internals->PickPoint1)
     {
-  case 1:
-    pick_point1 = true;
-    break;
-
-  case 2:
-    pick_point1 = false;
-    break;
-
-  case 0:
-  default:
-    pick_point1 = this->Internals->PickPoint1;
-    this->Internals->PickPoint1 = !this->Internals->PickPoint1;
-    break;
+    this->pickPoint1(wx, wy, wz);
     }
+  else
+    {
+    this->pickPoint2(wx, wy, wz);
+    }
+  this->Internals->PickPoint1 = !this->Internals->PickPoint1;
+}
 
+//-----------------------------------------------------------------------------
+void pqLinePropertyWidget::pickPoint1(double wx, double wy, double wz)
+{
   double position[3] = {wx, wy, wz};
   vtkSMNewWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
-  vtkSMPropertyHelper(wdgProxy,
-    pick_point1? "Point1WorldPosition" : "Point2WorldPosition").Set(position, 3);
+  vtkSMPropertyHelper(wdgProxy, "Point1WorldPosition").Set(position, 3);
+  wdgProxy->UpdateVTKObjects();
+  emit this->changeAvailable();
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqLinePropertyWidget::pickPoint2(double wx, double wy, double wz)
+{
+  double position[3] = {wx, wy, wz};
+  vtkSMNewWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
+  vtkSMPropertyHelper(wdgProxy, "Point2WorldPosition").Set(position, 3);
   wdgProxy->UpdateVTKObjects();
   emit this->changeAvailable();
   this->render();
