@@ -40,8 +40,6 @@ vtkCxxSetObjectMacro(vtkRulerSourceRepresentation, DistanceRepresentation,
 //----------------------------------------------------------------------------
 vtkRulerSourceRepresentation::vtkRulerSourceRepresentation()
 {
-  std::cout<<"Creating a ruler source representation"<<std::endl;
-
   vtkSmartPointer<vtkPointHandleRepresentation2D> handle =
     vtkSmartPointer<vtkPointHandleRepresentation2D>::New();
 
@@ -203,9 +201,10 @@ int vtkRulerSourceRepresentation::ProcessViewRequest(
     {
     vtkPVRenderView::SetPiece(inInfo, this,
                               this->CacheKeeper->GetOutputDataObject(0));
+    // `gather_before_delivery` is true, since vtkLineSource (which is the
+    // source for the ruler) doesn't produce any data on ranks except the root.
     vtkPVRenderView::SetDeliverToClientAndRenderingProcesses(inInfo, this,
-      /*deliver_to_client=*/ true, /*gather_before_delivery=*/ false);
-
+      /*deliver_to_client=*/ true, /*gather_before_delivery=*/ true);
     }
   else if (request_type == vtkPVView::REQUEST_RENDER())
     {
@@ -217,7 +216,7 @@ int vtkRulerSourceRepresentation::ProcessViewRequest(
     vtkPolyData* line = vtkPolyData::SafeDownCast(
       producerPort->GetProducer()->GetOutputDataObject(
         producerPort->GetIndex()));
-    if (line)
+    if (line && line->GetNumberOfPoints() == 2)
       {
       this->DistanceRepresentation->SetPoint1WorldPosition(
         line->GetPoints()->GetPoint(0));
