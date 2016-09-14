@@ -3802,5 +3802,10 @@
       </Hints>
     </Proxy>
   </ProxyGroup>
-
+  <ProxyGroup name="seed_sources">
+    <Proxy group="extended_sources"
+           name="PointSource"/>
+    <Proxy group="extended_sources"
+           name="HighResLineSource"/>
+  </ProxyGroup>
 </ServerManagerConfiguration>

@@ -265,9 +265,23 @@ vtkSMProxy* vtkSMSessionProxyManager::NewProxy(
   // initialized
   vtkPVXMLElement* element = this->GetProxyElement( groupName, proxyName,
                                                     subProxyName);
+
+  // Support for secondary group
+  std::string originalGroupName = groupName;
   if (element)
     {
-    return this->NewProxy(element, groupName, proxyName, subProxyName);
+    std::string tmpGroupName = element->GetAttributeOrEmpty("group");
+    if (!tmpGroupName.empty())
+      {
+      element = this->GetProxyElement(tmpGroupName.c_str(), proxyName,
+        subProxyName);
+      originalGroupName = tmpGroupName;
+      }
+    }
+
+  if (element)
+    {
+    return this->NewProxy(element, originalGroupName.c_str(), proxyName, subProxyName);
     }
 
   return 0;
