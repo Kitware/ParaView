@@ -80,7 +80,13 @@ public:
   // current data range. Returns true if rescale was successful.
   // If \c extend is true (false by default), the transfer function range will
   // only be extended as needed to fit the data range.
-  virtual bool RescaleTransferFunctionToDataRange(bool extend=false);
+  // If \c force is false (true by default), then the transfer function range is
+  // not changed if locked.
+  // @param[in] extend Extend existing range instead of clamping to the new
+  // range (default: false).
+  // @param[in] force Update transfer function even if the range is locked
+  // (default: true).
+  virtual bool RescaleTransferFunctionToDataRange(bool extend=false, bool force=true);
 
   // Description:
   // Rescales the color transfer function and opacity transfer function using the
@@ -89,31 +95,36 @@ public:
   // vtkDataObject::AttributeTypes.
   // If \c extend is true (false by default), the transfer function range will
   // only be extended as needed to fit the data range.
+  // If \c force is false (true by default), then the transfer function range is
+  // not changed if locked.
+  // @param[in] extend Extend existing range instead of clamping to the new
+  // range (default: false).
+  // @param[in] force Update transfer function even if the range is locked
+  // (default: true).
   virtual bool RescaleTransferFunctionToDataRange(
-    const char* arrayname, int attribute_type, bool extend=false);
+    const char* arrayname, int attribute_type, bool extend=false, bool force=true);
 
   // Description:
   // Safely call RescaleTransferFunctionToDataRange() after casting the proxy to
   // appropriate type.
-  // If \c extend is true, the transfer function range will
-  // only be extended as needed to fit the data range.
-  static bool RescaleTransferFunctionToDataRange(vtkSMProxy* proxy, bool extend=false)
+  static bool RescaleTransferFunctionToDataRange(
+    vtkSMProxy* proxy, bool extend=false, bool force=true)
     {
     vtkSMPVRepresentationProxy* self =
       vtkSMPVRepresentationProxy::SafeDownCast(proxy);
-    return self? self->RescaleTransferFunctionToDataRange(extend) : false;
+    return self? self->RescaleTransferFunctionToDataRange(extend, force) : false;
     }
 
   // Description:
   // Safely call RescaleTransferFunctionToDataRange() after casting the proxy to
   // appropriate type.
   static bool RescaleTransferFunctionToDataRange(vtkSMProxy* proxy,
-    const char* arrayname, int attribute_type, bool extend=false)
+    const char* arrayname, int attribute_type, bool extend=false, bool force=true)
     {
     vtkSMPVRepresentationProxy* self =
       vtkSMPVRepresentationProxy::SafeDownCast(proxy);
     return self?
-      self->RescaleTransferFunctionToDataRange(arrayname, attribute_type, extend) : false;
+      self->RescaleTransferFunctionToDataRange(arrayname, attribute_type, extend, force) : false;
     }
 
   // Description:
@@ -251,7 +262,7 @@ protected:
   // Description:
   // Rescales transfer function ranges using the array information provided.
   virtual bool RescaleTransferFunctionToDataRange(
-    vtkPVArrayInformation* info, bool extend=false);
+    vtkPVArrayInformation* info, bool extend=false, bool force=true);
 
   // Description:
   // Overridden to ensure that the RepresentationTypesInfo and
