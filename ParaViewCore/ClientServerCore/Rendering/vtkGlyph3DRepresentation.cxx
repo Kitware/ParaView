@@ -24,6 +24,7 @@
 #include "vtkPVLODActor.h"
 #include "vtkPVRenderView.h"
 #include "vtkRenderer.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 
 vtkStandardNewMacro(vtkGlyph3DRepresentation);
 //----------------------------------------------------------------------------
@@ -118,8 +119,10 @@ int vtkGlyph3DRepresentation::RequestData(vtkInformation* request,
 {
   if (inputVector[1]->GetNumberOfInformationObjects()==1)
     {
-    this->GlyphMapper->SetInputConnection(1, this->GetInternalOutputPort(1));
-    this->LODGlyphMapper->SetInputConnection(1, this->GetInternalOutputPort(1));
+    this->GlyphMapper->SetInputDataObject(1,
+      vtkDataObject::GetData(inputVector[1], 0));
+    this->LODGlyphMapper->SetInputDataObject(1,
+      vtkDataObject::GetData(inputVector[1], 0));
     }
   else
     {
@@ -130,6 +133,30 @@ int vtkGlyph3DRepresentation::RequestData(vtkInformation* request,
 
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }
+
+//----------------------------------------------------------------------------
+int vtkGlyph3DRepresentation::RequestUpdateExtent(vtkInformation* request,
+  vtkInformationVector** inputVector,
+  vtkInformationVector* outputVector)
+{
+  if (!this->Superclass::RequestUpdateExtent(request, inputVector, outputVector))
+    {
+    return 0;
+    }
+
+  // For the input geometry used as the Glyph, we need it duplicated on all
+  // ranks.
+  for (int kk=0; kk < inputVector[1]->GetNumberOfInformationObjects(); kk++)
+    {
+    vtkInformation* info = inputVector[1]->GetInformationObject(kk);
+    info->Set(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER(), 0);
+    info->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES(), 1);
+    info->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(), 0);
+    info->Set(vtkStreamingDemandDrivenPipeline::EXACT_EXTENT(), 1);
+    }
+  return 1;
+}
+
 
 //----------------------------------------------------------------------------
 int vtkGlyph3DRepresentation::ProcessViewRequest(

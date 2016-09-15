@@ -85,6 +85,12 @@ protected:
     vtkInformationVector**, vtkInformationVector*);
 
   // Description:
+  // Overridden to request single piece from the Glyph source.
+  int RequestUpdateExtent(vtkInformation* request,
+    vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
+
+  // Description:
   // Adds the representation to the view.  This is called from
   // vtkView::AddRepresentation().  Subclasses should override this method.
   // Returns true if the addition succeeds.
