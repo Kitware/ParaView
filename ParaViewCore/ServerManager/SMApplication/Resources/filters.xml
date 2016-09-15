@@ -10432,6 +10432,7 @@ source.</Documentation>
       </InputProperty>
       <!-- End GenericTessellator -->
     </SourceProxy>
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkMultiBlockDataGroupFilter"
                  label="Group Datasets"
                  name="GroupDataSets">
@@ -10453,6 +10454,28 @@ source.</Documentation>
         </DataTypeDomain>
         <Documentation>This property indicates the the inputs to the Group
         Datasets filter.</Documentation>
+      </InputProperty>
+      <Hints>
+        <Visibility replace_input="1" />
+      </Hints>
+      <!-- End GroupDataSets -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkMultiBlockFromTimeSeriesFilter"
+                 label="Group Datasets Over Time"
+                 name="GroupDataSetsOverTime">
+      <Documentation long_help="Group data set over time."
+                     short_help="Group all the time steps in the input into one collection with no time.">
+                     Groups all the time steps in the input into a collection with no time information.
+                     Each timestep will become one block of the output.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <Documentation>This property specifies the input dataset.</Documentation>
       </InputProperty>
       <Hints>
         <Visibility replace_input="1" />
