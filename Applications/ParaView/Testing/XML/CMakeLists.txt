@@ -283,6 +283,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/Plot3DReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PlotEdges2.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PlotEdges.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/PlotGlobalVariablesOverTime.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PlotOverTimeAutoApply.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PolygonCellSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PolygonPointSelection.xml

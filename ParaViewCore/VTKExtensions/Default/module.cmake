@@ -8,6 +8,7 @@ endif()
 vtk_module(vtkPVVTKExtensionsDefault
   DEPENDS
     vtkFiltersAMR
+    vtkFiltersExtraction
     vtkFiltersGeneral
     vtkFiltersParallelStatistics
     vtkImagingFourier
