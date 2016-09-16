@@ -192,6 +192,10 @@ public:
   vtkGetMacro(Time, double);
 
   // Description:
+  // Returns the number of time steps.
+  vtkGetMacro(NumberOfTimeSteps, int);
+
+  // Description:
   // Returns the label that should be used instead of "Time" if any.
   vtkGetStringMacro(TimeLabel);
 
@@ -246,6 +250,7 @@ protected:
   double         TimeSpan[2];
   double         Time;
   int            HasTime;
+  int            NumberOfTimeSteps;
 
   char*          DataClassName;
   vtkSetStringMacro(DataClassName);

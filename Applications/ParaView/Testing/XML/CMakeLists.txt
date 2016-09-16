@@ -251,6 +251,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/ExTimeseries2.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExtractComponentFilter.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExtractLevel.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ExtractTimeSteps.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/FFTOverTime.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/FieldDataBlocks.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Flow.xml
