@@ -36,4 +36,5 @@
   <!-- once we have toggled the visibility of the sphere, the component numbers should have updated. This is the easiet way to check it.
        this still doesn't confirm that the currently shown component is Y, but, oh well!-->
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Components" command="set_string" arguments="X" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
 </pqevents>

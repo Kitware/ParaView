@@ -10,4 +10,5 @@
   <pqevent object="pqRescaleRangeDialog/MinimumScalar" command="set_string" arguments="-0.1" />
   <pqevent object="pqRescaleRangeDialog/MaximumScalar" command="set_string" arguments="0.1" />
   <pqevent object="pqRescaleRangeDialog/RescaleButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
 </pqevents>
