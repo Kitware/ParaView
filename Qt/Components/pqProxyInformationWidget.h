@@ -63,7 +63,7 @@ public slots:
   void setOutputPort(pqOutputPort* outputport);
 
 private slots:
-  void onItemClicked(QTreeWidgetItem* item);
+  void onCurrentItemChanged(QTreeWidgetItem* item);
 
 private:
   /// builds the composite tree structure.
