@@ -84,8 +84,8 @@ pqProxyInformationWidget::pqProxyInformationWidget(QWidget* p)
   this->VTKConnect = vtkEventQtSlotConnect::New();
   this->Ui = new pqUi(this);
   this->Ui->setupUi(this);
-  QObject::connect(this->Ui->compositeTree, SIGNAL(itemClicked(QTreeWidgetItem*, int)),
-    this, SLOT(onItemClicked(QTreeWidgetItem*)), Qt::QueuedConnection);
+  QObject::connect(this->Ui->compositeTree, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)),
+    this, SLOT(onCurrentItemChanged(QTreeWidgetItem*)), Qt::QueuedConnection);
   this->updateInformation(); // initialize state.
 
 
@@ -542,7 +542,7 @@ QTreeWidgetItem* pqProxyInformationWidget::fillCompositeInformation(
 }
 
 //-----------------------------------------------------------------------------
-void pqProxyInformationWidget::onItemClicked(QTreeWidgetItem* item)
+void pqProxyInformationWidget::onCurrentItemChanged(QTreeWidgetItem* item)
 {
   vtkPVDataInformation* info = reinterpret_cast<vtkPVDataInformation*>(
     item->data(0, Qt::UserRole).value<void*>());
