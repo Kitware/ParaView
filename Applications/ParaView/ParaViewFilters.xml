@@ -60,17 +60,18 @@
   </Category>
 
   <Category name="Temporal" menu_label="&amp;Temporal">
-    <Proxy group="filters" name="ParticleTracer" />
+    <Proxy group="filters" name="ExtractTimeSteps" />
+    <Proxy group="filters" name="GroupDataSetsOverTime" />
     <Proxy group="filters" name="ParticlePath" />
+    <Proxy group="filters" name="ParticleTracer" />
     <Proxy group="filters" name="StreakLine" />
     <Proxy group="filters" name="TemporalCache" />
     <Proxy group="filters" name="TemporalInterpolator" />
-    <Proxy group="filters" name="TemporalSnapToTimeStep" />
     <Proxy group="filters" name="TemporalShiftScale" />
+    <Proxy group="filters" name="TemporalSnapToTimeStep" />
     <Proxy group="filters" name="TemporalStatistics" />
     <Proxy group="filters" name="TimeStepProgressFilter" />
     <Proxy group="filters" name="TimeToTextConvertor" />
-    <Proxy group="filters" name="GroupDataSetsOverTime" />
   </Category>
 
   <Category name="Material Analysis" menu_label="&amp;Material Analysis">
@@ -172,7 +173,6 @@
   <Proxy group="filters" name="ExtractHistogram" />
   <Proxy group="filters" name="ExtractSelection" />
   <Proxy group="filters" name="ExtractSelectionOverTime" />
-  <Proxy group="filters" name="ExtractTimeSteps" />
   <Proxy group="filters" name="FeatureEdges" />
   <Proxy group="filters" name="FFTSelectionOverTime" />
   <Proxy group="filters" name="GaussianSplatter"/>
