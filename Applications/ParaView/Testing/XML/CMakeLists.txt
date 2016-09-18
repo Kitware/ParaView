@@ -95,7 +95,6 @@ SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/DisconnectAndSaveAnimation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Ensemble.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/FileSeries.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/HistogramSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LineChartSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateMultiView.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LogColorMap.xml
@@ -103,6 +102,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/Molecule.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/NonlinearSubdivisionDisplay.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/QuartilePlot.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/RectilinearFractal.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ReloadExodusFile.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RemoteRendering.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RenderNan.xml
@@ -137,6 +137,12 @@ endif()
 if(PARAVIEW_USE_OSPRAY)
   list(APPEND TESTS_WITH_BASELINES
     ${CMAKE_CURRENT_SOURCE_DIR}/OSPRay.xml)
+endif()
+
+# hits OSX bug with FileDialog so exclude test on APPLE
+if (NOT APPLE)
+  list (APPEND TESTS_WITH_INLINE_COMPARES
+    ${CMAKE_CURRENT_SOURCE_DIR}/HistogramSelection.xml)
 endif()
 
 # Catalyst-Live tests
@@ -296,7 +302,6 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion3.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyLink.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ReadXMLPolyDataFileSeries.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/RectilinearFractal.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RepresentationSelector.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ResampleWithDataset.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RescaleToTemporal.xml
