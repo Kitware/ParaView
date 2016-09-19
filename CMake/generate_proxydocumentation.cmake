@@ -9,20 +9,24 @@ cmake_minimum_required(VERSION 3.3)
 #                   :- xsl file to generate a categoryindex for Readers and Writers
 # xml_to_html_xsl   :- xsl file to conevrt the internal xml to html.
 # xml_to_wiki_xsl   :- xsl file to conevrt the internal xml to wiki.
-# input_xmls        :- + separated list of SM xml files
-# input_gui_xmls    :- + separated list of GUI xml files used to generate the
+# input_xmls        :- coded-separator list of SM xml files
+# input_gui_xmls    :- coded-separator list of GUI xml files used to generate the
 #                        CatergoryIndex.html
 # output_dir        :- Directory where all HTMLs are written out.
 # output_file       :- File written out on successful completion.
 #                      This file is also used to save intermediate results.
+#
+# see ParaViewMacros.cmake for information about coded-separator lists
 
 if (NOT EXISTS "${xmlpatterns}")
   message(FATAL_ERROR "No xmlpatterns executable was defined!!!")
 endif()
 
 # input_xmls is a pseudo-list. Convert it to a real CMake list.
-string(REPLACE "+" ";" input_xmls "${input_xmls}")
-string(REPLACE "+" ";" input_gui_xmls "${input_gui_xmls}")
+string(REPLACE "_s" ";"  input_xmls "${input_xmls}")
+string(REPLACE "_u" "_"  input_xmls "${input_xmls}")
+string(REPLACE "_s" ";"  input_gui_xmls "${input_gui_xmls}")
+string(REPLACE "_u" "_"  input_gui_xmls "${input_gui_xmls}")
 
 set (xslt_xml)
 
