@@ -80,6 +80,19 @@ if("${TEST_NAME}" STREQUAL "CoProcessingFullWorkflowCinemaComposite")
   return()
 endif()
 
+if("${TEST_NAME}" STREQUAL "CoProcessingFullWorkflowCinemaCompositeFloat")
+  if(NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_fl_image/info.json" OR
+     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_fl_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=0.im" OR
+     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_fl_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=1.png" OR
+     # For value images look for either a float buffer (im) or an RGB buffer (png)
+     # in case there was no support for float textures.
+     NOT (EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_fl_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=2.im" OR
+          EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_fl_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=2.png"))
+    message(FATAL_ERROR "Catalyst did not generate a composite cinema store (float value images)!")
+  endif()
+  return()
+endif()
+
 if(NOT EXISTS "${COPROCESSING_IMAGE_TESTER}")
   message(FATAL_ERROR "'${COPROCESSING_IMAGE_TESTER}' does not exist")
 endif()

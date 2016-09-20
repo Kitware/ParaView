@@ -2726,6 +2726,8 @@ void vtkPVRenderView::SetValueRenderingMode(int mode)
     }
 
     this->Modified();
+#else
+  (void)mode;
 #endif
 }
 
