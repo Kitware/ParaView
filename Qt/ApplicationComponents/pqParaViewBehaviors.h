@@ -84,7 +84,6 @@ public:
   PQ_BEHAVIOR_DEFINE_METHODS(CommandLineOptionsBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(PersistentMainWindowStateBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(CollaborationBehavior);
-  PQ_BEHAVIOR_DEFINE_METHODS(StandardArrayColorMapsBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(ViewStreamingBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(PluginSettingsBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(ApplyBehavior);
@@ -116,7 +115,6 @@ private:
   PQ_BEHAVIOR_DECLARE_FLAG(CommandLineOptionsBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(PersistentMainWindowStateBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(CollaborationBehavior);
-  PQ_BEHAVIOR_DECLARE_FLAG(StandardArrayColorMapsBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(ViewStreamingBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(PluginSettingsBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(ApplyBehavior);
