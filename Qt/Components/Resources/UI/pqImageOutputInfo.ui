@@ -250,11 +250,35 @@
          </widget>
         </item>
         <item row="5" column="0">
-         <widget class="QLabel" name="label_2">
+         <widget class="QLabel" name="laComposite">
           <property name="text">
            <string>Composite</string>
           </property>
          </widget>
+        </item>
+        <item row="5" column="2">
+         <layout class="QFormLayout" name="formLayout">
+          <property name="fieldGrowthPolicy">
+           <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+          </property>
+          <item row="0" column="0">
+           <widget class="QLabel" name="laFloatValue">
+            <property name="text">
+             <string>Float Value Images</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QCheckBox" name="cbUseFloatValues">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </item>

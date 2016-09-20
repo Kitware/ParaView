@@ -62,7 +62,6 @@ class ImageExplorer(explorers.Explorer):
         # Using float rasters for value arrays by default. vtkPVRenderView will fall
         # back to INVERTIBLE_LUT if the required extensions are not supported.
         self.ValueMode = ValueMode().FLOATING_POINT
-        #self.ValueMode = ValueMode().INVERTIBLE_LUT
 
         if self.view:
             try:
@@ -86,6 +85,9 @@ class ImageExplorer(explorers.Explorer):
                 res = as_grey.reshape(height,width).astype('uint8')
                 return res
             self.rgb2grey = rgb2grey
+
+    def enableFloatValues(self, enable):
+        self.ValueMode = ValueMode().FLOATING_POINT if enable else ValueMode().INVERTIBLE_LUT
 
     def insert(self, document):
         """overridden to use paraview to generate an image and create a
@@ -128,6 +130,8 @@ class ImageExplorer(explorers.Explorer):
                 document.data = imageslice
 
             elif self.CaptureValues: # Value capture
+                # Check the current mode since it could change if there is no
+                # context support.
                 mode = self.view.GetValueRenderingMode()
                 if mode is ValueMode().INVERTIBLE_LUT:
                     imageslice = self.captureWindowRGB()

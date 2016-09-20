@@ -593,10 +593,11 @@ def project_to_at(eye, fp, cr):
     at = [p_fp[0]+eye[0], p_fp[1]+eye[1], p_fp[2]+eye[2]]
     return at
 
-def explore(cs, proxies, iSave=True, currentTime=None, userDefined = {},
+def explore(cs, proxies, iSave = True, currentTime = None, userDefined = {},
             specLevel = "A",
             camType = 'phi-theta',
-            tracking={}):
+            tracking = {},
+            floatValues = True):
     """
     Runs a pipeline through all the changes we know how to make and saves off
     images into the store for each one.
@@ -685,6 +686,8 @@ def explore(cs, proxies, iSave=True, currentTime=None, userDefined = {},
                                    tracks,
                                    view_proxy,
                                    iSave)
+    e.enableFloatValues(floatValues)
+
     for c in cols:
         c.imageExplorer = e
 
@@ -870,10 +873,12 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
                                specLevel = specLevel,
                                camType = camType)
 
+        enableFloatVal = False if 'floatValues' not in cinemaParams else cinemaParams['floatValues']
+
         explore(cs, p, userDefined = userDefValues,
                 specLevel = specLevel,
                 camType = camType,
-                tracking = tracking_def)
+                tracking = tracking_def, floatValues = enableFloatVal)
 
         view.LockBounds = 0
         cs.save()
