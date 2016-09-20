@@ -127,7 +127,10 @@ public:
   /// accept this dialog
   void accept();
 
-  /// set a file current to support test playback
+  /// Set a file current to support test playback. Since this API is
+  /// intended for test playback, this will also trigger
+  /// accept on the dialog, if possible. Returns true, accept was triggered,
+  /// else returns false.
   bool selectFile(const QString&);
 
   /// set if we show hidden files and holders
