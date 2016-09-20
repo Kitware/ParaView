@@ -29,9 +29,9 @@
 
 #include "vtk1DTransferFunctionChooser.h"
 
-#include "vtkObjectFactory.h"
-#include "vtk1DLookupTableTransferFunction.h"
 #include "vtk1DGaussianTransferFunction.h"
+#include "vtk1DLookupTableTransferFunction.h"
+#include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtk1DTransferFunctionChooser)
 

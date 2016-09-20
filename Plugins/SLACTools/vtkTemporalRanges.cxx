@@ -41,8 +41,8 @@
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
 #include <algorithm>
-#include <vector>
 #include <sstream>
+#include <vector>
 
 //=============================================================================
 namespace vtkTemporalRangesNamespace{

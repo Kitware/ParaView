@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqFileDialogEventPlayer_h
 #define _pqFileDialogEventPlayer_h
 
-#include <pqWidgetEventPlayer.h>
 #include "pqCoreModule.h"
+#include <pqWidgetEventPlayer.h>
 
 /**
 Concrete implementation of pqWidgetEventPlayer that handles playback of recorded file dialog user input.

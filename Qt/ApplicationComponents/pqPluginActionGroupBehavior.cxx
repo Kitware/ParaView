@@ -31,9 +31,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqPluginActionGroupBehavior.h"
 
-#include "pqInterfaceTracker.h"
-#include "pqApplicationCore.h"
 #include "pqActionGroupInterface.h"
+#include "pqApplicationCore.h"
+#include "pqInterfaceTracker.h"
 
 #include <QMainWindow>
 #include <QMenu>

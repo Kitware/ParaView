@@ -42,7 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 #include "vtkNew.h"
 #include "vtkPVDataInformation.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMPropertyGroup.h"
@@ -50,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTrace.h"
+#include "vtkSmartPointer.h"
 #include "vtkWeakPointer.h"
 
 #include <QtDebug>

@@ -41,9 +41,9 @@
 #include <assert.h>
 #include <map>
 #include <set>
+#include <sstream>
 #include <string>
 #include <vtksys/SystemTools.hxx>
-#include <sstream>
 
 //#define vtkLiveInsituLinkDebugMacro(x) cerr x << endl;
 #define vtkLiveInsituLinkDebugMacro(x)

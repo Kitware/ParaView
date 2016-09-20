@@ -27,8 +27,8 @@
 #ifndef vtkPVProxyDefinitionIterator_h
 #define vtkPVProxyDefinitionIterator_h
 
-#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkObject.h"
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 
 class vtkPVXMLElement;
 

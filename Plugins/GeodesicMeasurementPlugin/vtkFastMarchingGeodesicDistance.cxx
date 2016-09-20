@@ -22,20 +22,20 @@
 
 #include "vtkFastMarchingGeodesicDistance.h"
 
-#include "vtkInformation.h"
-#include "vtkInformationVector.h"
-#include "vtkObjectFactory.h"
-#include "vtkExecutive.h"
-#include "vtkIdList.h"
-#include "vtkFloatArray.h"
 #include "vtkCellArray.h"
 #include "vtkCommand.h"
+#include "vtkExecutive.h"
+#include "vtkFloatArray.h"
+#include "vtkIdList.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 #include "vtkNew.h"
+#include "vtkObjectFactory.h"
 
+#include "gw_core/GW_Face.h"
+#include "gw_core/GW_Vertex.h"
 #include "gw_geodesic/GW_GeodesicMesh.h"
 #include "gw_geodesic/GW_GeodesicPath.h"
-#include "gw_core/GW_Vertex.h"
-#include "gw_core/GW_Face.h"
 #include <assert.h>
 #include <set>
 

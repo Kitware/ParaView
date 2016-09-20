@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqPluginSettingsBehavior_h
 #define pqPluginSettingsBehavior_h
 
-#include <QObject>
 #include "pqApplicationComponentsModule.h"
+#include <QObject>
 
 /// @ingroup Behaviors
 /// pqPluginSettingsBehavior adds support for adding applicatin settings from plugins

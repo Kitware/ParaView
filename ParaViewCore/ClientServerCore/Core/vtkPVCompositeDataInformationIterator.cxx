@@ -15,8 +15,8 @@
 #include "vtkPVCompositeDataInformationIterator.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkPVDataInformation.h"
 #include "vtkPVCompositeDataInformation.h"
+#include "vtkPVDataInformation.h"
 
 #include <vector>
 

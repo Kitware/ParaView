@@ -21,8 +21,8 @@
 #ifndef vtkPVCompositeDataInformationIterator_h
 #define vtkPVCompositeDataInformationIterator_h
 
-#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 
 class vtkPVDataInformation;
 

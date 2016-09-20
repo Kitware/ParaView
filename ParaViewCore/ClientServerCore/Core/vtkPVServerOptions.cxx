@@ -15,8 +15,8 @@
 #include "vtkPVServerOptions.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVServerOptionsInternals.h"
+#include "vtkProcessModule.h"
 
 #include <sstream>
 #include <vtksys/SystemTools.hxx>

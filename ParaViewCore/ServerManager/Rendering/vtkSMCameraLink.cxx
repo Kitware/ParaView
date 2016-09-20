@@ -18,10 +18,10 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMMessage.h"
 #include "vtkSMProperty.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSmartPointer.h"
 
 #include <list>
 

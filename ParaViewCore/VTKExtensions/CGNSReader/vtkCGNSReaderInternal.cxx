@@ -16,9 +16,9 @@
 
 #include "vtkCGNSReaderInternal.h"
 
-#include <algorithm>
-#include "vtkCellType.h"
 #include "cgio_helpers.h"
+#include "vtkCellType.h"
+#include <algorithm>
 
 namespace CGNSRead
 {

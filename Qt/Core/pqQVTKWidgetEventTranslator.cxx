@@ -31,17 +31,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqQVTKWidgetEventTranslator.h"
-#include "pqCoreTestUtility.h"
-#include "pqFileDialog.h"
 #include "pqApplicationCore.h"
+#include "pqCoreTestUtility.h"
 #include "pqCoreUtilities.h"
 #include "pqEventTypes.h"
+#include "pqFileDialog.h"
 
 #include "vtkRenderWindow.h"
 
+#include <QDebug>
 #include <QEvent>
 #include <QMouseEvent>
-#include <QDebug>
 
 #include "QVTKWidget.h"
 pqQVTKWidgetEventTranslator::pqQVTKWidgetEventTranslator(QObject* p)

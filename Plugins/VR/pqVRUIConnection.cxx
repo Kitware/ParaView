@@ -31,21 +31,17 @@
   ========================================================================*/
 #include "pqVRUIConnection.h"
 
-#include "vtkMath.h"
 #include "pqActiveObjects.h"
 #include "pqView.h"
-#include <pqDataRepresentation.h>
-#include "vtkSMRenderViewProxy.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMRepresentationProxy.h"
-#include "vtkSMPropertyHelper.h"
-#include <vtkCamera.h>
-#include <vtkRenderer.h>
-#include <vtkRenderWindow.h>
-#include "vtkObjectFactory.h"
-#include "vtkPVXMLElement.h"
+#include "vtkMath.h"
 #include "vtkMath.h"
 #include "vtkMatrix4x4.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVXMLElement.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMRenderViewProxy.h"
+#include "vtkSMRepresentationProxy.h"
 #include "vtkTransform.h"
 #include "vtkVRUIPipe.h"
 #include "vtkVRUIServerState.h"
@@ -53,18 +49,22 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QMutex>
-#include <vector>
-#include <iostream>
-#include <sstream>
 #include <algorithm>
+#include <iostream>
+#include <pqDataRepresentation.h>
+#include <sstream>
+#include <vector>
+#include <vtkCamera.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderer.h>
 #ifdef QTSOCK
 #include <QTcpSocket>
 #else
-#include <sys/socket.h>
 #include <fcntl.h>
-#include <netinet/in.h>
-#include <unistd.h>
 #include <netdb.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <unistd.h>
 #endif
 
 // ----------------------------------------------------------------------------

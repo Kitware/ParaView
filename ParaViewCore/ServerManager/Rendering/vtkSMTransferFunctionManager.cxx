@@ -17,10 +17,10 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkSMCoreUtilities.h"
+#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyIterator.h"
-#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMScalarBarWidgetRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSettings.h"
@@ -28,9 +28,9 @@
 #include "vtkSMTransferFunctionProxy.h"
 
 #include <assert.h>
+#include <set>
 #include <sstream>
 #include <vtksys/RegularExpression.hxx>
-#include <set>
 
 namespace
 {

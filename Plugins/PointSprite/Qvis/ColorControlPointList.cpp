@@ -35,9 +35,9 @@
 *
 *****************************************************************************/
 
+#include <ColorControlPoint.h>
 #include <ColorControlPointList.h>
 #include <DataNode.h>
-#include <ColorControlPoint.h>
 
 namespace pointsprite {
 // Type map format string

@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqSaveSnapshotDialog_h
 #define pqSaveSnapshotDialog_h
 
-#include <QDialog>
 #include "pqComponentsModule.h"
+#include <QDialog>
 
 /// Dialog used to ask the user for the resolution of the snapshot to save.
 class PQCOMPONENTS_EXPORT pqSaveSnapshotDialog : public QDialog

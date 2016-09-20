@@ -20,12 +20,12 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMViewProxy.h"
+#include "vtkSmartPointer.h"
 #include "vtkTestUtilities.h"
 
-#include <sstream>
 #include <assert.h>
+#include <sstream>
 
 int TestParaViewPipelineController(int argc, char* argv[])
 {

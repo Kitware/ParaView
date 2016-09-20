@@ -33,10 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqSGExportStateWizard_h
 
 #include "pqComponentsModule.h"
-#include <QWizard>
-#include <QWizardPage>
 #include <QString>
 #include <QStringList>
+#include <QWizard>
+#include <QWizardPage>
 
 class QLabel;
 class pqImageOutputInfo;

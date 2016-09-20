@@ -45,13 +45,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
 
-#include "vtkSmartPointer.h"
 #include "vtkNew.h"
+#include "vtkSmartPointer.h"
 
-#include <QMenu>
 #include <QMap>
-#include <QPointer>
+#include <QMenu>
 #include <QPair>
+#include <QPointer>
 #include <QSet>
 #include <QStringList>
 

@@ -1,7 +1,7 @@
 #include "vtkCTHDataArray.h"
-#include "vtkObjectFactory.h"
-#include "vtkIdList.h"
 #include "vtkArrayIteratorTemplate.h"
+#include "vtkIdList.h"
+#include "vtkObjectFactory.h"
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro (vtkCTHDataArray);

@@ -1,8 +1,8 @@
 #include "vtkClientServerStream.h"
-#include "vtkVariantArray.h"
-#include "vtkStringArray.h"
 #include "vtkDoubleArray.h"
 #include "vtkNew.h"
+#include "vtkStringArray.h"
+#include "vtkVariantArray.h"
 
 static double dblIni[] = { 904., 906., 917. };
 static const char* strIni[] = { "901", "Turbo", "Targa" };

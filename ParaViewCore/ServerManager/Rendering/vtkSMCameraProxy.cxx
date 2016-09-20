@@ -14,9 +14,9 @@
 =========================================================================*/
 #include "vtkSMCameraProxy.h"
 
+#include "vtkCamera.h"
 #include "vtkObjectFactory.h"
 #include "vtkSMDoubleVectorProperty.h"
-#include "vtkCamera.h"
 
 vtkStandardNewMacro(vtkSMCameraProxy);
 //-----------------------------------------------------------------------------

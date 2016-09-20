@@ -4,13 +4,13 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVEnsembleDataReaderInformation.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMCoreUtilities.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMReaderFactory.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSmartPointer.h"
 
 #include <cassert>
 #include <vector>

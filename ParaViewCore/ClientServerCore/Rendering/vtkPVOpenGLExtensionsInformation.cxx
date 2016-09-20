@@ -21,19 +21,19 @@
 #endif
 
 #include "vtkClientServerStream.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVDisplayInformation.h"
+#include "vtkProcessModule.h"
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
-#include "vtkNew.h"
 
+#include <algorithm>
+#include <iterator>
+#include <set>
 #include <string>
 #include <vector>
 #include <vtksys/SystemTools.hxx>
-#include <set>
-#include <algorithm>
-#include <iterator>
 
 //-----------------------------------------------------------------------------
 class vtkPVOpenGLExtensionsInformationInternal

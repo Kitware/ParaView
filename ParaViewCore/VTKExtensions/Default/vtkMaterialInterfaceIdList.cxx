@@ -14,8 +14,8 @@
 =========================================================================*/
 
 #include "vtkMaterialInterfaceIdList.h"
-#include <cassert>
 #include <algorithm>
+#include <cassert>
 
 namespace {
 // Binary search. l & r are the range to search in.

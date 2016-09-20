@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqProxiesWidget_h
 #define pqProxiesWidget_h
 
+#include "pqComponentsModule.h"
 #include <QScopedPointer>
 #include <QWidget>
-#include "pqComponentsModule.h"
 
 class vtkSMProxy;
 class pqView;

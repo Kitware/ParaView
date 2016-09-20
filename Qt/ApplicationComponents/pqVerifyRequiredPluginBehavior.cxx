@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqVerifyRequiredPluginBehavior.h"
 
 #include "pqApplicationCore.h"
-#include "pqPluginManager.h"
 #include "pqManagePluginsReaction.h"
+#include "pqPluginManager.h"
 
 
 //-----------------------------------------------------------------------------

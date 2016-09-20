@@ -15,7 +15,6 @@
 #include "vtkHierarchicalFractal.h"
 
 #include "vtkAMRBox.h"
-#include "vtkParallelAMRUtilities.h"
 #include "vtkAMRInformation.h"
 #include "vtkCellData.h"
 #include "vtkCompositeDataIterator.h"
@@ -28,13 +27,14 @@
 #include "vtkIntArray.h"
 #include "vtkMath.h"
 #include "vtkMultiBlockDataSet.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkParallelAMRUtilities.h"
 #include "vtkPointData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkSmartPointer.h"
 #include "vtkUniformGrid.h"
 #include "vtkUnsignedCharArray.h"
-#include "vtkMultiProcessController.h"
 
 #include <assert.h>
 

@@ -37,20 +37,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pq3DWidgetFactory.h"
 #include "pqApplicationCore.h"
 #include "pqPropertyLinks.h"
+#include "pqSMAdaptor.h"
 #include "pqServerManagerModel.h"
 #include "pqSignalAdaptorTreeWidget.h"
-#include "pqSMAdaptor.h"
 
 #include <QDoubleValidator>
 #include <QShortcut>
 #include <QtDebug>
 
-#include "vtkSmartPointer.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMPropertyHelper.h"
+#include "vtkSmartPointer.h"
 
 class pqSplineWidget::pqInternals : public Ui::SplineWidget
 {

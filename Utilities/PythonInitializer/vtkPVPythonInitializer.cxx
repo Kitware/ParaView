@@ -12,8 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPython.h"
 #include "pvpythonmodules.h"
+#include "vtkPython.h"
 #include "vtkUtilitiesPythonInitializerModule.h"
 
 #ifdef PARAVIEW_FREEZE_PYTHON

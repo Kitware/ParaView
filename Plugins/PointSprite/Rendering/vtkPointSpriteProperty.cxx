@@ -29,20 +29,20 @@
 
 #include "vtkPointSpriteProperty.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkShaderProgram2.h"
-#include "vtkShader2.h"
-#include "vtkTimeStamp.h"
-#include "vtkRenderer.h"
-#include "vtkOpenGLRenderWindow.h"
-#include "vtkShader2Collection.h"
 #include "vtkCamera.h"
-#include "vtkUniformVariables.h"
-#include "vtkOpenGLExtensionManager.h"
-#include "vtkgl.h"
-#include "vtkSmartPointer.h"
-#include "vtkPainterPolyDataMapper.h"
 #include "vtkDataObject.h"
+#include "vtkObjectFactory.h"
+#include "vtkOpenGLExtensionManager.h"
+#include "vtkOpenGLRenderWindow.h"
+#include "vtkPainterPolyDataMapper.h"
+#include "vtkRenderer.h"
+#include "vtkShader2.h"
+#include "vtkShader2Collection.h"
+#include "vtkShaderProgram2.h"
+#include "vtkSmartPointer.h"
+#include "vtkTimeStamp.h"
+#include "vtkUniformVariables.h"
+#include "vtkgl.h"
 #include <cmath>
 
 vtkStandardNewMacro(vtkPointSpriteProperty)

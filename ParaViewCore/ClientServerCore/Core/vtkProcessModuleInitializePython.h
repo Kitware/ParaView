@@ -16,10 +16,10 @@
 #define vtkProcessModulePythonInitializePython_h
 
 #include "vtkPSystemTools.h"
+#include "vtkPVConfig.h" //  needed for PARAVIEW_FREEZE_PYTHON
 #include "vtkPythonInterpreter.h"
 #include <string>
 #include <vtksys/SystemTools.hxx>
-#include "vtkPVConfig.h" //  needed for PARAVIEW_FREEZE_PYTHON
 
 /* The maximum length of a file name.  */
 #if defined(PATH_MAX)

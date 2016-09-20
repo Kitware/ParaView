@@ -15,11 +15,11 @@
 #include "vtkPVSessionCoreInterpreterHelper.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkSIProxy.h"
 #include "vtkPVProgressHandler.h"
 #include "vtkPVSession.h"
-#include "vtkProcessModule.h"
 #include "vtkPVSessionCore.h"
+#include "vtkProcessModule.h"
+#include "vtkSIProxy.h"
 
 vtkStandardNewMacro(vtkPVSessionCoreInterpreterHelper);
 //----------------------------------------------------------------------------

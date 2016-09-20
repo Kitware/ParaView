@@ -34,9 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsModule.h"
 
+#include "vtkType.h"
 #include <QObject>
 #include <QPair>
-#include "vtkType.h"
 
 class pqOutputPort;
 class pqPipelineSource;

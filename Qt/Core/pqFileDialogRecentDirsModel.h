@@ -32,10 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqFileDialogRecentDirsModel_h
 #define pqFileDialogRecentDirsModel_h
 
-#include <QAbstractListModel>
-#include <QStringList>
-#include <QPointer>
 #include "pqCoreModule.h"
+#include <QAbstractListModel>
+#include <QPointer>
+#include <QStringList>
 
 class pqServer;
 class pqFileDialogModel;

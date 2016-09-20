@@ -32,10 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqServerConfigurationImporter_h
 #define pqServerConfigurationImporter_h
 
-#include <QObject>
-#include <QList>
 #include "pqComponentsModule.h"
 #include "pqServerConfiguration.h"
+#include <QList>
+#include <QObject>
 
 class QAuthenticator;
 class QNetworkReply;

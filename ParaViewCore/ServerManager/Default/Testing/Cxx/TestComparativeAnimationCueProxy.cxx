@@ -16,15 +16,15 @@
 // works are expected.
 
 #include "vtkInitializationHelper.h"
-#include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
+#include "vtkProcessModule.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 
-#include "vtkSMComparativeAnimationCueProxy.h"
 #include "vtkPVComparativeAnimationCue.h"
+#include "vtkSMComparativeAnimationCueProxy.h"
 #include "vtkSmartPointer.h"
 #include <assert.h>
 

@@ -32,10 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "myMainWindow.h"
 #include "ui_myMainWindow.h"
 
-#include "pqApplicationCore.h"
-#include "pqRenderView.h"
 #include "pqActiveObjects.h"
+#include "pqApplicationCore.h"
 #include "pqObjectBuilder.h"
+#include "pqRenderView.h"
 #include "pqServerResource.h"
 
 //-----------------------------------------------------------------------------

@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Server Manager includes.
 #include "vtkSMNewWidgetRepresentationProxy.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSmartPointer.h"
 
 // Qt Includes.
 #include <QList>
@@ -43,8 +43,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView includes.
 #include "pqApplicationCore.h"
 #include "pqObjectBuilder.h"
-#include "pqServerManagerObserver.h"
 #include "pqServer.h"
+#include "pqServerManagerObserver.h"
 
 // used by the 3D widget factory to store information about each widget
 // it creates and passes to the user.

@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pq_ComboBoxDomain_h
 #define pq_ComboBoxDomain_h
 
-#include <QObject>
 #include "pqComponentsModule.h"
+#include <QObject>
 
 class QComboBox;
 class vtkSMProperty;

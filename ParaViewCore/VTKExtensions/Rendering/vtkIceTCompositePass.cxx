@@ -36,24 +36,24 @@
 #include "vtkTextureObject.h"
 #include "vtkTilesHelper.h"
 
-#include <assert.h>
 #include "vtk_icet.h"
+#include <assert.h>
 
 #ifdef VTKGL2
-# include "vtkOpenGLShaderCache.h"
-# include "vtkShaderProgram.h"
-# include "vtkOpenGLHelper.h"
-# include "vtkTextureObjectVS.h"
-# include "vtkCompositeZPassFS.h"
+#include "vtkCompositeZPassFS.h"
+#include "vtkOpenGLHelper.h"
+#include "vtkOpenGLShaderCache.h"
+#include "vtkShaderProgram.h"
+#include "vtkTextureObjectVS.h"
 #else
-# include "vtkCamera.h"
-# include "vtkgl.h"
-# include "vtkShader2.h"
-# include "vtkShader2Collection.h"
-# include "vtkShaderProgram2.h"
-# include "vtkTextureUnitManager.h"
-# include "vtkUniformVariables.h"
-extern const char *vtkIceTCompositeZPassShader_fs;
+#include "vtkCamera.h"
+#include "vtkShader2.h"
+#include "vtkShader2Collection.h"
+#include "vtkShaderProgram2.h"
+#include "vtkTextureUnitManager.h"
+#include "vtkUniformVariables.h"
+#include "vtkgl.h"
+extern const char* vtkIceTCompositeZPassShader_fs;
 #endif
 
 

@@ -29,10 +29,10 @@
 #ifndef vtkPVSynchronizedRenderWindows_h
 #define vtkPVSynchronizedRenderWindows_h
 
-#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
-#include "vtkObject.h"
 #include "vtkMultiProcessController.h" // for vtkRMIFunctionType
-#include "vtkWeakPointer.h" // for vtkWeakPointer.
+#include "vtkObject.h"
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
+#include "vtkWeakPointer.h"                       // for vtkWeakPointer.
 
 class vtkDataObject;
 class vtkMultiProcessController;

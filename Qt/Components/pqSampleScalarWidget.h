@@ -33,13 +33,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqSampleScalarWidget_h
 #define _pqSampleScalarWidget_h
 
-#include "pqSMProxy.h"
 #include "pqComponentsModule.h"
+#include "pqSMProxy.h"
 
-#include <QWidget>
-#include <QModelIndex>
 #include <QList>
+#include <QModelIndex>
 #include <QVariant>
+#include <QWidget>
 
 class QItemSelection;
 

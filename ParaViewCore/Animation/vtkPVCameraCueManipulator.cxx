@@ -19,9 +19,9 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVCameraAnimationCue.h"
 #include "vtkPVCameraKeyFrame.h"
+#include "vtkPVDataInformation.h"
 #include "vtkPVRenderView.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkPVDataInformation.h"
 #include "vtkVector.h"
 #include "vtkVectorOperators.h"
 

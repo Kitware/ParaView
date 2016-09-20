@@ -22,9 +22,9 @@
 #ifndef vtkMaterialInterfaceProcessRing_h
 #define vtkMaterialInterfaceProcessRing_h
 
-#include <vector> // needed for Initialize()
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMaterialInterfaceProcessLoading.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
+#include <vector>                            // needed for Initialize()
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMaterialInterfaceProcessRing
 {

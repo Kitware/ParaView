@@ -37,10 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkDataSetAttributes.h"
 #include "vtkGraph.h"
 #include "vtkInEdgeIterator.h"
+#include "vtkMemberFunctionCommand.h"
 #include "vtkOutEdgeIterator.h"
 #include "vtkSMSILModel.h"
 #include "vtkStringArray.h"
-#include "vtkMemberFunctionCommand.h"
 
 // Qt Includes.
 #include <QtDebug>

@@ -43,9 +43,9 @@
 #ifndef vtkSMViewProxyInteractorHelper_h
 #define vtkSMViewProxyInteractorHelper_h
 
-#include "vtkPVServerManagerRenderingModule.h" //needed for exports
-#include "vtkWeakPointer.h" //needed for vtkWeakPointer
 #include "vtkObject.h"
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
+#include "vtkWeakPointer.h"                    //needed for vtkWeakPointer
 
 class vtkCommand;
 class vtkRenderWindowInteractor;

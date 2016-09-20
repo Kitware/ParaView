@@ -44,10 +44,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVRenderView.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkSMInteractiveSelectionPipeline.h"
-#include "vtkSMTooltipSelectionPipeline.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMTooltipSelectionPipeline.h"
 
 #include <QToolTip>
 

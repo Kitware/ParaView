@@ -31,18 +31,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqSpreadSheetViewWidget.h"
 
-#include "pqSpreadSheetViewModel.h"
 #include "pqNonEditableStyledItemDelegate.h"
+#include "pqSpreadSheetViewModel.h"
 
+#include <QApplication>
 #include <QHeaderView>
 #include <QItemDelegate>
+#include <QPainter>
+#include <QPen>
 #include <QPointer>
 #include <QTableView>
 #include <QTextLayout>
 #include <QTextOption>
-#include <QPainter>
-#include <QPen>
-#include <QApplication>
 #include <QVBoxLayout>
 
 namespace

@@ -18,8 +18,8 @@
 #ifndef vtkPVEnSightMasterServerTranslator_h
 #define vtkPVEnSightMasterServerTranslator_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkExtentTranslator.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVEnSightMasterServerTranslator : public vtkExtentTranslator
 {

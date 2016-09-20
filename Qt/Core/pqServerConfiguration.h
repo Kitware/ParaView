@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqServerConfiguration_h
 #define pqServerConfiguration_h
 
-#include <QObject>
 #include "pqCoreModule.h"
 #include "vtkSmartPointer.h"
+#include <QObject>
 
 class vtkPVXMLElement;
 class pqServerResource;

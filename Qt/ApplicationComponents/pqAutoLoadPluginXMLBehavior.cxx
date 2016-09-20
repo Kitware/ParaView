@@ -37,8 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVPluginTracker.h"
 #include "vtkPVServerManagerPluginInterface.h"
 
-#include <QDir>
 #include "vtkObject.h"
+#include <QDir>
 
 void getAllParaViewResourcesDirs(const QString& prefix, QSet<QString>& set)
 {

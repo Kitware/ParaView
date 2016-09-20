@@ -83,9 +83,9 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace std;
 
 // RRU stuff
-#include "Partition.h"
-#include "ParticleExchange.h"
 #include "ParticleDistribute.h"
+#include "ParticleExchange.h"
+#include "Partition.h"
 
 using namespace cosmotk;
 

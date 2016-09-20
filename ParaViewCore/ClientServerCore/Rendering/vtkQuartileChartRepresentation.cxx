@@ -22,8 +22,8 @@
 #include "vtkPlotLine.h"
 #include "vtkStdString.h"
 
-#include <vtksys/RegularExpression.hxx>
 #include <map>
+#include <vtksys/RegularExpression.hxx>
 
 namespace
 {

@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqFindDataCreateSelectionFrame_h
 #define pqFindDataCreateSelectionFrame_h
 
-#include <QWidget>
 #include "pqComponentsModule.h"
+#include <QWidget>
 
 class pqOutputPort;
 class QComboBox;

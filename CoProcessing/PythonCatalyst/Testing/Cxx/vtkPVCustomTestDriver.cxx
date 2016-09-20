@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkPVCustomTestDriver.h"
 
-#include "vtkCommunicator.h"
 #include "vtkCPDataDescription.h"
 #include "vtkCPInputDataDescription.h"
 #include "vtkCPLinearScalarFieldFunction.h"
@@ -22,6 +21,7 @@
 #include "vtkCPProcessor.h"
 #include "vtkCPPythonScriptPipeline.h"
 #include "vtkCPUniformGridBuilder.h"
+#include "vtkCommunicator.h"
 #include "vtkDataObject.h"
 #include "vtkImageData.h"
 #include "vtkMultiProcessController.h"

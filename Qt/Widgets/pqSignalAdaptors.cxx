@@ -37,8 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QColor>
 #include <QComboBox>
 #include <QSlider>
-#include <QTextEdit>
 #include <QSpinBox>
+#include <QTextEdit>
 
 //----------------------------------------------------------------------------
 pqSignalAdaptorComboBox::pqSignalAdaptorComboBox(QComboBox* p)

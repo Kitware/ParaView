@@ -46,9 +46,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVPluginsInformation.h"
 
 // pqCore
-#include "pqPluginManager.h"
 #include "pqApplicationCore.h"
 #include "pqFileDialog.h"
+#include "pqPluginManager.h"
 #include "pqServer.h"
 #include "pqSettings.h"
 

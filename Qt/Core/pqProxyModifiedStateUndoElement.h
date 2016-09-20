@@ -24,8 +24,8 @@
 #ifndef pqProxyModifiedStateUndoElement_h
 #define pqProxyModifiedStateUndoElement_h
 
-#include "vtkSMUndoElement.h"
 #include "pqCoreModule.h"
+#include "vtkSMUndoElement.h"
 
 class pqProxy;
 

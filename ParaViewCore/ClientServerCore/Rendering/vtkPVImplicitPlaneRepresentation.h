@@ -20,8 +20,8 @@
 #ifndef vtkPVImplicitPlaneRepresentation_h
 #define vtkPVImplicitPlaneRepresentation_h
 
-#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkImplicitPlaneRepresentation.h"
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVImplicitPlaneRepresentation

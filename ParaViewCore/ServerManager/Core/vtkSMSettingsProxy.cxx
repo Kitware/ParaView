@@ -17,10 +17,10 @@
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVSession.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMSettings.h"
+#include "vtkSmartPointer.h"
 
 class vtkSMSettingsObserver : public vtkCommand
 {

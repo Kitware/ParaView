@@ -16,34 +16,34 @@
 
 #include "vtkAbstractArray.h"
 #include "vtkAlgorithmOutput.h"
-#include "vtkClientServerStream.h"
 #include "vtkCellData.h"
-#include "vtkCompositeDataSet.h"
+#include "vtkClientServerStream.h"
 #include "vtkCompositeDataIterator.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkDataArray.h"
 #include "vtkDataSet.h"
 #include "vtkDataSetAttributes.h"
-#include "vtkGraph.h"
 #include "vtkExecutive.h"
-#include "vtkObjectFactory.h"
+#include "vtkGraph.h"
 #include "vtkInformation.h"
-#include "vtkInformationKey.h"
 #include "vtkInformationIterator.h"
+#include "vtkInformationKey.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkNew.h"
-#include "vtkPointData.h"
-#include "vtkPVPostFilter.h"
+#include "vtkObjectFactory.h"
 #include "vtkPVDataRepresentation.h"
-#include "vtkStringArray.h"
+#include "vtkPVPostFilter.h"
+#include "vtkPointData.h"
 #include "vtkStdString.h"
+#include "vtkStringArray.h"
 #include "vtkTable.h"
 #include "vtkVariant.h"
 #include "vtkVariantArray.h"
 
 #include <map>
 #include <set>
-#include <vector>
 #include <sstream>
+#include <vector>
 
 #define VTK_MAX_CATEGORICAL_VALS (32)
 

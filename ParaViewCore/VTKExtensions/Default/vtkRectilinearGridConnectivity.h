@@ -74,8 +74,8 @@
 #ifndef vtkRectilinearGridConnectivity_h
 #define vtkRectilinearGridConnectivity_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class vtkPolyData;
 class vtkDoubleArray;

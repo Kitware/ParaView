@@ -36,8 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationModel.h"
 #include "pqAnimationTrack.h"
 #include "pqApplicationCore.h"
-#include "pqPropertyLinksConnection.h"
 #include "pqPropertyLinks.h"
+#include "pqPropertyLinksConnection.h"
 #include "pqProxy.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
@@ -49,10 +49,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSourceProxy.h"
 
-#include <QtDebug>
-#include <QVariant>
-#include <QPainter>
 #include <QLineF>
+#include <QPainter>
+#include <QVariant>
+#include <QtDebug>
 
 namespace
 {

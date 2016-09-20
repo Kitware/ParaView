@@ -47,8 +47,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDialog>
 #include <QLineEdit>
 #include <QList>
-#include <QStringList>
 #include <QString>
+#include <QStringList>
 
 class pqCustomViewButtonDialogUI;
 class vtkSMCameraConfigurationReader;

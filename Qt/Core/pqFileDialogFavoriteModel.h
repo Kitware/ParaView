@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqFileDialogFavoriteModel_h
 
 #include "pqCoreModule.h"
-#include <QObject>
 #include <QAbstractListModel>
+#include <QObject>
 
 class vtkProcessModule;
 class pqServer;

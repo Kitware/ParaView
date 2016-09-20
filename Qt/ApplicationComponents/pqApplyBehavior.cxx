@@ -47,18 +47,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVGeneralSettings.h"
 #include "vtkSMAnimationSceneProxy.h"
 #include "vtkSMLiveInsituLinkProxy.h"
+#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMSession.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMViewProxy.h"
 #include "vtkWeakPointer.h"
 
-#include <QtDebug>
-#include <QSet>
 #include <QList>
+#include <QSet>
+#include <QtDebug>
 
 class pqApplyBehavior::pqInternals
 {

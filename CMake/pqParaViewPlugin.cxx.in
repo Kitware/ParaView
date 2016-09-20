@@ -71,8 +71,8 @@ void PushBack(T& vector, F& fun)
 //-----------------------------------------------------------------------------
 #ifdef plugin_type_servermanager
 # if defined(INITIALIZE_WRAPPING) || defined(INITIALIZE_EXTRA_CS_MODULES)
-#  include "vtkClientServerInterpreterInitializer.h"
-#  include "vtkClientServerInterpreter.h"
+#include "vtkClientServerInterpreter.h"
+#include "vtkClientServerInterpreterInitializer.h"
 
 #   if defined(INITIALIZE_WRAPPING)
 extern "C" void @PLUGIN_NAME@_Initialize(vtkClientServerInterpreter *);

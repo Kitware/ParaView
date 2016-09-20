@@ -24,8 +24,8 @@
 #ifndef vtkPVLODVolume_h
 #define vtkPVLODVolume_h
 
-#include "vtkVolume.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
+#include "vtkVolume.h"
 
 class vtkLODProp3D;
 class vtkMapper;

@@ -38,8 +38,8 @@
 #ifndef QvisAbstractOpacityBar_H
 #define QvisAbstractOpacityBar_H
 
-#include <qframe.h>
 #include "vtkQvisModule.h" // for export macro
+#include <qframe.h>
 
 class QPixmap;
 

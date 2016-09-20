@@ -25,10 +25,10 @@
 #ifndef vtkGridConnectivity_h
 #define vtkGridConnectivity_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"
-#include "vtkSmartPointer.h" // For ivars
-#include <vector>     // For ivars
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
+#include "vtkSmartPointer.h"                 // For ivars
+#include <vector>                            // For ivars
 
 class vtkCell;
 class vtkPoints;

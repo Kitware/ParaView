@@ -67,12 +67,12 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkObjectFactory.h"
 
+#include <Engine/Control/RTRT.h>
+#include <Interface/Context.h>
 #include <Interface/Light.h>
 #include <Interface/LightSet.h>
-#include <Interface/Context.h>
-#include <Engine/Control/RTRT.h>
-#include <Model/Lights/PointLight.h>
 #include <Model/Lights/DirectionalLight.h>
+#include <Model/Lights/PointLight.h>
 
 #include <math.h>
 

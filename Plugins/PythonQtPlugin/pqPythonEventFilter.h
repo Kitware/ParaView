@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqPythonEventFilter_h
 #define pqPythonEventFilter_h
 
-#include <QObject>
 #include <QEvent>
+#include <QObject>
 
 class  pqPythonEventFilter : public QObject
 {

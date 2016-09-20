@@ -43,9 +43,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef vtkPVPlotMatrixRepresentation_h
 #define vtkPVPlotMatrixRepresentation_h
 
-#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkChartRepresentation.h"
-#include "vtkColor.h" // for ivars
+#include "vtkColor.h"                             // for ivars
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 
 class vtkScatterPlotMatrix;
 class vtkStringArray;

@@ -37,16 +37,16 @@
 
 #include "QvisGaussianOpacityBar.h"
 
-#include <qpainter.h>
-#include <qpolygon.h>
-#include <qpixmap.h>
+#include <QMouseEvent>
 #include <qimage.h>
 #include <qnamespace.h>
-#include <QMouseEvent>
+#include <qpainter.h>
+#include <qpixmap.h>
+#include <qpolygon.h>
 
-#include <iostream>
 #include <cmath>
 #include <cstdlib>
+#include <iostream>
 
 // ****************************************************************************
 //  Method:  QvisGaussianOpacityBar::QvisGaussianOpacityBar

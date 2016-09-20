@@ -1,11 +1,11 @@
 
+#include <QComboBox>
 #include <QMainWindow>
 #include <QPointer>
-#include <QComboBox>
 #include <QStringList>
 
-#include "pqPipelineModel.h"
 #include "pqPipelineBrowserWidget.h"
+#include "pqPipelineModel.h"
 #include "vtkObject.h"
 
 class pqServer;

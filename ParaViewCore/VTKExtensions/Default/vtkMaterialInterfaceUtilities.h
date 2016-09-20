@@ -19,11 +19,11 @@
 // Vtk
 #include<vtkCommunicator.h>
 // Vtk containers
-#include<vtkDoubleArray.h>
-#include<vtkFloatArray.h>
-#include<vtkIntArray.h>
-#include<vtkUnsignedIntArray.h>
-#include<vtkDataArraySelection.h>
+#include <vtkDataArraySelection.h>
+#include <vtkDoubleArray.h>
+#include <vtkFloatArray.h>
+#include <vtkIntArray.h>
+#include <vtkUnsignedIntArray.h>
 // STL
 #include <fstream>
 using std::ofstream;

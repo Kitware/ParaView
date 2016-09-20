@@ -21,8 +21,8 @@
 #ifndef vtkPVComparativeView_h
 #define vtkPVComparativeView_h
 
-#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkObject.h"
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 
 class vtkCollection;
 class vtkImageData;

@@ -24,8 +24,8 @@
 #ifndef vtkCompositeDataToUnstructuredGridFilter_h
 #define vtkCompositeDataToUnstructuredGridFilter_h
 
-#include "vtkUnstructuredGridAlgorithm.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
+#include "vtkUnstructuredGridAlgorithm.h"
 
 class vtkCompositeDataSet;
 class vtkAppendFilter;

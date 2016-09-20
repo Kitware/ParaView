@@ -22,14 +22,14 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
-#include "vtkPointData.h"
 #include "vtkPVPostFilter.h"
+#include "vtkPointData.h"
 
 #include <algorithm>
 #include <assert.h>
 #include <set>
-#include <string>
 #include <sstream>
+#include <string>
 
 namespace
 {

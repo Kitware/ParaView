@@ -33,10 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPythonMacroSupervisor_h
 
 #include "pqPythonModule.h"
-#include <QObject>
-#include <QMap>
-#include <QPointer>
 #include <QList>
+#include <QMap>
+#include <QObject>
+#include <QPointer>
 #include <QString>
 
 class QAction;

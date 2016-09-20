@@ -3,14 +3,14 @@ Example of rendering something with vtkManta.
 */
 
 #include "vtkCylinderSource.h"
+#include "vtkMantaActor.h"
+#include "vtkMantaCamera.h"
 #include "vtkMantaPolyDataMapper.h"
 #include "vtkMantaProperty.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderer.h"
-#include "vtkMantaCamera.h"
-#include "vtkMantaActor.h"
 #include "vtkMantaRenderer.h"
+#include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
+#include "vtkRenderer.h"
 
 double lamp_black[]     = {0.1800, 0.2800, 0.2300};
 

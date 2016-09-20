@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef vtkVRUIServerState_h
 #define vtkVRUIServerState_h
 
-#include "vtkVRUITrackerState.h"
 #include "vtkSmartPointer.h"
+#include "vtkVRUITrackerState.h"
 #include <vector>
 
 class vtkVRUIServerState

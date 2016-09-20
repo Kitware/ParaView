@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqScalarsToColors_h
 
 #include "pqProxy.h"
-#include <QPair>
 #include <QList>
+#include <QPair>
 #include <QVariant>
 
 class pqRenderViewBase;

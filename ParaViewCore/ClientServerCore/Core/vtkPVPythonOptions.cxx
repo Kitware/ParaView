@@ -16,12 +16,12 @@
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPSystemTools.h"
+#include "vtkProcessModule.h"
 
+#include <sstream>
 #include <vtksys/CommandLineArguments.hxx>
 #include <vtksys/SystemTools.hxx>
-#include <sstream>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonOptions);

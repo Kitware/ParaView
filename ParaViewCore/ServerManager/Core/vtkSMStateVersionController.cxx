@@ -23,11 +23,11 @@
 #include "vtkPVXMLParser.h"
 
 #include <set>
-#include <string>
 #include <sstream>
+#include <sstream>
+#include <string>
 #include <vector>
 #include <vtk_pugixml.h>
-#include <sstream>
 
 using namespace pugi;
 using namespace std;

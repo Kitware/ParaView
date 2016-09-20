@@ -25,8 +25,8 @@
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
-#include "vtkSMSettings.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMSettings.h"
 #include "vtkSMSourceProxy.h"
 
 //----------------------------------------------------------------------------

@@ -25,8 +25,8 @@
 #ifndef vtkSpyPlotFileSeriesReader_h
 #define vtkSpyPlotFileSeriesReader_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkFileSeriesReader.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 /// vtkSpyPlotFileSeriesReader extends vtkFileSeriesReader to change the number
 /// of output ports on this reader. Based on whether markers support was

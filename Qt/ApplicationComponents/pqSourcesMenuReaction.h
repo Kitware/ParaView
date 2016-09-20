@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqSourcesMenuReaction_h
 #define pqSourcesMenuReaction_h
 
-#include <QObject>
 #include "pqApplicationComponentsModule.h"
+#include <QObject>
 
 class pqPipelineSource;
 class pqProxyGroupMenuManager;

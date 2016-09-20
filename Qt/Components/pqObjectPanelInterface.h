@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqObjectPanelInterface_h
 #define _pqObjectPanelInterface_h
 
-#include <QtPlugin>
 #include "pqComponentsModule.h"
+#include <QtPlugin>
 
 class pqObjectPanel;
 class pqProxy;

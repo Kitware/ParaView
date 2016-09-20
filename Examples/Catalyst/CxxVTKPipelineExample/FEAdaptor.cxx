@@ -1,18 +1,18 @@
-#include <iostream>
 #include "FEAdaptor.h"
 #include "FEDataStructures.h"
 #include "vtkCPVTKPipeline.h"
+#include <iostream>
 
-#include <vtkCellData.h>
-#include <vtkCellType.h>
 #include <vtkCPDataDescription.h>
 #include <vtkCPInputDataDescription.h>
 #include <vtkCPProcessor.h>
+#include <vtkCellData.h>
+#include <vtkCellType.h>
 #include <vtkDoubleArray.h>
 #include <vtkFloatArray.h>
 #include <vtkNew.h>
-#include <vtkPoints.h>
 #include <vtkPointData.h>
+#include <vtkPoints.h>
 #include <vtkUnstructuredGrid.h>
 
 namespace

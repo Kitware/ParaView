@@ -65,9 +65,9 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef vtkMantaTexture_h
 #define vtkMantaTexture_h
 
+#include "Interface/Texture.h"
 #include "vtkMantaModule.h"
 #include "vtkTexture.h"
-#include "Interface/Texture.h"
 
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 

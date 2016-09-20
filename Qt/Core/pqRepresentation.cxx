@@ -34,18 +34,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Server Manager includes.
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
-#include "vtkSmartPointer.h" 
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkSmartPointer.h"
 
 // Qt includes.
 #include <QPointer>
 
 // ParaView includes.
+#include "pqSMAdaptor.h"
 #include "pqServer.h"
 #include "pqView.h"
-#include "pqSMAdaptor.h"
 
 //-----------------------------------------------------------------------------
 class pqRepresentation::pqInternal

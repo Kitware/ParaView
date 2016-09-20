@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqQueryClauseWidget_h
 #define pqQueryClauseWidget_h
 
-#include <QWidget>
 #include "pqComponentsModule.h"
 #include "vtkSelectionNode.h"
+#include <QWidget>
 
 class pqOutputPort;
 class vtkPVDataSetAttributesInformation;

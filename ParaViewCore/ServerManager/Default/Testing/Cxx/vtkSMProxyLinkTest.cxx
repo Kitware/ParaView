@@ -15,12 +15,12 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkSMProxyLinkTest.h"
 
-#include "vtkSMProxyManager.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyLink.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
-#include "vtkSMProxyLink.h"
-#include "vtkSMPropertyHelper.h"
 
 void vtkSMProxyLinkTest::AddLinkedProxy()
 {

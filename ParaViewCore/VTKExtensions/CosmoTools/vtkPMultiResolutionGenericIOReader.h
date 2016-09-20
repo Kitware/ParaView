@@ -23,8 +23,8 @@
 #ifndef vtkPMultiResolutionGenericIOReader_h
 #define vtkPMultiResolutionGenericIOReader_h
 
-#include "vtkPVVTKExtensionsCosmoToolsModule.h" // For export macro
 #include "vtkMultiBlockDataSetAlgorithm.h"
+#include "vtkPVVTKExtensionsCosmoToolsModule.h" // For export macro
 
 class vtkCallbackCommand;
 class vtkDataArraySelection;

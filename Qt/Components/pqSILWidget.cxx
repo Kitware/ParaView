@@ -32,17 +32,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSILWidget.h"
 
 #include <QDebug>
-#include <QHeaderView>
 #include <QHBoxLayout>
-#include <QVBoxLayout>
+#include <QHeaderView>
 #include <QPushButton>
+#include <QVBoxLayout>
 
 #include "pqApplicationCore.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqProxySILModel.h"
-#include "pqSelectionManager.h"
 #include "pqSILModel.h"
+#include "pqSelectionManager.h"
 #include "pqTreeView.h"
 #include "pqTreeViewSelectionHelper.h"
 #include "vtkPVCompositeDataInformation.h"

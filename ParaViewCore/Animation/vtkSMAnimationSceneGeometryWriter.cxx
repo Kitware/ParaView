@@ -16,14 +16,14 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMSessionProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRepresentationProxy.h"
-#include "vtkSMStringVectorProperty.h"
-#include "vtkSMPropertyHelper.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMStringVectorProperty.h"
 
 #include <assert.h>
 

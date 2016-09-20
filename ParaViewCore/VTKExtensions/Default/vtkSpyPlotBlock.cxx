@@ -15,18 +15,18 @@ PURPOSE.  See the above copyright notice for more information.
 =========================================================================*/
 #include "vtkSpyPlotBlock.h"
 
+#include "vtkBoundingBox.h"
+#include "vtkByteSwap.h"
 #include "vtkCellData.h"
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
 #include "vtkMath.h"
 #include "vtkSpyPlotIStream.h"
-#include "vtkByteSwap.h"
-#include "vtkBoundingBox.h"
 #include "vtkUnsignedCharArray.h"
 
+#include <assert.h>
 #include <map>
 #include <sstream>
-#include <assert.h>
 
 #define MinBlockBound(i) this->XYZArrays[i]->GetTuple1(0)
 #define MaxBlockBound(i)  \

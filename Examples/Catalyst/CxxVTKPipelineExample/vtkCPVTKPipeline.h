@@ -1,8 +1,8 @@
 #ifndef VTKCPVTKPIPELINE_H
 #define VTKCPVTKPIPELINE_H
 
-#include <vtkCPPipeline.h>
 #include <string>
+#include <vtkCPPipeline.h>
 
 class vtkCPDataDescription;
 class vtkCPPythonHelper;

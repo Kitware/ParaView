@@ -32,10 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqCategoryToolbarsBehavior_h
 #define pqCategoryToolbarsBehavior_h
 
+#include "pqApplicationComponentsModule.h"
+#include <QList>
 #include <QObject>
 #include <QPointer>
-#include <QList>
-#include "pqApplicationComponentsModule.h"
 
 class pqProxyGroupMenuManager;
 class QMainWindow;

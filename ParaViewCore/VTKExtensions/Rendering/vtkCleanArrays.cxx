@@ -26,9 +26,9 @@
 #include "vtkPointData.h"
 
 #include <algorithm>
+#include <iterator>
 #include <set>
 #include <string>
-#include <iterator>
 
 inline bool vtkSkipAttributeType(int attr)
 {

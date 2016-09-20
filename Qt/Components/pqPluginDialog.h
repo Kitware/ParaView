@@ -33,9 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqPluginDialog_h
 #define _pqPluginDialog_h
 
+#include "pqComponentsModule.h"
 #include <QDialog>
 #include <QPointer>
-#include "pqComponentsModule.h"
 
 
 class QTreeWidget;

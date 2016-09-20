@@ -21,8 +21,8 @@
 #ifndef vtkTCPNetworkAccessManager_h
 #define vtkTCPNetworkAccessManager_h
 
-#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkNetworkAccessManager.h"
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 
 class vtkMultiProcessController;
 

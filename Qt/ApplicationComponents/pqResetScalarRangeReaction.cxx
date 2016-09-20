@@ -41,10 +41,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "vtkDiscretizableColorTransferFunction.h"
 #include "vtkPVDataInformation.h"
-#include "vtkSMPropertyHelper.h"
 #include "vtkSMPVRepresentationProxy.h"
-#include "vtkSMTransferFunctionProxy.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMTimeKeeperProxy.h"
+#include "vtkSMTransferFunctionProxy.h"
 
 #include <QDebug>
 #include <QMessageBox>

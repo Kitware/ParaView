@@ -16,9 +16,9 @@
 #include "vtkSMCameraConfigurationFileInfo.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkStringList.h"
 #include "vtkSMNamedPropertyIterator.h"
 #include "vtkSMProxy.h"
+#include "vtkStringList.h"
 
 vtkStandardNewMacro(vtkSMCameraConfigurationWriter);
 

@@ -28,17 +28,17 @@
 // </verbatim>
 
 #include "vtkCellPointsFilter.h"
-#include "vtkInformationVector.h"
-#include "vtkInformation.h"
-#include "vtkCompositeDataSet.h"
-#include "vtkCompositeDataPipeline.h"
-#include "vtkCompositeDataIterator.h"
-#include "vtkPolyData.h"
-#include "vtkGenericDataSet.h"
-#include "vtkCellArray.h"
-#include "vtkPointData.h"
-#include "vtkObjectFactory.h"
 #include "vtkAppendPolyData.h"
+#include "vtkCellArray.h"
+#include "vtkCompositeDataIterator.h"
+#include "vtkCompositeDataPipeline.h"
+#include "vtkCompositeDataSet.h"
+#include "vtkGenericDataSet.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkObjectFactory.h"
+#include "vtkPointData.h"
+#include "vtkPolyData.h"
 #include "vtkSmartPointer.h"
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkCellPointsFilter)

@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Qt includes.
 #include <QAbstractProxyModel>
 #include <QPointer>
-#include <QtDebug>
 #include <QSet>
+#include <QtDebug>
 
 // ParaView includes.
 #include "pqActiveObjects.h"

@@ -19,9 +19,9 @@
 #ifndef vtkProcessModule_h
 #define vtkProcessModule_h
 
-#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"
-#include "vtkSmartPointer.h" // needed for vtkSmartPointer.
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
+#include "vtkSmartPointer.h"                 // needed for vtkSmartPointer.
 
 #include <string> // for std::string
 

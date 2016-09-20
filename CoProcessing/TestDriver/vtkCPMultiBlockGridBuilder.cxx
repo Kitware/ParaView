@@ -19,8 +19,8 @@
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 
-#include <vector>
 #include <algorithm> // for std::find
+#include <vector>
 
 vtkStandardNewMacro(vtkCPMultiBlockGridBuilder);
 vtkCxxSetObjectMacro(vtkCPMultiBlockGridBuilder, Grid, vtkMultiBlockDataSet);

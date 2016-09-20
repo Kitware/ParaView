@@ -32,10 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqOrbitCreatorDialog_h
 #define pqOrbitCreatorDialog_h
 
+#include "pqComponentsModule.h"
 #include <QDialog>
 #include <QList>
 #include <QVariant>
-#include "pqComponentsModule.h"
 
 /// pqOrbitCreatorDialog is used by pqAnimationViewWidget to request the orbit
 /// parameters from the user when the user want to create a camera animation track

@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqSelectionAdaptor_h
 
 #include "pqComponentsModule.h"
-#include <QObject>
 #include <QItemSelectionModel> //need for qtSelectionFlags
+#include <QObject>
 
 class pqServerManagerModelItem;
 class QAbstractItemModel;

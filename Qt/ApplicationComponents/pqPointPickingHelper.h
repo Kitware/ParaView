@@ -32,10 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqPointPickingHelper_h
 #define pqPointPickingHelper_h
 
+#include "pqApplicationComponentsModule.h"
+#include <QKeySequence>
 #include <QObject>
 #include <QPointer>
-#include <QKeySequence>
-#include "pqApplicationComponentsModule.h"
 
 class pqRenderView;
 class pqView;

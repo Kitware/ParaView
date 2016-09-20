@@ -17,8 +17,8 @@
 #ifndef vtkPVImageReader_h
 #define vtkPVImageReader_h
 
+#include "vtkPVConfig.h"                     // for PARAVIEW_USE_MPI
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
-#include "vtkPVConfig.h" // for PARAVIEW_USE_MPI
 
 #ifdef PARAVIEW_USE_MPI
 #include "vtkMPIImageReader.h" // For MPI-enabled builds

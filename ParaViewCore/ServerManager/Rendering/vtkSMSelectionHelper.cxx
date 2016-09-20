@@ -20,19 +20,15 @@
 #include "vtkDataRepresentation.h"
 #include "vtkDoubleArray.h"
 #include "vtkIdTypeArray.h"
-#include "vtkInformationDoubleKey.h"
 #include "vtkInformation.h"
+#include "vtkInformationDoubleKey.h"
 #include "vtkInformationIntegerKey.h"
 #include "vtkInformationIterator.h"
 #include "vtkInformationStringKey.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVSelectionInformation.h"
-#include "vtkSelection.h"
-#include "vtkSelectionNode.h"
-#include "vtkSelectionSerializer.h"
-#include "vtkSmartPointer.h"
+#include "vtkProcessModule.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIdTypeVectorProperty.h"
 #include "vtkSMInputProperty.h"
@@ -43,14 +39,18 @@
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSelection.h"
+#include "vtkSelectionNode.h"
+#include "vtkSelectionSerializer.h"
+#include "vtkSmartPointer.h"
 #include "vtkUnsignedIntArray.h"
 #include "vtkView.h"
 
 #include <cassert>
 #include <map>
 #include <set>
-#include <vector>
 #include <sstream>
+#include <vector>
 
 vtkStandardNewMacro(vtkSMSelectionHelper);
 

@@ -28,8 +28,8 @@
 #ifndef vtkSMChartUseIndexForAxisDomain_h
 #define vtkSMChartUseIndexForAxisDomain_h
 
-#include "vtkSMBooleanDomain.h"
 #include "vtkPVServerManagerRenderingModule.h" // needed for exports
+#include "vtkSMBooleanDomain.h"
 
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMChartUseIndexForAxisDomain : public vtkSMBooleanDomain
 {

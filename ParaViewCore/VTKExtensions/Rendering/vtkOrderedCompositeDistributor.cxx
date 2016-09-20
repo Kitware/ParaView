@@ -28,6 +28,7 @@
 #include "vtkBSPCuts.h"
 #include "vtkCallbackCommand.h"
 #include "vtkDataObjectTypes.h"
+#include "vtkDataSetSurfaceFilter.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
@@ -36,7 +37,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPKdTree.h"
 #include "vtkPolyData.h"
-#include "vtkDataSetSurfaceFilter.h"
 #include "vtkUnstructuredGrid.h"
 
 #ifdef PARAVIEW_USE_MPI

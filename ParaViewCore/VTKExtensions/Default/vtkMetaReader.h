@@ -22,8 +22,8 @@
 #ifndef vtkMetaReader_h
 #define vtkMetaReader_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkDataObjectAlgorithm.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 #include <string> // for std::string
 

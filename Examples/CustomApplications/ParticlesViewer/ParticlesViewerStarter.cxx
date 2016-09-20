@@ -32,12 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ParticlesViewerStarter.h"
 #include "ui_ParticlesViewerMainWindow.h"
 
-#include "pqCoreUtilities.h"
+#include "ParticlesViewerDisplayPolicy.h"
 #include "pqApplicationCore.h"
+#include "pqCoreUtilities.h"
 #include "pqLoadDataReaction.h"
 #include "pqParaViewBehaviors.h"
 #include "pqParaViewMenuBuilders.h"
-#include "ParticlesViewerDisplayPolicy.h"
 
 //-----------------------------------------------------------------------------
 ParticlesViewerStarter::ParticlesViewerStarter(QObject* parentObject)

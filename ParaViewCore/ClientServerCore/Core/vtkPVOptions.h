@@ -22,8 +22,8 @@
 #ifndef vtkPVOptions_h
 #define vtkPVOptions_h
 
-#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkCommandOptions.h"
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 
 class vtkPVOptionsInternal;
 

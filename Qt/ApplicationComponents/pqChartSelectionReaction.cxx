@@ -39,8 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkContextScene.h"
 #include "vtkContextView.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkScatterPlotMatrix.h"
 #include "vtkSMContextViewProxy.h"
+#include "vtkScatterPlotMatrix.h"
 
 #include <QActionGroup>
 #include <QtDebug>

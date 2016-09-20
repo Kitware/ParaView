@@ -38,8 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 #include "vtkMath.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
-#include "vtkSMPropertyGroup.h"
 #include "vtkSMProperty.h"
+#include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
 
 #include <QDoubleValidator>

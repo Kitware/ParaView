@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsModule.h"
 
-#include <QWidget>
-#include <QPointer>
 #include "pqComponentsModule.h"
+#include <QPointer>
+#include <QWidget>
 class pqProxy;
 class pqView;
 class pqPropertyManager;

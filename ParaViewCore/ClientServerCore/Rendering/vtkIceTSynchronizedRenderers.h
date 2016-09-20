@@ -27,9 +27,9 @@
 #ifndef vtkIceTSynchronizedRenderers_h
 #define vtkIceTSynchronizedRenderers_h
 
+#include "vtkIceTCompositePass.h"                 // needed for inline methods.
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkSynchronizedRenderers.h"
-#include "vtkIceTCompositePass.h" // needed for inline methods.
 
 class vtkCameraPass;
 class vtkImageProcessingPass;

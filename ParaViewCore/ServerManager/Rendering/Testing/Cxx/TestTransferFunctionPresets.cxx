@@ -15,14 +15,14 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkInitializationHelper.h"
 #include "vtkNew.h"
-#include "vtkSmartPointer.h"
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
 #include "vtkSMTransferFunctionPresets.h"
+#include "vtkSmartPointer.h"
 
 #include "vtk_jsoncpp.h"
-#include <sstream>
 #include <cassert>
+#include <sstream>
 
 #define myassert(condition, message) \
   if ((condition)) \

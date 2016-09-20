@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqApplyBehavior_h
 #define pqApplyBehavior_h
 
+#include "pqApplicationComponentsModule.h"
 #include <QObject>
 #include <QScopedPointer>
-#include "pqApplicationComponentsModule.h"
 
 class pqPipelineFilter;
 class pqPipelineSource;

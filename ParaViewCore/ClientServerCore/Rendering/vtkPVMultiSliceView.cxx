@@ -26,8 +26,8 @@
 #include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkTransform.h"
 
-#include <cassert>
 #include <algorithm>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 class vtkPVMultiSliceView::vtkSliceInternal

@@ -35,11 +35,11 @@
 *
 *****************************************************************************/
 
-#include <cmath>
-#include <VolumeAttributes.h>
-#include <DataNode.h>
 #include <ColorControlPoint.h>
+#include <DataNode.h>
 #include <GaussianControlPoint.h>
+#include <VolumeAttributes.h>
+#include <cmath>
 
 namespace pointsprite {
 //

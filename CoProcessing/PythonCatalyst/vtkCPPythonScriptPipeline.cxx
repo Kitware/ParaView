@@ -19,16 +19,16 @@
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
 #include "vtkPVPythonOptions.h"
+#include "vtkProcessModule.h"
 #include "vtkPythonInterpreter.h"
 #include "vtkSMObject.h"
 #include "vtkSMProxyManager.h"
 
+#include <sstream>
 #include <string>
 #include <vtksys/SystemTools.hxx>
-#include <sstream>
 
 extern "C" {
   void vtkPVInitializePythonModules();

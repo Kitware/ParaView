@@ -1,8 +1,8 @@
 #include "FEDataStructures.h"
 
+#include <assert.h>
 #include <iostream>
 #include <mpi.h>
-#include <assert.h>
 
 Grid::Grid()
 {

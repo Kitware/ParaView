@@ -46,11 +46,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSmartPointer.h"
 
-#include <QPointer>
-#include <QVBoxLayout>
-#include <QHeaderView>
 #include <QDebug>
 #include <QDoubleValidator>
+#include <QHeaderView>
+#include <QPointer>
+#include <QVBoxLayout>
 
 class pqCameraKeyFrameWidget::pqInternal : public Ui::CameraKeyFrameWidget
 {

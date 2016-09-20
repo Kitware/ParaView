@@ -25,11 +25,13 @@
 #include "vtkInformation.h"
 #include "vtkInformationExecutivePortKey.h"
 #include "vtkInformationVector.h"
-#include "vtkPVInstantiator.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVInstantiator.h"
 #include "vtkPointData.h"
 #include "vtkRectilinearGrid.h"
+#include "vtkSelection.h"
+#include "vtkSelectionSerializer.h"
 #include "vtkSmartPointer.h"
 #include "vtkSocketController.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
@@ -37,12 +39,10 @@
 #include "vtkTable.h"
 #include "vtkToolkits.h"
 #include "vtkTrivialProducer.h"
-#include "vtkSelection.h"
-#include "vtkSelectionSerializer.h"
 
 #include <sstream>
-#include <vector>
 #include <sstream>
+#include <vector>
 
 vtkStandardNewMacro(vtkReductionFilter);
 vtkCxxSetObjectMacro(vtkReductionFilter, Controller, vtkMultiProcessController);

@@ -13,9 +13,9 @@
 
 =========================================================================*/
 #include "vtkPEquivalenceSet.h"
-#include "vtkObjectFactory.h"
 #include "vtkIntArray.h"
 #include "vtkMultiProcessController.h"
+#include "vtkObjectFactory.h"
 
 vtkStandardNewMacro (vtkPEquivalenceSet);
 

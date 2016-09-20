@@ -32,13 +32,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSpreadSheetViewSelectionModel.h"
 
 // Server Manager Includes.
-#include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
-#include "vtkSelection.h"
-#include "vtkSelectionNode.h"
+#include "vtkProcessModule.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMVectorProperty.h"
+#include "vtkSelection.h"
+#include "vtkSelectionNode.h"
 
 // Qt Includes.
 #include <QtDebug>
@@ -47,8 +47,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataRepresentation.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
-#include "pqServer.h"
 #include "pqSMAdaptor.h"
+#include "pqServer.h"
 #include "pqSpreadSheetViewModel.h"
 
 namespace

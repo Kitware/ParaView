@@ -19,8 +19,8 @@
 #ifndef vtkPlotEdges_h
 #define vtkPlotEdges_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class Node;
 class Segment;

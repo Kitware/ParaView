@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqServerLauncher_h
 #define pqServerLauncher_h
 
+#include "pqComponentsModule.h"
 #include <QObject>
 #include <QProcess> // needed for QProcess::ProcessError.
-#include "pqComponentsModule.h"
 
 class pqServer;
 class pqServerConfiguration;

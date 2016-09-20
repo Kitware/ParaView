@@ -24,9 +24,9 @@
 #ifndef vtkPVPluginTracker_h
 #define vtkPVPluginTracker_h
 
-#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"
-#include "vtkSmartPointer.h" // needed  for vtkSmartPointer;
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
+#include "vtkSmartPointer.h"                 // needed  for vtkSmartPointer;
 
 class vtkPVPlugin;
 class vtkPVXMLElement;

@@ -25,8 +25,8 @@
 #ifndef vtkPointHandleRepresentationSphere_h
 #define vtkPointHandleRepresentationSphere_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkHandleRepresentation.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class vtkActor;
 class vtkGlyph3D;

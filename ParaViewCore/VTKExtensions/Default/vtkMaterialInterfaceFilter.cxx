@@ -15,60 +15,60 @@
 #include "vtkMaterialInterfaceFilter.h"
 
 // Pipeline & VTK
-#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObject.h"
 #include "vtkObjectFactory.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 // PV interface
 #include "vtkCallbackCommand.h"
-#include "vtkMath.h"
 #include "vtkDataArraySelection.h"
+#include "vtkMath.h"
 // Data sets
+#include "vtkAMRBox.h"
+#include "vtkCompositeDataIterator.h"
 #include "vtkDataSet.h"
-#include "vtkPolyData.h"
 #include "vtkImageData.h"
+#include "vtkMultiBlockDataSet.h"
+#include "vtkMultiPieceDataSet.h"
+#include "vtkNonOverlappingAMR.h"
+#include "vtkPolyData.h"
 #include "vtkUniformGrid.h"
 #include "vtkUnstructuredGrid.h"
-#include "vtkMultiBlockDataSet.h"
-#include "vtkNonOverlappingAMR.h"
-#include "vtkMultiPieceDataSet.h"
-#include "vtkCompositeDataIterator.h"
-#include "vtkAMRBox.h"
 // Data types, Arrays & Containers
+#include "vtkCellArray.h"
+#include "vtkCellData.h"
+#include "vtkCharArray.h"
+#include "vtkCollection.h"
 #include "vtkDataObject.h"
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
 #include "vtkIntArray.h"
-#include "vtkUnsignedIntArray.h"
-#include "vtkCharArray.h"
-#include "vtkCellArray.h"
-#include "vtkPointData.h"
-#include "vtkCellData.h"
-#include "vtkCollection.h"
-#include "vtkPointAccumulator.hxx"
+#include "vtkMaterialInterfaceIdList.h"
 #include "vtkMaterialInterfacePieceLoading.h"
+#include "vtkMaterialInterfacePieceTransaction.h"
+#include "vtkMaterialInterfacePieceTransactionMatrix.h"
 #include "vtkMaterialInterfaceProcessLoading.h"
 #include "vtkMaterialInterfaceProcessRing.h"
 #include "vtkMaterialInterfaceToProcMap.h"
-#include "vtkMaterialInterfacePieceTransaction.h"
-#include "vtkMaterialInterfacePieceTransactionMatrix.h"
-#include "vtkMaterialInterfaceIdList.h"
+#include "vtkPointAccumulator.hxx"
+#include "vtkPointData.h"
+#include "vtkUnsignedIntArray.h"
 // IO & IPC
 #include "vtkDataSetWriter.h"
-#include "vtkXMLPolyDataWriter.h"
 #include "vtkMaterialInterfaceCommBuffer.h"
+#include "vtkXMLPolyDataWriter.h"
 // Filters
-#include "vtkOBBTree.h"
 #include "vtkAppendPolyData.h"
-#include "vtkMarchingCubesTriangleCases.h"
+#include "vtkAppendPolyData.h"
 #include "vtkCleanPolyData.h"
 #include "vtkClipPolyData.h"
 #include "vtkContourFilter.h"
 #include "vtkDataSetSurfaceFilter.h"
+#include "vtkMarchingCubesTriangleCases.h"
+#include "vtkOBBTree.h"
 #include "vtkTriangleFilter.h"
-#include "vtkAppendPolyData.h"
 // STL
 #include <fstream>
 using std::ofstream;
@@ -80,8 +80,8 @@ using std::vector;
 using std::string;
 #include "algorithm"
 // ansi c
-#include <math.h>
 #include <ctime>
+#include <math.h>
 // other
 #include "vtkMaterialInterfaceUtilities.h"
 

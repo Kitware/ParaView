@@ -2,8 +2,8 @@
 #include <mpi.h>
 
 #ifdef USE_CATALYST
-#include <cstdlib>
 #include "FEAdaptor.h"
+#include <cstdlib>
 #include <iostream>
 #endif
 

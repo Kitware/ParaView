@@ -20,8 +20,8 @@
 #ifndef vtkPythonAnimationCue_h
 #define vtkPythonAnimationCue_h
 
-#include "vtkPVAnimationModule.h" //needed for exports
 #include "vtkAnimationCue.h"
+#include "vtkPVAnimationModule.h" //needed for exports
 
 class VTKPVANIMATION_EXPORT vtkPythonAnimationCue : public vtkAnimationCue
 {

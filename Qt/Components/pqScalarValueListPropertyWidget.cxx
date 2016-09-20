@@ -38,8 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHeaderView>
 #include <QVector>
 
-#include "pqSMAdaptor.h"
 #include "pqCollapsedGroup.h"
+#include "pqSMAdaptor.h"
 #include "pqSampleScalarAddRangeDialog.h"
 
 #include "vtkCommand.h"

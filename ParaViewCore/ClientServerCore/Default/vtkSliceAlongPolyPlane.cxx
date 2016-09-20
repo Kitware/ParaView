@@ -40,9 +40,9 @@
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkType.h"
 
-#include <list>
 #include <algorithm>
 #include <iostream>
+#include <list>
 
 vtkStandardNewMacro(vtkSliceAlongPolyPlane)
 

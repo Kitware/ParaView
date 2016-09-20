@@ -31,23 +31,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqComparativeContextView.h"
 
+#include "QVTKWidget.h"
 #include "pqServer.h"
 #include "pqUndoStack.h"
-#include "QVTKWidget.h"
 #include "vtkCollection.h"
 #include "vtkContextView.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkPVServerInformation.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMComparativeViewProxy.h"
 #include "vtkSMContextViewProxy.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSmartPointer.h"
 #include "vtkWeakPointer.h"
 
+#include <QGridLayout>
 #include <QMap>
 #include <QPointer>
 #include <QSet>
-#include <QGridLayout>
 #include <QWidget>
 
 class pqComparativeContextView::pqInternal

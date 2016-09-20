@@ -17,9 +17,8 @@
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVPluginLoader.h"
-#include "vtkPVPluginsInformation.h"
 #include "vtkPVPluginTracker.h"
-#include "vtkSmartPointer.h"
+#include "vtkPVPluginsInformation.h"
 #include "vtkSMPluginLoaderProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyDefinitionManager.h"
@@ -27,6 +26,7 @@
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTrace.h"
+#include "vtkSmartPointer.h"
 #include "vtkWeakPointer.h"
 
 #include <assert.h>

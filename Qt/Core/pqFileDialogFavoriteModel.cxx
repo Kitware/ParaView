@@ -32,19 +32,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqFileDialogFavoriteModel.h"
 
-#include <pqServer.h>
 #include <pqFileDialogModel.h>
+#include <pqServer.h>
 #include <vtkClientServerStream.h>
 #include <vtkCollection.h>
 #include <vtkCollectionIterator.h>
-#include <vtkProcessModule.h>
 #include <vtkPVFileInformation.h>
 #include <vtkPVFileInformationHelper.h>
-#include <vtkSmartPointer.h>
+#include <vtkProcessModule.h>
 #include <vtkSMIntVectorProperty.h>
 #include <vtkSMProxy.h>
 #include <vtkSMSessionProxyManager.h>
 #include <vtkSMStringVectorProperty.h>
+#include <vtkSmartPointer.h>
 #include <vtkStringList.h>
 
 #include "pqSMAdaptor.h"

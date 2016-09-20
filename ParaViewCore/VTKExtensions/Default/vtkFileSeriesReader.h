@@ -47,8 +47,8 @@
 #ifndef vtkFileSeriesReader_h
 #define vtkFileSeriesReader_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMetaReader.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class vtkStringArray;
 

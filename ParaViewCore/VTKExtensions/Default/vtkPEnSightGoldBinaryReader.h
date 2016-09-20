@@ -32,8 +32,8 @@
 #ifndef vtkPEnSightGoldBinaryReader_h
 #define vtkPEnSightGoldBinaryReader_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPEnSightReader.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class vtkMultiBlockDataSet;
 class vtkUnstructuredGrid;

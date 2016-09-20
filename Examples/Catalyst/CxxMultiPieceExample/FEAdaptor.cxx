@@ -1,14 +1,14 @@
-#include <iostream>
 #include "FEAdaptor.h"
 #include "FEDataStructures.h"
+#include <iostream>
 
-#include <vtkCellData.h>
-#include <vtkCellType.h>
-#include <vtkCommunicator.h>
 #include <vtkCPDataDescription.h>
 #include <vtkCPInputDataDescription.h>
 #include <vtkCPProcessor.h>
 #include <vtkCPPythonScriptPipeline.h>
+#include <vtkCellData.h>
+#include <vtkCellType.h>
+#include <vtkCommunicator.h>
 #include <vtkDoubleArray.h>
 #include <vtkFloatArray.h>
 #include <vtkImageData.h>
@@ -16,8 +16,8 @@
 #include <vtkMultiPieceDataSet.h>
 #include <vtkMultiProcessController.h>
 #include <vtkNew.h>
-#include <vtkPoints.h>
 #include <vtkPointData.h>
+#include <vtkPoints.h>
 
 #include <mpi.h>
 

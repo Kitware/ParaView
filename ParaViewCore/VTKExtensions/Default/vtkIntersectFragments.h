@@ -19,10 +19,10 @@
 #ifndef vtkIntersectFragments_h
 #define vtkIntersectFragments_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"
-#include <vector>//
-#include <string>//
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
+#include <string>                            //
+#include <vector>                            //
 
 class vtkPolyData;
 //class vtkMultiBlockDataSet;

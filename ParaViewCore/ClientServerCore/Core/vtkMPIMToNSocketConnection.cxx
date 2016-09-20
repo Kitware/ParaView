@@ -18,8 +18,8 @@
 #include "vtkMPIMToNSocketConnectionPortInformation.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVServerOptions.h"
+#include "vtkProcessModule.h"
 #include "vtkServerSocket.h"
 #include "vtkSocketCommunicator.h"
 

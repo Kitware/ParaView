@@ -37,22 +37,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pq3DWidgetFactory.h"
 #include "pqApplicationCore.h"
 #include "pqPropertyLinks.h"
+#include "pqSMAdaptor.h"
 #include "pqServerManagerModel.h"
 #include "pqSignalAdaptorTreeWidget.h"
-#include "pqSMAdaptor.h"
 
 #include <QDoubleValidator>
 #include <QShortcut>
 #include <QtDebug>
 
 #include "vtkObject.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
 #include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMPropertyHelper.h"
+#include "vtkSmartPointer.h"
 
 class pqPolyLineWidget::pqInternals : public Ui::PolyLineWidget
 {

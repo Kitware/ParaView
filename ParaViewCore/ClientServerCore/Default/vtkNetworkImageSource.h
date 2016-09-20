@@ -22,8 +22,8 @@
 #ifndef vtkNetworkImageSource_h
 #define vtkNetworkImageSource_h
 
-#include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
 #include "vtkImageAlgorithm.h"
+#include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
 
 class vtkImageData;
 class vtkClientServerStream;

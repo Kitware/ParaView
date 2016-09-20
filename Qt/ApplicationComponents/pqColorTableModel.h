@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqColorTableModel_h
 #define pqColorTableModel_h
 
-#include <QAbstractTableModel>
 #include "pqApplicationComponentsModule.h"
+#include <QAbstractTableModel>
 
 class pqColorOpacityEditorWidget;
 

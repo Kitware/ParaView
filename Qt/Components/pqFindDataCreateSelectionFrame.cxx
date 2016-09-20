@@ -40,10 +40,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSelectionManager.h"
 #include "vtkDataObject.h"
 #include "vtkPVDataInformation.h"
-#include "vtkSelectionNode.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSelectionNode.h"
+#include "vtkSmartPointer.h"
 
 #include <QPointer>
 

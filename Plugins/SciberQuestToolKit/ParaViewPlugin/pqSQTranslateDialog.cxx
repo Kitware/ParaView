@@ -31,10 +31,10 @@
 
 #include "ui_pqSQTranslateDialogForm.h"
 
-#include <QLineEdit>
-#include <QString>
 #include <QDoubleValidator>
+#include <QLineEdit>
 #include <QRadioButton>
+#include <QString>
 
 // User interface
 //=============================================================================

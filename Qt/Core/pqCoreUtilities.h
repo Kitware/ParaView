@@ -35,15 +35,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreModule.h"
 #include "pqEventDispatcher.h"
 
-#include <QEventLoop>
-#include <QPointer>
-#include <QWidget>
 #include <QDir>
-#include <QStringList>
-#include <QString>
+#include <QEventLoop>
 #include <QFile>
 #include <QFileInfo>
 #include <QMessageBox>
+#include <QPointer>
+#include <QString>
+#include <QStringList>
+#include <QWidget>
 
 class vtkObject;
 

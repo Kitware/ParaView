@@ -71,8 +71,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define vtkMantaPolyDataMapper_h
 
 #include "vtkMantaModule.h"
-#include "vtkPolyDataMapper.h"
 #include "vtkMantaTexture.h"
+#include "vtkPolyDataMapper.h"
 
 class vtkSphereSource;
 class vtkGlyph3D;

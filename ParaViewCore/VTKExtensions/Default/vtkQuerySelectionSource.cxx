@@ -14,17 +14,17 @@
 =========================================================================*/
 #include "vtkQuerySelectionSource.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkSelectionNode.h"
-#include "vtkSelection.h"
-#include "vtkIdTypeArray.h"
 #include "vtkDoubleArray.h"
+#include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkObjectFactory.h"
+#include "vtkSelection.h"
+#include "vtkSelectionNode.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-#include <vector>
 #include <sstream>
+#include <vector>
 #include <vtksys/SystemTools.hxx>
 
 class vtkQuerySelectionSource::vtkInternals

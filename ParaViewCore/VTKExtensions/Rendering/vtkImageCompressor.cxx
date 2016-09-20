@@ -15,11 +15,11 @@
 #include "vtkImageCompressor.h"
 #include "vtkObjectFactory.h"
 
-#include "vtkUnsignedCharArray.h"
 #include "vtkCommand.h"
 #include "vtkMultiProcessStream.h"
-#include <string>
+#include "vtkUnsignedCharArray.h"
 #include <sstream>
+#include <string>
 
 
 //-----------------------------------------------------------------------------

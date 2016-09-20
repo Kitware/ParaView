@@ -24,9 +24,9 @@
 #ifndef vtkImageVolumeRepresentation_h
 #define vtkImageVolumeRepresentation_h
 
+#include "vtkNew.h"                               // needed for vtkNew.
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"
-#include "vtkNew.h" // needed for vtkNew.
 
 class vtkColorTransferFunction;
 class vtkExtentTranslator;

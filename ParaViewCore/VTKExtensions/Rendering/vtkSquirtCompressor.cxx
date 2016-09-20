@@ -17,11 +17,11 @@
  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 ----------------------------------------------------------------------------*/
 #include "vtkSquirtCompressor.h"
+#include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkUnsignedCharArray.h"
-#include "vtkMultiProcessStream.h"
-#include <sstream>
 #include <algorithm>
+#include <sstream>
 
 vtkStandardNewMacro(vtkSquirtCompressor);
 

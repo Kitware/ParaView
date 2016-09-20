@@ -31,9 +31,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqKeyFrameTimeValidator.h"
 
-#include "vtkSmartPointer.h"
-#include "vtkSMDoubleRangeDomain.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkSMDoubleRangeDomain.h"
+#include "vtkSmartPointer.h"
 
 #include <QPointer>
 

@@ -21,9 +21,9 @@
 #ifndef vtkSMDeserializer_h
 #define vtkSMDeserializer_h
 
-#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkObject.h"
-#include "vtkWeakPointer.h" // needed for vtkWeakPointer.
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
+#include "vtkWeakPointer.h"               // needed for vtkWeakPointer.
 
 class vtkPVXMLElement;
 class vtkSMProxy;

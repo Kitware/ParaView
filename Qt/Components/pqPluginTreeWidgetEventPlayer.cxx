@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPluginTreeWidget.h"
 
-#include <QTreeWidget>
 #include <QDebug>
+#include <QTreeWidget>
 
 //-----------------------------------------------------------------------------
 pqPluginTreeWidgetEventPlayer::pqPluginTreeWidgetEventPlayer(QObject* parentObject)

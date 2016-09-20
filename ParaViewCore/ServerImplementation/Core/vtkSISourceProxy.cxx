@@ -24,19 +24,19 @@
 #include "vtkInformation.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVCompositeDataPipeline.h"
 #include "vtkPVInstantiator.h"
 #include "vtkPVPostFilter.h"
 #include "vtkPVXMLElement.h"
+#include "vtkProcessModule.h"
 #include "vtkSMMessage.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTimerLog.h"
 #include "vtkUnstructuredGrid.h"
 
-#include <vector>
-#include <sstream>
 #include <cassert>
+#include <sstream>
+#include <vector>
 
 //*****************************************************************************
 class vtkSISourceProxy::vtkInternals

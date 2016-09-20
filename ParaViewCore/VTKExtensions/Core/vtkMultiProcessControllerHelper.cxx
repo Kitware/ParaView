@@ -23,12 +23,12 @@
 #include "vtkImageData.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStructuredGridAppend.h"
 #include "vtkTrivialProducer.h"
 #include "vtkUnstructuredGrid.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkNew.h"
 
 vtkStandardNewMacro(vtkMultiProcessControllerHelper);
 //----------------------------------------------------------------------------

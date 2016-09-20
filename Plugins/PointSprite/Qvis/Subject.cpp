@@ -35,8 +35,8 @@
 *
 *****************************************************************************/
 
-#include <Subject.h>
 #include <SimpleObserver.h>
+#include <Subject.h>
 
 namespace pointsprite {
 

@@ -21,9 +21,9 @@
 #ifndef vtkPVXYChartView_h
 #define vtkPVXYChartView_h
 
+#include "vtkAxis.h"                              //for enums.
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVContextView.h"
-#include "vtkAxis.h" //for enums.
 
 class vtkChart;
 class vtkPVPlotTime;

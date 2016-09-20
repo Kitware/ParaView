@@ -15,8 +15,8 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkSMDoubleVectorPropertyTest.h"
 
-#include "vtkSMProxyManager.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMProxyManager.h"
 
 void vtkSMDoubleVectorPropertyTest::SetNumberOfElements()
 {

@@ -14,10 +14,10 @@
 =========================================================================*/
 #include "vtkCPDataDescription.h"
 
+#include "vtkCPInputDataDescription.h"
 #include "vtkCellData.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
-#include "vtkCPInputDataDescription.h"
 #include "vtkDataObject.h"
 #include "vtkDataSet.h"
 #include "vtkFieldData.h"

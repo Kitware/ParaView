@@ -14,16 +14,16 @@
 =========================================================================*/
 #include "vtkPolyLineToRectilinearGridFilter.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkPolyData.h"
-#include "vtkRectilinearGrid.h"
-#include "vtkPointData.h"
+#include "vtkCellArray.h"
 #include "vtkCellData.h"
+#include "vtkDoubleArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
-#include "vtkCellArray.h"
-#include "vtkDoubleArray.h"
+#include "vtkObjectFactory.h"
+#include "vtkPointData.h"
+#include "vtkPolyData.h"
+#include "vtkRectilinearGrid.h"
 
 vtkStandardNewMacro(vtkPolyLineToRectilinearGridFilter);
 //-----------------------------------------------------------------------------

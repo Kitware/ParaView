@@ -24,8 +24,8 @@
 #ifndef vtkPVExtractVOI_h
 #define vtkPVExtractVOI_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkDataSetAlgorithm.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class vtkDataObject;
 class vtkDataSet;

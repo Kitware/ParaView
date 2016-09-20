@@ -21,12 +21,12 @@
 #include "vtkSmartPointer.h"
 #include "vtkType.h"
 #include "vtkTypeTraits.h"
-#include <typeinfo>
 #include "vtkVariantExtract.h"
+#include <typeinfo>
 
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
 
 //----------------------------------------------------------------------------
 // Portability of typename keyword.

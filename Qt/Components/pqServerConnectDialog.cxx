@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqFileDialog.h"
-#include "pqServerConfigurationCollection.h"
 #include "pqServerConfiguration.h"
+#include "pqServerConfigurationCollection.h"
 #include "pqServerConfigurationImporter.h"
 #include "pqServerResource.h"
 #include "pqSettings.h"
@@ -45,9 +45,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMessageBox>
 #include <QNetworkReply>
 #include <QRegExp>
+#include <QSyntaxHighlighter>
 #include <QTextStream>
 #include <QUrl>
- #include <QSyntaxHighlighter>
 
 namespace
 {

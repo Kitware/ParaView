@@ -33,11 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Server Manager Includes.
 #include "vtkEventQtSlotConnect.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkSMSourceProxy.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMVectorProperty.h"
+#include "vtkSmartPointer.h"
 
 // Qt Includes.
 #include <QtDebug>
@@ -45,8 +45,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Includes.
 #include "pqApplicationCore.h"
 #include "pqPipelineSource.h"
-#include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
+#include "pqServerManagerModel.h"
 
 //-----------------------------------------------------------------------------
 class pqAnimatablePropertiesComboBox::pqInternal 

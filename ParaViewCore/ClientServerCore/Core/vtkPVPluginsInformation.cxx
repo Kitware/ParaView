@@ -14,16 +14,16 @@
 =========================================================================*/
 #include "vtkPVPluginsInformation.h"
 
+#include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVPlugin.h"
 #include "vtkPVPluginLoader.h"
 #include "vtkPVPluginTracker.h"
-#include "vtkClientServerStream.h"
 
+#include <iterator>
 #include <set>
 #include <string>
 #include <vector>
-#include <iterator>
 
 namespace
 {

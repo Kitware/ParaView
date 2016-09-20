@@ -25,8 +25,8 @@
 #ifndef vtkPVCompositeRepresentation_h
 #define vtkPVCompositeRepresentation_h
 
-#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkCompositeRepresentation.h"
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 
 class vtkSelectionRepresentation;
 

@@ -105,8 +105,8 @@
 #define vtkSMSessionProxyManager_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
+#include "vtkSMMessageMinimal.h"          // needed for vtkSMMessage.
 #include "vtkSMSessionObject.h"
-#include "vtkSMMessageMinimal.h" // needed for vtkSMMessage.
 
 class vtkCollection;
 class vtkEventForwarderCommand;

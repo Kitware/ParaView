@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqSMProxy.h"
 
-#include "pqHandleWidget.h" 
 #include "pqDeprecatedModule.h"
+#include "pqHandleWidget.h"
 
 class pqPropertyManager;
 

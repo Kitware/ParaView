@@ -16,13 +16,13 @@
 #ifndef vtkUncertaintySurfacePainter_h
 #define vtkUncertaintySurfacePainter_h
 
-#include "vtkPainter.h"
-#include "vtkSmartPointer.h"
-#include "vtkWeakPointer.h"
 #include "vtkLightingHelper.h"
 #include "vtkOpenGLRenderWindow.h"
-#include "vtkShaderProgram2.h"
+#include "vtkPainter.h"
 #include "vtkPiecewiseFunction.h"
+#include "vtkShaderProgram2.h"
+#include "vtkSmartPointer.h"
+#include "vtkWeakPointer.h"
 
 class VTK_EXPORT vtkUncertaintySurfacePainter : public vtkPainter
 {

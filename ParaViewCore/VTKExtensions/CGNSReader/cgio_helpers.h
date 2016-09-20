@@ -28,10 +28,10 @@
 #ifndef cgio_helpers_h
 #define cgio_helpers_h
 
-#include <vector>
 #include <map>
-#include <string>
 #include <string.h> // for inline strcmp
+#include <string>
+#include <vector>
 
 #include <cgns_io.h> // Low level IO for fast parsing
 #include <cgnslib.h> // DataType, and other definition

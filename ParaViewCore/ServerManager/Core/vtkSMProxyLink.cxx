@@ -17,11 +17,11 @@
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
+#include "vtkSMMessage.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
-#include "vtkSMMessage.h"
+#include "vtkSmartPointer.h"
 
 #include <list>
 #include <set>

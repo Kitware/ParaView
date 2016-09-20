@@ -41,8 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QPushButton>
 #include <QStringList>
-#include <algorithm>
 #include <QtDebug>
+#include <algorithm>
 
 class pqQuickLaunchDialog::pqInternal : public Ui::QuickLaunchDialog
 {

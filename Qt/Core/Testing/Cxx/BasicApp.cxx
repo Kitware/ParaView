@@ -2,9 +2,10 @@
 // A Test of a very simple app based on pqCore
 #include "BasicApp.h"
 
-#include <QTimer>
 #include <QApplication>
+#include <QTimer>
 
+#include "QVTKWidget.h"
 #include "pqApplicationCore.h"
 #include "pqCoreTestUtility.h"
 #include "pqObjectBuilder.h"
@@ -12,16 +13,15 @@
 #include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "QVTKWidget.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMViewProxy.h"
+#include "vtkSmartPointer.h"
 
 MainWindow::MainWindow()
 {

@@ -21,7 +21,6 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMMessage.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyIterator.h"
@@ -32,10 +31,11 @@
 #include "vtkSMTrace.h"
 #include "vtkSMUtilities.h"
 #include "vtkSMViewProxy.h"
+#include "vtkSmartPointer.h"
 #include "vtkWeakPointer.h"
 
-#include <assert.h>
 #include <algorithm>
+#include <assert.h>
 #include <vector>
 
 class vtkSMViewLayoutProxy::vtkInternals

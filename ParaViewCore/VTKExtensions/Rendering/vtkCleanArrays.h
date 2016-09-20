@@ -23,8 +23,8 @@
 #ifndef vtkCleanArrays_h
 #define vtkCleanArrays_h
 
-#include "vtkPassInputTypeAlgorithm.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
+#include "vtkPassInputTypeAlgorithm.h"
 
 class vtkMultiProcessController;
 class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkCleanArrays : public vtkPassInputTypeAlgorithm

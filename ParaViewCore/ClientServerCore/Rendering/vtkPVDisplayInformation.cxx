@@ -17,8 +17,8 @@
 #include "vtkClientServerStream.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
+#include "vtkProcessModule.h"
 #include "vtkRenderWindow.h"
 #include "vtkToolkits.h"
 

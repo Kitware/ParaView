@@ -47,16 +47,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVArrayInformation.h"
 #include "vtkPVProminentValuesInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
-#include "vtkSMPropertyGroup.h"
+#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMProperty.h"
+#include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
-#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMTransferFunctionPresets.h"
 #include "vtkSMTransferFunctionProxy.h"
+#include "vtkSmartPointer.h"
 #include "vtkStringList.h"
 #include "vtkTuple.h"
 #include "vtkVariant.h"
@@ -67,8 +67,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QColorDialog>
 #include <QHeaderView>
 #include <QMessageBox>
-#include <QPointer>
 #include <QPainter>
+#include <QPointer>
 #include <QSet>
 #include <algorithm>
 

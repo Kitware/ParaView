@@ -14,8 +14,8 @@
 =========================================================================*/
 #include "vtkPVDisableStackTraceSignalHandler.h"
 
-#include "vtkObjectFactory.h"
 #include "vtkClientServerStream.h"
+#include "vtkObjectFactory.h"
 
 #include <vtksys/SystemInformation.hxx>
 

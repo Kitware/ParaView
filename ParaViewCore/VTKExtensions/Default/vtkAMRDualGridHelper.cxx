@@ -13,23 +13,23 @@
 
 =========================================================================*/
 #include "vtkAMRDualGridHelper.h"
-#include "vtkObjectFactory.h"
-#include "vtkMultiProcessController.h"
-#include "vtkDummyController.h"
-#include "vtkImageData.h"
-#include "vtkUniformGrid.h"
-#include "vtkNonOverlappingAMR.h"
 #include "vtkAMRBox.h"
 #include "vtkCellData.h"
-#include "vtkDataArray.h"
 #include "vtkCharArray.h"
-#include "vtkIntArray.h"
-#include "vtkUnsignedCharArray.h"
-#include "vtkTimerLog.h"
-#include "vtkStdString.h"
-#include "vtkSortDataArray.h"
+#include "vtkDataArray.h"
 #include "vtkDoubleArray.h"
+#include "vtkDummyController.h"
 #include "vtkIdTypeArray.h"
+#include "vtkImageData.h"
+#include "vtkIntArray.h"
+#include "vtkMultiProcessController.h"
+#include "vtkNonOverlappingAMR.h"
+#include "vtkObjectFactory.h"
+#include "vtkSortDataArray.h"
+#include "vtkStdString.h"
+#include "vtkTimerLog.h"
+#include "vtkUniformGrid.h"
+#include "vtkUnsignedCharArray.h"
 
 #include "vtkSmartPointer.h"
 #define VTK_CREATE(type, name) \
@@ -44,8 +44,8 @@
 #include "vtkPVConfig.h"
 #ifdef PARAVIEW_USE_MPI
 #define VTK_AMR_DUAL_GRID_USE_MPI_ASYNCHRONOUS
-#include "vtkMPIController.h"
 #include "vtkMPICommunicator.h"
+#include "vtkMPIController.h"
 #endif
 
 vtkStandardNewMacro(vtkAMRDualGridHelper);

@@ -32,14 +32,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqAnimationModel.h"
 
-#include <QPainter>
-#include <QGraphicsView>
 #include <QEvent>
-#include <QStyle>
 #include <QGraphicsSceneMouseEvent>
+#include <QGraphicsView>
+#include <QPainter>
+#include <QStyle>
 
-#include "pqAnimationTrack.h"
 #include "pqAnimationKeyFrame.h"
+#include "pqAnimationTrack.h"
 #include "pqCheckBoxPixMaps.h"
 
 pqAnimationModel::pqAnimationModel(QGraphicsView* p)

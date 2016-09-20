@@ -32,12 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCollapsedGroup.h"
 
+#include <QLayout>
+#include <QMouseEvent>
 #include <QPainter>
 #include <QStyle>
-#include <QLayout>
-#include <QStylePainter>
 #include <QStyleOptionGroupBox>
-#include <QMouseEvent>
+#include <QStylePainter>
 
 static QStyleOptionGroupBox pqCollapseGroupGetStyleOption(const pqCollapsedGroup* p)
 {

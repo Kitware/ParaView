@@ -33,8 +33,8 @@
 #ifndef vtkSMChartSeriesSelectionDomain_h
 #define vtkSMChartSeriesSelectionDomain_h
 
-#include "vtkSMStringListDomain.h"
 #include "vtkPVServerManagerRenderingModule.h" // needed for exports
+#include "vtkSMStringListDomain.h"
 
 #include <set> // For std::set
 

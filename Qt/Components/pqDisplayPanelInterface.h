@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqDisplayPanelInterface_h
 #define _pqDisplayPanelInterface_h
 
-#include <QtPlugin>
 #include "pqComponentsModule.h"
+#include <QtPlugin>
 class pqDisplayPanel;
 class pqRepresentation;
 class QWidget;

@@ -19,17 +19,17 @@
 #ifndef vtkSMVectorPropertyTemplate_h
 #define vtkSMVectorPropertyTemplate_h
 
-#include <assert.h>
-#include <vector>
-#include <algorithm>
-#include <string>
-#include <sstream>
 #include "vtkCommand.h"
-#include <vtkPVXMLElement.h>
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
-#include <typeinfo>
+#include <algorithm>
+#include <assert.h>
 #include <limits>
+#include <sstream>
+#include <string>
+#include <typeinfo>
+#include <vector>
+#include <vtkPVXMLElement.h>
 
 class vtkSMProperty;
 

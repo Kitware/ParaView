@@ -35,11 +35,11 @@
 *
 *****************************************************************************/
 
+#include <ColorControlPoint.h>
+#include <ColorControlPointList.h>
 #include <ColorTableAttributes.h>
 #include <DataNode.h>
-#include <ColorControlPoint.h>
 #include <map>
-#include <ColorControlPointList.h>
 #include <snprintf.h>
 
 namespace pointsprite {

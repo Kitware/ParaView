@@ -15,11 +15,11 @@
 #include "vtkSMSILDomain.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkSMProperty.h"
 #include "vtkPVSILInformation.h"
-#include "vtkSMProxy.h"
-#include "vtkSMIdTypeVectorProperty.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMIdTypeVectorProperty.h"
+#include "vtkSMProperty.h"
+#include "vtkSMProxy.h"
 
 
 vtkStandardNewMacro(vtkSMSILDomain);

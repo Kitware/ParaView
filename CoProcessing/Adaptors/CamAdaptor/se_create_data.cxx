@@ -1,7 +1,7 @@
-#include <sstream>
-#include <set>
-#include <iterator>
 #include <cfloat>
+#include <iterator>
+#include <set>
+#include <sstream>
 
 #include "Grid.h"
 #include "vtkCPDataDescription.h"
@@ -9,8 +9,8 @@
 #include "vtkCPProcessor.h"
 #include "vtkCPPythonScriptPipeline.h"
 #include "vtkMath.h"
-#include "vtkUnstructuredGrid.h"
 #include "vtkSmartPointer.h"
+#include "vtkUnstructuredGrid.h"
 
 namespace
 {

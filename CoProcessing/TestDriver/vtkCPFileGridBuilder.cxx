@@ -14,12 +14,12 @@
 =========================================================================*/
 #include "vtkCPFileGridBuilder.h"
 
+#include "vtkCPFieldBuilder.h"
+#include "vtkCPFieldBuilder.h"
 #include "vtkCellData.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
-#include "vtkCPFieldBuilder.h"
 #include "vtkDataSet.h"
-#include "vtkCPFieldBuilder.h"
 #include "vtkPointData.h"
 
 vtkCxxSetObjectMacro(vtkCPFileGridBuilder, Grid, vtkDataObject);

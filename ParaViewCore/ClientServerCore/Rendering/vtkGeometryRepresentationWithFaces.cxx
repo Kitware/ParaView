@@ -17,9 +17,9 @@
 #include "vtkCompositePolyDataMapper2.h"
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
-#include "vtkProperty.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVRenderView.h"
+#include "vtkProperty.h"
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkGeometryRepresentationWithFaces);

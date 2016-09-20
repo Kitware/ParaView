@@ -1,6 +1,6 @@
 
-#include "vtkTilesHelper.h"
 #include "assert.h"
+#include "vtkTilesHelper.h"
 
 static void vtkTest(int rank, vtkTilesHelper* helper,
   int minx,  int miny, int maxx, int maxy)

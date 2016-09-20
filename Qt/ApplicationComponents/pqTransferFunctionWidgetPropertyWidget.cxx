@@ -37,18 +37,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkAxis.h"
 #include "vtkChartXY.h"
 #include "vtkPiecewiseFunction.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyListDomain.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMTransferFunctionProxy.h"
+#include "vtkSmartPointer.h"
 
 #include <QDebug>
-#include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QPushButton>
+#include <QVBoxLayout>
 
 namespace
 {

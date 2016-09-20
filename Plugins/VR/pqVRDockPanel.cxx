@@ -36,15 +36,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
-#include "pqRenderView.h"
 #include "pqLoadStateReaction.h"
+#include "pqRenderView.h"
 #include "pqSaveStateReaction.h"
 #include "pqServerManagerModel.h"
-#include "pqView.h"
 #include "pqVRAddConnectionDialog.h"
 #include "pqVRAddStyleDialog.h"
 #include "pqVRConnectionManager.h"
 #include "pqVRQueueHandler.h"
+#include "pqView.h"
 
 #ifdef PARAVIEW_USE_VRPN
 #include "pqVRPNConnection.h"

@@ -44,8 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxySelectionModel.h"
 
-#include <QWidget>
 #include <QMouseEvent>
+#include <QWidget>
 
 //-----------------------------------------------------------------------------
 pqObjectPickingBehavior::pqObjectPickingBehavior(QObject* parentObject)

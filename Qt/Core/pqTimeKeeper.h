@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqTimeKeeper_h
 #define pqTimeKeeper_h
 
-#include <QPair>
 #include "pqProxy.h"
+#include <QPair>
 
 class vtkSMProxy;
 

@@ -39,8 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFileInfo>
 #include <QImage>
 #include <QPixmap>
-#include <QtDebug>
 #include <QWidget>
+#include <QtDebug>
 
 #include "QtTestingConfigure.h"
 
@@ -74,14 +74,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPNGReader.h"
 #include "vtkPNGWriter.h"
 #include "vtkPNMWriter.h"
-#include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
+#include "vtkProcessModule.h"
 #include "vtkRenderWindow.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMViewProxy.h"
-#include "vtkTesting.h"
+#include "vtkSmartPointer.h"
 #include "vtkTIFFWriter.h"
+#include "vtkTesting.h"
 #include "vtkTrivialProducer.h"
 #include "vtkWindowToImageFilter.h"
 

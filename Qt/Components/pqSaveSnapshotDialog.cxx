@@ -43,8 +43,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqStereoModeHelper.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkRenderWindow.h" // for VTK_STEREO_*
-#include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
 

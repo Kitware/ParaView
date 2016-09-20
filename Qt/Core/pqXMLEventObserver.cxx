@@ -30,9 +30,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "pqEventTypes.h"
 #include "pqXMLEventObserver.h"
 #include "pqCoreTestUtility.h"
+#include "pqEventTypes.h"
 
 #include <QTextStream>
 

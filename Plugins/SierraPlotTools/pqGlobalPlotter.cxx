@@ -28,9 +28,9 @@
 #include <QStringList>
 #include <QtDebug>
 
-#include "vtkSMProxy.h"
-#include "vtkSMProperty.h"
 #include "vtkPVDataInformation.h"
+#include "vtkSMProperty.h"
+#include "vtkSMProxy.h"
 
 //-----------------------------------------------------------------------------
 pqGlobalPlotter::pqGlobalPlotter()

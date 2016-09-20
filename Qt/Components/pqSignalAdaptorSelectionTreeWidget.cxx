@@ -33,14 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMDomainIterator.h"
-#include "vtkSMProperty.h"
 #include "vtkSMEnumerationDomain.h"
+#include "vtkSMProperty.h"
 #include "vtkSMStringListDomain.h"
+#include "vtkSmartPointer.h"
 
-#include <QTreeWidget>
 #include <QPointer>
+#include <QTreeWidget>
 
 #include "pqSMAdaptor.h"
 

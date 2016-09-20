@@ -1,8 +1,8 @@
 #ifndef PQWELCOMEDIALOG_H
 #define PQWELCOMEDIALOG_H
 
-#include <QDialog>
 #include "pqApplicationComponentsModule.h"
+#include <QDialog>
 
 namespace Ui {
 class pqWelcomeDialog;

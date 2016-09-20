@@ -12,14 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkImageData.h"
-#include "vtkImageReader.h"
 #include "vtkImageContinuousDilate3D.h"
 #include "vtkImageContinuousErode3D.h"
-#include "vtkImageMedian3D.h"
+#include "vtkImageData.h"
 #include "vtkImageGradient.h"
-#include "vtkImageViewer.h"
 #include "vtkImageGradientMagnitude.h"
+#include "vtkImageMedian3D.h"
+#include "vtkImageReader.h"
+#include "vtkImageViewer.h"
 #include "vtkTestUtilities.h"
 #include "vtkTesting.h"
 

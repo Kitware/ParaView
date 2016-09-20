@@ -38,8 +38,8 @@
 #ifndef QVIS_COLOR_GRID_WIDGET_H
 #define QVIS_COLOR_GRID_WIDGET_H
 
-#include <QWidget>
 #include "vtkQvisModule.h" // for export macro
+#include <QWidget>
 
 class QPixmap;
 class QPainter;

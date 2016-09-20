@@ -21,9 +21,9 @@
 #define vtkSMServerStateLocator_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
+#include "vtkSMMessageMinimal.h"          // needed for vtkSMMessage.
 #include "vtkSMStateLocator.h"
 #include "vtkWeakPointer.h" // needed for the session ref
-#include "vtkSMMessageMinimal.h" // needed for vtkSMMessage.
 
 class vtkSMSession;
 

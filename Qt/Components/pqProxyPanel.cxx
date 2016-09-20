@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt includes
 #include <QApplication>
+#include <QHelpEvent>
 #include <QStyle>
 #include <QStyleOption>
-#include <QHelpEvent>
 #include <QToolTip>
 
 // VTK includes
@@ -45,14 +45,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkEventQtSlotConnect.h"
 
 // ParaView Server Manager includes
-#include "vtkSmartPointer.h"
+#include "vtkSMDocumentation.h"
 #include "vtkSMProperty.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSMDocumentation.h"
+#include "vtkSmartPointer.h"
 
 // ParaView includes
-#include "pqPropertyManager.h"
 #include "pqApplicationCore.h"
+#include "pqPropertyManager.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
 

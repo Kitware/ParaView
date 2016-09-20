@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _@ARG_CLASS_NAME@Implementation_h
 #define _@ARG_CLASS_NAME@Implementation_h
 
-#include <QObject>
 #include "pq3DWidgetInterface.h"
+#include <QObject>
 
 // make this panel available to the object inspector
 class @ARG_CLASS_NAME@Implementation : public QObject, public pq3DWidgetInterface

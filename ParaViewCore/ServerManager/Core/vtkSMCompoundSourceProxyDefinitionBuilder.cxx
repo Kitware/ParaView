@@ -16,12 +16,12 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMProxy.h"
+#include "vtkSmartPointer.h"
 
+#include <list>
 #include <map>
 #include <string>
-#include <list>
 
 class vtkSMCompoundSourceProxyDefinitionBuilder::vtkInternals
 {

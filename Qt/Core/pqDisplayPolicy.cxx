@@ -31,8 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqDisplayPolicy.h"
 
-#include <QtDebug>
 #include <QString>
+#include <QtDebug>
 
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"

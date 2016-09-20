@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqVCRToolbar_h
 #define pqVCRToolbar_h
 
-#include <QToolBar>
 #include "pqApplicationComponentsModule.h"
+#include <QToolBar>
 
 class pqVCRController;
 

@@ -32,10 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqSILWidget_h
 #define pqSILWidget_h
 
-#include <QTabWidget>
-#include <QPointer>
-#include <QList>
 #include "pqComponentsModule.h"
+#include <QList>
+#include <QPointer>
+#include <QTabWidget>
 
 class pqSILModel;
 class pqTreeView;

@@ -36,13 +36,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 
 // Qt includes
-#include <QPointer>
 #include <QDebug>
+#include <QPointer>
 
 // vtk includes
+#include <vtkCollection.h>
 #include <vtkEventQtSlotConnect.h>
 #include <vtkSmartPointer.h>
-#include <vtkCollection.h>
 
 // Server manager includes
 #include "vtkPVXMLElement.h"
@@ -66,12 +66,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // pqCore includes
 #include "pqApplicationCore.h"
+#include "pqInteractiveViewLink.h"
 #include "pqProxy.h"
 #include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
-#include "pqInteractiveViewLink.h"
 
 class pqLinksModel::pqInternal : public vtkCommand
 {

@@ -38,8 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMTrace.h"
 
 // Qt includes.
-#include <QtDebug>
 #include <QApplication>
+#include <QtDebug>
 
 // ParaView includes.
 #include "pqAnimationScene.h"

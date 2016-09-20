@@ -32,9 +32,9 @@
 #include "vtkSmartPointer.h"
 #include "vtkUnsignedIntArray.h"
 
+#include <assert.h>
 #include <map>
 #include <set>
-#include <assert.h>
 
 namespace
 {

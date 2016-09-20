@@ -34,26 +34,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <algorithm>
 
-#include <QStyle>
-#include <QDir>
 #include <QApplication>
+#include <QDir>
 #include <QMessageBox>
+#include <QStyle>
 
 #include <pqServer.h>
 #include <vtkClientServerStream.h>
 #include <vtkCollection.h>
 #include <vtkCollectionIterator.h>
 #include <vtkDirectory.h>
-#include <vtkProcessModule.h>
 #include <vtkPVFileInformation.h>
 #include <vtkPVFileInformationHelper.h>
-#include <vtkSmartPointer.h>
+#include <vtkProcessModule.h>
 #include <vtkSMDirectoryProxy.h>
 #include <vtkSMIntVectorProperty.h>
 #include <vtkSMProxy.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMSessionProxyManager.h>
 #include <vtkSMStringVectorProperty.h>
+#include <vtkSmartPointer.h>
 #include <vtkStringList.h>
 
 #include "pqSMAdaptor.h"

@@ -127,8 +127,8 @@
 #define vtkSMProperty_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
+#include "vtkSMMessageMinimal.h"          // needed for vtkSMMessage
 #include "vtkSMObject.h"
-#include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 #include "vtkWeakPointer.h" // needed for vtkweakPointer
 
 class vtkClientServerStream;

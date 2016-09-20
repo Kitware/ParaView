@@ -1,10 +1,10 @@
 #include "vtkSpyPlotReaderMap.h"
+#include "vtkMultiProcessStream.h"
 #include "vtkSpyPlotReader.h"
 #include "vtkSpyPlotUniReader.h"
-#include "vtkMultiProcessStream.h"
 
-#include <vtksys/SystemTools.hxx>
 #include <assert.h>
+#include <vtksys/SystemTools.hxx>
 
 namespace
 {

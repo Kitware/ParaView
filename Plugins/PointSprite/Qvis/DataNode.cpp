@@ -35,8 +35,8 @@
 *
 *****************************************************************************/
 
-#include <string.h>
 #include <DataNode.h>
+#include <string.h>
 namespace pointsprite {
 
 // Static members. These are returned from the As functions when there

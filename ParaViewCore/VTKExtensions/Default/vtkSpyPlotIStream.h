@@ -23,8 +23,8 @@ PURPOSE.  See the above copyright notice for more information.
 #ifndef vtkSpyPlotIStream_h
 #define vtkSpyPlotIStream_h
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
-#include "vtkType.h"
 #include "vtkSystemIncludes.h"
+#include "vtkType.h"
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSpyPlotIStream {
 public:

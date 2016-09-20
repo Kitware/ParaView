@@ -23,8 +23,8 @@
 #ifndef vtkPVAMRFragmentIntegration_h
 #define vtkPVAMRFragmentIntegration_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkAMRFragmentIntegration.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 // Forware declaration.
 class vtkPVAMRFragmentIntegrationInternal;

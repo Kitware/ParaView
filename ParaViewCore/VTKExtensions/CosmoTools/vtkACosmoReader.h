@@ -65,13 +65,13 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define vtkACosmoReader_h
 
 #include "vtkMultiBlockDataSetAlgorithm.h" // Base class
-#include "vtkPVVTKExtensionsCosmoToolsModule.h" // For export macro
 #include "vtkMultiBlockDataSetAlgorithm.h"
+#include "vtkPVVTKExtensionsCosmoToolsModule.h" // For export macro
 
 // C/C++ includes
+#include <set>    // For STL set
 #include <string> // For C++ string
 #include <vector> // For STL vector
-#include <set>    // For STL set
 
 // Forward declarations
 

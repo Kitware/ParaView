@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef vtkVRControlSlicePositionStyle_h
 #define vtkVRControlSlicePositionStyle_h
 
-#include "vtkVRInteractorStyle.h"
 #include "vtkNew.h"
+#include "vtkVRInteractorStyle.h"
 
 class vtkTransform;
 class vtkMatrix4x4;

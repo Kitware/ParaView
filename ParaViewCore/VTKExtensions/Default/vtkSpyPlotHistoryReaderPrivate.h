@@ -25,11 +25,11 @@
 
 #include <vtksys/SystemTools.hxx>
 
-#include <map> // Needed for STL map.
-#include <set> // Needed for STL set.
-#include <vector> // Needed for STL vector.
-#include <string> // Needed for STL string.
+#include <map>     // Needed for STL map.
+#include <set>     // Needed for STL set.
 #include <sstream> // Needed for STL sstream.
+#include <string>  // Needed for STL string.
+#include <vector>  // Needed for STL vector.
 
 //-----------------------------------------------------------------------------
 namespace SpyPlotHistoryReaderPrivate

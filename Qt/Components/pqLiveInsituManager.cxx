@@ -31,8 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqLiveInsituManager.h"
 
-#include <limits>
 #include <iostream>
+#include <limits>
 
 #include <QInputDialog>
 #include <QMessageBox>
@@ -43,16 +43,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
+#include "pqEventDispatcher.h"
 #include "pqLiveInsituVisualizationManager.h"
 #include "pqProxy.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqTestUtility.h"
 #include "pqWidgetEventPlayer.h"
-#include "pqEventDispatcher.h"
 
-#include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
+#include "vtkProcessModule.h"
 #include "vtkSMLiveInsituLinkProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSessionProxyManager.h"

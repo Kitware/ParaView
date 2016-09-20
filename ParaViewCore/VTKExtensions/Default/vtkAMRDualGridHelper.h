@@ -25,10 +25,10 @@
 #ifndef vtkAMRDualGridHelper_h
 #define vtkAMRDualGridHelper_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkObject.h"
-#include <vector>
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include <map>
+#include <vector>
 
 class vtkDataArray;
 class vtkIntArray;

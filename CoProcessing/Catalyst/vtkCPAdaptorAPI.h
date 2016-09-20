@@ -15,8 +15,8 @@
 #ifndef vtkCPAdaptorAPI_h
 #define vtkCPAdaptorAPI_h
 
-#include "vtkPVCatalystModule.h" // For windows import/export of shared libraries
 #include "vtkObject.h"
+#include "vtkPVCatalystModule.h" // For windows import/export of shared libraries
 
 class vtkCPDataDescription;
 class vtkCPProcessor;

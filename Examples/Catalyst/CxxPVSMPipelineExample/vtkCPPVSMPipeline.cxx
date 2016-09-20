@@ -1,24 +1,24 @@
 #include "vtkCPPVSMPipeline.h"
 
-#include <vtkCommunicator.h>
 #include <vtkCPDataDescription.h>
 #include <vtkCPInputDataDescription.h>
+#include <vtkCommunicator.h>
 #include <vtkMultiProcessController.h>
 #include <vtkNew.h>
 #include <vtkObjectFactory.h>
 #include <vtkPVTrivialProducer.h>
-#include <vtkSmartPointer.h>
 #include <vtkSMDoubleVectorProperty.h>
 #include <vtkSMInputProperty.h>
-#include <vtkSMSourceProxy.h>
-#include <vtkSMSessionProxyManager.h>
 #include <vtkSMProxyManager.h>
+#include <vtkSMSessionProxyManager.h>
+#include <vtkSMSourceProxy.h>
 #include <vtkSMStringVectorProperty.h>
 #include <vtkSMWriterProxy.h>
+#include <vtkSmartPointer.h>
 #include <vtkUnstructuredGrid.h>
 
-#include <string>
 #include <sstream>
+#include <string>
 
 vtkStandardNewMacro(vtkCPPVSMPipeline);
 

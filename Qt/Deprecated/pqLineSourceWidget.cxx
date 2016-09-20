@@ -30,16 +30,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "pqApplicationCore.h"
 #include "pqLineSourceWidget.h"
+#include "pqApplicationCore.h"
 #include "pqPropertyLinks.h"
 #include "pqSMSignalAdaptors.h"
 
 #include "ui_pqLineSourceControls.h"
 
+#include <vtkSMNewWidgetRepresentationProxy.h>
 #include <vtkSMProxyProperty.h>
 #include <vtkSMSourceProxy.h>
-#include <vtkSMNewWidgetRepresentationProxy.h>
 
 /////////////////////////////////////////////////////////////////////////
 // pqLineSourceWidget::pqImplementation

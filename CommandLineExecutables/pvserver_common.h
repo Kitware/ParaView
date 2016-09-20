@@ -24,8 +24,8 @@ extern "C" {
 #include "vtkMultiProcessController.h"
 #include "vtkNetworkAccessManager.h"
 #include "vtkPVServerOptions.h"
-#include "vtkProcessModule.h"
 #include "vtkPVSessionServer.h"
+#include "vtkProcessModule.h"
 
 #ifndef BUILD_SHARED_LIBS
 # include "pvStaticPluginsInit.h"

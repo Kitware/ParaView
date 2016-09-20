@@ -21,8 +21,8 @@
 #ifndef vtkFlashContour_h
 #define vtkFlashContour_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class vtkImageData;
 class vtkPoints;

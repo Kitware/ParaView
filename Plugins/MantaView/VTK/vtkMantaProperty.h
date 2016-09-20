@@ -66,9 +66,9 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef vtkMantaProperty_h
 #define vtkMantaProperty_h
 
+#include "Interface/Texture.h"
 #include "vtkMantaModule.h"
 #include "vtkProperty.h"
-#include "Interface/Texture.h"
 
 #include <string>
 

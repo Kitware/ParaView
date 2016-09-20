@@ -1,9 +1,9 @@
+#include "vtkImageData.h"
 #include "vtkNew.h"
 #include "vtkPNGReader.h"
 #include "vtkPVDataEncoder.h"
-#include "vtkTestUtilities.h"
 #include "vtkSmartPointer.h"
-#include "vtkImageData.h"
+#include "vtkTestUtilities.h"
 
 #include <vtksys/SystemTools.hxx>
 

@@ -16,12 +16,12 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVConfig.h" // needed for DEFAULT_DOUBLE_PRECISION_VALUE
 #include "vtkPVXMLElement.h"
+#include "vtkProcessModule.h"
 #include "vtkSMMessage.h"
-#include "vtkSMVectorPropertyTemplate.h"
 #include "vtkSMStateLocator.h"
+#include "vtkSMVectorPropertyTemplate.h"
 
 vtkStandardNewMacro(vtkSMDoubleVectorProperty);
 

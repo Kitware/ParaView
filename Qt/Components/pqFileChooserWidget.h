@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqFileChooserWidget_h
 
 #include "pqComponentsModule.h"
-#include <QWidget>
 #include <QString>
 #include <QStringList>
+#include <QWidget>
 class QLineEdit;
 class pqServer;
 

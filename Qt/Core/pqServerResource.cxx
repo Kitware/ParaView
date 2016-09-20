@@ -35,10 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerConfiguration.h"
 
 #include <QDir>
+#include <QPointer>
 #include <QRegExp>
 #include <QUrl>
 #include <QtDebug>
-#include <QPointer>
 
 //////////////////////////////////////////////////////////////////////////////
 // pqServerResource::pqImplementation

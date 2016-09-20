@@ -31,11 +31,11 @@
 #include "vtkStdString.h"
 #include "vtkStringList.h"
 
+#include <algorithm>
 #include <cassert>
 #include <set>
-#include <vector>
-#include <algorithm>
 #include <sstream>
+#include <vector>
 
 vtkStandardNewMacro(vtkSMArrayListDomain);
 

@@ -28,8 +28,8 @@
 
 #include <assert.h>
 #include <map>
-#include <vector>
 #include <sstream>
+#include <vector>
 #include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkPythonAnnotationFilter);

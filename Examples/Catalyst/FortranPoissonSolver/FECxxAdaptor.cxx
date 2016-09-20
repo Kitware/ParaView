@@ -4,10 +4,10 @@
 #include "vtkCPDataDescription.h"
 #include "vtkCPInputDataDescription.h"
 #include "vtkCPProcessor.h"
-#include "vtkSmartPointer.h"
 #include "vtkDoubleArray.h"
-#include "vtkPointData.h"
 #include "vtkImageData.h"
+#include "vtkPointData.h"
+#include "vtkSmartPointer.h"
 
 // Fortran specific header
 #include "vtkCPPythonAdaptorAPI.h"

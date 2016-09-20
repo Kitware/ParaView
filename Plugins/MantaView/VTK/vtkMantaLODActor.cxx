@@ -63,10 +63,10 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
 #include "vtkManta.h"
-#include "vtkMantaLODActor.h"
-#include "vtkObjectFactory.h"
 #include "vtkMantaActor.h"
+#include "vtkMantaLODActor.h"
 #include "vtkMatrix4x4.h"
+#include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkMantaLODActor);
 

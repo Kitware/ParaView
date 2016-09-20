@@ -17,12 +17,12 @@
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkWeakPointer.h"
 #include "vtkSMMessage.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkStdString.h"
+#include "vtkWeakPointer.h"
 
 #include <list>
 

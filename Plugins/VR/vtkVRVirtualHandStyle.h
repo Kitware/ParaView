@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef vtkVRVirtualHandStyle_h
 #define vtkVRVirtualHandStyle_h
 
-#include "vtkVRTrackStyle.h"
 #include "vtkNew.h"
+#include "vtkVRTrackStyle.h"
 
 class vtkCamera;
 class vtkMatrix4x4;

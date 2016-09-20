@@ -33,12 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Server Manager Includes.
 #include "vtkMath.h"
-#include "vtkSMNewWidgetRepresentationProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMNewWidgetRepresentationProxy.h"
 
 // Qt Includes.
-#include <QVBoxLayout>
 #include <QLabel>
+#include <QVBoxLayout>
 
 // ParaView Includes.
 

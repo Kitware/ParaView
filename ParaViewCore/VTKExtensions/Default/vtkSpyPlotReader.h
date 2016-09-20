@@ -49,8 +49,8 @@ PURPOSE.  See the above copyright notice for more information.
 #ifndef vtkSpyPlotReader_h
 #define vtkSpyPlotReader_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkCompositeDataSetAlgorithm.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class vtkBoundingBox;
 class vtkCallbackCommand;

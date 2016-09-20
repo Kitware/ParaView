@@ -36,14 +36,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCollection.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkIntArray.h"
-#include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVRenderView.h"
-#include "vtkSelection.h"
-#include "vtkSelectionNode.h"
-#include "vtkSmartPointer.h"
-#include "vtkSMInteractionUndoStackBuilder.h"
+#include "vtkProcessModule.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMInteractionUndoStackBuilder.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
@@ -53,19 +50,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTrace.h"
 #include "vtkSMUndoStack.h"
+#include "vtkSelection.h"
+#include "vtkSelectionNode.h"
+#include "vtkSmartPointer.h"
 #include "vtkStructuredData.h"
 
 // Qt includes.
-#include <QFileInfo>
-#include <QList>
-#include <QPointer>
-#include <QtDebug>
 #include <QEvent>
-#include <QMouseEvent>
-#include <QMenu>
-#include <QSet>
-#include <QPainter>
+#include <QFileInfo>
 #include <QGridLayout>
+#include <QList>
+#include <QMenu>
+#include <QMouseEvent>
+#include <QPainter>
+#include <QPointer>
+#include <QSet>
+#include <QtDebug>
 
 // ParaView includes.
 #include "pqApplicationCore.h"
@@ -74,9 +74,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOptions.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
+#include "pqSMAdaptor.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
 
 namespace {

@@ -36,10 +36,9 @@
 #ifndef vtkDepthSortPainter_h
 #define vtkDepthSortPainter_h
 
-
-#include "vtkPointSpriteRenderingModule.h" //needed for exports
 #include "vtkPainter.h"
-#include "vtkWeakPointer.h" // Needed
+#include "vtkPointSpriteRenderingModule.h" //needed for exports
+#include "vtkWeakPointer.h"                // Needed
 
 class vtkFloatArray;
 class vtkIdTypeArray;

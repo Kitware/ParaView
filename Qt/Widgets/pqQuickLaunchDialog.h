@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqQuickLaunchDialog_h
 #define pqQuickLaunchDialog_h
 
-#include <QDialog>
 #include "pqWidgetsModule.h"
+#include <QDialog>
 
 /// A borderless pop-up dialog used to show actions that the user can launch.
 /// Provides search capabilities.

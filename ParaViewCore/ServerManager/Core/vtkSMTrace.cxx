@@ -33,9 +33,9 @@
 #include "vtkSMProxySelectionModel.h"
 #include "vtkSMSessionProxyManager.h"
 
-#include <sstream>
-#include <map>
 #include <cassert>
+#include <map>
+#include <sstream>
 
 #ifndef PARAVIEW_ENABLE_PYTHON
 class vtkSmartPyObject

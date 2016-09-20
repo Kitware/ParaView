@@ -33,9 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pq_SMSignalAdaptors_h
 #define pq_SMSignalAdaptors_h
 
+#include "pqComponentsModule.h"
 #include <QObject>
 #include <QVariant>
-#include "pqComponentsModule.h"
 class pqProxy;
 
 /// signal adaptor to allow getting/setting/observing of a pseudo vtkSMProxy property

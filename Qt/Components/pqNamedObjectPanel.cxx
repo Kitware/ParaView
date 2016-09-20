@@ -31,8 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqNamedObjectPanel.h"
 
-#include "vtkPVXMLElement.h"
 #include "vtkCollection.h"
+#include "vtkPVXMLElement.h"
 
 //#include "pq3DWidget.h"
 #include "pqNamedWidgets.h"

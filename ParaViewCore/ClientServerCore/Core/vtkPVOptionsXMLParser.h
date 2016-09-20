@@ -22,8 +22,8 @@
 #ifndef vtkPVOptionsXMLParser_h
 #define vtkPVOptionsXMLParser_h
 
-#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkCommandOptionsXMLParser.h"
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 class vtkCommandOptions;
 
 class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVOptionsXMLParser : public vtkCommandOptionsXMLParser

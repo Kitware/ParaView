@@ -36,23 +36,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageData.h"
 #include "vtkMath.h"
 #include "vtkNew.h"
-#include "vtkPiecewiseFunction.h"
 #include "vtkPVDiscretizableColorTransferFunction.h"
-#include "vtkSmartPointer.h"
+#include "vtkPiecewiseFunction.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTransferFunctionPresets.h"
 #include "vtkSMTransferFunctionProxy.h"
+#include "vtkSmartPointer.h"
 #include "vtkUnsignedCharArray.h"
 
-#include <QPixmap>
-#include <QSize>
 #include <QImage>
-#include <QPixmap>
 #include <QPainter>
 #include <QPainterPath>
 #include <QPen>
+#include <QPixmap>
+#include <QPixmap>
+#include <QSize>
 
 class pqPresetToPixmap::pqInternals
 {

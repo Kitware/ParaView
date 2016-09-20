@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqLightsEditor_h
 #define pqLightsEditor_h
 
-#include <QDialog>
 #include "pqApplicationComponentsModule.h"
+#include <QDialog>
 
 class vtkSMProxy;
 class vtkSMPropertyGroup;

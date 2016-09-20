@@ -32,10 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqServerConfigurationCollection_h
 #define pqServerConfigurationCollection_h
 
-#include <QObject>
-#include <QMap>
-#include <QList>
 #include "pqCoreModule.h"
+#include <QList>
+#include <QMap>
+#include <QObject>
 
 class vtkPVXMLElement;
 class pqServerResource;

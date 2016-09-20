@@ -14,8 +14,8 @@
 =========================================================================*/
 #include "vtkMySpecialRepresentation.h"
 
-#include "vtkObjectFactory.h"
 #include "vtkMySpecialPolyDataMapper.h"
+#include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkMySpecialRepresentation);
 //----------------------------------------------------------------------------

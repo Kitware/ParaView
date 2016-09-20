@@ -32,10 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef vtkVRStyleGrabNRotateSliceNormal_h
 #define vtkVRStyleGrabNRotateSliceNormal_h
 
-#include "vtkVRStyleGrabNUpdateMatrix.h"
 #include "vtkSmartPointer.h"
-#include <vector>
+#include "vtkVRStyleGrabNUpdateMatrix.h"
 #include <map>
+#include <vector>
 
 class vtkSMProperty;
 class vtkSMProxy;

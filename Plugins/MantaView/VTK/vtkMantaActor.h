@@ -66,8 +66,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef vtkMantaActor_h
 #define vtkMantaActor_h
 
-#include "vtkMantaModule.h"
 #include "vtkActor.h"
+#include "vtkMantaModule.h"
 
 namespace Manta {
 class Group;

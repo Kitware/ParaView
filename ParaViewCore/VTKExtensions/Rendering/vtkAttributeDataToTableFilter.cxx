@@ -19,6 +19,7 @@
 #include "vtkCompositeDataPipeline.h"
 #include "vtkDataSet.h"
 #include "vtkGraph.h"
+#include "vtkIdList.h"
 #include "vtkIdTypeArray.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
@@ -29,7 +30,6 @@
 #include "vtkRectilinearGrid.h"
 #include "vtkStructuredGrid.h"
 #include "vtkTable.h"
-#include "vtkIdList.h"
 
 vtkStandardNewMacro(vtkAttributeDataToTableFilter);
 //----------------------------------------------------------------------------

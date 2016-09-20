@@ -18,13 +18,13 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMCoreUtilities.h"
-#include "vtkSMStringVectorProperty.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMStringVectorProperty.h"
 #include "vtkSMUncheckedPropertyHelper.h"
+#include "vtkSmartPointer.h"
 
-#include <vtksys/SystemTools.hxx>
 #include <iostream>
+#include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkSMInputFileNameDomain);
 

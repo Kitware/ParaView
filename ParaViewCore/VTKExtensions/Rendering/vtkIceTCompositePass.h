@@ -31,11 +31,11 @@
 #ifndef vtkIceTCompositePass_h
 #define vtkIceTCompositePass_h
 
+#include "vtkNew.h"                            // needed for vtkWeakPointer.
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 #include "vtkRenderPass.h"
 #include "vtkSynchronizedRenderers.h" //  needed for vtkRawImage.
-#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
-#include "vtkNew.h" // needed for vtkWeakPointer.
-#include <IceT.h> // for icet types
+#include <IceT.h>                     // for icet types
 
 class vtkMultiProcessController;
 class vtkPKdTree;

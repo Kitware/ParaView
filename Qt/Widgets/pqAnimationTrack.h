@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqWidgetsModule.h"
 
-#include <QObject>
 #include <QGraphicsItem>
 #include <QList>
+#include <QObject>
 
 class pqAnimationKeyFrame;
 

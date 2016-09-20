@@ -17,8 +17,8 @@
 #include "vtkCamera.h"
 #include "vtkCameraInterpolator2.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVCameraCueManipulator.h"
 #include "vtkPVCameraAnimationCue.h"
+#include "vtkPVCameraCueManipulator.h"
 #include "vtkPVKeyFrame.h"
 
 #include <assert.h>

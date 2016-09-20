@@ -36,8 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "vtkBoundingBox.h"
 #include "vtkPVDataInformation.h"
-#include "vtkSMPropertyHelper.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
+#include "vtkSMPropertyHelper.h"
 
 //-----------------------------------------------------------------------------
 pqOrbitWidget::pqOrbitWidget(

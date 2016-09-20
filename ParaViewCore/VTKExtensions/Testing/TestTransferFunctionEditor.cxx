@@ -1,11 +1,11 @@
 #include "vtkCleanUnstructuredGrid.h"
 #include "vtkColorTransferFunction.h"
-#include "vtkExtractHistogram.h"
 #include "vtkDataSetReader.h"
+#include "vtkExtractHistogram.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkTesting.h"
 #include "vtkTestUtilities.h"
+#include "vtkTesting.h"
 #include "vtkTransferFunctionViewer.h"
 
 int main(int argc, char* argv[])

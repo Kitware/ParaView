@@ -28,9 +28,9 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkMath.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVConfig.h"
 #include "vtkPointData.h"
 #include "vtkPoints.h"
-#include "vtkPVConfig.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnsignedCharArray.h"
@@ -43,16 +43,15 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkMultiProcessController.h"
 #endif
 
-
-#include "vtksys/SystemTools.hxx"
 #include "vtk_netcdf.h"
 #include "vtk_netcdfcpp.h"
+#include "vtksys/SystemTools.hxx"
 
+#include <algorithm>
+#include <iterator>
 #include <set>
 #include <string>
 #include <vector>
-#include <iterator>
-#include <algorithm>
 
 
 namespace

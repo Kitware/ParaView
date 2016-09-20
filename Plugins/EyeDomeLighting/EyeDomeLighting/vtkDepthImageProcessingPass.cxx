@@ -37,27 +37,27 @@ Ph.D. thesis of Christian BOUCHENY.
 ------------------------------------------------------------------------*/
 
 #include "vtkDepthImageProcessingPass.h"
+#include "vtkFrameBufferObject.h"
 #include "vtkObjectFactory.h"
-#include <assert.h>
+#include "vtkOpenGLRenderWindow.h"
 #include "vtkRenderState.h"
 #include "vtkRenderer.h"
-#include "vtkgl.h"
-#include "vtkFrameBufferObject.h"
-#include "vtkTextureObject.h"
-#include "vtkShaderProgram2.h"
 #include "vtkShader2.h"
 #include "vtkShader2Collection.h"
-#include "vtkUniformVariables.h"
-#include "vtkOpenGLRenderWindow.h"
+#include "vtkShaderProgram2.h"
+#include "vtkTextureObject.h"
 #include "vtkTextureUnitManager.h"
+#include "vtkUniformVariables.h"
+#include "vtkgl.h"
+#include <assert.h>
 
-#include "vtkPNGWriter.h"
-#include "vtkImageImport.h"
-#include "vtkPixelBufferObject.h"
-#include "vtkPixelBufferObject.h"
-#include "vtkImageExtractComponents.h"
 #include "vtkCamera.h"
+#include "vtkImageExtractComponents.h"
+#include "vtkImageImport.h"
 #include "vtkMath.h"
+#include "vtkPNGWriter.h"
+#include "vtkPixelBufferObject.h"
+#include "vtkPixelBufferObject.h"
 
 vtkCxxSetObjectMacro(vtkDepthImageProcessingPass,DelegatePass,vtkRenderPass);
 

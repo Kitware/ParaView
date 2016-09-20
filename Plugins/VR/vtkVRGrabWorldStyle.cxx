@@ -46,8 +46,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 #include "pqView.h"
 
-#include <sstream>
 #include <algorithm>
+#include <sstream>
 
 // -----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkVRGrabWorldStyle)

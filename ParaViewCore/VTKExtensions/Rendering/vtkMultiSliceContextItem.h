@@ -17,9 +17,9 @@
 #ifndef vtkMultiSliceContextItem_h
 #define vtkMultiSliceContextItem_h
 
-#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
-#include "vtkContextItem.h"
 #include "vtkCommand.h" // needed for vtkCommand::UserEvent.
+#include "vtkContextItem.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkAxis;
 

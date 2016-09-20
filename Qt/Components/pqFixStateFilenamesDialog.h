@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqFixStateFilenamesDialog_h
 #define pqFixStateFilenamesDialog_h
 
-#include <QDialog>
 #include "pqComponentsModule.h"
+#include <QDialog>
 
 class vtkPVXMLElement;
 class vtkFileSequenceParser;

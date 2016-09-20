@@ -32,10 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqProgressWidget_h
 #define pqProgressWidget_h
 
-
-#include <QWidget>
-#include <QTime>
 #include "pqWidgetsModule.h"
+#include <QTime>
+#include <QWidget>
 
 class pqProgressBar;
 class QToolButton;

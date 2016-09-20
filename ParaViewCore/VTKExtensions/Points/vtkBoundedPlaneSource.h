@@ -21,8 +21,8 @@
 #ifndef vtkBoundedPlaneSource_h
 #define vtkBoundedPlaneSource_h
 
-#include "vtkPolyDataAlgorithm.h"
 #include "vtkPVVTKExtensionsPointsModule.h" // for export macro
+#include "vtkPolyDataAlgorithm.h"
 class VTKPVVTKEXTENSIONSPOINTS_EXPORT vtkBoundedPlaneSource : public vtkPolyDataAlgorithm
 {
 public:

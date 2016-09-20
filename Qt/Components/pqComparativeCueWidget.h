@@ -32,10 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqComparativeCueWidget_h
 #define pqComparativeCueWidget_h
 
-#include <QTableWidget>
 #include "pqComponentsModule.h"
 #include "pqTimer.h"
 #include "vtkSmartPointer.h"
+#include <QTableWidget>
 
 class vtkEventQtSlotConnect;
 class vtkSMComparativeAnimationCueProxy;

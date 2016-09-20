@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqTreeViewSelectionHelper_h
 #define pqTreeViewSelectionHelper_h
 
-#include <QObject>
 #include "pqWidgetsModule.h"
 #include <QItemSelection>
+#include <QObject>
 #include <QTreeView>
 
 // pqTreeViewSelectionHelper is analogous to pqTreeWidgetSelectionHelper.

@@ -9,8 +9,8 @@
 using std::cerr;
 using std::endl;
 
-#include <string>
 #include <sstream>
+#include <string>
 
 #define pqErrorMacro(estr)\
   qDebug()\

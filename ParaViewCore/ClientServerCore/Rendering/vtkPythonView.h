@@ -22,9 +22,9 @@
 
 #include "vtkPVView.h"
 
+#include "vtkImageData.h"                         // needed for member variable
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
-#include "vtkImageData.h" // needed for member variable
-#include "vtkSmartPointer.h" //needed for member variables
+#include "vtkSmartPointer.h"                      //needed for member variables
 
 class vtkImageData;
 class vtkInformationRequestKey;

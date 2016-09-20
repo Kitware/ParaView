@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqFlatTreeViewEventTranslator_h
 #define _pqFlatTreeViewEventTranslator_h
 
-#include "pqWidgetEventTranslator.h"
 #include "pqCoreModule.h"
+#include "pqWidgetEventTranslator.h"
 #include <QPoint>
 
 /**

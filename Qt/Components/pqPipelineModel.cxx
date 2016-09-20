@@ -59,9 +59,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QApplication>
 #include <QFont>
+#include <QSignalMapper>
 #include <QString>
 #include <QStyle>
-#include <QSignalMapper>
 #include <QtDebug>
 
 class ModifiedLiveInsituLink : public vtkCommand

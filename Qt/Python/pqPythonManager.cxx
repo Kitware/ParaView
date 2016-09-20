@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include <vtkPython.h> // Python first
 #include "pqPythonManager.h"
+#include <vtkPython.h> // Python first
 
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
@@ -53,16 +53,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 
 #include <QApplication>
-#include <QMainWindow>
-#include <QStatusBar>
 #include <QCursor>
 #include <QDebug>
 #include <QLayout>
+#include <QMainWindow>
 #include <QSplitter>
+#include <QStatusBar>
 
-#include <QFileDialog>
-#include <QFile>
 #include <QDir>
+#include <QFile>
+#include <QFileDialog>
 #include <QTextStream>
 
 #include <QTimer>

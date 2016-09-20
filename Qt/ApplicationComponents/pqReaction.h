@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqReaction_h
 #define pqReaction_h
 
-#include <QObject>
-#include <QAction>
 #include "pqApplicationComponentsModule.h"
+#include <QAction>
+#include <QObject>
 
 /// @defgroup Reactions ParaView Reactions
 /// ParaView client relies of a collection of reactions that autonomous entities

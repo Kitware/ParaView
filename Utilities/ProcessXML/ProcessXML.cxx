@@ -14,13 +14,13 @@
 =========================================================================*/
 #include "vtkObject.h"
 
-#include <string>
-#include <vector>
-#include <vtksys/SystemTools.hxx>
-#include <vtksys/Base64.h>
-#include <vtksys/RegularExpression.hxx>
 #include <fstream>
 #include <sstream>
+#include <string>
+#include <vector>
+#include <vtksys/Base64.h>
+#include <vtksys/RegularExpression.hxx>
+#include <vtksys/SystemTools.hxx>
 
 #include <assert.h>
 class Output

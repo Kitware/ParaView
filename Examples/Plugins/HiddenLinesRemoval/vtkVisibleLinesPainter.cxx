@@ -16,23 +16,23 @@
 
 #include "vtkActor.h"
 #include "vtkBoundingBox.h"
-#include "vtkPVColorMaterialHelper.h"
 #include "vtkFrameBufferObject.h"
-#include "vtkPVLightingHelper.h"
-#include "vtkShaderProgram2.h"
-#include "vtkShader2.h"
-#include "vtkShader2Collection.h"
-#include "vtkUniformVariables.h"
-#include "vtkTextureObject.h"
 #include "vtkObjectFactory.h"
+#include "vtkOpenGLRenderWindow.h"
+#include "vtkPVColorMaterialHelper.h"
+#include "vtkPVLightingHelper.h"
 #include "vtkPolyData.h"
 #include "vtkProperty.h"
 #include "vtkRenderer.h"
-#include "vtkOpenGLRenderWindow.h"
+#include "vtkShader2.h"
+#include "vtkShader2Collection.h"
+#include "vtkShaderProgram2.h"
+#include "vtkTextureObject.h"
+#include "vtkUniformVariables.h"
 
-#include <string>
-#include <assert.h>
 #include "vtkgl.h"
+#include <assert.h>
+#include <string>
 
 extern const char* vtkVisibleLinesPainter_vs;
 extern const char* vtkVisibleLinesPainter_fs;

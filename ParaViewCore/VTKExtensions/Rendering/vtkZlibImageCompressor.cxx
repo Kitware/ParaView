@@ -13,10 +13,10 @@
 
 =========================================================================*/
 #include "vtkZlibImageCompressor.h"
-#include "vtk_zlib.h"
+#include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkUnsignedCharArray.h"
-#include "vtkMultiProcessStream.h"
+#include "vtk_zlib.h"
 #include <sstream>
 
 vtkStandardNewMacro(vtkZlibImageCompressor);

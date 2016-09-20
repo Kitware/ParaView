@@ -27,9 +27,9 @@
 #ifndef vtkSpreadSheetRepresentation_h
 #define vtkSpreadSheetRepresentation_h
 
+#include "vtkNew.h"                               // needed for vtkNew.
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"
-#include "vtkNew.h" // needed for vtkNew.
 
 class vtkBlockDeliveryPreprocessor;
 class vtkCleanArrays;

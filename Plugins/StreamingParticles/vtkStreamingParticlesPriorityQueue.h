@@ -30,9 +30,9 @@
 #ifndef vtkStreamingParticlesPriorityQueue_h
 #define vtkStreamingParticlesPriorityQueue_h
 
-#include "vtkPVClientServerCoreRenderingModule.h" // for export macros
 #include "vtkObject.h"
-#include <set> // needed for set
+#include "vtkPVClientServerCoreRenderingModule.h" // for export macros
+#include <set>                                    // needed for set
 
 class vtkMultiBlockDataSet;
 class vtkMultiProcessController;

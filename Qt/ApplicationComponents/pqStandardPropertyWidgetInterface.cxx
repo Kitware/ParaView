@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqArrayStatusPropertyWidget.h"
 #include "pqBackgroundEditorWidget.h"
 #include "pqBoxPropertyWidget.h"
+#include "pqCTHArraySelectionDecorator.h"
 #include "pqCalculatorWidget.h"
 #include "pqCameraManipulatorWidget.h"
 #include "pqColorAnnotationsPropertyWidget.h"
@@ -42,7 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqColorSelectorPropertyWidget.h"
 #include "pqCommandButtonPropertyWidget.h"
 #include "pqCylinderPropertyWidget.h"
-#include "pqCTHArraySelectionDecorator.h"
 #include "pqDisplayRepresentationWidget.h"
 #include "pqDoubleRangeSliderPropertyWidget.h"
 #include "pqEnableWidgetDecorator.h"
@@ -70,9 +70,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTransferFunctionWidgetPropertyWidget.h"
 #include "pqViewTypePropertyWidget.h"
 #include "pqYoungsMaterialPropertyWidget.h"
-#include "vtkSMPropertyGroup.h"
-#include "vtkSMProperty.h"
 #include "vtkPVConfig.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyGroup.h"
 #ifdef PARAVIEW_ENABLE_PYTHON
 #include "pqCinemaConfiguration.h"
 #endif

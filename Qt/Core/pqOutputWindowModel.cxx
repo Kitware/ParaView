@@ -31,14 +31,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include <QDebug>
+#include <QIcon>
 #include <QStyleFactory>
 #include <QTableView>
-#include <QIcon>
 
-
-#include "pqOutputWindowModel.h"
-#include "pqOutputWindow.h"
 #include "pqCheckBoxDelegate.h"
+#include "pqOutputWindow.h"
+#include "pqOutputWindowModel.h"
 
 #include <iostream>
 

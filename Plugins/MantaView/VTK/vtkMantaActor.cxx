@@ -75,12 +75,12 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRendererCollection.h"
 #include "vtkTimerLog.h"
 
-#include <Interface/Scene.h>
-#include <Interface/Context.h>
 #include <Engine/Control/RTRT.h>
+#include <Interface/Context.h>
+#include <Interface/Scene.h>
 #include <Model/Groups/DynBVH.h>
-#include <Model/Groups/RecursiveGrid.h>
 #include <Model/Groups/Group.h>
+#include <Model/Groups/RecursiveGrid.h>
 
 //============================================================================
 

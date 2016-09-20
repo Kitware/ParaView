@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqInterfaceTracker_h
 #define pqInterfaceTracker_h
 
-#include <QObject>
 #include "pqCoreModule.h"
+#include <QObject>
 
 class vtkObject;
 

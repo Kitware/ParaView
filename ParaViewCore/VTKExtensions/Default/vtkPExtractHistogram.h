@@ -20,8 +20,8 @@
 #ifndef vtkPExtractHistogram_h
 #define vtkPExtractHistogram_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkExtractHistogram.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class vtkMultiProcessController;
 

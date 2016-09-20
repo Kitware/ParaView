@@ -33,19 +33,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRemoteControl.h"
 #include "ui_pqRemoteControl.h"
 
-#include "pqRemoteControlThread.h"
 #include "pqApplicationCore.h"
+#include "pqRemoteControlThread.h"
 #include "pqRenderView.h"
 #include "pqServerManagerModel.h"
 
+#include <vtkPVRenderView.h>
 #include <vtkSMPropertyHelper.h>
 #include <vtkSMRenderViewProxy.h>
-#include <vtkPVRenderView.h>
 
+#include <QDesktopServices>
 #include <QHostInfo>
 #include <QInputDialog>
 #include <QTimer>
-#include <QDesktopServices>
 #include <QUrl>
 
 //-----------------------------------------------------------------------------

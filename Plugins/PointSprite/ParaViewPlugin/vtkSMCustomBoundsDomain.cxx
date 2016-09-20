@@ -15,8 +15,8 @@
 #include "vtkSMCustomBoundsDomain.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkSMDoubleVectorProperty.h"
 #include "vtkPVDataInformation.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMPropertyHelper.h"
 
 vtkStandardNewMacro(vtkSMCustomBoundsDomain);

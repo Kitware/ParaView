@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqListWidgetItemObject_h
 
 #include "pqWidgetsModule.h"
-#include <QObject>
 #include <QListWidgetItem>
+#include <QObject>
 
 /// QListWidgetItem subclass with additional signals, slots, and properties
 class PQWIDGETS_EXPORT pqListWidgetItemObject : public QObject, public QListWidgetItem

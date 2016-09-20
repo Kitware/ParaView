@@ -1,5 +1,5 @@
-#include <algorithm>
 #include "FEDataStructures.h"
+#include <algorithm>
 #include <iostream>
 #include <mpi.h>
 #include <vector>

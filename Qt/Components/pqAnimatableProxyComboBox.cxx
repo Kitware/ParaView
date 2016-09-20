@@ -37,9 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Includes.
 #include "pqApplicationCore.h"
-#include "pqServerManagerModel.h"
-#include "pqSMProxy.h"
 #include "pqPipelineSource.h"
+#include "pqSMProxy.h"
+#include "pqServerManagerModel.h"
 
 //-----------------------------------------------------------------------------
 pqAnimatableProxyComboBox::pqAnimatableProxyComboBox(QWidget* _parent)

@@ -39,20 +39,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 #include <QEvent>
 #include <QHeaderView>
+#include <QHelpEvent>
 #include <QItemEditorFactory>
 #include <QLineEdit>
 #include <QList>
-#include <QPainter>
 #include <QPaintEvent>
+#include <QPainter>
 #include <QPersistentModelIndex>
 #include <QPoint>
 #include <QRect>
 #include <QScrollBar>
 #include <QStyle>
-#include <QtDebug>
 #include <QTime>
 #include <QToolTip>
-#include <QHelpEvent>
+#include <QtDebug>
 
 class pqFlatTreeViewColumn
 {

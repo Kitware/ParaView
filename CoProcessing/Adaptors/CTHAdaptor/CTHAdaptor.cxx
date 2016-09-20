@@ -1,15 +1,15 @@
-#include "vtkObjectFactory.h"
 #include "vtkMultiProcessController.h"
+#include "vtkObjectFactory.h"
 #include "vtkStdString.h"
 
-#include "vtkCTHSource.h"
-#include "vtkCPProcessor.h"
 #include "vtkCPDataDescription.h"
+#include "vtkCPProcessor.h"
 #include "vtkCPPythonScriptPipeline.h"
+#include "vtkCTHSource.h"
 
-#include <stdio.h>
 #include <execinfo.h>
 #include <signal.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 namespace 

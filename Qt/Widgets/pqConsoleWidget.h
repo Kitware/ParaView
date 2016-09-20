@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqWidgetsModule.h"
 
-#include <QWidget>
-#include <QTextCharFormat>
 #include <QCompleter>
+#include <QTextCharFormat>
+#include <QWidget>
 
 class pqConsoleWidgetCompleter;
 

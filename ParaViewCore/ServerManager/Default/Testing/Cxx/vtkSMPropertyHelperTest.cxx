@@ -15,11 +15,11 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkSMPropertyHelperTest.h"
 
-#include "vtkSMProxyManager.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
-#include "vtkSMPropertyHelper.h"
 
 void vtkSMPropertyHelperTest::Set()
 {

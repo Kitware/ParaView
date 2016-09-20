@@ -21,8 +21,8 @@
 #ifndef vtkPVNullSource_h
 #define vtkPVNullSource_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkLineSource.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVNullSource : public vtkLineSource
 {

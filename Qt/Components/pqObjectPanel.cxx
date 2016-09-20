@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectPanel.h"
 
 // ParaView includes
-#include "pqProxy.h"
 #include "pqObjectPanelPropertyWidget.h"
+#include "pqProxy.h"
 
 //-----------------------------------------------------------------------------
 pqObjectPanel::pqObjectPanel(pqProxy* object_proxy, QWidget* p) :

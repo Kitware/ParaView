@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqViewMenuManager_h
 #define pqViewMenuManager_h
 
-#include <QObject>
 #include "pqApplicationComponentsModule.h"
+#include <QObject>
 class QMenu;
 class QMainWindow;
 

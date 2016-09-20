@@ -25,8 +25,8 @@
 
 
 #include "vtkImageData.h"
-#include "vtkStructuredGrid.h"
 #include "vtkRectilinearGrid.h"
+#include "vtkStructuredGrid.h"
 
 #include <vector>
 

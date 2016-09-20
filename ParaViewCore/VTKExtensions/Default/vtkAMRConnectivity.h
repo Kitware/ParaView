@@ -21,11 +21,11 @@
 #ifndef vtkAMRConnectivity_h
 #define vtkAMRConnectivity_h
 
+#include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
-#include "vtkMultiBlockDataSetAlgorithm.h" 
-#include "vtkSmartPointer.h" // needed for vtkSmartPointer.
-#include <string>  // STL required.
-#include <vector>  // STL required.
+#include "vtkSmartPointer.h"                 // needed for vtkSmartPointer.
+#include <string>                            // STL required.
+#include <vector>                            // STL required.
 
 class vtkNonOverlappingAMR;
 class vtkUniformGrid;

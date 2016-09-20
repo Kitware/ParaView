@@ -17,10 +17,10 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkInitializationHelper.h"
 #include "vtkNew.h"
 #include "vtkProcessModule.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMProxy.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSmartPointer.h"
 
 int TestSessionProxyManager(int argc, char* argv[])
 {

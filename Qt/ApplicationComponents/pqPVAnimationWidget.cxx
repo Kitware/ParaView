@@ -31,8 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqPVAnimationWidget.h"
 
-#include "pqPVApplicationCore.h"
 #include "pqAnimationManager.h"
+#include "pqPVApplicationCore.h"
 
 //-----------------------------------------------------------------------------
 pqPVAnimationWidget::pqPVAnimationWidget(QWidget* parentObject)

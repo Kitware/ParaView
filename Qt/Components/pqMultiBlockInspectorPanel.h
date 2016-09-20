@@ -18,11 +18,11 @@
 
 #include "pqComponentsModule.h"
 
-#include <QMap>
-#include <QWidget>
-#include <QPointer>
-#include <QIcon>
 #include "pqTimer.h" // needed for pqTimer.
+#include <QIcon>
+#include <QMap>
+#include <QPointer>
+#include <QWidget>
 
 #include <iostream>
 

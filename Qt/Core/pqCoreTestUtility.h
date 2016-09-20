@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCoreModule.h"
 #include "pqTestUtility.h"
-#include <vtkIOStream.h>
-#include <QStringList>
 #include <QSize>
+#include <QStringList>
+#include <vtkIOStream.h>
 
 class pqEventPlayer;
 class pqEventTranslator;

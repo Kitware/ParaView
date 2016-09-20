@@ -31,9 +31,9 @@
 #ifndef vtkSMAnimationScene_h
 #define vtkSMAnimationScene_h
 
-#include "vtkPVAnimationModule.h" //needed for exports
 #include "vtkAnimationCue.h"
-#include "vtkCommand.h" // needed for vtkCommand::UserEvent
+#include "vtkCommand.h"           // needed for vtkCommand::UserEvent
+#include "vtkPVAnimationModule.h" //needed for exports
 
 class vtkCompositeAnimationPlayer;
 class vtkEventForwarderCommand;

@@ -14,10 +14,10 @@
 =========================================================================*/
 #include "vtkSMDirectoryProxy.h"
 
-#include "vtkObjectFactory.h"
 #include "vtkClientServerStream.h"
-#include "vtkSMSession.h"
+#include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkSMSession.h"
 
 vtkStandardNewMacro(vtkSMDirectoryProxy);
 //----------------------------------------------------------------------------

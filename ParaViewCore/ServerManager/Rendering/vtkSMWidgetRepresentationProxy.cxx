@@ -15,9 +15,9 @@
 #include "vtkSMWidgetRepresentationProxy.h"
 
 #include "vtkClientServerStream.h"
-#include "vtkWidgetRepresentation.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkWidgetRepresentation.h"
 
 vtkStandardNewMacro(vtkSMWidgetRepresentationProxy);
 

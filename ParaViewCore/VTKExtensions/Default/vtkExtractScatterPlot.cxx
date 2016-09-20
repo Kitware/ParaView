@@ -13,9 +13,9 @@
 
 =========================================================================*/
 
+#include "vtkExtractScatterPlot.h"
 #include "vtkCellData.h"
 #include "vtkDoubleArray.h"
-#include "vtkExtractScatterPlot.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMath.h"

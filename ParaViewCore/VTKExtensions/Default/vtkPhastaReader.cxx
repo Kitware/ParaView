@@ -15,16 +15,16 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPhastaReader.h"
 
 #include "vtkByteSwap.h"
-#include "vtkCellType.h"   //added for constants such as VTK_TETRA etc...
+#include "vtkCellData.h"
+#include "vtkCellType.h" //added for constants such as VTK_TETRA etc...
 #include "vtkDataArray.h"
-#include "vtkIntArray.h"
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkIntArray.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
-#include "vtkCellData.h"
 #include "vtkPointSet.h"
 #include "vtkSmartPointer.h"
 #include "vtkUnstructuredGrid.h"
@@ -34,9 +34,9 @@ vtkStandardNewMacro(vtkPhastaReader);
 vtkCxxSetObjectMacro(vtkPhastaReader, CachedGrid, vtkUnstructuredGrid);
 
 #include <map>
-#include <vector>
-#include <string>
 #include <sstream>
+#include <string>
+#include <vector>
 
 struct vtkPhastaReaderInternal
 {

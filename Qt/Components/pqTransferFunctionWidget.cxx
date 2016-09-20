@@ -31,9 +31,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqTransferFunctionWidget.h"
 
+#include "QVTKWidget.h"
 #include "pqCoreUtilities.h"
 #include "pqTimer.h"
-#include "QVTKWidget.h"
 #include "vtkAxis.h"
 #include "vtkBoundingBox.h"
 #include "vtkChartXY.h"
@@ -53,12 +53,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPiecewiseFunction.h"
 #include "vtkPiecewiseFunctionItem.h"
 #include "vtkRenderWindow.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMCoreUtilities.h"
+#include "vtkSmartPointer.h"
 
-#include <QVBoxLayout>
-#include <QPointer>
 #include <QColorDialog>
+#include <QPointer>
+#include <QVBoxLayout>
 #include <algorithm>
 
 //-----------------------------------------------------------------------------

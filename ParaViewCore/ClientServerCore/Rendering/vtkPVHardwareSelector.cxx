@@ -27,12 +27,12 @@
 #include "vtkProcessModule.h"
 //#define vtkPVHardwareSelectorDEBUG
 #ifdef vtkPVHardwareSelectorDEBUG
-#include "vtkPNMWriter.h"
 #include "vtkImageImport.h"
 #include "vtkNew.h"
+#include "vtkPNMWriter.h"
 #include "vtkProcessModule.h"
+#include "vtkWindows.h" // OK on Unix etc
 #include <sstream>
-#include "vtkWindows.h"  // OK on Unix etc
 #endif
 
 class vtkPVHardwareSelector::vtkInternals

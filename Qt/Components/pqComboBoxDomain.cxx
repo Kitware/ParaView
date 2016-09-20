@@ -37,16 +37,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QComboBox>
 
 // VTK includes
-#include <vtkSmartPointer.h>
 #include <vtkEventQtSlotConnect.h>
+#include <vtkSmartPointer.h>
 
 // ParaView Server Manager includes
-#include <vtkSMProperty.h>
+#include <vtkSMArrayListDomain.h>
 #include <vtkSMDomain.h>
 #include <vtkSMDomainIterator.h>
 #include <vtkSMEnumerationDomain.h>
+#include <vtkSMProperty.h>
 #include <vtkSMStringListDomain.h>
-#include <vtkSMArrayListDomain.h>
 
 
 // ParaView includes

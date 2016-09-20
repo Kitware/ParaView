@@ -31,8 +31,8 @@
 #include "vtkSQVolumeSourceConfigurationFileInfo.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkStringList.h"
 #include "vtkSMNamedPropertyIterator.h"
+#include "vtkStringList.h"
 
 
 vtkStandardNewMacro(vtkSQVolumeSourceConfigurationWriter);

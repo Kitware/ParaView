@@ -32,11 +32,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqAnimationKeyFrame.h"
 
-#include <QPainter>
-#include <QFontMetrics>
-#include <QWidget>
-#include <QGraphicsView>
 #include "pqAnimationTrack.h"
+#include <QFontMetrics>
+#include <QGraphicsView>
+#include <QPainter>
+#include <QWidget>
 
 //-----------------------------------------------------------------------------
 pqAnimationKeyFrame::pqAnimationKeyFrame(pqAnimationTrack* p)

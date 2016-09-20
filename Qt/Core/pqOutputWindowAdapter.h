@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCoreModule.h"
 
-#include <vtkOutputWindow.h>
 #include <QObject>
+#include <vtkOutputWindow.h>
 
 /**
 vtkOutputWindow implementation that converts VTK output messages into Qt signals.

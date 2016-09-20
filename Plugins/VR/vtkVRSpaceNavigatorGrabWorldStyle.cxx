@@ -31,20 +31,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "vtkVRSpaceNavigatorGrabWorldStyle.h"
 
+#include "vtkCamera.h"
+#include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
+#include "vtkRenderer.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkVRQueue.h"
-#include "vtkCamera.h"
-#include "vtkMath.h"
 
-#include <sstream>
 #include <algorithm>
+#include <sstream>
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkVRSpaceNavigatorGrabWorldStyle)

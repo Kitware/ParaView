@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqStereoModeHelper_h
 #define pqStereoModeHelper_h
 
-#include <QScopedPointer> // needed for QScopedPointer.
-#include <QStringList> // needed for QStringList.
 #include "pqCoreModule.h" // needed for export macros.
+#include <QScopedPointer> // needed for QScopedPointer.
+#include <QStringList>    // needed for QStringList.
 
 class pqServer;
 class pqView;

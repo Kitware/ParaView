@@ -20,8 +20,8 @@
 #ifndef vtkPVPlotTime_h
 #define vtkPVPlotTime_h
 
-#include "vtkPlot.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
+#include "vtkPlot.h"
 
 class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVPlotTime : public vtkPlot
 {

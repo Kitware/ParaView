@@ -23,9 +23,9 @@
 #define pqPlotVariablesDialog_h
 
 #include <QDialog>
+#include <QItemSelection>
 #include <QLabel>
 #include <QStringList>
-#include <QItemSelection>
 
 class QListWidgetItem;
 class QListWidget;

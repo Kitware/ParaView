@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqXMLUtil.h"
 
+#include "vtkPVXMLElement.h"
 #include <QString>
 #include <QStringList>
-#include "vtkPVXMLElement.h"
 
 
 vtkPVXMLElement *pqXMLUtil::FindNestedElementByName(vtkPVXMLElement *element,

@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqOptions_h
 
 #include "pqCoreModule.h"
-#include <vtkPVOptions.h>
 #include <QStringList>
+#include <vtkPVOptions.h>
 
 /*! \brief Command line options for pqClient.
  *

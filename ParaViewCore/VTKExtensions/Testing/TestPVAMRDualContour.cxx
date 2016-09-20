@@ -14,12 +14,12 @@
 =========================================================================*/
 #include <iostream>
 
+#include "vtkDummyController.h"
+#include "vtkMultiProcessController.h"
 #include "vtkPVAMRDualContour.h"
 #include "vtkSmartPointer.h"
 #include "vtkSpyPlotReader.h"
 #include "vtkTestUtilities.h"
-#include "vtkDummyController.h"
-#include "vtkMultiProcessController.h"
 
 typedef vtkSmartPointer<vtkDummyController> vtkDummyControllerRefPtr;
 typedef vtkSmartPointer<vtkSpyPlotReader> vtkSpyPlotReaderRefPtr;

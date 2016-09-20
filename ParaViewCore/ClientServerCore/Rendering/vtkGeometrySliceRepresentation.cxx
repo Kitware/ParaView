@@ -44,8 +44,8 @@
 #ifndef VTKGL2
 # include "vtkHardwareSelectionPolyDataPainter.h"
 #endif
-#include <vector>
 #include <cassert>
+#include <vector>
 namespace
 {
   bool GetNormalsToBasisPlanes(vtkMatrix4x4* changeOfBasisMatrix, vtkVector3d sliceNormals[3])

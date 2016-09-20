@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqActionGroupInterface_h
 #define _pqActionGroupInterface_h
 
-#include <QtPlugin>
 #include "pqComponentsModule.h"
+#include <QtPlugin>
 class QActionGroup;
 
 /// interface class for plugins that create QActionGroups

@@ -29,36 +29,36 @@
 
 #include "vtkDepthSortPainter.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkIdTypeArray.h"
-#include "vtkDataSet.h"
 #include "vtkCamera.h"
-#include "vtkMatrix4x4.h"
-#include "vtkFloatArray.h"
 #include "vtkCell.h"
-#include "vtkMath.h"
-#include "vtkSortDataArray.h"
-#include "vtkPoints.h"
-#include "vtkRenderer.h"
-#include "vtkPolyData.h"
 #include "vtkCellArray.h"
-#include "vtkCompositeDataSet.h"
 #include "vtkCompositeDataIterator.h"
-#include "vtkTexture.h"
-#include "vtkProperty.h"
+#include "vtkCompositeDataSet.h"
+#include "vtkDataSet.h"
 #include "vtkDepthSortPolyData.h"
+#include "vtkFloatArray.h"
+#include "vtkIdTypeArray.h"
+#include "vtkMath.h"
+#include "vtkMatrix4x4.h"
+#include "vtkObjectFactory.h"
+#include "vtkPoints.h"
+#include "vtkPolyData.h"
+#include "vtkProperty.h"
+#include "vtkRenderer.h"
 #include "vtkScalarsToColors.h"
+#include "vtkSortDataArray.h"
+#include "vtkTexture.h"
 
-#include <vector>
 #include <algorithm>
 #include <functional>
+#include <vector>
 
-#include <cmath>
+#include "vtkCellData.h"
 #include "vtkImageData.h"
 #include "vtkPNGWriter.h"
 #include "vtkPointData.h"
-#include "vtkCellData.h"
 #include "vtkPolyData.h"
+#include <cmath>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkDepthSortPainter)

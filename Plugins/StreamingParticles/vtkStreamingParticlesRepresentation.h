@@ -21,11 +21,11 @@
 #ifndef vtkStreamingParticlesRepresentation_h
 #define vtkStreamingParticlesRepresentation_h
 
+#include "vtkBoundingBox.h" // needed for vtkBoundingBox.
 #include "vtkPVDataRepresentation.h"
 #include "vtkSmartPointer.h" // for smart pointer.
-#include "vtkWeakPointer.h" // for weak pointer.
-#include "vtkBoundingBox.h" // needed for vtkBoundingBox.
-#include <vector> // needed for std::vector
+#include "vtkWeakPointer.h"  // for weak pointer.
+#include <vector>            // needed for std::vector
 
 class vtkCompositePolyDataMapper2;
 class vtkMultiBlockDataSet;

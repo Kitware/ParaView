@@ -33,9 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqPluginManager_h
 #define _pqPluginManager_h
 
+#include "pqCoreModule.h"
 #include <QObject>
 #include <QStringList>
-#include "pqCoreModule.h"
 
 class pqServer;
 class vtkSMPluginManager;

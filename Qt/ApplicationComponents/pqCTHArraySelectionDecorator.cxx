@@ -32,10 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCTHArraySelectionDecorator.h"
 
 #include "pqPropertyWidget.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMUncheckedPropertyHelper.h"
-#include "vtkPVXMLElement.h"
 
 
 //-----------------------------------------------------------------------------

@@ -20,9 +20,9 @@
 #ifndef vtkPointGaussianRepresentation_h
 #define vtkPointGaussianRepresentation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" // needed for exports
 #include "vtkPVDataRepresentation.h"
-#include "vtkSmartPointer.h"                       // needed for smart pointer
-#include "vtkPVClientServerCoreRenderingModule.h"  // needed for exports
+#include "vtkSmartPointer.h" // needed for smart pointer
 
 class vtkActor;
 class vtkPointGaussianMapper;

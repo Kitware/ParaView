@@ -23,21 +23,21 @@ using Ui::pqMemoryInspectorPanelForm;
 // #define MIP_PROCESS_TABLE
 
 #include "pqActiveObjects.h"
-#include "pqServerManagerModel.h"
 #include "pqApplicationCore.h"
-#include "pqView.h"
 #include "pqRenderView.h"
+#include "pqServerManagerModel.h"
+#include "pqView.h"
 #include "vtkSMRenderViewProxy.h"
 
-#include "vtkProcessModule.h"
-#include "vtkPVSystemConfigInformation.h"
-#include "vtkPVMemoryUseInformation.h"
-#include "vtkPVEnableStackTraceSignalHandler.h"
+#include "vtkClientServerStream.h"
 #include "vtkPVDisableStackTraceSignalHandler.h"
+#include "vtkPVEnableStackTraceSignalHandler.h"
+#include "vtkPVInformation.h"
+#include "vtkPVMemoryUseInformation.h"
+#include "vtkPVSystemConfigInformation.h"
+#include "vtkProcessModule.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionClient.h"
-#include "vtkPVInformation.h"
-#include "vtkClientServerStream.h"
 
 #include <QDebug>
 #include <QFont>

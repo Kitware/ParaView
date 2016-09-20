@@ -20,20 +20,20 @@
 #include "vtkImageProcessingPass.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVDefaultPass.h"
-#include "vtkRenderer.h"
+#include "vtkOpenGLError.h"
 #include "vtkOpenGLRenderer.h"
+#include "vtkPVDefaultPass.h"
 #include "vtkRenderState.h"
 #include "vtkRenderWindow.h"
+#include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
 #include "vtkTileDisplayHelper.h"
 #include "vtkTilesHelper.h"
 #include "vtkTimerLog.h"
-#include "vtkOpenGLError.h"
 
-#include <assert.h>
 #include <IceT.h>
 #include <IceTGL.h>
+#include <assert.h>
 
 #include <map>
 

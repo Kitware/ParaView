@@ -22,8 +22,8 @@
 #include "vtkSMInputArrayDomain.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMTrace.h"
-#include "vtkSMViewProxy.h"
 #include "vtkSMViewLayoutProxy.h"
+#include "vtkSMViewProxy.h"
 
 #include <cassert>
 

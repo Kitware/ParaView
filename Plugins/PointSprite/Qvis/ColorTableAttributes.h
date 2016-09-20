@@ -37,8 +37,8 @@
 
 #ifndef COLORTABLEATTRIBUTES_H
 #define COLORTABLEATTRIBUTES_H
-#include <string>
 #include <AttributeSubject.h>
+#include <string>
 
 namespace pointsprite {
 class ColorControlPointList;

@@ -1,6 +1,6 @@
 #include "FEDataStructures.h"
-#include <mpi.h>
 #include <iostream>
+#include <mpi.h>
 
 #include "FEAdaptor.h"
 

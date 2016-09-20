@@ -14,9 +14,9 @@
 =========================================================================*/
 #include "vtkSMBagChartSeriesListDomain.h"
 
-#include "vtkSMPropertyHelper.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkStdString.h"
 
 #include <assert.h>

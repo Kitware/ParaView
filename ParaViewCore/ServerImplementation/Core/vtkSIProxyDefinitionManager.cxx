@@ -35,12 +35,12 @@
 #include "vtkStringList.h"
 #include "vtkTimerLog.h"
 
-#include <sstream>
 #include <map>
-#include <vtksys/RegularExpression.hxx>
 #include <set>
+#include <sstream>
 #include <string>
 #include <vector>
+#include <vtksys/RegularExpression.hxx>
 
 #include <assert.h>
 

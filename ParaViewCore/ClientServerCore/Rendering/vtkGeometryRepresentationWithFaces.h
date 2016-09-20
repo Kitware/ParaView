@@ -21,8 +21,8 @@
 #ifndef vtkGeometryRepresentationWithFaces_h
 #define vtkGeometryRepresentationWithFaces_h
 
-#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkGeometryRepresentation.h"
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkGeometryRepresentationWithFaces : public vtkGeometryRepresentation
 {

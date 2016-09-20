@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqOutputPort_h
 #define pqOutputPort_h
 
-#include "pqServerManagerModelItem.h"
 #include "pqCoreModule.h"
+#include "pqServerManagerModelItem.h"
 
 class pqDataRepresentation;
 class pqPipelineSource;

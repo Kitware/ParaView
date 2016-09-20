@@ -19,13 +19,13 @@
 #include "vtkDataArray.h"
 #include "vtkDataObject.h"
 #include "vtkDataSetAttributes.h"
-#include "vtkGenericAttributeCollection.h"
 #include "vtkGenericAttribute.h"
+#include "vtkGenericAttributeCollection.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVGenericAttributeInformation.h"
 #include "vtkSmartPointer.h"
-#include "vtkNew.h"
 
 #include <algorithm>
 #include <map>

@@ -17,15 +17,15 @@
 #include "vtkCommand.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVServerInformation.h"
 #include "vtkPVMultiClientsInformation.h"
+#include "vtkPVServerInformation.h"
+#include "vtkPVSessionCore.h"
 #include "vtkProcessModule.h"
 #include "vtkSMMessage.h"
-#include "vtkPVSessionCore.h"
 #include "vtkWeakPointer.h"
 
-#include <sstream>
 #include <assert.h>
+#include <sstream>
 
 //----------------------------------------------------------------------------
 vtkPVSessionBase::vtkPVSessionBase()

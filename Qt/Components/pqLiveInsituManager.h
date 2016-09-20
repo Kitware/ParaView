@@ -32,10 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqLiveInsituManager_h
 #define pqLiveInsituManager_h
 
-
-#include <QPointer>
-#include <QMap>
 #include "pqComponentsModule.h"
+#include <QMap>
+#include <QPointer>
 
 #include "vtkType.h"
 

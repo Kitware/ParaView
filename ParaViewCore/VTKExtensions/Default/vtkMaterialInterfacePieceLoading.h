@@ -23,10 +23,10 @@
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkSystemIncludes.h"
 
-#include <cassert>
 #include "vtkType.h"
-#include <vector>
+#include <cassert>
 #include <iostream>
+#include <vector>
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMaterialInterfacePieceLoading
 {

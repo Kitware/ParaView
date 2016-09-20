@@ -63,8 +63,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqStreamingTestingEventPlayer.h"
 #include "pqViewStreamingBehavior.h"
 
-#include <QShortcut>
 #include <QMainWindow>
+#include <QShortcut>
 
 #define PQ_BEHAVIOR_DEFINE_FLAG(_name,_default) bool pqParaViewBehaviors:: _name = _default;
 PQ_BEHAVIOR_DEFINE_FLAG(StandardPropertyWidgets, true);

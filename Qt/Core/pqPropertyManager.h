@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCoreModule.h"
 #include <QObject>
-#include <QVariant>
 #include <QPointer>
+#include <QVariant>
 
 class vtkSMProxy;
 class vtkSMProperty;

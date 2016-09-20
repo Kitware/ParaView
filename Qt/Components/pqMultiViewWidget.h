@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqMultiViewWidget_h
 #define pqMultiViewWidget_h
 
-#include <QWidget>
-#include <QUuid>
 #include "pqComponentsModule.h"
+#include <QUuid>
+#include <QWidget>
 
 class pqProxy;
 class pqView;

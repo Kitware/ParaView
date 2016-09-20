@@ -1,29 +1,29 @@
 // A Test of a very simple app based on pqCore
 #include "FilteredPipelineBrowserApp.h"
 
-#include <QTimer>
 #include <QApplication>
-#include <QVBoxLayout>
 #include <QDebug>
 #include <QStringList>
+#include <QTimer>
+#include <QVBoxLayout>
 
 #include "QVTKWidget.h"
 #include "vtkObjectFactory.h"
-#include "vtkSmartPointer.h"
-#include "vtkSMSourceProxy.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSmartPointer.h"
 
 #include "pqApplicationCore.h"
 #include "pqCoreTestUtility.h"
 #include "pqObjectBuilder.h"
 #include "pqOptions.h"
-#include "pqPipelineSource.h"
 #include "pqPipelineAnnotationFilterModel.h"
+#include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "vtkProcessModule.h"
 
-#include <QToolBar>
 #include <QAction>
+#include <QToolBar>
 
 MainPipelineWindow::MainPipelineWindow()
 {

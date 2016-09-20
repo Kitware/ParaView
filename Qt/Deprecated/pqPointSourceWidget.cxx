@@ -30,17 +30,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
+#include "pqPointSourceWidget.h"
 #include "pqHandleWidget.h"
 #include "pqNamedWidgets.h"
-#include "pqPointSourceWidget.h"
 #include "pqPropertyLinks.h"
 
 #include "ui_pqPointSourceControls.h"
 
 #include <vtkSMDoubleVectorProperty.h>
 #include <vtkSMIntVectorProperty.h>
-#include <vtkSMProxyProperty.h>
 #include <vtkSMNewWidgetRepresentationProxy.h>
+#include <vtkSMProxyProperty.h>
 
 #include <QDoubleValidator>
 #include <QHBoxLayout>

@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqRecentlyUsedResourcesList_h
 #define pqRecentlyUsedResourcesList_h
 
-#include <QObject>
-#include <QList>
 #include "pqServerResource.h"
+#include <QList>
+#include <QObject>
 
 class pqSettings;
 /// pqRecentlyUsedResourcesList encapsulates a persistent collection of

@@ -41,10 +41,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMCompoundSourceProxy.h"
 #include "vtkSMOutputPort.h"
 
-#include <QSet>
 #include <QList>
 #include <QMap>
 #include <QPixmap>
+#include <QSet>
 #include <QString>
 
 

@@ -16,13 +16,13 @@
 #include "vtkSMDoubleMapProperty.h"
 
 #include <map>
-#include <vector>
 #include <sstream>
+#include <vector>
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMMessage.h"
 #include "vtkSMDoubleMapPropertyIterator.h"
+#include "vtkSMMessage.h"
 
 //---------------------------------------------------------------------------
 class vtkSMDoubleMapPropertyPrivate

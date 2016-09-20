@@ -25,11 +25,11 @@
 #include "vtkPointSet.h"
 #include "vtkPolyData.h"
 #include "vtkPolyLineToRectilinearGridFilter.h"
-#include "vtkTable.h"
 #include "vtkSmartPointer.h"
+#include "vtkTable.h"
 
-#include <vector>
 #include <sstream>
+#include <vector>
 
 vtkStandardNewMacro(vtkCSVWriter);
 //-----------------------------------------------------------------------------

@@ -29,15 +29,15 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkPython.h" // python first
 #include "pqPythonShell.h"
+#include "vtkPython.h" // python first
 
 #include "pqApplicationCore.h"
 #include "pqConsoleWidget.h"
 #include "pqUndoStack.h"
 #include "vtkCommand.h"
-#include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
+#include "vtkProcessModule.h"
 #include "vtkPythonInteractiveInterpreter.h"
 #include "vtkPythonInterpreter.h"
 #include "vtkStdString.h"

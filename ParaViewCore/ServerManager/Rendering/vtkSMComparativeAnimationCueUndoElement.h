@@ -20,8 +20,8 @@
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMUndoElement.h"
-#include <vtkWeakPointer.h> // needed for vtkWeakPointer.
 #include <vtkSmartPointer.h> // needed for vtkSmartPointer.
+#include <vtkWeakPointer.h>  // needed for vtkWeakPointer.
 
 class vtkPVXMLElement;
 

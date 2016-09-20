@@ -24,10 +24,10 @@
 #define vtkPVSystemInformation_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
-#include "vtkProcessModule.h" // needed for vtkProcessModule::ProcessTypes
 #include "vtkPVInformation.h"
-#include "vtkStdString.h" // needed for vtkStdString
-#include <vector> // needed for std::vector
+#include "vtkProcessModule.h" // needed for vtkProcessModule::ProcessTypes
+#include "vtkStdString.h"     // needed for vtkStdString
+#include <vector>             // needed for std::vector
 
 class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVSystemInformation : public vtkPVInformation
 {

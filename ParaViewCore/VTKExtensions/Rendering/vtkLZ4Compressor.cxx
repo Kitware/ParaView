@@ -18,9 +18,9 @@
 #include "vtkObjectFactory.h"
 #include "vtkUnsignedCharArray.h"
 
+#include "vtk_lz4.h"
 #include <cassert>
 #include <sstream>
-#include "vtk_lz4.h"
 
 vtkStandardNewMacro(vtkLZ4Compressor);
 //----------------------------------------------------------------------------

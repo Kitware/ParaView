@@ -17,35 +17,35 @@
 #include <vector>
 
 // Pipeline & VTK
-#include "vtkMarchingCubesTriangleCases.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMarchingCubesTriangleCases.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObject.h"
 #include "vtkObjectFactory.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 // PV interface
 #include "vtkCallbackCommand.h"
-#include "vtkMath.h"
 #include "vtkDataArraySelection.h"
+#include "vtkMath.h"
 // Data sets
-#include "vtkDataSet.h"
-#include "vtkCellData.h"
-#include "vtkPointData.h"
-#include "vtkFloatArray.h"
-#include "vtkPolyData.h"
-#include "vtkImageData.h"
-#include "vtkUniformGrid.h"
-#include "vtkUnstructuredGrid.h"
-#include "vtkMultiBlockDataSet.h"
-#include "vtkNonOverlappingAMR.h"
-#include "vtkCompositeDataIterator.h"
-#include "vtkMultiPieceDataSet.h"
 #include "vtkAMRBox.h"
 #include "vtkCellArray.h"
+#include "vtkCellData.h"
+#include "vtkCompositeDataIterator.h"
+#include "vtkDataSet.h"
+#include "vtkFloatArray.h"
+#include "vtkImageData.h"
+#include "vtkMultiBlockDataSet.h"
+#include "vtkMultiPieceDataSet.h"
+#include "vtkNonOverlappingAMR.h"
+#include "vtkPointData.h"
+#include "vtkPolyData.h"
+#include "vtkUniformGrid.h"
 #include "vtkUnsignedCharArray.h"
-#include <math.h>
+#include "vtkUnstructuredGrid.h"
 #include <ctime>
+#include <math.h>
 
 
 vtkStandardNewMacro(vtkAMRDualContour);

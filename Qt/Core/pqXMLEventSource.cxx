@@ -36,15 +36,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 
 #include <QFile>
-#include <QtDebug>
 #include <QWidget>
+#include <QtDebug>
 
 #include "pqCoreTestUtility.h"
 #include "pqObjectNaming.h"
 #include "pqOptions.h"
-#include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
+#include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
 
 ///////////////////////////////////////////////////////////////////////////

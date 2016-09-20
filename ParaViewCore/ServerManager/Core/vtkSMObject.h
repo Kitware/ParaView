@@ -20,8 +20,8 @@
 #ifndef vtkSMObject_h
 #define vtkSMObject_h
 
-#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkObject.h"
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 
 class vtkSMApplication;
 

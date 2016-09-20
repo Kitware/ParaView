@@ -19,14 +19,13 @@
 #include "vtkEventForwarderCommand.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVConfig.h" // for PARAVIEW_VERSION_*
 #include "vtkPVInstantiator.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
+#include "vtkProcessModule.h"
 #include "vtkReservedRemoteObjectIds.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMCollaborationManager.h"
 #include "vtkSMCoreUtilities.h"
 #include "vtkSMDeserializerProtobuf.h"
@@ -34,8 +33,8 @@
 #include "vtkSMGlobalPropertiesLinkUndoElement.h"
 #include "vtkSMPipelineState.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxyIterator.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
@@ -44,18 +43,19 @@
 #include "vtkSMSessionClient.h"
 #include "vtkSMStateLoader.h"
 #include "vtkSMStateLocator.h"
-#include "vtkSMUndoStackBuilder.h"
 #include "vtkSMUndoStack.h"
+#include "vtkSMUndoStackBuilder.h"
+#include "vtkSmartPointer.h"
 #include "vtkStdString.h"
 #include "vtkStringList.h"
 #include "vtkVersion.h"
 
+#include <assert.h>
 #include <map>
 #include <set>
-#include <vector>
 #include <sstream>
+#include <vector>
 #include <vtksys/RegularExpression.hxx>
-#include <assert.h>
 
 #include "vtkSMSessionProxyManagerInternals.h"
 

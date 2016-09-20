@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqProxyGroupMenuManager_h
 #define pqProxyGroupMenuManager_h
 
-#include <QMenu>
 #include "pqApplicationComponentsModule.h"
+#include <QMenu>
 
 class vtkPVXMLElement;
 class vtkSMProxy;

@@ -1,23 +1,23 @@
 #include "vtkCPVTKPipeline.h"
 
+#include <vtkCPDataDescription.h>
+#include <vtkCPInputDataDescription.h>
 #include <vtkCommunicator.h>
 #include <vtkCompleteArrays.h>
-#include <vtkCPDataDescription.h>
 #include <vtkDataArray.h>
-#include <vtkCPInputDataDescription.h>
 #include <vtkMultiProcessController.h>
 #include <vtkNew.h>
 #include <vtkObjectFactory.h>
-#include <vtkPointData.h>
 #include <vtkPVArrayCalculator.h>
 #include <vtkPVTrivialProducer.h>
+#include <vtkPointData.h>
 #include <vtkSMProxyManager.h>
 #include <vtkThreshold.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkXMLPUnstructuredGridWriter.h>
 
-#include <string>
 #include <sstream>
+#include <string>
 
 vtkStandardNewMacro(vtkCPVTKPipeline);
 

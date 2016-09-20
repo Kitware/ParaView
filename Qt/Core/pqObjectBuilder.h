@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqObjectBuilder_h
 #define pqObjectBuilder_h
 
-#include <QObject>
 #include "pqCoreModule.h"
 #include <QMap>
+#include <QObject>
 #include <QVariant>
 
 class pqAnimationCue;

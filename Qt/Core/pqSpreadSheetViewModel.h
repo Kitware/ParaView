@@ -32,11 +32,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqSpreadSheetViewModel_h
 #define pqSpreadSheetViewModel_h
 
+#include "pqCoreModule.h"
+#include "vtkType.h" // needed for vtkIdType.
 #include <QAbstractTableModel>
 #include <QPair>
 #include <QSet>
-#include "pqCoreModule.h"
-#include "vtkType.h" // needed for vtkIdType.
 
 /// This is the model used by SpreadSheetView to show the data. This model works
 /// with vtkSMSpreadSheetRepresentationProxy to fetch blocks of data from the

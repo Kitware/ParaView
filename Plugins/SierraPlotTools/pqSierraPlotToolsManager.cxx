@@ -32,8 +32,8 @@
 
 #include "ui_pqVariablePlot.h"
 
-#include "vtkCompositeDataSet.h"
 #include "vtkCompositeDataIterator.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkDataSet.h"
 #include "vtkExodusFileSeriesReader.h"
 #include "vtkExodusIIReader.h"
@@ -43,32 +43,32 @@
 #include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
-#include "vtkSelectionNode.h"
 #include "vtkSMIdTypeVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMOutputPort.h"
-#include "vtkSMProxy.h"
 #include "vtkSMProperty.h"
+#include "vtkSMProxy.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkSelectionNode.h"
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqDisplayPolicy.h"
-#include "pqXYChartView.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
-#include "pqPipelineRepresentation.h"
 #include "pqPipelineFilter.h"
+#include "pqPipelineRepresentation.h"
 #include "pqPipelineSource.h"
 #include "pqRenderView.h"
+#include "pqSMAdaptor.h"
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include <pqSetName.h>
-#include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
+#include "pqXYChartView.h"
+#include <pqSetName.h>
 
 
 #include <QDockWidget>
@@ -80,10 +80,10 @@
 #include <QPointer>
 #include <QPushButton>
 #include <QStringList>
-#include <QtAlgorithms>
-#include <QtDebug>
 #include <QToolButton>
 #include <QVariant>
+#include <QtAlgorithms>
+#include <QtDebug>
 
 #include "ui_pqSierraPlotToolsActionHolder.h"
 

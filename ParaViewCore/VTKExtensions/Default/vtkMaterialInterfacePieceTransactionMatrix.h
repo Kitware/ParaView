@@ -27,10 +27,10 @@
 #ifndef vtkMaterialInterfacePieceTransactionMatrix_h
 #define vtkMaterialInterfacePieceTransactionMatrix_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMaterialInterfacePieceTransaction.h" //
-#include "vtkType.h" //
-#include <vector> //
+#include "vtkPVVTKExtensionsDefaultModule.h"      //needed for exports
+#include "vtkType.h"                              //
+#include <vector>                                 //
 
 class vtkCommunicator;
 

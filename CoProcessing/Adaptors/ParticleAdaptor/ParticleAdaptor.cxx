@@ -1,10 +1,10 @@
 #include "ParticleAdaptor.h"
 
-#include "vtkDoubleArray.h"
-#include "vtkCellType.h"
 #include "vtkCPDataDescription.h"
 #include "vtkCPInputDataDescription.h"
 #include "vtkCPProcessor.h"
+#include "vtkCellType.h"
+#include "vtkDoubleArray.h"
 #include "vtkMPI.h"
 #include "vtkMPICommunicator.h"
 #include "vtkMPIController.h"

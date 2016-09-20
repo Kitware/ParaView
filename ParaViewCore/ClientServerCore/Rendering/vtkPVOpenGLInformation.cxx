@@ -25,21 +25,21 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkMultiProcessController.h"
-#include "vtkProcessModule.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDisplayInformation.h"
 #include "vtkPVOptions.h"
+#include "vtkProcessModule.h"
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
-#include "vtkNew.h"
 
+#include <algorithm>
+#include <iterator>
+#include <set>
 #include <sstream>
 #include <string>
 #include <vector>
 #include <vtksys/SystemTools.hxx>
-#include <set>
-#include <algorithm>
-#include <iterator>
 
 #define safes(arg) (arg?((const char *)arg):"")
 

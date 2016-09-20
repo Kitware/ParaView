@@ -19,8 +19,8 @@
 #ifndef vtkSMGL2PSExporterProxy_h
 #define vtkSMGL2PSExporterProxy_h
 
-#include "vtkSMRenderViewExporterProxy.h"
 #include "vtkPVServerManagerDefaultModule.h" //needed for exports
+#include "vtkSMRenderViewExporterProxy.h"
 
 class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMGL2PSExporterProxy :
     public vtkSMRenderViewExporterProxy

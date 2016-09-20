@@ -25,11 +25,11 @@
 #ifndef vtkPVPlugin_h
 #define vtkPVPlugin_h
 
-#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"
-#include "vtkPVConfig.h" // needed for PARAVIEW_VERSION and CMAKE_CXX_COMPILER_ID
-#include <vector>
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
+#include "vtkPVConfig.h"                     // needed for PARAVIEW_VERSION and CMAKE_CXX_COMPILER_ID
 #include <string>
+#include <vector>
 
 #ifdef _WIN32
 // __cdecl gives an unmangled name

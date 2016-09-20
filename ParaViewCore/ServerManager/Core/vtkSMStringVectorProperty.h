@@ -29,8 +29,8 @@
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMVectorProperty.h"
 
-#include <vector> // needed for std::vector
 #include <string> // needed for std::string
+#include <vector> // needed for std::vector
 
 class vtkStringList;
 class vtkSMStateLocator;

@@ -12,8 +12,8 @@
 
 =========================================================================*/
 #include "vtkPVOptionsXMLParser.h"
-#include "vtkPVOptions.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVOptions.h"
 #include "vtkStdString.h"
 
 #include <vtksys/SystemTools.hxx>

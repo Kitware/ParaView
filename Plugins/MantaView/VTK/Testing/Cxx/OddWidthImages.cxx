@@ -3,14 +3,14 @@ Tests whether we can give manta non aligned image sizes without getting staircas
 */
 
 #include "vtkConeSource.h"
-#include "vtkSphereSource.h"
 #include "vtkCylinderSource.h"
-#include "vtkMantaPolyDataMapper.h"
 #include "vtkMantaActor.h"
+#include "vtkMantaPolyDataMapper.h"
 #include "vtkMantaRenderer.h"
+#include "vtkRegressionTestImage.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkRegressionTestImage.h"
+#include "vtkSphereSource.h"
 
 #ifndef usleep
 #define usleep(time)

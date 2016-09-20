@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqCheckBoxPixMaps_h
 #define pqCheckBoxPixMaps_h
 
+#include "pqWidgetsModule.h"
 #include <QObject>
 #include <QPixmap>
-#include "pqWidgetsModule.h"
 
 class QWidget;
 

@@ -17,12 +17,12 @@
 #include "vtkCollection.h"
 #include "vtkObjectFactory.h"
 #include "vtkSMMessage.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyLocator.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMRemoteObject.h"
 #include "vtkSMSession.h"
 #include "vtkSMStateLocator.h"
-#include "vtkSMProxyLocator.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMProxy.h"
 
 #include <vtkNew.h>
 

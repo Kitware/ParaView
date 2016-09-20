@@ -24,10 +24,10 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOverlappingAMR.h"
-#include "vtkPointData.h"
 #include "vtkPVStreamingMacros.h"
-#include "vtkUniformGridAMRDataIterator.h"
+#include "vtkPointData.h"
 #include "vtkUniformGrid.h"
+#include "vtkUniformGridAMRDataIterator.h"
 #include "vtkVoxel.h"
 
 #include <algorithm>

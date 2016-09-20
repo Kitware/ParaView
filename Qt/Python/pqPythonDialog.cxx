@@ -30,14 +30,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "pqPythonDialog.h"
-#include "ui_pqPythonDialog.h"
 #include "pqApplicationCore.h"
 #include "pqFileDialog.h"
 #include "pqSettings.h"
+#include "ui_pqPythonDialog.h"
 
 #include <QCloseEvent>
-#include <QtDebug>
 #include <QFile>
+#include <QtDebug>
 
 //////////////////////////////////////////////////////////////////////
 // pqPythonDialog::pqImplementation

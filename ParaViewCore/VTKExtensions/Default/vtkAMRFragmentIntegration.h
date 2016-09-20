@@ -24,10 +24,10 @@
 #ifndef vtkAMRFragmentIntegration_h
 #define vtkAMRFragmentIntegration_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"
-#include <string>  // STL required.
-#include <vector>  // STL required.
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
+#include <string>                            // STL required.
+#include <vector>                            // STL required.
 
 class vtkTable;
 class vtkNonOverlappingAMR;

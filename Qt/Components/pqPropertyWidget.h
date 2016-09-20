@@ -34,11 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsModule.h"
 
-#include <QPointer>
-#include <QWidget>
-#include <QScopedPointer>
-#include "pqPropertyLinks.h"
 #include "pqDebug.h"
+#include "pqPropertyLinks.h"
+#include <QPointer>
+#include <QScopedPointer>
+#include <QWidget>
 
 class pqPropertyWidgetDecorator;
 class pqTimer;

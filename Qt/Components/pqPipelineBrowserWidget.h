@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqPipelineBrowserWidget_h
 #define pqPipelineBrowserWidget_h
 
-#include "pqFlatTreeView.h"
 #include "pqComponentsModule.h"
+#include "pqFlatTreeView.h"
 
 class pqPipelineModel;
 class pqPipelineAnnotationFilterModel;

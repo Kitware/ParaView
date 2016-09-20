@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkInSituPParticlePathFilter.h"
 
-#include "vtkPointData.h"
 #include "vtkCellArray.h"
 #include "vtkCharArray.h"
 #include "vtkDataArray.h"
@@ -25,6 +24,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPointData.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTemporalInterpolatedVelocityField.h"
 

@@ -19,8 +19,8 @@
 #ifndef vtkPConvertSelection_h
 #define vtkPConvertSelection_h
 
-#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkConvertSelection.h"
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 
 class vtkMultiProcessController;
 

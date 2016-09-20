@@ -23,8 +23,8 @@
 #include "vtkPVXMLElement.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-#include <vector>
 #include <sstream>
+#include <vector>
 
 #include <assert.h>
 

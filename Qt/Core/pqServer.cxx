@@ -44,9 +44,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkNetworkAccessManager.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
 #include "vtkPVServerInformation.h"
+#include "vtkProcessModule.h"
 #include "vtkSMCollaborationManager.h"
 #include "vtkSMMessage.h"
 #include "vtkSMParaViewPipelineController.h"
@@ -55,19 +55,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxySelectionModel.h"
-#include "vtkSMSessionClient.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionClient.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMViewProxy.h"
 #include "vtkToolkits.h"
 
 // Qt includes.
 #include <QColor>
-#include <QDir>
 #include <QCoreApplication>
-#include <QtDebug>
+#include <QDir>
 #include <QStringList>
 #include <QTimer>
+#include <QtDebug>
 
 class pqServer::pqInternals
 {

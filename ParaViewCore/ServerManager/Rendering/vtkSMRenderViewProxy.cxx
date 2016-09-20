@@ -30,8 +30,6 @@
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPointData.h"
-#include "vtkProcessModule.h"
 #include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDisplayInformation.h"
@@ -40,20 +38,19 @@
 #include "vtkPVRenderView.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkRenderer.h"
+#include "vtkPointData.h"
+#include "vtkProcessModule.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkSelection.h"
-#include "vtkSelectionNode.h"
-#include "vtkSmartPointer.h"
+#include "vtkRenderer.h"
 #include "vtkSMCollaborationManager.h"
 #include "vtkSMDataDeliveryManager.h"
 #include "vtkSMEnumerationDomain.h"
 #include "vtkSMInputProperty.h"
+#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSession.h"
@@ -61,12 +58,15 @@
 #include "vtkSMTrace.h"
 #include "vtkSMUncheckedPropertyHelper.h"
 #include "vtkSMViewProxyInteractorHelper.h"
+#include "vtkSelection.h"
+#include "vtkSelectionNode.h"
+#include "vtkSmartPointer.h"
 #include "vtkTransform.h"
 #include "vtkWeakPointer.h"
 #include "vtkWindowToImageFilter.h"
 
-#include <map>
 #include <cassert>
+#include <map>
 
 namespace
 {

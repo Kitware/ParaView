@@ -31,11 +31,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqLinkSelectionReaction.h"
 
-#include "pqSelectionManager.h"
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
-#include "pqServerManagerModel.h"
 #include "pqLinksModel.h"
+#include "pqSelectionManager.h"
+#include "pqServerManagerModel.h"
 #include "vtkSMSourceProxy.h"
 
 //-----------------------------------------------------------------------------

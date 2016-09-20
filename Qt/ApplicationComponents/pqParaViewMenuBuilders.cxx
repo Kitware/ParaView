@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqParaViewMenuBuilders.h"
 #include "vtkPVConfig.h"
 
-#include "ui_pqFileMenuBuilder.h"
 #include "ui_pqEditMenuBuilder.h"
+#include "ui_pqFileMenuBuilder.h"
 #include "ui_pqPipelineBrowserContextMenu.h"
 
 #include "pqAboutDialogReaction.h"
@@ -71,8 +71,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqManageCustomFiltersReaction.h"
 #include "pqManageLinksReaction.h"
 #include "pqManagePluginsReaction.h"
-#include "pqProxyGroupMenuManager.h"
 #include "pqPVApplicationCore.h"
+#include "pqProxyGroupMenuManager.h"
 #include "pqPythonShellReaction.h"
 #include "pqRecentFilesMenu.h"
 #include "pqReloadFilesReaction.h"

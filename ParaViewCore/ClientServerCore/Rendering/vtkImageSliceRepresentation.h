@@ -22,10 +22,10 @@
 #ifndef vtkImageSliceRepresentation_h
 #define vtkImageSliceRepresentation_h
 
+#include "vtkNew.h"                               // for vtkNew.
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"
 #include "vtkStructuredData.h" // for VTK_*_PLANE
-#include "vtkNew.h" // for vtkNew.
 
 class vtkImageData;
 class vtkPExtentTranslator;

@@ -18,8 +18,8 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMMessage.h"
-#include "vtkSMVectorPropertyTemplate.h"
 #include "vtkSMStateLocator.h"
+#include "vtkSMVectorPropertyTemplate.h"
 
 vtkStandardNewMacro(vtkSMIntVectorProperty);
 

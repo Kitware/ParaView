@@ -31,8 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqManageLinksReaction.h"
 
-#include "pqLinksManager.h"
 #include "pqCoreUtilities.h"
+#include "pqLinksManager.h"
 
 //-----------------------------------------------------------------------------
 void pqManageLinksReaction::manageLinks()

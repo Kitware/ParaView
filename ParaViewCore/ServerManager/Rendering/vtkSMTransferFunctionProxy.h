@@ -22,8 +22,8 @@
 #ifndef vtkSMTransferFunctionProxy_h
 #define vtkSMTransferFunctionProxy_h
 
-#include "vtkSMProxy.h"
 #include "vtkPVServerManagerRenderingModule.h" // needed for export macro
+#include "vtkSMProxy.h"
 
 namespace Json
 {

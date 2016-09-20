@@ -53,8 +53,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ctkDoubleRangeSlider_h
 
 // Qt includes
-#include <QWidget>
 #include <QSlider>
+#include <QWidget>
 
 // PQ includes
 #include "pqWidgetsModule.h"

@@ -52,9 +52,9 @@
 #ifndef vtkSMInputArrayDomain_h
 #define vtkSMInputArrayDomain_h
 
+#include "vtkDataObject.h"                // needed for vtkDataObject::AttributeTypes
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDomain.h"
-#include "vtkDataObject.h" // needed for vtkDataObject::AttributeTypes
 
 #include <vector> // Needed for vector
 

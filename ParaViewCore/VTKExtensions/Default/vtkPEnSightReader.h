@@ -33,16 +33,16 @@
 #ifndef vtkPEnSightReader_h
 #define vtkPEnSightReader_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPGenericEnSightReader.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 #include "vtkIdTypeArray.h" // For ivars
-#include <map> // For ivars
-#include <string> // For ivars
-#include <algorithm> // For ivars
-#include <string> // For ivars
-#include <vector> // For ivars
-#include <map> // For ivars
+#include <algorithm>        // For ivars
+#include <map>              // For ivars
+#include <map>              // For ivars
+#include <string>           // For ivars
+#include <string>           // For ivars
+#include <vector>           // For ivars
 
 class vtkDataSet;
 class vtkIdList;

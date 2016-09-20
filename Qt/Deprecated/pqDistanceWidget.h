@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqDistanceWidget_h
 #define pqDistanceWidget_h
 
-#include "pqLineWidget.h"
 #include "pqDeprecatedModule.h"
+#include "pqLineWidget.h"
 
 class QLabel;
 

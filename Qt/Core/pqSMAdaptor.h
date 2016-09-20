@@ -38,11 +38,11 @@ class vtkSMProxy;
 class vtkObject;
 
 #include "pqCoreModule.h"
-#include <QVariant>
-#include <QList>
-#include <QPair>
 #include "pqSMProxy.h"
 #include "vtkVariant.h"
+#include <QList>
+#include <QPair>
+#include <QVariant>
 
 Q_DECLARE_METATYPE(QList<QList<QVariant> >)
 

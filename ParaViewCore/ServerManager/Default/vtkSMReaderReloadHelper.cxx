@@ -19,16 +19,16 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVFileInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMCoreUtilities.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMTrace.h"
+#include "vtkSmartPointer.h"
 
-#include <vtksys/SystemTools.hxx>
 #include <cassert>
+#include <vtksys/SystemTools.hxx>
 
 namespace
 {

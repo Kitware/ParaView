@@ -40,10 +40,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include <QtDebug>
 
-#include "pqSettings.h"
-#include "vtkPVXMLParser.h"
-#include "vtkPVXMLElement.h"
 #include "pqApplicationCore.h"
+#include "pqSettings.h"
+#include "vtkPVXMLElement.h"
+#include "vtkPVXMLParser.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
 #include <sstream>

@@ -26,9 +26,9 @@
 #ifndef vtkScatterPlotMapper_h
 #define vtkScatterPlotMapper_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkCompositePolyDataMapper2.h"
-#include "vtkWeakPointer.h" // needed for vtkWeakPointer.
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
+#include "vtkWeakPointer.h"                  // needed for vtkWeakPointer.
 
 class vtkPainterPolyDataMapper;
 class vtkPolyData;

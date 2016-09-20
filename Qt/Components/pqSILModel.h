@@ -33,12 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqSILModel_h
 
 #include <QAbstractItemModel>
-#include <QVector>
 #include <QSet>
+#include <QVector>
 #include <set>
 
-#include "vtkObject.h"
 #include "pqComponentsModule.h"
+#include "vtkObject.h"
 #include "vtkSmartPointer.h"
 
 class vtkGraph;

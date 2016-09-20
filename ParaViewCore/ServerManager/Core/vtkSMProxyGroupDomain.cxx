@@ -18,13 +18,13 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMSessionProxyManager.h"
-#include "vtkSMSession.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 
-#include <vector>
 #include <assert.h>
+#include <vector>
 
 #include "vtkStdString.h"
 

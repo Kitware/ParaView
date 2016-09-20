@@ -14,11 +14,11 @@
 =========================================================================*/
 #include "vtkCPAdaptorAPI.h"
 
-#include "vtkCellData.h"
-#include "vtkCompositeDataIterator.h"
 #include "vtkCPDataDescription.h"
 #include "vtkCPInputDataDescription.h"
 #include "vtkCPProcessor.h"
+#include "vtkCellData.h"
+#include "vtkCompositeDataIterator.h"
 #include "vtkDataSet.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkPointData.h"

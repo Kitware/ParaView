@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <pqFileDialog.h>
 
-#include <QEvent>
 #include <QDir>
+#include <QEvent>
 #include <QtDebug>
 
 pqFileDialogEventTranslator::pqFileDialogEventTranslator(QObject* p) 

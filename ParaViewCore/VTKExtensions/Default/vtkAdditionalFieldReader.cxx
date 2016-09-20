@@ -18,8 +18,8 @@
 #include "vtkObjectFactory.h"
 
 #include "vtkAbstractArray.h"
-#include "vtkCompositeDataSet.h"
 #include "vtkCompositeDataIterator.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkDataObject.h"
 #include "vtkDataObjectReader.h"
 #include "vtkDataSet.h"

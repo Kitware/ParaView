@@ -5,19 +5,19 @@
 #include "pqView.h"
 #include "vtkCamera.h"
 #include "vtkMath.h"
-#include "vtkRenderer.h"
+#include "vtkMatrix4x4.h"
+#include "vtkPVXMLElement.h"
 #include "vtkRenderWindow.h"
+#include "vtkRenderer.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationProxy.h"
-#include "vtkPVXMLElement.h"
 #include "vtkTransform.h"
-#include "vtkMatrix4x4.h"
 #include "vtkVRQueue.h"
-#include <sstream>
 #include <algorithm>
+#include <sstream>
 
 vtkVRStyleGrabNUpdateMatrix::vtkVRStyleGrabNUpdateMatrix(QObject* parentObject) :
   Superclass(parentObject)

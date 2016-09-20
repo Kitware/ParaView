@@ -35,10 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqWidgetsModule.h"
 
-#include <QObject>
 #include <QGraphicsScene>
-#include <QStandardItemModel>
+#include <QObject>
 #include <QPolygonF>
+#include <QStandardItemModel>
 
 class pqAnimationTrack;
 class pqAnimationKeyFrame;

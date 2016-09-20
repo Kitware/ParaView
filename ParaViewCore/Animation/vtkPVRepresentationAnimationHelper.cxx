@@ -15,8 +15,8 @@
 #include "vtkPVRepresentationAnimationHelper.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkSMRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMRepresentationProxy.h"
 
 vtkStandardNewMacro(vtkPVRepresentationAnimationHelper);
 //----------------------------------------------------------------------------

@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqServerConnectDialog_h
 #define pqServerConnectDialog_h
 
-#include <QDialog>
 #include "pqComponentsModule.h"
 #include "pqServerResource.h"
+#include <QDialog>
 
 #include <QList>
 class pqServerConfiguration;

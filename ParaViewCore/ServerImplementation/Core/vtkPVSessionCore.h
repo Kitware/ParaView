@@ -23,10 +23,10 @@
 #ifndef vtkPVSessionCore_h
 #define vtkPVSessionCore_h
 
-#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkObject.h"
-#include "vtkSMMessageMinimal.h" // needed for vtkSMMessage.
-#include "vtkWeakPointer.h" // needed for vtkMultiProcessController
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
+#include "vtkSMMessageMinimal.h"                 // needed for vtkSMMessage.
+#include "vtkWeakPointer.h"                      // needed for vtkMultiProcessController
 
 class vtkClientServerInterpreter;
 class vtkClientServerStream;

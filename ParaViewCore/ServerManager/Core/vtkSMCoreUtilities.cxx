@@ -16,19 +16,19 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
+#include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
-#include "vtkSMDomain.h"
+#include "vtkSmartPointer.h"
 
-#include <sstream>
-#include <ctype.h>
 #include <cassert>
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
+#include <ctype.h>
+#include <sstream>
 
 
 vtkStandardNewMacro(vtkSMCoreUtilities);

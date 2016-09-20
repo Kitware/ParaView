@@ -17,9 +17,9 @@
 #include "vtkInitializationHelper.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVConfig.h" // Required to get build options for paraview
 #include "vtkPVOptions.h"
+#include "vtkProcessModule.h"
 #include "vtkSMObject.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMProperty.h"
@@ -30,8 +30,8 @@
 #include "vtkCPConfig.h"
 
 #include <assert.h>
-#include <string>
 #include <sstream>
+#include <string>
 #include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------

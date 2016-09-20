@@ -15,15 +15,15 @@
 #include "vtkPVMultiClientsInformation.h"
 
 #include "vtkClientServerStream.h"
+#include "vtkCompositeMultiProcessController.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
 #include "vtkPVServerOptions.h"
 #include "vtkPVServerOptionsInternals.h"
-#include "vtkToolkits.h"
 #include "vtkPVSession.h"
-#include "vtkCompositeMultiProcessController.h"
+#include "vtkProcessModule.h"
+#include "vtkToolkits.h"
 
 vtkStandardNewMacro(vtkPVMultiClientsInformation);
 

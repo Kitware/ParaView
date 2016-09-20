@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqUndoRedoBehavior_h
 #define pqUndoRedoBehavior_h
 
-#include <QObject>
 #include "pqApplicationComponentsModule.h"
+#include <QObject>
 
 /// @ingroup Behaviors
 /// pqUndoRedoBehavior enables application wide undo-redo.

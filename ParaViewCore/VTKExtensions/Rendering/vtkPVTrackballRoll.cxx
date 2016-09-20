@@ -14,12 +14,12 @@
 =========================================================================*/
 #include "vtkPVTrackballRoll.h"
 
-#include "vtkMath.h"
 #include "vtkCamera.h"
+#include "vtkMath.h"
 #include "vtkObjectFactory.h"
+#include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
 #include "vtkTransform.h"
 
 vtkStandardNewMacro(vtkPVTrackballRoll);

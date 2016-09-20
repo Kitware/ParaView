@@ -41,8 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageData.h"
 
 #include <QApplication>
-#include <QWidget>
 #include <QDebug>
+#include <QWidget>
 
 pqComponentsTestUtility::pqComponentsTestUtility(QObject* parentObj) :
   Superclass(parentObj)

@@ -15,8 +15,8 @@
 #include "vtkPistonInformationHelper.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkPistonDataObject.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPistonDataObject.h"
 
 vtkStandardNewMacro(vtkPistonInformationHelper);
 

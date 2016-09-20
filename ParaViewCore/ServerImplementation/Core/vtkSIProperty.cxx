@@ -17,9 +17,9 @@
 #include "vtkClientServerInterpreter.h"
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSIProxy.h"
 #include "vtkSMMessage.h"
-#include "vtkPVXMLElement.h"
 
 //****************************************************************************/
 //                    Internal Classes and typedefs

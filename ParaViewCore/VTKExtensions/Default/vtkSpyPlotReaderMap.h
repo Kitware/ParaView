@@ -23,9 +23,9 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkSystemIncludes.h"
 
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
 
 class vtkMultiProcessStream;
 class vtkSpyPlotReader;

@@ -15,9 +15,9 @@
 #include "vtkPVLightingHelper.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkgl.h"
-#include "vtkShaderProgram2.h"
 #include "vtkShader2Collection.h"
+#include "vtkShaderProgram2.h"
+#include "vtkgl.h"
 
 extern const char* vtkPVLightingHelper_s;
 

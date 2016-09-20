@@ -31,9 +31,9 @@
 #ifndef vtkResampledAMRImageSource_h
 #define vtkResampledAMRImageSource_h
 
-#include "vtkTrivialProducer.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
-#include "vtkSmartPointer.h" // needed for vtkSmartPointer
+#include "vtkSmartPointer.h"                   // needed for vtkSmartPointer
+#include "vtkTrivialProducer.h"
 
 class vtkAMRBox;
 class vtkImageData;

@@ -20,9 +20,9 @@
 #include "vtkObjectFactory.h"
 #include "vtkProp3DCollection.h"
 #include "vtkPropCollection.h"
+#include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkRendererCollection.h"
-#include "vtkRenderWindow.h"
 
 #include <cstdio> // for rename
 

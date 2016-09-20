@@ -20,8 +20,8 @@
 #ifndef vtkPGenericIOMultiBlockReader_h
 #define vtkPGenericIOMultiBlockReader_h
 
-#include "vtkPVVTKExtensionsCosmoToolsModule.h" // For export macro
 #include "vtkMultiBlockDataSetAlgorithm.h"
+#include "vtkPVVTKExtensionsCosmoToolsModule.h" // For export macro
 
 #include <set> // For std::set
 

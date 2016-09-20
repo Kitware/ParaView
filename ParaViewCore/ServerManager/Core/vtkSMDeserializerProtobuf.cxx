@@ -16,13 +16,13 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
+#include "vtkSMMessage.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMStateLocator.h"
-#include "vtkSMMessage.h"
+#include "vtkSmartPointer.h"
 
 #define BEFORE_LOAD(proxy) \
   if (session && session->IsProcessingRemoteNotification()) \

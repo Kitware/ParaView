@@ -24,17 +24,17 @@
 #include "vtkObjectFactory.h"
 #include "vtkPNGWriter.h"
 #include "vtkPNMWriter.h"
-#include "vtkPoints.h"
 #include "vtkPVInstantiator.h"
+#include "vtkPoints.h"
 #include "vtkTIFFWriter.h"
 #include "vtkTimerLog.h"
 #include "vtkTransform.h"
 #include "vtkTuple.h"
 
-#include <vtksys/SystemTools.hxx>
+#include <algorithm>
 #include <sstream>
 #include <string>
-#include <algorithm>
+#include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkSMUtilities);
 

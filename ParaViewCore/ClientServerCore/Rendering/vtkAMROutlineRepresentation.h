@@ -23,10 +23,10 @@
 #ifndef vtkAMROutlineRepresentation_h
 #define vtkAMROutlineRepresentation_h
 
+#include "vtkBoundingBox.h" // needed for vtkBoundingBox.
 #include "vtkPVDataRepresentation.h"
 #include "vtkSmartPointer.h" // for smart pointer.
-#include "vtkWeakPointer.h" // for weak pointer.
-#include "vtkBoundingBox.h" // needed for vtkBoundingBox.
+#include "vtkWeakPointer.h"  // for weak pointer.
 
 class vtkAMRStreamingPriorityQueue;
 class vtkCompositePolyDataMapper2;

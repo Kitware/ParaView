@@ -21,11 +21,11 @@ PURPOSE.  See the above copyright notice for more information.
 #define vtksys_SHARED_FORWARD_OPTION_PRINT "--print"
 #define vtksys_SHARED_FORWARD_OPTION_LDD "--ldd"
 
-#include <vtksys/SharedForward.h>
-#include <unistd.h>
-#include <sys/types.h>
 #include <pwd.h>
 #include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <vtksys/SharedForward.h>
 
 int get_driver_cache_user_path(char *driver_cache_path)
 {

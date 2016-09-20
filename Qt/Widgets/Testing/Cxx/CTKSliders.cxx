@@ -1,11 +1,11 @@
-#include "ctkRangeSlider.h"
 #include "ctkDoubleRangeSlider.h"
+#include "ctkRangeSlider.h"
 
-#include <QTimer>
-#include <QStandardItemModel>
 #include <QItemSelectionModel>
-#include <QVBoxLayout>
 #include <QObject>
+#include <QStandardItemModel>
+#include <QTimer>
+#include <QVBoxLayout>
 
 #include "QTestApp.h"
 #include "SignalCatcher.h"

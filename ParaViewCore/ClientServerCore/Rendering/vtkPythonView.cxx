@@ -21,11 +21,11 @@
 #include "vtkInformationRequestKey.h"
 #include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkPythonInterpreter.h"
-#include "vtkSmartPyObject.h"
 #include "vtkPythonRepresentation.h"
+#include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkRendererCollection.h"
-#include "vtkRenderWindow.h"
+#include "vtkSmartPyObject.h"
 #include "vtkTexture.h"
 #include "vtkTimerLog.h"
 

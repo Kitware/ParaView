@@ -20,8 +20,8 @@
 #ifndef vtkPVLegacyGlyphFilter_h
 #define vtkPVLegacyGlyphFilter_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkGlyph3D.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class vtkMaskPoints;
 

@@ -31,8 +31,8 @@
 #include "vtkSQPlaneSourceConfigurationFileInfo.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkStringList.h"
 #include "vtkSMNamedPropertyIterator.h"
+#include "vtkStringList.h"
 
 vtkStandardNewMacro(vtkSQPlaneSourceConfigurationWriter);
 

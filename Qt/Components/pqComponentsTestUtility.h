@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqComponentsTestUtility_h
 #define pqComponentsTestUtility_h
 
-#include "pqCoreTestUtility.h"
 #include "pqComponentsModule.h"
+#include "pqCoreTestUtility.h"
 
 /// pqComponentsTestUtility simply adds a pqComponents specific testing
 /// capabilities to pqCoreTestUtility.

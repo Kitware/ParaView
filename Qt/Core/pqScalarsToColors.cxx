@@ -36,17 +36,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProxy.h"
 
-#include <QPointer>
 #include <QList>
+#include <QPointer>
 #include <QtDebug>
 
 #include "pqApplicationCore.h"
 #include "pqPipelineRepresentation.h"
 #include "pqRenderViewBase.h"
+#include "pqSMAdaptor.h"
 #include "pqScalarBarRepresentation.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
-#include "pqSMAdaptor.h"
 #include "vtkSMProperty.h"
 #include "vtkSMTransferFunctionProxy.h"
 

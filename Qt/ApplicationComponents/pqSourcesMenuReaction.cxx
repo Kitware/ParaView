@@ -31,15 +31,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqSourcesMenuReaction.h"
 
-#include "pqProxyGroupMenuManager.h"
 #include "pqActiveObjects.h"
-#include "pqUndoStack.h"
 #include "pqObjectBuilder.h"
+#include "pqProxyGroupMenuManager.h"
 #include "pqServer.h"
+#include "pqUndoStack.h"
 
 #include "pqCollaborationManager.h"
-#include "vtkSMCollaborationManager.h"
 #include "vtkPVServerInformation.h"
+#include "vtkSMCollaborationManager.h"
 
 //-----------------------------------------------------------------------------
 pqSourcesMenuReaction::pqSourcesMenuReaction(

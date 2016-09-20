@@ -37,13 +37,13 @@
 #include "vtkCDIReader.h"
 
 #include "vtkCallbackCommand.h"
+#include "vtkCellArray.h"
 #include "vtkCellData.h"
 #include "vtkCellType.h"
-#include "vtkCellArray.h"
 #include "vtkDataArraySelection.h"
 #include "vtkDataObject.h"
-#include "vtkErrorCode.h"
 #include "vtkDoubleArray.h"
+#include "vtkErrorCode.h"
 #include "vtkInformation.h"
 #include "vtkInformationDoubleVectorKey.h"
 #include "vtkInformationVector.h"
@@ -59,15 +59,15 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtk_netcdfcpp.h"
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include "stdlib.h"
-#include <string>
-#include <cmath>
-#include <cfloat>
-#include <algorithm>
 #include "cdi.h"
+#include "stdlib.h"
+#include <algorithm>
+#include <cfloat>
+#include <cmath>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
 
 using namespace std;
 

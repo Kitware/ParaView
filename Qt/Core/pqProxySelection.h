@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqProxySelection_h
 #define pqProxySelection_h
 
-#include <QSet>
 #include "pqCoreModule.h"
+#include <QSet>
 
 class pqServerManagerModelItem;
 class vtkSMProxySelectionModel;

@@ -31,14 +31,14 @@
 
 #include "vtkAlgorithm.h"
 #include "vtkClientServerStream.h"
+#include "vtkImageData.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkImageData.h"
 
-#include "vtkSMSession.h"
 #include "vtkSIObject.h"
 #include "vtkSIProxy.h"
+#include "vtkSMSession.h"
 
 vtkStandardNewMacro(vtkSMSpriteTextureProxy);
 //----------------------------------------------------------------------------

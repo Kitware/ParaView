@@ -47,8 +47,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkUndoSet.h"
 
-#include <QtDebug>
 #include <QPointer>
+#include <QtDebug>
 
 
 //-----------------------------------------------------------------------------

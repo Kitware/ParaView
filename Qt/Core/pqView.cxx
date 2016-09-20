@@ -36,20 +36,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageData.h"
 #include "vtkMath.h"
 #include "vtkNew.h"
-#include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
+#include "vtkProcessModule.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSession.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMViewProxy.h"
+#include "vtkSmartPointer.h"
 
 // Qt includes.
 #include <QList>
 #include <QPointer>
-#include <QtDebug>
 #include <QWidget>
+#include <QtDebug>
 
 // ParaView includes.
 #include "pqApplicationCore.h"

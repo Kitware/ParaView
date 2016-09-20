@@ -23,9 +23,9 @@
 #ifndef vtkPVDataSetAttributesInformation_h
 #define vtkPVDataSetAttributesInformation_h
 
+#include "vtkDataSetAttributes.h"            // needed for NUM_ATTRIBUTES
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"
-#include "vtkDataSetAttributes.h" // needed for NUM_ATTRIBUTES
 
 class vtkDataSetAttributes;
 class vtkFieldData;

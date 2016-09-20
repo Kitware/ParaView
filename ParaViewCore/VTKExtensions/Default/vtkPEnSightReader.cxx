@@ -17,11 +17,11 @@
 
 #include "vtkDataArrayCollection.h"
 #include "vtkFloatArray.h"
-#include "vtkMultiBlockDataSet.h"
 #include "vtkIdList.h"
 #include "vtkIdListCollection.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkSmartPointer.h"
@@ -30,12 +30,12 @@
 #include "vtkStructuredPoints.h"
 #include "vtkUnstructuredGrid.h"
 
+#include "vtkBSPCuts.h"
+#include "vtkKdNode.h"
 #include "vtkPKdTree.h"
 #include "vtkPointSet.h"
 #include "vtkPoints.h"
 #include "vtkPolyData.h"
-#include "vtkBSPCuts.h"
-#include "vtkKdNode.h"
 
 #include "vtkMultiProcessController.h"
 #include "vtkObject.h"

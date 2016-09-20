@@ -15,8 +15,8 @@
 #include "vtkImageData.h"
 #include "vtkPNGReader.h"
 #include "vtkSmartPointer.h"
-#include <vtksys/SystemTools.hxx>
 #include "vtkTesting.h"
+#include <vtksys/SystemTools.hxx>
 
 // Checks to see if the file exists and that it is a png file.
 // Returns 1 for a valid file and 0 for an invalid file.

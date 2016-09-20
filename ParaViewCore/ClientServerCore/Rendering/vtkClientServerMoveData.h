@@ -26,8 +26,8 @@
 #ifndef vtkClientServerMoveData_h
 #define vtkClientServerMoveData_h
 
-#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkDataObjectAlgorithm.h"
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 
 class vtkMultiProcessController;
 class vtkMultiProcessController;

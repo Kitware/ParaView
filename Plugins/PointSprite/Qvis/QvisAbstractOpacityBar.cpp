@@ -38,14 +38,14 @@
 #include "QvisAbstractOpacityBar.h"
 #include "ColorControlPointList.h"
 
-#include <qpainter.h>
-#include <qpolygon.h>
-#include <qpixmap.h>
 #include <qimage.h>
+#include <qpainter.h>
+#include <qpixmap.h>
+#include <qpolygon.h>
 
-#include <iostream>
 #include <cmath>
 #include <cstdlib>
+#include <iostream>
 
 
 // ****************************************************************************

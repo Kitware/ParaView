@@ -30,12 +30,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqCinemaConfiguration.h"
-#include "ui_pqCinemaConfiguration.h"
 #include "pqApplicationCore.h"
-#include "pqServerManagerModel.h"
-#include "pqRenderViewBase.h"
 #include "pqContextView.h"
 #include "pqPipelineFilter.h"
+#include "pqRenderViewBase.h"
+#include "pqServerManagerModel.h"
+#include "ui_pqCinemaConfiguration.h"
 
 
 // ----------------------------------------------------------------------------

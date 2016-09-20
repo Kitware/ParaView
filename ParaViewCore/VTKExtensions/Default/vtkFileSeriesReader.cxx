@@ -24,8 +24,8 @@
 
 #include "vtkFileSeriesReader.h"
 
-#include "vtkClientServerInterpreterInitializer.h"
 #include "vtkClientServerInterpreter.h"
+#include "vtkClientServerInterpreterInitializer.h"
 #include "vtkClientServerStream.h"
 #include "vtkGenericDataObjectReader.h"
 #include "vtkInformation.h"
@@ -43,11 +43,11 @@
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
 #include <algorithm>
+#include <ctype.h> // for isprint().
 #include <map>
 #include <set>
 #include <string>
 #include <vector>
-#include <ctype.h> // for isprint().
 
 //=============================================================================
 vtkStandardNewMacro(vtkFileSeriesReader);

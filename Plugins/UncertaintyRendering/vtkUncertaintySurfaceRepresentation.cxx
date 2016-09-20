@@ -15,17 +15,17 @@
 
 #include "vtkUncertaintySurfaceRepresentation.h"
 
+#include "vtkCompositeDataSet.h"
 #include "vtkCompositePolyDataMapper2.h"
-#include "vtkObjectFactory.h"
-#include "vtkUncertaintySurfacePainter.h"
-#include "vtkUncertaintySurfaceDefaultPainter.h"
 #include "vtkDataObject.h"
 #include "vtkDataSet.h"
-#include "vtkCompositeDataSet.h"
-#include "vtkPointData.h"
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
 #include "vtkIntArray.h"
+#include "vtkObjectFactory.h"
+#include "vtkPointData.h"
+#include "vtkUncertaintySurfaceDefaultPainter.h"
+#include "vtkUncertaintySurfacePainter.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkUncertaintySurfaceRepresentation)

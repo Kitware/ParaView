@@ -23,18 +23,18 @@
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPoints.h"
 #include "vtkPointData.h"
-#include "vtkUnstructuredGrid.h"
+#include "vtkPoints.h"
 #include "vtkTypeInt64Array.h"
+#include "vtkUnstructuredGrid.h"
 
 #include "CosmoHaloFinderP.h"
 #include "FOFHaloProperties.h"
+#include "HaloCenterFinder.h"
 #include "ParticleDistribute.h"
 #include "ParticleExchange.h"
 #include "Partition.h"
 #include "SubHaloFinder.h"
-#include "HaloCenterFinder.h"
 
 #include <cassert>
 #include <vector>

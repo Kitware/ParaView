@@ -33,10 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqRenderViewSelectionReaction_h
 
 #include "pqSelectionReaction.h"
-#include <QPointer>
-#include <QCursor>
-#include <QTimer>
 #include "vtkWeakPointer.h"
+#include <QCursor>
+#include <QPointer>
+#include <QTimer>
 
 class pqRenderView;
 class pqView;

@@ -19,9 +19,9 @@
 #ifndef vtkXYChartRepresentationInternals_h
 #define vtkXYChartRepresentationInternals_h
 
+#include "vtkCSVExporter.h"
 #include "vtkChartXY.h"
 #include "vtkColor.h"
-#include "vtkCSVExporter.h"
 #include "vtkDataArray.h"
 #include "vtkPen.h"
 #include "vtkPlotBar.h"

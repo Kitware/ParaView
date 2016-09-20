@@ -33,10 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt includes.
 #include <QHeaderView>
-#include <QTableView>
-#include <QVBoxLayout>
 #include <QMenu>
 #include <QSortFilterProxyModel>
+#include <QTableView>
+#include <QVBoxLayout>
 
 // ParaView includes.
 #include "pqActiveObjects.h"

@@ -14,12 +14,12 @@
 =========================================================================*/
 #include "vtkSMProxyLocator.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkSmartPointer.h"
-#include "vtkSMDeserializer.h"
-#include "vtkSMSession.h"
-#include "vtkSMProxy.h"
 #include "vtkCollection.h"
+#include "vtkObjectFactory.h"
+#include "vtkSMDeserializer.h"
+#include "vtkSMProxy.h"
+#include "vtkSMSession.h"
+#include "vtkSmartPointer.h"
 
 #include <map>
 

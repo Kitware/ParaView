@@ -45,9 +45,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 
 #include "vtkNew.h"
-#include "vtkProcessModule.h"
 #include "vtkPVProxyDefinitionIterator.h"
-#include "vtkSmartPointer.h"
+#include "vtkProcessModule.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMParaViewPipelineController.h"
@@ -55,19 +54,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyDefinitionManager.h"
-#include "vtkSMSessionProxyManager.h"
-#include "vtkSMSessionClient.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionClient.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSmartPointer.h"
 #include "vtkStringList.h"
 
 // Qt Includes.
-#include <QPointer>
 #include <QList>
+#include <QMap>
+#include <QPointer>
 #include <QString>
 #include <QStringList>
-#include <QMap>
 #include <QtDebug>
 
 //-----------------------------------------------------------------------------

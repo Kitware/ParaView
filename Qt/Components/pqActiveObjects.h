@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqActiveObjects_h
 #define pqActiveObjects_h
 
+#include "pqComponentsModule.h"
 #include <QObject>
 #include <QPointer>
-#include "pqComponentsModule.h"
 
 /// needed for inline get-methods.
 #include "pqDataRepresentation.h"

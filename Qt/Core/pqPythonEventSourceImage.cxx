@@ -40,9 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPythonEventSourceImage.h"
 
 // Qt include
-#include <QWidget>
 #include <QCoreApplication>
 #include <QEvent>
+#include <QWidget>
 
 // Qt testing includes
 #include "pqEventDispatcher.h"

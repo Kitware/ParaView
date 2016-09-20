@@ -16,12 +16,12 @@
 #include "vtkScatterPlotMatrix.h"
 
 #include "vtkClientServerStream.h"
+#include "vtkCommand.h"
 #include "vtkDoubleArray.h"
 #include "vtkIdTypeArray.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVPlotMatrixView.h"
 #include "vtkPVXMLElement.h"
-#include "vtkCommand.h"
 #include "vtkVector.h"
 
 #include "vtkSMSession.h"

@@ -41,16 +41,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDoubleRangeWidget.h"
 #include "pqHighlightablePushButton.h"
 #include "pqLineEdit.h"
-#include "pqPropertiesPanel.h"
 #include "pqListPropertyWidget.h"
+#include "pqPropertiesPanel.h"
 #include "pqSignalAdaptors.h"
 #include "pqWidgetRangeDomain.h"
 
-#include <QtDebug>
 #include <QDoubleSpinBox>
 #include <QHBoxLayout>
-#include <QStyle>
 #include <QMenu>
+#include <QStyle>
+#include <QtDebug>
 
 //-----------------------------------------------------------------------------
 pqFileNamePropertyWidget::pqFileNamePropertyWidget(

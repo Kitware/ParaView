@@ -14,16 +14,16 @@
 =========================================================================*/
 #include "vtkPVTestUtilities.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkType.h"
-#include "vtkPolyData.h"
-#include "vtkPointData.h"
 #include "vtkDataArray.h"
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
-#include <string>//
-#include <vector>//
-#include "vtkType.h"//
+#include "vtkObjectFactory.h"
+#include "vtkPointData.h"
+#include "vtkPolyData.h"
+#include "vtkType.h"
+#include "vtkType.h" //
+#include <string>    //
+#include <vector>    //
 using std::string;
 using std::vector;
 

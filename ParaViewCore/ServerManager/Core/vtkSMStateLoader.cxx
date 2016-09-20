@@ -17,7 +17,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVInstantiator.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxyIterator.h"
@@ -28,6 +27,7 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStateVersionController.h"
+#include "vtkSmartPointer.h"
 
 #include <cassert>
 #include <cstdlib>

@@ -39,8 +39,8 @@
 #ifndef vtkPVRecoverGeometryWireframe_h
 #define vtkPVRecoverGeometryWireframe_h
 
-#include "vtkPolyDataAlgorithm.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
+#include "vtkPolyDataAlgorithm.h"
 
 class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVRecoverGeometryWireframe : public vtkPolyDataAlgorithm
 {

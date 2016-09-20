@@ -14,14 +14,14 @@
 =========================================================================*/
 #include "vtkPVGeometryFilter.h"
 
-#include "vtkAlgorithmOutput.h"
 #include "vtkAMRInformation.h"
+#include "vtkAlgorithmOutput.h"
 #include "vtkAppendPolyData.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCellArray.h"
 #include "vtkCellData.h"
-#include "vtkCellTypes.h"
 #include "vtkCellIterator.h"
+#include "vtkCellTypes.h"
 #include "vtkCommand.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkCompositeDataSet.h"
@@ -49,11 +49,11 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineSource.h"
+#include "vtkPVRecoverGeometryWireframe.h"
+#include "vtkPVTrivialProducer.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkPolygon.h"
-#include "vtkPVRecoverGeometryWireframe.h"
-#include "vtkPVTrivialProducer.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkRectilinearGridOutlineFilter.h"
 #include "vtkSelectionNode.h"
@@ -67,16 +67,16 @@
 #include "vtkUniformGrid.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnsignedIntArray.h"
-#include "vtkUnstructuredGridGeometryFilter.h"
 #include "vtkUnstructuredGrid.h"
+#include "vtkUnstructuredGridGeometryFilter.h"
 
-#include <map>
-#include <vector>
-#include <string>
+#include <algorithm>
 #include <assert.h>
+#include <map>
 #include <math.h>
 #include <set>
-#include <algorithm>
+#include <string>
+#include <vector>
 
 
 vtkStandardNewMacro(vtkPVGeometryFilter);

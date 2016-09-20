@@ -20,8 +20,8 @@
 #ifndef vtkOutlineRepresentation_h
 #define vtkOutlineRepresentation_h
 
-#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkGeometryRepresentationWithFaces.h"
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkOutlineRepresentation :
   public vtkGeometryRepresentationWithFaces

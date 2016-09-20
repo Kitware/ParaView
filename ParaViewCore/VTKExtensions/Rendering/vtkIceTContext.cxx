@@ -20,8 +20,8 @@
 #include "vtkIceTContext.h"
 
 #include "vtkMPI.h"
-#include "vtkMPIController.h"
 #include "vtkMPICommunicator.h"
+#include "vtkMPIController.h"
 #include "vtkObjectFactory.h"
 
 #include "IceT.h"

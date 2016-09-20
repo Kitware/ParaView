@@ -16,8 +16,8 @@
 
 #include "vtkAppendFilter.h"
 #include "vtkCleanArrays.h"
-#include "vtkDataObjectTreeIterator.h"
 #include "vtkCompositeDataSet.h"
+#include "vtkDataObjectTreeIterator.h"
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkUnstructuredGrid.h"

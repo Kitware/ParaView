@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqVerifyRequiredPluginBehavior_h
 #define pqVerifyRequiredPluginBehavior_h
 
+#include "pqApplicationComponentsModule.h"
 #include <QObject>
 #include <QSet>
-#include "pqApplicationComponentsModule.h"
 
 /// @ingroup Behaviors
 ///

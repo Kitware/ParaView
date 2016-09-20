@@ -14,8 +14,8 @@
 =========================================================================*/
 #include "vtkPVCenterAxesActor.h"
 
-#include "vtkObjectFactory.h"
 #include "vtkAxes.h"
+#include "vtkObjectFactory.h"
 #include "vtkPolyDataMapper.h"
 
 vtkStandardNewMacro(vtkPVCenterAxesActor);

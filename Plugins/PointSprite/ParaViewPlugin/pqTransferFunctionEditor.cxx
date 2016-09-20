@@ -33,9 +33,9 @@
 #include <vtkDataObject.h>
 #include <vtkSMPropertyHelper.h>
 
+#include <QChar>
 #include <QDoubleValidator>
 #include <QTimer>
-#include <QChar>
 
 #include <iostream>
 using namespace std;
@@ -145,8 +145,8 @@ static const char * white_xpm[] = { "40 20 1 1", "+    c #FFFFFF",
 #include "vtkSMStringVectorProperty.h"
 
 // vtk includes
-#include "vtkSmartPointer.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkSmartPointer.h"
 
 #include "pqUndoStack.h"
 

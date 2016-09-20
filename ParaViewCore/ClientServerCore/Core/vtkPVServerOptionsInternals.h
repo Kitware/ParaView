@@ -16,8 +16,8 @@
 #ifndef vtkPVServerOptionsInternals_h
 #define vtkPVServerOptionsInternals_h
 
-#include <vector>
 #include <string>
+#include <vector>
 
 class vtkPVServerOptionsInternals
 {

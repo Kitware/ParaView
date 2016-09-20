@@ -30,8 +30,8 @@ PURPOSE.  See the above copyright notice for more information.
 #ifndef vtkSpyPlotUniReader_h
 #define vtkSpyPlotUniReader_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkObject.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 class vtkSpyPlotBlock;
 class vtkDataArraySelection;
 class vtkDataArray;

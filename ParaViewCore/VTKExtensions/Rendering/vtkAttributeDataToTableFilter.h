@@ -23,8 +23,8 @@
 #ifndef vtkAttributeDataToTableFilter_h
 #define vtkAttributeDataToTableFilter_h
 
-#include "vtkTableAlgorithm.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
+#include "vtkTableAlgorithm.h"
 
 class vtkFieldData;
 

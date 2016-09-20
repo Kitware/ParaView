@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqArrayStatusPropertyWidget.h"
 
 #include "pqExodusIIVariableSelectionWidget.h"
-#include "vtkSMPropertyGroup.h"
 #include "vtkSMProperty.h"
+#include "vtkSMPropertyGroup.h"
 #include "vtkSMProxy.h"
 
 #include <QHBoxLayout>

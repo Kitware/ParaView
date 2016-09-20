@@ -21,8 +21,8 @@
 #include "vtkSMProxyLocator.h"
 #include "vtkWeakPointer.h"
 
-#include <map>
 #include <list>
+#include <map>
 
 class vtkSMGlobalPropertiesProxy::vtkInternals
 {

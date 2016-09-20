@@ -12,10 +12,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkObjectFactory.h"
 #include "vtkCinemaExporter.h"
-#include "vtkStdString.h"
+#include "vtkObjectFactory.h"
 #include "vtkPVConfig.h" // needed for PARAVIEW_ENABLE_PYTHON
+#include "vtkStdString.h"
 #ifdef PARAVIEW_ENABLE_PYTHON
 #include "vtkPythonInterpreter.h"
 #endif

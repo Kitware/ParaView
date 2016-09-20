@@ -24,8 +24,8 @@
 #define vtkSMPropertyModificationUndoElement_h
 
 #include "vtkPVServerManagerDefaultModule.h" //needed for exports
+#include "vtkSMMessageMinimal.h"             // needed for vtkSMMessage
 #include "vtkSMUndoElement.h"
-#include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 class vtkSMProxy;
 
 class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMPropertyModificationUndoElement : public vtkSMUndoElement

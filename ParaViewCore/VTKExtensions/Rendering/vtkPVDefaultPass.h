@@ -21,8 +21,8 @@
 #ifndef vtkPVDefaultPass_h
 #define vtkPVDefaultPass_h
 
-#include "vtkRenderPass.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
+#include "vtkRenderPass.h"
 
 class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVDefaultPass : public vtkRenderPass
 {

@@ -26,8 +26,8 @@
 #ifndef vtkPVCacheKeeper_h
 #define vtkPVCacheKeeper_h
 
-#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkDataObjectAlgorithm.h"
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 
 class vtkCacheSizeKeeper;
 

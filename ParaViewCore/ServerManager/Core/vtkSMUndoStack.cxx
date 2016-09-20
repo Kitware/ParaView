@@ -17,23 +17,23 @@
 #include "vtkCollection.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
+#include "vtkProcessModule.h"
+#include "vtkSMDeserializerProtobuf.h"
 #include "vtkSMMessage.h"
+#include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMRemoteObjectUpdateUndoElement.h"
 #include "vtkSMSession.h"
+#include "vtkSMStateLocator.h"
 #include "vtkSMUndoElement.h"
 #include "vtkUndoSet.h"
 #include "vtkUndoStackInternal.h"
-#include "vtkSMStateLocator.h"
-#include "vtkSMProxyLocator.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMDeserializerProtobuf.h"
-#include "vtkSMRemoteObjectUpdateUndoElement.h"
 
-#include <vtksys/RegularExpression.hxx>
-#include <set>
 #include "vtkNew.h"
+#include <set>
+#include <vtksys/RegularExpression.hxx>
 
 //*****************************************************************************
 class vtkSMUndoStack::vtkInternal

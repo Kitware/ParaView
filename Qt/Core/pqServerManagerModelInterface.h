@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqServerManagerModelInterface_h
 #define pqServerManagerModelInterface_h
 
-#include <QtPlugin>
 #include "pqCoreModule.h"
+#include <QtPlugin>
 
 class vtkSMProxy;
 class pqServer;

@@ -19,9 +19,9 @@
 #include "vtkPVDataDeliveryManager.h"
 #include "vtkPVRenderView.h"
 
+#include <algorithm>
 #include <set>
 #include <vector>
-#include <algorithm>
 
 class vtkPVStreamingPiecesInformation::vtkInternals :
   public std::set<unsigned int>

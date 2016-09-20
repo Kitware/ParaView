@@ -32,12 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCPExportStateWizard.h"
 
 #include <vtkCamera.h>
+#include <vtkPVXMLElement.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMRenderViewProxy.h>
 #include <vtkSMSessionProxyManager.h>
 #include <vtkSMSourceProxy.h>
 #include <vtkSMViewProxy.h>
-#include <vtkPVXMLElement.h>
 
 #include <pqApplicationCore.h>
 #include <pqCinemaTrack.h>

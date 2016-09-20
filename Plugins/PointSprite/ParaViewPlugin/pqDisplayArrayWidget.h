@@ -30,8 +30,8 @@
 #ifndef _pqDisplayArrayWidget_h
 #define _pqDisplayArrayWidget_h
 
-#include <QWidget>
 #include <QPointer>
+#include <QWidget>
 
 class QComboBox;
 class QHBoxLayout;

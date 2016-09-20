@@ -19,8 +19,8 @@
 #ifndef vtkPVMetaSliceDataSet_h
 #define vtkPVMetaSliceDataSet_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPVDataSetAlgorithmSelectorFilter.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class vtkImplicitFunction;
 

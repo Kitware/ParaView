@@ -46,23 +46,23 @@
     #define  VTKIONETCDF_EXPORT __declspec(dllexport)
 #endif
 
+#include "vtkIONetCDFModule.h"
+#include "vtkIntArray.h"
 #include "vtkUnstructuredGridAlgorithm.h"
 #include <string>
-#include <vtkSmartPointer.h>
-#include "vtkIONetCDFModule.h"
-#include <vtkSelectionNode.h>
-#include <vtkSelection.h>
 #include <vtkExtractSelection.h>
+#include <vtkSelection.h>
+#include <vtkSelectionNode.h>
 #include <vtkSmartPointer.h>
-#include "vtkIntArray.h"
+#include <vtkSmartPointer.h>
 
+#include <cctype>
 #include <iostream>
 #include <sstream>
-#include <vector>
-#include <cctype>
-#include <string>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string>
+#include <vector>
 
 #include "cdi.h"
 

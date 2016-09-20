@@ -25,8 +25,8 @@
 #include "vtkBoundingBox.h"
 #include "vtkMath.h"
 
-#include <queue>
 #include <algorithm>
+#include <queue>
 
 //*****************************************************************************
 namespace

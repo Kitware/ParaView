@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqCameraToolbar_h
 #define pqCameraToolbar_h
 
-#include <QToolBar>
 #include "pqApplicationComponentsModule.h"
+#include <QToolBar>
 
 /// pqCameraToolbar is the toolbar that has icons for resetting camera
 /// orientations as well as zoom-to-data and zoom-to-box.

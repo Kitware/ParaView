@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "@name@Implementation.h"
 
 #include "@classname@.h"
-#include "vtkSMPropertyGroup.h"
 #include "vtkSMProperty.h"
+#include "vtkSMPropertyGroup.h"
 
 //-----------------------------------------------------------------------------
 @name@Implementation::@name@Implementation(QObject* parentObject)

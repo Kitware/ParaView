@@ -16,9 +16,9 @@
 
 #include "vtkCamera.h"
 #include "vtkObjectFactory.h"
+#include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
 
 vtkStandardNewMacro(vtkPVTrackballZoom);
 

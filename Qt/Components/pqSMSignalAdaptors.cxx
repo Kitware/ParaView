@@ -37,8 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLayout>
 #include <QMap>
 #include <QPointer>
-#include <QtDebug>
 #include <QWidget>
+#include <QtDebug>
 
 // SM includes
 #include "vtkPVXMLElement.h"
@@ -52,8 +52,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineFilter.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineSource.h"
-#include "pqServerManagerModel.h"
 #include "pqSMProxy.h"
+#include "pqServerManagerModel.h"
 
 pqSignalAdaptorProxy::pqSignalAdaptorProxy(QObject* p, 
               const char* colorProperty, const char* signal)

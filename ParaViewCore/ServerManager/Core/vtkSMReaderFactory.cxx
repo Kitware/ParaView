@@ -17,28 +17,28 @@
 #include "vtkCallbackCommand.h"
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
-#include "vtkSmartPointer.h"
+#include "vtkProcessModule.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSmartPointer.h"
 #include "vtkStringList.h"
 
+#include <assert.h>
 #include <list>
 #include <set>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
-#include <vtksys/SystemTools.hxx>
 #include <vtksys/RegularExpression.hxx>
-#include <assert.h>
+#include <vtksys/SystemTools.hxx>
 
 static void string_replace(std::string& string, char c, std::string str)
 {

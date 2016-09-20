@@ -17,19 +17,19 @@
 #include "vtkObjectFactory.h"
 
 #include "vtkActor.h"
+#include "vtkConeSource.h"
+#include "vtkCylinderSource.h"
+#include "vtkFollower.h"
+#include "vtkLineSource.h"
+#include "vtkPolyData.h"
+#include "vtkPolyDataMapper.h"
 #include "vtkPropCollection.h"
 #include "vtkProperty.h"
 #include "vtkRenderWindow.h"
-#include "vtkTransform.h"
-#include "vtkCylinderSource.h"
-#include "vtkPolyDataMapper.h"
-#include "vtkLineSource.h"
-#include "vtkPolyData.h"
-#include "vtkConeSource.h"
-#include "vtkSphereSource.h"
-#include "vtkVectorText.h"
-#include "vtkFollower.h"
 #include "vtkRenderer.h"
+#include "vtkSphereSource.h"
+#include "vtkTransform.h"
+#include "vtkVectorText.h"
 
 #include <math.h>
 

@@ -139,9 +139,9 @@
 #include "vapor/DataMgr.h" //needed for vapor datastructures
 #include "vapor/WaveletBlock3DRegionReader.h" //needed for vapor datastructures
 
-#include <map> //needed for protected ivars
-#include <vector> //needed for protected ivars
+#include <map>    //needed for protected ivars
 #include <string> //needed for protected ivars
+#include <vector> //needed for protected ivars
 
 //using namespace std;
 using namespace VAPoR;

@@ -23,10 +23,10 @@
 #define vtkSMProxyDefinitionManager_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
+#include "vtkSIProxyDefinitionManager.h"  // needed for enums
+#include "vtkSMMessageMinimal.h"          // needed
 #include "vtkSMRemoteObject.h"
-#include "vtkSIProxyDefinitionManager.h" // needed for enums
 #include "vtkWeakPointer.h" // needed for weak pointer.
-#include "vtkSMMessageMinimal.h" // needed
 
 class vtkSMProxyLocator;
 class vtkEventForwarderCommand;

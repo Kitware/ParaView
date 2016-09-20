@@ -19,7 +19,6 @@
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMPropertyHelper.h"
@@ -29,15 +28,16 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMWriterProxy.h"
+#include "vtkSmartPointer.h"
 #include "vtkStringList.h"
 
+#include <assert.h>
 #include <list>
 #include <set>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
 #include <vtksys/SystemTools.hxx>
-#include <assert.h>
 
 class vtkSMWriterFactory::vtkInternals
 {

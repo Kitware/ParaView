@@ -15,8 +15,8 @@
 #include "vtkPVCameraAnimationCue.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkPVRenderView.h"
 #include "vtkPVCameraCueManipulator.h"
+#include "vtkPVRenderView.h"
 
 vtkStandardNewMacro(vtkPVCameraAnimationCue);
 vtkCxxSetObjectMacro(vtkPVCameraAnimationCue, View, vtkPVRenderView);

@@ -19,8 +19,8 @@
 #ifndef vtkPVMultiServerDataSource_h
 #define vtkPVMultiServerDataSource_h
 
-#include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkDataObjectAlgorithm.h"
+#include "vtkPVServerManagerDefaultModule.h" //needed for exports
 
 class vtkSMSourceProxy;
 class vtkInformation;

@@ -36,8 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderViewBase.h"
 #include "pqTimer.h"
 #include "pqUndoStack.h"
-#include "vtkSMPropertyHelper.h"
 #include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMTransferFunctionProxy.h"
 
 #include <QDebug>

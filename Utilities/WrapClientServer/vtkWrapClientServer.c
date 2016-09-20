@@ -12,13 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include "vtkWrap.h"
 #include "vtkParse.h"
 #include "vtkParseHierarchy.h"
 #include "vtkParseMain.h"
-#include "vtkWrap.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 int numberOfWrappedFunctions = 0;
 FunctionInfo *wrappedFunctions[1000];

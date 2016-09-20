@@ -29,44 +29,44 @@
  */
 #include "pqSQVolumeSource.h"
 
+#include "pqSQMacros.h"
 #include "vtkSQVolumeSourceConfigurationReader.h"
 #include "vtkSQVolumeSourceConfigurationWriter.h"
-#include "pqSQMacros.h"
 
 #include "pqApplicationCore.h"
-#include "pqProxy.h"
-#include "pqPropertyLinks.h"
-#include "pqSettings.h"
-#include "pqRenderView.h"
 #include "pqFileDialog.h"
+#include "pqPropertyLinks.h"
+#include "pqProxy.h"
+#include "pqRenderView.h"
+#include "pqSettings.h"
 
+#include "vtkMath.h"
+#include "vtkPVXMLParser.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMRenderViewProxy.h"
-#include "vtkSMProperty.h"
 #include "vtkSMStringVectorProperty.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMPropertyHelper.h"
-#include "vtkPVXMLParser.h"
-#include "vtkMath.h"
 
-#include <QMenu>
 #include <QAction>
-#include <QContextMenuEvent>
-#include <QClipboard>
 #include <QApplication>
-#include <QString>
-#include <QMessageBox>
-#include <QFileDialog>
+#include <QClipboard>
+#include <QContextMenuEvent>
+#include <QDebug>
 #include <QDoubleValidator>
+#include <QFileDialog>
 #include <QLineEdit>
+#include <QMenu>
+#include <QMessageBox>
 #include <QPalette>
 #include <QSettings>
-#include <QDebug>
+#include <QString>
 
-#include <string>
 #include <iostream>
 #include <sstream>
+#include <string>
 
 // #define pqSQVolumeSourceDEBUG
 

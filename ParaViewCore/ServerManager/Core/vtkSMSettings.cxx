@@ -16,9 +16,8 @@
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
+#include "vtkProcessModule.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMEnumerationDomain.h"
 #include "vtkSMIdTypeVectorProperty.h"
@@ -29,15 +28,16 @@
 #include "vtkSMProxy.h"
 #include "vtkSMProxyListDomain.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkSmartPointer.h"
 #include "vtkStringList.h"
 
+#include "vtk_jsoncpp.h"
 #include <sstream>
 #include <vtksys/SystemTools.hxx>
-#include "vtk_jsoncpp.h"
 
 #include <algorithm>
-#include <string>
 #include <cfloat>
+#include <string>
 
 #define vtkSMSettingsDebugMacro(x)\
   { if (vtksys::SystemTools::GetEnv("PV_SETTINGS_DEBUG")) {     \

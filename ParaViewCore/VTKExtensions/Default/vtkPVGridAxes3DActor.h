@@ -34,8 +34,8 @@
 #ifndef vtkPVGridAxes3DActor_h
 #define vtkPVGridAxes3DActor_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkGridAxes3DActor.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class vtkMatrix4x4;
 

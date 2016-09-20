@@ -25,9 +25,9 @@
 #ifndef vtkHierarchicalFractal_h
 #define vtkHierarchicalFractal_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkCompositeDataSetAlgorithm.h"
-#include "vtkSmartPointer.h" //for ivars
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
+#include "vtkSmartPointer.h"                 //for ivars
 
 class vtkIntArray;
 class vtkUniformGrid;

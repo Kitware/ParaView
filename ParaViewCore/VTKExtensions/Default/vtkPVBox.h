@@ -19,8 +19,8 @@
 #ifndef vtkPVBox_h
 #define vtkPVBox_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkBox.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVBox : public vtkBox
 {

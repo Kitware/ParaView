@@ -1,24 +1,24 @@
 #include "vtkMinkowskiFilter.h"
 
+#include <cmath>
 #include <cstdio>
 #include <map>
-#include <cmath>
 
-#include <vtkMath.h>
-#include <vtkPoints.h>
 #include <vtkCell.h>
-#include <vtkPolygon.h>
-#include <vtkPolyhedron.h>
-#include <vtkPointData.h>
 #include <vtkCellData.h>
-#include <vtkFloatArray.h>
 #include <vtkDoubleArray.h>
+#include <vtkFloatArray.h>
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
-#include <vtkUnstructuredGrid.h>
-#include <vtkUnstructuredGrid.h>
-#include <vtkStreamingDemandDrivenPipeline.h>
+#include <vtkMath.h>
 #include <vtkObjectFactory.h>
+#include <vtkPointData.h>
+#include <vtkPoints.h>
+#include <vtkPolygon.h>
+#include <vtkPolyhedron.h>
+#include <vtkStreamingDemandDrivenPipeline.h>
+#include <vtkUnstructuredGrid.h>
+#include <vtkUnstructuredGrid.h>
 
 #include <vtkSmartPointer.h>
 #define VTK_CREATE(type, name) \

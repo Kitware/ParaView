@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqCameraKeyFrameWidget_h
 #define pqCameraKeyFrameWidget_h
 
-#include <QWidget>
 #include "pqComponentsModule.h"
+#include <QWidget>
 
 class vtkSMProxy;
 class vtkCamera;

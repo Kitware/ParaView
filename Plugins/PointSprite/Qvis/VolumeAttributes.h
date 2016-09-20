@@ -37,10 +37,10 @@
 
 #ifndef VOLUMEATTRIBUTES_H
 #define VOLUMEATTRIBUTES_H
-#include <string>
 #include <AttributeSubject.h>
 #include <ColorControlPointList.h>
 #include <GaussianControlPointList.h>
+#include <string>
 
 namespace pointsprite {
 

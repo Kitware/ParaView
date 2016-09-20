@@ -33,8 +33,8 @@
 #ifndef vtkSMChartSeriesListDomain_h
 #define vtkSMChartSeriesListDomain_h
 
-#include "vtkSMStringListDomain.h"
 #include "vtkPVServerManagerRenderingModule.h" // needed for exports
+#include "vtkSMStringListDomain.h"
 
 class vtkPVArrayInformation;
 class vtkPVDataInformation;

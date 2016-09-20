@@ -31,13 +31,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqColorButtonEventTranslator.h"
 
-#include "pqTestUtility.h"
 #include "pqColorButtonEventPlayer.h"
 #include "pqColorChooserButton.h"
+#include "pqTestUtility.h"
 
 #include <QEvent>
-#include <QtDebug>
 #include <QMenu>
+#include <QtDebug>
 
 
 //-----------------------------------------------------------------------------

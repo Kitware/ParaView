@@ -28,8 +28,8 @@
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"
-#include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 #include "vtkSmartPointer.h" // needed for vtkWeakPointer.
+#include "vtkWeakPointer.h"  // needed for vtkWeakPointer.
 
 class vtkChartRepresentation;
 class vtkPVContextView;

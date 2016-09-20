@@ -36,18 +36,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
-#include "pqProxyWidgetDialog.h"
 #include "pqPVApplicationCore.h"
+#include "pqProxyWidgetDialog.h"
 #include "pqRecentlyUsedResourcesList.h"
 #include "pqServer.h"
 #include "pqServerResource.h"
 #include "vtkNew.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTrace.h"
+#include "vtkSmartPointer.h"
 
 #include <QtDebug>
 

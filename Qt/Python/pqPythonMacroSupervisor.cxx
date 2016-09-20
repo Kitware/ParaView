@@ -31,27 +31,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqPythonMacroSupervisor.h"
 #include "pqApplicationCore.h"
-#include "pqSettings.h"
 #include "pqServer.h"
+#include "pqSettings.h"
 
-#include "pqPythonManager.h"
 #include "pqCoreUtilities.h"
+#include "pqPythonManager.h"
 #include <vtksys/SystemTools.hxx>
 
 #include <QAction>
+#include <QApplication>
 #include <QDebug>
+#include <QDir>
+#include <QFile>
 #include <QFileInfo>
+#include <QFileInfo>
+#include <QMenu>
 #include <QPointer>
 #include <QSet>
-#include <QMenu>
-#include <QVariant>
-#include <QWidget>
-#include <QFileInfo>
-#include <QFile>
-#include <QDir>
 #include <QString>
 #include <QStringList>
-#include <QApplication>
+#include <QVariant>
+#include <QWidget>
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
 const char ENV_PATH_SEP=';';

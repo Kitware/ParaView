@@ -1,11 +1,11 @@
 
-#include <QApplication>
 #include "QTestApp.h"
+#include <QApplication>
 
-#include "pqAnimationWidget.h"
+#include "pqAnimationKeyFrame.h"
 #include "pqAnimationModel.h"
 #include "pqAnimationTrack.h"
-#include "pqAnimationKeyFrame.h"
+#include "pqAnimationWidget.h"
 
 int Animation(int argc, char* argv[])
 {

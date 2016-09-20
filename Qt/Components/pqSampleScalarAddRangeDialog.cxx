@@ -33,9 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSampleScalarAddRangeDialog.h"
 #include "ui_pqSampleScalarAddRangeDialog.h"
 
+#include <QDoubleValidator>
 #include <algorithm>
 #include <cmath>
-#include <QDoubleValidator>
 
 
 

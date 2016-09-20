@@ -22,9 +22,9 @@
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-#include <vector>
 #include <map>
 #include <string>
+#include <vector>
 
 //----------------------------------------------------------------------------
 // Internal Static data structure

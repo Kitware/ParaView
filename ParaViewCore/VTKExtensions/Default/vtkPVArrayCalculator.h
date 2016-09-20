@@ -28,8 +28,8 @@
 #ifndef vtkPVArrayCalculator_h
 #define vtkPVArrayCalculator_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkArrayCalculator.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class vtkDataObject;
 class vtkDataSetAttributes;

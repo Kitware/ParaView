@@ -19,25 +19,25 @@
 #include "vtkDebugLeaks.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVAxesWidget.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVSession.h"
-#include "vtkRendererCollection.h"
-#include "vtkRenderer.h"
+#include "vtkProcessModule.h"
 #include "vtkRenderWindow.h"
+#include "vtkRenderer.h"
+#include "vtkRendererCollection.h"
 #include "vtkSelectionSerializer.h"
 #include "vtkSmartPointer.h"
 #include "vtkSocketController.h"
 #include "vtkTilesHelper.h"
 #include "vtkTuple.h"
 
-#include <vtksys/SystemTools.hxx>
-#include <sstream>
 #include <assert.h>
 #include <map>
 #include <set>
+#include <sstream>
 #include <vector>
+#include <vtksys/SystemTools.hxx>
 
 class vtkPVSynchronizedRenderWindows::vtkInternals
 {

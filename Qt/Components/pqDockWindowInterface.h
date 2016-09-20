@@ -33,9 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqDockWindowInterface_h
 #define _pqDockWindowInterface_h
 
+#include "pqComponentsModule.h"
 #include <QString>
 #include <QtPlugin>
-#include "pqComponentsModule.h"
 class QDockWidget;
 class QWidget;
 

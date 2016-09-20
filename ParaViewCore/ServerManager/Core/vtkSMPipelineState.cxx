@@ -17,17 +17,17 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkSMMessage.h"
-#include "vtkSMSession.h"
+#include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMStateLocator.h"
-#include "vtkSMProxyLocator.h"
 
 #include "vtkPVSession.h"
 
-#include <vtksys/SystemTools.hxx>
-#include <sstream>
 #include <assert.h>
+#include <sstream>
+#include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkSMPipelineState);
 //----------------------------------------------------------------------------

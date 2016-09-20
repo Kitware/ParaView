@@ -33,9 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqProgressManager_h
 
 #include "pqCoreModule.h"
+#include <QList>
 #include <QObject>
 #include <QPointer>
-#include <QList>
 
 class vtkObject;
 class pqServer;

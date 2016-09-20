@@ -20,9 +20,9 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVCompositeRepresentation.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSISourceProxy.h"
 #include "vtkSelectionRepresentation.h"
 #include "vtkSmartPointer.h"
-#include "vtkSISourceProxy.h"
 
 #include <map>
 #include <string>

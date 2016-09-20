@@ -27,8 +27,8 @@
 #define vtkSMUndoStackBuilder_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
+#include "vtkSMMessageMinimal.h"          // needed for vtkSMMessage
 #include "vtkSMObject.h"
-#include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 
 class vtkSMProxy;
 class vtkSMUndoStack;

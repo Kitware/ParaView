@@ -36,9 +36,9 @@
 #include "vtkSMUndoStackBuilder.h"
 #include "vtkWeakPointer.h"
 
+#include <assert.h>
 #include <sstream>
 #include <vtkNew.h>
-#include <assert.h>
 
 //----------------------------------------------------------------------------
 // STATICS

@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqParaViewBehaviors_h
 #define pqParaViewBehaviors_h
 
-#include <QObject>
-#include <QFlags>
 #include "pqApplicationComponentsModule.h"
+#include <QFlags>
+#include <QObject>
 
 class QMainWindow;
 

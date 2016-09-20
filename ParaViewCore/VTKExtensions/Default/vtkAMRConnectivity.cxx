@@ -14,18 +14,18 @@
 =========================================================================*/
 #include "vtkAMRConnectivity.h"
 
-#include "vtkObject.h"
-#include "vtkObjectFactory.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkObject.h"
+#include "vtkObjectFactory.h"
 
 #include "vtkAMRDualGridHelper.h"
-#include "vtkCellData.h"
 #include "vtkCell.h"
+#include "vtkCellData.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkDataArray.h"
-#include "vtkDataSet.h"
 #include "vtkDataObject.h"
+#include "vtkDataSet.h"
 #include "vtkDoubleArray.h"
 #include "vtkIdList.h"
 #include "vtkIdTypeArray.h"
@@ -43,8 +43,8 @@
 #include "vtkMPIController.h"
 #endif
 
-#include <map>
 #include <list>
+#include <map>
 
 vtkStandardNewMacro (vtkAMRConnectivity);
 

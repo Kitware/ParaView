@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqHelpWindow_h
 #define pqHelpWindow_h
 
-#include <QMainWindow>
 #include "pqWidgetsModule.h"
+#include <QMainWindow>
 #include <QScopedPointer>
 
 class QHelpEngine;

@@ -31,8 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqCPActionsGroup.h"
 
-#include "pqCoreUtilities.h"
 #include "pqCPExportStateWizard.h"
+#include "pqCoreUtilities.h"
 
 //-----------------------------------------------------------------------------
 pqCPActionsGroup::pqCPActionsGroup(QObject* parentObject)

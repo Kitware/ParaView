@@ -21,8 +21,8 @@
 #ifndef vtkMinkowskiFilter_h
 #define vtkMinkowskiFilter_h
 
-#include "vtkUnstructuredGridAlgorithm.h"
 #include "vtkPVVTKExtensionsCosmoToolsModule.h" // For export macro
+#include "vtkUnstructuredGridAlgorithm.h"
 
 class vtkUnstructuredGrid;
 class vtkCell;

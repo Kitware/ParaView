@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqSearchBox_h
 #define pqSearchBox_h
 
-#include <QWidget>
-#include <QScopedPointer>
 #include "pqComponentsModule.h"
+#include <QScopedPointer>
+#include <QWidget>
 
 class QSettings;
 /// pqSearchBox is a line edit and an advanced tool button in the same

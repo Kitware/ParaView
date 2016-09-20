@@ -20,12 +20,12 @@
 #include "vtkInformationRequestKey.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVDataRepresentation.h"
 #include "vtkPVOptions.h"
 #include "vtkPVSession.h"
 #include "vtkPVStreamingMacros.h"
 #include "vtkPVSynchronizedRenderWindows.h"
+#include "vtkProcessModule.h"
 #include "vtkTimerLog.h"
 
 #include <assert.h>

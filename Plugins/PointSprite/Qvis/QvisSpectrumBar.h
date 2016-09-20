@@ -37,8 +37,8 @@
 
 #ifndef QVIS_SPECTRUM_BAR_H
 #define QVIS_SPECTRUM_BAR_H
-#include <qwidget.h>
 #include "vtkQvisModule.h" // needed for export
+#include <qwidget.h>
 
 // Forward declarations.
 class ControlPointList;

@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef @name@Implementation_h
 #define @name@Implementation_h
 
-#include <QObject>
 #include "pqPropertyWidgetInterface.h"
+#include <QObject>
 
 class @name@Implementation : public QObject, public pqPropertyWidgetInterface
 {

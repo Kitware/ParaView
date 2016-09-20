@@ -20,8 +20,8 @@
 #ifndef vtkPVSynchronizedRenderer_h
 #define vtkPVSynchronizedRenderer_h
 
-#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkObject.h"
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 
 class vtkIceTSynchronizedRenderers;
 class vtkImageProcessingPass;

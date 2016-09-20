@@ -41,9 +41,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QNetworkAccessManager>
 #include <QNetworkProxy>
 #include <QTimer>
-#include <QtNetwork/QNetworkReply>
 #include <QWebPage>
 #include <QWebView>
+#include <QtNetwork/QNetworkReply>
 
 namespace
 {

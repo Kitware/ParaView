@@ -36,11 +36,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 
 #include "pqCoreModule.h"
+#include "vtkEventQtSlotConnect.h"
 #include "vtkNew.h"
-#include "vtkWeakPointer.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
-#include "vtkEventQtSlotConnect.h"
+#include "vtkWeakPointer.h"
 
 class pqPropertyLinks;
 

@@ -66,8 +66,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "@PANEL_NAME@.h"
 #include "@PANEL_NAME@Implementation.h"
 
-#include "vtkSMProxy.h"
 #include "pqRepresentation.h"
+#include "vtkSMProxy.h"
 
 @PANEL_NAME@Implementation::@PANEL_NAME@Implementation(QObject* p)
   : QObject(p)

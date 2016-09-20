@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProgressManager.h"
 #include "pqProgressWidget.h"
 
+#include <QFrame>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QFrame>
 #include <QPixmap>
 #include <QToolButton>
 

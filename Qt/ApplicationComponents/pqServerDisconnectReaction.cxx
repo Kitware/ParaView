@@ -37,8 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqObjectBuilder.h"
-#include "pqPipelineSource.h"
 #include "pqPVApplicationCore.h"
+#include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 

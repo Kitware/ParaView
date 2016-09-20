@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLightsEditor.h"
 #include "ui_pqLightsEditor.h"
 
-#include <QDoubleValidator>
 #include "pqApplicationCore.h"
 #include "pqNamedWidgets.h"
 #include "pqPropertyGroupWidget.h"
@@ -43,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSmartPointer.h"
+#include <QDoubleValidator>
 
 class pqLightsEditor::pqInternal : public Ui::LightsEditor
 {

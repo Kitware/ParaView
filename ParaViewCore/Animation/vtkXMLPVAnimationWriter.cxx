@@ -27,9 +27,9 @@
 #include "vtkXMLWriter.h"
 
 #include <map>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVAnimationWriter);

@@ -37,11 +37,11 @@
 #ifndef ATTRIBUTEGROUP_H
 #define ATTRIBUTEGROUP_H
 
-#include <vector>
-#include <string>
-#include <exception>
-#include <visitstream.h>
 #include <VisItException.h>
+#include <exception>
+#include <string>
+#include <vector>
+#include <visitstream.h>
 
 namespace pointsprite {
 // Forward declaration

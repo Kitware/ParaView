@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // qt includes
 #include <QString>
-#include <QtDebug>
 #include <QVariant>
+#include <QtDebug>
 
 // vtk includes
 #include "vtkConfigure.h"   // for 64-bitness
@@ -64,12 +64,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkSMProxyGroupDomain.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyGroupDomain.h"
 #include "vtkSMProxyListDomain.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSILDomain.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringListDomain.h"
 #include "vtkSMStringVectorProperty.h"

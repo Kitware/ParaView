@@ -36,15 +36,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqFileChooserWidget.h"
 #include "pqObjectBuilder.h"
-#include "pqServerConfiguration.h"
 #include "pqServer.h"
+#include "pqServerConfiguration.h"
 #include "pqServerResource.h"
 #include "pqSettings.h"
 #include "vtkMath.h"
-#include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
 #include "vtkPVOptions.h"
 #include "vtkPVXMLElement.h"
+#include "vtkProcessModule.h"
 #include "vtkTimerLog.h"
 
 #include <QCheckBox>
@@ -61,8 +61,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QProcessEnvironment>
 #include <QPushButton>
 #include <QSpinBox>
-#include <QtDebug>
 #include <QTimer>
+#include <QtDebug>
 
 //----------------------------------------------------------------------------
 const QMetaObject* pqServerLauncher::DefaultServerLauncherType = NULL;

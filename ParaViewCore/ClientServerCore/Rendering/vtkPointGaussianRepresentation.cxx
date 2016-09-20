@@ -4,6 +4,7 @@
 #include "vtkAlgorithmOutput.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkCompositeDataToUnstructuredGridFilter.h"
+#include "vtkDataSet.h"
 #include "vtkFloatArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -11,14 +12,13 @@
 #include "vtkMatrix4x4.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVRenderView.h"
+#include "vtkPiecewiseFunction.h"
 #include "vtkPointData.h"
 #include "vtkPointGaussianMapper.h"
 #include "vtkProperty.h"
-#include "vtkPVRenderView.h"
 #include "vtkRenderer.h"
 #include "vtkUnstructuredGrid.h"
-#include "vtkDataSet.h"
-#include "vtkPiecewiseFunction.h"
 
 vtkStandardNewMacro(vtkPointGaussianRepresentation)
 

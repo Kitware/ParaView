@@ -31,9 +31,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqXYFunctionalBagChartView.h"
 
-#include "vtkSMProperty.h"
-#include "vtkSMContextViewProxy.h"
 #include "pqSMAdaptor.h"
+#include "vtkSMContextViewProxy.h"
+#include "vtkSMProperty.h"
 
 //-----------------------------------------------------------------------------
 pqXYFunctionalBagChartView::pqXYFunctionalBagChartView(const QString& group,

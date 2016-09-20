@@ -15,18 +15,18 @@
 #include "vtkNIfTIReader.h"
 
 #include "vtkByteSwap.h"
+#include "vtkDoubleArray.h"
 #include "vtkImageData.h"
 #include "vtkLookupTable.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
-#include "vtknifti1_io.h"
+#include "vtk_zlib.h"
 #include "vtknifti1.h"
+#include "vtknifti1_io.h"
+#include "vtkznzlib.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
-#include "vtkznzlib.h"
-#include "vtk_zlib.h"
-#include "vtkDoubleArray.h"
 
 #include "vtkStringArray.h"
 #define NAME_ARRAY "Name"

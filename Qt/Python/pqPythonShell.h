@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPythonShell_h
 
 #include "pqPythonModule.h" //  needed for PQPYTHON_EXPORT.
-#include <QWidget>
 #include "pqTimer.h"
+#include <QWidget>
 
 class vtkObject;
 class pqConsoleWidget;

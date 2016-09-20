@@ -1,9 +1,9 @@
 
 #include "pqFlatTreeView.h"
 
-#include <QTimer>
-#include <QStandardItemModel>
 #include <QItemSelectionModel>
+#include <QStandardItemModel>
+#include <QTimer>
 
 #include "QTestApp.h"
 

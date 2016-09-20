@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqFileDialogFilter.h"
 
-#include <QIcon>
 #include <QFileIconProvider>
+#include <QIcon>
 #include <QStringBuilder>
 
 #include "pqFileDialogModel.h"

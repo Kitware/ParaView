@@ -34,10 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QVBoxLayout>
 
-#include "pqRenderView.h"
 #include "pqApplicationCore.h"
-#include "pqServerManagerModel.h"
 #include "pqPipelineRepresentation.h"
+#include "pqRenderView.h"
+#include "pqServerManagerModel.h"
 
 pqTextureSelectorPropertyWidget::pqTextureSelectorPropertyWidget(vtkSMProxy *smProxy, QWidget *pWidget)
   : pqPropertyWidget(smProxy, pWidget)

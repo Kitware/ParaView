@@ -34,8 +34,8 @@
 #include <cassert>
 #include <map>
 #include <set>
-#include <string>
 #include <sstream>
+#include <string>
 
 struct resolution_t
 {

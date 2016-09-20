@@ -20,10 +20,10 @@
 #include "vtkDataSet.h"
 #include "vtkDoubleArray.h"
 #include "vtkGraph.h"
+#include "vtkIOStream.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkIntArray.h"
-#include "vtkIOStream.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
@@ -31,9 +31,9 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTable.h"
 
-#include <vector>
 #include <map>
 #include <string>
+#include <vector>
 
 struct vtkEHInternals
 {

@@ -22,9 +22,9 @@
 #ifndef vtkPVDataRepresentation_h
 #define vtkPVDataRepresentation_h
 
-#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkDataRepresentation.h"
-#include "vtkWeakPointer.h" // needed for vtkWeakPointer
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
+#include "vtkWeakPointer.h"                       // needed for vtkWeakPointer
 class vtkInformationRequestKey;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVDataRepresentation : public vtkDataRepresentation

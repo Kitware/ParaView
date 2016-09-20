@@ -14,14 +14,14 @@
 =========================================================================*/
 
 #include "vtkVolumeRepresentationPreprocessor.h"
-#include "vtkExtractBlock.h"
+#include "vtkCompositeDataIterator.h"
 #include "vtkDataSetTriangleFilter.h"
-#include "vtkMultiBlockDataSet.h"
+#include "vtkExtractBlock.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkUnstructuredGrid.h"
-#include "vtkCompositeDataIterator.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkObjectFactory.h"
+#include "vtkUnstructuredGrid.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkVolumeRepresentationPreprocessor);

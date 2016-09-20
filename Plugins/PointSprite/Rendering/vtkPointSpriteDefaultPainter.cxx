@@ -29,16 +29,16 @@
 
 #include "vtkPointSpriteDefaultPainter.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkScalarsToColorsPainter.h"
-#include "vtkGarbageCollector.h"
-#include "vtkTwoScalarsToColorsPainter.h"
 #include "vtkClipPlanesPainter.h"
-#include "vtkPointsPainter.h"
-#include "vtkStandardPolyDataPainter.h"
-#include "vtkPointSpriteCoincidentTopologyResolutionPainter.h"
 #include "vtkDepthSortPainter.h"
+#include "vtkGarbageCollector.h"
 #include "vtkMapper.h"
+#include "vtkObjectFactory.h"
+#include "vtkPointSpriteCoincidentTopologyResolutionPainter.h"
+#include "vtkPointsPainter.h"
+#include "vtkScalarsToColorsPainter.h"
+#include "vtkStandardPolyDataPainter.h"
+#include "vtkTwoScalarsToColorsPainter.h"
 
 vtkStandardNewMacro(vtkPointSpriteDefaultPainter)
 

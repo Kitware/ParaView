@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqXMLEventObserver_h
 #define _pqXMLEventObserver_h
 
-#include "pqEventObserver.h"
 #include "pqCoreModule.h"
+#include "pqEventObserver.h"
 
 /**
 Observes high-level ParaView events, and serializes them to a stream as XML

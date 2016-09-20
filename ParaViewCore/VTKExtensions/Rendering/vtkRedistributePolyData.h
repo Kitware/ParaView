@@ -23,8 +23,8 @@
 #ifndef vtkRedistributePolyData_h
 #define vtkRedistributePolyData_h
 
-#include "vtkPolyDataAlgorithm.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
+#include "vtkPolyDataAlgorithm.h"
 
 //*******************************************************************
 class vtkDataArray;

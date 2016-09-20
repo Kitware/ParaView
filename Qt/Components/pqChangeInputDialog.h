@@ -32,10 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqChangeInputDialog_h
 #define pqChangeInputDialog_h
 
-#include <QDialog>
-#include <QMap>
-#include <QList>
 #include "pqComponentsModule.h"
+#include <QDialog>
+#include <QList>
+#include <QMap>
 
 class pqOutputPort;
 class vtkSMProxy;

@@ -54,8 +54,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHBoxLayout>
 
 // CTK includes
-#include "ctkRangeSlider.h"
 #include "ctkDoubleRangeSlider.h"
+#include "ctkRangeSlider.h"
 
 // STD includes
 #include <limits>

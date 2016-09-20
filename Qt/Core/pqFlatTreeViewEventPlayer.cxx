@@ -32,14 +32,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqFlatTreeViewEventPlayer.h"
 
-#include <QHeaderView>
 #include <QApplication>
-#include <QMouseEvent>
+#include <QHeaderView>
 #include <QKeyEvent>
+#include <QMouseEvent>
 #include <QtDebug>
 
-#include "pqFlatTreeView.h"
 #include "pqEventDispatcher.h"
+#include "pqFlatTreeView.h"
 
 /// Converts a string representation of a model index into the real thing
 static QModelIndex OldGetIndex(pqFlatTreeView& View, const QString& Name)

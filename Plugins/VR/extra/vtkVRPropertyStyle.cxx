@@ -31,19 +31,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "vtkVRPropertyStyle.h"
 
+#include "pqActiveObjects.h"
+#include "pqView.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMProxyManager.h"
 #include "vtkSMProxyLocator.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkVRQueue.h"
+#include <algorithm>
 #include <iostream>
 #include <sstream>
-#include <algorithm>
-#include "pqView.h"
-#include "pqActiveObjects.h"
-#include "vtkSMRenderViewProxy.h"
 
 //------------------------------------------------------------------------cnstr
 vtkVRPropertyStyle::vtkVRPropertyStyle(QObject* parentObject)

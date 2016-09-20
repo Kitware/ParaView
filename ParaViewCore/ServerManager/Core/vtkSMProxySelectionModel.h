@@ -24,8 +24,8 @@
 #define vtkSMProxySelectionModel_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
+#include "vtkSMMessageMinimal.h"          // Needed for vtkSMMessage*
 #include "vtkSMRemoteObject.h"
-#include "vtkSMMessageMinimal.h" // Needed for vtkSMMessage*
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer.
 
 class vtkSMProxySelectionModelInternal;

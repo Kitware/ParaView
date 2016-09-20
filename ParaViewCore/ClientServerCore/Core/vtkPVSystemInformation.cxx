@@ -14,11 +14,11 @@
 =========================================================================*/
 #include "vtkPVSystemInformation.h"
 
-#include "vtkObjectFactory.h"
 #include "vtkClientServerStream.h"
+#include "vtkObjectFactory.h"
 
-#include <vtksys/SystemInformation.hxx>
 #include <algorithm>
+#include <vtksys/SystemInformation.hxx>
 
 vtkStandardNewMacro(vtkPVSystemInformation);
 //----------------------------------------------------------------------------

@@ -35,12 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqCollapsedGroup.h"
 #include "pqFileChooserWidget.h"
-#include "vtkFileSequenceParser.h"
 #include "pqSMAdaptor.h"
+#include "vtkFileSequenceParser.h"
 #include "vtkPVFileInformation.h"
 #include "vtkPVFileInformationHelper.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMFileListDomain.h"
@@ -50,8 +49,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSmartPointer.h"
 
 #include <QDebug>
+#include <QFileInfo>
 #include <QGridLayout>
 #include <QLabel>
 #include <QLineEdit>
@@ -59,7 +60,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPushButton>
 #include <QSet>
 #include <QStringList>
-#include <QFileInfo>
 
 class pqFixStateFilenamesDialog::pqInternals : public Ui::FixStateFilenamesDialog
 {

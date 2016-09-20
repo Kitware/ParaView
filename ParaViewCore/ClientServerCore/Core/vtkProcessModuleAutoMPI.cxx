@@ -13,21 +13,21 @@
 
 =========================================================================*/
 #include "vtkProcessModuleAutoMPI.h"
-#include "vtkPVOptions.h"
 #include "vtkMultiThreader.h"
-#include "vtkSocket.h"
-#include "vtkPVConfig.h"
-#include "vtkPVConfig.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVConfig.h"
+#include "vtkPVConfig.h"
+#include "vtkPVOptions.h"
 #include "vtkProcessModule.h"
+#include "vtkSocket.h"
 #include <vtksys/SystemTools.hxx>
 
-#include "vtksys/Process.h"
 #include "vtkSocket.h"
+#include "vtksys/Process.h"
 
-#include <vector>
-#include <string>
 #include <sstream>
+#include <string>
+#include <vector>
 
 bool vtkProcessModuleAutoMPI::EnableAutoMPI = 0;
 int vtkProcessModuleAutoMPI::NumberOfCores = 0;

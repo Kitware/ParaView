@@ -38,9 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHeaderView>
 #include <QIntValidator>
 #include <QItemDelegate>
+#include <QLineEdit>
 #include <QPointer>
 #include <QTableWidget>
-#include <QLineEdit>
 
 namespace
 {
