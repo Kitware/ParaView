@@ -13,7 +13,7 @@
 
 =========================================================================*/
 #include "vtkMaterialInterfaceCommBuffer.h"
-#include "vtkMaterialInterfaceUtilities.hxx"
+#include "vtkMaterialInterfaceUtilities.h"
 
 using std::vector;
 

@@ -63,7 +63,7 @@ using std::string;
 // ansi c
 #include <math.h>
 // other
-#include "vtkMaterialInterfaceUtilities.hxx"
+#include "vtkMaterialInterfaceUtilities.h"
 
 vtkStandardNewMacro(vtkIntersectFragments);
 
