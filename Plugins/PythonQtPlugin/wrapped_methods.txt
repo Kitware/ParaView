@@ -19,7 +19,7 @@ int pqTimeKeeper::getNumberOfTimeStepValues() const
 
 pqServerManagerModel* pqApplicationCore::getServerManagerModel() const
 
-QWidget* pqRenderViewBase::getWidget()
+QWidget* pqRenderViewBase::widget()
 
 void pqRenderView::resetCamera()
 
