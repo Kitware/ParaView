@@ -43,7 +43,7 @@
 #include "vtkMaterialInterfaceProcessLoading.h"
 #include "vtkMaterialInterfaceProcessRing.h"
 #include "vtkMaterialInterfaceToProcMap.h"
-#include "vtkPointAccumulator.hxx"
+#include "vtkPointAccumulator.h"
 #include "vtkPointData.h"
 #include "vtkUnsignedIntArray.h"
 // Io/Ipc
