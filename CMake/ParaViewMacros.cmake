@@ -385,7 +385,7 @@ function(build_help_project name)
     # generate the toc at run-time.
     COMMAND ${CMAKE_COMMAND}
             -Doutput_file:FILEPATH=${qhp_filename}
-            -Dfile_patterns:STRING="${arg_FILEPATTERNS}"
+            "-Dfile_patterns:STRING=${arg_FILEPATTERNS}"
             -Dnamespace:STRING="${arg_NAMESPACE}"
             -Dfolder:PATH=${arg_FOLDER}
             -Dname:STRING="${name}"
