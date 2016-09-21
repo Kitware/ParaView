@@ -13,7 +13,7 @@
 
 =========================================================================*/
 #include "vtkMaterialInterfacePieceLoading.h"
-#include "vtkMaterialInterfaceUtilities.hxx"
+#include "vtkMaterialInterfaceUtilities.h"
 #include <vector>
 using std::vector;
 using std::ostream;

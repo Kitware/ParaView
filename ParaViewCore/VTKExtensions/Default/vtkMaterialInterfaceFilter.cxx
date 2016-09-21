@@ -83,7 +83,7 @@ using std::string;
 #include <math.h>
 #include <ctime>
 // other
-#include "vtkMaterialInterfaceUtilities.hxx"
+#include "vtkMaterialInterfaceUtilities.h"
 
 //for paraview cliping
 #include "vtkPlane.h"
