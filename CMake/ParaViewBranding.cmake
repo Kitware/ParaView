@@ -202,23 +202,28 @@ FUNCTION(build_paraview_client BPC_NAME)
     SET (BPC_HAS_GUI_CONFIGURATION_XMLS 1)
   ENDIF ()
 
-  # Generate a resource file out of the splash image.
-  GENERATE_QT_RESOURCE_FROM_FILES(
-    "${CMAKE_CURRENT_BINARY_DIR}/${BPC_NAME}_generated.qrc"
-    "/${BPC_NAME}" ${BPC_SPLASH_IMAGE})
+  set (ui_resources)
+  set (ui_resource_init "")
 
-  GENERATE_QT_RESOURCE_FROM_FILES(
-    "${CMAKE_CURRENT_BINARY_DIR}/${BPC_NAME}_configuration.qrc"
-    "/${BPC_NAME}/Configuration"
-    "${BPC_GUI_CONFIGURATION_XMLS}")
+  if (BPC_SPLASH_IMAGE)
+    # Generate a resource file out of the splash image.
+    set (outfile "${CMAKE_CURRENT_BINARY_DIR}/${BPC_NAME}_generated.qrc")
+    GENERATE_QT_RESOURCE_FROM_FILES("${outfile}"
+      "/${BPC_NAME}" ${BPC_SPLASH_IMAGE})
+    list(APPEND ui_resources "${outfile}")
+    set(ui_resource_init
+      "${ui_resource_init}  Q_INIT_RESOURCE(${BPC_NAME}_generated);\n")
+  endif ()
 
-  SET (ui_resources
-    "${CMAKE_CURRENT_BINARY_DIR}/${BPC_NAME}_generated.qrc"
-    "${CMAKE_CURRENT_BINARY_DIR}/${BPC_NAME}_configuration.qrc"
-    )
-  set (ui_resource_init
-    "  Q_INIT_RESOURCE(${BPC_NAME}_generated);\n  Q_INIT_RESOURCE(${BPC_NAME}_configuration);\n")
-
+  if (BPC_GUI_CONFIGURATION_XMLS)
+    set (outfile "${CMAKE_CURRENT_BINARY_DIR}/${BPC_NAME}_configuration.qrc")
+    GENERATE_QT_RESOURCE_FROM_FILES("${outfile}"
+      "/${BPC_NAME}/Configuration"
+      "${BPC_GUI_CONFIGURATION_XMLS}")
+    list(APPEND ui_resources "${outfile}")
+    set(ui_resource_init
+      "${ui_resource_init}  Q_INIT_RESOURCE(${BPC_NAME}_configuration);\n")
+  endif ()
 
   IF (BPC_COMPRESSED_HELP_FILE)
     # If a help collection file is specified, create a resource from it so that
