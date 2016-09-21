@@ -377,7 +377,8 @@ public:
 
     bool overallSuccess = true;
 
-    vtkSMPropertyIterator * iter = proxy->NewPropertyIterator();
+    vtkSmartPointer<vtkSMPropertyIterator> iter;
+    iter.TakeReference(proxy->NewPropertyIterator());
     for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
       {
       vtkSMProperty* property = iter->GetProperty();
@@ -451,8 +452,6 @@ public:
           }
         }
       }
-
-    iter->Delete();
 
     return overallSuccess;
   }
