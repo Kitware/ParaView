@@ -503,7 +503,7 @@ public:
 
   //*****************************************************************
   // Forward to 3D renderer.
-  virtual void SetUseHiddenLineRemoval(int val);
+  vtkSetMacro(UseHiddenLineRemoval, bool)
   virtual void SetUseDepthPeeling(int val);
   virtual void SetMaximumNumberOfPeels(int val);
   virtual void SetBackground(double r, double g, double b);
@@ -857,6 +857,9 @@ private:
 
   // Cached value for parallel projection set on camera.
   int ParallelProjection;
+
+  // Cached state. Is currently ignored for distributed rendering.
+  bool UseHiddenLineRemoval;
 
   class vtkInternals;
   vtkInternals* Internals;

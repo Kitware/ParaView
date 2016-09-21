@@ -2079,8 +2079,8 @@
         <BooleanDomain name="bool" />
         <Documentation>
           Use a hidden line removal technique to hide wireframe surfaces that
-          are occluded by other wireframe surfaces. Note that this may introduce
-          rendering artifacts when used with parallel remote rendering.
+          are occluded by other wireframe surfaces. Note that this is disabled
+          when rendering distributed geometry in parallel.
         </Documentation>
       </IntVectorProperty>
 

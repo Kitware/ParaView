@@ -395,7 +395,7 @@ vtkPVRenderView::vtkPVRenderView()
     observer);
   observer->FastDelete();
 
-  this->GetRenderer()->SetUseHiddenLineRemoval(0);
+  this->UseHiddenLineRemoval = false;
   this->GetRenderer()->SetUseDepthPeeling(1);
   this->GetRenderer()->AddCuller(this->Culler);
 
@@ -1470,6 +1470,15 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     in_cave_mode ||
     (!use_distributed_rendering && in_tile_display_mode));
 
+  if (this->UseHiddenLineRemoval && !use_distributed_rendering)
+    {
+    this->GetRenderer()->SetUseHiddenLineRemoval(true);
+    }
+  else
+    { // Ignore for distributed rendering.
+    this->GetRenderer()->SetUseHiddenLineRemoval(false);
+    }
+
   if (this->ShowAnnotation)
     {
     std::ostringstream stream;
@@ -2276,12 +2285,6 @@ void vtkPVRenderView::SetMaintainLuminance(int val)
 
 //*****************************************************************
 // Forward to 3D renderer.
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetUseHiddenLineRemoval(int val)
-{
-  this->GetRenderer()->SetUseHiddenLineRemoval(val);
-}
-
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetUseDepthPeeling(int val)
 {
