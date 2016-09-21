@@ -1250,6 +1250,7 @@ void pqProxyWidget::updatePanel()
 bool pqProxyWidget::restoreDefaults()
 {
   bool anyReset = false;
+  vtkSMSettings* settings = vtkSMSettings::GetInstance();
   if (this->Internals->Proxy)
     {
     vtkSmartPointer<vtkSMPropertyIterator> iter;
@@ -1275,6 +1276,9 @@ bool pqProxyWidget::restoreDefaults()
           anyReset = true;
           }
         smproperty->ResetToDefault();
+
+        // Restore to site settings if there is one.
+        settings->GetPropertySetting(smproperty, 1.0);
         }
       }
     }
