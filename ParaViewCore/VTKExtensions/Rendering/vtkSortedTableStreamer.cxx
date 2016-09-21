@@ -57,8 +57,6 @@
 #include <sstream>
 using std::ostringstream;
 
-#define MAX(a,b)		(((a)>(b)) ? (a) : (b))
-#define MIN(a,b)		(((a)<(b)) ? (a) : (b))
 //****************************************************************************
 class vtkSortedTableStreamer::InternalsBase
 {
@@ -784,12 +782,12 @@ public:
 
 
     // Extract the subset
-    vtkIdType localSize = MIN(tableSizes[this->Me], blockSize);
+    vtkIdType localSize = vtkMath::Min(tableSizes[this->Me], blockSize);
     if(localOffset < 0)
       {
-      localSize = MAX( 0,
-                       MIN(
-                           localOffset + MAX(tableSizes[this->Me], blockSize),
+      localSize = vtkMath::Max( static_cast<vtkIdType>(0),
+                       vtkMath::Min(
+                           localOffset + vtkMath::Max(tableSizes[this->Me], blockSize),
                            blockSize));
       localOffset = 0;
       }

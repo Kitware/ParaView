@@ -47,6 +47,8 @@
 #include "vtkVertex.h"
 
 #include <algorithm>
+#include <cmath>
+#include <cstdlib>
 #include <functional>
 #include <iterator>
 #include <string>
@@ -1891,7 +1893,7 @@ int vtkCGNSReader::GetUnstructuredZone(int base, int zone,
           {
           vtkIdType faceId = cellElements[p + nf + 1]; 
           bool mustReverse = faceId > 0;
-          faceId = abs(faceId); 
+          faceId = std::abs(faceId); 
 
           // the following is needed because when the NGON_n face data preceeds the 
           // NFACE_n cell data, the indices are continuous, so a "global-to-local" mapping must be done.
@@ -2421,7 +2423,7 @@ class WithinTolerance: public std::binary_function<double, double, bool>
 public:
   result_type operator()(first_argument_type a, second_argument_type b) const
   {
-    bool result = (fabs(a-b) <= (a*1E-6));
+    bool result = (std::fabs(a-b) <= (a*1E-6));
     return (result_type) result;
   }
 };
