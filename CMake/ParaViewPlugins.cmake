@@ -899,7 +899,8 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
     endif()
 
     # generate the qch file for the plugin if any documentation is provided.
-    if (proxy_documentation_files OR ARG_DOCUMENTATION_DIR)
+    if ((proxy_documentation_files OR ARG_DOCUMENTATION_DIR) AND
+        IS_DIRECTORY "${ARG_DOCUMENTATION_DIR}")
       build_help_project(${NAME}
         DESTINATION_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/doc"
         DOCUMENTATION_SOURCE_DIR "${ARG_DOCUMENTATION_DIR}"
