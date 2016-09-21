@@ -827,6 +827,7 @@ int vtkH5PartReader::RequestData(
     output->SetVerts(vertices);
     }
   //
+  coords->SetName("Points");
   points->SetData(coords);
   output->SetPoints(points);
   return 1;
