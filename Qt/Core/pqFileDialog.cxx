@@ -1176,12 +1176,12 @@ bool pqFileDialog::selectFile(const QString& f)
   this->Implementation->Model->setCurrentPath(dirname.c_str());
   this->Implementation->Ui.FileName->setText(filename.c_str());
   this->Implementation->SuppressOverwriteWarning = true;
-  if (this->Implementation->Ui.OK->isEnabled())
+  this->accept();
+  if(diag && diag->result() != QDialog::Accepted)
     {
-    pqTimer::singleShot(100, this->Implementation->Ui.OK, SLOT(click())) ;
-    return true;
+    return false;
     }
-  return false;
+  return true;
 }
 
 //-----------------------------------------------------------------------------
