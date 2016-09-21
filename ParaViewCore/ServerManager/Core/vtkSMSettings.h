@@ -84,7 +84,7 @@ namespace Json
   class Value;
 }
 
-
+class vtkSMProperty;
 class vtkSMProxy;
 class vtkSMPropertyIterator;
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMSettings : public vtkObject
@@ -157,6 +157,25 @@ public:
   std::string GetSettingAsString(const char* settingName,
                                  unsigned int index,
                                  const std::string & defaultValue);
+
+  // Description:
+  // Set the property value from the setting collections.
+  bool GetPropertySetting(vtkSMProperty* property);
+
+  // Description:
+  // Set the property value from the setting collections that have priority
+  // at or less than the given priority.
+  bool GetPropertySetting(vtkSMProperty* property, double maxPriority);
+
+  // Description:
+  // Set the property value from the setting collections under the given prefix.
+  bool GetPropertySetting(const char* prefix, vtkSMProperty* property);
+
+  // Description:
+  // Set the property value from the setting collections under the given prefix.
+  // that have priority at or less than the given priority.
+  bool GetPropertySetting(const char* prefix, vtkSMProperty* property,
+                           double maxPriority);
 
   // Description:
   // Set the property values in a vtkSMProxy from the setting collections.

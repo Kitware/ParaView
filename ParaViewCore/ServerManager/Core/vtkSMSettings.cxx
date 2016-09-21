@@ -219,6 +219,44 @@ public:
   }
 
   //----------------------------------------------------------------------------
+  bool GetPropertySetting(const char* settingName, vtkSMProperty* property,
+                          double maxPriority)
+  {
+    if (!property || !this->HasSetting(settingName, maxPriority))
+      {
+      return false;
+      }
+
+    bool success = false;
+    if (vtkSMIntVectorProperty* intVectorProperty =
+        vtkSMIntVectorProperty::SafeDownCast(property))
+      {
+      success = this->GetPropertySetting(settingName, intVectorProperty,
+                                         maxPriority);
+      }
+    else if (vtkSMDoubleVectorProperty* doubleVectorProperty =
+             vtkSMDoubleVectorProperty::SafeDownCast(property))
+      {
+      success = this->GetPropertySetting(settingName, doubleVectorProperty,
+                                         maxPriority);
+      }
+    else if (vtkSMStringVectorProperty* stringVectorProperty =
+             vtkSMStringVectorProperty::SafeDownCast(property))
+      {
+      success = this->GetPropertySetting(settingName, stringVectorProperty,
+                                         maxPriority);
+      }
+    else if (vtkSMInputProperty* inputProperty =
+             vtkSMInputProperty::SafeDownCast(property))
+      {
+      success = this->GetPropertySetting(settingName, inputProperty,
+                                         maxPriority);
+      }
+
+    return success;
+  }
+
+  //----------------------------------------------------------------------------
   bool GetPropertySetting(const char* settingName,
                           vtkSMIntVectorProperty* property,
                           double maxPriority)
@@ -1220,6 +1258,54 @@ std::string vtkSMSettings::GetSettingDescription(const char *settingName)
     }
 
   return std::string();
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSettings::GetPropertySetting(vtkSMProperty* property)
+{
+  return this->GetPropertySetting(property, VTK_DOUBLE_MAX);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSettings::GetPropertySetting(vtkSMProperty* property,
+                                        double maxPriority)
+{
+  if (!property)
+    {
+    return false;
+    }
+
+  std::string jsonPrefix(".");
+
+  // TODO - not sure about the GetParent() part
+  jsonPrefix.append(property->GetParent()->GetXMLGroup());
+
+  return this->GetPropertySetting(jsonPrefix.c_str(), property, maxPriority);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSettings::GetPropertySetting(const char* prefix,
+                                        vtkSMProperty* property)
+{
+  return this->GetPropertySetting(prefix, property, VTK_DOUBLE_MAX);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSettings::GetPropertySetting(const char* prefix,
+                                       vtkSMProperty* property,
+                                       double maxPriority)
+{
+  vtkSMProxy* parent = property->GetParent();
+
+  std::string jsonPrefix(prefix);
+  jsonPrefix.append(".");
+  jsonPrefix.append(parent->GetXMLName());
+  jsonPrefix.append(".");
+  jsonPrefix.append(parent->GetPropertyName(property));
+  std::cout << maxPriority << ", " << jsonPrefix << std::endl;
+
+  return this->Internal->GetPropertySetting(jsonPrefix.c_str(), property,
+                                            maxPriority);
 }
 
 //----------------------------------------------------------------------------
