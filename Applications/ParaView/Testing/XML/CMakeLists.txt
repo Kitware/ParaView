@@ -91,6 +91,7 @@ endif()
 SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/AxesGrid.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CameraLink.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChartLoadNoVariables.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Contour.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/DisconnectAndSaveAnimation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Ensemble.xml

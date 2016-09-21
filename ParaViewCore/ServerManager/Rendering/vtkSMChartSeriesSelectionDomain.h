@@ -77,6 +77,14 @@ public:
   // Add/Remove series names to hide by default. These are regular expressions.
   static void AddSeriesVisibilityDefault(const char* regex, bool value);
 
+  // Description:
+  // Global flag to toggle between (a) the default behavior and
+  // (b) setting default visibility to off.
+  static void SetLoadNoChartVariables(bool choice)
+  { vtkSMChartSeriesSelectionDomain::LoadNoVariables = choice; }
+  static bool GetLoadNoChartVariables()
+  { return vtkSMChartSeriesSelectionDomain::LoadNoVariables; }
+
 protected:
   vtkSMChartSeriesSelectionDomain();
   ~vtkSMChartSeriesSelectionDomain();
@@ -122,7 +130,7 @@ protected:
   // Call this method in PopulateAvailableArrays() to override a specific array's
   // default visibility. Used for hiding array components, by default, for
   // example.
- virtual void SetDefaultVisibilityOverride(const vtkStdString& arrayname, bool visibility);
+  virtual void SetDefaultVisibilityOverride(const vtkStdString& arrayname, bool visibility);
 
   int DefaultMode;
 
@@ -134,6 +142,8 @@ protected:
   // Description:
   // Specify if table components should be split.
   bool FlattenTable;
+
+  static bool LoadNoVariables;
 
 private:
   vtkSMChartSeriesSelectionDomain(const vtkSMChartSeriesSelectionDomain&) VTK_DELETE_FUNCTION;
