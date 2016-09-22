@@ -8622,10 +8622,7 @@ source.</Documentation>
           <Group name="sources" />
         </ProxyGroupDomain>
         <ProxyListDomain name="proxy_list">
-          <Proxy group="extended_sources"
-                 name="PointSource" />
-          <Proxy group="extended_sources"
-                 name="HighResLineSource" />
+          <Group name="seed_sources"/>
         </ProxyListDomain>
         <Documentation>The value of this property determines how the seeds for
         the streamlines will be generated.</Documentation>
@@ -10278,10 +10275,7 @@ source.</Documentation>
           <Group name="sources" />
         </ProxyGroupDomain>
         <ProxyListDomain name="proxy_list">
-          <Proxy group="extended_sources"
-                 name="PointSource" />
-          <Proxy group="extended_sources"
-                 name="HighResLineSource" />
+          <Group name="seed_sources"/>
         </ProxyListDomain>
         <Documentation>The value of this property determines how the seeds for
         the streamlines will be generated.</Documentation>
