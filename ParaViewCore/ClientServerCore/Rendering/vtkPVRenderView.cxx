@@ -21,12 +21,11 @@
 #include "vtkCamera.h"
 #include "vtkCommand.h"
 #include "vtkCuller.h"
-#include "vtkFloatArray.h"
 #include "vtkDataRepresentation.h"
-#include "vtkPVGridAxes3DActor.h"
+#include "vtkFloatArray.h"
+#include "vtkInformation.h"
 #include "vtkInformationDoubleKey.h"
 #include "vtkInformationDoubleVectorKey.h"
-#include "vtkInformation.h"
 #include "vtkInformationIntegerKey.h"
 #include "vtkInformationObjectBaseKey.h"
 #include "vtkInformationRequestKey.h"
@@ -37,40 +36,41 @@
 #include "vtkInteractorStyleRubberBandZoom.h"
 #include "vtkLight.h"
 #include "vtkLightKit.h"
+#include "vtkMPIMoveData.h"
 #include "vtkMath.h"
 #include "vtkMatrix4x4.h"
 #include "vtkMemberFunctionCommand.h"
-#include "vtkMPIMoveData.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPKdTree.h"
-#include "vtkPointData.h"
-#include "vtkProcessModule.h"
 #include "vtkPVAxesWidget.h"
 #include "vtkPVCenterAxesActor.h"
 #include "vtkPVConfig.h"
 #include "vtkPVDataDeliveryManager.h"
 #include "vtkPVDataRepresentation.h"
 #include "vtkPVDisplayInformation.h"
+#include "vtkPVGridAxes3DActor.h"
 #include "vtkPVHardwareSelector.h"
 #include "vtkPVInteractorStyle.h"
 #include "vtkPVOptions.h"
 #include "vtkPVSession.h"
 #include "vtkPVStreamingMacros.h"
-#include "vtkPVSynchronizedRenderer.h"
 #include "vtkPVSynchronizedRenderWindows.h"
+#include "vtkPVSynchronizedRenderer.h"
 #include "vtkPVTrackballMultiRotate.h"
 #include "vtkPVTrackballRoll.h"
 #include "vtkPVTrackballRotate.h"
 #include "vtkPVTrackballRotate.h"
 #include "vtkPVTrackballZoom.h"
 #include "vtkPVTrackballZoomToMouse.h"
-#include "vtkRenderer.h"
+#include "vtkPointData.h"
+#include "vtkProcessModule.h"
 #include "vtkRenderViewBase.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
+#include "vtkRenderer.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
@@ -83,8 +83,8 @@
 #include "vtkTrackballPan.h"
 #include "vtkTrivialProducer.h"
 #ifdef VTKGL2
-#include "vtkValuePass.h"
 #include "vtkLightingMapPass.h"
+#include "vtkValuePass.h"
 #else
 #include "vtkValuePasses.h"
 #endif
@@ -107,10 +107,10 @@
 #endif
 
 #include <assert.h>
-#include <vector>
-#include <set>
 #include <map>
+#include <set>
 #include <sstream>
+#include <vector>
 
 class vtkPVRenderView::vtkInternals
 {

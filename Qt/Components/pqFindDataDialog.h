@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqFindDataDialog_h
 #define pqFindDataDialog_h
 
-#include <QDialog>
 #include "pqComponentsModule.h"
+#include <QDialog>
 
 class pqOutputPort;
 

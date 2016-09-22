@@ -24,8 +24,8 @@
 #define vtkSMPipelineState_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
+#include "vtkSMMessageMinimal.h"          // needed for vtkSMMessage
 #include "vtkSMRemoteObject.h"
-#include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer
 
 class vtkSMSession;

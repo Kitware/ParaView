@@ -30,13 +30,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
+#include "pqLineWidget.h"
 #include "pq3DWidgetFactory.h"
 #include "pqApplicationCore.h"
-#include "pqServerManagerModel.h"
-#include "pqLineWidget.h"
 #include "pqPropertyLinks.h"
 #include "pqProxy.h"
 #include "pqSMAdaptor.h"
+#include "pqServerManagerModel.h"
 #include "vtkEventQtSlotConnect.h"
 
 #include "ui_pqLineWidget.h"

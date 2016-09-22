@@ -21,10 +21,10 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVTrivialProducer.h"
-#include "vtkRenderer.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkPistonDataObject.h"
 #include "vtkPistonMapper.h"
+#include "vtkRenderer.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 
 #include <vtksys/SystemTools.hxx>
 

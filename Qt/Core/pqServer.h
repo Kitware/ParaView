@@ -49,8 +49,8 @@ class vtkSMSessionProxyManager;
 #include "pqServerManagerModelItem.h"
 #include "pqServerResource.h"
 #include "pqTimer.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMMessageMinimal.h"
+#include "vtkSmartPointer.h"
 #include "vtkWeakPointer.h"
 
 #include <QPointer>

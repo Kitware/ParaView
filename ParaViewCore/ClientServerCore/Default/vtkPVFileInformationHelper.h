@@ -25,8 +25,8 @@
 #ifndef vtkPVFileInformationHelper_h
 #define vtkPVFileInformationHelper_h
 
-#include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
 #include "vtkObject.h"
+#include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
 
 class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkPVFileInformationHelper : public vtkObject
 {

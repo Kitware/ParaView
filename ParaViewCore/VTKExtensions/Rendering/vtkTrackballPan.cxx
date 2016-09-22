@@ -15,11 +15,11 @@
 #include "vtkTrackballPan.h"
 
 #include "vtkCamera.h"
-#include "vtkObjectFactory.h"
-#include "vtkRenderWindowInteractor.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderer.h"
 #include "vtkMath.h"
+#include "vtkObjectFactory.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderWindowInteractor.h"
+#include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkTrackballPan);
 

@@ -36,20 +36,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialog.h"
 #include "pqProxyWidget.h"
 #include "vtkNew.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMExporterProxy.h"
 #include "vtkSMExporterProxy.h"
 #include "vtkSMTrace.h"
 #include "vtkSMViewExportHelper.h"
 #include "vtkSMViewProxy.h"
+#include "vtkSmartPointer.h"
 
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QtDebug>
 #include <QToolButton>
 #include <QVBoxLayout>
+#include <QtDebug>
 
 //-----------------------------------------------------------------------------
 pqExportReaction::pqExportReaction(QAction* parentObject)

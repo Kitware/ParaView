@@ -42,7 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "vtkNew.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
@@ -50,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyIterator.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSettings.h"
+#include "vtkSmartPointer.h"
 
 #include <QKeyEvent>
 #include <QMap>

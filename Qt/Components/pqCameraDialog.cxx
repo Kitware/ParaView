@@ -33,37 +33,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqCameraDialog.h"
 
 // VTK / ParaView Server Manager includes.
-#include "vtkSmartPointer.h"
 #include "vtkCamera.h"
 #include "vtkMath.h"
 #include "vtkProcessModule.h"
-#include "vtkSMProxy.h"
-#include "vtkSMRenderViewProxy.h"
-#include "vtkSMProperty.h"
 #include "vtkSMCameraConfigurationReader.h"
 #include "vtkSMCameraConfigurationWriter.h"
+#include "vtkSMProperty.h"
+#include "vtkSMProxy.h"
+#include "vtkSMRenderViewProxy.h"
+#include "vtkSmartPointer.h"
 #include "vtkTransform.h"
 
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 
 // Qt includes.
+#include <QDebug>
 #include <QPointer>
 #include <QString>
-#include <QDebug>
 
 // ParaView Client includes.
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
-#include "pqRenderView.h"
-#include "pqPropertyLinks.h"
-#include "pqSettings.h"
-#include "pqFileDialog.h"
 #include "pqCustomViewButtonDialog.h"
+#include "pqFileDialog.h"
+#include "pqPropertyLinks.h"
+#include "pqRenderView.h"
+#include "pqSettings.h"
 
 // STL
-#include <string>
 #include <sstream>
+#include <string>
 
 #define pqErrorMacro(estr)\
   qDebug()\

@@ -26,10 +26,10 @@
 #ifndef vtkAMRDualContour_h
 #define vtkAMRDualContour_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"
-#include <vector>
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include <string>
+#include <vector>
 
 class vtkDataSet;
 class vtkImageData;

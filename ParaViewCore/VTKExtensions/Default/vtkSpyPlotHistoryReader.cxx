@@ -25,13 +25,13 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkTable.h"
 #include "vtkVariant.h"
 
+#include <fstream>
+#include <iostream>
 #include <map>
 #include <set>
-#include <vector>
-#include <string>
-#include <iostream>
 #include <sstream>
-#include <fstream>
+#include <string>
+#include <vector>
 
 
 using namespace SpyPlotHistoryReaderPrivate;

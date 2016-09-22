@@ -31,8 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqPythonQtWrapperFactory.h"
 
-#include <vtkPythonUtil.h>
 #include <vtkObject.h>
+#include <vtkPythonUtil.h>
 
 //-----------------------------------------------------------------------------
 PyObject* pqPythonQtWrapperFactory::wrap(const QByteArray& classname, void *ptr)

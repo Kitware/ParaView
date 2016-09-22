@@ -37,10 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMRemoteObject.h"
+#include "vtkSMSession.h"
 #include "vtkSMUndoStack.h"
 #include "vtkUndoSet.h"
-#include "vtkSMSession.h"
-#include "vtkSMRemoteObject.h"
 
 #include <sstream>
 #include <vtksys/RegularExpression.hxx>

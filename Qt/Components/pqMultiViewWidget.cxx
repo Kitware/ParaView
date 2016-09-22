@@ -38,9 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectBuilder.h"
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
-#include "pqViewFrameActionsInterface.h"
-#include "pqViewFrame.h"
 #include "pqView.h"
+#include "pqViewFrame.h"
+#include "pqViewFrameActionsInterface.h"
 #include "vtkCommand.h"
 #include "vtkNew.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
@@ -50,7 +50,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMViewProxy.h"
 #include "vtkWeakPointer.h"
 
-#include <QVariant>
 #include <QApplication>
 #include <QFrame>
 #include <QHBoxLayout>
@@ -58,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QSplitter>
 #include <QVBoxLayout>
+#include <QVariant>
 #include <QVector>
 
 class pqMultiViewWidget::pqInternals

@@ -18,20 +18,20 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkClientServerInterpreterInitializer.h"
 #include "vtkNew.h"
 #include "vtkOutputWindow.h"
-#include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
 #include "vtkPVInitializer.h"
 #include "vtkPVOptions.h"
 #include "vtkPVPluginLoader.h"
 #include "vtkPVSession.h"
-#include "vtkSMSettings.h"
-#include "vtkSmartPointer.h"
+#include "vtkProcessModule.h"
 #include "vtkSMMessage.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSettings.h"
+#include "vtkSmartPointer.h"
 
-#include <string>
 #include <sstream>
+#include <string>
 #include <vtksys/SystemTools.hxx>
 
 // Windows-only helper functionality:

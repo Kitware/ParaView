@@ -24,13 +24,13 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSIProperty.h"
 #include "vtkSIProxyDefinitionManager.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMMessage.h"
+#include "vtkSmartPointer.h"
 
 #include <map>
 #include <set>
-#include <string>
 #include <sstream>
+#include <string>
 
 //****************************************************************************
 struct SubProxyInfo

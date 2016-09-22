@@ -27,12 +27,12 @@
 #define vtkChartRepresentation_h
 
 #include "vtkPVDataRepresentation.h"
-#include "vtkWeakPointer.h" // needed for vtkWeakPointer
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer
-#include "vtkStdString.h" //  needed for vtkStdString.
+#include "vtkStdString.h"    //  needed for vtkStdString.
+#include "vtkWeakPointer.h"  // needed for vtkWeakPointer
 
-#include <set> //needed for ivars
 #include <map> // needed for map
+#include <set> //needed for ivars
 
 class vtkChartSelectionRepresentation;
 class vtkCSVExporter;

@@ -32,14 +32,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqRemoteControlThread.h"
 
-#include <vtkNew.h>
 #include <vtkClientSocket.h>
+#include <vtkNew.h>
+#include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
 #include <vtkRendererCollection.h>
-#include <vtkRenderWindow.h>
 #include <vtkServerSocket.h>
-#include <vtkSocketCollection.h>
 #include <vtkSmartPointer.h>
+#include <vtkSocketCollection.h>
 #include <vtkWebGLExporter.h>
 #include <vtkWebGLObject.h>
 

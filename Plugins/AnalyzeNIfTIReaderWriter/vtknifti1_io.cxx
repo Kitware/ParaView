@@ -2399,8 +2399,8 @@ void vtknifti1_io::old_swap_nifti_header(nifti_1_header *h , int is_nifti )
 /* Return the file length (0 if file not found or has no contents).
    This is a Unix-specific function, since it uses stat().
 -----------------------------------------------------------------------------*/
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 
 /*---------------------------------------------------------------------------*/
 /*! return the size of a file, in bytes

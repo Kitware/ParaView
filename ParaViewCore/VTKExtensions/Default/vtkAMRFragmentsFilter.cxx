@@ -14,20 +14,20 @@
 =========================================================================*/
 #include "vtkAMRFragmentsFilter.h"
 
-#include "vtkObject.h"
-#include "vtkObjectFactory.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkObject.h"
+#include "vtkObjectFactory.h"
 
 #include "vtkDataObject.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkNonOverlappingAMR.h"
 
-#include "vtkTrivialProducer.h"
+#include "vtkAMRConnectivity.h"
 #include "vtkExtractCTHPart.h"
 #include "vtkPVAMRDualContour.h"
-#include "vtkAMRConnectivity.h"
 #include "vtkPVAMRFragmentIntegration.h"
+#include "vtkTrivialProducer.h"
 
 vtkStandardNewMacro(vtkAMRFragmentsFilter);
 

@@ -20,12 +20,12 @@
 #include "vtkMatrix4x4.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVChangeOfBasisHelper.h"
 #include "vtkRTAnalyticSource.h"
 #include "vtkStringArray.h"
-#include "vtkTransformFilter.h"
 #include "vtkTransform.h"
+#include "vtkTransformFilter.h"
 #include "vtkUnstructuredGrid.h"
-#include "vtkPVChangeOfBasisHelper.h"
 
 #include <algorithm>
 

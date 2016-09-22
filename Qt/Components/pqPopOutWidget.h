@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqPopOutWidget_h
 #define _pqPopOutWidget_h
 
-#include <QWidget>
 #include "pqComponentsModule.h"
+#include <QWidget>
 
 class QLayout;
 class QPushButton;

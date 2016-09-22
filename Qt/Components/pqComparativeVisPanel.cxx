@@ -34,15 +34,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Server Manager Includes.
 #include "vtkEventQtSlotConnect.h"
-#include "vtkProcessModule.h"
 #include "vtkPVComparativeAnimationCue.h"
-#include "vtkSmartPointer.h"
+#include "vtkProcessModule.h"
 #include "vtkSMComparativeAnimationCueProxy.h"
 #include "vtkSMComparativeViewProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMVectorProperty.h"
+#include "vtkSmartPointer.h"
 
 // Qt Includes.
 #include <QHeaderView>
@@ -59,11 +59,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqPipelineSource.h"
 #include "pqPropertyLinks.h"
+#include "pqSMAdaptor.h"
+#include "pqSMProxy.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSignalAdaptors.h"
-#include "pqSMAdaptor.h"
-#include "pqSMProxy.h"
 #include "pqTimeKeeper.h"
 #include "pqUndoStack.h"
 #include "pqView.h"

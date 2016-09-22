@@ -22,16 +22,16 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVOptions.h"
 #include "vtkPointData.h"
 #include "vtkProcessModule.h"
-#include "vtkPVOptions.h"
 #include "vtkPythonInterpreter.h"
 
 #include <algorithm>
 #include <map>
+#include <sstream>
 #include <string>
 #include <vtksys/SystemTools.hxx>
-#include <sstream>
 
 vtkStandardNewMacro(vtkPythonCalculator);
 

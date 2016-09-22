@@ -33,31 +33,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqKeyFrameEditor.h"
 #include "ui_pqKeyFrameEditor.h"
 
-#include <QPointer>
-#include <QStandardItemModel>
-#include <QHeaderView>
-#include <QLineEdit>
-#include <QDialog>
-#include <QItemDelegate>
-#include <QStandardItem>
 #include <QComboBox>
-#include <QVBoxLayout>
+#include <QDialog>
 #include <QDialogButtonBox>
+#include <QHeaderView>
+#include <QItemDelegate>
+#include <QLineEdit>
+#include <QPointer>
 #include <QSignalMapper>
+#include <QStandardItem>
+#include <QStandardItemModel>
+#include <QVBoxLayout>
 
 #include <vtkSMRenderViewProxy.h>
 
 #include "pqAnimationCue.h"
 #include "pqAnimationScene.h"
-#include "pqSMAdaptor.h"
 #include "pqApplicationCore.h"
-#include "pqServerManagerModel.h"
-#include "pqUndoStack.h"
-#include "pqKeyFrameTypeWidget.h"
-#include "pqSignalAdaptorKeyFrameType.h"
-#include "pqSMProxy.h"
-#include "pqPropertyLinks.h"
 #include "pqCameraKeyFrameWidget.h"
+#include "pqKeyFrameTypeWidget.h"
+#include "pqPropertyLinks.h"
+#include "pqSMAdaptor.h"
+#include "pqSMProxy.h"
+#include "pqServerManagerModel.h"
+#include "pqSignalAdaptorKeyFrameType.h"
+#include "pqUndoStack.h"
 
 //-----------------------------------------------------------------------------
 // editor dialog that comes and goes for editing a single key frame

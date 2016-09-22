@@ -1,8 +1,8 @@
 
-#include <QMainWindow>
-#include <QPointer>
 #include "pqRenderView.h"
 #include "vtkObject.h"
+#include <QMainWindow>
+#include <QPointer>
 
 class MainWindow : public QMainWindow
 {

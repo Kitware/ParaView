@@ -1,8 +1,8 @@
 
 #include "pqTextEditTest.h"
 
-#include <QObject>
 #include <QDebug>
+#include <QObject>
 #include <QSignalSpy>
 #include <QTest>
 

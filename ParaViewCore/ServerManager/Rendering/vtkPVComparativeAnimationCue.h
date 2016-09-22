@@ -23,8 +23,8 @@
 #ifndef vtkPVComparativeAnimationCue_h
 #define vtkPVComparativeAnimationCue_h
 
-#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkObject.h"
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 
 class vtkSMDomain;
 class vtkSMProperty;

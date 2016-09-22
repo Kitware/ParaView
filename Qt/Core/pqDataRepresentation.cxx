@@ -35,10 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkEventQtSlotConnect.h"
 #include "vtkNew.h"
 #include "vtkPVArrayInformation.h"
-#include "vtkPVGeneralSettings.h"
-#include "vtkPVProminentValuesInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVGeneralSettings.h"
+#include "vtkPVProminentValuesInformation.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRepresentationProxy.h"
@@ -46,17 +46,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMTransferFunctionManager.h"
 
-#include <QtDebug>
-#include <QPointer>
 #include <QColor>
+#include <QPointer>
+#include <QtDebug>
 
 #include "pqApplicationCore.h"
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
+#include "pqSMAdaptor.h"
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqSMAdaptor.h"
 
 //-----------------------------------------------------------------------------
 class pqDataRepresentationInternal

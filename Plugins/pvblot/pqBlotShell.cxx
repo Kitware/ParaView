@@ -26,14 +26,14 @@
 #include "pqConsoleWidget.h"
 #include "pqServer.h"
 
-#include <QDir>
 #include <QCoreApplication>
+#include <QDir>
 #include <QVBoxLayout>
 
 #include "vtkEventQtSlotConnect.h"
-#include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
 #include "vtkPVPythonInterpretor.h"
+#include "vtkProcessModule.h"
 
 //=============================================================================
 pqBlotShell::pqBlotShell(QWidget *p) : QWidget(p)

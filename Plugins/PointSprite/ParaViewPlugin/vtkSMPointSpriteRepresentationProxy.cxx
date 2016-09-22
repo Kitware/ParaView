@@ -30,22 +30,22 @@
 #include "vtkSMPointSpriteRepresentationProxy.h"
 
 #include "vtkAbstractMapper.h"
-#include "vtkObjectFactory.h"
 #include "vtkGlyphSource2D.h"
+#include "vtkObjectFactory.h"
 #include "vtkProperty.h"
 
+#include "vtkPVDataInformation.h"
 #include "vtkProcessModule.h"
-#include "vtkSMProxyProperty.h"
-#include "vtkSMSourceProxy.h"
-#include "vtkSMPropertyHelper.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMProxyIterator.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkType.h"
-#include "vtkPVDataInformation.h"
-#include "vtkSMProxyIterator.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMDoubleVectorProperty.h"
 
 using std::string;
 

@@ -16,9 +16,16 @@
 
 #include "vtkCellArray.h"
 #include "vtkCellData.h"
+#include "vtkCleanPolyData.h"
+#include "vtkCollection.h"
+#include "vtkCollectionIterator.h"
+#include "vtkCompositeDataIterator.h"
+#include "vtkDoubleArray.h"
 #include "vtkIdList.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMath.h"
+#include "vtkMergePoints.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
@@ -26,19 +33,12 @@
 #include "vtkPolyData.h"
 #include "vtkSmartPointer.h"
 #include "vtkType.h"
-#include "vtkCollection.h"
-#include "vtkCollectionIterator.h"
-#include "vtkMath.h"
-#include "vtkDoubleArray.h"
-#include "vtkCompositeDataIterator.h"
-#include "vtkMergePoints.h"
-#include "vtkCleanPolyData.h"
 
+#include "vtkAppendCompositeDataLeaves.h"
+#include "vtkAppendPolyData.h"
 #include "vtkMultiProcessController.h"
 #include "vtkReductionFilter.h"
-#include "vtkAppendPolyData.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkAppendCompositeDataLeaves.h"
 
 #define MY_MAX(x, y)    ((x) < (y) ? (y) : (x))
 

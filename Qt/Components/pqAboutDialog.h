@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqAboutDialog_h
 #define _pqAboutDialog_h
 
-#include <QDialog>
 #include "pqComponentsModule.h"
+#include <QDialog>
 
 namespace Ui { class pqAboutDialog; }
 

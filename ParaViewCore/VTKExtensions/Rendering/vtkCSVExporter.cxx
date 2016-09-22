@@ -18,11 +18,11 @@
 #include "vtkFieldData.h"
 #include "vtkObjectFactory.h"
 
-#include <vtksys/SystemTools.hxx>
 #include <cassert>
 #include <map>
-#include <string>
 #include <sstream>
+#include <string>
+#include <vtksys/SystemTools.hxx>
 
 class vtkCSVExporter::vtkInternals
 {

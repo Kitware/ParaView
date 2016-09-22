@@ -20,8 +20,8 @@
 #ifndef vtkVRMLSource_h
 #define vtkVRMLSource_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class vtkMultiBlockDataSet;
 class vtkVRMLImporter;

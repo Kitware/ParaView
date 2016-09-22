@@ -20,9 +20,9 @@
 #ifndef vtkRulerSourceRepresentation_h
 #define vtkRulerSourceRepresentation_h
 
+#include "vtkNew.h"                               //needed for instances of vtkPVCacheKeeper, vtkPolyData
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"
-#include "vtkNew.h" //needed for instances of vtkPVCacheKeeper, vtkPolyData
 
 class vtkDistanceRepresentation2D;
 class vtkPolyData;

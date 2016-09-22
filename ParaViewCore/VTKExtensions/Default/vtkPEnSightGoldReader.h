@@ -32,8 +32,8 @@
 #ifndef vtkPEnSightGoldReader_h
 #define vtkPEnSightGoldReader_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPEnSightReader.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class UndefPartialInternal;
 

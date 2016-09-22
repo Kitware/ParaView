@@ -25,8 +25,8 @@
 #include "vtkSMProperty.h"
 #include "vtkSMRepresentationProxy.h"
 
-#include <vtksys/RegularExpression.hxx>
 #include <cassert>
+#include <vtksys/RegularExpression.hxx>
 
 namespace
 {

@@ -31,10 +31,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqProgressManager.h"
 
-#include <QtDebug>
 #include <QApplication>
 #include <QKeyEvent>
 #include <QMouseEvent>
+#include <QtDebug>
 
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"

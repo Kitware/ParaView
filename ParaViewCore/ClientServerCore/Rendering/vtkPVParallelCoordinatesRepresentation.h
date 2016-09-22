@@ -21,8 +21,8 @@
 #ifndef vtkPVParallelCoordinatesRepresentation_h
 #define vtkPVParallelCoordinatesRepresentation_h
 
-#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkChartRepresentation.h"
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 
 class vtkChartParallelCoordinates;
 

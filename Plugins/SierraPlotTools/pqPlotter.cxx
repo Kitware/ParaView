@@ -27,17 +27,17 @@
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
-#include "pqXYChartView.h"
 #include "pqObjectBuilder.h"
 #include "pqPipelineRepresentation.h"
 #include "pqPipelineSource.h"
 #include "pqPlotVariablesDialog.h"
 #include "pqRenderView.h"
-#include <pqServerManagerModel.h>
-#include <pqServer.h>
-#include "pqSierraPlotToolsUtils.h"
 #include "pqSMAdaptor.h"
+#include "pqSierraPlotToolsUtils.h"
 #include "pqView.h"
+#include "pqXYChartView.h"
+#include <pqServer.h>
+#include <pqServerManagerModel.h>
 
 #include <QLabel>
 #include <QList>
@@ -53,8 +53,8 @@
 #include "vtkSMOutputPort.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
-#include "vtkSMStringVectorProperty.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMStringVectorProperty.h"
 
 // used to show line number in #pragma messages
 #define STRING2(x) #x

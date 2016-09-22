@@ -32,10 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqPresetDialog_h
 #define pqPresetDialog_h
 
+#include "pqComponentsModule.h" // for exports
 #include <QDialog>
 #include <QModelIndex>
 #include <QScopedPointer> // for QScopedPointer
-#include "pqComponentsModule.h" // for exports
 
 class QModelIndex;
 namespace Json

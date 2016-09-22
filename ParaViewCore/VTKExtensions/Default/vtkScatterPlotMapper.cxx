@@ -18,10 +18,10 @@
 #include "vtkBitArray.h"
 #include "vtkBoundingBox.h"
 #include "vtkCamera.h"
+#include "vtkCellArray.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkCompositeDataSet.h"
-#include "vtkCellArray.h"
 #include "vtkDataArray.h"
 #include "vtkDataSet.h"
 #include "vtkDataSetAttributes.h"
@@ -54,10 +54,10 @@
 #include "vtkTrivialProducer.h"
 #include "vtkgl.h"
 
-#include <vector>
+#include <assert.h>
 #include <sstream>
 #include <string>
-#include <assert.h>
+#include <vector>
 
 //#define PI 3.141592653589793
 

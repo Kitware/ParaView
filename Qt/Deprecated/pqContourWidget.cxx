@@ -35,18 +35,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pq3DWidgetFactory.h"
 #include "pqApplicationCore.h"
 #include "pqPropertyLinks.h"
+#include "pqSMAdaptor.h"
 #include "pqServerManagerModel.h"
 #include "pqSignalAdaptorTreeWidget.h"
-#include "pqSMAdaptor.h"
 
 #include <QDoubleValidator>
+#include <QMessageBox>
 #include <QShortcut>
 #include <QtDebug>
-#include <QMessageBox>
 
 #include "vtkEventQtSlotConnect.h"
 #include "vtkPVProxyDefinitionIterator.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
@@ -55,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSmartPointer.h"
 
 #include "vtkClientServerStream.h"
 

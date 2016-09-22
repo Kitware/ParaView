@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqSpreadSheetViewWidget_h
 #define pqSpreadSheetViewWidget_h
 
-#include <QTableView>
 #include "pqCoreModule.h"
+#include <QTableView>
 
 class pqSpreadSheetViewModel;
 

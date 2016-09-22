@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqTableView_h
 #define pqTableView_h
 
-#include <QTableView>
 #include "pqWidgetsModule.h" // for export macro
+#include <QTableView>
 
 /// pqTableView extends QTableView (in the spirit of pqTableView) to resize the
 /// view vertically to fit contents. It servers to purposes:

@@ -22,19 +22,19 @@
 #include "vtkEnSight6Reader.h"
 #include "vtkEnSightGoldBinaryReader.h"
 #include "vtkEnSightGoldReader.h"
-#include "vtkMultiBlockDataSet.h"
-#include "vtkMultiProcessController.h"
 #include "vtkIdListCollection.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMultiBlockDataSet.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPEnSightGoldBinaryReader.h"
 #include "vtkPEnSightGoldReader.h"
 
-#include <string>
-#include <map>
 #include <assert.h>
 #include <ctype.h> /* isspace */
+#include <map>
+#include <string>
 
 vtkStandardNewMacro(vtkPGenericEnSightReader);
 

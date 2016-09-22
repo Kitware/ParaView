@@ -29,8 +29,8 @@
 #ifndef vtkHybridProbeFilter_h
 #define vtkHybridProbeFilter_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkDataObjectAlgorithm.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class vtkUnstructuredGrid;
 

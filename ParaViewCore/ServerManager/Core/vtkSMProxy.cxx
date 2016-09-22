@@ -21,13 +21,12 @@
 #include "vtkGarbageCollector.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVInstantiator.h"
 #include "vtkPVOptions.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSIProxyDefinitionManager.h"
+#include "vtkProcessModule.h"
 #include "vtkSIProxy.h"
-#include "vtkSmartPointer.h"
+#include "vtkSIProxyDefinitionManager.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMMessage.h"
@@ -38,13 +37,14 @@
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMStateLocator.h"
+#include "vtkSmartPointer.h"
 
 #include <algorithm>
 #include <assert.h>
 #include <set>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
 #include <vtksys/RegularExpression.hxx>
 
 //---------------------------------------------------------------------------

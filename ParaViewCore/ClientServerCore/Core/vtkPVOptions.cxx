@@ -14,9 +14,9 @@
 #include "vtkPVOptions.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVConfig.h" //For PARAVIEW_ALWAYS_SECURE_CONNECTION option
 #include "vtkPVOptionsXMLParser.h"
+#include "vtkProcessModule.h"
 // #include "vtkPVView.h"
 
 #include <vtksys/CommandLineArguments.hxx>

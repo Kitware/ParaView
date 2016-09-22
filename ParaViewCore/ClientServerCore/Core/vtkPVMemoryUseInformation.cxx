@@ -14,8 +14,8 @@
 =========================================================================*/
 #include "vtkPVMemoryUseInformation.h"
 
-#include "vtkObjectFactory.h"
 #include "vtkClientServerStream.h"
+#include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 
 #include <vtksys/SystemInformation.hxx>

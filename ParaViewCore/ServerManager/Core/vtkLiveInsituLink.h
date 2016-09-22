@@ -39,8 +39,8 @@
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 
 #include "vtkSMObject.h"
-#include "vtkWeakPointer.h"  // Needed for Weak pointer
 #include "vtkSmartPointer.h" // Needed for Smart pointer
+#include "vtkWeakPointer.h"  // Needed for Weak pointer
 
 class vtkMultiProcessController;
 class vtkSMSessionProxyManager;

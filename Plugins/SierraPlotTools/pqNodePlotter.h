@@ -23,8 +23,8 @@
 #ifndef pqNodePlotter_h
 #define pqNodePlotter_h
 
-#include <QString>
 #include "pqPlotter.h"
+#include <QString>
 class pqOutputPort;
 
 class pqNodePlotter : public pqPlotter

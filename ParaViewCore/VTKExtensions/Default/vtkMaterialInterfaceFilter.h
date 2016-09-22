@@ -28,10 +28,10 @@
 #ifndef vtkMaterialInterfaceFilter_h
 #define vtkMaterialInterfaceFilter_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"
-#include <vector> // needed for vector
-#include <string> // needed for string
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
+#include <string>                            // needed for string
+#include <vector>                            // needed for vector
 
 #include "vtkSmartPointer.h" // needed for smart pointer
 #include "vtkTimerLog.h" // needed for vtkTimerLog.

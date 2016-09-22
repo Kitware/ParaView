@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqPluginTreeWidgetEventTranslator_h
 #define _pqPluginTreeWidgetEventTranslator_h
 
-#include "pqWidgetEventTranslator.h"
 #include "pqComponentsModule.h"
+#include "pqWidgetEventTranslator.h"
 #include <QPointer>
 
 class QModelIndex;

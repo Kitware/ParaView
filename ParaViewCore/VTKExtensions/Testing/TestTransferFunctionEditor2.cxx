@@ -1,10 +1,10 @@
 #include "vtkCleanUnstructuredGrid.h"
-#include "vtkExtractHistogram.h"
 #include "vtkDataSetReader.h"
+#include "vtkExtractHistogram.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkTesting.h"
 #include "vtkTestUtilities.h"
+#include "vtkTesting.h"
 #include "vtkTransferFunctionEditorWidget.h"
 #include "vtkTransferFunctionViewer.h"
 

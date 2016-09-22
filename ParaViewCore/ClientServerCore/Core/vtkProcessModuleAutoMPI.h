@@ -15,10 +15,9 @@
 #ifndef vtkProcessModuleAutoMPI_h
 #define vtkProcessModuleAutoMPI_h
 
-
-#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
-#include "vtkObject.h"
 #include "vtkClientServerID.h" // needed for UniqueID.
+#include "vtkObject.h"
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 
 class vtkProcessModuleAutoMPIInternals;
 class VTKPVCLIENTSERVERCORECORE_EXPORT vtkProcessModuleAutoMPI: public vtkObject

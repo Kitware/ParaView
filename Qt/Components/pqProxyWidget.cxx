@@ -59,15 +59,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkNew.h"
 #include "vtkPVXMLElement.h"
 
-#include "vtkSmartPointer.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMNamedPropertyIterator.h"
 #include "vtkSMOrderedPropertyIterator.h"
-#include "vtkSMPropertyGroup.h"
 #include "vtkSMProperty.h"
+#include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
@@ -76,6 +75,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSettings.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMTrace.h"
+#include "vtkSmartPointer.h"
 #include "vtkStringList.h"
 
 #include <QHideEvent>

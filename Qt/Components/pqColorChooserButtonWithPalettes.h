@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqColorChooserButton.h"
 #include "pqComponentsModule.h"
-#include <QPointer>
 #include "vtkWeakPointer.h"
+#include <QPointer>
 
 class QActionGroup;
 class vtkSMGlobalPropertiesProxy;

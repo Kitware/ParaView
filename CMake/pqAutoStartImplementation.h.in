@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef @ARG_CLASS_NAME@Implementation_h
 #define @ARG_CLASS_NAME@Implementation_h
 
-#include <QObject>
 #include "pqAutoStartInterface.h"
+#include <QObject>
 
 class @ARG_CLASS_NAME@;
 

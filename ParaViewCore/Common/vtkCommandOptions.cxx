@@ -17,10 +17,10 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVConfig.h" //For PARAVIEW_ALWAYS_SECURE_CONNECTION option
 
-#include <vtksys/CommandLineArguments.hxx>
-#include <vtksys/SystemTools.hxx>
 #include <sstream>
 #include <string>
+#include <vtksys/CommandLineArguments.hxx>
+#include <vtksys/SystemTools.hxx>
 
 
 //----------------------------------------------------------------------------

@@ -15,8 +15,8 @@
 #include "vtkPVRenderViewWithSobel.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkSobelGradientMagnitudePass.h"
 #include "vtkPVSynchronizedRenderer.h"
+#include "vtkSobelGradientMagnitudePass.h"
 
 vtkStandardNewMacro(vtkPVRenderViewWithSobel);
 //----------------------------------------------------------------------------

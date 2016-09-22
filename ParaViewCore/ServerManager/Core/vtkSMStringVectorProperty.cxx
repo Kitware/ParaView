@@ -18,10 +18,10 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMMessage.h"
+#include "vtkSMStateLocator.h"
 #include "vtkSMVectorPropertyTemplate.h"
 #include "vtkStdString.h"
 #include "vtkStringList.h"
-#include "vtkSMStateLocator.h"
 
 #include <algorithm>
 #include <sstream>

@@ -39,8 +39,8 @@
 #ifndef vtkOrderedCompositeDistributor_h
 #define vtkOrderedCompositeDistributor_h
 
-#include "vtkPointSetAlgorithm.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
+#include "vtkPointSetAlgorithm.h"
 
 class vtkBSPCuts;
 class vtkDataSet;

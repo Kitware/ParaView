@@ -32,20 +32,20 @@
 #include "ui_pqSQRemoteSignalDialogForm.h"
 
 #include <QDebug>
-#include <QTreeWidgetItem>
-#include <QTreeWidgetItemIterator>
+#include <QDebug>
+#include <QFont>
+#include <QMessageBox>
+#include <QPalette>
+#include <QPlastiqueStyle>
+#include <QProgressBar>
+#include <QSettings>
 #include <QString>
 #include <QStringList>
-#include <QSettings>
-#include <QMessageBox>
-#include <QProgressBar>
-#include <QPalette>
-#include <QFont>
-#include <QPlastiqueStyle>
-#include <QDebug>
+#include <QTreeWidgetItem>
+#include <QTreeWidgetItemIterator>
 
-#include "PrintUtils.h"
 #include "FsUtils.h"
+#include "PrintUtils.h"
 
 #include <iostream>
 

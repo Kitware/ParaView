@@ -14,10 +14,10 @@
 =========================================================================*/
 
 #include "vtkAMRFileSeriesReader.h"
-#include "vtkInformationVector.h"
 #include "vtkInformation.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 
 vtkStandardNewMacro(vtkAMRFileSeriesReader);
 

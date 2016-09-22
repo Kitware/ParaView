@@ -35,18 +35,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDoubleValidator>
 
-#include "vtkSMProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMProxy.h"
 
-#include "pqSMAdaptor.h"
-#include "pqTimeKeeper.h"
-#include "pqServer.h"
-#include "pqUndoStack.h"
-#include "pqKeyFrameEditor.h"
 #include "pqAnimationCue.h"
 #include "pqAnimationScene.h"
 #include "pqApplicationCore.h"
+#include "pqKeyFrameEditor.h"
+#include "pqSMAdaptor.h"
+#include "pqServer.h"
+#include "pqTimeKeeper.h"
+#include "pqUndoStack.h"
 
 //-----------------------------------------------------------------------------
 class pqPipelineTimeKeyFrameEditor::pqInternal

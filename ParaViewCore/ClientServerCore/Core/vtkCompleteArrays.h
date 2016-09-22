@@ -22,8 +22,8 @@
 #ifndef vtkCompleteArrays_h
 #define vtkCompleteArrays_h
 
-#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkDataSetAlgorithm.h"
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 
 class vtkMultiProcessController;
 

@@ -36,8 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqUndoStack.h"
 #include "vtkNew.h"
-#include "vtkSMProxyClipboard.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyClipboard.h"
 //-----------------------------------------------------------------------------
 pqCopyReaction::pqCopyReaction(QAction* parentObject, bool paste_mode)
   : Superclass(parentObject), Paste(paste_mode)

@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqPluginDockWidgetsBehavior_h
 #define pqPluginDockWidgetsBehavior_h
 
-#include <QObject>
 #include "pqApplicationComponentsModule.h"
+#include <QObject>
 
 class QMainWindow;
 

@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqCollaborationManager.h"
-#include "vtkSMCollaborationManager.h"
 #include "pqEventDispatcher.h"
+#include "vtkSMCollaborationManager.h"
 
 #include <QEventLoop>
 

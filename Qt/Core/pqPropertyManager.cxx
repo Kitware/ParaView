@@ -34,9 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyManager.h"
 
 // Qt includes
+#include <QApplication>
 #include <QByteArray>
 #include <QMultiMap>
-#include <QApplication>
 
 // ParaView includes
 #include "pqPropertyLinks.h"

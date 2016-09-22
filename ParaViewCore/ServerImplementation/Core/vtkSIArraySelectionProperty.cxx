@@ -25,8 +25,8 @@
 #include "vtkSMMessage.h"
 #include "vtkStringArray.h"
 
-#include <string>
 #include <sstream>
+#include <string>
 
 vtkStandardNewMacro(vtkSIArraySelectionProperty);
 //----------------------------------------------------------------------------

@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqCommandLineOptionsBehavior_h
 #define pqCommandLineOptionsBehavior_h
 
-#include <QObject>
 #include "pqApplicationComponentsModule.h"
+#include <QObject>
 
 /// @ingroup Behaviors
 /// pqCommandLineOptionsBehavior processes command-line options on startup and

@@ -16,11 +16,11 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkSMMessage.h"
+#include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSMSession.h"
 #include "vtkSMUndoStack.h"
-#include "vtkSMPropertyIterator.h"
-#include "vtkSMProxyProperty.h"
 
 #include <map>
 #include <set>

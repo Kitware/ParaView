@@ -32,24 +32,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSelectionInputWidget.h"
 
 #include "vtkEventQtSlotConnect.h"
-#include "vtkSelection.h"
-#include "vtkSelectionNode.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyIterator.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMSessionProxyManager.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSelection.h"
+#include "vtkSelectionNode.h"
 
-#include <QtDebug>
 #include <QTextStream>
+#include <QtDebug>
 
 #include "pqApplicationCore.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqProxy.h"
-#include "pqSelectionManager.h"
 #include "pqSMAdaptor.h"
+#include "pqSelectionManager.h"
 
 #include <string>
 

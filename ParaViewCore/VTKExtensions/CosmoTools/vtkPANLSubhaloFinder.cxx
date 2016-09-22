@@ -25,11 +25,11 @@
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPoints.h"
-#include "vtkUnstructuredGrid.h"
 #include "vtkTypeInt64Array.h"
+#include "vtkUnstructuredGrid.h"
 
-#include "SubHaloFinder.h"
 #include "FOFHaloProperties.h"
+#include "SubHaloFinder.h"
 
 #include <map>
 #include <set>

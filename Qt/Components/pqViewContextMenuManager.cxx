@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqViewContextMenuManager.h"
 
-#include "pqViewContextMenuHandler.h"
 #include "pqView.h"
+#include "pqViewContextMenuHandler.h"
 
 #include <QMap>
 #include <QString>

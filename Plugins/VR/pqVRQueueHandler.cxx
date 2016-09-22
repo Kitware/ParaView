@@ -31,8 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqVRQueueHandler.h"
 
-#include "vtkObjectFactory.h"
 #include "vtkCollection.h"
+#include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkVRGrabWorldStyle.h"
@@ -42,13 +42,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVRTrackStyle.h"
 #include "vtkWeakPointer.h"
 
-#include "pqApplicationCore.h"
 #include "pqActiveObjects.h"
+#include "pqApplicationCore.h"
 #include "pqView.h"
 
 #include <QList>
-#include <QtDebug>
 #include <QTimer>
+#include <QtDebug>
 
 class pqVRQueueHandler::pqInternals
 {

@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqStandardLegacyCustomPanels_h
 #define pqStandardLegacyCustomPanels_h
 
-#include <QObject>
 #include "pqObjectPanelInterface.h"
+#include <QObject>
 
 #include "pqComponentsModule.h"
 

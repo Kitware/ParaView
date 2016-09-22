@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqViewStreamingBehavior_h
 #define pqViewStreamingBehavior_h
 
-#include <QObject>
 #include "pqApplicationComponentsModule.h"
 #include "pqTimer.h"
+#include <QObject>
 
 class pqView;
 class vtkObject;

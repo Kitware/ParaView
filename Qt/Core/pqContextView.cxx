@@ -37,8 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqQVTKWidget.h"
-#include "pqServer.h"
 #include "pqSMAdaptor.h"
+#include "pqServer.h"
 #include "vtkAnnotationLink.h"
 #include "vtkChartXY.h"
 #include "vtkCommand.h"
@@ -48,21 +48,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkIdTypeArray.h"
 #include "vtkImageData.h"
 #include "vtkNew.h"
-#include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSelection.h"
-#include "vtkSelectionNode.h"
+#include "vtkProcessModule.h"
 #include "vtkSMContextViewProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSelection.h"
+#include "vtkSelectionNode.h"
 #include "vtkVariant.h"
 
-#include <QList>
-#include <QVariant>
-#include <QPointer>
 #include <QDebug>
+#include <QList>
+#include <QPointer>
+#include <QVariant>
 
 // Command implementation
 class pqContextView::command : public vtkCommand

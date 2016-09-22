@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqHighlightablePushButton_h
 #define pqHighlightablePushButton_h
 
+#include "pqWidgetsModule.h"
 #include <QPushButton>
 #include <QScopedPointer>
-#include "pqWidgetsModule.h"
 
 /// pqHighlightablePushButton extents QPushButton to add support for
 /// highlighting the button.

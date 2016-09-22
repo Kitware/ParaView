@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QApplication>
 #include <QContextMenuEvent>
-#include <QtDebug>
 #include <QRegExp>
+#include <QtDebug>
 
 #include <QtDebug>
 

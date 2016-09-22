@@ -1,6 +1,6 @@
-#include <QApplication>
-#include "pqPVApplicationCore.h"
 #include "myMainWindow.h"
+#include "pqPVApplicationCore.h"
+#include <QApplication>
 
 int main(int argc, char** argv)
 {

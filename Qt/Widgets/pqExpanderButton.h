@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqExpanderButton_h
 #define pqExpanderButton_h
 
-#include <QFrame>
 #include "pqWidgetsModule.h"
+#include <QFrame>
 
 /// pqExpanderButton provides a frame with a toggle mode. This can be used to
 /// simulate a toggle button used to expand frames in an accordion style, for

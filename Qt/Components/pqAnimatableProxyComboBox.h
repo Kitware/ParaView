@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqAnimatableProxyComboBox_h
 #define pqAnimatableProxyComboBox_h
 
-#include <QComboBox>
 #include "pqComponentsModule.h"
 #include "pqSMProxy.h"
+#include <QComboBox>
 
 class vtkSMProxy;
 class pqPipelineSource;

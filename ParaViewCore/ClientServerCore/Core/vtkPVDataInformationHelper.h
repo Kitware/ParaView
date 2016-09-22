@@ -23,8 +23,8 @@
 #ifndef vtkPVDataInformationHelper_h
 #define vtkPVDataInformationHelper_h
 
-#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 
 class vtkPVDataInformation;
 class vtkDataObject;

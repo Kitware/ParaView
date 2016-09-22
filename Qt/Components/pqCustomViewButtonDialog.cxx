@@ -5,15 +5,15 @@
 #include <QDebug>
 
 #include "vtkIndent.h"
-#include "vtkSmartPointer.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSMCameraConfigurationFileInfo.h"
+#include "vtkSmartPointer.h"
 
 #include "pqFileDialog.h"
 
-#include <string>
 #include <sstream>
+#include <string>
 
 #define pqErrorMacro(estr)\
   qDebug()\

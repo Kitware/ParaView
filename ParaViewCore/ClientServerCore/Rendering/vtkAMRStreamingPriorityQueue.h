@@ -28,8 +28,8 @@
 #ifndef vtkAMRStreamingPriorityQueue_h
 #define vtkAMRStreamingPriorityQueue_h
 
-#include "vtkPVClientServerCoreRenderingModule.h" // for export macros
 #include "vtkObject.h"
+#include "vtkPVClientServerCoreRenderingModule.h" // for export macros
 
 class vtkAMRInformation;
 class vtkMultiProcessController;

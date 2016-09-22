@@ -15,14 +15,14 @@
 
 // This test focus on noticed buggy behaviour based on the smallest basis
 
-#include "vtkTestUtilities.h"
+#include "vtkDoubleArray.h"
+#include "vtkDummyController.h"
+#include "vtkMultiProcessController.h"
+#include "vtkSmartPointer.h"
 #include "vtkSortedTableStreamer.h"
 #include "vtkTable.h"
-#include "vtkDoubleArray.h"
+#include "vtkTestUtilities.h"
 #include "vtkUnsignedCharArray.h"
-#include "vtkSmartPointer.h"
-#include "vtkMultiProcessController.h"
-#include "vtkDummyController.h"
 
 #include <float.h>
 // ----------------------------------------------------------------------------

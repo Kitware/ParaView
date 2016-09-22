@@ -14,9 +14,9 @@
 =========================================================================*/
 #include "vtkCPCellFieldBuilder.h"
 
+#include "vtkCPTensorFieldFunction.h"
 #include "vtkCell.h"
 #include "vtkCellData.h"
-#include "vtkCPTensorFieldFunction.h"
 #include "vtkDataSet.h"
 #include "vtkDoubleArray.h"
 #include "vtkObjectFactory.h"

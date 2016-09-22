@@ -18,8 +18,8 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMIntVectorProperty.h"
 
-#include <vector>
 #include <sstream>
+#include <vector>
 
 #include "vtkStdString.h"
 

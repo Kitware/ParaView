@@ -32,12 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqPipelineContextMenuBehavior_h
 #define pqPipelineContextMenuBehavior_h
 
+#include "pqApplicationComponentsModule.h"
+#include "vtkType.h"
+#include <QList> // needed for QList.
 #include <QObject>
 #include <QPoint> // needed for QPoint.
 #include <QPointer>
-#include <QList> // needed for QList.
-#include "vtkType.h"
-#include "pqApplicationComponentsModule.h"
 
 class pqDataRepresentation;
 class pqPipelineRepresentation;

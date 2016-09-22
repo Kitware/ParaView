@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialogEventPlayer.h"
 #include "pqCoreTestUtility.h"
 
-#include "pqFileDialog.h"
 #include "pqEventDispatcher.h"
+#include "pqFileDialog.h"
 
 #include <vtksys/SystemTools.hxx>
 

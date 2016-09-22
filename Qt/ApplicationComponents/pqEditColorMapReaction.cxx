@@ -37,9 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineRepresentation.h"
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
+#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
-#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMTrace.h"
 
 #include <QColorDialog>

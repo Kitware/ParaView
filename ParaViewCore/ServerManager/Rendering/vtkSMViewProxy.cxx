@@ -22,14 +22,13 @@
 #include "vtkMath.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
 #include "vtkPVView.h"
 #include "vtkPVXMLElement.h"
-#include "vtkRendererCollection.h"
-#include "vtkRenderer.h"
+#include "vtkProcessModule.h"
 #include "vtkRenderWindow.h"
-#include "vtkSmartPointer.h"
+#include "vtkRenderer.h"
+#include "vtkRendererCollection.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyManager.h"
@@ -38,6 +37,7 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMUncheckedPropertyHelper.h"
 #include "vtkSMUtilities.h"
+#include "vtkSmartPointer.h"
 
 #include <assert.h>
 

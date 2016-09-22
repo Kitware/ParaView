@@ -30,18 +30,18 @@
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPlot.h"
-#include "vtkProcessModule.h"
 #include "vtkPVCacheKeeper.h"
 #include "vtkPVContextView.h"
 #include "vtkPVMergeTablesMultiBlock.h"
+#include "vtkPlot.h"
+#include "vtkProcessModule.h"
 #include "vtkReductionFilter.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkTable.h"
 
-#include <sstream>
 #include <set>
+#include <sstream>
 #include <string>
 
 #define CLASSNAME(a) (a? a->GetClassName() : "None")

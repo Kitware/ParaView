@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqQVTKWidgetEventPlayer_h
 #define _pqQVTKWidgetEventPlayer_h
 
-#include "pqWidgetEventPlayer.h"
 #include "pqCoreModule.h"
+#include "pqWidgetEventPlayer.h"
 
 /**
 Concrete implementation of pqWidgetEventPlayer that handles playback of "activate" events for buttons and menus.

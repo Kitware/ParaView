@@ -1,6 +1,6 @@
-#include "vtkPython.h"
 #include "QApplication"
 #include "pqPVApplicationCore.h"
+#include "vtkPython.h"
 
 #include <iostream>
 

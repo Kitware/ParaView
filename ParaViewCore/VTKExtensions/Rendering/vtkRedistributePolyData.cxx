@@ -30,19 +30,19 @@
 #include "vtkIntArray.h"
 #include "vtkLongArray.h"
 #include "vtkMath.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataWriter.h"
 #include "vtkSetGet.h"
 #include "vtkShortArray.h"
+#include "vtkSmartPointer.h"
 #include "vtkTimerLog.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
-#include "vtkSmartPointer.h"
-#include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkRedistributePolyData);
 

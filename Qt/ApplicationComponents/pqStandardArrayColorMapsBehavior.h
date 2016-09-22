@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqStandardArrayColorMapsBehavior_h
 #define pqStandardArrayColorMapsBehavior_h
 
-#include <QObject>
 #include "pqApplicationComponentsModule.h" // for exports.
+#include <QObject>
 
 /// @ingroup Behaviors
 /// pqStandardArrayColorMapsBehavior setups color palettes to use for certain

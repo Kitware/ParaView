@@ -1,7 +1,7 @@
 #include "FEDataStructures.h"
 
-#include <mpi.h>
 #include <iostream>
+#include <mpi.h>
 
 Grid::Grid()
 {}

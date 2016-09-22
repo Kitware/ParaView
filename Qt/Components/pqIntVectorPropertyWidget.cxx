@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqIntVectorPropertyWidget.h"
 
-#include "vtkSmartPointer.h"
 #include "vtkSMBooleanDomain.h"
 #include "vtkSMCompositeTreeDomain.h"
 #include "vtkSMDomain.h"
@@ -43,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMNumberOfComponentsDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSmartPointer.h"
 
 #include "pqComboBoxDomain.h"
 #include "pqIntRangeWidget.h"

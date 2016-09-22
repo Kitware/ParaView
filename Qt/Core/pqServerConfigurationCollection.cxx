@@ -36,14 +36,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerConfiguration.h"
 #include "pqServerResource.h"
 #include "vtkNew.h"
-#include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
+#include "vtkProcessModule.h"
 
-#include <QtDebug>
-#include <QTextStream>
-#include <QDir>
 #include <QApplication>
+#include <QDir>
+#include <QTextStream>
+#include <QtDebug>
 #include <sstream>
 
 namespace

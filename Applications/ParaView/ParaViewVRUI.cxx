@@ -31,18 +31,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "ParaViewVRUI.h"
 
+#include "pqActiveObjects.h"
+#include "pqView.h"
 #include "vruiPipe.h"
 #include "vruiServerState.h"
 #include "vruiThread.h"
-#include <vector>
-#include <iostream>
-#include <QTcpSocket>
-#include <QWaitCondition>
-#include <QMutex>
 #include "vtkMath.h"
 #include "vtkSMCaveRenderViewProxy.h"
-#include "pqActiveObjects.h"
-#include "pqView.h"
+#include <QMutex>
+#include <QTcpSocket>
+#include <QWaitCondition>
+#include <iostream>
+#include <vector>
 
 
 class ParaViewVRUI::pqInternals

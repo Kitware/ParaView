@@ -14,9 +14,9 @@
 =========================================================================*/
 #include "vtkAMRStreamingVolumeRepresentation.h"
 
-#include "vtkAlgorithmOutput.h"
 #include "vtkAMRStreamingPriorityQueue.h"
 #include "vtkAMRVolumeMapper.h"
+#include "vtkAlgorithmOutput.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -26,8 +26,8 @@
 #include "vtkPVLODVolume.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVStreamingMacros.h"
-#include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
+#include "vtkRenderer.h"
 #include "vtkResampledAMRImageSource.h"
 #include "vtkSmartVolumeMapper.h"
 #include "vtkUniformGrid.h"

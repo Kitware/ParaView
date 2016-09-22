@@ -31,22 +31,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "vtkVRStyleGrabNRotateWorld.h"
 
+#include "pqActiveObjects.h"
+#include "pqView.h"
+#include "vtkMath.h"
+#include "vtkMatrix4x4.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMProperty.h"
-#include "vtkSMProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkVRQueue.h"
+#include <algorithm>
 #include <iostream>
 #include <sstream>
-#include <algorithm>
-#include "pqView.h"
-#include "pqActiveObjects.h"
-#include "vtkSMRenderViewProxy.h"
-#include "vtkSMPropertyHelper.h"
-#include "vtkMatrix4x4.h"
-#include "vtkMath.h"
 
 //------------------------------------------------------------------------cnstr
 vtkVRStyleGrabNRotateWorld::vtkVRStyleGrabNRotateWorld(QObject* parentObject)

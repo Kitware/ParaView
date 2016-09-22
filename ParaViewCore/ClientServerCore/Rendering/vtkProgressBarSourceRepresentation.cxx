@@ -22,12 +22,12 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
-#include "vtkPointSource.h"
-#include "vtkPolyData.h"
 #include "vtkPVCacheKeeper.h"
 #include "vtkPVRenderView.h"
-#include "vtkTable.h"
+#include "vtkPointSource.h"
+#include "vtkPolyData.h"
 #include "vtkProgressBarRepresentation.h"
+#include "vtkTable.h"
 #include "vtkVariant.h"
 
 namespace

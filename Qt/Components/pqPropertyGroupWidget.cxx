@@ -42,8 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqColorChooserButtonWithPalettes.h"
 #include "pqComboBoxDomain.h"
 #include "pqSignalAdaptors.h"
-#include "vtkSMPropertyGroup.h"
 #include "vtkSMProperty.h"
+#include "vtkSMPropertyGroup.h"
 #include "vtkSMProxy.h"
 
 //-----------------------------------------------------------------------------

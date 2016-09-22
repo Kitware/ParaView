@@ -15,11 +15,11 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkSMProxyTest.h"
 
-#include "vtkSMProxyManager.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
-#include "vtkSMDoubleVectorProperty.h"
 
 void vtkSMProxyTest::SetAnnotation()
 {

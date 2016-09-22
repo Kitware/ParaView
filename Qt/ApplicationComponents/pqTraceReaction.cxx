@@ -33,17 +33,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
-#include "pqProxyWidgetDialog.h"
 #include "pqPVApplicationCore.h"
+#include "pqProxyWidgetDialog.h"
 #include "pqServer.h"
 #include "vtkCommand.h"
 #include "vtkNew.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTrace.h"
+#include "vtkSmartPointer.h"
 
 #include "vtkPVConfig.h"
 #ifdef PARAVIEW_ENABLE_PYTHON

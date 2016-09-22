@@ -26,8 +26,8 @@
 
 #include <sstream>
 #if !defined(_WIN32) || defined(__CYGWIN__)
-# include <unistd.h>
-# include <sys/wait.h>
+#include <sys/wait.h>
+#include <unistd.h>
 #endif
 namespace
 {

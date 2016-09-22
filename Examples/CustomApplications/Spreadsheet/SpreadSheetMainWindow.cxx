@@ -42,9 +42,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputPort.h"
 #include "pqPersistentMainWindowStateBehavior.h"
 #include "pqPipelineSource.h"
-#include "pqSpreadSheetViewDecorator.h"
-#include "pqSpreadSheetView.h"
 #include "pqRecentFilesMenu.h"
+#include "pqSpreadSheetView.h"
+#include "pqSpreadSheetViewDecorator.h"
 
 //-----------------------------------------------------------------------------
 SpreadSheetMainWindow::SpreadSheetMainWindow(QWidget* parentObject,

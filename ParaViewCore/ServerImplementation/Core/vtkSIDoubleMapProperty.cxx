@@ -15,9 +15,9 @@
 #include "vtkSIDoubleMapProperty.h"
 #include "vtkObjectFactory.h"
 
-#include <cassert>
-#include "vtkSMMessage.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMMessage.h"
+#include <cassert>
 
 vtkStandardNewMacro(vtkSIDoubleMapProperty);
 //----------------------------------------------------------------------------

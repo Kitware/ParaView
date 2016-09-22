@@ -16,8 +16,8 @@
 
 #include "vtkClientServerInterpreter.h"
 #include "vtkObjectFactory.h"
-#include "vtkSMMessage.h"
 #include "vtkPVSessionCore.h"
+#include "vtkSMMessage.h"
 
 #include <assert.h>
 

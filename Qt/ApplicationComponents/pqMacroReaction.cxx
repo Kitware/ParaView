@@ -34,9 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPVApplicationCore.h"
 #include "pqPythonManager.h"
 
-#include "pqPythonMacroSupervisor.h"
-#include "pqFileDialog.h"
 #include "pqCoreUtilities.h"
+#include "pqFileDialog.h"
+#include "pqPythonMacroSupervisor.h"
 
 //-----------------------------------------------------------------------------
 pqMacroReaction::pqMacroReaction(QAction* parentObject)

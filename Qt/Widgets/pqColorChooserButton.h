@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqWidgetsModule.h"
 
-#include <QToolButton>
 #include <QColor>
+#include <QToolButton>
 #include <QVariant>
 
 /// pqColorChooserButton is a QToolButton subclass suitable for showing a

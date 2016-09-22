@@ -24,8 +24,8 @@
 #ifndef vtkParallelSerialWriter_h
 #define vtkParallelSerialWriter_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkDataObjectAlgorithm.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class vtkClientServerInterpreter;
 

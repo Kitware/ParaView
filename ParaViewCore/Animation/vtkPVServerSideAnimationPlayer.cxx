@@ -35,8 +35,8 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkWeakPointer.h"
 
 #include <assert.h>
-#include <string>
 #include <sstream>
+#include <string>
 
 //****************************************************************************
 class vtkPVServerSideAnimationPlayer::vtkInternals

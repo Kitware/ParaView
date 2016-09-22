@@ -21,6 +21,7 @@
 #include "vtkEdgeListIterator.h"
 #include "vtkEventForwarderCommand.h"
 #include "vtkExtractSelection.h"
+#include "vtkFloatArray.h"
 #include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -35,26 +36,25 @@
 #include "vtkTable.h"
 #include "vtkTree.h"
 #include "vtkVertexListIterator.h"
-#include "vtkFloatArray.h"
 
-#include "vtkMultiProcessController.h"
 #include "vtkCommunicator.h"
-#include "vtkMath.h"
-#include "vtkIntArray.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
-#include "vtkMultiBlockDataSet.h"
-#include "vtkUnsignedIntArray.h"
 #include "vtkDoubleArray.h"
+#include "vtkIntArray.h"
+#include "vtkMath.h"
+#include "vtkMultiBlockDataSet.h"
+#include "vtkMultiProcessController.h"
+#include "vtkUnsignedIntArray.h"
 
 #include <algorithm>
-#include <vector>
 #include <set>
+#include <vector>
 
 #include <float.h>
 
-#include <string>
 #include <sstream>
+#include <string>
 using std::ostringstream;
 
 //****************************************************************************

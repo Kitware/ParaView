@@ -32,11 +32,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputPortComboBox.h"
 
 // ParaView Includes.
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqServerManagerModel.h"
-#include "pqActiveObjects.h"
 
 //-----------------------------------------------------------------------------
 pqOutputPortComboBox::pqOutputPortComboBox(QWidget* _parent) : Superclass(_parent)

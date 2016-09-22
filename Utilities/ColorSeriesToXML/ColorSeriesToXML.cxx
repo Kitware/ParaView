@@ -13,11 +13,11 @@
 
 =========================================================================*/
 
-#include "vtkLookupTable.h"
-#include "vtkColorSeries.h"
 #include "vtkColor.h"
+#include "vtkColorSeries.h"
 #include "vtkDoubleArray.h"
 #include "vtkImageData.h"
+#include "vtkLookupTable.h"
 #include "vtkPointData.h"
 #include "vtkSmartPointer.h"
 #include "vtkTrivialProducer.h"

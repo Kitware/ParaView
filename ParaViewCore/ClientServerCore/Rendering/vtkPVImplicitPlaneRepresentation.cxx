@@ -14,8 +14,8 @@
 =========================================================================*/
 #include "vtkPVImplicitPlaneRepresentation.h"
 
-#include "vtkObjectFactory.h"
 #include "vtkMultiProcessController.h"
+#include "vtkObjectFactory.h"
 #include "vtkProperty.h"
 
 

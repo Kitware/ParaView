@@ -1,20 +1,20 @@
 #include "pqRemoteCommandDialog.h"
-#include "ui_pqRemoteCommandDialogForm.h"
 #include "pqRemoteCommandTemplateDialog.h"
+#include "ui_pqRemoteCommandDialogForm.h"
 
 #include <QDebug>
-#include <QSettings>
 #include <QInputDialog>
-#include <QMessageBox>
 #include <QList>
-#include <QStringList>
+#include <QMessageBox>
+#include <QSettings>
 #include <QString>
+#include <QStringList>
 
 #include "vtkIndent.h"
 
 #include "pqApplicationCore.h"
-#include "pqSettings.h"
 #include "pqFileDialog.h"
+#include "pqSettings.h"
 
 #include <string>
 

@@ -22,22 +22,22 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkCompositeDataSet.h"
 #include "vtkDataArray.h"
 #include "vtkDataObject.h"
-#include "vtkDataSet.h"
 #include "vtkDataObjectTypes.h"
+#include "vtkDataSet.h"
 #include "vtkDoubleArray.h"
 #include "vtkInformation.h"
-#include "vtkInformationVector.h"
 #include "vtkInformationStringVectorKey.h"
+#include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVPostFilterExecutive.h"
 #include "vtkPointData.h"
 #include "vtkPointDataToCellData.h"
-#include "vtkPVPostFilterExecutive.h"
 
-#include <vtksys/SystemTools.hxx>
-#include <string>
 #include <assert.h>
 #include <set>
 #include <sstream>
+#include <string>
+#include <vtksys/SystemTools.hxx>
 
 namespace
 {

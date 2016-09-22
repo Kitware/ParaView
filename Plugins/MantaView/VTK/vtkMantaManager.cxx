@@ -14,8 +14,8 @@
 =========================================================================*/
 
 #include "vtkMantaManager.h"
-#include "vtkObjectFactory.h"
 #include "vtkManta.h"
+#include "vtkObjectFactory.h"
 
 #include <Core/Color/Color.h>
 #include <Core/Color/ColorDB.h>
@@ -29,8 +29,8 @@
 #include <Interface/Context.h>
 #include <Interface/Light.h>
 #include <Interface/LightSet.h>
-#include <Interface/Scene.h>
 #include <Interface/Object.h>
+#include <Interface/Scene.h>
 #include <Model/AmbientLights/ConstantAmbient.h>
 #include <Model/Backgrounds/ConstantBackground.h>
 #include <Model/Groups/Group.h>

@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt Includes.
 #include <QItemSelection>
-#include <QtDebug>
 #include <QMenu>
+#include <QtDebug>
 
 // ParaView Includes.
 

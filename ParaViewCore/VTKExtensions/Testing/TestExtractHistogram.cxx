@@ -16,10 +16,10 @@
 #include "vtkCellData.h"
 #include "vtkDoubleArray.h"
 #include "vtkExtractHistogram.h"
-#include "vtkTable.h"
+#include "vtkIntArray.h"
 #include "vtkSmartPointer.h"
 #include "vtkSphereSource.h"
-#include "vtkIntArray.h"
+#include "vtkTable.h"
 
 /// Test the output of the vtkExtractHistogram filter in a simple serial case
 int TestExtractHistogram(int, char*[])

@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqLockViewSizeCustomDialog_h
 #define pqLockViewSizeCustomDialog_h
 
-#include <QDialog>
 #include "pqComponentsModule.h"
+#include <QDialog>
 
 /// Dialog used to ask the user what resolution to lock the views to.
 class PQCOMPONENTS_EXPORT pqLockViewSizeCustomDialog : public QDialog

@@ -46,8 +46,8 @@
 #ifndef vtkSMGlobalPropertiesProxy_h
 #define vtkSMGlobalPropertiesProxy_h
 
-#include "vtkSMProxy.h"
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
+#include "vtkSMProxy.h"
 
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMGlobalPropertiesProxy : public vtkSMProxy
 {

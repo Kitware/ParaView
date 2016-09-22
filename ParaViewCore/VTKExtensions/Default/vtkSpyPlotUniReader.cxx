@@ -1,15 +1,15 @@
 #include "vtkSpyPlotUniReader.h"
-#include "vtkSpyPlotBlock.h"
-#include "vtkDataArraySelection.h"
-#include "vtkObjectFactory.h"
+#include "vtkByteSwap.h"
 #include "vtkDataArray.h"
-#include "vtkSpyPlotIStream.h"
+#include "vtkDataArraySelection.h"
 #include "vtkFloatArray.h"
 #include "vtkIntArray.h"
+#include "vtkObjectFactory.h"
+#include "vtkSpyPlotBlock.h"
+#include "vtkSpyPlotIStream.h"
 #include "vtkUnsignedCharArray.h"
-#include "vtkByteSwap.h"
-#include <vector>
 #include <sstream>
+#include <vector>
 #include <vtksys/RegularExpression.hxx>
 
 //=============================================================================

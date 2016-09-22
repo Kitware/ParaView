@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pq3DWidgetFactory.h"
 #include "pqApplicationCore.h"
 #include "pqPropertyLinks.h"
-#include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
+#include "pqServerManagerModel.h"
 
 #include <QDoubleValidator>
 #include <QShortcut>

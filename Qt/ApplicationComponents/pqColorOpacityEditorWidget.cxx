@@ -50,12 +50,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkDiscretizableColorTransferFunction.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkNew.h"
-#include "vtkPiecewiseFunction.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMPropertyGroup.h"
-#include "vtkSMProperty.h"
-#include "vtkSMPropertyHelper.h"
+#include "vtkPiecewiseFunction.h"
 #include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyGroup.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTransferFunctionPresets.h"
@@ -67,9 +67,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDoubleValidator>
 #include <QMessageBox>
 #include <QPointer>
-#include <QtDebug>
 #include <QTimer>
 #include <QVBoxLayout>
+#include <QtDebug>
 
 namespace
 {

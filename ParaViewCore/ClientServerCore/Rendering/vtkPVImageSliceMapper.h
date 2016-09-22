@@ -28,9 +28,9 @@
 #ifndef vtkPVImageSliceMapper_h
 #define vtkPVImageSliceMapper_h
 
-#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkMapper.h"
-#include "vtkStructuredData.h" // needed for VTK_*_PLANE
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
+#include "vtkStructuredData.h"                    // needed for VTK_*_PLANE
 
 class vtkImageData;
 class vtkRenderer;

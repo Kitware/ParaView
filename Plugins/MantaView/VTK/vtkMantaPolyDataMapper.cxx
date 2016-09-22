@@ -97,18 +97,18 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Model/Materials/Dielectric.h>
 #include <Model/Materials/Flat.h>
 #include <Model/Materials/Lambertian.h>
-#include <Model/Materials/Transparent.h>
 #include <Model/Materials/MetalMaterial.h>
 #include <Model/Materials/Phong.h>
 #include <Model/Materials/ThinDielectric.h>
+#include <Model/Materials/Transparent.h>
 #include <Model/Primitives/TextureCoordinateCylinder.h>
 #include <Model/Primitives/TextureCoordinateSphere.h>
 #include <Model/Primitives/WaldTriangle.h>
-#include <Model/Textures/TexCoordTexture.h>
 #include <Model/Textures/Constant.h>
+#include <Model/Textures/TexCoordTexture.h>
 
-#include <vector>
 #include <math.h>
+#include <vector>
 
 class vtkMantaPolyDataMapper::Helper {
 public:

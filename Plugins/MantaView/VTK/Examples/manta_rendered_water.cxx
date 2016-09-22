@@ -5,22 +5,22 @@
 #include <string.h>
 
 // include the required header files for the VTK classes we are using.
+#include "vtkCellArray.h"
+#include "vtkCleanPolyData.h"
+#include "vtkInteractorStyleTrackballCamera.h"
 #include "vtkMantaActor.h"
+#include "vtkMantaCamera.h"
 #include "vtkMantaLight.h"
+#include "vtkMantaPolyDataMapper.h"
 #include "vtkMantaRenderer.h"
+#include "vtkParametricFunctionSource.h"
+#include "vtkParametricRandomHills.h"
+#include "vtkPoints.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkMantaCamera.h"
-#include "vtkMantaPolyDataMapper.h"
-#include "vtkInteractorStyleTrackballCamera.h"
-#include "vtkPoints.h"
-#include "vtkTransformFilter.h"
 #include "vtkTransform.h"
-#include "vtkCellArray.h"
-#include "vtkParametricRandomHills.h"
-#include "vtkParametricFunctionSource.h"
+#include "vtkTransformFilter.h"
 #include "vtkTransformPolyDataFilter.h"
-#include "vtkCleanPolyData.h"
 
 #include "vtkMantaProperty.h"
 

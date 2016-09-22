@@ -29,21 +29,21 @@
 
 #include "vtkTwoScalarsToColorsPainter.h"
 
-#include "vtkObjectFactory.h"
+#include "vtkAbstractMapper.h"
+#include "vtkActor.h"
+#include "vtkCellData.h"
+#include "vtkCompositeDataIterator.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkDataObject.h"
 #include "vtkDataSet.h"
-#include "vtkCellData.h"
-#include "vtkPointData.h"
-#include "vtkCompositeDataSet.h"
-#include "vtkCompositeDataIterator.h"
-#include "vtkLookupTable.h"
-#include "vtkAbstractMapper.h"
 #include "vtkFloatArray.h"
-#include "vtkActor.h"
-#include "vtkProperty.h"
 #include "vtkImageData.h"
-#include "vtkOpenGL.h"
+#include "vtkLookupTable.h"
 #include "vtkMapper.h"
+#include "vtkObjectFactory.h"
+#include "vtkOpenGL.h"
+#include "vtkPointData.h"
+#include "vtkProperty.h"
 
 vtkStandardNewMacro(vtkTwoScalarsToColorsPainter)
 

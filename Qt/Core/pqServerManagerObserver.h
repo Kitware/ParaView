@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqServerManagerObserver_h
 
 #include "pqCoreModule.h"
-#include <QObject>
 #include "vtkType.h" // needed for vtkIdType
+#include <QObject>
 
 class pqMultiView;
 class pqServerManagerObserverInternal;

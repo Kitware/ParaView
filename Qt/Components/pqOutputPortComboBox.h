@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqOutputPortComboBox_h
 #define pqOutputPortComboBox_h
 
-#include <QComboBox>
 #include "pqComponentsModule.h"
+#include <QComboBox>
 
 class pqOutputPort;
 class pqPipelineSource;

@@ -14,8 +14,8 @@
 =========================================================================*/
 #include "pqMultiSliceView.h"
 
-#include <QtCore>
 #include <QGridLayout>
+#include <QtCore>
 #include <QtGui>
 
 #include "QVTKWidget.h"
@@ -29,9 +29,9 @@
 #include "vtkChartXY.h"
 #include "vtkDataRepresentation.h"
 #include "vtkMath.h"
-#include "vtkPlot.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVRenderView.h"
+#include "vtkPlot.h"
 #include "vtkSMMultiSliceViewProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"

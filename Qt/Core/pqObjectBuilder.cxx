@@ -33,9 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkDebugLeaksManager.h"
 #include "vtkNew.h"
-#include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
+#include "vtkProcessModule.h"
 #include "vtkSMCoreUtilities.h"
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
@@ -51,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMTransferFunctionManager.h"
+#include "vtkSmartPointer.h"
 
 #include <QApplication>
 #include <QFileInfo>

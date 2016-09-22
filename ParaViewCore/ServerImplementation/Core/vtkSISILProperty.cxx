@@ -24,18 +24,18 @@
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutEdgeIterator.h"
-#include "vtkSIProxy.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
+#include "vtkSIProxy.h"
 #include "vtkSMMessage.h"
+#include "vtkSmartPointer.h"
 #include "vtkStdString.h"
 #include "vtkStringArray.h"
 
 #include <map>
 #include <set>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
 
 class vtkSISILProperty::vtkIdTypeSet : public std::set<vtkIdType> {};
 

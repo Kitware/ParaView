@@ -36,8 +36,8 @@
 #ifndef vtkExodusFileSeriesReader_h
 #define vtkExodusFileSeriesReader_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkFileSeriesReader.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkExodusFileSeriesReader : public vtkFileSeriesReader
 {

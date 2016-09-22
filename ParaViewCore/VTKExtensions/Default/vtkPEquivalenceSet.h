@@ -20,8 +20,8 @@
 #ifndef vtkPEquivalenceSet_h
 #define vtkPEquivalenceSet_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkEquivalenceSet.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPEquivalenceSet : public vtkEquivalenceSet
 {

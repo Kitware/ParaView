@@ -15,8 +15,8 @@
 
 #include "vtkMetaReader.h"
 
-#include "vtkClientServerInterpreterInitializer.h"
 #include "vtkClientServerInterpreter.h"
+#include "vtkClientServerInterpreterInitializer.h"
 #include "vtkClientServerStream.h"
 #include "vtkDataObject.h"
 #include "vtkInformation.h"

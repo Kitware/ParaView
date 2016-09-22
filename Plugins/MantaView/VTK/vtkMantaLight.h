@@ -66,8 +66,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef vtkMantaLight_h
 #define vtkMantaLight_h
 
-#include "vtkMantaModule.h"
 #include "vtkLight.h"
+#include "vtkMantaModule.h"
 
 namespace Manta {
 class Light;

@@ -14,12 +14,12 @@
 =========================================================================*/
 #include "vtkPVDataRepresentationPipeline.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkPVDataRepresentation.h"
-#include "vtkInformationVector.h"
-#include "vtkInformation.h"
 #include "vtkAlgorithm.h"
 #include "vtkAlgorithmOutput.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVDataRepresentation.h"
 
 vtkStandardNewMacro(vtkPVDataRepresentationPipeline);
 //----------------------------------------------------------------------------

@@ -17,30 +17,30 @@
 
 #include <limits>
 
-#include "vtkPolyDataPainter.h"
 #include "vtkDataObject.h"
+#include "vtkGLSLShaderDeviceAdapter2.h"
+#include "vtkGenericVertexAttributeMapping.h"
+#include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkOpenGLRenderWindow.h"
-#include "vtkRenderer.h"
 #include "vtkPolyData.h"
+#include "vtkPolyDataPainter.h"
+#include "vtkRenderer.h"
 #include "vtkShader2Collection.h"
-#include "vtkGLSLShaderDeviceAdapter2.h"
-#include "vtkInformation.h"
-#include "vtkgl.h"
-#include "vtkGenericVertexAttributeMapping.h"
 #include "vtkUniformVariables.h"
+#include "vtkgl.h"
 
-#include "vtkIdTypeArray.h"
-#include "vtkMultiBlockDataSet.h"
+#include "vtkCompositeDataIterator.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkFloatArray.h"
-#include "vtkPolyDataMapper.h"
+#include "vtkIdTypeArray.h"
+#include "vtkMultiBlockDataSet.h"
+#include "vtkOpenGLError.h"
+#include "vtkOpenGLExtensionManager.h"
 #include "vtkPointData.h"
-#include "vtkCompositeDataIterator.h"
+#include "vtkPolyDataMapper.h"
 #include "vtkScalarsToColors.h"
 #include "vtkScalarsToColorsPainter.h"
-#include "vtkOpenGLExtensionManager.h"
-#include "vtkOpenGLError.h"
 
 // vertex and fragment shader source code for the uncertainty surface
 extern const char* vtkUncertaintySurfacePainter_fs;

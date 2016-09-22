@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqTreeWidgetSelectionHelper_h
 #define pqTreeWidgetSelectionHelper_h
 
-#include <QObject>
 #include "pqWidgetsModule.h"
 #include <QItemSelection>
+#include <QObject>
 
 class QTreeWidget;
 class QTreeWidgetItem;

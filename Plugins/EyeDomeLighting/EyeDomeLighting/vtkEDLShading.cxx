@@ -38,24 +38,24 @@ Ph.D. thesis of Christian BOUCHENY.
 
 #include "vtkEDLShading.h"
 
+#include "vtkCamera.h"
+#include "vtkFrameBufferObject.h"
+#include "vtkMath.h"
 #include "vtkObjectFactory.h"
-#include <assert.h>
-#include <string>
-#include <sstream>
+#include "vtkOpenGLRenderWindow.h"
+#include "vtkPropCollection.h"
 #include "vtkRenderState.h"
 #include "vtkRenderer.h"
-#include "vtkCamera.h"
-#include "vtkgl.h"
-#include "vtkFrameBufferObject.h"
-#include "vtkTextureObject.h"
-#include "vtkShaderProgram2.h"
 #include "vtkShader2.h"
 #include "vtkShader2Collection.h"
-#include "vtkUniformVariables.h"
-#include "vtkOpenGLRenderWindow.h"
+#include "vtkShaderProgram2.h"
+#include "vtkTextureObject.h"
 #include "vtkTextureUnitManager.h"
-#include "vtkPropCollection.h"
-#include "vtkMath.h"
+#include "vtkUniformVariables.h"
+#include "vtkgl.h"
+#include <assert.h>
+#include <sstream>
+#include <string>
 
 vtkStandardNewMacro(vtkEDLShading)
 ;

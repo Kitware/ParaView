@@ -28,44 +28,44 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "pqSQHemisphereSource.h"
+#include "pqSQMacros.h"
 #include "vtkSQHemisphereSourceConfigurationReader.h"
 #include "vtkSQHemisphereSourceConfigurationWriter.h"
-#include "pqSQMacros.h"
 
-#include "pqProxy.h"
-#include "pqPropertyLinks.h"
 #include "pqFileDialog.h"
+#include "pqPropertyLinks.h"
+#include "pqProxy.h"
 
-#include "vtkSMProxy.h"
-#include "vtkSMProperty.h"
-#include "vtkSMStringVectorProperty.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMPropertyHelper.h"
 #include "vtkMath.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMProxy.h"
+#include "vtkSMStringVectorProperty.h"
 
 
 #include "vtkEventQtSlotConnect.h"
 #include "vtkProcessModule.h"
 
-#include <QString>
-#include <QMessageBox>
-#include <QFileDialog>
+#include <QDebug>
 #include <QDoubleValidator>
+#include <QFileDialog>
 #include <QLineEdit>
+#include <QMessageBox>
 #include <QPalette>
 #include <QSettings>
-#include <QDebug>
+#include <QString>
 
 #include "FsUtils.h"
 #if defined pqSQHemisphereSourceDEBUG
 #include <PrintUtils.h>
 #endif
 
-#include <string>
 #include <fstream>
-#include <sstream>
 #include <iostream>
+#include <sstream>
+#include <string>
 
 //-----------------------------------------------------------------------------
 pqSQHemisphereSource::pqSQHemisphereSource(

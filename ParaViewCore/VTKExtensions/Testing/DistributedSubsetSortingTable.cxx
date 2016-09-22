@@ -16,19 +16,19 @@
 // Test simple sorting on a distributed wavelet
 // This test requires 4 MPI processes.
 
+#include "vtkAttributeDataToTableFilter.h"
+#include "vtkDistributedDataFilter.h"
+#include "vtkFloatArray.h"
+#include "vtkImageData.h"
+#include "vtkMPIController.h"
+#include "vtkObjectFactory.h"
+#include "vtkPieceScalars.h"
+#include "vtkRTAnalyticSource.h"
+#include "vtkSortedTableStreamer.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkTable.h"
 #include "vtkTestUtilities.h"
 #include "vtkUnstructuredGrid.h"
-#include "vtkImageData.h"
-#include "vtkRTAnalyticSource.h"
-#include "vtkDistributedDataFilter.h"
-#include "vtkPieceScalars.h"
-#include "vtkSortedTableStreamer.h"
-#include "vtkMPIController.h"
-#include "vtkAttributeDataToTableFilter.h"
-#include "vtkTable.h"
-#include "vtkFloatArray.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkObjectFactory.h"
 /*
 ** This test only builds if MPI is in use
 */

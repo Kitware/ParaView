@@ -37,8 +37,8 @@
 #ifndef vtk1DTransferFunctionFilter_h
 #define vtk1DTransferFunctionFilter_h
 
-#include "vtkPointSpriteGraphicsModule.h" //needed for exports
 #include "vtkPassInputTypeAlgorithm.h"
+#include "vtkPointSpriteGraphicsModule.h" //needed for exports
 
 class vtk1DTransferFunction;
 

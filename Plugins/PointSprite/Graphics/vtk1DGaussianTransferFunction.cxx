@@ -29,8 +29,8 @@
 
 #include "vtk1DGaussianTransferFunction.h"
 
-#include "vtkObjectFactory.h"
 #include "vtkDoubleArray.h"
+#include "vtkObjectFactory.h"
 
 #ifndef MAX
 #define MAX(a, b) (a>b? a : b)

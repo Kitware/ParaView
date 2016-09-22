@@ -16,18 +16,18 @@
 
 #include "vtkDataObject.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVInstantiator.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
+#include "vtkProcessModule.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSmartPointer.h"
 #include "vtkStdString.h"
 
-#include <vector>
 #include <map>
 #include <string>
+#include <vector>
 
 
 //*****************************************************************************

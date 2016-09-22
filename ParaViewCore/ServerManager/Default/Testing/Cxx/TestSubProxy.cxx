@@ -15,14 +15,14 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkInitializationHelper.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNetworkAccessManager.h"
-#include "vtkProcessModule.h"
+#include "vtkPVDataInformation.h"
 #include "vtkPVOptions.h"
+#include "vtkProcessModule.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkPVDataInformation.h"
 
 #include "vtkPVXMLElement.h"
 

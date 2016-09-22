@@ -34,9 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqLinksEditor_h
 
 #include <QDialog>
-#include <QScopedPointer>
 #include <QListWidgetItem>
 #include <QModelIndex>
+#include <QScopedPointer>
 
 #include "pqComponentsModule.h"
 #include "pqLinksModel.h"

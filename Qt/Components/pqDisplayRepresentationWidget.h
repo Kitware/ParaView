@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqDisplayRepresentationWidget_h
 
 #include "pqComponentsModule.h"
-#include <QWidget>
 #include "pqPropertyWidget.h"
+#include <QWidget>
 
 class pqDataRepresentation;
 class vtkSMProxy;

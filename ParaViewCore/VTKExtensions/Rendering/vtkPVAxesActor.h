@@ -23,8 +23,8 @@
 #ifndef vtkPVAxesActor_h
 #define vtkPVAxesActor_h
 
-#include "vtkProp3D.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
+#include "vtkProp3D.h"
 
 class vtkRenderer;
 class vtkPropCollection;

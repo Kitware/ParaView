@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef vtkVRControlSliceOrientationStyle_h
 #define vtkVRControlSliceOrientationStyle_h
 
-#include "vtkVRInteractorStyle.h"
 #include "vtkNew.h"
+#include "vtkVRInteractorStyle.h"
 
 class vtkMatrix4x4;
 

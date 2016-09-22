@@ -45,8 +45,8 @@
 #include "pqApplicationCore.h"
 #include "pqOutputPort.h"
 #include "pqPipelineRepresentation.h"
-#include "pqScalarsToColors.h"
 #include "pqSMAdaptor.h"
+#include "pqScalarsToColors.h"
 #include "pqTimer.h"
 #include "pqUndoStack.h"
 

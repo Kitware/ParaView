@@ -27,9 +27,9 @@
 #include <map>
 #include <vector>
 
-#include <sstream>
-#include "vtksys/SystemTools.hxx"
 #include "vtksys/SystemInformation.hxx"
+#include "vtksys/SystemTools.hxx"
+#include <sstream>
 
 vtkStandardNewMacro(vtkEnvironmentAnnotationFilter);
 //----------------------------------------------------------------------------

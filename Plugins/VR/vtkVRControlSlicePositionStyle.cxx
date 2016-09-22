@@ -31,25 +31,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "vtkVRControlSlicePositionStyle.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkPVXMLElement.h"
-#include "vtkSMProperty.h"
-#include "vtkSMProxy.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMSessionProxyManager.h"
-#include "vtkSMProxyLocator.h"
-#include "vtkVRQueue.h"
-#include <iostream>
-#include <sstream>
-#include <algorithm>
-#include "pqView.h"
 #include "pqActiveObjects.h"
-#include "vtkSMRenderViewProxy.h"
-#include "vtkSMPropertyHelper.h"
-#include "vtkTransform.h"
+#include "pqView.h"
 #include "vtkMatrix4x4.h"
 #include "vtkNew.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVXMLElement.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyLocator.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMRenderViewProxy.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkTransform.h"
+#include "vtkVRQueue.h"
+#include <algorithm>
+#include <iostream>
+#include <sstream>
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkVRControlSlicePositionStyle)

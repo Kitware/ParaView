@@ -14,9 +14,9 @@
 =========================================================================*/
 #include "vtkPVClipClosedSurface.h"
 
+#include "vtkObjectFactory.h"
 #include "vtkPlane.h"
 #include "vtkPlaneCollection.h"
-#include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkPVClipClosedSurface );
 

@@ -18,19 +18,19 @@
 #include "vtkCharArray.h"
 #include "vtkDataSet.h"
 #include "vtkFieldData.h"
-#include "vtkPVInstantiator.h"
-#include "vtkMultiBlockDataSet.h"
-#include "vtkObjectFactory.h"
-#include "vtkSmartPointer.h"
-#include "vtkXMLDataElement.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMultiBlockDataSet.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVInstantiator.h"
+#include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkXMLDataElement.h"
 
-#include <vector>
-#include <string>
-#include <map>
 #include <algorithm>
+#include <map>
+#include <string>
+#include <vector>
 
 vtkStandardNewMacro(vtkXMLCollectionReader);
 

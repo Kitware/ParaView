@@ -19,9 +19,9 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMMessage.h"
 
-#include <vector>
-#include <string>
 #include <assert.h>
+#include <string>
+#include <vector>
 
 class vtkSIStringVectorProperty::vtkVectorOfStrings :
   public std::vector <std::string> {};

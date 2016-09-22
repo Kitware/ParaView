@@ -33,18 +33,18 @@
 #include "vtkActor.h"
 #include "vtkBrownianPoints.h"
 #include "vtkCamera.h"
-#include "vtkProperty.h"
-#include "vtkPainterPolyDataMapper.h"
-#include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderWindowInteractor.h"
-#include "vtkSphereSource.h"
-#include "vtkPointSpriteProperty.h"
 #include "vtkDataObject.h"
 #include "vtkDataSetAttributes.h"
+#include "vtkPainterPolyDataMapper.h"
+#include "vtkPointSpriteProperty.h"
+#include "vtkProperty.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderWindowInteractor.h"
+#include "vtkRenderer.h"
+#include "vtkSphereSource.h"
 
-#include "vtkTestUtilities.h"
 #include "vtkRegressionTestImage.h"
+#include "vtkTestUtilities.h"
 
 int main(int argc, char *argv[])
 {

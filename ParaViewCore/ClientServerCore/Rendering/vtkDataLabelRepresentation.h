@@ -29,8 +29,8 @@
 #define vtkDataLabelRepresentation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
-#include "vtkSmartPointer.h" // needed for vtkSmartPointer.
 #include "vtkPVDataRepresentation.h"
+#include "vtkSmartPointer.h" // needed for vtkSmartPointer.
 
 class vtkActor2D;
 class vtkCellCenters;

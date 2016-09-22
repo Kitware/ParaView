@@ -21,16 +21,16 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
+#include "vtkProcessModule.h"
 #include "vtkPythonInterpreter.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-#include <vtksys/SystemTools.hxx>
 #include <algorithm>
-#include <sstream>
 #include <map>
+#include <sstream>
 #include <string>
+#include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 

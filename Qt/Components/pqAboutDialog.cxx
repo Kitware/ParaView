@@ -33,25 +33,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAboutDialog.h"
 #include "ui_pqAboutDialog.h"
 
+#include "QtTestingConfigure.h"
 #include "pqApplicationCore.h"
 #include "pqOptions.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerResource.h"
-#include "QtTestingConfigure.h"
 #include "vtkNew.h"
-#include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
-#include "vtkPVPythonInformation.h"
 #include "vtkPVOpenGLInformation.h"
+#include "vtkPVPythonInformation.h"
 #include "vtkPVServerInformation.h"
+#include "vtkProcessModule.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMViewProxy.h"
 
-#include <QHeaderView>
 #include <QApplication>
 #include <QFile>
+#include <QHeaderView>
 
 #include <sstream>
 

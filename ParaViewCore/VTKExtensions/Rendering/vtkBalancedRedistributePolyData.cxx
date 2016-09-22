@@ -19,8 +19,8 @@
 
 #include "vtkBalancedRedistributePolyData.h"
 #include "vtkMath.h"
-#include "vtkObjectFactory.h"
 #include "vtkMultiProcessController.h"
+#include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkBalancedRedistributePolyData);

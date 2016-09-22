@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqTransferFunctionWidget_h
 #define pqTransferFunctionWidget_h
 
-#include <QWidget>
 #include "pqComponentsModule.h"
 #include "vtkType.h"
+#include <QWidget>
 
 class vtkScalarsToColors;
 class vtkPiecewiseFunction;

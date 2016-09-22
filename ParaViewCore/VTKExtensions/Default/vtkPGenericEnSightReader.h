@@ -20,8 +20,8 @@
 #ifndef vtkPGenericEnSightReader_h
 #define vtkPGenericEnSightReader_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkGenericEnSightReader.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class vtkCallbackCommand;
 class vtkDataArrayCollection;

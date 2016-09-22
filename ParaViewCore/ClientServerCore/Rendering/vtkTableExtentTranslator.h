@@ -23,8 +23,8 @@
 #ifndef vtkTableExtentTranslator_h
 #define vtkTableExtentTranslator_h
 
-#include "vtkPVClientServerCoreRenderingModule.h" // For export macro
 #include "vtkExtentTranslator.h"
+#include "vtkPVClientServerCoreRenderingModule.h" // For export macro
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkTableExtentTranslator : public vtkExtentTranslator
 {

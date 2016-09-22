@@ -14,24 +14,24 @@
 =========================================================================*/
 #include "vtkAMROutlineRepresentation.h"
 
-#include "vtkCompositePolyDataMapper2.h"
-#include "vtkAlgorithmOutput.h"
 #include "vtkAMRStreamingPriorityQueue.h"
+#include "vtkAlgorithmOutput.h"
 #include "vtkAppendCompositeDataLeaves.h"
 #include "vtkCompositeDataPipeline.h"
+#include "vtkCompositePolyDataMapper2.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOverlappingAMR.h"
-#include "vtkPolyData.h"
-#include "vtkProperty.h"
 #include "vtkPVGeometryFilter.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVStreamingMacros.h"
 #include "vtkPVTrivialProducer.h"
+#include "vtkPolyData.h"
+#include "vtkProperty.h"
 #include "vtkRenderer.h"
 
 #include <assert.h>

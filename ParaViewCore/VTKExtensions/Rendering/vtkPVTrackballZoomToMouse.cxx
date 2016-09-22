@@ -16,10 +16,10 @@
 
 #include "vtkCamera.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVInteractorStyle.h"
+#include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
-#include "vtkPVInteractorStyle.h"
 
 vtkStandardNewMacro(vtkPVTrackballZoomToMouse);
 

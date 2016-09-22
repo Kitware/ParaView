@@ -33,9 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqKeyFrameEditor_h
 #define _pqKeyFrameEditor_h
 
-#include <QWidget>
-#include <QDialog>
 #include "pqComponentsModule.h"
+#include <QDialog>
+#include <QWidget>
 
 class pqAnimationCue;
 class pqAnimationScene;

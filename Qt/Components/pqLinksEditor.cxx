@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqLinksEditor.h"
 
 // Qt
-#include <QPushButton>
 #include <QDebug>
+#include <QPushButton>
 
 // SM
 #include "vtkSMDoubleVectorProperty.h"

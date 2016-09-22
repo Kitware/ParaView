@@ -14,26 +14,26 @@
 =========================================================================*/
 #include "vtkArrowGlyphFilter.h"
 
-#include "vtkCellData.h"
+#include "vtkArrowSource.h"
 #include "vtkCell.h"
+#include "vtkCellData.h"
 #include "vtkDataSet.h"
 #include "vtkFloatArray.h"
 #include "vtkIdList.h"
 #include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMaskPoints.h"
 #include "vtkMath.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
+#include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkUnsignedCharArray.h"
-#include "vtkArrowSource.h"
-#include "vtkMaskPoints.h"
-#include "vtkMultiProcessController.h"
-#include "vtkProcessModule.h"
 #include "vtkTransform.h"
+#include "vtkUnsignedCharArray.h"
 
 vtkStandardNewMacro(vtkArrowGlyphFilter);
 vtkCxxSetObjectMacro(vtkArrowGlyphFilter, ArrowSourceObject, vtkArrowSource);

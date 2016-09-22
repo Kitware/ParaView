@@ -23,11 +23,11 @@
 #include "vtkPVDataInformation.h"
 #include "vtkSmartPointer.h"
 #include "vtkTimerLog.h"
-#include "vtkUniformGridAMR.h"
 #include "vtkUniformGrid.h"
+#include "vtkUniformGridAMR.h"
 
-#include <vector>
 #include <string>
+#include <vector>
 
 vtkStandardNewMacro(vtkPVCompositeDataInformation);
 

@@ -19,8 +19,8 @@
 #ifndef vtkPVRayCastPickingHelper_h
 #define vtkPVRayCastPickingHelper_h
 
-#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkObject.h"
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 class vtkAlgorithm;
 class vtkDataSet;
 

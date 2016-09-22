@@ -31,11 +31,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqPersistentMainWindowStateBehavior.h"
 
-#include "pqSettings.h"
 #include "pqApplicationCore.h"
+#include "pqSettings.h"
 
-#include <QMainWindow>
 #include <QCoreApplication>
+#include <QMainWindow>
 #include <QTimer>
 
 //-----------------------------------------------------------------------------

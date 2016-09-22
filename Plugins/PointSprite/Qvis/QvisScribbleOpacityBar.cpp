@@ -38,15 +38,15 @@
 #include "QvisScribbleOpacityBar.h"
 #include "ColorControlPointList.h"
 
-#include <qpainter.h>
-#include <QPolygon>
-#include <qpixmap.h>
-#include <qimage.h>
 #include <QMouseEvent>
+#include <QPolygon>
+#include <qimage.h>
+#include <qpainter.h>
+#include <qpixmap.h>
 
-#include <iostream>
 #include <cmath>
 #include <cstdlib>
+#include <iostream>
 
 // ****************************************************************************
 //  Method:  QvisScribbleOpacityBar::QvisScribbleOpacityBar

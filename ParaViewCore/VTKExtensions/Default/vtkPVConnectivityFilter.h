@@ -22,8 +22,8 @@
 #ifndef vtkPVConnectivityFilter_h
 #define vtkPVConnectivityFilter_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkConnectivityFilter.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVConnectivityFilter : public vtkConnectivityFilter
 {

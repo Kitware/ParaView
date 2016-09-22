@@ -13,13 +13,13 @@ PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 #include "vtkInitializationHelper.h"
-#include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
-#include "vtkSmartPointer.h"
+#include "vtkProcessModule.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSmartPointer.h"
 
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])

@@ -35,8 +35,8 @@
 *
 *****************************************************************************/
 
-#include <GaussianControlPoint.h>
 #include <DataNode.h>
+#include <GaussianControlPoint.h>
 
 namespace pointsprite {
 

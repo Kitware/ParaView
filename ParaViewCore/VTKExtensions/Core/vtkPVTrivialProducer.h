@@ -21,8 +21,8 @@
 #ifndef vtkPVTrivialProducer_h
 #define vtkPVTrivialProducer_h
 
-#include "vtkTrivialProducer.h"
 #include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
+#include "vtkTrivialProducer.h"
 
 struct vtkPVTrivialProducerInternal;
 

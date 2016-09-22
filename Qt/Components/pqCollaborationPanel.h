@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqCollaborationPanel_h
 #define pqCollaborationPanel_h
 
-#include <QWidget>
 #include "pqComponentsModule.h"
 #include "vtkSMMessageMinimal.h"
+#include <QWidget>
 
 class pqServer;
 class pqView;

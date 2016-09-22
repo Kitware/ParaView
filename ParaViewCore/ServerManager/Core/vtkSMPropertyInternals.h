@@ -21,9 +21,9 @@
 #include "vtkSmartPointer.h"
 #include "vtkWeakPointer.h"
 
+#include "vtkStdString.h"
 #include <map>
 #include <vector>
-#include "vtkStdString.h"
 
 struct vtkSMPropertyInternals
 {

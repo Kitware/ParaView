@@ -36,14 +36,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 #include "vtkCamera.h"
 #include "vtkMath.h"
-#include "vtkRenderer.h"
+#include "vtkPVXMLElement.h"
 #include "vtkRenderWindow.h"
+#include "vtkRenderer.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkVRQueue.h"
-#include "vtkPVXMLElement.h"
 
 // ----------------------------------------------------------------------------
 vtkVRActiveObjectManipulationStyle::vtkVRActiveObjectManipulationStyle(QObject* parentObject) :

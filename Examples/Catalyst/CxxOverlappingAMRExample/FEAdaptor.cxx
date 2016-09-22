@@ -1,12 +1,12 @@
-#include <iostream>
 #include "FEAdaptor.h"
+#include <iostream>
 
 #include <vtkAMRBox.h>
-#include <vtkCompositeDataIterator.h>
 #include <vtkCPDataDescription.h>
 #include <vtkCPInputDataDescription.h>
 #include <vtkCPProcessor.h>
 #include <vtkCPPythonScriptPipeline.h>
+#include <vtkCompositeDataIterator.h>
 #include <vtkNew.h>
 #include <vtkOverlappingAMR.h>
 #include <vtkUniformGrid.h>

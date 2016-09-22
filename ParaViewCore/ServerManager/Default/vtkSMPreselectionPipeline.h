@@ -28,9 +28,9 @@
 #ifndef vtkSMPreselectionPipeline_h
 #define vtkSMPreselectionPipeline_h
 
-#include "vtkPVServerManagerDefaultModule.h" //needed for exports
-#include "vtkWeakPointer.h" // Weak Pointer
 #include "vtkObject.h"
+#include "vtkPVServerManagerDefaultModule.h" //needed for exports
+#include "vtkWeakPointer.h"                  // Weak Pointer
 
 // Forward declarations
 class vtkCallbackCommand;

@@ -20,9 +20,9 @@
 #ifndef vtkPVPLYWriter_h
 #define vtkPVPLYWriter_h
 
+#include "vtkNew.h"                          // needed for vtkNew
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
-#include "vtkNew.h" // needed for vtkNew
-#include "vtkSmartPointer.h" // needed for vtkSmartPointer
+#include "vtkSmartPointer.h"                 // needed for vtkSmartPointer
 #include "vtkWriter.h"
 
 class vtkPLYWriter;

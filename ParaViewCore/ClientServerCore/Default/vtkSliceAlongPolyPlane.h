@@ -25,8 +25,8 @@
 #ifndef vtkSliceAlongPolyPlane_h
 #define vtkSliceAlongPolyPlane_h
 
-#include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
 #include "vtkDataObjectAlgorithm.h"
+#include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
 
 class vtkDataSet;
 class vtkPolyData;

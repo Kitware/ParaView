@@ -29,8 +29,8 @@
 
 #include "vtk1DTransferFunction.h"
 
-#include "vtkObjectFactory.h"
 #include "vtkDataArray.h"
+#include "vtkObjectFactory.h"
 
 
 vtk1DTransferFunction::vtk1DTransferFunction()

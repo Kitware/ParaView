@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqPresetToPixmap_h
 #define pqPresetToPixmap_h
 
+#include "pqComponentsModule.h"
 #include <QObject>
 #include <QScopedPointer>
-#include "pqComponentsModule.h"
 
 namespace Json
 {

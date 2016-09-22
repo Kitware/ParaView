@@ -16,11 +16,11 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
+#include "vtkSmartPointer.h"
 
 #include <map>
 #include <vtkSmartPointer.h>

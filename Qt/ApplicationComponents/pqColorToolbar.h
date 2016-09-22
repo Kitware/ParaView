@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqColorToolbar_h
 #define pqColorToolbar_h
 
-#include <QToolBar>
 #include "pqApplicationComponentsModule.h"
+#include <QToolBar>
 
 /// pqColorToolbar is the toolbar that allows the user to choose the scalar
 /// color or solid color for the active representation.

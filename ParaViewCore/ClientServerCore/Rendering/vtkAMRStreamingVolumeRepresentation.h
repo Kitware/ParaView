@@ -21,9 +21,9 @@
 #ifndef vtkAMRStreamingVolumeRepresentation_h
 #define vtkAMRStreamingVolumeRepresentation_h
 
+#include "vtkBoundingBox.h" // needed for vtkBoundingBox.
 #include "vtkPVDataRepresentation.h"
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer.
-#include "vtkBoundingBox.h" // needed for vtkBoundingBox.
 
 class vtkAMRStreamingPriorityQueue;
 class vtkColorTransferFunction;

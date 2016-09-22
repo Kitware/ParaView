@@ -17,12 +17,12 @@
 #include "vtkAxis.h"
 #include "vtkChartBox.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVContextView.h"
 #include "vtkPen.h"
 #include "vtkPlot.h"
 #include "vtkPlotBox.h"
-#include "vtkPVContextView.h"
-#include "vtkTable.h"
 #include "vtkStdString.h"
+#include "vtkTable.h"
 
 #include <map>
 #include <string>

@@ -34,16 +34,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Server Manager Includes.
 #include "vtkClientServerID.h"
 #include "vtkEventQtSlotConnect.h"
-#include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
+#include "vtkProcessModule.h"
 #include "vtkSMProxyIterator.h"
-#include "vtkSMProxyProperty.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSMSessionProxyManager.h"
 
-#include <vtksys/SystemTools.hxx>
 #include <assert.h>
+#include <vtksys/SystemTools.hxx>
 
 // Qt Includes.
 #include <QFileInfo>
@@ -57,9 +57,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataRepresentation.h"
 #include "pqFileDialog.h"
 #include "pqRenderView.h"
+#include "pqSMAdaptor.h"
 #include "pqServer.h"
 #include "pqServerManagerObserver.h"
-#include "pqSMAdaptor.h"
 #include "pqTimer.h"
 #include "pqTriggerOnIdleHelper.h"
 #include "pqUndoStack.h"

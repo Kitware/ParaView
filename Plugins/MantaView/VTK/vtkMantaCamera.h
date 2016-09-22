@@ -66,8 +66,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef vtkMantaCamera_h
 #define vtkMantaCamera_h
 
-#include "vtkMantaModule.h"
 #include "vtkCamera.h"
+#include "vtkMantaModule.h"
 
 namespace Manta {
 class Camera;

@@ -38,34 +38,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QComboBox>
 #include <QDoubleSpinBox>
 #include <QGroupBox>
+#include <QHeaderView>
+#include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
 #include <QListWidget>
-#include <QPushButton>
-#include <QSlider>
-#include <QtDebug>
-#include <QTextEdit>
-#include <QTreeWidget>
-#include <QLabel>
 #include <QMetaObject>
 #include <QMetaProperty>
-#include <QHeaderView>
+#include <QPushButton>
+#include <QSlider>
+#include <QTextEdit>
+#include <QTreeWidget>
+#include <QtDebug>
 
 // VTK includes
 
 // ParaView Server Manager includes
 #include "vtkCollection.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMCompositeTreeDomain.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMEnumerationDomain.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMOrderedPropertyIterator.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkSMStringListDomain.h"
-#include "vtkSMIntVectorProperty.h"
 #include "vtkSMSILDomain.h"
+#include "vtkSMStringListDomain.h"
+#include "vtkSmartPointer.h"
 
 // ParaView includes
 #include "pqApplicationCore.h"
@@ -81,17 +81,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineFilter.h"
 #include "pqPropertyManager.h"
 #include "pqProxySILModel.h"
+#include "pqSILModel.h"
+#include "pqSILWidget.h"
+#include "pqSMAdaptor.h"
+#include "pqSMProxy.h"
+#include "pqSMSignalAdaptors.h"
 #include "pqSelectionInputWidget.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 #include "pqSignalAdaptorCompositeTreeWidget.h"
 #include "pqSignalAdaptorSelectionTreeWidget.h"
 #include "pqSignalAdaptors.h"
-#include "pqSILModel.h"
-#include "pqSILWidget.h"
-#include "pqSMAdaptor.h"
-#include "pqSMProxy.h"
-#include "pqSMSignalAdaptors.h"
 #include "pqTreeView.h"
 #include "pqTreeWidget.h"
 #include "pqTreeWidgetSelectionHelper.h"

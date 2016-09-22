@@ -58,8 +58,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <QtPlugin>
 #include "pqCoreModule.h"
+#include <QtPlugin>
 
 /// Abstract interface for "auto-start" plugins. An auto-start plugin is a
 /// plugin that is notified by ParaView when ParaView starts and exits. 

@@ -1,6 +1,6 @@
-#include <iostream>     // std::cout
-#include <algorithm>    // std::sort
-#include <vector>       // std::vector
+#include <algorithm> // std::sort
+#include <iostream>  // std::cout
+#include <vector>    // std::vector
 
 #include "vtkTimerLog.h"
 

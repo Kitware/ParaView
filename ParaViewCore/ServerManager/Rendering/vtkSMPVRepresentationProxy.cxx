@@ -40,8 +40,8 @@
 
 #include <cmath>
 #include <set>
-#include <string>
 #include <sstream>
+#include <string>
 
 class vtkSMPVRepresentationProxy::vtkStringSet :
   public std::set<std::string> {};

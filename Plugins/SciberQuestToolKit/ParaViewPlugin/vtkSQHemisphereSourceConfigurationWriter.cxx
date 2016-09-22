@@ -31,9 +31,9 @@
 #include "vtkSQHemisphereSourceConfigurationFileInfo.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkStringList.h"
 #include "vtkSMNamedPropertyIterator.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkStringList.h"
 
 vtkStandardNewMacro(vtkSQHemisphereSourceConfigurationWriter);
 

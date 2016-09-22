@@ -33,11 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqViewFrame_h
 
 #include "pqComponentsModule.h"
-#include <QWidget>
-#include <QPointer>
 #include <QMap>
-#include <QUuid>
+#include <QPointer>
 #include <QScopedPointer>
+#include <QUuid>
+#include <QWidget>
 
 class QDragEnterEvent;
 class QDragMoveEvent;

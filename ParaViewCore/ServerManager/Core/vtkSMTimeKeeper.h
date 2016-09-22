@@ -38,8 +38,8 @@
 #ifndef vtkSMTimeKeeper_h
 #define vtkSMTimeKeeper_h
 
-#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkObject.h"
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 
 class vtkSMProperty;
 class vtkSMSourceProxy;

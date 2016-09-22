@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef vtkVRGrabWorldStyle_h_
 #define vtkVRGrabWorldStyle_h_
 
-#include "vtkVRTrackStyle.h"
 #include "vtkNew.h"
+#include "vtkVRTrackStyle.h"
 
 class vtkCamera;
 class vtkMatrix4x4;

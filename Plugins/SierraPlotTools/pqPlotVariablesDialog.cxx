@@ -34,8 +34,8 @@
 #include "pqDisplayPolicy.h"
 #include "pqObjectBuilder.h"
 #include "pqPipelineSource.h"
-#include "pqSierraPlotToolsUtils.h"
 #include "pqSMAdaptor.h"
+#include "pqSierraPlotToolsUtils.h"
 #include "pqUndoStack.h"
 
 #include <QApplication>
@@ -47,8 +47,8 @@
 #include <QListWidgetItem>
 #include <QMouseEvent>
 #include <QPushButton>
-#include <QtDebug>
 #include <QToolTip>
+#include <QtDebug>
 
 #include "ui_pqVariablePlot.h"
 

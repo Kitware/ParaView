@@ -22,15 +22,15 @@
 
 #include "vtkPolyDataGeodesicDistance.h"
 
+#include "vtkExecutive.h"
+#include "vtkFieldData.h"
+#include "vtkFloatArray.h"
+#include "vtkIdList.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
-#include "vtkPolyData.h"
-#include "vtkExecutive.h"
-#include "vtkFloatArray.h"
-#include "vtkFieldData.h"
 #include "vtkPointData.h"
-#include "vtkIdList.h"
+#include "vtkPolyData.h"
 
 vtkCxxSetObjectMacro( vtkPolyDataGeodesicDistance, Seeds, vtkIdList );
 

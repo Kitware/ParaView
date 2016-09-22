@@ -17,8 +17,8 @@
 #include "vtkAlgorithm.h"
 #include "vtkClientServerStream.h"
 // #include "vtkDemandDrivenPipeline.h"
-#include "vtkObjectFactory.h"
 #include "vtkInformation.h"
+#include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkPVAlgorithmPortsInformation);
 

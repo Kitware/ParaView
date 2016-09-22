@@ -32,15 +32,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqSignalAdaptorKeyFrameType.h"
 
+#include <QDebug>
 #include <QLabel>
 #include <QPointer>
-#include <QDebug>
 
 #include "pqKeyFrameTypeWidget.h"
 #include "pqPropertyLinks.h"
 #include "vtkPVCompositeKeyFrame.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMProxy.h"
+#include "vtkSmartPointer.h"
 
 class pqSignalAdaptorKeyFrameType::pqInternals
 {

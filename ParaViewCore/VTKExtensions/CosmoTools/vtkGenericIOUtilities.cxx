@@ -9,8 +9,8 @@
 
 // GenericIO includes
 #include "GenericIOMPIReader.h"
-#include "GenericIOPosixReader.h"
 #include "GenericIOMPIWriter.h"
+#include "GenericIOPosixReader.h"
 
 // C/C++ includes
 #include <cassert>

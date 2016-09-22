@@ -34,44 +34,44 @@
 =========================================================================*/
 #include "vtkH5PartReader.h"
 //
+#include "vtkDataArray.h"
+#include "vtkDataArraySelection.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkDataArraySelection.h"
 #include "vtkPointData.h"
 #include "vtkPoints.h"
 #include "vtkPolyData.h"
-#include "vtkDataArray.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 //
-#include "vtkCharArray.h"
-#include "vtkUnsignedCharArray.h"
-#include "vtkShortArray.h"
-#include "vtkUnsignedShortArray.h"
-#include "vtkLongArray.h"
-#include "vtkUnsignedLongArray.h"
-#include "vtkLongLongArray.h"
-#include "vtkUnsignedLongLongArray.h"
-#include "vtkIntArray.h"
-#include "vtkUnsignedIntArray.h"
-#include "vtkFloatArray.h"
-#include "vtkDoubleArray.h"
 #include "vtkCellArray.h"
-//
-#include <vtksys/SystemTools.hxx>
-#include <vtksys/RegularExpression.hxx>
-#include <vector>
-//
 #include "vtkCharArray.h"
-#include "vtkUnsignedCharArray.h"
-#include "vtkCharArray.h"
-#include "vtkShortArray.h"
-#include "vtkUnsignedShortArray.h"
+#include "vtkDoubleArray.h"
+#include "vtkFloatArray.h"
 #include "vtkIntArray.h"
 #include "vtkLongArray.h"
-#include "vtkFloatArray.h"
+#include "vtkLongLongArray.h"
+#include "vtkShortArray.h"
+#include "vtkUnsignedCharArray.h"
+#include "vtkUnsignedIntArray.h"
+#include "vtkUnsignedLongArray.h"
+#include "vtkUnsignedLongLongArray.h"
+#include "vtkUnsignedShortArray.h"
+//
+#include <vector>
+#include <vtksys/RegularExpression.hxx>
+#include <vtksys/SystemTools.hxx>
+//
+#include "vtkCharArray.h"
+#include "vtkCharArray.h"
 #include "vtkDoubleArray.h"
+#include "vtkFloatArray.h"
+#include "vtkIntArray.h"
+#include "vtkLongArray.h"
+#include "vtkShortArray.h"
 #include "vtkSmartPointer.h"
+#include "vtkUnsignedCharArray.h"
+#include "vtkUnsignedShortArray.h"
 
 #ifdef PARAVIEW_USE_MPI
 #include "vtkMultiProcessController.h"

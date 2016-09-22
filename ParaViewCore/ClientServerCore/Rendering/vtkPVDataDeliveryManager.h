@@ -24,10 +24,10 @@
 #ifndef vtkPVDataDeliveryManager_h
 #define vtkPVDataDeliveryManager_h
 
-#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkObject.h"
-#include "vtkSmartPointer.h" // needed for iVar.
-#include "vtkWeakPointer.h" // needed for iVar.
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
+#include "vtkSmartPointer.h"                      // needed for iVar.
+#include "vtkWeakPointer.h"                       // needed for iVar.
 
 class vtkAlgorithmOutput;
 class vtkDataObject;

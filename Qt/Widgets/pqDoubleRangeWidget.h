@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqDoubleRangeWidget_h
 #define pqDoubleRangeWidget_h
 
-#include <QWidget>
 #include "pqWidgetsModule.h"
-  
+#include <QWidget>
+
 class QSlider;
 class pqLineEdit;
 

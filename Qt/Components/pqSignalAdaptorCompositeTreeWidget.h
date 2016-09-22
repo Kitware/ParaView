@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqSignalAdaptorCompositeTreeWidget_h
 #define pqSignalAdaptorCompositeTreeWidget_h
 
+#include "pqComponentsModule.h"
 #include <QObject>
 #include <QVariant>
-#include "pqComponentsModule.h"
 
 
 class pqTreeWidgetItem;

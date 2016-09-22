@@ -32,10 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqDisplayPanel_h
 #define _pqDisplayPanel_h
 
-#include <QWidget>
-#include <QPointer>
 #include "pqComponentsModule.h"
 #include "pqRepresentation.h"
+#include <QPointer>
+#include <QWidget>
 
 
 /// Widget which provides an editor for the properties of a 

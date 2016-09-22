@@ -14,9 +14,9 @@
 =========================================================================*/
 #include "vtkAnimationPlayer.h"
 
-#include "vtkSMAnimationScene.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkSMAnimationScene.h"
 
 //----------------------------------------------------------------------------
 vtkAnimationPlayer::vtkAnimationPlayer()

@@ -14,10 +14,10 @@
 =========================================================================*/
 #include "vtkPVAMRDualContour.h"
 
-#include "vtkNonOverlappingAMR.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiBlockDataSet.h"
+#include "vtkNonOverlappingAMR.h"
 #include "vtkObjectFactory.h"
 
 #include "vtkCompositeDataIterator.h"

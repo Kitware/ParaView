@@ -31,8 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqIntMaskPropertyWidget.h"
 
-#include "vtkSMProperty.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMProperty.h"
 
 #include <QAction>
 #include <QHBoxLayout>

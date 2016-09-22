@@ -33,9 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqTreeLayoutStrategyInterface_h
 #define _pqTreeLayoutStrategyInterface_h
 
-#include <QtPlugin>
-#include <QStringList>
 #include "pqCoreModule.h"
+#include <QStringList>
+#include <QtPlugin>
 
 class vtkAreaLayoutStrategy;
 

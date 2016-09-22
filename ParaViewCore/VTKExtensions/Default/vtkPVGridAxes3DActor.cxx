@@ -14,9 +14,9 @@
 =========================================================================*/
 #include "vtkPVGridAxes3DActor.h"
 
-#include "vtkObjectFactory.h"
 #include "vtkBoundingBox.h"
 #include "vtkMatrix4x4.h"
+#include "vtkObjectFactory.h"
 
 #include <algorithm>
 

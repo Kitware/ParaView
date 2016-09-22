@@ -27,8 +27,8 @@
 #define vtkTileDisplayHelper_h
 
 #include "vtkObject.h"
-#include "vtkSynchronizedRenderers.h" // needed for vtkRawImage.
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
+#include "vtkSynchronizedRenderers.h"          // needed for vtkRawImage.
 
 class vtkRenderer;
 

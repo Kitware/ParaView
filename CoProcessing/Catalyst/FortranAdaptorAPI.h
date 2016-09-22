@@ -15,8 +15,8 @@
 #ifndef FortranAdaptorAPI_h
 #define FortranAdaptorAPI_h
 
-#include "vtkPVCatalystModule.h"
 #include "FortranAdaptorAPIMangling.h"
+#include "vtkPVCatalystModule.h"
 
 // This code is meant to be used as an API for C simulation
 // codes. To use with C codes, include this header file. Call the

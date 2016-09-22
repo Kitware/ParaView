@@ -19,8 +19,8 @@
 #ifndef vtkPVServerSideAnimationPlayer_h
 #define vtkPVServerSideAnimationPlayer_h
 
-#include "vtkPVAnimationModule.h" //needed for exports
 #include "vtkObject.h"
+#include "vtkPVAnimationModule.h" //needed for exports
 
 class vtkSMAnimationSceneImageWriter;
 class vtkPVXMLElement;

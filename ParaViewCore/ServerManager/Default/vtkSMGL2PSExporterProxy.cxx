@@ -17,9 +17,9 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVGL2PSExporter.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMContextViewProxy.h"
 #include "vtkSMProxy.h"
 #include "vtkSMRenderViewProxy.h"
-#include "vtkSMContextViewProxy.h"
 
 vtkStandardNewMacro(vtkSMGL2PSExporterProxy)
 

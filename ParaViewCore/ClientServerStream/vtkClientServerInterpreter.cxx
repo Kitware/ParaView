@@ -20,10 +20,10 @@
 #include "vtkObjectFactory.h"
 
 #include <map>
-#include <string>
-#include <vector>
 #include <sstream>
+#include <string>
 #include <sys/stat.h>
+#include <vector>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
 

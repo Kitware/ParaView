@@ -15,8 +15,8 @@
 #ifndef vtkPVMacFileInformationHelper_h
 #define vtkPVMacFileInformationHelper_h
 
-#include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
 #include "vtkObject.h"
+#include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
 
 #include <string> // needed for string
 #include <vector> // needed for vector of strings

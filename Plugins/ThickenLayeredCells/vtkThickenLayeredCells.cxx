@@ -22,10 +22,10 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkVector.h"
 #include "vtkVectorOperators.h"
-#include <cassert>
-#include <set>
-#include <map>
 #include <algorithm>
+#include <cassert>
+#include <map>
+#include <set>
 
 namespace
 {

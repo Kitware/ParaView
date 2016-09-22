@@ -26,8 +26,8 @@
 #include "pqSettings.h"
 
 #include <QFile>
-#include <QtDebug>
 #include <QToolBar>
+#include <QtDebug>
 
 #include "ui_pqBlotDialog.h"
 class pqBlotDialog::UI : public Ui::pqBlotDialog { };

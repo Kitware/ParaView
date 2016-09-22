@@ -19,8 +19,8 @@
 #ifndef vtkPVExtractComponent_h
 #define vtkPVExtractComponent_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkDataSetAlgorithm.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class vtkDataSet;
 

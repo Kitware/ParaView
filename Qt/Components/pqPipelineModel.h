@@ -39,10 +39,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsModule.h"
 
-#include <QAbstractItemModel>
-#include <QPointer>
 #include "pqView.h"
 #include "vtkSmartPointer.h"
+#include <QAbstractItemModel>
+#include <QPointer>
 
 
 

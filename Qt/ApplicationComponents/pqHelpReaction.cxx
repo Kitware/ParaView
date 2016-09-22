@@ -37,9 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QStringList>
 
+#include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqHelpWindow.h"
-#include "pqApplicationCore.h"
 #include "pqPluginDocumentationBehavior.h"
 
 //-----------------------------------------------------------------------------

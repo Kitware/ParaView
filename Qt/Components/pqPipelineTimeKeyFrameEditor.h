@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqPipelineTimeKeyFrameEditor_h
 #define _pqPipelineTimeKeyFrameEditor_h
 
-#include <QDialog>
 #include "pqComponentsModule.h"
+#include <QDialog>
 
 class pqAnimationScene;
 class pqAnimationCue;

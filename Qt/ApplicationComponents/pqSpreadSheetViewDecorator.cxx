@@ -39,11 +39,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAction>
 #include <QComboBox>
 #include <QDebug>
+#include <QMenu>
 #include <QPointer>
 #include <QToolButton>
 #include <QVBoxLayout>
 #include <QWidget>
-#include <QMenu>
 
 // ParaView Includes.
 #include "pqComboBoxDomain.h"

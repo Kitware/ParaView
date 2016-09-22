@@ -44,9 +44,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pq3DWidgetFactory.h"
 #include "pqApplicationCore.h"
 #include "pqPropertyLinks.h"
+#include "pqSMSignalAdaptors.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqSMSignalAdaptors.h"
 
 class pqSphereWidget::pqImplementation : public Ui::pqSphereWidget
 {

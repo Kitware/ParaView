@@ -26,8 +26,8 @@
 #ifndef vtkPVContourFilter_h
 #define vtkPVContourFilter_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkContourFilter.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVContourFilter : public vtkContourFilter
 {

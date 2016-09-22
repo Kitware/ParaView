@@ -35,12 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkMath.h"
 #include "vtkNew.h"
-#include "vtkProcessModule.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVXMLElement.h"
+#include "vtkProcessModule.h"
 #include "vtkRenderWindow.h"
 #include "vtkSMAnimationSceneGeometryWriter.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
@@ -52,10 +51,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMTrace.h"
 #include "vtkSMViewProxy.h"
+#include "vtkSmartPointer.h"
 #include "vtkWeakPointer.h"
 
-#include <QIntValidator>
 #include <QFileInfo>
+#include <QIntValidator>
 #include <QMap>
 #include <QMessageBox>
 #include <QPointer>
@@ -72,10 +72,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectBuilder.h"
 #include "pqProgressManager.h"
 #include "pqProxy.h"
+#include "pqSMAdaptor.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
-#include "pqSMAdaptor.h"
 #include "pqStereoModeHelper.h"
 #include "pqTabbedMultiViewWidget.h"
 #include "pqView.h"

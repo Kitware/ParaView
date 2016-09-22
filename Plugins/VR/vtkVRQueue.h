@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef vtkVRQueue_h
 #define vtkVRQueue_h
 
-#include "vtkObject.h"
 #include "vtkNew.h"
+#include "vtkObject.h"
 
 class vtkConditionVariable;
 class vtkMutexLock;

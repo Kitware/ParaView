@@ -19,15 +19,15 @@
 #include "vtkCamera.h"
 #include "vtkCoordinate.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVAxesActor.h"
 #include "vtkPoints.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper2D.h"
 #include "vtkProperty.h"
 #include "vtkProperty2D.h"
-#include "vtkPVAxesActor.h"
-#include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
+#include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVAxesWidget);
 

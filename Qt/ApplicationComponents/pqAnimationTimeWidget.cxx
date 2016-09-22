@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationTimeWidget.h"
 #include "ui_pqAnimationTimeWidget.h"
 
-#include "pqPropertyLinksConnection.h"
 #include "pqPropertyLinks.h"
+#include "pqPropertyLinksConnection.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMTimeKeeperProxy.h"
 #include "vtkWeakPointer.h"

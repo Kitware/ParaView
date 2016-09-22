@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "@ARG_CLASS_NAME@Implementation.h"
 #include "@ARG_CLASS_NAME@.h"
+#include "@ARG_CLASS_NAME@Implementation.h"
 
 //-----------------------------------------------------------------------------
 @ARG_CLASS_NAME@Implementation::@ARG_CLASS_NAME@Implementation(QObject* _parent)

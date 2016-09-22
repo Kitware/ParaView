@@ -23,10 +23,10 @@
 #ifndef vtkPVRenderView_h
 #define vtkPVRenderView_h
 
+#include "vtkBoundingBox.h"                       // needed for iVar
+#include "vtkNew.h"                               // needed for iVar
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVView.h"
-#include "vtkBoundingBox.h" // needed for iVar
-#include "vtkNew.h" // needed for iVar
 #include "vtkSmartPointer.h" // needed for iVar
 
 

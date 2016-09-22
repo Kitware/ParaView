@@ -37,9 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
 #include "vtkDiscretizableColorTransferFunction.h"
+#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMTransferFunctionProxy.h"
 
 #include <QDebug>

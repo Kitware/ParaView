@@ -50,13 +50,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 // Qt includes
-#include <QDebug>
-#include <QMouseEvent>
-#include <QKeyEvent>
-#include <QStyleOptionSlider>
 #include <QApplication>
-#include <QStylePainter>
+#include <QDebug>
+#include <QKeyEvent>
+#include <QMouseEvent>
 #include <QStyle>
+#include <QStyleOptionSlider>
+#include <QStylePainter>
 #include <QToolTip>
 
 // CTK includes

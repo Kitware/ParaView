@@ -35,14 +35,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqLinksManager.h"
 
 // Qt
-#include <QLineEdit>
 #include <QComboBox>
 #include <QLabel>
+#include <QLineEdit>
 
 // SM
 #include "vtkSMPropertyLink.h"
-#include "vtkSMProxyLink.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyLink.h"
 #include "vtkSMProxyManager.h"
 
 // pqCore
@@ -50,8 +50,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 
 // pqComponents
-#include "pqLinksModel.h"
 #include "pqLinksEditor.h"
+#include "pqLinksModel.h"
 
 pqLinksManager::pqLinksManager(QWidget* p)
   : QDialog(p),

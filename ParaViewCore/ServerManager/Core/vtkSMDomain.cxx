@@ -23,8 +23,8 @@
 #include "vtkStdString.h"
 #include "vtkWeakPointer.h"
 
-#include <map>
 #include <assert.h>
+#include <map>
 
 struct vtkSMDomainInternals
 {

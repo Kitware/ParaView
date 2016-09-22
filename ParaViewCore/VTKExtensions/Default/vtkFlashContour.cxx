@@ -13,21 +13,21 @@
 
 =========================================================================*/
 #include "vtkFlashContour.h"
-#include "vtkObjectFactory.h"
+#include "vtkCellArray.h"
+#include "vtkCellData.h"
+#include "vtkDataArray.h"
+#include "vtkDoubleArray.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMarchingCubesTriangleCases.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiPieceDataSet.h"
-#include "vtkPolyData.h"
-#include "vtkPoints.h"
-#include "vtkCellData.h"
+#include "vtkObjectFactory.h"
 #include "vtkPointData.h"
-#include "vtkCellArray.h"
-#include "vtkDataArray.h"
-#include "vtkDoubleArray.h"
+#include "vtkPoints.h"
+#include "vtkPolyData.h"
 #include "vtkUnsignedCharArray.h"
-#include "vtkMarchingCubesTriangleCases.h"
 
 vtkStandardNewMacro(vtkFlashContour);
 

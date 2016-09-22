@@ -36,8 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataRepresentation.h"
 #include "pqPresetDialog.h"
 #include "pqUndoStack.h"
-#include "vtkSMPropertyHelper.h"
 #include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMTransferFunctionProxy.h"
 
 namespace pvInternals

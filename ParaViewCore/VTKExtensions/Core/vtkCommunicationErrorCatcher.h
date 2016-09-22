@@ -28,8 +28,8 @@
 #ifndef vtkCommunicationErrorCatcher_h
 #define vtkCommunicationErrorCatcher_h
 
-#include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 #include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
+#include "vtkWeakPointer.h"               // needed for vtkWeakPointer.
 #include <string>
 
 class vtkCommunicator;

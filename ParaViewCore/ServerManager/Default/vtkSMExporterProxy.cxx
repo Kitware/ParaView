@@ -15,8 +15,8 @@
 #include "vtkSMExporterProxy.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
+#include "vtkProcessModule.h"
 #include "vtkSMViewProxy.h"
 
 vtkCxxSetObjectMacro(vtkSMExporterProxy, View, vtkSMViewProxy);

@@ -32,8 +32,8 @@
 #ifndef vtk1DGaussianTransferFunction_h
 #define vtk1DGaussianTransferFunction_h
 
-#include "vtkPointSpriteGraphicsModule.h" //needed for exports
 #include "vtk1DTransferFunction.h"
+#include "vtkPointSpriteGraphicsModule.h" //needed for exports
 
 class vtkDoubleArray;
 

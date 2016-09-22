@@ -20,9 +20,9 @@
 #ifndef vtkSMContextViewProxy_h
 #define vtkSMContextViewProxy_h
 
+#include "vtkNew.h"                            // needed for vtkInteractorObserver.
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMViewProxy.h"
-#include "vtkNew.h" // needed for vtkInteractorObserver.
 
 class vtkAbstractContextItem;
 class vtkContextView;

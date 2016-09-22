@@ -20,10 +20,10 @@
 #ifndef vtkPVPythonPluginInterface_h
 #define vtkPVPythonPluginInterface_h
 
-#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"
-#include <vector> // STL Header
-#include <string> // STL Header
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
+#include <string>                            // STL Header
+#include <vector>                            // STL Header
 
 class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVPythonPluginInterface
 {

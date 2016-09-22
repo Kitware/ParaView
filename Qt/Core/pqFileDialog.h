@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqFileDialog_h
 
 #include "pqCoreModule.h"
-#include <QStringList>
 #include <QDialog>
+#include <QStringList>
 
 class QModelIndex;
 class QPoint;

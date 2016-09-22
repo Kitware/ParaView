@@ -17,10 +17,9 @@
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVInstantiator.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
+#include "vtkProcessModule.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
@@ -28,9 +27,10 @@
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxy.h"
+#include "vtkSmartPointer.h"
 
-#include <vector>
 #include <sstream>
+#include <vector>
 
 #include "vtkSMPropertyInternals.h"
 

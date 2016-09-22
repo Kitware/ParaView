@@ -20,7 +20,6 @@
 #include "vtkPVInstantiator.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMGlobalPropertiesProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
@@ -38,13 +37,14 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTimeKeeperProxy.h"
 #include "vtkSMTrace.h"
+#include "vtkSmartPointer.h"
 #include "vtkWeakPointer.h"
 
 #include <cassert>
 #include <map>
 #include <set>
-#include <vector>
 #include <sstream>
+#include <vector>
 
 class vtkSMParaViewPipelineController::vtkInternals
 {

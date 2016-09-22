@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqLiveInsituVisualizationManager_h
 #define pqLiveInsituVisualizationManager_h
 
-#include <QObject>
 #include "pqComponentsModule.h"
+#include <QObject>
 
 class pqOutputPort;
 class pqPipelineSource;

@@ -33,10 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqVCRToolbar.h"
 
 #include "pqActiveObjects.h"
-#include "pqPVApplicationCore.h"
-#include "pqVCRController.h"
-#include "pqUndoStack.h"
 #include "pqAnimationManager.h"
+#include "pqPVApplicationCore.h"
+#include "pqUndoStack.h"
+#include "pqVCRController.h"
 
 class pqVCRToolbar::pqInternals : public Ui::pqVCRToolbar
 {

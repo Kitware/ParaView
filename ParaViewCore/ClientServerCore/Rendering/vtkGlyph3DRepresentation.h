@@ -22,8 +22,8 @@
 #ifndef vtkGlyph3DRepresentation_h
 #define vtkGlyph3DRepresentation_h
 
-#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkGeometryRepresentation.h"
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 
 class vtkGlyph3DMapper;
 class vtkPVArrowSource;

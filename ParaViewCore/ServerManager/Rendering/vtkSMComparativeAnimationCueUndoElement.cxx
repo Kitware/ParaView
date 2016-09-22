@@ -14,16 +14,16 @@
 =========================================================================*/
 #include "vtkSMComparativeAnimationCueUndoElement.h"
 
+#include "vtkCollection.h"
+#include "vtkCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkSMComparativeAnimationCueProxy.h"
 #include "vtkPVComparativeAnimationCue.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMComparativeAnimationCueProxy.h"
+#include "vtkSMProxyLocator.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
-#include "vtkSMProxyManager.h"
-#include "vtkCollection.h"
-#include "vtkSMProxyLocator.h"
-#include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkSMComparativeAnimationCueUndoElement);
 //-----------------------------------------------------------------------------

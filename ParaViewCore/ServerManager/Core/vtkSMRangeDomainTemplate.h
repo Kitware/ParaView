@@ -50,10 +50,10 @@
 #ifndef vtkSMRangeDomainTemplate_h
 #define vtkSMRangeDomainTemplate_h
 
-#include "vtkSMDomain.h"
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
+#include "vtkSMDomain.h"
 #include "vtkTuple.h" // needed for vtkTuple.
-#include <vector> // needed for std::vector
+#include <vector>     // needed for std::vector
 
 template <class T>
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMRangeDomainTemplate :

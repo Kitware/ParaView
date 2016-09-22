@@ -20,9 +20,9 @@
 #ifndef vtkPVSessionCoreInterpreterHelper_h
 #define vtkPVSessionCoreInterpreterHelper_h
 
-#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkObject.h"
-#include "vtkWeakPointer.h" // needed for vtkWeakPointer.
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
+#include "vtkWeakPointer.h"                      // needed for vtkWeakPointer.
 
 class vtkObject;
 class vtkSIObject;

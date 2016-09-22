@@ -24,12 +24,12 @@
 #include "vtkDepthSortPainter.h"
 #include "vtkImageSpriteSource.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVCacheKeeper.h"
+#include "vtkPVLODActor.h"
 #include "vtkPointSpriteDefaultPainter.h"
 #include "vtkPointSpriteProperty.h"
-#include "vtkPVLODActor.h"
 #include "vtkTexture.h"
 #include "vtkTwoScalarsToColorsPainter.h"
-#include "vtkPVCacheKeeper.h"
 
 vtkStandardNewMacro(vtkPointSpriteRepresentation);
 vtkCxxSetObjectMacro(vtkPointSpriteRepresentation, TextureInternal, vtkTexture);

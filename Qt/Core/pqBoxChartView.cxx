@@ -31,11 +31,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqBoxChartView.h"
 
-#include "vtkSMProperty.h"
-#include "vtkSMContextViewProxy.h"
-#include "pqSMAdaptor.h"
-#include "pqRepresentation.h"
 #include "pqDataRepresentation.h"
+#include "pqRepresentation.h"
+#include "pqSMAdaptor.h"
+#include "vtkSMContextViewProxy.h"
+#include "vtkSMProperty.h"
 
 //-----------------------------------------------------------------------------
 pqBoxChartView::pqBoxChartView(const QString& group,

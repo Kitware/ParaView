@@ -37,10 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyGroup.h"
 
 #include <QApplication>
-#include <QPainter>
-#include <QStyle>
 #include <QHeaderView>
 #include <QLayout>
+#include <QPainter>
+#include <QStyle>
 
 #include "pqTimer.h"
 

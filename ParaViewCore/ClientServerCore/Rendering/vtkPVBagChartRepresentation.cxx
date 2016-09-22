@@ -34,21 +34,21 @@
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVCacheKeeper.h"
+#include "vtkPVContextView.h"
+#include "vtkPVXYChartView.h"
 #include "vtkPen.h"
 #include "vtkPlotBag.h"
 #include "vtkPlotHistogram2D.h"
 #include "vtkPlotLine.h"
 #include "vtkPointData.h"
 #include "vtkProcessModule.h"
-#include "vtkPVCacheKeeper.h"
-#include "vtkPVContextView.h"
-#include "vtkPVXYChartView.h"
 #include "vtkReductionFilter.h"
 #include "vtkTable.h"
 
 #include <algorithm>
-#include <string>
 #include <sstream>
+#include <string>
 
 vtkStandardNewMacro(vtkPVBagChartRepresentation);
 vtkCxxSetObjectMacro(vtkPVBagChartRepresentation,LookupTable,vtkScalarsToColors)

@@ -15,8 +15,8 @@
 #include "vtkMPIMToNSocketConnectionPortInformation.h"
 
 #include "vtkClientServerStream.h"
-#include "vtkObjectFactory.h"
 #include "vtkMPIMToNSocketConnection.h"
+#include "vtkObjectFactory.h"
 #include <string>
 #include <vector>
 

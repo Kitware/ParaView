@@ -31,8 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqSignalAdaptorTreeWidget.h"
 
-#include <QtDebug>
 #include <QHeaderView>
+#include <QtDebug>
 
 #include "pqTreeWidget.h"
 

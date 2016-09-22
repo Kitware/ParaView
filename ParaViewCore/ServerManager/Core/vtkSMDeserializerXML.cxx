@@ -16,11 +16,11 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
-#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSmartPointer.h"
 
 vtkStandardNewMacro(vtkSMDeserializerXML);
 //----------------------------------------------------------------------------

@@ -14,11 +14,11 @@
 =========================================================================*/
 #include "vtkPVDataSizeInformation.h"
 
+#include "vtkAlgorithm.h"
+#include "vtkClientServerStream.h"
+#include "vtkDataObject.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
-#include "vtkClientServerStream.h"
-#include "vtkAlgorithm.h"
-#include "vtkDataObject.h"
 
 vtkStandardNewMacro(vtkPVDataSizeInformation);
 //----------------------------------------------------------------------------

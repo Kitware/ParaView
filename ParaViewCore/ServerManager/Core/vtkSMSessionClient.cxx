@@ -22,13 +22,12 @@
 #include "vtkNetworkAccessManager.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
 #include "vtkPVMultiClientsInformation.h"
 #include "vtkPVOptions.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVSessionServer.h"
-#include "vtkSMSettings.h"
+#include "vtkProcessModule.h"
 #include "vtkReservedRemoteObjectIds.h"
 #include "vtkSMCollaborationManager.h"
 #include "vtkSMMessage.h"
@@ -39,10 +38,11 @@
 #include "vtkSMProxyProperty.h"
 #include "vtkSMServerStateLocator.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMSettings.h"
 #include "vtkSocketCommunicator.h"
 
-#include <string>
 #include <sstream>
+#include <string>
 #include <vtksys/RegularExpression.hxx>
 
 #include <assert.h>

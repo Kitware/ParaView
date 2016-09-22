@@ -31,11 +31,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqCheckBoxPixMaps.h"
 
-#include <QWidget>
 #include <QPainter>
 #include <QPixmap>
 #include <QStyle>
 #include <QStyleOptionButton>
+#include <QWidget>
 
 //-----------------------------------------------------------------------------
 pqCheckBoxPixMaps::pqCheckBoxPixMaps(QWidget* parentWidget)

@@ -120,9 +120,9 @@
 #ifndef vtkSMProxy_h
 #define vtkSMProxy_h
 
+#include "vtkClientServerID.h"            // needed for vtkClientServerID
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMRemoteObject.h"
-#include "vtkClientServerID.h" // needed for vtkClientServerID
 
 struct vtkSMProxyInternals;
 

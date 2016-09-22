@@ -19,13 +19,13 @@
 #include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMProxy.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
-#include "vtkSMProxy.h"
 #include "vtkSmartPointer.h"
 
-#include <set>
 #include <map>
+#include <set>
 #include <vector>
 
 class vtkSMTimeKeeper::vtkInternal

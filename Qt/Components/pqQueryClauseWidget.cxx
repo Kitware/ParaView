@@ -33,11 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqQueryClauseWidget.h"
 #include "ui_pqQueryCompositeTreeDialog.h"
 
+#include "pqHelpWindow.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqSignalAdaptorCompositeTreeWidget.h"
-#include "pqHelpWindow.h"
 #include "vtkDataObject.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
@@ -46,8 +46,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMCompositeTreeDomain.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSelectionHelper.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSelectionNode.h"
 

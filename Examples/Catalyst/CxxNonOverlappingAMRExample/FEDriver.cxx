@@ -1,7 +1,7 @@
+#include "FEAdaptor.h"
 #include <algorithm>
 #include <iostream>
 #include <vector>
-#include "FEAdaptor.h"
 
 // Example of a C++ adaptor for a simulation code
 // where the simulation code has a fixed topology

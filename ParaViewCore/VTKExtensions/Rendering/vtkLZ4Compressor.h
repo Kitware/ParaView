@@ -22,8 +22,8 @@
 #define vtkLZ4Compressor_h
 
 #include "vtkImageCompressor.h"
+#include "vtkNew.h"                            // needed for vtkNew
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for exports
-#include "vtkNew.h" // needed for vtkNew
 
 class vtkMultiProcessStream;
 

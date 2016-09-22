@@ -14,29 +14,29 @@
 =========================================================================*/
 #include "vtkAMRFragmentIntegration.h"
 
-#include "vtkObject.h"
-#include "vtkObjectFactory.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkObject.h"
+#include "vtkObjectFactory.h"
 
-#include "vtkCellData.h"
 #include "vtkCell.h"
+#include "vtkCellData.h"
 #include "vtkCommunicator.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkDataArray.h"
-#include "vtkDataSet.h"
 #include "vtkDataObject.h"
+#include "vtkDataSet.h"
 #include "vtkDoubleArray.h"
 #include "vtkIdTypeArray.h"
 #include "vtkKdTreePointLocator.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNonOverlappingAMR.h"
 #include "vtkPointData.h"
+#include "vtkSmartPointer.h"
 #include "vtkTable.h"
 #include "vtkTimerLog.h"
 #include "vtkUniformGrid.h"
 #include "vtkUnsignedCharArray.h"
-#include "vtkSmartPointer.h"
 
 #include <map>
 #include <vector>

@@ -38,8 +38,8 @@
 #ifndef vtkPVProgressHandler_h
 #define vtkPVProgressHandler_h
 
-#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 
 class vtkMultiProcessController;
 class vtkPVSession;

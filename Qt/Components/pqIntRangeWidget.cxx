@@ -34,12 +34,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt includes
 #include "pqLineEdit.h"
-#include <QSlider>
 #include <QHBoxLayout>
 #include <QIntValidator>
+#include <QSlider>
 
-#include "vtkSMIntRangeDomain.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkSMIntRangeDomain.h"
 
 pqIntRangeWidget::pqIntRangeWidget(QWidget* p)
   : QWidget(p) 

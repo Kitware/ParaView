@@ -43,8 +43,8 @@
 #define VISIT_EXCEPTION_H
 
 #include <exception>
-#include <visitstream.h>
 #include <string>
+#include <visitstream.h>
 #ifdef FAKE_EXCEPTIONS
 #include <setjmp.h>
 #endif

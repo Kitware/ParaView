@@ -40,8 +40,8 @@
 #include <QDialog>
 #include <QLineEdit>
 #include <QList>
-#include <QStringList>
 #include <QString>
+#include <QStringList>
 
 class pqSQRemoteSignalDialogUI;
 

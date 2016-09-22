@@ -26,9 +26,9 @@
 #include "vtksys/SystemTools.hxx"
 
 #include <cassert>
-#include <sstream>
-#include <set>
 #include <list>
+#include <set>
+#include <sstream>
 
 class vtkSMTransferFunctionPresets::vtkInternals
 {

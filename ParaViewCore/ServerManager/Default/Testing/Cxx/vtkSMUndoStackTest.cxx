@@ -15,15 +15,15 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkSMUndoStackTest.h"
 
-#include "vtkSMUndoStack.h"
-#include "vtkUndoSet.h"
-#include "vtkSMSession.h"
+#include "vtkSMMessage.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkSMSessionProxyManager.h"
 #include "vtkSMPropertyModificationUndoElement.h"
 #include "vtkSMProxy.h"
 #include "vtkSMRemoteObjectUpdateUndoElement.h"
-#include "vtkSMMessage.h"
+#include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMUndoStack.h"
+#include "vtkUndoSet.h"
 
 void vtkSMUndoStackTest::UndoRedo()
 {

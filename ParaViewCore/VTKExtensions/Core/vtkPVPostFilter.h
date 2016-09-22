@@ -26,8 +26,8 @@
 #define vtkPVPostFilter_h
 
 #include "vtkDataObjectAlgorithm.h"
-#include "vtkStdString.h" // needed for: vtkStdString
 #include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
+#include "vtkStdString.h"                 // needed for: vtkStdString
 
 class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVPostFilter : public vtkDataObjectAlgorithm
 {

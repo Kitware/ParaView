@@ -4,9 +4,9 @@
 #include "vtkCellData.h"
 #include "vtkCharArray.h"
 #include "vtkFloatArray.h"
-#include "vtkMultiBlockDataSet.h"
 #include "vtkIdList.h"
 #include "vtkImageData.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
@@ -14,9 +14,9 @@
 #include "vtkStructuredGrid.h"
 #include "vtkUnstructuredGrid.h"
 
-#include <sys/stat.h>
 #include <ctype.h>
 #include <string>
+#include <sys/stat.h>
 
 vtkStandardNewMacro(vtkPEnSightGoldBinaryReader);
 

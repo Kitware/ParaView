@@ -20,13 +20,13 @@ extern "C" {
 
 #include "vtkInitializationHelper.h"
 #include "vtkMultiProcessController.h"
-#include "vtkProcessModule.h"
 #include "vtkPVPythonOptions.h"
+#include "vtkProcessModule.h"
 #include "vtkPythonInterpreter.h"
 #include "vtkSMSession.h"
 
-#include <vtksys/SystemTools.hxx>
 #include <vector>
+#include <vtksys/SystemTools.hxx>
 
 namespace ParaViewPython {
 

@@ -31,9 +31,9 @@
 #ifndef vtkSMDomain_h
 #define vtkSMDomain_h
 
+#include "vtkClientServerID.h"            // needed for saving animation in batch script
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMSessionObject.h"
-#include "vtkClientServerID.h" // needed for saving animation in batch script
 
 class vtkPVDataInformation;
 class vtkPVXMLElement;

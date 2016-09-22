@@ -22,8 +22,8 @@
 #ifndef vtkChartWarning_h
 #define vtkChartWarning_h
 
-#include "vtkPVClientServerCoreRenderingModule.h" // For export macro
 #include "vtkBlockItem.h"
+#include "vtkPVClientServerCoreRenderingModule.h" // For export macro
 
 class vtkChart;
 

@@ -15,8 +15,8 @@
 #include "vtkMergeCompositeDataSet.h"
 
 #include "vtkCellArray.h"
-#include "vtkCompositeDataSet.h"
 #include "vtkCompositeDataIterator.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkGraph.h"
 #include "vtkInformation.h"

@@ -15,9 +15,9 @@
 
 #include "vtkMPICompositeManager.h"
 
-#include "vtkObjectFactory.h"
 #include "vtkByteSwap.h"
 #include "vtkMultiProcessController.h"
+#include "vtkObjectFactory.h"
 #include "vtkRenderWindow.h"
 vtkStandardNewMacro(vtkMPICompositeManager);
 

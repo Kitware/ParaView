@@ -18,26 +18,26 @@
 
 #include "vtkCollection.h"
 #include "vtkCommand.h"
+#include "vtkDebugLeaks.h"
 #include "vtkNew.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMCollaborationManager.h"
 #include "vtkSMLink.h"
 #include "vtkSMMessage.h"
 #include "vtkSMOutputPort.h"
-#include "vtkSMSourceProxy.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxySelectionModel.h"
-#include "vtkSMSessionClient.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionClient.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSmartPointer.h"
 #include "vtkStdString.h"
-#include "vtkDebugLeaks.h"
 
 #include <map>
 #include <set>
-#include <vector>
 #include <sstream>
+#include <vector>
 #include <vtksys/RegularExpression.hxx>
 
 // Sub-classed to avoid symbol length explosion.

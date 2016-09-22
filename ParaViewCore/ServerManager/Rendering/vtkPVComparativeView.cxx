@@ -19,9 +19,8 @@
 #include "vtkImageData.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVComparativeAnimationCue.h"
-#include "vtkSmartPointer.h"
+#include "vtkProcessModule.h"
 #include "vtkSMCameraLink.h"
 #include "vtkSMComparativeAnimationCueProxy.h"
 #include "vtkSMPropertyHelper.h"
@@ -33,13 +32,14 @@
 #include "vtkSMUtilities.h"
 #include "vtkSMViewLayoutProxy.h"
 #include "vtkSMViewProxy.h"
+#include "vtkSmartPointer.h"
 #include "vtkVectorOperators.h"
 
-#include <vector>
 #include <map>
 #include <set>
-#include <string>
 #include <sstream>
+#include <string>
+#include <vector>
 
 #include <assert.h>
 

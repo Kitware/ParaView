@@ -23,8 +23,8 @@
 #ifndef vtkPVStreamingPiecesInformation_h
 #define vtkPVStreamingPiecesInformation_h
 
-#include "vtkPVInformation.h"
 #include "vtkPVClientServerCoreRenderingModule.h" // needed for export macro
+#include "vtkPVInformation.h"
 
 #include <vector> // needed for internal API
 

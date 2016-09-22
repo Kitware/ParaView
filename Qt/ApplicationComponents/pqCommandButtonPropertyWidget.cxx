@@ -32,13 +32,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCommandButtonPropertyWidget.h"
 
-#include "vtkSMProxy.h"
 #include "vtkSMProperty.h"
+#include "vtkSMProxy.h"
 
 #include "pqPVApplicationCore.h"
 
-#include <QVBoxLayout>
 #include <QPushButton>
+#include <QVBoxLayout>
 
 pqCommandButtonPropertyWidget::pqCommandButtonPropertyWidget(vtkSMProxy *smProxy,
                                                              vtkSMProperty *proxyProperty,

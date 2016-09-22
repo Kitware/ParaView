@@ -42,8 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDoubleRangeDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProperty.h"
-#include "vtkSMUncheckedPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkSMUncheckedPropertyHelper.h"
 
 #include "pqCoreUtilities.h"
 #include "pqDoubleRangeWidget.h"
@@ -57,8 +57,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDoubleSpinBox>
 #include <QHBoxLayout>
-#include <QStyle>
 #include <QMenu>
+#include <QStyle>
 
 pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProperty,
                                                            vtkSMProxy *smProxy,

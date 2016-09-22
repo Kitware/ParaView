@@ -19,14 +19,14 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
-#include "vtkSMVectorProperty.h"
 #include "vtkSMProxy.h"
+#include "vtkSMVectorProperty.h"
 
-#include <vtksys/SystemTools.hxx>
 #include <sstream>
-#include <vector>
-#include <string>
 #include <string.h>
+#include <string>
+#include <vector>
+#include <vtksys/SystemTools.hxx>
 
 class vtkPVComparativeAnimationCue::vtkInternals
 {

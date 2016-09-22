@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqVCRController_h
 
 #include "pqComponentsModule.h"
-#include <QPointer>
 #include <QObject>
+#include <QPointer>
 
 class pqPipelineSource;
 class pqAnimationScene;

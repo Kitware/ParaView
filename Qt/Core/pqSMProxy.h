@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqSMProxy_h
 
 #include "pqCoreModule.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMProxy.h"
+#include "vtkSmartPointer.h"
 #include <QMetaType>
 
 /// make pqSMProxy synonymous to a smart pointer of a vtkSMProxy

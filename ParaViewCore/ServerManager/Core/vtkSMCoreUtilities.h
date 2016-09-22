@@ -19,9 +19,9 @@
 #ifndef vtkSMCoreUtilities_h
 #define vtkSMCoreUtilities_h
 
-#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkObject.h"
-#include "vtkStdString.h" // needed for vtkStdString.
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
+#include "vtkStdString.h"                 // needed for vtkStdString.
 
 class vtkSMProxy;
 

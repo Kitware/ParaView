@@ -14,8 +14,8 @@
 =========================================================================*/
 #include "vtkDataLabelRepresentation.h"
 
-#include "vtkActor2D.h"
 #include "vtkActor.h"
+#include "vtkActor2D.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCellCenters.h"
 #include "vtkCompositeDataToUnstructuredGridFilter.h"

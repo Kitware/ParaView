@@ -14,27 +14,27 @@
 =========================================================================*/
 #include "vtkRectilinearGridConnectivity.h"
 
-#include "vtkPolyData.h"
-#include "vtkCellData.h"
-#include "vtkPointData.h"
 #include "vtkCellArray.h"
-#include "vtkIdTypeArray.h"
+#include "vtkCellData.h"
 #include "vtkDoubleArray.h"
 #include "vtkEquivalenceSet.h"
-#include "vtkRectilinearGrid.h"
-#include "vtkMultiBlockDataSet.h"
+#include "vtkIdTypeArray.h"
 #include "vtkIncrementalOctreePointLocator.h"
+#include "vtkMultiBlockDataSet.h"
+#include "vtkPointData.h"
+#include "vtkPolyData.h"
+#include "vtkRectilinearGrid.h"
 
-#include "vtkInformation.h"
-#include "vtkObjectFactory.h"
-#include "vtkInformationVector.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataPipeline.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 #include "vtkMultiProcessController.h"
+#include "vtkObjectFactory.h"
 
 #include <map>
-#include <vector>
 #include <string>
+#include <vector>
 
 
 vtkStandardNewMacro( vtkRectilinearGridConnectivity );

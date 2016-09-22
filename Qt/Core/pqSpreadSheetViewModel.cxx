@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSpreadSheetViewModel.h"
 
 // Server Manager Includes.
+#include "vtkCellType.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkIdList.h"
 #include "vtkIdTypeArray.h"
@@ -41,27 +42,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVCompositeDataInformationIterator.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
-#include "vtkSelection.h"
-#include "vtkSelectionNode.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMTrace.h"
+#include "vtkSelection.h"
+#include "vtkSelectionNode.h"
+#include "vtkSmartPointer.h"
 #include "vtkSpreadSheetView.h"
 #include "vtkStdString.h"
 #include "vtkTable.h"
 #include "vtkUnsignedIntArray.h"
 #include "vtkVariant.h"
 #include "vtkWeakPointer.h"
-#include "vtkCellType.h"
 
 // Qt Includes.
 #include <QItemSelectionModel>
-#include <QtDebug>
 #include <QPointer>
+#include <QtDebug>
 
 // ParaView Includes.
 #include "pqDataRepresentation.h"

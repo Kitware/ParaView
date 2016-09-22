@@ -38,11 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSmartPointer.h>
 #include <vtksys/SystemTools.hxx>
 
-#include <vtkSMProxy.h>
-#include <vtkSMProperty.h>
-#include <vtkSMDoubleRangeDomain.h>
 #include <pqPipelineFilter.h>
 #include <pqScalarValueListPropertyWidget.h>
+#include <vtkSMDoubleRangeDomain.h>
+#include <vtkSMProperty.h>
+#include <vtkSMProxy.h>
 
 #include "ui_pqCinemaTrack.h"
 

@@ -13,8 +13,8 @@
 
 =========================================================================*/
 // bring in the definition for VTK_PROTOBUF_EXPORT.
-#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSMMessage.h"
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 
 // The actual implementation is the file generated from "protoc".
 #include "vtkPVMessage.pb.cc"

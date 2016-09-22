@@ -15,17 +15,17 @@
 #include "vtkAdiosPixieReader.h"
 #include "vtkAdiosInternals.h"
 
-#include "vtkObjectFactory.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkObjectFactory.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
+#include <map>
 #include <sstream>
 #include <string>
-#include <map>
 
-#include <sys/stat.h>
 #include <assert.h>
+#include <sys/stat.h>
 
 #include <vtkCellData.h>
 #include <vtkDataArray.h>

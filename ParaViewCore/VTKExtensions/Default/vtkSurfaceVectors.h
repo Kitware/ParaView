@@ -21,8 +21,8 @@
 #ifndef vtkSurfaceVectors_h
 #define vtkSurfaceVectors_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkDataSetAlgorithm.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class vtkFloatArray;
 class vtkIdList;

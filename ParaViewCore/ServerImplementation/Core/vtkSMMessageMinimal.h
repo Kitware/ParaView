@@ -21,8 +21,8 @@
 #ifndef vtkSMMessageMinimal_h
 #define vtkSMMessageMinimal_h
 
-#include "vtkSystemIncludes.h"
 #include "vtkPVServerImplementationCoreModule.h"
+#include "vtkSystemIncludes.h"
 
 namespace paraview_protobuf
 {

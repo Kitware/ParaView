@@ -70,8 +70,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkLight.h"
 #include "vtkLightCollection.h"
 #include "vtkObjectFactory.h"
-#include "vtkRendererCollection.h"
 #include "vtkRenderWindow.h"
+#include "vtkRendererCollection.h"
 #include "vtkTimerLog.h"
 
 #include <Core/Color/Color.h>
@@ -87,8 +87,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Interface/Context.h>
 #include <Interface/Light.h>
 #include <Interface/LightSet.h>
-#include <Interface/Scene.h>
 #include <Interface/Object.h>
+#include <Interface/Scene.h>
 #include <Model/AmbientLights/ConstantAmbient.h>
 #include <Model/Backgrounds/ConstantBackground.h>
 #include <Model/Backgrounds/EnvMapBackground.h>

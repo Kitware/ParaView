@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqSettingsDialog_h
 #define pqSettingsDialog_h
 
-#include <QDialog>
 #include "pqComponentsModule.h"
+#include <QDialog>
 
 class pqServer;
 class QAbstractButton;

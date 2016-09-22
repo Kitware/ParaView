@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqObjectPickingBehavior_h
 #define pqObjectPickingBehavior_h
 
+#include "pqApplicationComponentsModule.h"
 #include <QObject>
 #include <QPoint>
-#include "pqApplicationComponentsModule.h"
 
 class pqView;
 class pqOutputPort;

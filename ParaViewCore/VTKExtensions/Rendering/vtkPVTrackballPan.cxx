@@ -18,9 +18,9 @@
 #include "vtkCameraManipulatorGUIHelper.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
-#include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
+#include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVTrackballPan);
 

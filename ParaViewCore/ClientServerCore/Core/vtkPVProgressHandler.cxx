@@ -22,13 +22,13 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
-#include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
 #include "vtkPVSession.h"
+#include "vtkProcessModule.h"
 #include "vtkTimerLog.h"
 
-#include <string>
 #include <map>
+#include <string>
 
 // define this variable to disable progress all together. This may be useful to
 // doing really large runs.

@@ -36,8 +36,8 @@
 #include <vtksys/SystemTools.hxx>
 
 #ifdef PARAVIEW_USE_MPI
-# include "vtkMPIController.h"
-# include "vtkMPI.h"
+#include "vtkMPI.h"
+#include "vtkMPIController.h"
 #endif
 
 #ifdef PARAVIEW_ENABLE_PYTHON
@@ -55,8 +55,8 @@
 #include "vtkPVPluginLoader.h"
 
 #include <assert.h>
+#include <clocale>   // needed for setlocale()
 #include <stdexcept> // for runtime_error
-#include <clocale> // needed for setlocale()
 
 namespace
 {

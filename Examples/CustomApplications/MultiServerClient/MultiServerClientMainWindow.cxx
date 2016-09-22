@@ -37,15 +37,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectBuilder.h"
 #include "pqParaViewBehaviors.h"
 #include "pqParaViewMenuBuilders.h"
+#include "pqPipelineBrowserWidget.h"
+#include "pqServer.h"
 #include "pqServerConfiguration.h"
 #include "pqServerConnectReaction.h"
-#include "pqPipelineBrowserWidget.h"
 #include "pqServerManagerModel.h"
-#include "pqServer.h"
 
 #include "vtkProcessModule.h"
-#include "vtkSession.h"
 #include "vtkSMSession.h"
+#include "vtkSession.h"
 
 #include <QComboBox>
 

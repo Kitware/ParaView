@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyGroupButton.h"
 
 #include <QDialog>
-#include <QVBoxLayout>
 #include <QPushButton>
+#include <QVBoxLayout>
 
 #include "pqPropertiesPanel.h"
 #include "pqProxy.h"

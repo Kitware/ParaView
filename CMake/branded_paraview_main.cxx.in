@@ -51,8 +51,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtksys/SystemTools.hxx>
 
-#include <stdlib.h>
 #include <clocale>
+#include <stdlib.h>
 
 namespace
 {

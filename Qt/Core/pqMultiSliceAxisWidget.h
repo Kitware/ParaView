@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCoreModule.h"
 
-#include <QWidget>
 #include <QPointer>
+#include <QWidget>
 
 class vtkContextScene;
 class vtkObject;

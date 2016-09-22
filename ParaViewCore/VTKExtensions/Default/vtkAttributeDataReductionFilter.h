@@ -25,8 +25,8 @@
 #ifndef vtkAttributeDataReductionFilter_h
 #define vtkAttributeDataReductionFilter_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkDataObjectAlgorithm.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAttributeDataReductionFilter : public vtkDataObjectAlgorithm
 {

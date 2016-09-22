@@ -24,8 +24,8 @@
 #ifndef vtkPExtractTemporalFieldData_h
 #define vtkPExtractTemporalFieldData_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkExtractTemporalFieldData.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class vtkMultiProcessController;
 

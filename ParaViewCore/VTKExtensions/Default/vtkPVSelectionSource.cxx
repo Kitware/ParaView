@@ -14,17 +14,17 @@
 =========================================================================*/
 #include "vtkPVSelectionSource.h"
 
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkSelectionSource.h"
-#include "vtkInformationVector.h"
-#include "vtkInformation.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
 
-#include <vector>
 #include <set>
+#include <vector>
 
 class vtkPVSelectionSource::vtkInternal
 {

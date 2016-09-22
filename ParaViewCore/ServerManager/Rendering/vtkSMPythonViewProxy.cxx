@@ -18,11 +18,11 @@
 #include "vtkDataArray.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
 #include "vtkPointData.h"
 #include "vtkProcessModule.h"
 #include "vtkPythonView.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderer.h"
 #include "vtkWindowToImageFilter.h"
 
 

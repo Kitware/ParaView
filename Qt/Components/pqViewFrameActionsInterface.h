@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqViewFrameActionsInterface_h
 #define pqViewFrameActionsInterface_h
 
-#include <QtPlugin>
 #include "pqComponentsModule.h"
+#include <QtPlugin>
 
 class pqViewFrame;
 class pqView;

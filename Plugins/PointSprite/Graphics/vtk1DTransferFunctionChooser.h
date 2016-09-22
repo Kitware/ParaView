@@ -32,8 +32,8 @@
 #ifndef vtk1DTransferFunctionChooser_h
 #define vtk1DTransferFunctionChooser_h
 
-#include "vtkPointSpriteGraphicsModule.h" //needed for exports
 #include "vtk1DTransferFunction.h"
+#include "vtkPointSpriteGraphicsModule.h" //needed for exports
 
 class vtk1DLookupTableTransferFunction;
 class vtk1DGaussianTransferFunction;

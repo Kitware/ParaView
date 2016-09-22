@@ -22,8 +22,8 @@
 #include "vtkWeakPointer.h"
 
 #include <assert.h>
-#include <vector>
 #include <map>
+#include <vector>
 
 #define GENERATE_DEBUG_LOG 0
 

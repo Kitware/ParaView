@@ -21,11 +21,11 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVCameraAnimationCue.h"
 #include "vtkPVGeneralSettings.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMViewProxy.h"
+#include "vtkSmartPointer.h"
 #include "vtkVector.h"
 
 #ifdef PARAVIEW_ENABLE_PYTHON

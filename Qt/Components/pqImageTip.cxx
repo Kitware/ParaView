@@ -32,7 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqImageTip.h"
 
+#include <QBasicTimer>
+#include <QToolTip>
 #include <qapplication.h>
+#include <qdebug.h>
 #include <qdesktopwidget.h>
 #include <qevent.h>
 #include <qhash.h>
@@ -42,9 +45,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <qstyleoption.h>
 #include <qstylepainter.h>
 #include <qtimer.h>
-#include <qdebug.h>
-#include <QBasicTimer>
-#include <QToolTip>
 
 void pqImageTip::showTip(const QPixmap& image, const QPoint& pos)
 {

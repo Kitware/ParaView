@@ -33,9 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqAnimationManager.h"
-#include "pqPVApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
+#include "pqPVApplicationCore.h"
 
 #include <QDebug>
 

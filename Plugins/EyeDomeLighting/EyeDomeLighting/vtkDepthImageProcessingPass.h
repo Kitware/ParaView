@@ -49,8 +49,8 @@ Ph.D. thesis of Christian BOUCHENY.
 #ifndef vtkDepthImageProcessingPass_h
 #define vtkDepthImageProcessingPass_h
 
-#include "vtkImageProcessingPass.h"
 #include "vtkEyeDomeLightingModule.h" // needed for exports.
+#include "vtkImageProcessingPass.h"
 
 class vtkOpenGLRenderWindow;
 class vtkDepthPeelingPassLayerList; // Pimpl

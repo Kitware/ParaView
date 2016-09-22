@@ -36,6 +36,7 @@
 #include "vtkLookupTable.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
+#include "vtkOpenGLError.h"
 #include "vtkPainter.h"
 #include "vtkPainterPolyDataMapper.h"
 #include "vtkPointData.h"
@@ -50,13 +51,12 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTimerLog.h"
 #include "vtkTransform.h"
-#include "vtkOpenGLError.h"
 #include "vtkgl.h"
 
-#include <vector>
+#include <assert.h>
 #include <sstream>
 #include <string>
-#include <assert.h>
+#include <vector>
 
 vtkStandardNewMacro(vtkScatterPlotPainter);
 

@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
@@ -51,11 +50,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTrace.h"
+#include "vtkSmartPointer.h"
 
 // Qt includes.
-#include <QtDebug>
 #include <QPointer>
 #include <QShortcut>
+#include <QtDebug>
 
 // ParaView GUI includes.
 #include "pq3DWidgetFactory.h"
@@ -74,8 +74,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPointSourceWidget.h"
 #include "pqPolyLineWidget.h"
 #include "pqRenderView.h"
-#include "pqServer.h"
 #include "pqSMAdaptor.h"
+#include "pqServer.h"
 #include "pqSphereWidget.h"
 #include "pqSplineWidget.h"
 

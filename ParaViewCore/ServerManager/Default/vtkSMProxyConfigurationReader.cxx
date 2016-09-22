@@ -16,10 +16,10 @@
 #include "vtkSMCameraConfigurationFileInfo.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkSmartPointer.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSMProxy.h"
+#include "vtkSmartPointer.h"
 
 #include <string>
 

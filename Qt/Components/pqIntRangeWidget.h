@@ -32,10 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqIntRangeWidget_h
 #define pqIntRangeWidget_h
 
-#include <QWidget>
 #include "pqComponentsModule.h"
 #include "vtkSmartPointer.h"
-  
+#include <QWidget>
+
 class QSlider;
 class pqLineEdit;
 class vtkSMIntRangeDomain;

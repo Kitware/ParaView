@@ -25,8 +25,8 @@
 #ifndef vtkPVExtractArraysOverTime_h
 #define vtkPVExtractArraysOverTime_h
 
-#include "vtkPVClientServerCoreCoreModule.h" // For export macro
 #include "vtkPExtractArraysOverTime.h"
+#include "vtkPVClientServerCoreCoreModule.h" // For export macro
 
 class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVExtractArraysOverTime : public vtkPExtractArraysOverTime
 {

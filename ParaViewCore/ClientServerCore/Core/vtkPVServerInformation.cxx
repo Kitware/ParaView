@@ -16,15 +16,15 @@
 #include "vtkPVServerInformation.h"
 
 #include "vtkClientServerStream.h"
+#include "vtkCompositeMultiProcessController.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
+#include "vtkPVConfig.h"
 #include "vtkPVConfig.h"
 #include "vtkPVServerOptions.h"
 #include "vtkPVServerOptionsInternals.h"
-#include "vtkPVConfig.h"
 #include "vtkPVSession.h"
-#include "vtkCompositeMultiProcessController.h"
+#include "vtkProcessModule.h"
 
 // ------------------------
 // NOTE for OGVSupport

@@ -20,9 +20,9 @@
 #ifndef vtkPVMultiSliceView_h
 #define vtkPVMultiSliceView_h
 
+#include "vtkNew.h"                               // needed for vtkNew
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVRenderView.h"
-#include "vtkNew.h" // needed for vtkNew
 #include <vector> // needed for std::vector
 
 class vtkClientServerStream;

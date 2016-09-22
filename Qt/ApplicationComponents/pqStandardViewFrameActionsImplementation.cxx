@@ -46,8 +46,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 #include "pqRenderViewSelectionReaction.h"
 #include "pqServer.h"
-#include "pqSpreadSheetViewDecorator.h"
 #include "pqSpreadSheetView.h"
+#include "pqSpreadSheetViewDecorator.h"
 #include "pqToggleInteractionViewMode.h"
 #include "pqUndoStack.h"
 #include "pqViewFrame.h"
@@ -56,13 +56,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCollection.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMInteractiveSelectionPipeline.h"
-#include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTooltipSelectionPipeline.h"
+#include "vtkSmartPointer.h"
 
 #include <QKeyEvent>
 #include <QMenu>

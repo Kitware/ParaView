@@ -1,6 +1,6 @@
 
-#include <QWidget>
 #include <QPointer>
+#include <QWidget>
 class QPushButton;
 class QLabel;
 class QComboBox;

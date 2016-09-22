@@ -20,8 +20,8 @@
 #ifndef vtkSMBagChartSeriesListDomain_h
 #define vtkSMBagChartSeriesListDomain_h
 
-#include "vtkSMChartSeriesListDomain.h"
 #include "vtkPVServerManagerRenderingModule.h" // needed for exports
+#include "vtkSMChartSeriesListDomain.h"
 
 class vtkPVDataInformation;
 

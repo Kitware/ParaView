@@ -31,11 +31,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqCollaborationBehavior.h"
 
-#include "pqApplicationCore.h"
 #include "pqActiveObjects.h"
+#include "pqApplicationCore.h"
+#include "pqCollaborationManager.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqCollaborationManager.h"
 
 #include "vtkSMSession.h"
 

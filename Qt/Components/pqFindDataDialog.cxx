@@ -36,12 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
+#include "pqServer.h"
 #include "vtkPVDataInformation.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSMPropertyHelper.h"
 #include "vtkSelectionNode.h"
-#include "pqServer.h"
 
 #include <QMessageBox>
 

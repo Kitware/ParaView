@@ -33,10 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _QtWidgetsPlugin_h
 #define _QtWidgetsPlugin_h
 
-#include <QDesignerCustomWidgetInterface>
 #include <QDesignerCustomWidgetCollectionInterface>
-#include <qplugin.h>
+#include <QDesignerCustomWidgetInterface>
 #include <QObject>
+#include <qplugin.h>
 
 class pqCollapsedGroupPlugin :
   public QDesignerCustomWidgetInterface

@@ -20,8 +20,8 @@
 #ifndef vtkEquivalenceSet_h
 #define vtkEquivalenceSet_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkObject.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 class vtkIntArray;
 
 

@@ -29,8 +29,8 @@
 #ifndef vtkVolumeRepresentationPreprocessor_h
 #define vtkVolumeRepresentationPreprocessor_h
 
-#include "vtkUnstructuredGridAlgorithm.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
+#include "vtkUnstructuredGridAlgorithm.h"
 
 class vtkMultiBlockDataSet;
 class vtkDataSetTriangleFilter;

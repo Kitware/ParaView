@@ -34,9 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Server Manager Includes.
 
 // Qt Includes.
+#include <QMenu>
 #include <QTreeWidget>
 #include <QtDebug>
-#include <QMenu>
 // ParaView Includes.
 
 //-----------------------------------------------------------------------------

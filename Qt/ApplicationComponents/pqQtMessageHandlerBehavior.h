@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqQtMessageHandlerBehavior_h
 #define pqQtMessageHandlerBehavior_h
 
-#include <QObject>
 #include "pqApplicationComponentsModule.h"
+#include <QObject>
 
 /// @ingroup Behaviors
 /// pqQtMessageHandlerBehavior install a message handler to capture Qt

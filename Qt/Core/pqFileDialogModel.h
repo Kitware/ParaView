@@ -34,9 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqFileDialogModel_h
 
 #include "pqCoreModule.h"
-#include <QObject>
 #include <QAbstractItemModel>
 #include <QFileIconProvider>
+#include <QObject>
 
 #include "vtkPVFileInformation.h"
 class vtkProcessModule;

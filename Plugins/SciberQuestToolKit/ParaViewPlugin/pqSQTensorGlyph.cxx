@@ -30,8 +30,8 @@
 #include "pqSQTensorGlyph.h"
 
 #include <QCheckBox>
-#include <QWidget>
 #include <QLabel>
+#include <QWidget>
 #include <QtDebug>
 
 //-----------------------------------------------------------------------------

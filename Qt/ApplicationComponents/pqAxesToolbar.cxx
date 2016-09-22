@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqDataRepresentation.h"
 #include "pqRenderView.h"
-#include "vtkSMRenderViewProxy.h"
 #include "pqRenderViewSelectionReaction.h"
+#include "vtkSMRenderViewProxy.h"
 
 class pqAxesToolbar::pqInternals : public Ui::pqAxesToolbar
 {

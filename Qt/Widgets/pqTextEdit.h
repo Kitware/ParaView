@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqTextEdit_h
 #define pqTextEdit_h
 
-#include <QTextEdit>
 #include "pqWidgetsModule.h"
+#include <QTextEdit>
 
 class pqTextEditPrivate;
 

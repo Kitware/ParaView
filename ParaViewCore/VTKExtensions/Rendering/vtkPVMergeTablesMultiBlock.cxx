@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPVMergeTablesMultiBlock.h"
 
+#include "assert.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkInformation.h"
@@ -23,7 +24,6 @@
 #include "vtkSmartPointer.h"
 #include "vtkTable.h"
 #include "vtkVariant.h"
-#include "assert.h"
 
 vtkStandardNewMacro(vtkPVMergeTablesMultiBlock);
 //----------------------------------------------------------------------------

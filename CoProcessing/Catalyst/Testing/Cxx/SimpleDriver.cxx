@@ -15,10 +15,10 @@
 // Create a simple driver for the co-processing library by
 // setting the desired classes inside of other classes.
 
+#include "vtkCPLinearScalarFieldFunction.h"
 #include "vtkCPNodalFieldBuilder.h"
 #include "vtkCPTestDriver.h"
 #include "vtkCPUniformGridBuilder.h"
-#include "vtkCPLinearScalarFieldFunction.h"
 
 int SimpleDriver(int, char*[])
 {

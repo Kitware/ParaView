@@ -20,10 +20,10 @@
 #include "vtkInformation.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVXMLElement.h"
+#include "vtkProcessModule.h"
 #include "vtkSIInputProperty.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkProcessModule.h"
-#include "vtkPVXMLElement.h"
 
 #include <cassert>
 

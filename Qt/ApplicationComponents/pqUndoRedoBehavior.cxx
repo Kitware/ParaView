@@ -31,15 +31,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqUndoRedoBehavior.h"
 
-#include "pqApplicationCore.h"
-#include "pqUndoStackBuilder.h"
-#include "pqUndoStack.h"
 #include "pqActiveObjects.h"
+#include "pqApplicationCore.h"
 #include "pqServerManagerModel.h"
+#include "pqUndoStack.h"
+#include "pqUndoStackBuilder.h"
 
 #include "vtkSMProxyManager.h"
-#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 
 #include <QDebug>
 

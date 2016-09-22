@@ -39,15 +39,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineModel.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkSmartPointer.h"
 
-#include <QRadioButton>
-#include <QLineEdit>
 #include <QItemSelectionModel>
+#include <QLineEdit>
+#include <QRadioButton>
 
 class pqChangeInputDialog::pqInternals : public Ui::pqChangeInputDialog
 {

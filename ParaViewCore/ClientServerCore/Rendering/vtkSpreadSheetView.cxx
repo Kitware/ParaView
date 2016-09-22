@@ -15,21 +15,21 @@
 #include "vtkSpreadSheetView.h"
 
 #include "vtkAlgorithmOutput.h"
+#include "vtkCSVExporter.h"
 #include "vtkCharArray.h"
 #include "vtkClientServerMoveData.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
-#include "vtkCSVExporter.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkMarkSelectedRows.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkPassArrays.h"
-#include "vtkProcessModule.h"
 #include "vtkPVMergeTables.h"
 #include "vtkPVSynchronizedRenderWindows.h"
+#include "vtkPassArrays.h"
+#include "vtkProcessModule.h"
 #include "vtkReductionFilter.h"
 #include "vtkSmartPointer.h"
 #include "vtkSortedTableStreamer.h"
@@ -37,10 +37,10 @@
 #include "vtkTable.h"
 #include "vtkVariant.h"
 
-#include <map>
-#include <vector>
 #include <algorithm>
+#include <map>
 #include <string>
+#include <vector>
 namespace
 {
   struct OrderByNames :

@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqYoungsMaterialPropertyWidget.h"
 
 #include "pqComboBoxDomain.h"
-#include "pqPropertyLinksConnection.h"
 #include "pqPropertyLinks.h"
+#include "pqPropertyLinksConnection.h"
 #include "pqSMAdaptor.h"
 #include "pqTreeWidget.h"
 #include "vtkSMPropertyGroup.h"

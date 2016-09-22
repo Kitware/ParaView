@@ -17,7 +17,6 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVProxyDefinitionIterator.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMExporterProxy.h"
 #include "vtkSMParaViewPipelineController.h"
@@ -25,10 +24,11 @@
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMViewProxy.h"
+#include "vtkSmartPointer.h"
 
-#include <vtksys/SystemTools.hxx>
-#include <vtksys/RegularExpression.hxx>
 #include <sstream>
+#include <vtksys/RegularExpression.hxx>
+#include <vtksys/SystemTools.hxx>
 
 vtkObjectFactoryNewMacro(vtkSMViewExportHelper);
 //----------------------------------------------------------------------------

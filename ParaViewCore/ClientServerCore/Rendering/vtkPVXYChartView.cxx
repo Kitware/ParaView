@@ -16,6 +16,7 @@
 
 #include "vtkAnnotationLink.h"
 #include "vtkAxis.h"
+#include "vtkCSVExporter.h"
 #include "vtkChartBox.h"
 #include "vtkChartLegend.h"
 #include "vtkChartParallelCoordinates.h"
@@ -25,18 +26,17 @@
 #include "vtkContextMouseEvent.h"
 #include "vtkContextScene.h"
 #include "vtkContextView.h"
-#include "vtkCSVExporter.h"
 #include "vtkDoubleArray.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPen.h"
 #include "vtkPVPlotTime.h"
+#include "vtkPen.h"
 #include "vtkStringArray.h"
 #include "vtkTextProperty.h"
 #include "vtkXYChartRepresentation.h"
 
-#include <string>
 #include <sstream>
+#include <string>
 
 class vtkPVXYChartView::vtkInternals
 {

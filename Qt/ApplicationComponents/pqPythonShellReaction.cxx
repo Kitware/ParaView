@@ -31,12 +31,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqPythonShellReaction.h"
 
-#include "vtkPVConfig.h"
 #include "pqPVApplicationCore.h"
+#include "vtkPVConfig.h"
 
 #ifdef PARAVIEW_ENABLE_PYTHON
-#include "pqPythonManager.h"
 #include "pqPythonDialog.h"
+#include "pqPythonManager.h"
 #endif
 
 //-----------------------------------------------------------------------------

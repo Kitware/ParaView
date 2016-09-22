@@ -23,8 +23,8 @@
 #ifndef vtkMantaManager_h
 #define vtkMantaManager_h
 
-#include "vtkObject.h"
 #include "vtkMantaModule.h"
+#include "vtkObject.h"
 
 namespace Manta {
 class Camera;

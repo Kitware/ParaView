@@ -16,12 +16,12 @@
 #define vtkSMProxyPropertyInternals_h
 
 #include "vtkCommand.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMMessage.h"
 #include "vtkSMObject.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMSession.h"
+#include "vtkSmartPointer.h"
 #include "vtkWeakPointer.h"
 
 #include <algorithm>

@@ -35,11 +35,11 @@
 *
 *****************************************************************************/
 
+#include "QvisColorGridWidget.h"
+#include <QKeyEvent>
 #include <qcursor.h>
 #include <qpainter.h>
 #include <qpixmap.h>
-#include <QKeyEvent>
-#include "QvisColorGridWidget.h"
 
 // ****************************************************************************
 // Method: QvisColorGridWidget::QvisColorGridWidget

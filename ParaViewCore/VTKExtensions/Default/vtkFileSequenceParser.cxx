@@ -16,10 +16,10 @@
 
 #include "vtkObjectFactory.h"
 
-#include <vtksys/SystemTools.hxx>
-#include <vtksys/RegularExpression.hxx>
 #include <set>
 #include <string>
+#include <vtksys/RegularExpression.hxx>
+#include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkFileSequenceParser);
 //-----------------------------------------------------------------------------

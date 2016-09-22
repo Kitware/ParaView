@@ -32,10 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqModelTransformSupportBehavior_h
 #define pqModelTransformSupportBehavior_h
 
-#include <QObject>
 #include "pqApplicationComponentsModule.h"
 #include "vtkStdString.h"
 #include "vtkTuple.h"
+#include <QObject>
 
 class pqView;
 class vtkSMSourceProxy;

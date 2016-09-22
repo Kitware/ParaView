@@ -33,10 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqImageOutputInfo_h
 
 #include "pqComponentsModule.h"
+#include <QScopedPointer>
 #include <QString>
 #include <QStringList>
 #include <QWidget>
-#include <QScopedPointer>
 
 
 class pqView;

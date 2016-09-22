@@ -21,10 +21,10 @@
 #ifndef vtkSIProperty_h
 #define vtkSIProperty_h
 
-#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkObject.h"
-#include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
-#include "vtkWeakPointer.h" // needed for vtkWeakPointer.
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
+#include "vtkSMMessageMinimal.h"                 // needed for vtkSMMessage
+#include "vtkWeakPointer.h"                      // needed for vtkWeakPointer.
 
 class vtkClientServerStream;
 class vtkSIObject;

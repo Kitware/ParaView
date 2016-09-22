@@ -22,8 +22,8 @@
 #ifndef vtkSortedTableStreamer_h
 #define vtkSortedTableStreamer_h
 
-#include "vtkTableAlgorithm.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
+#include "vtkTableAlgorithm.h"
 class vtkTable;
 class vtkDataArray;
 class vtkMultiProcessController;

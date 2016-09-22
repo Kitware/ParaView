@@ -36,9 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertiesPanel.h"
 #include "pqProxyWidget.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyListDomain.h"
+#include "vtkSmartPointer.h"
 #include "vtkWeakPointer.h"
 
 #include <QPointer>

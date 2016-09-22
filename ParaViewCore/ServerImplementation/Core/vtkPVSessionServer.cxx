@@ -22,27 +22,27 @@
 #include "vtkNetworkAccessManager.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
 #include "vtkPVInformation.h"
 #include "vtkPVInstantiator.h"
 #include "vtkPVServerOptions.h"
 #include "vtkPVSessionCore.h"
+#include "vtkProcessModule.h"
 #include "vtkReservedRemoteObjectIds.h"
-#include "vtkSIProxyDefinitionManager.h"
 #include "vtkSIProxy.h"
-#include "vtkSmartPointer.h"
+#include "vtkSIProxyDefinitionManager.h"
 #include "vtkSMMessage.h"
+#include "vtkSmartPointer.h"
 #include "vtkSocketCommunicator.h"
 #include "vtkSocketController.h"
 
 #include <assert.h>
-#include <string>
+#include <map>
 #include <sstream>
-#include <vtksys/RegularExpression.hxx>
+#include <string>
 #include <string>
 #include <vector>
-#include <map>
+#include <vtksys/RegularExpression.hxx>
 
 //****************************************************************************/
 //                    Internal Classes and typedefs

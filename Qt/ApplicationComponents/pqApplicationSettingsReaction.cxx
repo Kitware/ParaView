@@ -31,8 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqApplicationSettingsReaction.h"
 
-#include "pqSettingsDialog.h"
 #include "pqCoreUtilities.h"
+#include "pqSettingsDialog.h"
 
 
 QPointer<pqSettingsDialog> pqApplicationSettingsReaction::Dialog;

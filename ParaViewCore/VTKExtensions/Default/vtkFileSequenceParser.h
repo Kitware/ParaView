@@ -24,8 +24,8 @@
 #ifndef vtkFileSequenceParser_h
 #define vtkFileSequenceParser_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkObject.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 namespace vtksys {
   class RegularExpression;

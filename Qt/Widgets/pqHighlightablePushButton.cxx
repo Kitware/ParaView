@@ -31,8 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqHighlightablePushButton.h"
 
-#include <QPalette>
 #include <QColor>
+#include <QPalette>
 
 class pqHighlightablePushButton::pqInternals
 {

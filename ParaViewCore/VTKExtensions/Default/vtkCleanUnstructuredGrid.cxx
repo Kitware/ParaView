@@ -14,17 +14,17 @@ PURPOSE.  See the above copyright notice for more information.
 =========================================================================*/
 #include "vtkCleanUnstructuredGrid.h"
 
-#include "vtkUnstructuredGrid.h"
 #include "vtkCell.h"
-#include "vtkPoints.h"
-#include "vtkPointData.h"
 #include "vtkCellData.h"
-#include "vtkObjectFactory.h"
-#include "vtkIntArray.h"
 #include "vtkCollection.h"
-#include "vtkMergePoints.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkIntArray.h"
+#include "vtkMergePoints.h"
+#include "vtkObjectFactory.h"
+#include "vtkPointData.h"
+#include "vtkPoints.h"
+#include "vtkUnstructuredGrid.h"
 
 vtkStandardNewMacro(vtkCleanUnstructuredGrid);
 

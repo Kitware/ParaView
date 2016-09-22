@@ -15,13 +15,13 @@
 #include "vtkSMProxyConfigurationWriter.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkSMProxy.h"
-#include "vtkSMPropertyIterator.h"
 #include "vtkSMNamedPropertyIterator.h"
+#include "vtkSMPropertyIterator.h"
+#include "vtkSMProxy.h"
 #include "vtkSMProxyConfigurationFileInfo.h"
 
-#include "vtkStringList.h"
 #include "vtkPVXMLElement.h"
+#include "vtkStringList.h"
 
 #include <fstream>
 #include <iostream>

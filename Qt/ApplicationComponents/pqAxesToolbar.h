@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqAxesToolbar_h
 #define pqAxesToolbar_h
 
-#include <QToolBar>
 #include "pqApplicationComponentsModule.h"
+#include <QToolBar>
 
 /// pqAxesToolbar is the toolbar that has buttons for setting the center
 /// rotation axes, toggling its visibility etc.

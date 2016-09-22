@@ -23,8 +23,8 @@
 #ifndef vtkTexturePainter_h
 #define vtkTexturePainter_h
 
-#include "vtkPainter.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
+#include "vtkPainter.h"
 
 class vtkImageData;
 class vtkInformationIntegerKey;

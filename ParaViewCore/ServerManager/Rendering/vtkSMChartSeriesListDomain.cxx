@@ -25,9 +25,9 @@
 #include "vtkSMUncheckedPropertyHelper.h"
 #include "vtkStdString.h"
 
-#include <vector>
 #include <algorithm>
 #include <assert.h>
+#include <vector>
 
 vtkStandardNewMacro(vtkSMChartSeriesListDomain);
 //----------------------------------------------------------------------------

@@ -16,7 +16,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkNew.h"
 #include "vtkProcessModule.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
@@ -24,10 +23,11 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSmartPointer.h"
 #include "vtkTestUtilities.h"
 
-#include <sstream>
 #include <assert.h>
+#include <sstream>
 
 // This demonstrates how to put together a simple application with rendering
 // capabilities using the vtkSMParaViewPipelineControllerWithRendering.

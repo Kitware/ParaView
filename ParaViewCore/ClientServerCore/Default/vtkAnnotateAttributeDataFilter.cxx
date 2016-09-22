@@ -20,8 +20,8 @@
 #include "vtkObjectFactory.h"
 #include "vtkPythonInterpreter.h"
 
-#include <string>
 #include <sstream>
+#include <string>
 #include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------

@@ -31,23 +31,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqFileDialog.h"
-#include "pqFileDialogModel.h"
 #include "pqFileDialogFavoriteModel.h"
-#include "pqFileDialogRecentDirsModel.h"
 #include "pqFileDialogFilter.h"
+#include "pqFileDialogModel.h"
+#include "pqFileDialogRecentDirsModel.h"
 #include "pqServer.h"
 
+#include <QAbstractButton>
+#include <QAbstractItemView>
+#include <QAction>
+#include <QComboBox>
 #include <QCompleter>
 #include <QDir>
-#include <QMessageBox>
-#include <QtDebug>
-#include <QPoint>
-#include <QAction>
-#include <QMenu>
 #include <QLineEdit>
-#include <QAbstractButton>
-#include <QComboBox>
-#include <QAbstractItemView>
+#include <QMenu>
+#include <QMessageBox>
+#include <QPoint>
+#include <QtDebug>
 
 #include <QKeyEvent>
 #include <QMouseEvent>

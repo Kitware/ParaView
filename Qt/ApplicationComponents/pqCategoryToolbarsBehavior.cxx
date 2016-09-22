@@ -31,11 +31,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqCategoryToolbarsBehavior.h"
 
-#include "pqProxyGroupMenuManager.h"
 #include "pqApplicationCore.h"
-#include "pqTestUtility.h"
 #include "pqEventDispatcher.h"
 #include "pqEventTranslator.h"
+#include "pqProxyGroupMenuManager.h"
+#include "pqTestUtility.h"
 
 #include <QMainWindow>
 #include <QToolBar>

@@ -32,22 +32,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCollaborationPanel.h"
 
 // Qt Includes.
-#include <QDockWidget>
-#include <QTextDocument>
-#include <QTextCursor>
-#include <QColor>
-#include <QPointer>
 #include <QCheckBox>
+#include <QColor>
+#include <QDockWidget>
+#include <QPointer>
 #include <QScrollArea>
+#include <QTextCursor>
+#include <QTextDocument>
 #include <QtDebug>
 
 //// ParaView Includes.
-#include "pqCollaborationManager.h"
-#include "pqApplicationCore.h"
 #include "pqActiveObjects.h"
+#include "pqApplicationCore.h"
+#include "pqCollaborationManager.h"
+#include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqView.h"
-#include "pqServer.h"
 
 #include "vtkEventQtSlotConnect.h"
 #include "vtkPVServerInformation.h"
@@ -63,10 +63,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSessionProxyManager.h"
 
 #include "vtkCommand.h"
-#include <vtkNew.h>
 #include <map>
-#include <string>
 #include <sstream>
+#include <string>
+#include <vtkNew.h>
 
 //*****************************************************************************
 #include "ui_pqCollaborationPanel.h"

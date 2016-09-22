@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 #include "vtkCamera.h"
 #include "vtkMath.h"
-#include "vtkSMPropertyGroup.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
+#include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 

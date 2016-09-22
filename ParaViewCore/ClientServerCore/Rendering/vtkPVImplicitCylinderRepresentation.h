@@ -20,8 +20,8 @@
 #ifndef vtkPVImplicitCylinderRepresentation_h
 #define vtkPVImplicitCylinderRepresentation_h
 
-#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkImplicitCylinderRepresentation.h"
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVImplicitCylinderRepresentation

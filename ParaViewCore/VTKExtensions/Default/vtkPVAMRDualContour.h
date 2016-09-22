@@ -23,8 +23,8 @@
 #ifndef vtkPVAMRDualContour_h
 #define vtkPVAMRDualContour_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkAMRDualContour.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 // Forware declaration.
 class vtkPVAMRDualContourInternal;

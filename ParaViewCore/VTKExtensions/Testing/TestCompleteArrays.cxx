@@ -13,11 +13,11 @@
 
 =========================================================================*/
 
+#include "vtkArrayCalculator.h"
+#include "vtkCompleteArrays.h"
 #include "vtkConeSource.h"
 #include "vtkMultiProcessController.h"
-#include "vtkCompleteArrays.h"
 #include "vtkPolyData.h"
-#include "vtkArrayCalculator.h"
 
 // This will be called by all processes
 void MyMain( vtkMultiProcessController *controller, void * )

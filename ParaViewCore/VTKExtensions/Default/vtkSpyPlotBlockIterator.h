@@ -1,10 +1,10 @@
 #ifndef vtkSpyPlotBlockIterator_h
 #define vtkSpyPlotBlockIterator_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
-#include "vtkSpyPlotUniReader.h"
-#include "vtkSpyPlotReaderMap.h"
 #include "assert.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
+#include "vtkSpyPlotReaderMap.h"
+#include "vtkSpyPlotUniReader.h"
 
 class vtkSpyBlock;
 class vtkSpyPlotReaderMap;

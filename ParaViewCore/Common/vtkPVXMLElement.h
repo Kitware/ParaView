@@ -20,8 +20,8 @@
 #define vtkPVXMLElement_h
 
 #include "vtkObject.h"
-#include "vtkStdString.h" // needed for vtkStdString.
 #include "vtkPVCommonModule.h" // needed for export macro
+#include "vtkStdString.h"      // needed for vtkStdString.
 
 class vtkCollection;
 class vtkPVXMLParser;

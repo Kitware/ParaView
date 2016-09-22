@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqFileDialogFilter_h
 
 #include "pqCoreModule.h"
-#include <QSortFilterProxyModel>
 #include <QRegExp>
+#include <QSortFilterProxyModel>
 class pqFileDialogModel;
 
 class PQCORE_EXPORT pqFileDialogFilter :

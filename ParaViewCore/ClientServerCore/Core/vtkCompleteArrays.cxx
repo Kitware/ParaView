@@ -22,9 +22,9 @@
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkPointData.h"
 #include "vtkPointSet.h"
-#include "vtkPVArrayInformation.h"
 
 
 // this doesn't directly use vtkPVDataSetAttributesInformation since

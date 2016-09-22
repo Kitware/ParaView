@@ -21,38 +21,38 @@
 #include "vtkFileSequenceParser.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVFileInformationHelper.h"
+#include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
 
 #if defined(_WIN32)
-# define _WIN32_IE 0x0400  // special folder support
-# define _WIN32_WINNT 0x0400  // shared folder support
-# include <windows.h>   // FindFirstFile, FindNextFile, FindClose, ...
-# include <direct.h>    // _getcwd
-# include <shlobj.h>    // SHGetFolderPath
-# include <sys/stat.h>  // stat
-# include <string.h>   // for strcasecmp
-# define vtkPVServerFileListingGetCWD _getcwd
+#define _WIN32_IE 0x0400    // special folder support
+#define _WIN32_WINNT 0x0400 // shared folder support
+#include <direct.h>         // _getcwd
+#include <shlobj.h>         // SHGetFolderPath
+#include <string.h>         // for strcasecmp
+#include <sys/stat.h>       // stat
+#include <windows.h>        // FindFirstFile, FindNextFile, FindClose, ...
+#define vtkPVServerFileListingGetCWD _getcwd
 #else
-# include <sys/types.h> // DIR, struct dirent, struct stat
-# include <sys/stat.h>  // stat
-# include <dirent.h>    // opendir, readdir, closedir
-# include <unistd.h>    // access, getcwd
-# include <errno.h>     // errno
-# include <string.h>    // strerror
-# include <stdlib.h>    // getenv
-# define vtkPVServerFileListingGetCWD getcwd
+#include <dirent.h>    // opendir, readdir, closedir
+#include <errno.h>     // errno
+#include <stdlib.h>    // getenv
+#include <string.h>    // strerror
+#include <sys/stat.h>  // stat
+#include <sys/types.h> // DIR, struct dirent, struct stat
+#include <unistd.h>    // access, getcwd
+#define vtkPVServerFileListingGetCWD getcwd
 #endif
 #if defined (__APPLE__)
 #include "vtkPVMacFileInformationHelper.h"
 #include <vector>
 #endif
 
-#include <vtksys/SystemTools.hxx>
-#include <vtksys/RegularExpression.hxx>
 #include <set>
 #include <string>
+#include <vtksys/RegularExpression.hxx>
+#include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkPVFileInformation);
 

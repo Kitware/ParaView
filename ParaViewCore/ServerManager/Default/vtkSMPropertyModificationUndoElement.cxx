@@ -16,10 +16,10 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMMessage.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMSession.h"
-#include "vtkSMMessage.h"
 
 vtkStandardNewMacro(vtkSMPropertyModificationUndoElement);
 //-----------------------------------------------------------------------------

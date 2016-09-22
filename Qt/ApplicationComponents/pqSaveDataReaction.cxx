@@ -41,14 +41,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyWidgetDialog.h"
 #include "pqServer.h"
 #include "pqTestUtility.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTrace.h"
 #include "vtkSMWriterFactory.h"
+#include "vtkSmartPointer.h"
 
-#include <QMessageBox>
 #include <QDebug>
+#include <QMessageBox>
 
 //-----------------------------------------------------------------------------
 pqSaveDataReaction::pqSaveDataReaction(QAction* parentObject)

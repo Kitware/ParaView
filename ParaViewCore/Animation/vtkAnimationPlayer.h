@@ -20,8 +20,8 @@
 #define vtkAnimationPlayer_h
 
 #include "vtkObject.h"
-#include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 #include "vtkPVAnimationModule.h" // needed for export macro
+#include "vtkWeakPointer.h"       // needed for vtkWeakPointer.
 
 class vtkSMAnimationScene;
 class VTKPVANIMATION_EXPORT vtkAnimationPlayer : public vtkObject

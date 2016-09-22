@@ -48,12 +48,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMMessage.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMSessionClient.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionClient.h"
 #include "vtkWeakPointer.h"
 
-#include <set>
 #include <map>
+#include <set>
 
 // Qt includes.
 #include <QAction>
@@ -61,10 +61,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMap>
 #include <QMouseEvent>
 #include <QPointer>
-#include <QtDebug>
 #include <QTimer>
 #include <QVariant>
 #include <QWidget>
+#include <QtDebug>
 
 //***************************************************************************
 //                           Internal class

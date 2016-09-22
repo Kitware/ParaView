@@ -23,8 +23,8 @@
 #ifndef vtkMaterialInterfaceIdList_h
 #define vtkMaterialInterfaceIdList_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMaterialInterfaceIdListItem.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 #include <vector> // needed for Initialize method
 

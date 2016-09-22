@@ -36,8 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 
-#include <QVBoxLayout>
 #include <QLabel>
+#include <QVBoxLayout>
 
 //-----------------------------------------------------------------------------
 pqColorSelectorPropertyWidget::pqColorSelectorPropertyWidget(

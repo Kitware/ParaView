@@ -19,8 +19,8 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSIObject.h"
 #include "vtkSIProxy.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMMessage.h"
+#include "vtkSmartPointer.h"
 
 #include <algorithm>
 #include <assert.h>

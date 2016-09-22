@@ -32,10 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqServerManagerModel_h
 #define pqServerManagerModel_h
 
-#include <QObject>
-#include <QList>
 #include "pqCoreModule.h"
 #include "vtkType.h" // for vtkIdType.
+#include <QList>
+#include <QObject>
 
 class pqPipelineSource;
 class pqProxy;

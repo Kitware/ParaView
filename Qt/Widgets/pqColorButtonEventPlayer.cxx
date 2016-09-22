@@ -31,8 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqColorButtonEventPlayer.h"
 
-#include "pqTestUtility.h"
 #include "pqColorChooserButton.h"
+#include "pqTestUtility.h"
 
 #include <QColor>
 #include <QRegExp>

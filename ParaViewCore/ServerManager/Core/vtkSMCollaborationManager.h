@@ -37,8 +37,8 @@
 #define vtkSMCollaborationManager_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
+#include "vtkSMMessageMinimal.h"          // needed for vtkSMMessage
 #include "vtkSMRemoteObject.h"
-#include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 
 class vtkSMProxyLocator;
 

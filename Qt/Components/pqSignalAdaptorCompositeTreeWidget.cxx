@@ -36,12 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMCompositeTreeDomain.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSmartPointer.h"
 
 // Qt Includes.
 #include <QPointer>
@@ -49,8 +49,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 // ParaView Includes.
-#include "pqTreeWidgetItem.h"
 #include "pqSMAdaptor.h"
+#include "pqTreeWidgetItem.h"
 
 //-----------------------------------------------------------------------------
 class pqSignalAdaptorCompositeTreeWidget::pqInternal

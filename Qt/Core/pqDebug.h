@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqDebug_h
 #define pqDebug_h
 
-#include <QDebug>
 #include "pqCoreModule.h"
+#include <QDebug>
 
 /// pqDebugType provides a mechanism for application to define categories for
 /// debugging various components of the UI. By passing an appropriate name for

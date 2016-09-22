@@ -22,8 +22,8 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkZlibImageCompressor.h"
 
-#include <sstream>
 #include <assert.h>
+#include <sstream>
 
 vtkStandardNewMacro(vtkPVClientServerSynchronizedRenderers);
 vtkCxxSetObjectMacro(vtkPVClientServerSynchronizedRenderers, Compressor,

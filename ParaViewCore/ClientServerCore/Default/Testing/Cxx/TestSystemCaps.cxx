@@ -1,16 +1,16 @@
-#include "vtkSetGet.h"
-#include "vtkRenderWindow.h"
-#include "vtkOpenGLRenderWindow.h"
 #include "vtkOpenGLExtensionManager.h"
+#include "vtkOpenGLRenderWindow.h"
+#include "vtkRenderWindow.h"
+#include "vtkSetGet.h"
 #if defined(TEST_MPI_CAPS)
 # include "vtkMPI.h"
 #endif
 #if defined(TEST_PY_CAPS)
 # include "patchlevel.h"
 #endif
-#include <vtksys/SystemInformation.hxx>
-#include <string>
 #include <sstream>
+#include <string>
+#include <vtksys/SystemInformation.hxx>
 
 using std::string;
 using std::ostringstream;

@@ -22,8 +22,8 @@
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
-#include <cassert>
 #include "vtkType.h"
+#include <cassert>
 #include <iostream>
 #include <vector>
 

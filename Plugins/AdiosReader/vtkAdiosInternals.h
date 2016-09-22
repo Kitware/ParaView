@@ -14,12 +14,12 @@
 =========================================================================*/
 
 // Standard library
-#include <sstream>
-#include <string>
+#include <assert.h>
 #include <map>
 #include <set>
+#include <sstream>
+#include <string>
 #include <sys/stat.h>
-#include <assert.h>
 
 using std::ostringstream;
 
@@ -56,8 +56,8 @@ using std::ostringstream;
 
 extern "C"
 {
-#include <adios_read.h>
 #include <adios_error.h>
+#include <adios_read.h>
 }
 
 #ifndef vtkAdiosInternals_v2_h

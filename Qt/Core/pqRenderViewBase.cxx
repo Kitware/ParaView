@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkErrorCode.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkImageData.h"
-#include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
+#include "vtkProcessModule.h"
 #include "vtkRenderWindow.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProperty.h"
@@ -66,11 +66,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqQVTKWidget.h"
+#include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
 #include "pqTimer.h"
-#include "pqRenderView.h"
 
 #include <string>
 

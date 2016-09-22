@@ -40,9 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "pqWidgetsModule.h"
+#include <QHeaderView>
 #include <QMenu>
 #include <QPointer>
-#include <QHeaderView>
 
 class PQWIDGETS_EXPORT pqSectionVisibilityContextMenu : public QMenu
 {

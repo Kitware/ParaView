@@ -15,8 +15,8 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkSMIntVectorPropertyTest.h"
 
-#include "vtkSMProxyManager.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMProxyManager.h"
 
 void vtkSMIntVectorPropertyTest::SetNumberOfElements()
 {

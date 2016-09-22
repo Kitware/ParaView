@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqPythonEventSourceImage_h
 #define _pqPythonEventSourceImage_h
 
-#include "pqPythonEventSource.h"
 #include "pqCoreModule.h"
+#include "pqPythonEventSource.h"
 
 /** Python event source with Image comparison capabilities 
 

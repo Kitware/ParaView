@@ -17,11 +17,11 @@
 #include "vtkCellArray.h"
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
+#include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPoints.h"
 #include "vtkPolyData.h"
-#include "vtkMath.h"
 
 vtkStandardNewMacro(vtkAppendArcLength);
 //----------------------------------------------------------------------------

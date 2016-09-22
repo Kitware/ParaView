@@ -38,23 +38,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderViewBase.h"
 #include "pqServerManagerModel.h"
 #include "vtkPythonInterpreter.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMCoreUtilities.h"
+#include "vtkSmartPointer.h"
 
-#include "pqPipelineFilter.h"
-#include "vtkSMProperty.h"
-#include "vtkSMDoubleRangeDomain.h"
 #include "pqCinemaTrack.h"
+#include "pqPipelineFilter.h"
+#include "vtkSMDoubleRangeDomain.h"
+#include "vtkSMProperty.h"
 
 #include <vtksys/SystemTools.hxx>
 
 #include <QLabel>
-#include <QPixmap>
-#include <QSize>
 #include <QMessageBox>
+#include <QPixmap>
 #include <QPointer>
 #include <QRegExp>
 #include <QRegExpValidator>
+#include <QSize>
 
 #include <QDebug>
 

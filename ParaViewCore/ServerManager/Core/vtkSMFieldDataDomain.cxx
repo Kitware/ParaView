@@ -20,12 +20,12 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMInputArrayDomain.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSmartPointer.h"
 
 #include <set>
 

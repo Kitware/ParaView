@@ -35,16 +35,16 @@
 #include <QStringList>
 #include <QtDebug>
 
+#include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
-#include "vtkSelectionNode.h"
 #include "vtkSMIdTypeVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMProperty.h"
+#include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
-#include "vtkSMProperty.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSMProperty.h"
 #include "vtkSMVectorProperty.h"
-#include "vtkPVDataInformation.h"
+#include "vtkSelectionNode.h"
 
 ///
 /// pqElementPlotter

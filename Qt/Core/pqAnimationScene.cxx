@@ -34,17 +34,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationCue.h"
 #include "pqApplicationCore.h"
 #include "pqObjectBuilder.h"
-#include "pqServer.h"
-#include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 #include "pqSMProxy.h"
+#include "pqServer.h"
+#include "pqServerManagerModel.h"
 #include "pqTimeKeeper.h"
 #include "vtkAnimationCue.h"
 #include "vtkBoundingBox.h"
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkPoints.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxyManager.h"
@@ -54,11 +53,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMUtilities.h"
 #include "vtkSMViewProxy.h"
+#include "vtkSmartPointer.h"
 
 #include <QPointer>
 #include <QSet>
-#include <QtDebug>
 #include <QSize>
+#include <QtDebug>
 
 
 template<class T>

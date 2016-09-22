@@ -36,8 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMouseEvent>
 #include <QPainter>
 
-#include <iostream>
 #include <cmath>
+#include <iostream>
 
 
 namespace

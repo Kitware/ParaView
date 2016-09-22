@@ -31,8 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqExampleVisualizationsDialogReaction.h"
 
-#include "pqExampleVisualizationsDialog.h"
 #include "pqCoreUtilities.h"
+#include "pqExampleVisualizationsDialog.h"
 
 //-----------------------------------------------------------------------------
 pqExampleVisualizationsDialogReaction::pqExampleVisualizationsDialogReaction(

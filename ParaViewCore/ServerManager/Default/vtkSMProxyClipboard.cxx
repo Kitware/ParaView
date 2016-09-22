@@ -23,9 +23,9 @@
 #include "vtkSMProxy.h"
 #include "vtkSMProxyListDomain.h"
 #include "vtkSMProxyLocator.h"
-#include <sstream>
-#include <map>
 #include <cassert>
+#include <map>
+#include <sstream>
 
 //============================================================================
 class vtkSMProxyClipboardPropertyIterator : public vtkSMPropertyIterator

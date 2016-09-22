@@ -42,8 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMap>
 #include <QPointer>
 #include <QSize>
-#include <QtDebug>
 #include <QTemporaryFile>
+#include <QtDebug>
 
 // ParaView includes.
 #include "pq3DWidgetFactory.h"
@@ -57,38 +57,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLinksModel.h"
 #include "pqObjectBuilder.h"
 #include "pqOptions.h"
-#include "pqOutputWindowAdapter.h"
 #include "pqOutputWindow.h"
+#include "pqOutputWindowAdapter.h"
 #include "pqPipelineFilter.h"
 #include "pqPluginManager.h"
 #include "pqProgressManager.h"
 #include "pqRecentlyUsedResourcesList.h"
 #include "pqRenderView.h"
-#include "pqServerConfigurationCollection.h"
+#include "pqSMAdaptor.h"
 #include "pqServer.h"
+#include "pqServerConfigurationCollection.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 #include "pqSettings.h"
-#include "pqSMAdaptor.h"
 #include "pqStandardServerManagerModelInterface.h"
 #include "pqUndoStack.h"
 #include "pqXMLUtil.h"
 #include "vtkInitializationHelper.h"
-#include "vtkProcessModuleAutoMPI.h"
-#include "vtkProcessModule.h"
 #include "vtkPVPluginTracker.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
-#include "vtkSmartPointer.h"
+#include "vtkProcessModule.h"
+#include "vtkProcessModuleAutoMPI.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMReaderFactory.h"
-#include "vtkSMWriterFactory.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMWriterFactory.h"
+#include "vtkSmartPointer.h"
 
 //-----------------------------------------------------------------------------
 class pqApplicationCore::pqInternals

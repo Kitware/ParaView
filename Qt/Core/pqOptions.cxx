@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqOptions.h"
 
-#include <vtkObjectFactory.h>
 #include <string>
+#include <vtkObjectFactory.h>
 
 vtkStandardNewMacro(pqOptions);
 

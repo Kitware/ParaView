@@ -20,7 +20,6 @@
 #include "vtkImageProcessingPass.h"
 #include "vtkObjectFactory.h"
 #include "vtkOpenGLRenderer.h"
-#include "vtkProcessModule.h"
 #include "vtkPVClientServerSynchronizedRenderers.h"
 #include "vtkPVConfig.h"
 #include "vtkPVDefaultPass.h"
@@ -28,6 +27,7 @@
 #include "vtkPVRenderViewSettings.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVSession.h"
+#include "vtkProcessModule.h"
 #include "vtkRenderer.h"
 #include "vtkSocketController.h"
 

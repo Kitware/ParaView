@@ -24,8 +24,8 @@
 #ifndef vtkPVDataSetAlgorithmSelectorFilter_h
 #define vtkPVDataSetAlgorithmSelectorFilter_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkAlgorithm.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVDataSetAlgorithmSelectorFilter : public vtkAlgorithm
 {

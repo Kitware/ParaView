@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QDoubleValidator>
+#include <QFormLayout>
 #include <QIntValidator>
 #include <QLabel>
 #include <QLineEdit>
@@ -45,7 +46,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSignalMapper>
 #include <QToolButton>
 #include <QVBoxLayout>
-#include <QFormLayout>
 #include <QtDebug>
 
 #include "pqActiveObjects.h"
@@ -64,11 +64,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineTimeKeyFrameEditor.h"
 #include "pqPropertyLinks.h"
 #include "pqRenderView.h"
+#include "pqSMAdaptor.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSetName.h"
 #include "pqSignalAdaptors.h"
-#include "pqSMAdaptor.h"
 #include "pqTimeKeeper.h"
 #include "pqUndoStack.h"
 

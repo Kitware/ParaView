@@ -35,19 +35,19 @@
 *
 *****************************************************************************/
 
-#include <cstdlib> // for qsort
-#include <qpainter.h>
-#include <qpixmap.h>
-#include <qpainter.h>
-#include <qstyle.h>
-#include <qtimer.h>
+#include "QvisSpectrumBar.h"
 #include <QEvent>
 #include <QKeyEvent>
+#include <QMatrix>
 #include <QPalette>
 #include <QPolygon>
-#include <QMatrix>
 #include <QStyleOption>
-#include "QvisSpectrumBar.h"
+#include <cstdlib> // for qsort
+#include <qpainter.h>
+#include <qpainter.h>
+#include <qpixmap.h>
+#include <qstyle.h>
+#include <qtimer.h>
 
 // Some constants for paging modes.
 #define NO_PAGING      -1

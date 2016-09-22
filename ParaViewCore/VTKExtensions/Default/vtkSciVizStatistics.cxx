@@ -4,8 +4,9 @@
 #include "vtkAlgorithm.h"
 #include "vtkCellData.h"
 #include "vtkCompositeDataSet.h"
-#include "vtkDataObjectTreeIterator.h"
+#include "vtkDataArray.h"
 #include "vtkDataObject.h"
+#include "vtkDataObjectTreeIterator.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkDemandDrivenPipeline.h"
 #include "vtkInformation.h"
@@ -19,7 +20,6 @@
 #include "vtkStringArray.h"
 #include "vtkTable.h"
 #include "vtkVariantArray.h"
-#include "vtkDataArray.h"
 
 #include <set>
 #include <sstream>

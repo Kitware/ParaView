@@ -20,17 +20,17 @@
 #include "vtkCompositeDataSet.h"
 #include "vtkDataArray.h"
 #include "vtkDataSet.h"
-#include "vtkMultiBlockDataSet.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkIntegrateAttributes.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
+#include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkSurfaceVectors.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnstructuredGrid.h"
-#include "vtkSmartPointer.h"
 
 vtkStandardNewMacro(vtkIntegrateFlowThroughSurface);
 

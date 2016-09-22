@@ -66,8 +66,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkObjectFactory.h"
 
-#include <Interface/Camera.h>
 #include <Engine/Control/RTRT.h>
+#include <Interface/Camera.h>
 #include <math.h>
 
 vtkStandardNewMacro(vtkMantaCamera);

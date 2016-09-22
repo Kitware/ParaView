@@ -27,8 +27,8 @@
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkMolecule.h"
 #include "vtkMPIMToNSocketConnection.h"
+#include "vtkMolecule.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessControllerHelper.h"
@@ -36,11 +36,11 @@
 #include "vtkObjectFactory.h"
 #include "vtkOutlineFilter.h"
 #include "vtkOverlappingAMR.h"
+#include "vtkPVConfig.h"
+#include "vtkPVSession.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkProcessModule.h"
-#include "vtkPVConfig.h"
-#include "vtkPVSession.h"
 #include "vtkSmartPointer.h"
 #include "vtkSocketCommunicator.h"
 #include "vtkSocketController.h"
@@ -55,8 +55,8 @@
 #include <vector>
 
 #ifdef PARAVIEW_USE_MPI
-#include "vtkMPICommunicator.h"
 #include "vtkAllToNRedistributeCompositePolyData.h"
+#include "vtkMPICommunicator.h"
 #endif
 
 #include <vector>

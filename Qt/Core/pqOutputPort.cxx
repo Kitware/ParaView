@@ -38,8 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 
 // Qt Includes.
-#include <QtDebug>
 #include <QList>
+#include <QtDebug>
 
 // ParaView Includes.
 #include "pqDataRepresentation.h"

@@ -18,16 +18,16 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkSMProperty.h"
-#include "vtkSMProxy.h"
-#include "vtkSmartPointer.h"
-#include "vtkSMProxyLink.h"
-#include "vtkWeakPointer.h"
 #include "vtkSMPropertyGroup.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyLink.h"
+#include "vtkSmartPointer.h"
+#include "vtkWeakPointer.h"
 
-#include <map>
-#include <vector>
 #include "vtkStdString.h"
+#include <map>
 #include <string>
+#include <vector>
 
 //---------------------------------------------------------------------------
 // Internal data structure for storing object IDs, server IDs and

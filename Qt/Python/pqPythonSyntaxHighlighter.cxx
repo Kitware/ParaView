@@ -40,11 +40,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QScrollBar>
 #include <QString>
-#include <QTextEdit>
 #include <QTextCursor>
+#include <QTextEdit>
 
-#include <vtkSmartPyObject.h>
 #include <vtkPythonInterpreter.h>
+#include <vtkSmartPyObject.h>
 
 class pqPythonSyntaxHighlighter::pqInternal {
 public:

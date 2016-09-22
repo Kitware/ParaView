@@ -35,10 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Qt Includes.
 
 // ParaView Includes.
+#include "pqApplicationCore.h"
 #include "pqFileDialogModel.h"
 #include "pqServer.h"
 #include "pqServerResource.h"
-#include "pqApplicationCore.h"
 #include "pqSettings.h"
 
 #include <string>

@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqAnimatablePropertiesComboBox_h
 #define pqAnimatablePropertiesComboBox_h
 
-#include <QComboBox>
 #include "pqComponentsModule.h"
+#include <QComboBox>
 
 class vtkSMProxy;
 

@@ -38,21 +38,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkEventQtSlotConnect.h"
 #include "vtkNew.h"
 #include "vtkPVServerInformation.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMComparativeViewProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSmartPointer.h"
 #include "vtkWeakPointer.h"
 
 // Qt Includes.
+#include <QGridLayout>
 #include <QMap>
 #include <QPointer>
 #include <QSet>
-#include <QGridLayout>
 
 // ParaView Includes.
-#include "pqServer.h"
 #include "pqSMAdaptor.h"
+#include "pqServer.h"
 
 class pqComparativeRenderView::pqInternal
 {

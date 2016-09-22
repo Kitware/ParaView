@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqXMLEventSource_h
 #define _pqXMLEventSource_h
 
-#include "pqEventSource.h"
 #include "pqCoreModule.h"
+#include "pqEventSource.h"
 
 class QString;
 

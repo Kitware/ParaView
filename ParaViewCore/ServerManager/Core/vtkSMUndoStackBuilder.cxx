@@ -16,8 +16,8 @@
 
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
+#include "vtkProcessModule.h"
 #include "vtkSMMessage.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
@@ -29,8 +29,8 @@
 #include "vtkUndoSet.h"
 #include "vtkUndoStackInternal.h"
 
-#include <vtksys/RegularExpression.hxx>
 #include <map>
+#include <vtksys/RegularExpression.hxx>
 
 vtkStandardNewMacro(vtkSMUndoStackBuilder);
 vtkCxxSetObjectMacro(vtkSMUndoStackBuilder, UndoStack, vtkSMUndoStack);

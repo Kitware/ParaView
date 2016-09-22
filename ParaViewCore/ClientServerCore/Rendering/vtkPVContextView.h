@@ -20,10 +20,10 @@
 #ifndef vtkPVContextView_h
 #define vtkPVContextView_h
 
+#include "vtkNew.h"                               // needed for vtkNew.
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVView.h"
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer.
-#include "vtkNew.h" // needed for vtkNew.
 
 class vtkAbstractContextItem;
 class vtkChart;

@@ -31,9 +31,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqApplicationComponentsInit.h"
 
-#include "vtkPVConfig.h"
 #include "pqComponentsInit.h"
-#include <QObject>  // for Q_INIT_RESOURCE
+#include "vtkPVConfig.h"
+#include <QObject> // for Q_INIT_RESOURCE
 #include <QtPlugin>
 
 void pqApplicationComponentsInit()

@@ -18,8 +18,8 @@
 #ifndef vtkPVEnSightMasterServerReader_h
 #define vtkPVEnSightMasterServerReader_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkGenericEnSightReader.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class vtkMultiProcessController;
 class vtkPVEnSightMasterServerReaderInternal;

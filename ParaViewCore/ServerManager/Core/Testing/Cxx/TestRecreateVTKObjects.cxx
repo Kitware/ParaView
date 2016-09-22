@@ -16,13 +16,13 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkInitializationHelper.h"
 #include "vtkNew.h"
 #include "vtkProcessModule.h"
-#include "vtkSmartPointer.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSmartPointer.h"
 #include "vtkSphereSource.h"
 #include "vtkWeakPointer.h"
-#include "vtkSMPropertyHelper.h"
 
 int TestRecreateVTKObjects(int argc, char* argv[])
 {

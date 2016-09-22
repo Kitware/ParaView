@@ -27,13 +27,13 @@
 
 #include "vtkPVConfig.h"
 #ifdef PARAVIEW_USE_MPI
-# include "vtkPExtractGrid.h"
-# include "vtkPExtractVOI.h"
-# include "vtkPExtractRectilinearGrid.h"
+#include "vtkPExtractGrid.h"
+#include "vtkPExtractRectilinearGrid.h"
+#include "vtkPExtractVOI.h"
 #else
-# include "vtkExtractGrid.h"
-# include "vtkExtractVOI.h"
-# include "vtkExtractRectilinearGrid.h"
+#include "vtkExtractGrid.h"
+#include "vtkExtractRectilinearGrid.h"
+#include "vtkExtractVOI.h"
 #endif
 
 vtkStandardNewMacro(vtkPVExtractVOI);

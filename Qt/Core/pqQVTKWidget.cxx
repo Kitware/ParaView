@@ -31,19 +31,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqQVTKWidget.h"
 
-#include <QMoveEvent>
-#include <QResizeEvent>
-#include <QPixmap>
 #include <QImage>
+#include <QMoveEvent>
 #include <QPainter>
-#include <QPointer>
+#include <QPixmap>
 #include <QPoint>
+#include <QPointer>
+#include <QResizeEvent>
 
 #include "pqUndoStack.h"
+#include "vtkRenderWindow.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMSession.h"
-#include "vtkRenderWindow.h"
 
 #include "QVTKInteractorAdapter.h"
 

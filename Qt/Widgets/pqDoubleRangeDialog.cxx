@@ -32,10 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqDoubleRangeDialog.h"
 
-#include <QLabel>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
 #include <QDialogButtonBox>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QVBoxLayout>
 
 #include "pqDoubleRangeWidget.h"
 

@@ -44,9 +44,9 @@
 #include "vtkGenericIOUtilities.h"
 
 // GenericIO includes
-#include "GenericIOReader.h"
 #include "GenericIOMPIReader.h"
 #include "GenericIOPosixReader.h"
+#include "GenericIOReader.h"
 #include "GenericIOUtilities.h"
 
 // C/C++ includes

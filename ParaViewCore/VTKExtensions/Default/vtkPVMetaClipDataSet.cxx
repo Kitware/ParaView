@@ -15,13 +15,13 @@
 #include "vtkPVMetaClipDataSet.h"
 
 #include "vtkAlgorithm.h"
-#include "vtkPVClipDataSet.h"
 #include "vtkDataObject.h"
 #include "vtkExtractGeometry.h"
 #include "vtkImplicitFunction.h"
 #include "vtkInformation.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVClipDataSet.h"
 #include "vtkSmartPointer.h"
 
 class vtkPVMetaClipDataSet::vtkInternals

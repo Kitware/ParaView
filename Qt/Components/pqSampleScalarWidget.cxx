@@ -30,16 +30,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "pqSampleScalarAddRangeDialog.h"
 #include "pqSampleScalarWidget.h"
+#include "pqSampleScalarAddRangeDialog.h"
 #include "pqScalarSetModel.h"
 
 #include "ui_pqSampleScalarWidget.h"
 
+#include <QKeyEvent>
 #include <vtkMemberFunctionCommand.h>
 #include <vtkSMDoubleRangeDomain.h>
 #include <vtkSMDoubleVectorProperty.h>
-#include <QKeyEvent>
 
 ///////////////////////////////////////////////////////////////////////////
 // pqSampleScalarWidget::pqImplementation

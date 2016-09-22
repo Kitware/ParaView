@@ -35,9 +35,9 @@
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVInformationKeys.h"
 #include "vtkPointData.h"
 #include "vtkPolyhedron.h"
-#include "vtkPVInformationKeys.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStructuredGrid.h"
 #include "vtkTypeInt32Array.h"
@@ -51,10 +51,10 @@
 #include <cstdlib>
 #include <functional>
 #include <iterator>
-#include <string>
-#include <string.h>
-#include <vector>
 #include <map>
+#include <string.h>
+#include <string>
+#include <vector>
 
 #include <vtksys/SystemTools.hxx>
 

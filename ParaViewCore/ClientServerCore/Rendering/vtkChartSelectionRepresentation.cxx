@@ -20,11 +20,11 @@
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVContextView.h"
 #include "vtkProcessModule.h"
 #include "vtkProperty.h"
-#include "vtkPVContextView.h"
-#include "vtkSelectionDeliveryFilter.h"
 #include "vtkSelection.h"
+#include "vtkSelectionDeliveryFilter.h"
 #include "vtkSelectionSerializer.h"
 
 #include <assert.h>

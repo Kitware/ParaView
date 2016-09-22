@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqSignalAdaptorSILModel_h
 #define pqSignalAdaptorSILModel_h
 
-#include <QObject>
 #include "pqComponentsModule.h"
+#include <QObject>
 
 class pqSILModel;
 

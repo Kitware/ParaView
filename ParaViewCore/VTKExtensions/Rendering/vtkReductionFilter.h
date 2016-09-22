@@ -31,9 +31,9 @@
 #define vtkReductionFilter_h
 
 #include "vtkDataObjectAlgorithm.h"
-#include "vtkSmartPointer.h" // needed for vtkSmartPointer.
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
-#include <vector> //  needed for std::vector
+#include "vtkSmartPointer.h"                   // needed for vtkSmartPointer.
+#include <vector>                              //  needed for std::vector
 
 class vtkMultiProcessController;
 class vtkSelection;

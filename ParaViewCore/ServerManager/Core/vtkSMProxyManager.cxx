@@ -16,18 +16,18 @@
 
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVConfig.h" // for PARAVIEW_VERSION_*
 #include "vtkPVXMLElement.h"
-#include "vtkSessionIterator.h"
+#include "vtkProcessModule.h"
 #include "vtkSIProxyDefinitionManager.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMPluginManager.h"
 #include "vtkSMReaderFactory.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMUndoStackBuilder.h"
 #include "vtkSMWriterFactory.h"
+#include "vtkSessionIterator.h"
+#include "vtkSmartPointer.h"
 #include "vtkWeakPointer.h"
 
 #include <map>

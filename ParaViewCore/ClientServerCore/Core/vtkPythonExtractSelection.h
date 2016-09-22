@@ -20,8 +20,8 @@
 #ifndef vtkPythonExtractSelection_h
 #define vtkPythonExtractSelection_h
 
-#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkExtractSelectionBase.h"
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 
 class vtkCompositeDataSet;
 

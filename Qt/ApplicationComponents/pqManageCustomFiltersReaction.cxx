@@ -32,11 +32,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqManageCustomFiltersReaction.h"
 
 #include "pqApplicationCore.h"
+#include "pqCoreUtilities.h"
 #include "pqCustomFilterManager.h"
 #include "pqCustomFilterManagerModel.h"
-#include "pqServerManagerObserver.h"
 #include "pqServerManagerModel.h"
-#include "pqCoreUtilities.h"
+#include "pqServerManagerObserver.h"
 
 //-----------------------------------------------------------------------------
 pqManageCustomFiltersReaction::pqManageCustomFiltersReaction(QAction* parentObject)

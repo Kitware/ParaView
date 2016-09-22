@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqKeyFrameTimeValidator_h
 #define pqKeyFrameTimeValidator_h
 
-#include <QDoubleValidator>
 #include "pqComponentsModule.h"
+#include <QDoubleValidator>
 
 class pqAnimationScene;
 class vtkSMDomain;

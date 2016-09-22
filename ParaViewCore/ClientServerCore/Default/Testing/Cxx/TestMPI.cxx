@@ -13,8 +13,8 @@
 
 =========================================================================*/
 #include "vtkConeSource.h"
-#include "vtkPVConnectivityFilter.h"
 #include "vtkMPIMoveData.h"
+#include "vtkPVConnectivityFilter.h"
 #include "vtkPolyData.h"
 #include "vtkUnstructuredGrid.h"
 

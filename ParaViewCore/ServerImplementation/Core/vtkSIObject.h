@@ -20,10 +20,10 @@
 #ifndef vtkSIObject_h
 #define vtkSIObject_h
 
-#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkObject.h"
-#include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
-#include "vtkWeakPointer.h" // needed for vtkWeakPointer
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
+#include "vtkSMMessageMinimal.h"                 // needed for vtkSMMessage
+#include "vtkWeakPointer.h"                      // needed for vtkWeakPointer
 
 class vtkClientServerInterpreter;
 class vtkPVSessionCore;

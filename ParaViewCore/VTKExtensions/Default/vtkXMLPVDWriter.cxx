@@ -32,18 +32,18 @@
 #include "vtkXMLPDataWriter.h"
 #include "vtkXMLPImageDataWriter.h"
 #include "vtkXMLPMultiBlockDataWriter.h"
-#include "vtkXMLPolyDataWriter.h"
 #include "vtkXMLPPolyDataWriter.h"
 #include "vtkXMLPRectilinearGridWriter.h"
 #include "vtkXMLPStructuredGridWriter.h"
 #include "vtkXMLPUnstructuredGridWriter.h"
+#include "vtkXMLPolyDataWriter.h"
 #include "vtkXMLRectilinearGridWriter.h"
 #include "vtkXMLStructuredGridWriter.h"
 #include "vtkXMLUnstructuredGridWriter.h"
 #include "vtkXMLWriter.h"
 
-#include <vtksys/SystemTools.hxx>
 #include <sstream>
+#include <vtksys/SystemTools.hxx>
 
 #include <string>
 #include <vector>

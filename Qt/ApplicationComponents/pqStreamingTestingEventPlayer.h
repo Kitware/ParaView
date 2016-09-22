@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqStreamingTestingEventPlayer_h
 #define pqStreamingTestingEventPlayer_h
 
-#include "pqWidgetEventPlayer.h"
 #include "pqApplicationComponentsModule.h"
+#include "pqWidgetEventPlayer.h"
 #include <QPointer>
 
 class pqViewStreamingBehavior;

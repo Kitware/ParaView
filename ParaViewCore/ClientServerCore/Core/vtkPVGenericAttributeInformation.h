@@ -22,8 +22,8 @@
 #ifndef vtkPVGenericAttributeInformation_h
 #define vtkPVGenericAttributeInformation_h
 
-#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVArrayInformation.h"
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 
 class vtkClientServerStream;
 

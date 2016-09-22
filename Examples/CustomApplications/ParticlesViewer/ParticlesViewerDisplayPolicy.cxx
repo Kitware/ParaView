@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ParticlesViewerDisplayPolicy.h"
 
 #include "pqApplicationCore.h"
+#include "pqDataRepresentation.h"
 #include "pqObjectBuilder.h"
 #include "pqSMAdaptor.h"
-#include "pqDataRepresentation.h"
 #include "vtkSMProxy.h"
 
 //-----------------------------------------------------------------------------

@@ -23,8 +23,8 @@
 #ifndef vtkAMRDualClip_h
 #define vtkAMRDualClip_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class vtkDataSet;
 class vtkImageData;

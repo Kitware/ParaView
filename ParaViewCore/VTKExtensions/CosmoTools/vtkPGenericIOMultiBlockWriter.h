@@ -18,8 +18,8 @@
 #ifndef vtkPGenericIOMultiBlockWriter_h
 #define vtkPGenericIOMultiBlockWriter_h
 
-#include "vtkWriter.h"
 #include "vtkPVVTKExtensionsCosmoToolsModule.h" // for export macro
+#include "vtkWriter.h"
 
 class vtkMultiProcessController;
 

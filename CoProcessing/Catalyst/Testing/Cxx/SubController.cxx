@@ -1,9 +1,9 @@
 // Test whether Catalyst can be initialized with just a subset of
 // the MPI processes.
 
+#include <vtkCPProcessor.h>
 #include <vtkMPI.h>
 #include <vtkSmartPointer.h>
-#include <vtkCPProcessor.h>
 
 #include <vector>
 

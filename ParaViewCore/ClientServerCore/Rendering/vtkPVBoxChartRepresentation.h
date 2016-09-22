@@ -21,8 +21,8 @@
 #ifndef vtkPVBoxChartRepresentation_h
 #define vtkPVBoxChartRepresentation_h
 
-#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkChartRepresentation.h"
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 
 class vtkChartBox;
 

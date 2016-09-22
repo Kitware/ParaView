@@ -14,8 +14,8 @@ PURPOSE.  See the above copyright notice for more information.
 =========================================================================*/
 #include "vtkPVInformationKeys.h"
 
-#include "vtkInformationStringKey.h"
 #include "vtkInformationDoubleVectorKey.h"
+#include "vtkInformationStringKey.h"
 
 vtkInformationKeyMacro(vtkPVInformationKeys, TIME_LABEL_ANNOTATION, String);
 vtkInformationKeyRestrictedMacro(vtkPVInformationKeys, WHOLE_BOUNDING_BOX, DoubleVector, 6);

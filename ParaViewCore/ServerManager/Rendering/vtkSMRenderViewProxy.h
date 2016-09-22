@@ -21,9 +21,9 @@
 #ifndef vtkSMRenderViewProxy_h
 #define vtkSMRenderViewProxy_h
 
+#include "vtkNew.h"                            // needed for vtkInteractorObserver.
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMViewProxy.h"
-#include "vtkNew.h" // needed for vtkInteractorObserver.
 class vtkCamera;
 class vtkCollection;
 class vtkFloatArray;

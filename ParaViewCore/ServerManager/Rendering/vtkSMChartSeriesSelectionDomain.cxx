@@ -36,8 +36,8 @@
 #include <assert.h>
 #include <map>
 #include <set>
-#include <vector>
 #include <sstream>
+#include <vector>
 #include <vtksys/RegularExpression.hxx>
 
 vtkStandardNewMacro(vtkSMChartSeriesSelectionDomain);

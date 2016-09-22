@@ -15,11 +15,11 @@
 #include "vtkSMDimensionsDomain.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkPVDataInformation.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkStructuredData.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkPVDataInformation.h"
+#include "vtkStructuredData.h"
 
 vtkStandardNewMacro(vtkSMDimensionsDomain);
 //----------------------------------------------------------------------------

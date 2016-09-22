@@ -33,9 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqHandleWidget_h
 #define _pqHandleWidget_h
 
-#include "pqProxy.h"
 #include "pq3DWidget.h"
 #include "pqDeprecatedModule.h"
+#include "pqProxy.h"
 
 /// Provides a complete Qt UI for working with a 3D handle widget
 class PQDEPRECATED_EXPORT pqHandleWidget : public pq3DWidget

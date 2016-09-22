@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqProxySILModel_h
 #define pqProxySILModel_h
 
-#include <QAbstractProxyModel>
 #include "pqComponentsModule.h"
 #include "pqTimer.h"
+#include <QAbstractProxyModel>
 
 #include <QPixmap>
 

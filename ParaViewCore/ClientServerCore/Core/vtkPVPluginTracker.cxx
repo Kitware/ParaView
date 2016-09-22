@@ -19,7 +19,6 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPSystemTools.h"
-#include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
 #include "vtkPVOptions.h"
 #include "vtkPVPlugin.h"
@@ -29,13 +28,14 @@
 #include "vtkPVServerManagerPluginInterface.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
+#include "vtkProcessModule.h"
 
 #include <assert.h>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
-#include <vtksys/SystemTools.hxx>
 #include <vtksys/String.hxx>
+#include <vtksys/SystemTools.hxx>
 
 
 #if defined(_WIN32) && !defined(__CYGWIN__)

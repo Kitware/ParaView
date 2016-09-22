@@ -23,8 +23,8 @@
 #ifndef vtkIsoVolume_h
 #define vtkIsoVolume_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkDataObjectAlgorithm.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 // Forware declarations.
 class vtkPVClipDataSet;

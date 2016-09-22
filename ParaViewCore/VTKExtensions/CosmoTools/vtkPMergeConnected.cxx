@@ -1,7 +1,7 @@
 #include "vtkPMergeConnected.h"
 
-#include <iostream>
 #include <cstring>
+#include <iostream>
 #include <map>
 
 #include <vtkCellData.h>

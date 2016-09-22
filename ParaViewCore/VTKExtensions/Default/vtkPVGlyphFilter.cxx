@@ -28,20 +28,20 @@
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkOctreePointLocator.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkUniformGrid.h"
 #include "vtkTuple.h"
-#include "vtkOctreePointLocator.h"
+#include "vtkUniformGrid.h"
 
 // C/C++ includes
-#include <vector>
-#include <map>
-#include <set>
 #include <algorithm>
 #include <cmath>
+#include <map>
+#include <set>
+#include <vector>
 
 class vtkPVGlyphFilter::vtkInternals
 {

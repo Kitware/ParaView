@@ -3,26 +3,26 @@
 
 #include "pqFileDialogTest.h"
 
-#include <QWidget>
 #include <QApplication>
-#include <QPushButton>
-#include <QLabel>
 #include <QComboBox>
-#include <QLineEdit>
-#include <QVBoxLayout>
-#include <QTimer>
 #include <QFileDialog>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QTimer>
+#include <QVBoxLayout>
+#include <QWidget>
 
-#include "vtkProcessModule.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
 
-#include "pqServer.h"
-#include "pqFileDialog.h"
 #include "pqApplicationCore.h"
-#include "pqTestUtility.h"
-#include "pqOptions.h"
+#include "pqFileDialog.h"
 #include "pqObjectBuilder.h"
+#include "pqOptions.h"
+#include "pqServer.h"
+#include "pqTestUtility.h"
 
 pqFileDialogTestUtility::pqFileDialogTestUtility()
 {

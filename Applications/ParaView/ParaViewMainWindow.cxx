@@ -50,9 +50,9 @@ extern "C" {
 #include "pqSettings.h"
 #include "pqTimer.h"
 #include "pqWelcomeDialog.h"
-#include "vtkProcessModule.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkPVPlugin.h"
+#include "vtkProcessModule.h"
 #include "vtkSMSettings.h"
 
 #ifndef BUILD_SHARED_LIBS
@@ -61,8 +61,8 @@ extern "C" {
 
 #include <QDragEnterEvent>
 #include <QDropEvent>
-#include <QUrl>
 #include <QMimeData>
+#include <QUrl>
 
 #ifdef PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION
 #include "ParaViewDocumentationInitializer.h"

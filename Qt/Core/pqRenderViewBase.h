@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqRenderViewBase_h
 #define pqRenderViewBase_h
 
-#include "pqView.h"
 #include "pqSMProxy.h" //needed for pqSMProxy.
+#include "pqView.h"
 #include "vtkSetGet.h" // needed for VTK_LEGACY.
 class pqTimer;
 

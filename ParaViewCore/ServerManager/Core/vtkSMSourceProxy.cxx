@@ -19,13 +19,12 @@
 #include "vtkCommand.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVAlgorithmPortsInformation.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
+#include "vtkProcessModule.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIdTypeVectorProperty.h"
@@ -37,11 +36,12 @@
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkSmartPointer.h"
 
+#include <assert.h>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
-#include <assert.h>
 
 #define OUTPUT_PORTNAME_PREFIX "Output-"
 #define MAX_NUMBER_OF_PORTS 10

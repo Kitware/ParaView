@@ -19,8 +19,8 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVCacheKeeperPipeline.h"
+#include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
 
 #include <map>

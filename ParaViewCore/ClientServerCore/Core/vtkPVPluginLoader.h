@@ -24,8 +24,8 @@
 #ifndef vtkPVPluginLoader_h
 #define vtkPVPluginLoader_h
 
-#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 
 class vtkIntArray;
 class vtkPVPlugin;

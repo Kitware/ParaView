@@ -19,8 +19,8 @@
 #ifndef vtkPVInformation_h
 #define vtkPVInformation_h
 
-#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 
 class vtkClientServerStream;
 class vtkMultiProcessStream;

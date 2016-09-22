@@ -20,7 +20,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVSession.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMCollaborationManager.h"
 #include "vtkSMMessage.h"
 #include "vtkSMOutputPort.h"
@@ -29,9 +28,10 @@
 #include "vtkSMSession.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTrace.h"
+#include "vtkSmartPointer.h"
 
-#include <vector>
 #include <set>
+#include <vector>
 #include <vtkNew.h>
 
 //-----------------------------------------------------------------------------

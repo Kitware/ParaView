@@ -32,25 +32,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "myMainWindow.h"
 #include "ui_myMainWindow.h"
 
+#include "pqAlwaysConnectedBehavior.h"
+#include "pqDefaultViewBehavior.h"
 #include "pqHelpReaction.h"
 #include "pqParaViewBehaviors.h"
 #include "pqParaViewMenuBuilders.h"
-#include "pqDefaultViewBehavior.h"
-#include "pqAlwaysConnectedBehavior.h"
 //#include "pqDeleteBehavior.h"
-#include "pqAutoLoadPluginXMLBehavior.h"
 #include "pqApplicationCore.h"
+#include "pqAutoLoadPluginXMLBehavior.h"
 //#include "pqPVNewSourceBehavior.h"
 
-#include <QToolBar>
-#include <QList>
 #include <QAction>
+#include <QList>
+#include <QToolBar>
 
+#include "pqAxesToolbar.h"
+#include "pqLoadDataReaction.h"
 #include "pqMainControlsToolbar.h"
 #include "pqRepresentationToolbar.h"
-#include "pqAxesToolbar.h"
 #include "pqSetName.h"
-#include "pqLoadDataReaction.h"
 
 
 class myMainWindow::pqInternals : public Ui::pqClientMainWindow

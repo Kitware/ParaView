@@ -26,8 +26,8 @@
 #include "vtkTransform.h"
 #include "vtkUnsignedCharArray.h"
 
-#include <vtksys/SystemTools.hxx>
 #include "assert.h"
+#include <vtksys/SystemTools.hxx>
 
 
 vtkStandardNewMacro(vtkCaveSynchronizedRenderers);

@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqProxyInformationWidget_h
 #define _pqProxyInformationWidget_h
 
-#include <QWidget>
-#include <QPointer>
 #include "pqComponentsModule.h"
+#include <QPointer>
+#include <QWidget>
 
 class pqOutputPort;
 class QTreeWidgetItem;

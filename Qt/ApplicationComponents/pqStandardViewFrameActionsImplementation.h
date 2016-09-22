@@ -32,10 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqStandardViewFrameActionsImplementation_h
 #define pqStandardViewFrameActionsImplementation_h
 
-#include "pqViewFrameActionsInterface.h"
 #include "pqApplicationComponentsModule.h" // needed for export macros
-#include <QPointer> // needed for QPointer
+#include "pqViewFrameActionsInterface.h"
 #include <QObject>  // needed for QObject
+#include <QPointer> // needed for QPointer
 
 class pqContextView;
 class pqRenderView;

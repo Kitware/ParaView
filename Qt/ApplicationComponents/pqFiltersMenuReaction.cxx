@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqChangeInputDialog.h"
+#include "pqCollaborationManager.h"
 #include "pqCoreUtilities.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
@@ -43,9 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
-#include "pqCollaborationManager.h"
 #include "vtkSMCollaborationManager.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMDataTypeDomain.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMInputArrayDomain.h"
@@ -56,9 +55,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxySelectionModel.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSmartPointer.h"
 
-#include <QMap>
 #include <QDebug>
+#include <QMap>
 
 static vtkSMInputProperty* getInputProperty(vtkSMProxy* proxy)
 {

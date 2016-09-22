@@ -40,12 +40,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSelectionManager.h"
 #include "pqServer.h"
 #include "pqSpreadSheetViewModel.h"
-#include "vtkSelectionNode.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMViewProxy.h"
+#include "vtkSelectionNode.h"
+#include "vtkSmartPointer.h"
 
 #include <QPointer>
 

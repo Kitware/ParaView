@@ -23,10 +23,10 @@
 #include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutEdgeIterator.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMProxy.h"
 #include "vtkSMSILDomain.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkSmartPointer.h"
 #include "vtkStdString.h"
 #include "vtkStringArray.h"
 

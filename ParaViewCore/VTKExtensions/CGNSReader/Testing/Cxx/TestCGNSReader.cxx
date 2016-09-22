@@ -12,11 +12,11 @@
 
 =========================================================================*/
 #include "vtkCGNSReader.h"
-#include "vtkNew.h"
-#include "vtkMultiBlockDataSet.h"
-#include "vtkUnstructuredGrid.h"
 #include "vtkCell.h"
+#include "vtkMultiBlockDataSet.h"
+#include "vtkNew.h"
 #include "vtkTestUtilities.h"
+#include "vtkUnstructuredGrid.h"
 
 
 #define TEST_SUCCESS 0

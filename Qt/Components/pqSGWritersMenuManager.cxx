@@ -31,8 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqSGWritersMenuManager.h"
 
-#include "pqApplicationCore.h"
 #include "pqActiveObjects.h"
+#include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
@@ -41,17 +41,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
-#include "vtkProcessModule.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
+#include "vtkProcessModule.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMProxySelectionModel.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSMProxySelectionModel.h"
+#include "vtkSmartPointer.h"
 
 #include <QAction>
 #include <QDebug>

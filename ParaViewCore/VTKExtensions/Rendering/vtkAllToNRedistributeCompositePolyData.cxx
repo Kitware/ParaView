@@ -14,15 +14,15 @@
 =========================================================================*/
 #include "vtkAllToNRedistributeCompositePolyData.h"
 
-#include "vtkObjectFactory.h"
+#include "vtkAllToNRedistributePolyData.h"
+#include "vtkCompositeDataIterator.h"
+#include "vtkCompositeDataPipeline.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkCompositeDataSet.h"
-#include "vtkCompositeDataIterator.h"
-#include "vtkPolyData.h"
-#include "vtkAllToNRedistributePolyData.h"
 #include "vtkMultiProcessController.h"
-#include "vtkCompositeDataPipeline.h"
+#include "vtkObjectFactory.h"
+#include "vtkPolyData.h"
 
 vtkStandardNewMacro(vtkAllToNRedistributeCompositePolyData);
 vtkCxxSetObjectMacro(vtkAllToNRedistributeCompositePolyData, Controller,

@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqSpinBox_h
 #define pqSpinBox_h
 
-#include <QSpinBox>
 #include "pqWidgetsModule.h"
+#include <QSpinBox>
 
 /// QSpinBox which fires editingFinished() signal when the value is changed
 /// by steps (increments).

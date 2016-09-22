@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _@ARG_CLASS_NAME@Implementation_h
 #define _@ARG_CLASS_NAME@Implementation_h
 
-#include <QObject>
 #include "pqDockWindowInterface.h"
+#include <QObject>
 
 // make this dock window a part of the application
 class @ARG_CLASS_NAME@Implementation : public QObject, public pqDockWindowInterface

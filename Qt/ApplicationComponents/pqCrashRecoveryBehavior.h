@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqCrashRecoveryBehavior_h
 #define pqCrashRecoveryBehavior_h
 
+#include "pqApplicationComponentsModule.h"
 #include <QObject>
 #include <QTimer>
-#include "pqApplicationComponentsModule.h"
 
 class pqServer;
 

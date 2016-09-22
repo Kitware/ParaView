@@ -32,10 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef vtkVRStyleGrabNTranslateWorld_h
 #define vtkVRStyleGrabNTranslateWorld_h
 
-#include "vtkVRInteractorStyle.h"
 #include "vtkSmartPointer.h"
-#include <vector>
+#include "vtkVRInteractorStyle.h"
 #include <map>
+#include <vector>
 
 class vtkSMProperty;
 class vtkSMProxy;

@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqFixPathsInStateFilesBehavior_h
 #define pqFixPathsInStateFilesBehavior_h
 
-#include <QObject>
 #include "pqApplicationComponentsModule.h"
+#include <QObject>
 
 class vtkPVXMLElement;
 

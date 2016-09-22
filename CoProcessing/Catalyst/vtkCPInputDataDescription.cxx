@@ -21,9 +21,9 @@
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 
-#include <vector>
-#include <string>
 #include <algorithm>
+#include <string>
+#include <vector>
 
 class vtkCPInputDataDescription::vtkInternals
 {

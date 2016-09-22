@@ -19,8 +19,8 @@
 #ifndef vtkPVMetaClipDataSet_h
 #define vtkPVMetaClipDataSet_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPVDataSetAlgorithmSelectorFilter.h"
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class vtkImplicitFunction;
 

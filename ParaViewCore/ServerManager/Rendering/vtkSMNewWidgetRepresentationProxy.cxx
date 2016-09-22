@@ -21,7 +21,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMPropertyGroup.h"
@@ -33,11 +32,12 @@
 #include "vtkSMUncheckedPropertyHelper.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSMWidgetRepresentationProxy.h"
+#include "vtkSmartPointer.h"
 #include "vtkWeakPointer.h"
 #include "vtkWidgetRepresentation.h"
 
-#include <list>
 #include <cassert>
+#include <list>
 
 vtkStandardNewMacro(vtkSMNewWidgetRepresentationProxy);
 

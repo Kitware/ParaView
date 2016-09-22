@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkAnnotationLink.h"
 #include "vtkObjectFactory.h"
-#include "vtkPlotPoints.h"
 #include "vtkPVContextView.h"
+#include "vtkPlotPoints.h"
 #include "vtkScatterPlotMatrix.h"
 #include "vtkSmartPointer.h"
 #include "vtkStdString.h"

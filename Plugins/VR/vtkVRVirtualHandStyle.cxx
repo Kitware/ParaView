@@ -47,8 +47,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 #include "pqView.h"
 
+#include <algorithm>
 #include <sstream>
-#include <algorithm> 
 
 // -----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkVRVirtualHandStyle)

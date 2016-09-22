@@ -31,25 +31,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include <QDebug>
 
-#include "vtkSMSourceProxy.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
-#include "vtkPVArrayInformation.h"
+#include "vtkSMSourceProxy.h"
 
-#include "pqCinemaTrackSelection.h"
-#include "ui_pqCinemaTrackSelection.h"
-#include "pqPropertyWidget.h"
-#include "pqPipelineFilter.h"
-#include "pqCinemaTrack.h"
-#include "pqApplicationCore.h"
-#include "pqServerManagerModel.h"
-#include "pqOutputPort.h"
-#include "pqPipelineModel.h"
-#include "pqRenderView.h"
-#include "pqTreeWidget.h"
-#include "pqTreeWidgetItem.h"
-#include "pqTreeWidgetCheckHelper.h"
 #include "pqAbstractItemSelectionModel.h"
+#include "pqApplicationCore.h"
+#include "pqCinemaTrack.h"
+#include "pqCinemaTrackSelection.h"
+#include "pqOutputPort.h"
+#include "pqPipelineFilter.h"
+#include "pqPipelineModel.h"
+#include "pqPropertyWidget.h"
+#include "pqRenderView.h"
+#include "pqServerManagerModel.h"
+#include "pqTreeWidget.h"
+#include "pqTreeWidgetCheckHelper.h"
+#include "pqTreeWidgetItem.h"
+#include "ui_pqCinemaTrackSelection.h"
 
 
 // ============================================================================

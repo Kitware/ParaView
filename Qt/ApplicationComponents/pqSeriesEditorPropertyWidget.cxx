@@ -39,10 +39,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkEventQtSlotConnect.h"
 #include "vtkNew.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMChartSeriesSelectionDomain.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMVectorProperty.h"
+#include "vtkSmartPointer.h"
 
 #include <QAbstractTableModel>
 #include <QByteArray>

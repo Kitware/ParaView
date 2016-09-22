@@ -32,11 +32,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqPVApplicationCore_h
 #define pqPVApplicationCore_h
 
-#include "pqApplicationCore.h"
 #include "pqApplicationComponentsModule.h"
+#include "pqApplicationCore.h"
 
-#include <QPointer>
 #include <QList>
+#include <QPointer>
 
 class pqAnimationManager;
 class pqPythonManager;

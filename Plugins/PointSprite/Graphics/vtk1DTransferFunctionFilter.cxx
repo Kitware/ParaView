@@ -29,20 +29,20 @@
 
 #include "vtk1DTransferFunctionFilter.h"
 
-#include "vtkObjectFactory.h"
 #include "vtk1DTransferFunctionChooser.h"
-#include "vtkDataArray.h"
-#include "vtkType.h"
-#include "vtkInformation.h"
-#include "vtkDataObject.h"
 #include "vtkAbstractArray.h"
-#include "vtkInformationVector.h"
-#include "vtkFieldData.h"
-#include "vtkTable.h"
-#include "vtkDataSet.h"
-#include "vtkGraph.h"
-#include "vtkPointData.h"
 #include "vtkCellData.h"
+#include "vtkDataArray.h"
+#include "vtkDataObject.h"
+#include "vtkDataSet.h"
+#include "vtkFieldData.h"
+#include "vtkGraph.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkObjectFactory.h"
+#include "vtkPointData.h"
+#include "vtkTable.h"
+#include "vtkType.h"
 
 #include <sstream>
 

@@ -41,9 +41,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHelpEngine>
 #include <QHelpSearchEngine>
 #include <QSet>
-#include <QtDebug>
 #include <QTemporaryFile>
 #include <QTimer>
+#include <QtDebug>
 
 //-----------------------------------------------------------------------------
 class pqPluginDocumentationBehavior::pqInternals

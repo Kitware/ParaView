@@ -17,12 +17,12 @@
 #include "vtkMantaTestSource.h"
 #include "vtkObjectFactory.h"
 
+#include "vtkCellArray.h"
+#include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkIdTypeArray.h"
-#include "vtkCellArray.h"
 
 vtkStandardNewMacro(vtkMantaTestSource);
 

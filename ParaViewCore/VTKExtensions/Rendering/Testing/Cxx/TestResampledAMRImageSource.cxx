@@ -13,17 +13,17 @@
 
 =========================================================================*/
 #include "vtkAMRFlashReader.h"
+#include "vtkCompositeDataPipeline.h"
+#include "vtkDataArray.h"
 #include "vtkDataArraySelection.h"
+#include "vtkGenericDataObjectWriter.h"
+#include "vtkImageData.h"
+#include "vtkInformation.h"
 #include "vtkNew.h"
 #include "vtkOverlappingAMR.h"
+#include "vtkPointData.h"
 #include "vtkResampledAMRImageSource.h"
 #include "vtkTesting.h"
-#include "vtkGenericDataObjectWriter.h"
-#include "vtkCompositeDataPipeline.h"
-#include "vtkInformation.h"
-#include "vtkPointData.h"
-#include "vtkDataArray.h"
-#include "vtkImageData.h"
 
 #include <string>
 

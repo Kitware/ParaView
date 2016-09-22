@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqAnimationTimeToolbar_h
 
 #include "pqApplicationComponentsModule.h"
-#include <QToolBar>
 #include <QPointer>
+#include <QToolBar>
 
 class pqAnimationTimeWidget;
 class pqAnimationScene;

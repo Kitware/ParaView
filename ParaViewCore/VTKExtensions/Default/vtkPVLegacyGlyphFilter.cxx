@@ -15,12 +15,12 @@
 #include "vtkPVLegacyGlyphFilter.h"
 
 #include "vtkAppendPolyData.h"
-#include "vtkCompositeDataPipeline.h"
 #include "vtkCompositeDataIterator.h"
+#include "vtkCompositeDataPipeline.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkGarbageCollector.h"
 #include "vtkHierarchicalBoxDataSet.h"
-#include "vtkCompositeDataSet.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMaskPoints.h"
@@ -31,9 +31,9 @@
 #include "vtkPolyData.h"
 #include "vtkUniformGrid.h"
 
+#include <algorithm>
 #include <stdlib.h>
 #include <time.h>
-#include <algorithm>
 
 vtkStandardNewMacro(vtkPVLegacyGlyphFilter);
 

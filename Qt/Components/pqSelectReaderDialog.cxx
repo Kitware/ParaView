@@ -36,9 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QListWidgetItem>
 
+#include "pqServer.h"
 #include "vtkSMReaderFactory.h"
 #include "vtkStringList.h"
-#include "pqServer.h"
 
 //-----------------------------------------------------------------------------
 class pqSelectReaderDialog::pqInternal : public QObject, public Ui::pqSelectReaderDialog

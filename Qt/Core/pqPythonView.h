@@ -15,8 +15,8 @@
 #ifndef pqPythonView_h
 #define pqPythonView_h
 
-#include "pqView.h"
 #include "pqSMProxy.h"
+#include "pqView.h"
 
 class vtkSMPythonViewProxy;
 

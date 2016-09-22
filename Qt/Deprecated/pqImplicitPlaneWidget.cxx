@@ -38,17 +38,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqPropertyLinks.h"
 #include "pqRenderView.h"
-#include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
+#include "pqServerManagerModel.h"
 
 #include <QDoubleValidator>
 
-#include "vtkMath.h"
 #include "vtkBoundingBox.h"
 #include "vtkCamera.h"
+#include "vtkMath.h"
 #include "vtkPVDataInformation.h"
 #include "vtkRenderer.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
@@ -57,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSmartPointer.h"
 
 /////////////////////////////////////////////////////////////////////////
 // pqImplicitPlaneWidget::pqImplementation

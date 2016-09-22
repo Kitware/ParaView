@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
 #include "pqPythonManager.h"
-#include "pqSettings.h"
 #include "pqPythonSyntaxHighlighter.h"
+#include "pqSettings.h"
 
 #include <QAction>
 #include <QApplication>

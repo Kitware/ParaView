@@ -32,10 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef vtkVRUIConnection_h
 #define vtkVRUIConnection_h
 
-#include <QThread>
+#include "vtkSmartPointer.h"
 #include "vtkVRQueue.h"
 #include "vtkVRUITrackerState.h"
-#include "vtkSmartPointer.h"
+#include <QThread>
 #include <map>
 #include <vector>
 

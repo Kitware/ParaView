@@ -14,10 +14,10 @@
 =========================================================================*/
 #include "vtkPVColorMaterialHelper.h"
 
-#include "vtkShaderProgram2.h"
 #include "vtkObjectFactory.h"
 #include "vtkShader2.h"
 #include "vtkShader2Collection.h"
+#include "vtkShaderProgram2.h"
 #include "vtkUniformVariables.h"
 #include "vtkgl.h"
 extern const char* vtkPVColorMaterialHelper_vs;

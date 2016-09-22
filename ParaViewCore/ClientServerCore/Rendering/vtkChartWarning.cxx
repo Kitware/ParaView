@@ -18,17 +18,17 @@
 // Get my new commands
 #include "vtkCommand.h"
 
-#include "vtkContext2D.h"
-#include "vtkContextScene.h"
-#include "vtkContextMouseEvent.h"
-#include "vtkPen.h"
-#include "vtkBrush.h"
-#include "vtkTextProperty.h"
-#include "vtkStdString.h"
-#include "vtkVectorOperators.h"
 #include "vtkAxis.h"
+#include "vtkBrush.h"
 #include "vtkChart.h"
+#include "vtkContext2D.h"
+#include "vtkContextMouseEvent.h"
+#include "vtkContextScene.h"
+#include "vtkPen.h"
 #include "vtkPlot.h"
+#include "vtkStdString.h"
+#include "vtkTextProperty.h"
+#include "vtkVectorOperators.h"
 
 #include "vtkObjectFactory.h"
 

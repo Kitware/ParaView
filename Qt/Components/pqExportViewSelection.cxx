@@ -34,11 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSessionProxyManager.h"
 
-#include "pqExportViewSelection.h"
-#include "ui_pqExportViewSelection.h"
-#include "pqRenderView.h"
 #include "pqContextView.h"
+#include "pqExportViewSelection.h"
 #include "pqImageOutputInfo.h"
+#include "pqRenderView.h"
+#include "ui_pqExportViewSelection.h"
 
 
 // ----------------------------------------------------------------------------

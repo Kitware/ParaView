@@ -20,8 +20,8 @@
 #define DO_TIMING 0
 #include "vtkAllToNRedistributePolyData.h"
 #include "vtkMath.h"
-#include "vtkObjectFactory.h"
 #include "vtkMultiProcessController.h"
+#include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkAllToNRedistributePolyData);

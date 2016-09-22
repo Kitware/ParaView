@@ -19,8 +19,8 @@
 #ifndef vtkPVCacheKeeperPipeline_h
 #define vtkPVCacheKeeperPipeline_h
 
-#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkCompositeDataPipeline.h"
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 
 class vtkPVCacheKeeper;
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVCacheKeeperPipeline : public vtkCompositeDataPipeline

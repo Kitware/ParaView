@@ -14,9 +14,9 @@
 =========================================================================*/
 #include "vtkPVInstantiator.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkClientServerInterpreterInitializer.h"
 #include "vtkClientServerInterpreter.h"
+#include "vtkClientServerInterpreterInitializer.h"
+#include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkPVInstantiator);
 //----------------------------------------------------------------------------

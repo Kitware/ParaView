@@ -15,8 +15,8 @@
 #include "vtkCommandOptionsXMLParser.h"
 #include "vtkCommandOptions.h"
 #include "vtkObjectFactory.h"
-#include <map>
 #include "vtkStdString.h"
+#include <map>
 
 //----------------------------------------------------------------------------
 struct vtkCommandOptionsXMLParserArgumentStructure

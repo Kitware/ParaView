@@ -21,9 +21,9 @@
 #ifndef vtk3DWidgetRepresentation_h
 #define vtk3DWidgetRepresentation_h
 
-#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkDataRepresentation.h"
-#include "vtkWeakPointer.h" // needed for vtkWeakPointer.
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
+#include "vtkWeakPointer.h"                       // needed for vtkWeakPointer.
 
 class vtkAbstractWidget;
 class vtkPVRenderView;

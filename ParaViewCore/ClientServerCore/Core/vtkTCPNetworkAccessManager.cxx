@@ -19,20 +19,20 @@
 #include "vtkObjectFactory.h"
 #include "vtkServerSocket.h"
 #include "vtkSmartPointer.h"
+#include "vtkSmartPointer.h"
 #include "vtkSocketCommunicator.h"
 #include "vtkSocketController.h"
 #include "vtkTimerLog.h"
 #include "vtkWeakPointer.h"
-#include "vtkSmartPointer.h"
 
 #include <vtksys/RegularExpression.hxx>
 #include <vtksys/SystemInformation.hxx>
 #include <vtksys/SystemTools.hxx>
 
-#include <string>
-#include <sstream>
-#include <vector>
 #include <map>
+#include <sstream>
+#include <string>
+#include <vector>
 
 // set this to 1 if you want to generate a log file with all the raw socket
 // communication.

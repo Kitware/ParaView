@@ -33,9 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPropertiesPanel.h"
 
+#include <QCheckBox>
 #include <QGridLayout>
 #include <QLabel>
-#include <QCheckBox>
 
 //-----------------------------------------------------------------------------
 pqMyPropertyWidgetForProperty::pqMyPropertyWidgetForProperty(

@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqUndoStackBuilder_h
 #define pqUndoStackBuilder_h
 
-#include "vtkSMUndoStackBuilder.h"
 #include "pqComponentsModule.h"
 #include "vtkSMMessageMinimal.h"
+#include "vtkSMUndoStackBuilder.h"
 
 class vtkCommand;
 

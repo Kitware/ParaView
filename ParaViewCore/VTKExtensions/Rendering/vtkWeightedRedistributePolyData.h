@@ -22,8 +22,8 @@
 #ifndef vtkWeightedRedistributePolyData_h
 #define vtkWeightedRedistributePolyData_h
 
-#include "vtkRedistributePolyData.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
+#include "vtkRedistributePolyData.h"
 
 class vtkMultiProcessController;
 

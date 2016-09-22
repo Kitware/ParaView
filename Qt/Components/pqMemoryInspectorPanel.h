@@ -16,9 +16,9 @@
 #define pqMemoryInspectorPanel_h
 
 #include "pqComponentsModule.h"
-#include <QWidget>
-#include <QProcess>
 #include <QMenu>
+#include <QProcess>
+#include <QWidget>
 
 #include <map>
 using std::map;

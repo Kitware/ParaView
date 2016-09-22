@@ -15,13 +15,13 @@
 #include "vtkTileDisplayHelper.h"
 
 #include "vtkCamera.h"
+#include "vtkImageData.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPNGWriter.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
-#include "vtkImageData.h"
-#include "vtkPNGWriter.h"
 
 #include <sstream>
 #include <vtkNew.h>

@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqPythonShellReaction_h
 #define pqPythonShellReaction_h
 
-#include "pqReaction.h"
 #include "pqApplicationComponentsModule.h"
+#include "pqReaction.h"
 
 /// @ingroup Reactions
 /// pqPythonShellReaction is a reaction to handle showing of the python shell.

@@ -14,10 +14,10 @@
 =========================================================================*/
 #include "vtkPVEnvironmentInformation.h"
 
-#include "vtkObjectFactory.h"
-#include <vtksys/SystemTools.hxx>
 #include "vtkClientServerStream.h"
+#include "vtkObjectFactory.h"
 #include "vtkPVEnvironmentInformationHelper.h"
+#include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkPVEnvironmentInformation);
 

@@ -29,8 +29,8 @@
 
 #include "vtk1DLookupTableTransferFunction.h"
 
-#include "vtkObjectFactory.h"
 #include "vtkDoubleArray.h"
+#include "vtkObjectFactory.h"
 
 #include <cmath>
 

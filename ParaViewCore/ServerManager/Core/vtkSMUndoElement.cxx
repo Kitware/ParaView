@@ -15,10 +15,10 @@
 #include "vtkSMUndoElement.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkSMSession.h"
-#include "vtkWeakPointer.h"
-#include "vtkSMSessionProxyManager.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkWeakPointer.h"
 
 //-----------------------------------------------------------------------------
 vtkSMUndoElement::vtkSMUndoElement()

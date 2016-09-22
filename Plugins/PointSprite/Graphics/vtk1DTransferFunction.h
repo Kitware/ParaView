@@ -32,8 +32,8 @@
 #ifndef vtk1DTransferFunction_h
 #define vtk1DTransferFunction_h
 
-#include "vtkPointSpriteGraphicsModule.h" //needed for exports
 #include "vtkObject.h"
+#include "vtkPointSpriteGraphicsModule.h" //needed for exports
 
 class vtkDataArray;
 

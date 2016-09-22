@@ -15,7 +15,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkInitializationHelper.h"
 #include "vtkNew.h"
 #include "vtkProcessModule.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMPropertyHelper.h"
@@ -23,9 +22,10 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSettings.h"
+#include "vtkSmartPointer.h"
 
-#include <sstream>
 #include <assert.h>
+#include <sstream>
 #include <vtk_jsoncpp.h>
 int TestSettings(int argc, char* argv[])
 {

@@ -17,17 +17,17 @@
 #include "vtkBoundingBox.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVArrayInformation.h"
-#include "vtkScalarBarRepresentation.h"
+#include "vtkProcessModule.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkScalarBarRepresentation.h"
 #include "vtkTuple.h"
 
 #include <algorithm>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
 
 vtkStandardNewMacro(vtkSMScalarBarWidgetRepresentationProxy);
 

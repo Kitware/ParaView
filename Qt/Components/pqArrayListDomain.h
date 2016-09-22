@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqArrayListDomain_h
 #define pqArrayListDomain_h
 
-#include <QObject>
 #include "pqComponentsModule.h"
+#include <QObject>
 
 class QWidget;
 class vtkSMProperty;

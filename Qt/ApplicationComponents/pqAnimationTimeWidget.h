@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationComponentsModule.h"
 
-#include <QWidget>
 #include <QScopedPointer>
+#include <QWidget>
 #include <vector>
 
 class vtkSMProxy;

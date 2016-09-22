@@ -22,9 +22,9 @@
 #ifndef vtkCommandOptionsXMLParser_h
 #define vtkCommandOptionsXMLParser_h
 
-#include "vtkXMLParser.h"
 #include "vtkCommandOptions.h" // for enum
 #include "vtkPVCommonModule.h" // needed for export macro
+#include "vtkXMLParser.h"
 
 class vtkCommandOptionsXMLParserInternal;
 class vtkCommandOptions;

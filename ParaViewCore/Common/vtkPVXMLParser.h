@@ -19,9 +19,9 @@
 #ifndef vtkPVXMLParser_h
 #define vtkPVXMLParser_h
 
-#include "vtkXMLParser.h"
 #include "vtkPVCommonModule.h" // needed for export macro
-#include "vtkSmartPointer.h" // needed for vtkSmartPointer.
+#include "vtkSmartPointer.h"   // needed for vtkSmartPointer.
+#include "vtkXMLParser.h"
 
 class vtkPVXMLElement;
 

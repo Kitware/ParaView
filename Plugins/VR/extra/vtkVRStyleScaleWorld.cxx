@@ -31,22 +31,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "vtkVRStyleScaleWorld.h"
 
+#include "pqActiveObjects.h"
+#include "pqView.h"
+#include "vtkMatrix4x4.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMProperty.h"
-#include "vtkSMProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMRenderViewProxy.h"
+#include "vtkTransform.h"
 #include "vtkVRQueue.h"
+#include <algorithm>
 #include <iostream>
 #include <sstream>
-#include <algorithm>
-#include "pqView.h"
-#include "pqActiveObjects.h"
-#include "vtkSMRenderViewProxy.h"
-#include "vtkSMPropertyHelper.h"
-#include "vtkTransform.h"
-#include "vtkMatrix4x4.h"
 
 //------------------------------------------------------------------------cnstr
 vtkVRStyleScaleWorld::vtkVRStyleScaleWorld(QObject* parentObject)

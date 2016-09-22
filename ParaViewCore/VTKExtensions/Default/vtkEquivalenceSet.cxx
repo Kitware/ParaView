@@ -13,8 +13,8 @@
 
 =========================================================================*/
 #include "vtkEquivalenceSet.h"
-#include "vtkObjectFactory.h"
 #include "vtkIntArray.h"
+#include "vtkObjectFactory.h"
 
 
 vtkStandardNewMacro(vtkEquivalenceSet);

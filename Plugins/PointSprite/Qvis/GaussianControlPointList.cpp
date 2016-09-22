@@ -35,9 +35,9 @@
 *
 *****************************************************************************/
 
-#include <GaussianControlPointList.h>
 #include <DataNode.h>
 #include <GaussianControlPoint.h>
+#include <GaussianControlPointList.h>
 
 namespace pointsprite {
 // Type map format string

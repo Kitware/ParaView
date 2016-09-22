@@ -24,9 +24,9 @@
 #include "vtkSmartPointer.h"
 
 #include <assert.h>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
 
 //****************************************************************************/
 //                        Internal Class

@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqDisplayPolicy_h
 #define pqDisplayPolicy_h
 
-#include <QObject>
 #include "pqCoreModule.h" // Needed for PQCORE_EXPORT macro
+#include <QObject>
 
 class pqDataRepresentation;
 class pqOutputPort;

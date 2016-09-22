@@ -33,11 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqCinemaTrack_h
 
 #include "pqComponentsModule.h"
+#include <QScopedPointer>
 #include <QString>
 #include <QStringList>
-#include <QWidget>
-#include <QScopedPointer>
 #include <QVariantList>
+#include <QWidget>
 
 class pqPipelineFilter;
 class pqScalarValueListPropertyWidget;

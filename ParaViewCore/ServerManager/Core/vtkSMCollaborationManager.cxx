@@ -15,20 +15,20 @@
 #include "vtkSMCollaborationManager.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
+#include "vtkPVMultiClientsInformation.h"
 #include "vtkPVServerInformation.h"
+#include "vtkProcessModule.h"
+#include "vtkReservedRemoteObjectIds.h"
 #include "vtkSMMessage.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionClient.h"
-#include "vtkReservedRemoteObjectIds.h"
-#include "vtkPVMultiClientsInformation.h"
 
-#include "vtkSMProxyLocator.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyLocator.h"
 
 #include <map>
-#include <vector>
 #include <string>
+#include <vector>
 
 //****************************************************************************
 //                              Internal class

@@ -21,10 +21,10 @@
 #ifndef vtkPVServerManagerPluginInterface_h
 #define vtkPVServerManagerPluginInterface_h
 
-#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkClientServerInterpreterInitializer.h"
-#include <vector> // STL Header
-#include <string> // STL Header
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
+#include <string>                            // STL Header
+#include <vector>                            // STL Header
 
 class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVServerManagerPluginInterface
 {

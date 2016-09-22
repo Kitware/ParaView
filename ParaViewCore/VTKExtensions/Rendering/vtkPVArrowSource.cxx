@@ -13,9 +13,9 @@
 
 =========================================================================*/
 #include "vtkPVArrowSource.h"
+#include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
-#include "vtkInformation.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
 vtkStandardNewMacro(vtkPVArrowSource);

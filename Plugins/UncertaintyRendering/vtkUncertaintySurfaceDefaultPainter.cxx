@@ -15,9 +15,9 @@
 
 #include "vtkUncertaintySurfaceDefaultPainter.h"
 
-#include "vtkUncertaintySurfacePainter.h"
-#include "vtkObjectFactory.h"
 #include "vtkClipPlanesPainter.h"
+#include "vtkObjectFactory.h"
+#include "vtkUncertaintySurfacePainter.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkUncertaintySurfaceDefaultPainter)

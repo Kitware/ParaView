@@ -17,8 +17,8 @@
 #include "vtkAlgorithmOutput.h"
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkSISourceProxy.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSISourceProxy.h"
 #include "vtkSMMessage.h"
 
 #include <assert.h>

@@ -16,6 +16,7 @@
 
 #include "vtkArrayIteratorIncludes.h"
 #include "vtkCellData.h"
+#include "vtkDataArray.h"
 #include "vtkDataSet.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -23,7 +24,6 @@
 #include "vtkPointData.h"
 #include "vtkSmartPointer.h"
 #include "vtkTable.h"
-#include "vtkDataArray.h"
 
 #include <vector>
 

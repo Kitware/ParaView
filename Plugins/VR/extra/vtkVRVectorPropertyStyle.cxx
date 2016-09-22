@@ -31,9 +31,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "vtkVRVectorPropertyStyle.h"
 
+#include "vtkPVXMLElement.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
-#include "vtkPVXMLElement.h"
 
 //-----------------------------------------------------------------------------
 vtkVRVectorPropertyStyle::vtkVRVectorPropertyStyle(

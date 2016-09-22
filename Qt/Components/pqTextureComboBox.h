@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqTextureComboBox_h
 #define pqTextureComboBox_h
 
-#include <QComboBox>
 #include "pqComponentsModule.h"
+#include <QComboBox>
 
 class pqDataRepresentation;
 class pqRenderView;

@@ -20,8 +20,8 @@
 #ifndef vtkPVChangeOfBasisHelper_h
 #define vtkPVChangeOfBasisHelper_h
 
-#include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
 #include "vtkObject.h"
+#include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
 
 #include "vtkDataObject.h"
 #include "vtkDoubleArray.h"

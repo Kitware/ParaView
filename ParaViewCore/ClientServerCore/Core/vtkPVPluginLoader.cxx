@@ -18,7 +18,6 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPDirectory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
 #include "vtkPVOptions.h"
 #include "vtkPVPlugin.h"
@@ -26,10 +25,11 @@
 #include "vtkPVPythonPluginInterface.h"
 #include "vtkPVServerManagerPluginInterface.h"
 #include "vtkPVXMLParser.h"
+#include "vtkProcessModule.h"
 
+#include <sstream>
 #include <string>
 #include <vtksys/SystemTools.hxx>
-#include <sstream>
 
 #include <cstdlib>
 
