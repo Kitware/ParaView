@@ -451,6 +451,7 @@ if(PARAVIEW_ENABLE_PYTHON)
     ${CMAKE_CURRENT_SOURCE_DIR}/TraceSupplementalProxiesFully.xml
   )
   list(APPEND TESTS_WITH_INLINE_COMPARES
+    ${CMAKE_CURRENT_SOURCE_DIR}/RestoreArrayDefaultTransferFunction.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/RestoreDefaultTransferFunction.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/TraceMultiViews.xml
   )

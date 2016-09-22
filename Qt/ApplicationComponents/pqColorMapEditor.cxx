@@ -394,10 +394,10 @@ void pqColorMapEditor::restoreDefaults()
       }
     else
       {
-      vtkSMTransferFunctionProxy::ResetPropertiesToDefaults(lutProxy, true);
+      vtkSMTransferFunctionProxy::ResetPropertiesToDefaults(lutProxy, arrayName.c_str(), true);
       if (vtkSMProxy* sofProxy = vtkSMPropertyHelper(lutProxy, "ScalarOpacityFunction").GetAsProxy())
         {
-        vtkSMTransferFunctionProxy::ResetPropertiesToDefaults(sofProxy, true);
+        vtkSMTransferFunctionProxy::ResetPropertiesToDefaults(sofProxy, arrayName.c_str(), true);
         }
       }
     }

@@ -870,7 +870,7 @@ bool vtkSMTransferFunctionProxy::UpdateScalarBarsComponentTitle(
 
 //----------------------------------------------------------------------------
 void vtkSMTransferFunctionProxy::ResetPropertiesToDefaults(
-  bool preserve_range)
+  const char* arrayName, bool preserve_range)
 {
   try
     {
@@ -912,9 +912,17 @@ void vtkSMTransferFunctionProxy::ResetPropertiesToDefaults(
 
     // First, check to see if there is an array-specific transfer function in
     // the settings.
-    
-
-    settings->GetProxySettings(this, nextafter(VTK_DOUBLE_MAX, 0));
+    double sitePriority = nextafter(VTK_DOUBLE_MAX, 0);
+    std::ostringstream prefix;
+    prefix << ".array_" << this->GetXMLGroup() << "." << arrayName;
+    if (settings->HasSetting(prefix.str().c_str(), sitePriority))
+      {
+      settings->GetProxySettings(prefix.str().c_str(), this, sitePriority);
+      }
+    else
+      {
+      settings->GetProxySettings(this, sitePriority);
+      }
 
     this->RescaleTransferFunction(range[0], range[1], false);
     }
