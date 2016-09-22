@@ -84,6 +84,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QShowEvent>
 #include <QVBoxLayout>
 
+#include <cmath>
 #include <vector>
 
 //-----------------------------------------------------------------------------------
@@ -1277,8 +1278,11 @@ bool pqProxyWidget::restoreDefaults()
           }
         smproperty->ResetToDefault();
 
-        // Restore to site settings if there is one.
-        settings->GetPropertySetting(smproperty, 1.0);
+        // Restore to site setting if there is one. If there isn't, this does
+        // not change the property setting. NOTE: user settings have priority
+        // of VTK_DOUBLE_MAX, so we set the site settings priority to a
+        // number just below VTK_DOUBLE_MAX.
+        settings->GetPropertySetting(smproperty, nextafter(VTK_DOUBLE_MAX, 0));
         }
       }
     }

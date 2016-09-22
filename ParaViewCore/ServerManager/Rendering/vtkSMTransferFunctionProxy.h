@@ -250,17 +250,17 @@ public:
   }
 
   // Description:
-  // Helper method to reset a transfer function proxy to its XML defaults. By
+  // Helper method to reset a transfer function proxy to its defaults. By
   // passing in preserve_range, you can make this method preserve the current
   // transfer function range.
-  virtual void ResetPropertiesToXMLDefaults(bool preserve_range);
-  static void ResetPropertiesToXMLDefaults(vtkSMProxy* proxy, bool preserve_range=false)
+  virtual void ResetPropertiesToDefaults(bool preserve_range);
+  static void ResetPropertiesToDefaults(vtkSMProxy* proxy, bool preserve_range=false)
     {
     vtkSMTransferFunctionProxy* self =
       vtkSMTransferFunctionProxy::SafeDownCast(proxy);
     if (self)
       {
-      self->ResetPropertiesToXMLDefaults(preserve_range);
+      self->ResetPropertiesToDefaults(preserve_range);
       }
     }
   using Superclass::ResetPropertiesToXMLDefaults;
