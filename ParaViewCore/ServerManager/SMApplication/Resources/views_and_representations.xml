@@ -2071,6 +2071,19 @@
         </EnumerationDomain>
       </IntVectorProperty>
 
+      <IntVectorProperty command="SetUseHiddenLineRemoval"
+                         default_values="0"
+                         name="HiddenLineRemoval"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Use a hidden line removal technique to hide wireframe surfaces that
+          are occluded by other wireframe surfaces. Note that this is disabled
+          when rendering distributed geometry in parallel.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty command="SetUseDepthPeeling"
                          default_values="1"
                          name="DepthPeeling"

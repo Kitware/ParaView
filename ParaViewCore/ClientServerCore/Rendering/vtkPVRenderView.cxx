@@ -395,6 +395,7 @@ vtkPVRenderView::vtkPVRenderView()
     observer);
   observer->FastDelete();
 
+  this->UseHiddenLineRemoval = false;
   this->GetRenderer()->SetUseDepthPeeling(1);
   this->GetRenderer()->AddCuller(this->Culler);
 
@@ -1482,6 +1483,15 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
   this->SynchronizedRenderers->SetDataReplicatedOnAllProcesses(
     in_cave_mode ||
     (!use_distributed_rendering && in_tile_display_mode));
+
+  if (this->UseHiddenLineRemoval && !use_distributed_rendering)
+    {
+    this->GetRenderer()->SetUseHiddenLineRemoval(true);
+    }
+  else
+    { // Ignore for distributed rendering.
+    this->GetRenderer()->SetUseHiddenLineRemoval(false);
+    }
 
   if (this->ShowAnnotation)
     {
