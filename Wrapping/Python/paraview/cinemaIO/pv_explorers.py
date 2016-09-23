@@ -62,6 +62,7 @@ class ImageExplorer(explorers.Explorer):
         # Using float rasters for value arrays by default. vtkPVRenderView will fall
         # back to INVERTIBLE_LUT if the required extensions are not supported.
         self.ValueMode = ValueMode().FLOATING_POINT
+        self.CheckFloatSupport = True
 
         if self.view:
             try:
@@ -87,6 +88,7 @@ class ImageExplorer(explorers.Explorer):
             self.rgb2grey = rgb2grey
 
     def enableFloatValues(self, enable):
+        self.CheckFloatSupport = True if enable else False
         self.ValueMode = ValueMode().FLOATING_POINT if enable else ValueMode().INVERTIBLE_LUT
 
     def insert(self, document):
@@ -130,13 +132,10 @@ class ImageExplorer(explorers.Explorer):
                 document.data = imageslice
 
             elif self.CaptureValues: # Value capture
-                # Check the current mode since it could change if there is no
-                # context support.
-                mode = self.view.GetValueRenderingMode()
-                if mode is ValueMode().INVERTIBLE_LUT:
+                if self.ValueMode is ValueMode().INVERTIBLE_LUT:
                     imageslice = self.captureWindowRGB()
 
-                elif mode is ValueMode().FLOATING_POINT:
+                elif self.ValueMode is ValueMode().FLOATING_POINT:
                     simple.Render()
                     image = self.view.GetValuesFloat()
                     idata = numpy_support.vtk_to_numpy(image)
@@ -202,8 +201,16 @@ class ImageExplorer(explorers.Explorer):
             self.view.ArrayNameToDraw = kwargs['name']
             self.view.ArrayComponentToDraw = kwargs['component']
             self.view.ScalarRange = kwargs['range']
+
             self.view.StartCaptureValues()
             self.view.SetValueRenderingMode(self.ValueMode)
+            # Ensure context support
+            if self.CheckFloatSupport and\
+            self.ValueMode == ValueMode().FLOATING_POINT:
+                simple.Render()
+                self.ValueMode = self.view.GetValueRenderingMode()
+                self.CheckFloatSupport = False
+
             self.CaptureDepth = False
             self.CaptureLuminance = False
             self.CaptureValues = True
