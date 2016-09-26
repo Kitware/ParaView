@@ -36,11 +36,37 @@ import explorers
 import paraview.simple as simple
 import numpy as np
 import paraview
+import math
 from paraview import numpy_support as numpy_support
 
 class ValueMode():
   INVERTIBLE_LUT = 1
   FLOATING_POINT = 2
+
+def printView(view):
+    ## For debugging/demonstrating frustums
+    ## spits out the coordinates of the four camera near plane corners
+    ## load them up in paraview
+    r = view.GetRenderer()
+    r.SetViewPoint(-1,-1,0)
+    r.ViewToWorld()
+    ll = r.GetWorldPoint()
+    r.SetViewPoint(1,-1,0)
+    r.ViewToWorld()
+    lr = r.GetWorldPoint()
+    r.SetViewPoint(1,1,0)
+    r.ViewToWorld()
+    ur = r.GetWorldPoint()
+    r.SetViewPoint(-1,1,0)
+    r.ViewToWorld()
+    ul = r.GetWorldPoint()
+    print ll[0], ll[1], ll[2]
+    print lr[0], lr[1], lr[2]
+    print ur[0], ur[1], ur[2]
+    print ul[0], ul[1], ul[2]
+    #print math.sqrt((ur[0]-ll[0])*(ur[0]-ll[0])+
+    #                (ur[1]-ll[1])*(ur[1]-ll[1])+
+    #                (ur[2]-ll[2])*(ur[2]-ll[2]))
 
 class ImageExplorer(explorers.Explorer):
     """
@@ -48,6 +74,7 @@ class ImageExplorer(explorers.Explorer):
     Basically it iterates over the parameters and for each unique combination
     it tells ParaView to make an image and saved the result into the store.
     """
+
     def __init__(self,
                 cinema_store, parameters, tracks,
                 view=None,
@@ -110,6 +137,8 @@ class ImageExplorer(explorers.Explorer):
 
             document.data = imageslice
             self.CaptureDepth = False
+            #printView(self.view)
+
         else:
             imageslice = None
 
@@ -269,7 +298,6 @@ class Camera(explorers.Track):
 
     @staticmethod
     def obtain_angles(angular_steps=[10,15]):
-        import math
         thetas = []
         phis = []
         theta_offset = 90 % angular_steps[1]
@@ -288,8 +316,8 @@ class PoseCamera(explorers.Track):
     """
     A track that connects a ParaView script's pose track which has 3x3
     camera orientations in it. Also takes in camera_eye, _at and _up
-    arrays, which designate the initial position at each timestep, about
-    which the camera rotated by each pose.
+    arrays, which designate the initial position at each timestep, from
+    which the camera moves according to each pose.
     """
     def __init__(self, view, camType, store):
         super(PoseCamera, self).__init__()
@@ -299,37 +327,53 @@ class PoseCamera(explorers.Track):
 
     def execute(self, document):
         """moves camera into position for the current phi, theta value"""
-        def VecAdd( V1, V2):
-            return [V1[0]+V2[0], V1[1]+V2[1], V1[2]+V2[2]]
-        def VecSub( V1, V2):
-            return [V1[0]-V2[0], V1[1]-V2[1], V1[2]-V2[2]]
-        def MatrixMul( V, M):
+        def VecNormalize( V1):
+            return V1/np.linalg.norm(V1)
+        def VecMatrixMul( V, M):
             return [
                 V[0]*M[0][0] + V[1]*M[0][1] + V[2]*M[0][2],
                 V[0]*M[1][0] + V[1]*M[1][1] + V[2]*M[1][2],
                 V[0]*M[2][0] + V[1]*M[2][1] + V[2]*M[2][2]
                 ]
+        def MatrixMatrixMul( mtx_a, mtx_b):
+            tpos_b = zip( *mtx_b)
+            rtn = [[ sum( ea*eb for ea,eb in zip(a,b)) for b in tpos_b] for a in mtx_a]
+            return rtn
         pose = document.descriptor['pose']
+
         #at every timestep paraview records camera location
         #use that as point to spin around
         iPosition = self.cstore.metadata['camera_eye'][-1]
         iFocalPoint = self.cstore.metadata['camera_at'][-1]
-        iViewUp = self.cstore.metadata['camera_up'][-1]
+        iViewUp = VecNormalize(self.cstore.metadata['camera_up'][-1])
+
+        atvec = VecNormalize(np.subtract(iPosition, iFocalPoint))
+        rightvec = np.cross(atvec, iViewUp)
+        m = [[rightvec[0], rightvec[1], rightvec[2]],
+             [iViewUp[0], iViewUp[1], iViewUp[2]],
+             [atvec[0],  atvec[1],  atvec[2]]]
+        #OK because orthogonal thus invert equals trans
+        mInv = [[m[0][0], m[1][0], m[2][0]],
+                [m[0][1], m[1][1], m[2][1]],
+                [m[0][2], m[1][2], m[2][2]]]
+        mi = MatrixMatrixMul(mInv, pose)
+        mf = MatrixMatrixMul(mi, m)
+
         if self.camType == "azimuth-elevation-roll":
-            pi = VecSub(iPosition, iFocalPoint)
-            pr = MatrixMul(pi,pose)
-            pf = VecAdd(pr, iFocalPoint)
+            pi = np.subtract(iPosition, iFocalPoint)
+            pr = VecMatrixMul(pi, mf)
+            pf = np.add(pr, iFocalPoint)
             self.view.GetActiveCamera().SetPosition(pf)
             self.view.GetActiveCamera().SetFocalPoint(iFocalPoint)
         elif self.camType == "yaw-pitch-roll":
-            pi = VecSub(iFocalPoint, iPosition)
-            pr = MatrixMul(pi,pose)
-            pf = VecAdd(pr, iPosition)
+            pi = np.subtract(iFocalPoint, iPosition)
+            pr = VecMatrixMul(pi, mf)
+            pf = np.add(pr, iPosition)
             self.view.GetActiveCamera().SetFocalPoint(pf)
             self.view.GetActiveCamera().SetPosition(iPosition)
         else:
             print "ERROR unexpected camera type"
-        newUp = MatrixMul(iViewUp, pose)
+        newUp = VecMatrixMul(iViewUp, mf)
         self.view.GetActiveCamera().SetViewUp(newUp)
 
 class Slice(explorers.Track):

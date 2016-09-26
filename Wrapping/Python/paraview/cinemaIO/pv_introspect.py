@@ -98,6 +98,9 @@ def max_bounds():
             maxb = bounds[3]
         if bounds[5] > maxb:
             maxb = bounds[5]
+    db = maxb-minb
+    minb = minb-db
+    maxb = maxb+db
     return minb, maxb
 
 def restore_visibility(proxies):
@@ -500,15 +503,15 @@ def make_cinema_store(proxies,
                 if v < 2:
                     poses.append((0,t,r))
                 else:
-                    #sample less frequently toward the pole
+                    #sample longitude less frequently toward the pole
                     increment_Scale = math.cos(math.pi*t/180.0)
                     if increment_Scale == 0:
                         increment_Scale = 1
                     #increment_Scale = 1 #for easy comparison
-                    j = -180
-                    while j<180:
-                        poses.append((j,t,r))
-                        j = j+360/(v*increment_Scale)
+                    p = -180
+                    while p<180:
+                        poses.append((p,t,r))
+                        p = p+360/(v*increment_Scale)
 
         #default is one closest to 0,0,0
         dist = math.sqrt((poses[0][0]*poses[0][0]) +
@@ -523,12 +526,12 @@ def make_cinema_store(proxies,
             sT = math.sin(-math.pi*(t/180.0))
             cR = math.cos(-math.pi*(r/180.0)) #roll is around gaze direction
             sR = math.sin(-math.pi*(r/180.0))
-            rX = [ [1,0,0], [0,cT,-sT], [0,sT,cT] ]
-            rY = [ [cP,0,sP], [0,1,0], [-sP,0,cP] ]
-            rZ = [ [cR,-sR,0], [sR,cR,0], [0,0,1] ]
+            rY = [ [cP,0,sP], [0,1,0], [-sP,0,cP] ] #x,z interchange
+            rX = [ [1,0,0], [0,cT,-sT], [0,sT,cT] ] #y,z interchange
+            rZ = [ [cR,-sR,0], [sR,cR,0], [0,0,1] ] #x,y interchange
             m1 = [ [1,0,0],  [0,1,0],  [0,0,1] ]
-            m2 = MatrixMul(m1,rX)
-            m3 = MatrixMul(m2,rY)
+            m2 = MatrixMul(m1,rY)
+            m3 = MatrixMul(m2,rX)
             m4 = MatrixMul(m3,rZ)
             matrices.append(m4)
             newdist = math.sqrt(p*p+t*t+r*r)
@@ -725,6 +728,7 @@ def explore(cs, proxies, iSave = True, currentTime = None, userDefined = {},
     else:
         for t in times:
             view_proxy.ViewTime=t
+            paraview.simple.Render(view_proxy)
             minbds, maxbds  = max_bounds()
             view_proxy.MaxClipBounds = [minbds, maxbds, minbds, maxbds, minbds, maxbds]
             eye, at, up = track_source(tracked_source, eye, at, up)
