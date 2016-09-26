@@ -507,6 +507,14 @@ vtkSMViewProxy* vtkSMParaViewPipelineControllerWithRendering::ShowInPreferredVie
     return NULL;
     }
 
+  if (strcmp(producer->GetXMLGroup(), "insitu_writer_parameters") == 0)
+    {
+    // This is a proxy for the Catalyst writers which isn't a real filter
+    // but a placeholder for a writer during the Catalyst script export
+    // process. We don't need to do anything with the views.
+    return NULL;
+    }
+
   this->UpdatePipelineBeforeDisplay(producer, outputPort, view);
 
   vtkSMSessionProxyManager* pxm = producer->GetSessionProxyManager();
