@@ -869,8 +869,8 @@ bool vtkSMTransferFunctionProxy::UpdateScalarBarsComponentTitle(
 }
 
 //----------------------------------------------------------------------------
-void vtkSMTransferFunctionProxy::ResetPropertiesToXMLDefaults(
-  bool preserve_range)
+void vtkSMTransferFunctionProxy::ResetPropertiesToDefaults(
+  const char* arrayName, bool preserve_range)
 {
   try
     {
@@ -903,6 +903,27 @@ void vtkSMTransferFunctionProxy::ResetPropertiesToXMLDefaults(
     double range[2] = {points.front().GetData()[0],
       points.back().GetData()[0]};
     this->ResetPropertiesToXMLDefaults();
+
+    // Restore to site setting if there is one. If there isn't, this does not
+    // change the property setting. NOTE: user settings have priority
+    // of VTK_DOUBLE_MAX, so we set the site settings priority to a
+    // number just below VTK_DOUBLE_MAX.
+    vtkSMSettings* settings = vtkSMSettings::GetInstance();
+
+    // First, check to see if there is an array-specific transfer function in
+    // the settings.
+    double sitePriority = nextafter(VTK_DOUBLE_MAX, 0);
+    std::ostringstream prefix;
+    prefix << ".array_" << this->GetXMLGroup() << "." << arrayName;
+    if (settings->HasSetting(prefix.str().c_str(), sitePriority))
+      {
+      settings->GetProxySettings(prefix.str().c_str(), this, sitePriority);
+      }
+    else
+      {
+      settings->GetProxySettings(this, sitePriority);
+      }
+
     this->RescaleTransferFunction(range[0], range[1], false);
     }
   catch (bool val)

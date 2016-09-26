@@ -84,6 +84,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QShowEvent>
 #include <QVBoxLayout>
 
+#include <cmath>
 #include <vector>
 
 //-----------------------------------------------------------------------------------
@@ -1250,6 +1251,7 @@ void pqProxyWidget::updatePanel()
 bool pqProxyWidget::restoreDefaults()
 {
   bool anyReset = false;
+  vtkSMSettings* settings = vtkSMSettings::GetInstance();
   if (this->Internals->Proxy)
     {
     vtkSmartPointer<vtkSMPropertyIterator> iter;
@@ -1275,6 +1277,12 @@ bool pqProxyWidget::restoreDefaults()
           anyReset = true;
           }
         smproperty->ResetToDefault();
+
+        // Restore to site setting if there is one. If there isn't, this does
+        // not change the property setting. NOTE: user settings have priority
+        // of VTK_DOUBLE_MAX, so we set the site settings priority to a
+        // number just below VTK_DOUBLE_MAX.
+        settings->GetPropertySetting(smproperty, nextafter(VTK_DOUBLE_MAX, 0));
         }
       }
     }

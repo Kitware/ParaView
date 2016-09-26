@@ -84,7 +84,7 @@ namespace Json
   class Value;
 }
 
-
+class vtkSMProperty;
 class vtkSMProxy;
 class vtkSMPropertyIterator;
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMSettings : public vtkObject
@@ -128,6 +128,11 @@ public:
   bool HasSetting(const char* settingName);
 
   // Description:
+  // Check whether a setting is defined for the requested names
+  // at or below a maximum priority level.
+  bool HasSetting(const char* settingName, double maxPriority);
+
+  // Description:
   // Get the number of elements in a setting.
   unsigned int GetSettingNumberOfElements(const char* settingName);
 
@@ -154,13 +159,43 @@ public:
                                  const std::string & defaultValue);
 
   // Description:
+  // Set the property value from the setting collections.
+  bool GetPropertySetting(vtkSMProperty* property);
+
+  // Description:
+  // Set the property value from the setting collections that have priority
+  // at or less than the given priority.
+  bool GetPropertySetting(vtkSMProperty* property, double maxPriority);
+
+  // Description:
+  // Set the property value from the setting collections under the given prefix.
+  bool GetPropertySetting(const char* prefix, vtkSMProperty* property);
+
+  // Description:
+  // Set the property value from the setting collections under the given prefix.
+  // that have priority at or less than the given priority.
+  bool GetPropertySetting(const char* prefix, vtkSMProperty* property,
+                           double maxPriority);
+
+  // Description:
   // Set the property values in a vtkSMProxy from the setting collections.
   bool GetProxySettings(vtkSMProxy* proxy);
+
+  // Description:
+  // Set the property values in a vtkSMProxy from the setting collections
+  // that have priority at or less than the given priority.
+  bool GetProxySettings(vtkSMProxy* proxy, double maxPriority);
 
   // Description:
   // Set the property values in a vtkSMProxy from the settings collections
   // under the given prefix.
   bool GetProxySettings(const char* prefix, vtkSMProxy* proxy);
+
+  // Description:
+  // Set the property values in a vtkSMProxy from the settings collections
+  // under the given prefix at or less than the given priority.
+  bool GetProxySettings(const char* prefix, vtkSMProxy* proxy,
+                        double maxPriority);;
 
   // Description:
   // Get description for a setting.

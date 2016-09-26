@@ -102,9 +102,11 @@ public:
   //----------------------------------------------------------------------------
   // Description:
   // See if given setting is defined
-  bool HasSetting(const char* settingName)
+  bool HasSetting(const char* settingName, double maxPriority)
   {
-    Json::Value value = this->GetSetting(settingName);
+    //Json::Value value = this->GetSetting(settingName);
+    Json::Value value =
+      this->GetSettingAtOrBelowPriority(settingName, maxPriority);
 
     return !value.isNull();
   }
@@ -126,7 +128,8 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  const Json::Value & GetSettingBelowPriority(const char* settingName, double priority)
+  const Json::Value & GetSettingBelowPriority(const char* settingName,
+                                              double priority)
   {
     this->SortCollectionsIfNeeded();
 
@@ -150,14 +153,15 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  const Json::Value & GetSettingAtOrBelowPriority(const char* settingName, double priority)
+  const Json::Value & GetSettingAtOrBelowPriority(const char* settingName, 
+                                                  double maxPriority)
   {
     this->SortCollectionsIfNeeded();
 
     // Iterate over settings, checking higher priority settings first
     for (size_t i = 0; i < this->SettingCollections.size(); ++i)
       {
-      if (this->SettingCollections[i].Priority > priority)
+      if (this->SettingCollections[i].Priority > maxPriority)
         {
         continue;
         }
@@ -175,11 +179,13 @@ public:
 
   //----------------------------------------------------------------------------
   template< typename T >
-  bool GetSetting(const char* settingName, std::vector<T> & values)
+  bool GetSetting(const char* settingName, std::vector<T> & values,
+                  double maxPriority)
   {
     values.clear();
 
-    Json::Value setting = this->GetSetting(settingName);
+    Json::Value setting =
+      this->GetSettingAtOrBelowPriority(settingName, maxPriority);
     if (!setting)
       {
       return false;
@@ -213,8 +219,47 @@ public:
   }
 
   //----------------------------------------------------------------------------
+  bool GetPropertySetting(const char* settingName, vtkSMProperty* property,
+                          double maxPriority)
+  {
+    if (!property || !this->HasSetting(settingName, maxPriority))
+      {
+      return false;
+      }
+
+    bool success = false;
+    if (vtkSMIntVectorProperty* intVectorProperty =
+        vtkSMIntVectorProperty::SafeDownCast(property))
+      {
+      success = this->GetPropertySetting(settingName, intVectorProperty,
+                                         maxPriority);
+      }
+    else if (vtkSMDoubleVectorProperty* doubleVectorProperty =
+             vtkSMDoubleVectorProperty::SafeDownCast(property))
+      {
+      success = this->GetPropertySetting(settingName, doubleVectorProperty,
+                                         maxPriority);
+      }
+    else if (vtkSMStringVectorProperty* stringVectorProperty =
+             vtkSMStringVectorProperty::SafeDownCast(property))
+      {
+      success = this->GetPropertySetting(settingName, stringVectorProperty,
+                                         maxPriority);
+      }
+    else if (vtkSMInputProperty* inputProperty =
+             vtkSMInputProperty::SafeDownCast(property))
+      {
+      success = this->GetPropertySetting(settingName, inputProperty,
+                                         maxPriority);
+      }
+
+    return success;
+  }
+
+  //----------------------------------------------------------------------------
   bool GetPropertySetting(const char* settingName,
-                          vtkSMIntVectorProperty* property)
+                          vtkSMIntVectorProperty* property,
+                          double maxPriority)
   {
     if (!property)
       {
@@ -226,7 +271,8 @@ public:
     if (enumDomain)
       {
       // The enumeration property could be either text or value
-      const Json::Value & jsonValue = this->GetSetting(settingName);
+      const Json::Value & jsonValue =
+        this->GetSettingAtOrBelowPriority(settingName, maxPriority);
       int enumValue;
       bool hasInt = this->ConvertJsonValue(jsonValue, enumValue);
       if (hasInt)
@@ -247,7 +293,7 @@ public:
         }
       }
     std::vector<int> vector;
-    if (!this->GetSetting(settingName, vector) ||
+    if (!this->GetSetting(settingName, vector, maxPriority) ||
       vector.size() != property->GetNumberOfElements())
       {
       return false;
@@ -264,10 +310,11 @@ public:
 
   //----------------------------------------------------------------------------
   bool GetPropertySetting(const char* settingName,
-                          vtkSMDoubleVectorProperty* property)
+                          vtkSMDoubleVectorProperty* property,
+                          double maxPriority)
   {
     std::vector<double> vector;
-    if (!property || !this->GetSetting(settingName, vector))
+    if (!property || !this->GetSetting(settingName, vector, maxPriority))
       {
       return false;
       }
@@ -287,10 +334,11 @@ public:
 
   //----------------------------------------------------------------------------
   bool GetPropertySetting(const char* settingName,
-                          vtkSMStringVectorProperty* property)
+                          vtkSMStringVectorProperty* property,
+                          double maxPriority)
   {
     std::vector<std::string> vector;
-    if (!property || !this->GetSetting(settingName, vector))
+    if (!property || !this->GetSetting(settingName, vector, maxPriority))
       {
       return false;
       }
@@ -317,7 +365,9 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  bool GetPropertySetting(const char* settingName, vtkSMInputProperty* property)
+  bool GetPropertySetting(const char* settingName,
+                          vtkSMInputProperty* property,
+                          double maxPriority)
   {
     vtkSMDomain * domain = property->GetDomain( "proxy_list" );
     vtkSMProxyListDomain * proxyListDomain = NULL;
@@ -328,10 +378,11 @@ public:
       sourceSettingString.append(".Selected");
 
       std::string sourceName;
-      if (this->HasSetting(sourceSettingString.c_str()))
+      if (this->HasSetting(sourceSettingString.c_str(), maxPriority))
         {
         std::vector<std::string> selectedString;
-        this->GetSetting(sourceSettingString.c_str(), selectedString);
+        this->GetSetting(sourceSettingString.c_str(), selectedString,
+                         maxPriority);
         if (selectedString.size() > 0)
           {
           sourceName = selectedString[0];
@@ -348,7 +399,8 @@ public:
         if (listProxy)
           {
           // Recurse on the proxy
-          bool success = this->GetProxySettings(settingName, listProxy);
+          bool success = this->GetProxySettings(settingName, listProxy,
+                                                maxPriority);
           if (!success)
             {
             return false;
@@ -368,7 +420,8 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  bool GetProxySettings(const char* settingPrefix, vtkSMProxy* proxy)
+  bool GetProxySettings(const char* settingPrefix, vtkSMProxy* proxy,
+                        double maxPriority)
   {
     if (!proxy)
       {
@@ -377,7 +430,8 @@ public:
 
     bool overallSuccess = true;
 
-    vtkSMPropertyIterator * iter = proxy->NewPropertyIterator();
+    vtkSmartPointer<vtkSMPropertyIterator> iter;
+    iter.TakeReference(proxy->NewPropertyIterator());
     for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
       {
       vtkSMProperty* property = iter->GetProperty();
@@ -416,28 +470,32 @@ public:
 
         const std::string settingString = settingStringStream.str();
         const char* settingName = settingString.c_str();
-        if (this->HasSetting(settingName))
+        if (this->HasSetting(settingName, maxPriority))
           {
           bool success = false;
           if (vtkSMIntVectorProperty* intVectorProperty =
               vtkSMIntVectorProperty::SafeDownCast(property))
             {
-            success = this->GetPropertySetting(settingName, intVectorProperty);
+            success = this->GetPropertySetting(settingName, intVectorProperty,
+                                               maxPriority);
             }
           else if (vtkSMDoubleVectorProperty* doubleVectorProperty =
                    vtkSMDoubleVectorProperty::SafeDownCast(property))
             {
-            success = this->GetPropertySetting(settingName, doubleVectorProperty);
+            success = this->GetPropertySetting(settingName, doubleVectorProperty,
+                                               maxPriority);
             }
           else if (vtkSMStringVectorProperty* stringVectorProperty =
                    vtkSMStringVectorProperty::SafeDownCast(property))
             {
-            success = this->GetPropertySetting(settingName, stringVectorProperty);
+            success = this->GetPropertySetting(settingName, stringVectorProperty,
+                                               maxPriority);
             }
           else if (vtkSMInputProperty* inputProperty =
                    vtkSMInputProperty::SafeDownCast(property))
             {
-            success = this->GetPropertySetting(settingName, inputProperty);
+            success = this->GetPropertySetting(settingName, inputProperty,
+                                               maxPriority);
             }
           else
             {
@@ -451,8 +509,6 @@ public:
           }
         }
       }
-
-    iter->Delete();
 
     return overallSuccess;
   }
@@ -469,7 +525,7 @@ public:
     this->SeparateBranchFromLeaf(settingName, root, leaf);
 
     std::vector< T > previousValues;
-    this->GetSetting(settingName, previousValues);
+    this->GetSetting(settingName, previousValues, VTK_DOUBLE_MAX);
 
     Json::Path settingPath(root.c_str());
     Json::Value & jsonValue = settingPath.make(this->SettingCollections[0].Value);
@@ -1097,7 +1153,13 @@ bool vtkSMSettings::SaveSettingsToFile(const std::string & filePath)
 //----------------------------------------------------------------------------
 bool vtkSMSettings::HasSetting(const char* settingName)
 {
-  return this->Internal->HasSetting(settingName);
+  return this->Internal->HasSetting(settingName, VTK_DOUBLE_MAX);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSettings::HasSetting(const char* settingName, double maxPriority)
+{
+  return this->Internal->HasSetting(settingName, maxPriority);
 }
 
 //----------------------------------------------------------------------------
@@ -1139,7 +1201,7 @@ int vtkSMSettings::GetSettingAsInt(const char* settingName,
                                          int defaultValue)
 {
   std::vector<int> values;
-  bool success = this->Internal->GetSetting(settingName, values);
+  bool success = this->Internal->GetSetting(settingName, values, VTK_DOUBLE_MAX);
 
   if (success && index < values.size())
     {
@@ -1155,7 +1217,7 @@ double vtkSMSettings::GetSettingAsDouble(const char* settingName,
                                          double defaultValue)
 {
   std::vector<double> values;
-  bool success = this->Internal->GetSetting(settingName, values);
+  bool success = this->Internal->GetSetting(settingName, values, VTK_DOUBLE_MAX);
 
   if (success && index < values.size())
     {
@@ -1171,7 +1233,7 @@ std::string vtkSMSettings::GetSettingAsString(const char* settingName,
                                               const std::string & defaultValue)
 {
   std::vector<std::string> values;
-  bool success = this->Internal->GetSetting(settingName, values);
+  bool success = this->Internal->GetSetting(settingName, values, VTK_DOUBLE_MAX);
 
   if (success && index < values.size())
     {
@@ -1199,6 +1261,54 @@ std::string vtkSMSettings::GetSettingDescription(const char *settingName)
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMSettings::GetPropertySetting(vtkSMProperty* property)
+{
+  return this->GetPropertySetting(property, VTK_DOUBLE_MAX);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSettings::GetPropertySetting(vtkSMProperty* property,
+                                        double maxPriority)
+{
+  if (!property)
+    {
+    return false;
+    }
+
+  std::string jsonPrefix(".");
+
+  // TODO - not sure about the GetParent() part
+  jsonPrefix.append(property->GetParent()->GetXMLGroup());
+
+  return this->GetPropertySetting(jsonPrefix.c_str(), property, maxPriority);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSettings::GetPropertySetting(const char* prefix,
+                                        vtkSMProperty* property)
+{
+  return this->GetPropertySetting(prefix, property, VTK_DOUBLE_MAX);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSettings::GetPropertySetting(const char* prefix,
+                                       vtkSMProperty* property,
+                                       double maxPriority)
+{
+  vtkSMProxy* parent = property->GetParent();
+
+  std::string jsonPrefix(prefix);
+  jsonPrefix.append(".");
+  jsonPrefix.append(parent->GetXMLName());
+  jsonPrefix.append(".");
+  jsonPrefix.append(parent->GetPropertyName(property));
+  std::cout << maxPriority << ", " << jsonPrefix << std::endl;
+
+  return this->Internal->GetPropertySetting(jsonPrefix.c_str(), property,
+                                            maxPriority);
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMSettings::GetProxySettings(vtkSMProxy* proxy)
 {
   if (!proxy)
@@ -1213,14 +1323,30 @@ bool vtkSMSettings::GetProxySettings(vtkSMProxy* proxy)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSettings::GetProxySettings(const char* prefix, vtkSMProxy* proxy)
+bool vtkSMSettings::GetProxySettings(vtkSMProxy* proxy, double maxPriority)
 {
   if (!proxy)
     {
     return false;
     }
 
-  return this->Internal->GetProxySettings(prefix, proxy);
+  std::string jsonPrefix(".");
+  jsonPrefix.append(proxy->GetXMLGroup());
+
+  return this->GetProxySettings(jsonPrefix.c_str(), proxy, maxPriority);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSettings::GetProxySettings(const char* prefix, vtkSMProxy* proxy)
+{
+  return this->GetProxySettings(prefix, proxy, VTK_DOUBLE_MAX);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSettings::GetProxySettings(const char* prefix, vtkSMProxy* proxy,
+                                     double maxPriority)
+{
+  return this->Internal->GetProxySettings(prefix, proxy, maxPriority);
 }
 
 //----------------------------------------------------------------------------
@@ -1245,7 +1371,7 @@ void vtkSMSettings::SetSetting(const char* settingName, const std::string & valu
 void vtkSMSettings::SetSetting(const char* settingName, unsigned int index, int value)
 {
   std::vector<int> values;
-  this->Internal->GetSetting(settingName, values);
+  this->Internal->GetSetting(settingName, values, VTK_DOUBLE_MAX);
   if (values.size() <= index)
     {
     values.resize(index+1, 0);
@@ -1259,7 +1385,7 @@ void vtkSMSettings::SetSetting(const char* settingName, unsigned int index, int 
 void vtkSMSettings::SetSetting(const char* settingName, unsigned int index, double value)
 {
   std::vector<double> values;
-  this->Internal->GetSetting(settingName, values);
+  this->Internal->GetSetting(settingName, values, VTK_DOUBLE_MAX);
   if (values.size() <= index)
     {
     values.resize(index+1, 0);
@@ -1273,7 +1399,7 @@ void vtkSMSettings::SetSetting(const char* settingName, unsigned int index, doub
 void vtkSMSettings::SetSetting(const char* settingName, unsigned int index, const std::string & value)
 {
   std::vector<std::string> values;
-  this->Internal->GetSetting(settingName, values);
+  this->Internal->GetSetting(settingName, values, VTK_DOUBLE_MAX);
   if (values.size() <= index)
     {
     values.resize(index+1, "");

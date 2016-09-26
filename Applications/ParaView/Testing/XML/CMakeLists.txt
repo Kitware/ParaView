@@ -452,10 +452,14 @@ if(PARAVIEW_ENABLE_PYTHON)
     ${CMAKE_CURRENT_SOURCE_DIR}/TraceSupplementalProxiesFully.xml
   )
   list(APPEND TESTS_WITH_INLINE_COMPARES
-    ${CMAKE_CURRENT_SOURCE_DIR}/TraceMultiViews.xml)
+    ${CMAKE_CURRENT_SOURCE_DIR}/RestoreArrayDefaultTransferFunction.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/RestoreDefaultTransferFunction.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/TraceMultiViews.xml
+  )
   list(APPEND TESTS_WITHOUT_BASELINES
     ${CMAKE_CURRENT_SOURCE_DIR}/PythonCalculator.xml
-    ${CMAKE_CURRENT_SOURCE_DIR}/TraceIntegrateVariables.xml)
+    ${CMAKE_CURRENT_SOURCE_DIR}/TraceIntegrateVariables.xml
+  )
 
   # Check that matplotlib is available
   include(FindPythonModules)
