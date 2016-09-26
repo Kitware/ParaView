@@ -80,7 +80,7 @@ bool vtkRulerSourceRepresentation::AddToView(vtkView* view)
   vtkPVRenderView* rView = vtkPVRenderView::SafeDownCast(view);
   if (this->DistanceRepresentation && rView)
     {
-    rView->GetRenderer()->AddActor(this->DistanceRepresentation);
+    rView->GetRenderer(vtkPVRenderView::NON_COMPOSITED_RENDERER)->AddActor(this->DistanceRepresentation);
     }
   return this->Superclass::AddToView(view);
 }
@@ -91,7 +91,7 @@ bool vtkRulerSourceRepresentation::RemoveFromView(vtkView* view)
   vtkPVRenderView* rView = vtkPVRenderView::SafeDownCast(view);
   if (this->DistanceRepresentation && rView)
     {
-    rView->GetRenderer()->RemoveActor(this->DistanceRepresentation);
+    rView->GetRenderer(vtkPVRenderView::NON_COMPOSITED_RENDERER)->RemoveActor(this->DistanceRepresentation);
     }
   return this->Superclass::RemoveFromView(view);
 }
