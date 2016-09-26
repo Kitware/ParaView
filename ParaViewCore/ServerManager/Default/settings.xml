@@ -496,6 +496,116 @@
         </Hints>
       </IntVectorProperty>
 
+      <IntVectorProperty name="UseFXAA"
+                         default_values="0"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable FXAA antialiasing on 3D geometry.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="FXAARelativeContrastThreshold"
+                            default_values="0.125"
+                            label="Relative Contrast Threshold"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <Documentation>
+          Contrast threshold for applying FXAA to a pixel, relative to max
+          luminance. Lower values will affect more edges. Default is 0.125.
+        </Documentation>
+        <DoubleRangeDomain name="range" min="0.0625" max="0.333333333" />
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseFXAA" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <!-- The hard contrast threshold is reduced to 0.045 by default. This
+           ensures that the the red arrow of the orientation axes is
+           antialiased. -->
+      <DoubleVectorProperty name="FXAAHardContrastThreshold"
+                            default_values="0.045"
+                            label="Hard Contrast Threshold"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <Documentation>
+          Hard contrast threshold for applying FXAA to a pixel. Lower values
+          will affect more edges. Default is 0.045.
+        </Documentation>
+        <DoubleRangeDomain name="range" min="0.03125" max="0.08333333" />
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseFXAA" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="FXAASubpixelBlendLimit"
+                            default_values="0.75"
+                            label="Subpixel Blend Limit"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <Documentation>
+          Maximum amount of lowpass filtering to apply to the final pixel color
+          to correct subpixel aliasing. Default value is 0.75.
+        </Documentation>
+        <DoubleRangeDomain name="range" min="0." max="1." />
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseFXAA" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="FXAASubpixelContrastThreshold"
+                            default_values="0.25"
+                            label="Subpixel Contrast Threshold"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <Documentation>
+          Contrast threshold for subpixel aliasing detection. Higher values
+          decrease sensitivity to subpixel aliasing. Default value is 0.25.
+        </Documentation>
+        <DoubleRangeDomain name="range" min="0." max="0.5" />
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseFXAA" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty name="FXAAUseHighQualityEndpoints"
+                         default_values="1"
+                         label="Improve Single Pixel Lines"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When enabled, a more sensitive endpoint detection method is used.
+          Disabling this will improve performance, but single-pixel lines will
+          have noticeable artifacts. Default is On.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseFXAA" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty name="FXAAEndpointSearchIterations"
+                         default_values="12"
+                         label="Endpoint Search Iterations"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <Documentation>
+          Endpoint detection radius. Higher values will provide higher quality
+          aliasing for long edges, but performance will suffer. Default is 12.
+        </Documentation>
+        <IntRangeDomain name="range" min="0" max="100" />
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseFXAA" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+
       <DoubleVectorProperty name="LODThreshold"
         label="LOD Threshold"
         default_values="20.0"
@@ -671,6 +781,16 @@
       <PropertyGroup label="Translucent Rendering Options">
         <Property name="DepthPeeling" />
         <Property name="MaximumNumberOfPeels" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Antialiasing Options">
+        <Property name="UseFXAA" />
+        <Property name="FXAARelativeContrastThreshold" />
+        <Property name="FXAAHardContrastThreshold" />
+        <Property name="FXAASubpixelBlendLimit" />
+        <Property name="FXAASubpixelContrastThreshold" />
+        <Property name="FXAAUseHighQualityEndpoints" />
+        <Property name="FXAAEndpointSearchIterations" />
       </PropertyGroup>
 
       <PropertyGroup label="Interactive Rendering Options">

@@ -2113,6 +2113,87 @@
         </Hints>
       </IntVectorProperty>
 
+      <IntVectorProperty command="SetUseFXAA"
+                         default_values="0"
+                         name="UseFXAA"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="UseFXAA"/>
+        </Hints>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetFXAARelativeContrastThreshold"
+                            default_values="0.125"
+                            name="FXAARelativeContrastThreshold"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="FXAARelativeContrastThreshold" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetFXAAHardContrastThreshold"
+                            default_values="0.0625"
+                            name="FXAAHardContrastThreshold"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="FXAAHardContrastThreshold" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetFXAASubpixelBlendLimit"
+                            default_values="0.75"
+                            name="FXAASubpixelBlendLimit"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="FXAASubpixelBlendLimit" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetFXAASubpixelContrastThreshold"
+                            default_values="0.25"
+                            name="FXAASubpixelContrastThreshold"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="FXAASubpixelContrastThreshold" />
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetFXAAUseHighQualityEndpoints"
+                         default_values="1"
+                         name="FXAAUseHighQualityEndpoints"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="FXAAUseHighQualityEndpoints" />
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetFXAAEndpointSearchIterations"
+                         default_values="12"
+                         name="FXAAEndpointSearchIterations"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="FXAAEndpointSearchIterations" />
+        </Hints>
+      </IntVectorProperty>
+
+
       <IntVectorProperty command="SetStereoCapableWindow"
                          default_values="none"
                          name="StereoCapableWindow"

@@ -23,6 +23,7 @@
 #include "vtkObject.h"
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 
+class vtkFXAAOptions;
 class vtkIceTSynchronizedRenderers;
 class vtkImageProcessingPass;
 class vtkPKdTree;
@@ -113,6 +114,14 @@ public:
   // Description:
   // Enable/Disable empty images optimization.
   void SetRenderEmptyImages(bool);
+
+  // Description:
+  // Enable/Disable FXAA antialiasing.
+  void SetUseFXAA(bool enable);
+
+  // Description:
+  // Set the FXAA configuration.
+  void SetFXAAOptions(vtkFXAAOptions *opts);
 
   // Description:
   // Not for the faint hearted. This internal vtkSynchronizedRenderers instances

@@ -35,6 +35,7 @@ class vtkCamera;
 class vtkCuller;
 class vtkExtentTranslator;
 class vtkFloatArray;
+class vtkFXAAOptions;
 class vtkInformationDoubleKey;
 class vtkInformationDoubleVectorKey;
 class vtkInformationIntegerKey;
@@ -620,6 +621,20 @@ public:
   bool GetRenderEmptyImages();
 
   // Description:
+  // Enable/disable FXAA antialiasing.
+  vtkSetMacro(UseFXAA, bool)
+  vtkGetMacro(UseFXAA, bool)
+
+  // Description:
+  // FXAA tunable parameters. See vtkFXAAOptions for details.
+  void SetFXAARelativeContrastThreshold(double val);
+  void SetFXAAHardContrastThreshold(double val);
+  void SetFXAASubpixelBlendLimit(double val);
+  void SetFXAASubpixelContrastThreshold(double val);
+  void SetFXAAUseHighQualityEndpoints(bool val);
+  void SetFXAAEndpointSearchIterations(int val);
+
+  // Description:
   // Provides access to the time when Update() was last called.
   unsigned long GetUpdateTimeStamp()
     { return this->UpdateTimeStamp; }
@@ -820,6 +835,9 @@ protected:
   bool UseInteractiveRenderingForScreenshots;
   bool NeedsOrderedCompositing;
   bool RenderEmptyImages;
+
+  bool UseFXAA;
+  vtkNew<vtkFXAAOptions> FXAAOptions;
 
   double LODResolution;
   bool UseLightKit;

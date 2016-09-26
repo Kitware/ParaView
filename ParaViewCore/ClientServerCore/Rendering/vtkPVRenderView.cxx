@@ -21,6 +21,8 @@
 #include "vtkCamera.h"
 #include "vtkCommand.h"
 #include "vtkCuller.h"
+#include "vtkFloatArray.h"
+#include "vtkFXAAOptions.h"
 #include "vtkDataRepresentation.h"
 #include "vtkFloatArray.h"
 #include "vtkInformation.h"
@@ -359,6 +361,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->Selector = vtkPVHardwareSelector::New();
   this->NeedsOrderedCompositing = false;
   this->RenderEmptyImages = false;
+  this->UseFXAA = false;
   this->DistributedRenderingRequired = false;
   this->NonDistributedRenderingRequired = false;
   this->DistributedRenderingRequiredLOD = false;
@@ -1493,6 +1496,23 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     this->GetRenderer()->SetUseHiddenLineRemoval(false);
     }
 
+  // Configure FXAA:
+  if (this->SynchronizedRenderers->GetEnabled())
+    {
+    this->SynchronizedRenderers->SetUseFXAA(this->UseFXAA);
+    this->SynchronizedRenderers->SetFXAAOptions(this->FXAAOptions.Get());
+    // Disable the renderer's FXAA implementation when rendering remotely. We
+    // need to run it on the composed image to avoid seam artifacts.
+    this->RenderView->GetRenderer()->SetUseFXAA(false);
+    }
+  else
+    {
+    this->RenderView->GetRenderer()->SetUseFXAA(this->UseFXAA);
+    this->RenderView->GetRenderer()->SetFXAAOptions(this->FXAAOptions.Get());
+    }
+  this->OrientationWidget->GetRenderer()->SetUseFXAA(this->UseFXAA);
+  this->OrientationWidget->GetRenderer()->SetFXAAOptions(this->FXAAOptions.Get());
+
   if (this->ShowAnnotation)
     {
     std::ostringstream stream;
@@ -1996,6 +2016,42 @@ bool vtkPVRenderView::GetRenderEmptyImages()
     return true;
     }
   return false;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetFXAARelativeContrastThreshold(double val)
+{
+  this->FXAAOptions->SetRelativeContrastThreshold(static_cast<float>(val));
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetFXAAHardContrastThreshold(double val)
+{
+  this->FXAAOptions->SetHardContrastThreshold(static_cast<float>(val));
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetFXAASubpixelBlendLimit(double val)
+{
+  this->FXAAOptions->SetSubpixelBlendLimit(static_cast<float>(val));
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetFXAASubpixelContrastThreshold(double val)
+{
+  this->FXAAOptions->SetSubpixelContrastThreshold(static_cast<float>(val));
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetFXAAUseHighQualityEndpoints(bool val)
+{
+  this->FXAAOptions->SetUseHighQualityEndpoints(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetFXAAEndpointSearchIterations(int val)
+{
+  this->FXAAOptions->SetEndpointSearchIterations(val);
 }
 
 //----------------------------------------------------------------------------

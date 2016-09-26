@@ -359,6 +359,7 @@
         { "class": "vtkFrameBufferObjectBase" },
         { "class": "vtkFollower" },
         { "class": "vtkFrustumCoverageCuller" },
+        { "class": "vtkFXAAOptions" },
         { "class": "vtkGenericRenderWindowInteractor" },
         { "class": "vtkGenericVertexAttributeMapping" },
         { "class": "vtkGlyph3DMapper" },
