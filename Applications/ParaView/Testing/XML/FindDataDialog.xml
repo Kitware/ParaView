@@ -75,20 +75,31 @@
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/FindDataDialog9.png" width="300" height="300" />
 
   <pqevent object="pqClientMainWindow/FindDataDialog/currentSelectionFrame/invertSelectionCheckBox" command="set_boolean" arguments="false" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/selectionDisplayFrame/pointLabelsButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/selectionDisplayFrame/PointLabelsMenu" command="activate" arguments="Pres" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/FindDataDialog10.png" width="300" height="300" />
-
-  <pqevent object="pqClientMainWindow/FindDataDialog/selectionDisplayFrame/pointLabelsButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/selectionDisplayFrame/PointLabelsMenu" command="activate" arguments="Pres" />
-
   <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/criteria" command="set_string" arguments="Global ID" />
   <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="40" />
   <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/runQuery" command="activate" arguments="" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/FindDataDialog11.png" width="300" height="300" />
 
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/selectionType" command="activated" arguments="Point(s)" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/condition" command="activated" arguments="is one of" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="5" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="50" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="500" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="500," />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="500,6" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="500,60" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="500,600" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/runQuery" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/selectionDisplayFrame/pointLabelsButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/selectionDisplayFrame/PointLabelsMenu" command="activate" arguments="GlobalNodeId" />
+
+  <!-- images are numbered out of order. here we have FindDataDialog14.png -->
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/FindDataDialog14.png" width="300" height="300" />
+
   <pqevent object="pqClientMainWindow/FindDataDialog/selectionDisplayFrame/pointLabelsButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FindDataDialog/selectionDisplayFrame/PointLabelsMenu" command="activate" arguments="Pres" />
+
   <pqevent object="pqClientMainWindow/FindDataDialog/selectionDisplayFrame/labelPropertiesSelection" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FindDataDialog/selectionDisplayFrame/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/FontEditor/FontFamily" command="set_string" arguments="Courier" />
   <pqevent object="pqClientMainWindow/FindDataDialog/selectionDisplayFrame/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/FontEditor/FontFamily" command="set_string" arguments="Courier" />
