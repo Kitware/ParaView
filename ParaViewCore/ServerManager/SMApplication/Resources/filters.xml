@@ -14945,5 +14945,43 @@ source.</Documentation>
 
       <!-- End ExtractTimeSteps -->
     </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkRulerLineForInput"
+                 name="RulerFilter"
+                 label="Ruler">
+      <Documentation short_help="Create a line along the input to use as a ruler">
+        This filter creates a line along the object and defaults its
+        representation to showing a ruler along that line.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty command="SetAxis"
+                         default_values="0"
+                         name="Axis"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="X Axis"
+                 value="0" />
+          <Entry text="Y Axis"
+                 value="1" />
+          <Entry text="Z Axis"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>Select which axis to put the ruler along</Documentation>
+      </IntVectorProperty>
+      <Hints>
+        <Representation view="RenderView" type="RulerSourceRepresentation" />
+        <Visibility replace_input="0" />
+      </Hints>
+      <!-- End vtkRulerLineForInput -->
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

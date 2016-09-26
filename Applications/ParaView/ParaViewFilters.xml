@@ -259,4 +259,5 @@
   <Proxy group="filters" name="GenericStreamTracer" />
   <Proxy group="filters" name="GenericGeometryFilter" />
   <Proxy group="filters" name="SliceAlongPolyLine" />
+  <Proxy group="filters" name="RulerFilter" />
 </ParaViewFilters>
