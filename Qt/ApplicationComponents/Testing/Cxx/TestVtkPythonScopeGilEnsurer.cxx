@@ -1,6 +1,7 @@
+#include "vtkPython.h" // Include python.h first.
+
 #include "QApplication"
 #include "pqPVApplicationCore.h"
-#include "vtkPython.h"
 
 #include <iostream>
 

@@ -29,12 +29,13 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#include "vtkPython.h" // Include python.h first.
+
 #include "pqPythonDebugLeaksView.h"
 #include "pqApplicationCore.h"
 #include "pqPythonDialog.h"
 #include "pqPythonManager.h"
 #include "pqPythonShell.h"
-#include "vtkPython.h"
 
 #include "vtkPythonUtil.h"
 #include "vtkQtDebugLeaksModel.h"

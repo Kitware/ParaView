@@ -29,8 +29,9 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "pqPythonManager.h"
 #include <vtkPython.h> // Python first
+
+#include "pqPythonManager.h"
 
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
