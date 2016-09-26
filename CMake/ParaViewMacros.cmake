@@ -385,7 +385,7 @@ function(build_help_project name)
     # generate the toc at run-time.
     COMMAND ${CMAKE_COMMAND}
             -Doutput_file:FILEPATH=${qhp_filename}
-            -Dfile_patterns:STRING="${arg_FILEPATTERNS}"
+            "-Dfile_patterns:STRING=${arg_FILEPATTERNS}"
             -Dnamespace:STRING="${arg_NAMESPACE}"
             -Dfolder:PATH=${arg_FOLDER}
             -Dname:STRING="${name}"
@@ -393,8 +393,14 @@ function(build_help_project name)
     )
   else ()
     # toc is provided, we'll just configure the file.
+    set(patterns)
+    foreach (filepattern IN LISTS arg_FILEPATTERNS)
+      list(APPEND patterns
+        "${arg_DESTINATION_DIRECTORY}/${filepattern}")
+    endforeach ()
+    file (GLOB matching_files RELATIVE "${arg_DESTINATION_DIRECTORY}" ${patterns} )
     set (files)
-    foreach(filename ${arg_FILEPATTERNS})
+    foreach(filename IN LISTS matching_files)
       set (files "${files}<file>${filename}</file>\n")
     endforeach()
 

@@ -38,10 +38,6 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
   # ignore std::copy() warnings.
   "vtkPVChangeOfBasisHelper.*_SCL_SECURE_NO_WARNINGS"
 
-  # ignore warnings from documentation generation tools.
-  "Warning.*Skipping it."
-  "warning.*Skipping it."
-
   # ignore external code issue
   ".*FreeType.*CxxTests.*"
 

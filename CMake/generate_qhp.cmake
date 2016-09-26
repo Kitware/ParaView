@@ -80,8 +80,17 @@ endif()
 set (toc
   "<toc> <section title=\"${name}\" ref=\"${index_page}\" >\n ${toc} </section> </toc>")
 
+set(matching_files)
+if (file_patterns)
+  set(patterns)
+  foreach (filepattern IN LISTS file_patterns)
+    list(APPEND patterns
+      "${CMAKE_CURRENT_BINARY_DIR}/${filepattern}")
+  endforeach ()
+  file (GLOB matching_files RELATIVE "${CMAKE_CURRENT_BINARY_DIR}" ${patterns} )
+endif ()
 set (files)
-foreach(filename ${file_patterns})
+foreach(filename IN LISTS matching_files)
   set (files "${files}<file>${filename}</file>\n")
 endforeach()
 
