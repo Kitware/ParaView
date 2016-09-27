@@ -4576,7 +4576,8 @@ int vtknifti1_io::nifti_read_next_extension( nifti1_extension * nex, nifti_image
                                       int remain, znzFile fp )
 {
    int swap = nim->byteorder != nifti_short_order();
-   int count, size, code;
+   int count, size;
+   int code = 0;
 
    /* first clear nex */
    nex->esize = nex->ecode = 0;
