@@ -12,7 +12,9 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPython.h" // Include python.h first.
+// Include vtkPython.h first to avoid python??_d.lib not found linking error on
+// Windows debug builds.
+#include "vtkPython.h"
 
 #include "pvpythonmodules.h"
 #include "vtkUtilitiesPythonInitializerModule.h"

@@ -1,4 +1,6 @@
-#include "vtkPython.h" // Include python.h first.
+// Include vtkPython.h first to avoid pythonXY_d.lib not found linking error on
+// Windows debug builds.
+#include "vtkPython.h"
 
 #include "QApplication"
 #include "pqPVApplicationCore.h"
