@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPVLODVolume.h"
 
+#include "vtkAbstractVolumeMapper.h"
 #include "vtkDataSet.h"
 #include "vtkImageData.h"
 #include "vtkLODProp3D.h"
@@ -405,4 +406,12 @@ void vtkPVLODVolume::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "EnableLOD: " << this->EnableLOD << endl;
   os << indent << "LODProp: " << endl;
   this->LODProp->PrintSelf(os, indent.GetNextIndent());
+}
+
+//----------------------------------------------------------------------------
+vtkAbstractVolumeMapper* vtkPVLODVolume::GetMapper()
+{
+  return vtkAbstractVolumeMapper::SafeDownCast
+    (this->LODProp->GetLODMapper(
+      this->HighLODId));
 }
