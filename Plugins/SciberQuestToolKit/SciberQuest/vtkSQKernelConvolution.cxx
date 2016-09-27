@@ -172,8 +172,8 @@ vtkSQKernelConvolution::vtkSQKernelConvolution()
         keys[i]=hostNames[i*hostNameLen];
 
         CountMapInsType ret;
-        CountMapValType val(keys[i],0);
-        ret=counts.insert(val);
+        CountMapValType valMap(keys[i],0);
+        ret=counts.insert(valMap);
         if (ret.second)
           {
           ret.first->second=1;
