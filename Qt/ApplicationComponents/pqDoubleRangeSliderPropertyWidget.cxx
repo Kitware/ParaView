@@ -90,6 +90,7 @@ pqDoubleRangeSliderPropertyWidget::pqDoubleRangeSliderPropertyWidget(
                           smProperty, 0);
   new pqWidgetRangeDomain(ui.ThresholdBetween_1, "minimum", "maximum",
                           smProperty, 1);
+  this->setProperty(smProperty);
 }
 
 //-----------------------------------------------------------------------------
