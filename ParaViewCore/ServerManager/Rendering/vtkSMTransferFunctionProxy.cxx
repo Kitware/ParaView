@@ -38,7 +38,8 @@
 #include "vtk_jsoncpp.h"
 
 #include <algorithm>
-#include <math.h>
+#include <cmath>
+#include <sstream>
 #include <vector>
 
 namespace
