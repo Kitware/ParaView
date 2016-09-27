@@ -104,6 +104,7 @@ class RasterWrangler(object):
             self.backends.add("PIL")
         elif vtkEnabled:
             self.backends.add("VTK")
+        self.compress = True
 
     def enableOpenEXR(self):
         """Try to turn on OpenEXR file IO support"""
@@ -297,49 +298,34 @@ class RasterWrangler(object):
 
     def zreader(self, fname):
         """reads a depth file to make a depth buffer"""
-        if "OpenEXR" in self.backends:
-            return exr.load_depth(fname)
-
-        elif "PIL" in self.backends:
-            try:
-                im = PIL.Image.open(fname)
-                #print "read", fname
-                return numpy.array(im, numpy.float32).reshape(im.size[1],im.size[0])
-            except:
-                #print "no such file", fname
-                return None
+        if not self.compress:
+            im = PIL.Image.open(fname)
+            return numpy.array(im, numpy.float32).reshape(im.size[1],im.size[0])
         else:
-            print "Warning: need OpenEXR or PIL to read from " + fname
+            adjustedName = fname + ".npz"
+            file = open(adjustedName, mode='r')
+            tz = numpy.load(file)
+            imageslice = tz[tz.files[0]]
+            tz.close()
+            file.close()
+            return imageslice
 
     def zwriter(self, imageslice, fname):
         """takes in a depth buffer and writes it as a depth file"""
-        if "OpenEXR" in self.backends:
-            imageslice = numpy.flipud(imageslice)
-            exr.save_depth(imageslice, fname)
-
-        elif "VTK" in self.backends:
-            height = imageslice.shape[1]
-            width = imageslice.shape[0]
-
-            file = open(fname, mode='w')
-            file.write("Image type: L 32F image\r\n")
-            file.write("Name: A cinema depth image\r\n")
-            file.write("Image size (x*y): "+str(height) + "*" + str(width) + "\r\n")
-            file.write("File size (no of images): 1\r\n")
-            file.write(chr(26))
-            imageslice.tofile(file)
-            file.close()
-
-        elif "PIL" in self.backends:
+        if not self.compress:
             imageslice = numpy.flipud(imageslice)
             pimg = PIL.Image.fromarray(imageslice)
             #TODO:
             # don't let ImImagePlugin.py insert the Name: filename in line two
             # why? because ImImagePlugin.py reader has a 100 character limit
             pimg.save(fname)
-
         else:
-            print "Warning: need OpenEXR or PIL or VTK to write to " + fname
+            adjustedName = fname + ".npz"
+            file = open(adjustedName, mode='w')
+            print adjustedName
+            print imageslice.shape, numpy.amin(imageslice), numpy.amax(imageslice)
+            numpy.savez_compressed(file, imageslice)
+            file.close()
 
     def assertvalidimage(self, filename):
         """tests that a given file is syntactically correct"""
