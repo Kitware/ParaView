@@ -7308,13 +7308,23 @@
         </Documentation>
       </StringVectorProperty>
 
+      <DoubleVectorProperty name="Scale"
+        command="SetScale"
+        number_of_elements="1"
+        default_values="1.">
+        <Documentation>
+          Scale factor applied to the global coordinate distance. Used to convert between the units used in the data set global coordinate distance to desired units. Example: convert from inches to centimeters by setting this value to 0.3937.
+        </Documentation>
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+
       <IntVectorProperty name="RulerMode"
         command="SetRulerMode"
         number_of_elements="1"
         default_values="0">
         <Documentation>
           Check to enable "ruler mode", where ticks are placed at increments
-          defined by the parameter "ruler distance".
+          defined by the Graduation property.
         </Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
@@ -7324,8 +7334,7 @@
         number_of_elements="1"
         default_values="5">
         <Documentation>
-          Specify the number of major ruler ticks. Note: the number of ticks is the
-          number between the two handle endpoints.
+          Specify the number of major ruler ticks. Note: the number of ticks is the number between the two handle endpoints.
         </Documentation>
         <IntRangeDomain name="range" min="1" />
         <Hints>
@@ -7341,23 +7350,7 @@
         number_of_elements="1"
         default_values="1.">
         <Documentation>
-          Specify the graduation, which indicates the spacing of the major ticks.
-        </Documentation>
-        <DoubleRangeDomain name="range" min="0" />
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="RulerMode"
-                                   value="1" />
-        </Hints>
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty name="Scale"
-        command="ScaleRulerDistance"
-        number_of_elements="1"
-        default_values="1.">
-        <Documentation>
-          Specify the graduation scale with respect to the global coordinate scale.
+          Specify the graduation, or the spacing of the ruler tick marks. Spacing is defined in the scaled global coordinate distance (see the Scale property). For example, if data is defined in terms of inches and the Scale property is set to display distances in centimeters, this property defines the spacing of tick marks in terms of centimeters.
         </Documentation>
         <DoubleRangeDomain name="range" min="0" />
         <Hints>

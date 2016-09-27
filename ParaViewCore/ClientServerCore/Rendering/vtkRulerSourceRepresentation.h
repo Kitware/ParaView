@@ -74,15 +74,21 @@ public:
   // vtkDistanceRepresentation::NumberOfRulerTicks is used to draw the tick
   // marks.
   void SetRulerMode(int choice);
+  int GetRulerMode();
 
   // Description:
-  // Specify the RulerDistance which indicates the spacing of the major ticks.
+  // Specify the RulerDistance which indicates the spacing of the major ticks
+  // in the unit space obtained after the Scale is applied (see SetScale()).
   // This ivar only has effect when the RulerMode is on.
   void SetRulerDistance(double distance);
+  double GetRulerDistance();
 
   // Description:
-  // Scale the ruler distance by a constant.
-  void ScaleRulerDistance(double scale);
+  // Set scale factor to apply to the ruler graduation scale and the displayed
+  // distance. Used to transform VTK world space units to a desired unit,
+  // e.g., inches to centimeters.
+  void SetScale(double distance);
+  double GetScale();
 
   // Description:
   // Specify the number of major ruler ticks. Note: the number of ticks is the
@@ -129,7 +135,6 @@ protected:
   vtkDistanceRepresentation2D* DistanceRepresentation;
   vtkNew<vtkPVCacheKeeper> CacheKeeper;
   vtkNew<vtkPolyData> Clone;
-  double RulerDistanceScale;
 
 private:
   vtkRulerSourceRepresentation(const vtkRulerSourceRepresentation&) VTK_DELETE_FUNCTION;

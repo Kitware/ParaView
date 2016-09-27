@@ -48,8 +48,6 @@ vtkRulerSourceRepresentation::vtkRulerSourceRepresentation()
   this->DistanceRepresentation->InstantiateHandleRepresentation();
 
   this->CacheKeeper->SetInputData(this->Clone.Get());
-
-  this->RulerDistanceScale = 1.0;
 }
 
 //----------------------------------------------------------------------------
@@ -82,7 +80,7 @@ bool vtkRulerSourceRepresentation::AddToView(vtkView* view)
   vtkPVRenderView* rView = vtkPVRenderView::SafeDownCast(view);
   if (this->DistanceRepresentation && rView)
     {
-    rView->GetRenderer()->AddActor(this->DistanceRepresentation);
+    rView->GetRenderer(vtkPVRenderView::NON_COMPOSITED_RENDERER)->AddActor(this->DistanceRepresentation);
     }
   return this->Superclass::AddToView(view);
 }
@@ -93,7 +91,7 @@ bool vtkRulerSourceRepresentation::RemoveFromView(vtkView* view)
   vtkPVRenderView* rView = vtkPVRenderView::SafeDownCast(view);
   if (this->DistanceRepresentation && rView)
     {
-    rView->GetRenderer()->RemoveActor(this->DistanceRepresentation);
+    rView->GetRenderer(vtkPVRenderView::NON_COMPOSITED_RENDERER)->RemoveActor(this->DistanceRepresentation);
     }
   return this->Superclass::RemoveFromView(view);
 }
@@ -137,34 +135,74 @@ void vtkRulerSourceRepresentation::SetAxisColor(double red, double green, double
 //----------------------------------------------------------------------------
 void vtkRulerSourceRepresentation::SetLabelFormat(char* labelFormat)
 {
+  // Checking if the LabelFormat has changed is a bit cumbersome,
+  // so we instead let the DistanceRepresentation handle it and
+  // only call Modified() if the DistanceRepresentation says it has
+  // changed.
+  vtkMTimeType previousMTime = this->DistanceRepresentation->GetMTime();
   this->DistanceRepresentation->SetLabelFormat(labelFormat);
+  if (this->DistanceRepresentation->GetMTime() != previousMTime)
+    {
+    this->Modified();
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkRulerSourceRepresentation::SetRulerMode(int choice)
 {
-  this->DistanceRepresentation->SetRulerMode(choice);
+  if (choice != this->GetRulerMode())
+    {
+    this->DistanceRepresentation->SetRulerMode(choice);
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+int vtkRulerSourceRepresentation::GetRulerMode()
+{
+  return this->DistanceRepresentation->GetRulerMode();
 }
 
 //----------------------------------------------------------------------------
 void vtkRulerSourceRepresentation::SetRulerDistance(double distance)
 {
-  this->DistanceRepresentation->SetRulerDistance(
-    distance*this->RulerDistanceScale);
+  if (distance != this->GetRulerDistance())
+    {
+    this->DistanceRepresentation->SetRulerDistance(distance);
+    this->Modified();
+    }
 }
 
 //----------------------------------------------------------------------------
-void vtkRulerSourceRepresentation::ScaleRulerDistance(double scale)
+double vtkRulerSourceRepresentation::GetRulerDistance()
 {
-  this->RulerDistanceScale = scale;
-  this->SetRulerDistance(
-    this->DistanceRepresentation->GetRulerDistance()*scale);
+  return this->DistanceRepresentation->GetRulerDistance();
+}
+
+//----------------------------------------------------------------------------
+void vtkRulerSourceRepresentation::SetScale(double scale)
+{
+  if (scale != this->GetScale())
+    {
+    this->DistanceRepresentation->SetScale(scale);
+    this->Modified();
+    }
+}
+
+//----------------------------------------------------------------------------
+double vtkRulerSourceRepresentation::GetScale()
+{
+  return this->DistanceRepresentation->GetScale();
 }
 
 //----------------------------------------------------------------------------
 void vtkRulerSourceRepresentation::SetNumberOfRulerTicks(int n)
 {
-  this->DistanceRepresentation->SetNumberOfRulerTicks(n);
+  if (n != this->DistanceRepresentation->GetNumberOfRulerTicks())
+    {
+    this->DistanceRepresentation->SetNumberOfRulerTicks(n);
+    this->Modified();
+    }
 }
 
 //----------------------------------------------------------------------------
