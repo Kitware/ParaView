@@ -29,7 +29,9 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkPython.h" // Include python.h first.
+// Include vtkPython.h first to avoid python??_d.lib not found linking error on
+// Windows debug builds.
+#include "vtkPython.h"
 
 #include "pqPythonDebugLeaksView.h"
 #include "pqApplicationCore.h"
