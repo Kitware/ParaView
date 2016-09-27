@@ -141,15 +141,14 @@ unsigned long long MemoryMonitor::GetStatusField(const char *name)
   if (!ok)
     {
     sqErrorMacro(std::cerr,"Failed to open /proc/self/status.");
-    return -1;
+    return static_cast<unsigned long long>(-1);
     }
   unsigned long long value;
   ok=NameValue(status,name,value);
   if (!ok)
     {
     sqErrorMacro(std::cerr,"Failed to find " << name << ".");
-    return -1;
+    return static_cast<unsigned long long>(-1);
     }
-
   return value;
 }
