@@ -30,9 +30,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-
 #include "pqFileDialogFilter.h"
 
+#include <QDateTime>
 #include <QFileIconProvider>
 #include <QIcon>
 #include <QStringBuilder>
@@ -45,6 +45,7 @@ pqFileDialogFilter::pqFileDialogFilter(pqFileDialogModel* model, QObject* Parent
   this->setSourceModel(model);
   this->Wildcards.setPatternSyntax(QRegExp::RegExp2);
   this->Wildcards.setCaseSensitivity(Qt::CaseSensitive);
+  this->setSortCaseSensitivity(Qt::CaseInsensitive);
 }
 
 pqFileDialogFilter::~pqFileDialogFilter()
@@ -163,4 +164,45 @@ bool pqFileDialogFilter::filterAcceptsRow(int row_source, const QModelIndex& sou
     }
 }
 
+bool pqFileDialogFilter::lessThan(const QModelIndex &left, const QModelIndex &right) const
+{
+  // Compare two index for sorting purposes
+  QModelIndex leftTypeIdx =
+    this->sourceModel()->index(left.row(), 1, left.parent());
+  QModelIndex rightTypeIdx =
+    this->sourceModel()->index(right.row(), 1, right.parent());
 
+  int leftType = this->sourceModel()->data(leftTypeIdx, Qt::UserRole).toInt();
+  int rightType =
+    this->sourceModel()->data(rightTypeIdx, Qt::UserRole).toInt();
+
+  // Sanity Check
+  if ((leftType != rightType)
+    || ((left.parent().isValid() && right.parent().isValid()
+      && left.parent() != right.parent())
+        || (left.parent().isValid() && !right.parent().isValid())
+        || (!left.parent().isValid() && right.parent().isValid()) ))
+    {
+    return false;
+    }
+  // Compare File Size
+  if (left.column() == 2)
+    {
+    qulonglong leftData =
+      this->sourceModel()->data(left, Qt::UserRole).toULongLong();
+    qulonglong rightData =
+      this->sourceModel()->data(right, Qt::UserRole).toULongLong();
+    return leftData < rightData;
+    }
+  // Compare Modification time
+  else if (left.column() == 3)
+    {
+    QDateTime leftData =
+      this->sourceModel()->data(left, Qt::UserRole).toDateTime();
+    QDateTime rightData =
+      this->sourceModel()->data(right, Qt::UserRole).toDateTime();
+    return leftData < rightData;
+    }
+  // Other column (strings) are handeld by the superclass
+  return QSortFilterProxyModel::lessThan(left, right);
+}

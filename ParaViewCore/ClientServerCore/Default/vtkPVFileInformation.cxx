@@ -51,6 +51,7 @@
 
 #include <set>
 #include <string>
+#include <time.h>
 #include <vtksys/RegularExpression.hxx>
 #include <vtksys/SystemTools.hxx>
 
@@ -144,7 +145,6 @@ static bool getNetworkSubdirs(const std::string& name,
     }
   return NO_ERROR == ret;
 }
-
 
 static bool getNetworkSubdirs(const std::string& path,
                               std::vector<std::string>& subdirs,
@@ -362,7 +362,6 @@ std::string MakeAbsolutePath(const std::string& path,
   return ret;
 }
 
-
 //-----------------------------------------------------------------------------
 class vtkPVFileInformationSet :
   public std::set<vtkSmartPointer<vtkPVFileInformation> >
@@ -380,6 +379,9 @@ vtkPVFileInformation::vtkPVFileInformation()
   this->FullPath = NULL;
   this->FastFileTypeDetection = 0;
   this->Hidden = false;
+  this->Extension = NULL;
+  this->Size = 0;
+  this->ModificationTime = time(NULL);
 }
 
 //-----------------------------------------------------------------------------
@@ -389,6 +391,9 @@ vtkPVFileInformation::~vtkPVFileInformation()
   this->SequenceParser->Delete();
   this->SetName(NULL);
   this->SetFullPath(NULL);
+  this->SetExtension(NULL);
+  this->Size = 0;
+  this->ModificationTime = time(NULL);
 }
 
 bool vtkPVFileInformation::IsDirectory(int t)
@@ -782,6 +787,25 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
       infoD->Type = type;
       infoD->FastFileTypeDetection = this->FastFileTypeDetection;
       infoD->SetHiddenFlag(); //needs full path set first
+
+      // Recover status info
+      struct stat status;
+      int res = stat(infoD->FullPath, &status);
+      if (res != -1)
+        {
+        if (isfile)
+          {
+          std::string::size_type pos = filename.rfind('.');
+          if (pos != std::string::npos)
+            {
+            std::string ext = filename.substr(pos + 1);
+            infoD->SetExtension(ext.c_str());
+            }
+          }
+        infoD->Size = status.st_size;
+        infoD->ModificationTime = status.st_mtime;
+        }
+
       info_set.insert(infoD);
       infoD->Delete();
       }
@@ -864,11 +888,26 @@ void vtkPVFileInformation::GetDirectoryListing()
     info->Type = INVALID;
     info->SetHiddenFlag();
 
+    // Recover status info
+    struct stat status;
+    int res = stat(info->FullPath, &status);
+    if (res != -1)
+      {
+      if (!S_ISDIR(status.st_mode))
+        {
+        std::string::size_type pos = std::string(d->d_name).rfind('.');
+        if (pos != std::string::npos)
+          {
+          std::string ext = std::string(d->d_name).substr(pos + 1);
+          info->SetExtension(ext.c_str());
+          }
+        }
+      info->Size = status.st_size;
+      info->ModificationTime = status.st_mtime;
+      }
     // fix to bug #09452 such that directories with trailing names can be
     // shown in the file dialog
 #if defined (__SVR4) && defined (__sun)
-  struct stat status;
-  int res = stat( info->FullPath, &status );
   if ( res != -1 && status.st_mode & S_IFDIR )
     {
     info->Type = DIRECTORY;
@@ -1044,7 +1083,6 @@ void vtkPVFileInformation::OrganizeCollection(vtkPVFileInformationSet& info_set)
     ++iter;
     }
 
-
   // Now scan through all created groups and dissolve trivial groups
   // i.e. groups with single entries. Add all other groups to the
   // results.
@@ -1083,7 +1121,10 @@ void vtkPVFileInformation::CopyToStream(vtkClientServerStream* stream)
     << this->FullPath
     << this->Type
     << this->Hidden
-    << this->Contents->GetNumberOfItems();
+    << this->Contents->GetNumberOfItems()
+    << this->Extension
+    << this->Size
+    << this->ModificationTime;
 
   vtkSmartPointer<vtkCollectionIterator> iter;
   iter.TakeReference(this->Contents->NewIterator());
@@ -1135,11 +1176,27 @@ void vtkPVFileInformation::CopyFromStream(const vtkClientServerStream* css)
     vtkErrorMacro("Error parsing Number of children.");
     return;
     }
+  if (!css->GetArgument(0, 5, &temp))
+    {
+    vtkErrorMacro("Error parsing File extension.");
+    return;
+    }
+  this->SetExtension(temp);
+  if (!css->GetArgument(0, 6, &this->Size))
+    {
+    vtkErrorMacro("Error parsing File extension.");
+    return;
+    }
+  if (!css->GetArgument(0, 7, &this->ModificationTime))
+    {
+    vtkErrorMacro("Error parsing File extension.");
+    return;
+    }
   for (int cc=0; cc < num_of_children; cc++)
     {
     vtkPVFileInformation* child = vtkPVFileInformation::New();
     vtkClientServerStream childStream;
-    if (!css->GetArgument(0, 5+cc, &childStream))
+    if (!css->GetArgument(0, 8+cc, &childStream))
       {
       vtkErrorMacro("Error parsing child #" << cc);
       return;
@@ -1158,6 +1215,9 @@ void vtkPVFileInformation::Initialize()
   this->Type = INVALID;
   this->Hidden = false;
   this->Contents->RemoveAllItems();
+  this->SetExtension(0);
+  this->Size=0;
+  this->ModificationTime = time(NULL);
 }
 
 //-----------------------------------------------------------------------------

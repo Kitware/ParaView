@@ -30,7 +30,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-
 #ifndef _pqFileDialogFilter_h
 #define _pqFileDialogFilter_h
 
@@ -55,6 +54,7 @@ public slots:
 
 protected:
   bool filterAcceptsRow(int row_source, const QModelIndex& source_parent) const;
+  bool lessThan(const QModelIndex &left, const QModelIndex &right) const;
 
   pqFileDialogModel* Model;
   QRegExp Wildcards;

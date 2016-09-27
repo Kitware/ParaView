@@ -35,7 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <algorithm>
 
 #include <QApplication>
+#include <QDateTime>
 #include <QDir>
+#include <QLocale>
 #include <QMessageBox>
 #include <QStyle>
 
@@ -57,7 +59,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkStringList.h>
 
 #include "pqSMAdaptor.h"
-
 //////////////////////////////////////////////////////////////////////
 // pqFileDialogModelFileInfo
 
@@ -69,16 +70,20 @@ public:
     Hidden(false)
   {
   }
-
   pqFileDialogModelFileInfo(const QString& l, const QString& filepath,
            vtkPVFileInformation::FileTypes t, const bool &h,
+           const QString& extension,const size_t& sizeVal,
+           const time_t& modificationTimeVal,
            const QList<pqFileDialogModelFileInfo>& g =
            QList<pqFileDialogModelFileInfo>()) :
     Label(l),
     FilePath(filepath),
     Type(t),
     Hidden(h),
-    Group(g)
+    Group(g),
+    Extension(extension),
+    ModificationTime(modificationTimeVal),
+    Size(sizeVal)
   {
   }
 
@@ -112,12 +117,75 @@ public:
     return this->Group;
   }
 
+  const QString extensionTypeString() const
+  {
+    if (this->Type == vtkPVFileInformation::DIRECTORY)
+      {
+      return QObject::tr("Folder");
+      }
+    else
+      {
+      return QString("%1%2%3").arg(this->Extension).
+        arg(this->Extension.isEmpty() ? "" : " ").arg(QObject::tr("File"));
+      }
+  }
+
+  const QString sizeString() const
+  {
+    if (this->Type == vtkPVFileInformation::DIRECTORY)
+      {
+      return QString();
+      }
+    const size_t kb = 1024;
+    const size_t mb = 1024 * kb;
+    const size_t gb = 1024 * mb;
+    const size_t tb = 1024 * gb;
+
+    if (this->Size >= tb)
+      {
+      return QString("%1 TB").arg(QLocale().toString(qreal(this->Size) / tb, 'f', 3));
+      }
+    if (this->Size >= gb)
+      {
+      return QString("%1 GB").arg(QLocale().toString(qreal(this->Size) / gb, 'f', 2));
+      }
+    if (this->Size >= mb)
+      {
+      return QString("%1 MB").arg(QLocale().toString(qreal(this->Size) / mb, 'f', 1));
+      }
+    if (this->Size >= kb)
+      {
+      return QString("%1 KB").arg(QLocale().toString(qreal(this->Size) / kb, 'f', 1));
+      }
+    return QString("%1 bytes").arg(QLocale().toString(
+      static_cast<qulonglong>(this->Size)));
+  }
+
+  const QString modificationTimeString() const
+  {
+    return QDateTime::fromTime_t(this->ModificationTime).
+      toString(Qt::SystemLocaleDate);
+  }
+
+  qulonglong size() const
+  {
+    return static_cast<qulonglong>(this->Size);
+  }
+
+  const QDateTime modificationTime() const
+  {
+    return QDateTime::fromTime_t(this->ModificationTime);
+  }
+
 private:
   QString Label;
   QString FilePath;
   vtkPVFileInformation::FileTypes Type;
   bool Hidden;
   QList<pqFileDialogModelFileInfo> Group;
+  QString Extension;
+  time_t ModificationTime;
+  size_t Size;
 };
 
 /////////////////////////////////////////////////////////////////////
@@ -357,14 +425,16 @@ public:
       if (vtkPVFileInformation::IsDirectory(info->GetType()))
         {
         dirs.push_back(pqFileDialogModelFileInfo(info->GetName(), info->GetFullPath(),
-            static_cast<vtkPVFileInformation::FileTypes>(info->GetType()),
-            info->GetHidden()));
+          static_cast<vtkPVFileInformation::FileTypes>(info->GetType()),
+          info->GetHidden(), info->GetExtension(), info->GetSize(),
+          info->GetModificationTime()));
         }
       else if (info->GetType() != vtkPVFileInformation::FILE_GROUP)
         {
         files.push_back(pqFileDialogModelFileInfo(info->GetName(), info->GetFullPath(),
-            static_cast<vtkPVFileInformation::FileTypes>(info->GetType()),
-            info->GetHidden()));
+          static_cast<vtkPVFileInformation::FileTypes>(info->GetType()),
+          info->GetHidden(), info->GetExtension(), info->GetSize(),
+          info->GetModificationTime()));
         }
       else if (info->GetType() == vtkPVFileInformation::FILE_GROUP)
         {
@@ -378,10 +448,14 @@ public:
             childIter->GetCurrentObject());
           groupFiles.push_back(pqFileDialogModelFileInfo(child->GetName(), child->GetFullPath(),
             static_cast<vtkPVFileInformation::FileTypes>(child->GetType()),
-            child->GetHidden()));
+            child->GetHidden(), child->GetExtension(), child->GetSize(),
+            child->GetModificationTime()));
           }
         files.push_back(pqFileDialogModelFileInfo(info->GetName(), groupFiles[0].filePath(),
-          vtkPVFileInformation::SINGLE_FILE,info->GetHidden(), groupFiles));
+          vtkPVFileInformation::SINGLE_FILE,info->GetHidden(),
+          info->GetExtension(),info->GetSize(),
+          info->GetModificationTime(),
+          groupFiles));
         }
       }
 
@@ -655,7 +729,6 @@ bool pqFileDialogModel::rmdir(const QString& dirName)
   this->Implementation->Update(cPath, info);
   this->endResetModel();
 
-
   return ret;
 }
 
@@ -747,14 +820,12 @@ int pqFileDialogModel::columnCount(const QModelIndex& idx) const
 {
   const pqFileDialogModelFileInfo* file =
     this->Implementation->infoForIndex(idx);
-
   if(!file)
     {
     // should never get here anyway
-    return 1;
+    return 4;
     }
-
-  return file->group().size() + 1;
+  return file->group().size() + 4;
 }
 
 QVariant pqFileDialogModel::data(const QModelIndex &idx, int role) const
@@ -762,7 +833,7 @@ QVariant pqFileDialogModel::data(const QModelIndex &idx, int role) const
 
   const pqFileDialogModelFileInfo *file;
 
-  if(idx.column() == 0)
+  if(idx.column() <= 3)
     {
     file = this->Implementation->infoForIndex(idx);
     }
@@ -771,35 +842,104 @@ QVariant pqFileDialogModel::data(const QModelIndex &idx, int role) const
     file = this->Implementation->infoForIndex(idx.parent());
     }
 
-  if(!file)
+  if (!file)
     {
     // should never get here anyway
     return QVariant();
     }
 
-  if(role == Qt::DisplayRole || role == Qt::EditRole)
+  int grSize = file->group().size();
+  if (role == Qt::DisplayRole || role == Qt::EditRole)
     {
-    if (idx.column() == 0)
+    if (grSize == 0)
       {
-      return file->label();
+      switch (idx.column())
+        {
+        case 0:
+          return file->label();
+          break;
+        case 1:
+          return file->extensionTypeString();
+          break;
+        case 2:
+          return file->sizeString();
+          break;
+        case 3:
+          return file->modificationTimeString();
+          break;
+        default:
+          return QVariant();
+          break;
+        }
       }
-    else if (idx.column() <= file->group().size())
+    else if (grSize > 0)
       {
-      return file->group().at(idx.column()-1).label();
+      switch (idx.column())
+        {
+        case 0:
+          return file->label();
+          break;
+        case 1:
+          return tr("Group");
+          break;
+        case 2:
+          return QVariant();
+          break;
+        case 3:
+          return QVariant();
+          break;
+        default:
+          return file->group().at(idx.column() - 4).label();
+          break;
+        }
       }
     }
-  else if(role == Qt::UserRole)
+  else if (role == Qt::UserRole)
     {
-    if (idx.column() == 0)
+    if (grSize == 0)
       {
-      return file->filePath();
+      switch (idx.column())
+        {
+        case 0:
+          return file->filePath();
+          break;
+        case 1:
+          return static_cast<int>(file->type());
+          break;
+        case 2:
+          return static_cast<qulonglong>(file->size());
+          break;
+        case 3:
+          return file->modificationTime();
+          break;
+        default:
+          return QVariant();
+          break;
+        }
       }
-    else if (idx.column() <= file->group().size())
+    else if (grSize > 0)
       {
-      return file->group().at(idx.column()-1).filePath();
+      switch (idx.column())
+        {
+        case 0:
+          return file->filePath();
+          break;
+        case 1:
+          return static_cast<int>(file->type());
+          break;
+        case 2:
+          return QVariant();
+          break;
+        case 3:
+          return QVariant();
+          break;
+        default:
+          return file->group().at(idx.column() - 4).filePath();
+          break;
+        }
       }
     }
-  else if(role == Qt::DecorationRole && idx.column() == 0)
+  else if (role == Qt::DecorationRole && idx.column() == 0)
     {
     return Icons()->icon(file->type());
     }
@@ -874,12 +1014,22 @@ QVariant pqFileDialogModel::headerData(int section,
 {
   switch(role)
     {
-  case Qt::DisplayRole:
-    switch(section)
-      {
-    case 0:
-      return tr("Filename");
-      }
+    case Qt::DisplayRole:
+      switch(section)
+        {
+        case 0:
+          return tr("Filename");
+          break;
+        case 1:
+          return tr("Type");
+          break;
+        case 2:
+          return tr("Size");
+          break;
+        case 3:
+          return tr("Date Modified");
+          break;
+        }
     }
 
   return QVariant();
