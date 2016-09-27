@@ -158,6 +158,12 @@ bool pqImageOutputInfo::getComposite()
 }
 
 //-----------------------------------------------------------------------------
+bool pqImageOutputInfo::getUseFloatValues()
+{
+  return this->Ui->cbUseFloatValues->isChecked();
+}
+
+//-----------------------------------------------------------------------------
 void pqImageOutputInfo::updateImageFileName()
 {
   QString fileName = this->Ui->imageFileName->displayText();
@@ -249,10 +255,18 @@ void pqImageOutputInfo::setCinemaVisible(bool status)
     {
     this->updateSpherical();
     this->Ui->gbCinemaOptions->show();
+    this->Ui->laComposite->show();
+    this->Ui->composite->show();
+    this->Ui->laFloatValue->show();
+    this->Ui->cbUseFloatValues->show();
     }
   else
     {
     this->Ui->gbCinemaOptions->hide();
+    this->Ui->laComposite->hide();
+    this->Ui->composite->hide();
+    this->Ui->laFloatValue->hide();
+    this->Ui->cbUseFloatValues->hide();
     }
 
 }

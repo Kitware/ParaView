@@ -45,6 +45,7 @@
 #include "vtkOpenGLShaderCache.h"
 #include "vtkShaderProgram.h"
 #include "vtkTextureObjectVS.h"
+# include "vtkValuePass.h"
 #else
 #include "vtkCamera.h"
 #include "vtkShader2.h"
@@ -115,7 +116,9 @@ vtkCxxSetObjectMacro(vtkIceTCompositePass, Controller,
   vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkIceTCompositePass::vtkIceTCompositePass()
-  : LastRenderedDepths()
+  : EnableFloatValuePass(false)
+  , LastRenderedDepths()
+  , LastRenderedRGBA32F()
 {
   this->IceTContext = vtkIceTContext::New();
   this->IceTContext->UseOpenGLOn();
@@ -265,17 +268,37 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
     }
   else
     {
+#ifdef VTKGL2
+    // First ensure the context supports floating point textures
+    if (this->EnableFloatValuePass)
+      {
+      vtkValuePass* valuePass = vtkValuePass::SafeDownCast(this->RenderPass);
+      vtkRenderWindow* context = render_state->GetRenderer()->GetRenderWindow();
+      bool supported = valuePass->IsFloatingPointModeSupported(context);
+      if (!supported)
+        {
+        vtkWarningMacro("Disabling FloatValuePass!");
+        this->EnableFloatValuePass = supported;
+        }
+      }
+
+    IceTEnum const format = this->EnableFloatValuePass ?
+      ICET_IMAGE_COLOR_RGBA_FLOAT : ICET_IMAGE_COLOR_RGBA_UBYTE;
+#else
+    IceTEnum const format = ICET_IMAGE_COLOR_RGBA_UBYTE;
+#endif
+
     // If translucent geometry is present, then we should not include
     // ICET_DEPTH_BUFFER_BIT in  the input-buffer argument.
     if (use_ordered_compositing)
       {
-      icetSetColorFormat(ICET_IMAGE_COLOR_RGBA_UBYTE);
+      icetSetColorFormat(format);
       icetSetDepthFormat(ICET_IMAGE_DEPTH_NONE);
       icetCompositeMode(ICET_COMPOSITE_MODE_BLEND);
       }
     else
       {
-      icetSetColorFormat(ICET_IMAGE_COLOR_RGBA_UBYTE);
+      icetSetColorFormat(format);
       icetSetDepthFormat(ICET_IMAGE_DEPTH_FLOAT);
       icetDisable(ICET_COMPOSITE_ONE_BUFFER);
       icetCompositeMode(ICET_COMPOSITE_MODE_Z_BUFFER);
@@ -509,21 +532,46 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
       render_state->GetRenderer()->GetActiveCamera()->GetLeftEye() == 1 ? 0 : 1;
     this->LastRenderedRGBAColors = this->LastRenderedEyes[eyeIndex];
     }
+#ifdef VTKGL2
+  IceTEnum const format = this->EnableFloatValuePass ?
+    ICET_IMAGE_COLOR_RGBA_FLOAT : ICET_IMAGE_COLOR_RGBA_UBYTE;
+#else
+  IceTEnum const format = ICET_IMAGE_COLOR_RGBA_UBYTE;
+#endif
 
   // Capture image.
   vtkIdType numPixels = icetImageGetNumPixels(renderedImage);
   if (icetImageGetColorFormat(renderedImage) != ICET_IMAGE_COLOR_NONE)
     {
-    this->LastRenderedRGBAColors->Resize(icetImageGetWidth(renderedImage),
-      icetImageGetHeight(renderedImage), 4);
-    icetImageCopyColorub(renderedImage,
-      this->LastRenderedRGBAColors->GetRawPtr()->GetPointer(0),
-      ICET_IMAGE_COLOR_RGBA_UBYTE);
-    this->LastRenderedRGBAColors->MarkValid();
+    switch (format)
+      {
+      case ICET_IMAGE_COLOR_RGBA_FLOAT:
+        // IceT requires the image format to be RGBA for float rendering
+        // (R32F not supported).
+        this->LastRenderedRGBA32F->SetNumberOfComponents(4);
+        this->LastRenderedRGBA32F->SetNumberOfTuples(numPixels);
+        icetImageCopyColorf(renderedImage,
+          this->LastRenderedRGBA32F->GetPointer(0),
+          ICET_IMAGE_COLOR_RGBA_FLOAT);
+        this->LastRenderedRGBAColors->MarkInValid();
+        break;
+
+      case ICET_IMAGE_COLOR_RGBA_UBYTE:
+      default:
+        this->LastRenderedRGBAColors->Resize(icetImageGetWidth(renderedImage),
+          icetImageGetHeight(renderedImage), 4);
+        icetImageCopyColorub(renderedImage,
+          this->LastRenderedRGBAColors->GetRawPtr()->GetPointer(0),
+          ICET_IMAGE_COLOR_RGBA_UBYTE);
+        this->LastRenderedRGBAColors->MarkValid();
+        this->LastRenderedRGBA32F->SetNumberOfTuples(0);
+        break;
+      }
     }
   else
     {
     this->LastRenderedRGBAColors->MarkInValid();
+    this->LastRenderedRGBA32F->SetNumberOfTuples(0);
     }
   if (icetImageGetDepthFormat(renderedImage) != ICET_IMAGE_DEPTH_NONE)
     {
@@ -544,7 +592,8 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
     }
   else if (this->FixBackground)
     {
-    this->PushIceTColorBufferToScreen(render_state);
+    if (format == ICET_IMAGE_COLOR_RGBA_UBYTE)
+      this->PushIceTColorBufferToScreen(render_state);
     }
 
   this->CleanupContext(render_state);
@@ -679,28 +728,50 @@ void vtkIceTCompositePass::Draw(const vtkRenderState* render_state,
     cam->Modified();
 
     // copy the results
-    if (icetImageGetColorFormat(result) != ICET_IMAGE_COLOR_NONE)
+    if (!this->EnableFloatValuePass)
       {
-      glReadPixels(0,0,
-        icetImageGetWidth(result),
-        icetImageGetHeight(result),
-        GL_RGBA, GL_UNSIGNED_BYTE,
-        icetImageGetColorub(result));
-      }
-    if (icetImageGetDepthFormat(result) != ICET_IMAGE_DEPTH_NONE)
-      {
-      glReadPixels(0,0,
-        icetImageGetWidth(result),
-        icetImageGetHeight(result),
-        GL_DEPTH_COMPONENT, GL_FLOAT,
-        icetImageGetDepthf(result));
-      }
-    }
-  if(this->DepthOnly)
-    {
-    glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
-    }
+      // Copy image from default buffer.
+      if (icetImageGetColorFormat(result) != ICET_IMAGE_COLOR_NONE)
+        {
+        glReadPixels(0,0,
+          icetImageGetWidth(result),
+          icetImageGetHeight(result),
+          GL_RGBA, GL_UNSIGNED_BYTE,
+          icetImageGetColorub(result));
+        }
 
+      if (icetImageGetDepthFormat(result) != ICET_IMAGE_DEPTH_NONE)
+        {
+        glReadPixels(0,0,
+          icetImageGetWidth(result),
+          icetImageGetHeight(result),
+          GL_DEPTH_COMPONENT, GL_FLOAT,
+          icetImageGetDepthf(result));
+        }
+
+      if (this->DepthOnly)
+        {
+        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+        }
+      }
+    else
+      {
+      // Copy image from the renderPass's internal buffer.
+      vtkValuePass* valuePass = vtkValuePass::SafeDownCast(this->RenderPass);
+      if (valuePass)
+        {
+        // Internal color attachment
+        // IceT requires the image format to be RGBA for float rendering
+        // (R32F not supported), so the entire attachment is read.
+        valuePass->GetFloatImageData(GL_RGBA, icetImageGetWidth(result),
+          icetImageGetHeight(result), icetImageGetColorf(result));
+
+        // Internal depth attachment
+        valuePass->GetFloatImageData(GL_DEPTH_COMPONENT, icetImageGetWidth(result),
+          icetImageGetHeight(result), icetImageGetDepthf(result));
+        }
+      }
+    }
   vtkOpenGLCheckErrorMacro("failed after Draw");
 }
 #else
@@ -889,6 +960,13 @@ vtkFloatArray* vtkIceTCompositePass::GetLastRenderedDepths()
 {
   return this->LastRenderedDepths->GetNumberOfTuples() >  0 ?
     this->LastRenderedDepths.GetPointer() : NULL;
+}
+
+//----------------------------------------------------------------------------
+vtkFloatArray* vtkIceTCompositePass::GetLastRenderedRGBA32F()
+{
+  return this->LastRenderedRGBA32F->GetNumberOfTuples() > 0 ?
+    this->LastRenderedRGBA32F.GetPointer() : NULL;
 }
 
 //----------------------------------------------------------------------------

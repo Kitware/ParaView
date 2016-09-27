@@ -579,11 +579,13 @@ class CoProcessor(object):
         pm = servermanager.vtkProcessModule.GetProcessModule()
         pid = pm.GetPartitionId()
 
+        enableFloatVal = False if 'floatValues' not in co else co['floatValues']
+
         pv_introspect.explore(fs, p, iSave = (pid == 0), currentTime = {'time':formatted_time},
                               userDefined = self.__CinemaTracks,
                               specLevel = specLevel,
                               camType = camType,
-                              tracking = tracking_def)
+                              tracking = tracking_def, floatValues = enableFloatVal)
         if pid == 0:
             fs.save()
 

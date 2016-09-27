@@ -38,6 +38,10 @@ import numpy as np
 import paraview
 from paraview import numpy_support as numpy_support
 
+class ValueMode():
+  INVERTIBLE_LUT = 1
+  FLOATING_POINT = 2
+
 class ImageExplorer(explorers.Explorer):
     """
     An Explorer that connects a ParaView script's views to a store.
@@ -52,18 +56,27 @@ class ImageExplorer(explorers.Explorer):
         self.view = view
         self.CaptureDepth = False
         self.CaptureLuminance = False
+        self.CaptureValues = False
         self.iSave = iSave
         self.UsingGL2 = False
+        # Using float rasters for value arrays by default. vtkPVRenderView will fall
+        # back to INVERTIBLE_LUT if the required extensions are not supported.
+        self.ValueMode = ValueMode().FLOATING_POINT
+        self.CheckFloatSupport = True
+
         if self.view:
             try:
-                rw=self.view.GetRenderWindow()
-                if rw.GetRenderingBackend()==2:
-                    self.UsingGL2 = True
+                backend = self.view.GetRenderWindow().GetRenderingBackend()
+                # TODO Keeps the LuminancePass purposely off. There is a bug when
+                # the Luminance pass is on (it seems to remain attached even after
+                # StopCapture).
+                #self.UsingGL2 = True if (backend == "OpenGL2") else False
             except AttributeError:
                 pass
         if self.UsingGL2:
             def rgb2grey(rgb, height, width):
-                as_grey = np.dot(rgb[...,:3], [0.0, 1.0, 0.0]) #pass through Diffuse lum term
+                #pass through Diffuse lum term
+                as_grey = np.dot(rgb[...,:3], [0.0, 1.0, 0.0])
                 res = as_grey.reshape(height,width).astype('uint8')
                 return res
             self.rgb2grey = rgb2grey
@@ -74,12 +87,17 @@ class ImageExplorer(explorers.Explorer):
                 return res
             self.rgb2grey = rgb2grey
 
+    def enableFloatValues(self, enable):
+        self.CheckFloatSupport = True if enable else False
+        self.ValueMode = ValueMode().FLOATING_POINT if enable else ValueMode().INVERTIBLE_LUT
+
     def insert(self, document):
         """overridden to use paraview to generate an image and create a
         the document for it"""
         if not self.view:
             return
         if self.CaptureDepth:
+            # Depth capture
             simple.Render()
             image = self.view.CaptureDepthBuffer()
             idata = numpy_support.vtk_to_numpy(image) * 256
@@ -89,53 +107,68 @@ class ImageExplorer(explorers.Explorer):
                 imageslice = idata.reshape(height,width)
             except ValueError:
                 imageslice = None
-            #import Image
-            #img = Image.fromarray(imageslice)
-            #img.show()
-            #try:
-            #    input("Press enter to continue ")
-            #except NameError:
-            #    pass
+
             document.data = imageslice
             self.CaptureDepth = False
         else:
             imageslice = None
-            if self.CaptureLuminance and not self.UsingGL2:
-                try:
-                    rep = simple.GetRepresentation()
-                    if rep != None:
-                        rep.DiffuseColor = [1,1,1]
-                        rep.ColorArrayName = None
-                except ValueError:
-                    pass
-                image = self.view.CaptureWindow(1)
-                ext = image.GetExtent()
-                width = ext[1] - ext[0] + 1
-                height = ext[3] - ext[2] + 1
-                imagescalars = image.GetPointData().GetScalars()
-                idata = numpy_support.vtk_to_numpy(imagescalars)
-                idata = self.rgb2grey(idata, height, width)
-                imageslice = np.dstack((idata,idata,idata))
-                image.UnRegister(None)
-            else:
-                image = self.view.CaptureWindow(1)
-                ext = image.GetExtent()
-                width = ext[1] - ext[0] + 1
-                height = ext[3] - ext[2] + 1
-                imagescalars = image.GetPointData().GetScalars()
-                idata = numpy_support.vtk_to_numpy(imagescalars)
-                imageslice = idata.reshape(height,width,3)
-                image.UnRegister(None)
-            #import Image
-            #img = Image.fromarray(imageslice)
-            #img.show()
-            #try:
-            #    input("Press enter to continue ")
-            #except NameError:
-            #    pass
-            document.data = imageslice
+
+            if self.CaptureLuminance:
+                if self.UsingGL2:
+                    # TODO: needs a fix for luminance pass
+                    imageslice = self.captureWindowRGB()
+                else: # GL1 support
+                    try:
+                        rep = simple.GetRepresentation()
+                        if rep != None:
+                            rep.DiffuseColor = [1,1,1]
+                            rep.ColorArrayName = None
+                    except ValueError:
+                        pass
+                    idata, width, height = self.captureWindowAsNumpy()
+                    idata = self.rgb2grey(idata, height, width)
+                    imageslice = np.dstack((idata,idata,idata))
+
+                document.data = imageslice
+
+            elif self.CaptureValues: # Value capture
+                if self.ValueMode is ValueMode().INVERTIBLE_LUT:
+                    imageslice = self.captureWindowRGB()
+
+                elif self.ValueMode is ValueMode().FLOATING_POINT:
+                    simple.Render()
+                    image = self.view.GetValuesFloat()
+                    idata = numpy_support.vtk_to_numpy(image)
+                    rw = self.view.GetRenderWindow()
+                    width, height = rw.GetSize()
+                    try:
+                      imageslice = idata.reshape(height, width)
+                    except ValueError:
+                      imageslice = None
+
+                document.data = imageslice
+
+            else: # Capture color image
+                imageslice = self.captureWindowRGB()
+                document.data = imageslice
+
         if self.iSave:
             super(ImageExplorer, self).insert(document)
+
+    def captureWindowRGB(self):
+        idata, width, height = self.captureWindowAsNumpy()
+        imageslice = idata.reshape(height, width, 3)
+        return imageslice
+
+    def captureWindowAsNumpy(self):
+        image = self.view.CaptureWindow(1)
+        ext = image.GetExtent()
+        width = ext[1] - ext[0] + 1
+        height = ext[3] - ext[2] + 1
+        imagescalars = image.GetPointData().GetScalars()
+        idata = numpy_support.vtk_to_numpy(imagescalars)
+        image.UnRegister(None)
+        return idata, width, height
 
     def setDrawMode(self, choice, **kwargs):
         """ helper for Color tracks so that they can cause ParaView to
@@ -146,18 +179,21 @@ class ImageExplorer(explorers.Explorer):
                 self.view.StopCaptureLuminance()
             self.CaptureDepth = False
             self.CaptureLuminance = False
+            self.CaptureValues = False
         if choice == 'luminance':
             self.view.StopCaptureValues()
             if self.UsingGL2:
                 self.view.StartCaptureLuminance()
             self.CaptureDepth = False
             self.CaptureLuminance = True
+            self.CaptureValues = False
         if choice == 'depth':
             self.view.StopCaptureValues()
             if self.UsingGL2:
                 self.view.StopCaptureLuminance()
             self.CaptureDepth=True
             self.CaptureLuminance = False
+            self.CaptureValues = False
         if choice == 'value':
             if self.UsingGL2:
                 self.view.StopCaptureLuminance()
@@ -165,9 +201,19 @@ class ImageExplorer(explorers.Explorer):
             self.view.ArrayNameToDraw = kwargs['name']
             self.view.ArrayComponentToDraw = kwargs['component']
             self.view.ScalarRange = kwargs['range']
+
             self.view.StartCaptureValues()
+            self.view.SetValueRenderingMode(self.ValueMode)
+            # Ensure context support
+            if self.CheckFloatSupport and\
+            self.ValueMode == ValueMode().FLOATING_POINT:
+                simple.Render()
+                self.ValueMode = self.view.GetValueRenderingMode()
+                self.CheckFloatSupport = False
+
             self.CaptureDepth = False
             self.CaptureLuminance = False
+            self.CaptureValues = True
 
     def finish(self):
         super(ImageExplorer, self).finish()

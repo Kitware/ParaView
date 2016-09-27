@@ -40,7 +40,8 @@ exrEnabled = False
 try:
     import OexrHelper as exr
     exrEnabled = True
-    print "Imported OpenEXR, will default to *.exr in z-buffer images."
+    print "Imported OpenEXR, will default to *.exr for float images (z-buffer, \
+    value, etc.)."
 except ImportError:
     pass
 
@@ -235,7 +236,36 @@ class RasterWrangler(object):
         else:
             print "Warning: need PIL or VTK to write to " + fname
 
-    def zfileextension(self):
+    def valuewriter(self, imageSlice, fname):
+        """ Takes in either a (1C) float or a RGB (3C) buffer and writes it as
+        an image file."""
+        dimensions = imageSlice.shape
+        if len(dimensions) == 2 and imageSlice.dtype == numpy.float32:
+          # Treat as single channel floating point buffer. Adjust the filename.
+          #print "->>> imageslice max/min: ", imageSlice.max(), " / ", imageSlice.min()
+          baseName, ext = os.path.splitext(fname)
+          adjustedName = baseName + self.floatExtension()
+          self.zwriter(imageSlice, adjustedName)
+
+        elif (len(dimensions) > 2) and (dimensions[2] == 3):
+          # Treat as a RGB buffer
+          self.rgbwriter(imageSlice, fname)
+
+        else:
+          raise ValueError("Invalid dimensions for a value raster.")
+
+    def valuereader(self, fname):
+        """ Opens a value image file and returns it as either a color buffer
+        or a floating point array (depending on how the image was exported)."""
+        baseName, ext = os.path.splitext(fname)
+        if ext == self.floatExtension():
+          # Treat as single channel floating point buffer.
+          return self.zreader(fname)
+        else:
+          # Treat as a RGB buffer
+          return self.rgbreader(fname)
+
+    def floatExtension(self):
         """determine file extension for depth images"""
         if "OpenEXR" in self.backends:
             return ".exr"

@@ -639,7 +639,7 @@ class FileStore(Store):
         """ overridden to use the filename pattern to determine default type """
         return self._default_type
 
-    def _get_filename(self, desc):
+    def _get_filename(self, desc, readingFile = True):
         dirname = os.path.dirname(self.__dbfilename)
 
         #find filename modulo any dependent parameters
@@ -688,12 +688,21 @@ class FileStore(Store):
                 base = base + sep + k + "=" + str(index)
                 sep = "/"
 
-        #determine file type for this document
+        # determine file type for this document
         doctype = self.determine_type(desc)
         if doctype == "Z":
-            ext = self.raster_wrangler.zfileextension()
+            # Depth images are by default float buffers
+            ext = self.raster_wrangler.floatExtension()
+        elif doctype == "VALUE" and\
+          (not os.path.exists(os.path.join(dirname, base + ext)) and\
+          readingFile):
+            # Value images could be RGB buffers (INVERTIBLE_LUT) or float buffers.
+            # When reading a file, if the default extension (provided in the json
+            # file) is not found then it is assumed to be a float buffer.
+            # TODO Split this function to handle these cases separately.
+            ext = self.raster_wrangler.floatExtension()
 
-        fullpath = os.path.join(dirname, base+ext)
+        fullpath = os.path.join(dirname, base + ext)
         return fullpath
 
     def insert(self, document):
@@ -701,7 +710,7 @@ class FileStore(Store):
         makes a record of it in the store"""
         super(FileStore, self).insert(document)
 
-        fname = self._get_filename(document.descriptor)
+        fname = self._get_filename(document.descriptor, readingFile = False)
 
         dirname = os.path.dirname(fname)
         if not os.path.exists(dirname):
@@ -709,8 +718,10 @@ class FileStore(Store):
 
         if not document.data is None:
             doctype = self.determine_type(document.descriptor)
-            if doctype == 'RGB' or doctype == 'VALUE' or doctype == 'LUMINANCE':
+            if doctype == 'RGB' or doctype == 'LUMINANCE':
                 self.raster_wrangler.rgbwriter(document.data, fname)
+            elif doctype == 'VALUE':
+                self.raster_wrangler.valuewriter(document.data, fname)
             elif doctype == 'Z':
                 self.raster_wrangler.zwriter(document.data, fname)
             else:
@@ -719,10 +730,10 @@ class FileStore(Store):
     def _load_data(self, doc_file, descriptor):
         doctype = self.determine_type(descriptor)
         try:
-            if doctype == 'RGB' or doctype == 'VALUE':
+            if doctype == 'RGB' or doctype == 'LUMINANCE':
                 data = self.raster_wrangler.rgbreader(doc_file)
-            elif doctype == 'LUMINANCE':
-                data = self.raster_wrangler.rgbreader(doc_file)
+            elif doctype == 'VALUE':
+                data = self.raster_wrangler.valuereader(doc_file)
             elif doctype == 'Z':
                 data = self.raster_wrangler.zreader(doc_file)
             else:

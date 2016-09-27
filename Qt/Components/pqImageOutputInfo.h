@@ -65,6 +65,7 @@ public:
   bool fitToScreen();
   int getMagnification();
   bool getComposite();
+  bool getUseFloatValues();
 
   /// Remove or add options depending on whether cinema is visible.
   void setCinemaVisible(bool status);

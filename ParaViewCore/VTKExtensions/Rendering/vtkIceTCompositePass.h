@@ -16,7 +16,7 @@
 // renderings across processes using IceT.
 // .SECTION Description
 // vtkIceTCompositePass is a vtkRenderPass subclass that can be used for
-// compositing images (rgba or depth buffer) across processes using IceT.
+// compositing images (RGBA_UBYTE, depth or RGBA_32F) across processes using IceT.
 // This can be used in lieu of vtkCompositeRGBAPass. The usage of this pass
 // differs slightly from vtkCompositeRGBAPass. vtkCompositeRGBAPass composites
 // the active frame buffer, while this class requires that the render pass to
@@ -27,6 +27,11 @@
 // TileDimensions > [1, 1] and instead of rendering a composited image
 // on the root node, it will split the view among all tiles and generate
 // renderings on all processes.
+//
+// Warning:
+// Compositing RGBA_32F is only supported for a specific pass (vtkValuePass).
+// For a more generic integration, vtkRenderPass should expose an internal FBO
+// API.
 
 #ifndef vtkIceTCompositePass_h
 #define vtkIceTCompositePass_h
@@ -165,6 +170,17 @@ public:
   vtkFloatArray* GetLastRenderedDepths();
 
   // Description:
+  // Adjusts this pass to handle vtkValuePass::FLOATING_POINT, in which floating-
+  // point values are rendered to vtkValuePass's internal FBO.
+  vtkSetMacro(EnableFloatValuePass, bool);
+
+  // Description:
+  // Provides access to the last rendered float image in vtkValuePass, if any.
+  // May return NULL if a float image was not composited and is not available on
+  // the current rank.
+  vtkFloatArray* GetLastRenderedRGBA32F();
+
+  // Description:
   // Obtains the composited depth-buffer from IceT and pushes it to the screen.
   // This is only done when DepthOnly is true.
   void PushIceTDepthBufferToScreen(const vtkRenderState* render_state);
@@ -216,6 +232,7 @@ protected:
   bool UseOrderedCompositing;
   bool DepthOnly;
   bool DataReplicatedOnAllProcesses;
+  bool EnableFloatValuePass;
   int TileDimensions[2];
   int TileMullions[2];
 
@@ -227,6 +244,8 @@ protected:
   int ImageReductionFactor;
 
   vtkNew<vtkFloatArray> LastRenderedDepths;
+
+  vtkNew<vtkFloatArray> LastRenderedRGBA32F;
 
   vtkPixelBufferObject *PBO;
   vtkTextureObject *ZTexture;
