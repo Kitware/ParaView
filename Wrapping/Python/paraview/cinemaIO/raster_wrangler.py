@@ -236,7 +236,7 @@ class RasterWrangler(object):
         else:
             print "Warning: need PIL or VTK to write to " + fname
 
-    def valuewriter(self, imageSlice, fname):
+    def valuewriter(self, imageSlice, fname, range):
         """ Takes in either a (1C) float or a RGB (3C) buffer and writes it as
         an image file."""
         dimensions = imageSlice.shape
@@ -249,7 +249,29 @@ class RasterWrangler(object):
 
         elif (len(dimensions) > 2) and (dimensions[2] == 3):
           # Treat as a RGB buffer
-          self.rgbwriter(imageSlice, fname)
+
+          w0 = numpy.left_shift(imageSlice[:,:,0].astype(numpy.uint32), 16)
+          #print "W0", w0.shape, numpy.amin(w0), numpy.amax(w0)
+          w1 = numpy.left_shift(imageSlice[:,:,1].astype(numpy.uint32), 8)
+          #print "W1", w1.shape, numpy.amin(w1), numpy.amax(w1)
+          w2 = imageSlice[:,:,2]
+          #print "W2", w2.shape, numpy.amin(w2), numpy.amax(w2)
+
+          value = numpy.bitwise_or(w0,w1)
+          value = numpy.bitwise_or(value,w2)
+          value = numpy.subtract(value.astype(numpy.int32),1) #0 is reserved as "nothing"
+          if range[1] != range[0]:
+            normalized_val = numpy.divide(value.astype(float),(0xFFFFFE/(range[1]-range[0])))
+          else:
+            normalized_val = numpy.divide(value.astype(float),0xFFFFFE)
+          adjusted_val = numpy.add(normalized_val,range[0])
+          #print "RANGE", range[0], "," , range[1]
+          #print "BV", adjusted_val.shape, numpy.amin(adjusted_val), numpy.amax(adjusted_val)
+
+          baseName, ext = os.path.splitext(fname)
+          adjustedName = baseName + self.floatExtension()
+
+          self.zwriter(adjusted_val, adjustedName)
 
         else:
           raise ValueError("Invalid dimensions for a value raster.")

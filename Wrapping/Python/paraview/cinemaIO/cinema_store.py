@@ -721,7 +721,14 @@ class FileStore(Store):
             if doctype == 'RGB' or doctype == 'LUMINANCE':
                 self.raster_wrangler.rgbwriter(document.data, fname)
             elif doctype == 'VALUE':
-                self.raster_wrangler.valuewriter(document.data, fname)
+                r = [0,1]
+                for pn, v in document.descriptor.iteritems():
+                    p = self.get_parameter(pn)
+                    if 'valueRanges' in p:
+                            vr = p['valueRanges']
+                            if v in vr:
+                                    r = vr[v]
+                self.raster_wrangler.valuewriter(document.data, fname, r)
             elif doctype == 'Z':
                 self.raster_wrangler.zwriter(document.data, fname)
             else:
