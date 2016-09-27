@@ -280,8 +280,8 @@ int vtkSQMedianFilter::Initialize(vtkPVXMLElement *root)
   int globalLogLevel=log->GetGlobalLevel();
   if (this->LogLevel || globalLogLevel)
     {
-    vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-    log->GetHeader()
+    vtkSQLog *log2=vtkSQLog::GetGlobalInstance();
+    log2->GetHeader()
       << "# ::vtkSQMedianFilter" << "\n"
       << "#   stencilWidth=" << stencilWidth << "\n"
       << "#   kernelType=" << kernelType << "\n";
