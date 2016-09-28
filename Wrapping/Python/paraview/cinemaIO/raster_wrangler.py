@@ -104,7 +104,8 @@ class RasterWrangler(object):
             self.backends.add("PIL")
         elif vtkEnabled:
             self.backends.add("VTK")
-        self.compress = True
+        #self.dontCompressFloatVals = False #don't expect we'll need this
+        #self.dontConvertValsToFloat = False #nor this
 
     def enableOpenEXR(self):
         """Try to turn on OpenEXR file IO support"""
@@ -237,45 +238,48 @@ class RasterWrangler(object):
         else:
             print "Warning: need PIL or VTK to write to " + fname
 
-    def valuewriter(self, imageSlice, fname, range):
+    def valuewriter(self, imageSlice, fname, vrange):
         """ Takes in either a (1C) float or a RGB (3C) buffer and writes it as
         an image file."""
+
+        # Adjust the filename, replace png with .im
+        baseName, ext = os.path.splitext(fname)
+        adjustedName = baseName + self.floatExtension()
+
         dimensions = imageSlice.shape
         if len(dimensions) == 2 and imageSlice.dtype == numpy.float32:
-          # Treat as single channel floating point buffer. Adjust the filename.
-          #print "->>> imageslice max/min: ", imageSlice.max(), " / ", imageSlice.min()
-          baseName, ext = os.path.splitext(fname)
-          adjustedName = baseName + self.floatExtension()
-          self.zwriter(imageSlice, adjustedName)
+            # Given as single channel floating point buffer.
+            self.zwriter(imageSlice, adjustedName)
 
         elif (len(dimensions) > 2) and (dimensions[2] == 3):
-          # Treat as a RGB buffer
+            #if self.dontConvertValsToFloat
+            #    self.rgbwriter(imageSlice, fname)
+            #    return
 
-          w0 = numpy.left_shift(imageSlice[:,:,0].astype(numpy.uint32), 16)
-          #print "W0", w0.shape, numpy.amin(w0), numpy.amax(w0)
-          w1 = numpy.left_shift(imageSlice[:,:,1].astype(numpy.uint32), 8)
-          #print "W1", w1.shape, numpy.amin(w1), numpy.amax(w1)
-          w2 = imageSlice[:,:,2]
-          #print "W2", w2.shape, numpy.amin(w2), numpy.amax(w2)
+            # Given an RGB buffer
+            # Convert it to a floating point buffer for consistency
+            # TODO: just one copy of this code in cinema
+            w0 = numpy.left_shift(imageSlice[:,:,0].astype(numpy.uint32), 16)
+            w1 = numpy.left_shift(imageSlice[:,:,1].astype(numpy.uint32), 8)
+            w2 = imageSlice[:,:,2]
+            value = numpy.bitwise_or(w0,w1)
+            value = numpy.bitwise_or(value,w2)
+            value = numpy.subtract(value.astype(numpy.int32), 1)
+            if vrange[1] != vrange[0]:
+                normalized_val = numpy.divide(value.astype(numpy.float32),
+                                              (0xFFFFFE/(vrange[1]-vrange[0])))
+            else:
+                normalized_val = numpy.divide(value.astype(numpy.float32),
+                                              0xFFFFFE)
+            adjusted_val = numpy.add(normalized_val, vrange[0])
+            #print "RANGE", vrange[0], "," , vrange[1]
+            #print "BV", adjusted_val.shape, \
+            # numpy.amin(adjusted_val), numpy.amax(adjusted_val)
 
-          value = numpy.bitwise_or(w0,w1)
-          value = numpy.bitwise_or(value,w2)
-          value = numpy.subtract(value.astype(numpy.int32),1) #0 is reserved as "nothing"
-          if range[1] != range[0]:
-            normalized_val = numpy.divide(value.astype(float),(0xFFFFFE/(range[1]-range[0])))
-          else:
-            normalized_val = numpy.divide(value.astype(float),0xFFFFFE)
-          adjusted_val = numpy.add(normalized_val,range[0])
-          #print "RANGE", range[0], "," , range[1]
-          #print "BV", adjusted_val.shape, numpy.amin(adjusted_val), numpy.amax(adjusted_val)
-
-          baseName, ext = os.path.splitext(fname)
-          adjustedName = baseName + self.floatExtension()
-
-          self.zwriter(adjusted_val, adjustedName)
+            self.zwriter(adjusted_val, adjustedName)
 
         else:
-          raise ValueError("Invalid dimensions for a value raster.")
+            raise ValueError("Invalid dimensions for a value raster.")
 
     def valuereader(self, fname):
         """ Opens a value image file and returns it as either a color buffer
@@ -298,34 +302,65 @@ class RasterWrangler(object):
 
     def zreader(self, fname):
         """reads a depth file to make a depth buffer"""
-        if not self.compress:
-            im = PIL.Image.open(fname)
-            return numpy.array(im, numpy.float32).reshape(im.size[1],im.size[0])
-        else:
-            adjustedName = fname + ".npz"
-            file = open(adjustedName, mode='r')
-            tz = numpy.load(file)
-            imageslice = tz[tz.files[0]]
-            tz.close()
-            file.close()
-            return imageslice
+
+        if "OpenEXR" in self.backends:
+            return exr.load_depth(fname)
+
+        if "PIL" in self.backends:
+            #for backwards compatibility with Bacall, remove as soon as possible
+            try:
+                im = PIL.Image.open(fname)
+                return numpy.array(im, numpy.float32).reshape(im.size[1],im.size[0])
+            except:
+                pass
+
+        # Adjust the filename, replace .im with .npz
+        baseName, ext = os.path.splitext(fname)
+        adjustedName = baseName + ".npz"
+
+        file = open(adjustedName, mode='r')
+        tz = numpy.load(file) #like a tar
+        imageslice = tz[tz.files[0]]
+        tz.close()
+        file.close()
+        return imageslice
 
     def zwriter(self, imageslice, fname):
         """takes in a depth buffer and writes it as a depth file"""
-        if not self.compress:
+
+        if "OpenEXR" in self.backends:
             imageslice = numpy.flipud(imageslice)
-            pimg = PIL.Image.fromarray(imageslice)
-            #TODO:
-            # don't let ImImagePlugin.py insert the Name: filename in line two
-            # why? because ImImagePlugin.py reader has a 100 character limit
-            pimg.save(fname)
-        else:
-            adjustedName = fname + ".npz"
-            file = open(adjustedName, mode='w')
-            print adjustedName
-            print imageslice.shape, numpy.amin(imageslice), numpy.amax(imageslice)
-            numpy.savez_compressed(file, imageslice)
-            file.close()
+            exr.save_depth(imageslice, fname)
+            return
+
+        #if self.dontCompressFloatVals:
+        #    if "VTK" in self.backends:
+        #        height = imageslice.shape[1]
+        #        width = imageslice.shape[0]
+        #
+        #        file = open(fname, mode='w')
+        #        file.write("Image type: L 32F image\r\n")
+        #        file.write("Name: A cinema depth image\r\n")
+        #        file.write("Image size (x*y): "+str(height) + "*" + str(width) + "\r\n")
+        #        file.write("File size (no of images): 1\r\n")
+        #        file.write(chr(26))
+        #        imageslice.tofile(file)
+        #        file.close()
+        #        return
+        #
+        #    imageslice = numpy.flipud(imageslice)
+        #    pimg = PIL.Image.fromarray(imageslice)
+        #    #TODO:
+        #    # don't let ImImagePlugin.py insert the Name: filename in line two
+        #    # why? because ImImagePlugin.py reader has a 100 character limit
+        #    pimg.save(fname)
+
+        # Adjust the filename, replace .im with .npz
+        baseName, ext = os.path.splitext(fname)
+        adjustedName = baseName + ".npz"
+        file = open(adjustedName, mode='w')
+        numpy.savez_compressed(file, imageslice)
+        file.close()
 
     def assertvalidimage(self, filename):
         """tests that a given file is syntactically correct"""

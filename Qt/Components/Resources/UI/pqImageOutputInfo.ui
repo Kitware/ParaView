@@ -264,7 +264,10 @@
           <item row="0" column="0">
            <widget class="QLabel" name="laFloatValue">
             <property name="text">
-             <string>Float Value Images</string>
+             <string>GL Float</string>
+            </property>
+            <property name="toolTip">
+              <string>Try to render via OpenGL float buffers first.</string>
             </property>
            </widget>
           </item>
