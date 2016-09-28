@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include <pwd.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <vtksys/SharedForward.h>
@@ -103,18 +104,53 @@ int append_driver_to_ldpath(const char *this_exe_path, const char *driver)
   return 0;
 }
 
+int choose_driver(const char *this_exe_path, const char *driver, int print)
+{
+  if (driver == NULL || driver[0] == '\0')
+    {
+    return 0;
+    }
+  if (strcmp(driver, "mesa") == 0)
+    {
+    // here we don't specify any GALLIUM_DRIVER and let user
+    // setup the environment on their own.
+    append_driver_to_ldpath(this_exe_path, "mesa");
+    }
+  if (strcmp(driver, "mesa-llvm") == 0)
+    {
+    if (print == 1)
+      {
+      printf("GALLIUM_DRIVER=llvmpipe\n");
+      }
+    setenv("GALLIUM_DRIVER", "llvmpipe", /*overwrite=*/ 1);
+    append_driver_to_ldpath(this_exe_path, "mesa");
+    }
+  else if (strcmp(driver, "mesa-swr-avx") == 0   ||
+           strcmp(driver, "mesa-swr-avx2") == 0  ||
+           strcmp(driver, "mesa-swr") == 0)
+    {
+    if (print == 1)
+      {
+      printf("GALLIUM_DRIVER=swr\n");
+      }
+    setenv("GALLIUM_DRIVER", "swr", /*overwrite=*/ 1);
+    append_driver_to_ldpath(this_exe_path, "mesa");
+    }
+  return 0;
+}
+
 #define MAX_DRIVER_CHOICE 32
 
 int main(int argc, char** argv)
 {
   int i = 0;
   int true_argc = 0;
-  int true_i = 0;
   char **true_argv = malloc((argc + 1) * sizeof(char*));
   int result = 0;
   FILE *driver_cache = NULL;
   char driver_choice[MAX_DRIVER_CHOICE] = { 0 };
   char driver_cache_path[KWSYS_SHARED_FORWARD_MAXPATH] = { 0 };
+  int print = 0;
 
   true_argv[argc] = NULL;
 
@@ -140,7 +176,7 @@ int main(int argc, char** argv)
   char *newline = strchr(driver_choice, '\n');
   if (newline)
     {
-      *newline = '\0';
+    *newline = '\0';
     }
 
   // Check for single-run driver specification; forward all other args
@@ -152,20 +188,25 @@ int main(int argc, char** argv)
       }
     else if (strcmp(argv[i], "--mesa-llvm") == 0      ||
              strcmp(argv[i], "--mesa-swr-avx") == 0   ||
-             strcmp(argv[i], "--mesa-swr-avx2") == 0)
+             strcmp(argv[i], "--mesa-swr-avx2") == 0  ||
+             strcmp(argv[i], "--mesa-swr") == 0       ||
+             strcmp(argv[i], "--mesa") == 0)
       {
       strncpy(driver_choice, argv[i] + 2, MAX_DRIVER_CHOICE);
       }
     else
       {
+      if (strcmp(argv[i], "--print") == 0)
+        {
+        print = 1;
+        }
+      true_argv[true_argc] = argv[i];
       true_argc++;
-      true_argv[true_i++] = argv[i];
       }
     }
+  true_argv[true_argc] = NULL;
 
-  // Update the LD_LIBRARY_PATH
-  append_driver_to_ldpath(argv[0], driver_choice);
-
+  choose_driver(argv[0], driver_choice, print);
   result = vtksys_shared_forward_to_real(true_argc, true_argv);
   free(true_argv);
   return result;
