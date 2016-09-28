@@ -29,7 +29,9 @@ vtkCacheSizeKeeper* vtkCacheSizeKeeper::New()
     {
     return static_cast<vtkCacheSizeKeeper*>(ret);
     }
-  return new vtkCacheSizeKeeper;
+  vtkCacheSizeKeeper *o = new vtkCacheSizeKeeper;
+  o->InitializeObjectBase();
+  return o;
 }
 
 //-----------------------------------------------------------------------------

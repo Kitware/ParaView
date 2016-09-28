@@ -55,11 +55,7 @@ vtkSMSession* vtkSMSession::New(vtkPVSessionBase *otherSession)
 vtkSMSession* vtkSMSession::New(vtkPVSessionCore *otherSessionCore)
 {
   vtkSMSession* session = new vtkSMSession(true, otherSessionCore);
-
-#ifdef VTK_DEBUG_LEAKS
-  vtkDebugLeaks::ConstructClass("vtkSMSession");
-#endif
-
+  session->InitializeObjectBase();
   return session;
 }
 

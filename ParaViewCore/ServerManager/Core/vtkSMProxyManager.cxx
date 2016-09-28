@@ -61,7 +61,9 @@ vtkSMProxyManager* vtkSMProxyManager::New()
     {
     return static_cast<vtkSMProxyManager*>(ret);
     }
-  return new vtkSMProxyManager;
+  vtkSMProxyManager *o = new vtkSMProxyManager;
+  o->InitializeObjectBase();
+  return o;
 }
 
 //---------------------------------------------------------------------------

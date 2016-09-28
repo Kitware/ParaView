@@ -130,10 +130,9 @@ protected:
 //---------------------------------------------------------------------------
 vtkSMSessionProxyManager* vtkSMSessionProxyManager::New(vtkSMSession* session)
 {
-#ifdef VTK_DEBUG_LEAKS
-  vtkDebugLeaks::ConstructClass("vtkSMSessionProxyManager");
-#endif
-  return new vtkSMSessionProxyManager(session);
+  vtkSMSessionProxyManager *ret = new vtkSMSessionProxyManager(session);
+  ret->InitializeObjectBase();
+  return ret;
 }
 
 //---------------------------------------------------------------------------

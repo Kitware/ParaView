@@ -56,10 +56,9 @@ public:
     {
     // This is required everytime we're implementing our own New() to avoid
     // "Deleting unknown object" warning from vtkDebugLeaks.
-#ifdef VTK_DEBUG_LEAKS
-    vtkDebugLeaks::ConstructClass("vtkSMProxyManagerProxyInfo");
-#endif
-    return new vtkSMProxyManagerProxyInfo();
+    vtkSMProxyManagerProxyInfo *ret = new vtkSMProxyManagerProxyInfo();
+    ret->InitializeObjectBase();
+    return ret;
     }
 
 private:

@@ -37,7 +37,7 @@ vtkPVRenderViewSettings* vtkPVRenderViewSettings::GetInstance()
   if (!vtkPVRenderViewSettings::Instance)
     {
     vtkPVRenderViewSettings* instance = new vtkPVRenderViewSettings();
-    vtkObjectFactory::ConstructInstance(instance->GetClassName());
+    instance->InitializeObjectBase();
     vtkPVRenderViewSettings::Instance.TakeReference(instance);
     }
   return vtkPVRenderViewSettings::Instance;

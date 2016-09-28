@@ -39,9 +39,9 @@ class vtkPTemporalRanges::vtkRangeTableReduction : public vtkTableAlgorithm
 public:
   vtkTypeMacro(vtkPTemporalRanges::vtkRangeTableReduction, vtkTableAlgorithm);
   static vtkRangeTableReduction *New() {
-    // Just registers with debug leaks.  Not expecting a result.
-    vtkObjectFactory::CreateInstance("vtkPTemporalRanges::vtkRangeTableReduction");
-    return new vtkRangeTableReduction;
+    vtkRangeTableReduction *ret = new vtkRangeTableReduction;
+    ret->InitializeObjectBase();
+    return ret;
   }
 
   vtkGetObjectMacro(Parent, vtkPTemporalRanges);

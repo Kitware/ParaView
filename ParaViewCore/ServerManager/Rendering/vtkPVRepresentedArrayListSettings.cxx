@@ -43,7 +43,7 @@ vtkPVRepresentedArrayListSettings* vtkPVRepresentedArrayListSettings::GetInstanc
   if (!vtkPVRepresentedArrayListSettings::Instance)
     {
     vtkPVRepresentedArrayListSettings* instance = new vtkPVRepresentedArrayListSettings();
-    vtkObjectFactory::ConstructInstance(instance->GetClassName());
+    instance->InitializeObjectBase();
     vtkPVRepresentedArrayListSettings::Instance.TakeReference(instance);
     }
   return vtkPVRepresentedArrayListSettings::Instance;
