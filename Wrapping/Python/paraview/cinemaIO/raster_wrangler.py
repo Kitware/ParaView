@@ -355,6 +355,7 @@ class RasterWrangler(object):
         #    # why? because ImImagePlugin.py reader has a 100 character limit
         #    pimg.save(fname)
 
+        imageslice = numpy.flipud(imageslice)
         # Adjust the filename, replace .im with .npz
         baseName, ext = os.path.splitext(fname)
         adjustedName = baseName + ".npz"
