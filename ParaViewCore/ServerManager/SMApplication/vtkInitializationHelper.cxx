@@ -249,6 +249,13 @@ void vtkInitializationHelper::Initialize(int argc, char**argv,
     {
     vtkInitializationHelper::LoadSettings();
     }
+
+  vtkSMSettings *settings = vtkSMSettings::GetInstance();
+  settings->AddCollectionFromString(
+    "{ \"standard_presets\": { "
+      "\"vtkBlockColors\": \"KAAMS\", "
+      "\"AtomicNumbers\": \"BlueObeliskElements\" "
+    "} }", 0.0);
 }
 
 //----------------------------------------------------------------------------

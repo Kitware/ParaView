@@ -286,8 +286,6 @@ set (Module_SRCS
   pqSpreadSheetViewDecorator.h
   pqSpreadSheetVisibilityBehavior.cxx
   pqSpreadSheetVisibilityBehavior.h
-  pqStandardArrayColorMapsBehavior.cxx
-  pqStandardArrayColorMapsBehavior.h
   pqStandardPropertyWidgetInterface.cxx
   pqStandardPropertyWidgetInterface.h
   pqStandardViewFrameActionsImplementation.cxx
@@ -456,7 +454,6 @@ set (Module_MOC_HDRS
   pqSplinePropertyWidget.h
   pqSpreadSheetViewDecorator.h
   pqSpreadSheetVisibilityBehavior.h
-  pqStandardArrayColorMapsBehavior.h
   pqStandardPropertyWidgetInterface.h
   pqStandardViewFrameActionsImplementation.h
   pqStatusBar.h

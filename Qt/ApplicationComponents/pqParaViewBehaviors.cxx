@@ -52,7 +52,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertiesPanel.h"
 #include "pqQtMessageHandlerBehavior.h"
 #include "pqSpreadSheetVisibilityBehavior.h"
-#include "pqStandardArrayColorMapsBehavior.h"
 #include "pqStandardPropertyWidgetInterface.h"
 #include "pqStandardViewFrameActionsImplementation.h"
 #include "pqUndoRedoBehavior.h"
@@ -86,7 +85,6 @@ PQ_BEHAVIOR_DEFINE_FLAG(FixPathsInStateFilesBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(CommandLineOptionsBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(PersistentMainWindowStateBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(CollaborationBehavior, true);
-PQ_BEHAVIOR_DEFINE_FLAG(StandardArrayColorMapsBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(ViewStreamingBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(PluginSettingsBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(ApplyBehavior, true);
@@ -187,10 +185,6 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   if (PQ_IS_BEHAVIOR_ENABLED(CollaborationBehavior))
     {
     new pqCollaborationBehavior(this);
-    }
-  if (PQ_IS_BEHAVIOR_ENABLED(StandardArrayColorMapsBehavior))
-    {
-    new pqStandardArrayColorMapsBehavior(this);
     }
   if (PQ_IS_BEHAVIOR_ENABLED(ViewStreamingBehavior))
     {

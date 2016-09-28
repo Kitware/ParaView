@@ -7,6 +7,16 @@ started tracking these (starting after version 4.2).
 Changes in 5.2
 --------------
 
+###Removed pqStandardArrayColorMapsBehavior###
+
+Setting the default colormaps from a Qt Behavior was causing inconsistent results
+between the ParaView UI and pvpython/pvbatch.  Adding these default settings was
+moved into the server manager.  To override these defaults, use
+vtkSMSettings::AddCollectionFromX with a priority greater than 0.  The settings
+affected are the default colormap for arrays with names vtkBlockColors and
+AtomicNumbers.  With these settings moved, the Qt behavior
+pqStandardArrayColorMapsBehavior no longer does anything and so it has been removed.
+
 ###Qt dependencies###
 
 Starting with 5.2, ParaView natively supports Qt 4 and Qt 5. To simplify writing
