@@ -256,6 +256,11 @@ int vtkRulerSourceRepresentation::ProcessViewRequest(
       this->DistanceRepresentation->SetPoint1WorldPosition(line->GetPoints()->GetPoint(0));
       this->DistanceRepresentation->SetPoint2WorldPosition(line->GetPoints()->GetPoint(1));
     }
+    else
+    {
+      vtkWarningMacro(<< "Expected line to have 2 points, but it had " << line->GetNumberOfPoints()
+                      << " points.");
+    }
   }
 
   return 1;
