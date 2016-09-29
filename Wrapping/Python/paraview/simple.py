@@ -35,6 +35,10 @@ A simple example::
 #
 #==============================================================================
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import paraview
 from paraview import servermanager
 import paraview._backwardscompatibilityhelper

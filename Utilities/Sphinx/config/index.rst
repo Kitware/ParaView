@@ -30,10 +30,23 @@ Main modules
 
    Available readers, sources, writers, filters and animation cues <paraview.servermanager_proxies>
 
+Python Version Support
+======================
+
+ParaView currently supports Python 2.7, but support for 3.5 is coming. To help
+this development, please use Python 3 compatible code constructs. This section
+discusses the most common needed changes.
+
+.. toctree::
+   :maxdepth: 2
+
+   python-2-vs-3
+
+
 API Changes
 ===========
 
-This docuements changes to ParaView's Python APIs between different versions, starting
+This documents changes to ParaView's Python APIs between different versions, starting
 with ParaView 4.2.0.
 
 .. toctree::

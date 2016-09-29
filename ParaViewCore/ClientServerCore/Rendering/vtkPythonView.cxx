@@ -493,7 +493,8 @@ int vtkPythonView::RunSimpleStringWithCustomLocals(const char* code)
     }
 
   result = NULL;
-  PyObject *f = PySys_GetObject("stdout");
+  // cast to avoid warning for python 2
+  PyObject *f = PySys_GetObject(const_cast<char *>("stdout"));
   if (f == NULL)
     {
     return 0;
