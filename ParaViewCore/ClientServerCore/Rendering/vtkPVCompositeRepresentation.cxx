@@ -16,16 +16,21 @@
 
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
+#include "vtkPolarAxesRepresentation.h"
 #include "vtkSelectionRepresentation.h"
 #include "vtkView.h"
 
 vtkStandardNewMacro(vtkPVCompositeRepresentation);
 vtkCxxSetObjectMacro(
   vtkPVCompositeRepresentation, SelectionRepresentation, vtkSelectionRepresentation);
+vtkCxxSetObjectMacro(
+  vtkPVCompositeRepresentation, PolarAxesRepresentation, vtkPolarAxesRepresentation);
+
 //----------------------------------------------------------------------------
 vtkPVCompositeRepresentation::vtkPVCompositeRepresentation()
 {
   this->SelectionRepresentation = vtkSelectionRepresentation::New();
+  this->PolarAxesRepresentation = NULL;
 
   this->SelectionVisibility = false;
   this->SelectionRepresentation->SetVisibility(false);
@@ -35,6 +40,7 @@ vtkPVCompositeRepresentation::vtkPVCompositeRepresentation()
 vtkPVCompositeRepresentation::~vtkPVCompositeRepresentation()
 {
   this->SetSelectionRepresentation(NULL);
+  this->SetPolarAxesRepresentation(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -42,6 +48,7 @@ void vtkPVCompositeRepresentation::SetVisibility(bool visible)
 {
   this->Superclass::SetVisibility(visible);
   this->SetSelectionVisibility(this->SelectionVisibility);
+  this->SetPolarAxesVisibility(visible);
 }
 
 //----------------------------------------------------------------------------
@@ -49,6 +56,15 @@ void vtkPVCompositeRepresentation::SetSelectionVisibility(bool visible)
 {
   this->SelectionVisibility = visible;
   this->SelectionRepresentation->SetVisibility(this->GetVisibility() && visible);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCompositeRepresentation::SetPolarAxesVisibility(bool visible)
+{
+  if (this->PolarAxesRepresentation)
+  {
+    this->PolarAxesRepresentation->SetParentVisibility(visible);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -60,6 +76,11 @@ bool vtkPVCompositeRepresentation::AddToView(vtkView* view)
   }
 
   view->AddRepresentation(this->SelectionRepresentation);
+
+  if (this->PolarAxesRepresentation)
+  {
+    view->AddRepresentation(this->PolarAxesRepresentation);
+  }
   return true;
 }
 
@@ -67,6 +88,10 @@ bool vtkPVCompositeRepresentation::AddToView(vtkView* view)
 bool vtkPVCompositeRepresentation::RemoveFromView(vtkView* view)
 {
   view->RemoveRepresentation(this->SelectionRepresentation);
+  if (this->PolarAxesRepresentation)
+  {
+    view->RemoveRepresentation(this->PolarAxesRepresentation);
+  }
   return this->Superclass::RemoveFromView(view);
 }
 
@@ -74,6 +99,11 @@ bool vtkPVCompositeRepresentation::RemoveFromView(vtkView* view)
 void vtkPVCompositeRepresentation::MarkModified()
 {
   this->SelectionRepresentation->MarkModified();
+
+  if (this->PolarAxesRepresentation)
+  {
+    this->PolarAxesRepresentation->MarkModified();
+  }
   this->Superclass::MarkModified();
 }
 
@@ -81,6 +111,11 @@ void vtkPVCompositeRepresentation::MarkModified()
 void vtkPVCompositeRepresentation::SetUpdateTime(double time)
 {
   this->SelectionRepresentation->SetUpdateTime(time);
+  if (this->PolarAxesRepresentation)
+  {
+    this->PolarAxesRepresentation->SetUpdateTime(time);
+  }
+
   this->Superclass::SetUpdateTime(time);
 }
 
@@ -88,6 +123,11 @@ void vtkPVCompositeRepresentation::SetUpdateTime(double time)
 void vtkPVCompositeRepresentation::SetForceUseCache(bool val)
 {
   this->SelectionRepresentation->SetForceUseCache(val);
+  if (this->PolarAxesRepresentation)
+  {
+    this->PolarAxesRepresentation->SetForceUseCache(val);
+  }
+
   this->Superclass::SetForceUseCache(val);
 }
 
@@ -95,6 +135,11 @@ void vtkPVCompositeRepresentation::SetForceUseCache(bool val)
 void vtkPVCompositeRepresentation::SetForcedCacheKey(double val)
 {
   this->SelectionRepresentation->SetForcedCacheKey(val);
+  if (this->PolarAxesRepresentation)
+  {
+    this->PolarAxesRepresentation->SetForcedCacheKey(val);
+  }
+
   this->Superclass::SetForcedCacheKey(val);
 }
 
@@ -121,5 +166,9 @@ unsigned int vtkPVCompositeRepresentation::Initialize(
 {
   unsigned int minId = minIdAvailable;
   minId = this->SelectionRepresentation->Initialize(minId, maxIdAvailable);
-  return this->Superclass::Initialize(minId, maxIdAvailable);
+  if (this->PolarAxesRepresentation)
+  {
+    minId = this->PolarAxesRepresentation->Initialize(minId, maxIdAvailable);
+  }
+  return  this->Superclass::Initialize(minId, maxIdAvailable);
 }

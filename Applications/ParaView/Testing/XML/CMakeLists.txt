@@ -303,6 +303,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/PolygonCellSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PolygonPointSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PointInterpolator.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/PolarAxes.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ProbePicking.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion1.xml

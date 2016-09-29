@@ -18,11 +18,12 @@
  *
  * vtkPVCompositeRepresentation is a data-representation used by ParaView for showing
  * a type of data-set in the render view. It is a composite-representation with
- * some fixed representations for showing things like selection and cube-axes.
+ * some fixed representations for showing things like selection and polar axes.
  * This representation has 1 input port and it ensures that that input is passed
- * on to the internal representations (except SelectionRepresentation) properly.
- * For SelectionRepresentation, the client is expected to setup the input (look
- * at vtkSMPVRepresentationProxy).
+ * on to the internal representations 
+ * (except SelectionRepresentation and PolarAxesRepresentation) properly.
+ * For SelectionRepresentation and PolarAxesRepresentation the client is expected 
+ * to setup the input (look at vtkSMPVRepresentationProxy).
 */
 
 #ifndef vtkPVCompositeRepresentation_h
@@ -31,6 +32,7 @@
 #include "vtkCompositeRepresentation.h"
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 
+class vtkPolarAxesRepresentation;
 class vtkSelectionRepresentation;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVCompositeRepresentation
@@ -48,6 +50,12 @@ public:
   void SetSelectionRepresentation(vtkSelectionRepresentation*);
 
   /**
+   * This must only be set during initialization before adding the
+   * representation to any views or calling Update().
+   */
+  void SetPolarAxesRepresentation(vtkPolarAxesRepresentation*);
+
+  /**
    * Propagate the modification to all internal representations.
    */
   virtual void MarkModified();
@@ -62,6 +70,11 @@ public:
    * Set the selection visibility.
    */
   virtual void SetSelectionVisibility(bool visible);
+
+  /**
+   * Set the polar axes visibility.
+   */
+  virtual void SetPolarAxesVisibility(bool visible);
 
   //@{
   /**
@@ -106,6 +119,7 @@ protected:
 
   vtkSelectionRepresentation* SelectionRepresentation;
   bool SelectionVisibility;
+  vtkPolarAxesRepresentation* PolarAxesRepresentation;
 
 private:
   vtkPVCompositeRepresentation(const vtkPVCompositeRepresentation&) VTK_DELETE_FUNCTION;
