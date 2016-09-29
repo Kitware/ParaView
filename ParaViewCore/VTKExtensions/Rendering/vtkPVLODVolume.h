@@ -57,6 +57,7 @@ public:
   // Description:
   // Set the high res input.  Overloads the virtual vtkVolume method.
   virtual void SetMapper(vtkAbstractVolumeMapper *);
+  virtual vtkAbstractVolumeMapper *GetMapper();
 
   // Description:
   // This sets the low res input.

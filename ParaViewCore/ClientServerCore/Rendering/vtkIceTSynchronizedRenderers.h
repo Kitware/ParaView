@@ -152,6 +152,8 @@ protected:
   vtkRenderPass* RenderPass;
   vtkImageProcessingPass *ImageProcessingPass;
 
+  virtual void SlaveStartRender();
+
 private:
   vtkIceTSynchronizedRenderers(const vtkIceTSynchronizedRenderers&) VTK_DELETE_FUNCTION;
   void operator=(const vtkIceTSynchronizedRenderers&) VTK_DELETE_FUNCTION;

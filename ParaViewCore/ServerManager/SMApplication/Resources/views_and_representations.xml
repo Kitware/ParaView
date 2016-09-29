@@ -4324,6 +4324,7 @@
           <Entry text="Smart" value="0" />
           <Entry text="Ray Cast Only" value="2" />
           <Entry text="GPU Based" value="4" />
+          <Entry text="OSPRay Based" value="6" />
         </EnumerationDomain>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetScalarOpacityUnitDistance"
