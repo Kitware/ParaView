@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkQuerySelectionSource.h"
 #include "vtkSMCompositeTreeDomain.h"
+#include "vtkSMCoreUtilities.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSelectionHelper.h"
@@ -199,6 +200,9 @@ void pqQueryClauseWidget::populateSelectionCriteria(
     for (int cc=0; cc < attrInfo->GetNumberOfArrays(); cc++)
       {
       vtkPVArrayInformation* arrayInfo = attrInfo->GetArrayInformation(cc);
+      QString pyArrayName =
+        vtkSMCoreUtilities::SanitizeName(arrayInfo->GetName()).c_str();
+
       int number_of_components = arrayInfo->GetNumberOfComponents();
       if (number_of_components > 1)
         {
@@ -208,7 +212,7 @@ void pqQueryClauseWidget::populateSelectionCriteria(
 
         int item_index = (this->Internals->criteria->count()-1);
         this->Internals->Arrays.insert(item_index,
-          pqInternals::ArrayInfo(arrayInfo->GetName(), -1, number_of_components));
+          pqInternals::ArrayInfo(pyArrayName, -1, number_of_components));
 
         for (int kk=0; kk < arrayInfo->GetNumberOfComponents(); kk++)
           {
@@ -217,7 +221,7 @@ void pqQueryClauseWidget::populateSelectionCriteria(
                 THRESHOLD);
           item_index = (this->Internals->criteria->count()-1);
           this->Internals->Arrays.insert(item_index,
-            pqInternals::ArrayInfo(arrayInfo->GetName(), kk, number_of_components));
+            pqInternals::ArrayInfo(pyArrayName, kk, number_of_components));
           }
         }
       else
@@ -226,7 +230,7 @@ void pqQueryClauseWidget::populateSelectionCriteria(
                                            THRESHOLD);
         int item_index = (this->Internals->criteria->count()-1);
         this->Internals->Arrays.insert(item_index,
-          pqInternals::ArrayInfo(arrayInfo->GetName(), 0, number_of_components));
+          pqInternals::ArrayInfo(pyArrayName, 0, number_of_components));
         }
       }
     }

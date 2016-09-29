@@ -94,6 +94,8 @@ const char* vtkSMCoreUtilities::GetFileNameProperty(vtkSMProxy* proxy)
 }
 
 //----------------------------------------------------------------------------
+// This is reimplemented in python's paraview.make_name_valid(). Keep both
+// implementations consistent.
 vtkStdString vtkSMCoreUtilities::SanitizeName(const char* name)
 {
   if (!name || name[0] == '\0')
@@ -104,13 +106,13 @@ vtkStdString vtkSMCoreUtilities::SanitizeName(const char* name)
   std::ostringstream cname;
   for (size_t cc=0; name[cc]; cc++)
     {
-    if (isalnum(name[cc]))
+    if (isalnum(name[cc]) || name[cc] == '_')
       {
       cname << name[cc];
       }
     }
   // if first character is not an alphabet, add an 'a' to it.
-  if (isalpha(cname.str()[0]))
+  if (cname.str().empty() || isalpha(cname.str()[0]))
     {
     return cname.str();
     }
