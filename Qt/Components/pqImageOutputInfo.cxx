@@ -81,6 +81,10 @@ void pqImageOutputInfo::initialize(Qt::WindowFlags parentFlags, pqView* view,
     this->Ui->cinemaExport, SIGNAL(currentIndexChanged(const QString&)),
     this, SLOT(updateCinemaType(const QString&)));
 
+  QObject::connect(
+    this->Ui->composite, SIGNAL(stateChanged(int)),
+    this, SLOT(updateComposite(int)));
+
   this->setCinemaVisible(false);
 
   this->setupScreenshotInfo();
@@ -276,6 +280,31 @@ void pqImageOutputInfo::updateCinemaType(
   const QString&)
 {
   this->updateSpherical();
+}
+
+//-----------------------------------------------------------------------------
+void pqImageOutputInfo::updateComposite(
+  int choseComposite)
+{
+  int index = this->Ui->cinemaExport->currentIndex();
+  this->Ui->cinemaExport->clear();
+  if (choseComposite)
+    {
+    this->Ui->cinemaExport->addItem("none");
+    this->Ui->cinemaExport->addItem("static");
+    this->Ui->cinemaExport->addItem("phi-theta");
+    this->Ui->cinemaExport->addItem("azimuth-elevation-roll");
+    this->Ui->cinemaExport->addItem("yaw-pitch-roll");
+    this->Ui->cinemaExport->setCurrentIndex(index);
+    }
+  else
+    {
+    this->Ui->cinemaExport->addItem("none");
+    this->Ui->cinemaExport->addItem("static");
+    this->Ui->cinemaExport->addItem("phi-theta");
+    this->Ui->cinemaExport->setCurrentIndex(index>2?2:index);
+    }
+
 }
 
 //------------------------------------------------------------------------------
