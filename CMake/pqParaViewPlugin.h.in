@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #cmakedefine INITIALIZE_WRAPPING
 #cmakedefine INITIALIZE_EXTRA_CS_MODULES
 
+#include "vtkConfigure.h"
 #include "vtkPVPlugin.h"
 
 #ifdef plugin_type_gui
@@ -80,27 +81,27 @@ public:
 
    // Description:
   // Returns the name for this plugin.
-  virtual const char* GetPluginName()
+  const char* GetPluginName() VTK_OVERRIDE
     {return "@PLUGIN_NAME@"; }
 
   // Description:
   // Returns the version for this plugin.
-  virtual const char* GetPluginVersionString()
+  const char* GetPluginVersionString() VTK_OVERRIDE
     { return "@PLUGIN_VERSION@"; }
 
   // Description:
   // Returns true if this plugin is required on the server.
-  virtual bool GetRequiredOnServer()
+  bool GetRequiredOnServer() VTK_OVERRIDE
     { return @PLUGIN_REQUIRED_ON_SERVER@; }
 
   // Description:
   // Returns true if this plugin is required on the client.
-  virtual bool GetRequiredOnClient()
+  bool GetRequiredOnClient() VTK_OVERRIDE
     { return @PLUGIN_REQUIRED_ON_CLIENT@; }
 
   // Description:
   // Returns a ';' separated list of plugin names required by this plugin.
-  virtual const char* GetRequiredPlugins()
+  const char* GetRequiredPlugins() VTK_OVERRIDE
     { 
     return "@PLUGIN_REQUIRED_PLUGINS@";
     }
@@ -109,29 +110,29 @@ public:
   // Provides access to binary resources compiled into the plugin.
   // This is primarily used to compile in icons and compressed help project
   // (qch) files into plugins.
-  virtual void GetBinaryResources(std::vector<std::string>& resources);
+  void GetBinaryResources(std::vector<std::string>& resources) VTK_OVERRIDE;
 
 #ifdef plugin_type_servermanager
   // Description:
   // Obtain the server-manager configuration xmls, if any.
-  virtual void GetXMLs(std::vector<std::string> &xmls);
+  void GetXMLs(std::vector<std::string> &xmls) VTK_OVERRIDE;
 
   // Description:
   // Returns the callback function to call to initialize the interpretor for the
   // new vtk/server-manager classes added by this plugin. Returning NULL is
   // perfectly valid.
-   virtual vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
-    GetInitializeInterpreterCallback();
+  vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
+    GetInitializeInterpreterCallback() VTK_OVERRIDE;
 #endif
 
 #ifdef plugin_type_gui
   /// Returns the list of ParaView-Interfaces provided by this plugin.
-  virtual QObjectList interfaces();
+  QObjectList interfaces() VTK_OVERRIDE;
 #endif
 
 #ifdef plugin_type_python
-  virtual void GetPythonSourceList(std::vector<std::string>& modules,
+  void GetPythonSourceList(std::vector<std::string>& modules,
     std::vector<std::string>& sources,
-    std::vector<int> &package_flags);
+    std::vector<int> &package_flags) VTK_OVERRIDE;
 #endif
 };
