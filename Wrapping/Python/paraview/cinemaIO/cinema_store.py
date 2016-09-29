@@ -721,7 +721,17 @@ class FileStore(Store):
             if doctype == 'RGB' or doctype == 'LUMINANCE':
                 self.raster_wrangler.rgbwriter(document.data, fname)
             elif doctype == 'VALUE':
-                self.raster_wrangler.valuewriter(document.data, fname)
+                #find the range for the value that this raster shows
+                vrange = [0,1]
+                for parname, parvalue in document.descriptor.iteritems():
+                    param = self.get_parameter(parname)
+                    if 'valueRanges' in param:
+                        #we now have a color parameter, look for the range
+                        #for the specific array we have a raster for
+                        vr = param['valueRanges']
+                        if parvalue in vr:
+                            vrange = vr[parvalue]
+                self.raster_wrangler.valuewriter(document.data, fname, vrange)
             elif doctype == 'Z':
                 self.raster_wrangler.zwriter(document.data, fname)
             else:

@@ -72,9 +72,9 @@ endif()
 
 if("${TEST_NAME}" STREQUAL "CoProcessingFullWorkflowCinemaComposite")
   if(NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_image/info.json" OR
-     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=0.im" OR
+     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=0.npz" OR
      NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=1.png" OR
-     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=2.png")
+     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=2.npz")
     message(FATAL_ERROR "Catalyst did not generate a composite cinema store!")
   endif()
   return()
@@ -82,12 +82,9 @@ endif()
 
 if("${TEST_NAME}" STREQUAL "CoProcessingFullWorkflowCinemaCompositeFloat")
   if(NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_fl_image/info.json" OR
-     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_fl_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=0.im" OR
+     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_fl_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=0.npz" OR
      NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_fl_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=1.png" OR
-     # For value images look for either a float buffer (im) or an RGB buffer (png)
-     # in case there was no support for float textures.
-     NOT (EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_fl_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=2.im" OR
-          EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_fl_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=2.png"))
+     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_fl_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=2.npz")
     message(FATAL_ERROR "Catalyst did not generate a composite cinema store (float value images)!")
   endif()
   return()
