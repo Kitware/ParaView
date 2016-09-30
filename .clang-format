@@ -5,6 +5,6 @@ AlignOperands: false
 AlwaysBreakAfterReturnType: None
 AlwaysBreakAfterDefinitionReturnType: None
 BreakBeforeBraces: Allman
-ColumnLimit: 0
+ColumnLimit: 100
 Standard: Cpp03
 ...
