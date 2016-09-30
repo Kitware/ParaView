@@ -122,6 +122,8 @@ $git_ls -z -- '*.c' '*.cc' '*.cpp' '*.cxx' '*.h' '*.hh' '*.hpp' '*.hxx' '*.glsl'
   egrep -z -v '^Plugins/SciberQuestToolKit/eigen-.*/' |
   egrep -z -v '^Plugins/SciberQuestToolKit/SciberQuest/' |
   egrep -z -v '^Plugins/CDIReader/cdi*' |
+  egrep -z -v '^Plugins/AnalyzeNIfTIReaderWriter/vtknifti*' |
+  egrep -z -v '^Plugins/AnalyzeNIfTIReaderWriter/vtkznzlib*' |
 
   # Update sources in-place.
   xargs -0 "$clang_format" -i
