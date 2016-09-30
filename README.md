@@ -11,7 +11,7 @@ has grown through collaborative efforts between [Kitware Inc.][Kitware],
 [Sandia National Laboratories][Sandia],
 [Los Alamos National Laboratory][LANL],
 [Army Research Laboratory][ARL], and various other
-government and commercial institutions, and acedemic partners.
+government and commercial institutions, and academic partners.
 
 [ParaView]: http://www.paraview.org
 [VTK]: http://www.vtk.org
@@ -32,8 +32,8 @@ Learning Resources
 * Commercial [support][Kitware Support] and [training][Kitware Training]
   are available from [Kitware][].
 
-* Additional documentation including Doxygen-generated nightly
-  reference documentation is available [online][Documentation].
+* Additional documentation, including Doxygen-generated nightly
+  reference documentation, is available [online][Documentation].
 
 [ParaView Homepage]: http://www.paraview.org
 [Documentation]: http://www.paraview.org/documentation/
@@ -48,7 +48,7 @@ Reporting Bugs
 
 If you have found a bug:
 
-1. If you have a patch, please read the [CONTRIBUTING.md][] document.
+1. If you have a source-code fix, please read the [CONTRIBUTING.md][] document.
 
 2. Otherwise, please join the one of the [ParaView Mailing Lists][] and ask
    about the expected and observed behaviors to determine if it is

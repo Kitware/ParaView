@@ -113,7 +113,7 @@ Typically, one addresses issues by writing code. To start contributing to ParaVi
 
     For more information see: [Setup][]
 
-5.  [Build Paraview] and run it.
+5.  [Build Paraview][] and run it.
 
 6.  Edit files and create commits (repeat as needed):
 
@@ -166,8 +166,7 @@ to provide support.
 [download instructions]: Documentation/dev/git/download.md#clone
 [developer setup script]: /Utilities/SetupForDevelopment.sh
 [Setup]: Documentation/dev/git/develop.md#Setup
-[Build Paraview]: http://www.paraview.org/Wiki/ParaView:Build_And_Install
-[Create a Topic]: Documentation/dev/git/develop.md#create-a-topic
+[Build Paraview]: Documentation/dev/build.md
 [Share a Topic]: Documentation/dev/git/develop.md#share-a-topic
 [Create a Merge Request]: Documentation/dev/git/develop.md#create-a-merge-request
 [Review a Merge Request]: Documentation/dev/git/develop.md#review-a-merge-request
