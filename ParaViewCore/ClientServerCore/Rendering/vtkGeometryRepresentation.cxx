@@ -158,6 +158,8 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   this->SetupDefaults();
 
   this->PWF = NULL;
+
+  this->UseDataPartitions = false;
 }
 
 //----------------------------------------------------------------------------
@@ -286,6 +288,12 @@ int vtkGeometryRepresentation::ProcessViewRequest(
       // start supporting them,
 
       outInfo->Set(vtkPVRenderView::NEED_ORDERED_COMPOSITING(), 1);
+      // Pass partitioning information to the render view.
+      if(this->UseDataPartitions == true)
+        {
+        vtkPVRenderView::SetOrderedCompositingInformation(
+          inInfo, this->DataBounds);
+        }
       }
 
     // Finally, let the view know about the geometry bounds. The view uses this

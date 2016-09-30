@@ -43,7 +43,7 @@
 #include <IceT.h>                     // for icet types
 
 class vtkMultiProcessController;
-class vtkPKdTree;
+class vtkPartitionOrderingInterface;
 class vtkIceTContext;
 class vtkPixelBufferObject;
 class vtkTextureObject;
@@ -121,10 +121,10 @@ public:
   vtkGetMacro(ImageReductionFactor, int);
 
   // Description:
-  // kd tree that gives processes ordering. Initial value is a NULL pointer.
+  // partition ordering that gives processes ordering. Initial value is a NULL pointer.
   // This is used only when UseOrderedCompositing is true.
-  vtkGetObjectMacro(KdTree,vtkPKdTree);
-  virtual void SetKdTree(vtkPKdTree *kdtree);
+  vtkGetObjectMacro(PartitionOrdering,vtkPartitionOrderingInterface);
+  virtual void SetPartitionOrdering(vtkPartitionOrderingInterface* partitionOrdering);
 
   // Description:
   // Enable/disable rendering of empty images. Painters that use MPI global
@@ -136,8 +136,8 @@ public:
   // Description:
   // Set this to true, if compositing must be done in a specific order. This is
   // necessary when rendering volumes or translucent geometries. When
-  // UseOrderedCompositing is set to true, it is expected that the KdTree is set as
-  // well. The KdTree is used to decide the process-order for compositing.
+  // UseOrderedCompositing is set to true, it is expected that the PartitionOrdering is set as
+  // well. The PartitionOrdering is used to decide the process-order for compositing.
   // Initial value is false.
   vtkGetMacro(UseOrderedCompositing, bool);
   vtkSetMacro(UseOrderedCompositing, bool);
@@ -224,7 +224,7 @@ protected:
   void UpdateTileInformation(const vtkRenderState*);
 
   vtkMultiProcessController *Controller;
-  vtkPKdTree *KdTree;
+  vtkPartitionOrderingInterface* PartitionOrdering;
   vtkRenderPass* RenderPass;
   vtkIceTContext* IceTContext;
 

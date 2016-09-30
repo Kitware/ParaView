@@ -44,6 +44,8 @@ set(Module_SRCS
   vtkMarkSelectedRows.cxx
   vtkMultiSliceContextItem.cxx
   vtkOrderedCompositeDistributor.cxx
+  vtkPartitionOrdering.cxx
+  vtkPartitionOrderingInterface.cxx
   vtkPVArrowSource.cxx
   vtkPVAxesActor.cxx
   vtkPVAxesWidget.cxx

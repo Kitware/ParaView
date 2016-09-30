@@ -3669,6 +3669,9 @@
                       panel_visibility="never" />
             <Property name="BlockColorsDistinctValues"
                       panel_visibility="advanced" />
+            <Property name="UseDataPartitions"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="surface" />
           </PropertyGroup>
 
           <PropertyGroup panel_visibility="advanced"
@@ -3944,6 +3947,7 @@
         <ShareProperties subproxy="SurfaceRepresentation">
           <Exception name="Input" />
           <Exception name="Visibility" />
+          <Exception name="UseDataPartitions" />
         </ShareProperties>
         <ExposedProperties>
           <PropertyGroup label="Volume Rendering">
@@ -3956,9 +3960,10 @@
             <Property name="SelectMapper"
                       panel_visibility="advanced"
                       panel_visibility_default_for_representation="volume" />
-            <Property name="UseDataParititions"
+            <Property name="UseDataPartitions"
                       panel_visibility="advanced"
-                      panel_visibility_default_for_representation="volume" />
+                      panel_visibility_default_for_representation="volume"
+                      override="1"/>
           </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
@@ -4126,13 +4131,6 @@
                          si_class="vtkSIUnstructuredGridVolumeRepresentationProxy"
                          base_proxygroup="representations"
                          base_proxyname="UnstructuredGridVolumeRepresentation">
-      <IntVectorProperty command="SetUseDataParititions"
-                         default_values="1"
-                         name="UseDataParititions"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <!-- end of StructuredGridVolumeRepresentation -->
     </RepresentationProxy>
 
     <!-- ================================================================== -->
@@ -8793,6 +8791,14 @@
                         proxy="GeneralSettings"
                         property="BlockColorsDistinctValues"/>
         </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseDataPartitions"
+                         default_values="0"
+                         name="UseDataPartitions"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Specify whether or not to redistribute the data when actor is translucent.
+        Default is false.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetEnableScaling"
                          default_values="0"

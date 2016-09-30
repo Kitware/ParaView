@@ -26,7 +26,7 @@
 class vtkFXAAOptions;
 class vtkIceTSynchronizedRenderers;
 class vtkImageProcessingPass;
-class vtkPKdTree;
+class vtkPartitionOrderingInterface;
 class vtkPVSession;
 class vtkRenderer;
 class vtkRenderPass;
@@ -56,9 +56,9 @@ public:
   void Initialize(vtkPVSession* session, unsigned int id);
 
   // Description:
-  // kd tree that gives processes ordering. Initial value is a NULL pointer.
+  // partition ordering that gives processes ordering. Initial value is a NULL pointer.
   // This is used only when UseOrderedCompositing is true.
-  void SetKdTree(vtkPKdTree *kdtree);
+  void SetPartitionOrdering(vtkPartitionOrderingInterface* partitionOrdering);
 
   // Description:
   // Set the renderer that is being synchronized.

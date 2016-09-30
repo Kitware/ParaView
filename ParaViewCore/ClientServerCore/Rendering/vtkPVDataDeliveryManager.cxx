@@ -643,6 +643,34 @@ void vtkPVDataDeliveryManager::RedistributeDataForOrderedCompositing(
 }
 
 //----------------------------------------------------------------------------
+void vtkPVDataDeliveryManager::ClearRedistributedData(
+  bool use_lod)
+{
+  // It seems like we should be able to set each item's RedistributedDataObject
+  // to NULL in this loop but that doesn't work. For now we're leaving this as
+  // is to make sure we don't break functionality but this should be revisited
+  // later.
+  vtkInternals::ItemsMapType::iterator iter;
+  for (iter = this->Internals->ItemsMap.begin();
+    iter != this->Internals->ItemsMap.end(); ++iter)
+    {
+    vtkInternals::vtkItem& item = use_lod? iter->second.second : iter->second.first;
+
+    if (!item.Redistributable ||
+      item.Representation == NULL ||
+      item.Representation->GetVisibility() == false ||
+
+      // delivered object can be null in case we're updating lod and the
+      // representation doeesn't have any LOD data.
+      item.GetDeliveredDataObject() == NULL)
+      {
+      continue;
+      }
+    item.SetRedistributedDataObject(item.GetDeliveredDataObject());
+    }
+}
+
+//----------------------------------------------------------------------------
 vtkPKdTree* vtkPVDataDeliveryManager::GetKdTree()
 {
   return this->KdTree;

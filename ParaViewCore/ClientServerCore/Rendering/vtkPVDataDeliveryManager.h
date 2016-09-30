@@ -125,9 +125,14 @@ public:
   vtkPVRenderView* GetRenderView();
 
   // Description:
-  // Called by the view on ever render when ordered compositing is to be used to
+  // Called by the view on every render when ordered compositing is to be used to
   // ensure that the geometries are redistributed, as needed.
   void RedistributeDataForOrderedCompositing(bool use_lod);
+
+  // Description:
+  // Removes all redistributed data that may have been redistributed for ordered compositing
+  // earlier when using KdTree based redistribution.
+  void ClearRedistributedData(bool use_load);
 
   // Description:
   // Pass the structured-meta-data for determining rendering order for ordered

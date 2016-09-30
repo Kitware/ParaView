@@ -32,7 +32,7 @@ vtkStandardNewMacro(vtkStructuredGridVolumeRepresentation);
 //----------------------------------------------------------------------------
 vtkStructuredGridVolumeRepresentation::vtkStructuredGridVolumeRepresentation()
 {
-  this->UseDataParititions = false;
+  this->UseDataPartitions = false;
   this->TableExtentTranslator = vtkTableExtentTranslator::New();
 }
 
@@ -43,11 +43,11 @@ vtkStructuredGridVolumeRepresentation::~vtkStructuredGridVolumeRepresentation()
 }
 
 //----------------------------------------------------------------------------
-void vtkStructuredGridVolumeRepresentation::SetUseDataParititions(bool val)
+void vtkStructuredGridVolumeRepresentation::SetUseDataPartitions(bool val)
 {
-  if (this->UseDataParititions != val)
+  if (this->UseDataPartitions != val)
     {
-    this->UseDataParititions = val;
+    this->UseDataPartitions = val;
     this->MarkModified();
     }
 }
@@ -74,7 +74,7 @@ int vtkStructuredGridVolumeRepresentation::RequestData(vtkInformation* request,
   this->TableExtentTranslator->SetNumberOfPiecesInTable(0);
 
   if (inputVector[0]->GetNumberOfInformationObjects()==1 &&
-    this->UseDataParititions)
+    this->UseDataPartitions)
     {
     // reduce bounds across processes in parallel.
     vtkMultiProcessController* controller =
@@ -151,7 +151,7 @@ int vtkStructuredGridVolumeRepresentation::ProcessViewRequest(
   if (request_type == vtkPVView::REQUEST_UPDATE())
     {
     if (this->GetNumberOfInputConnections(0) == 1 &&
-        this->UseDataParititions &&
+        this->UseDataPartitions &&
         this->TableExtentTranslator->GetNumberOfPiecesInTable() > 0)
       {
       vtkAlgorithmOutput* connection = this->GetInputConnection(0, 0);
@@ -202,5 +202,5 @@ void vtkStructuredGridVolumeRepresentation::PrintSelf(
   ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "UseDataParititions: " << this->UseDataParititions << endl;
+  os << indent << "UseDataPartitions: " << this->UseDataPartitions << endl;
 }

@@ -46,6 +46,8 @@
 #include "vtkMultiProcessStream.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPartitionOrdering.h"
+#include "vtkPartitionOrderingInterface.h"
 #include "vtkPKdTree.h"
 #include "vtkPVAxesWidget.h"
 #include "vtkPVCenterAxesActor.h"
@@ -1256,6 +1258,7 @@ void vtkPVRenderView::Update()
   this->NonDistributedRenderingRequired = false;
   this->ForceDataDistributionMode = -1;
 
+  this->PartitionOrdering->SetImplementation(NULL);
   this->Superclass::Update();
 
   // After every update we can expect the representation geometries to change.
@@ -1460,17 +1463,25 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     this->GetUseDistributedRenderingForInteractiveRender():
     this->GetUseDistributedRenderingForStillRender();
 
-  bool use_ordered_compositing = this->GetUseOrderedCompositing();
-  if (use_ordered_compositing)
+  if (this->GetUseOrderedCompositing())
     {
-    this->Internals->DeliveryManager->RedistributeDataForOrderedCompositing(
-      use_lod_rendering);
-    this->SynchronizedRenderers->SetKdTree(
-      this->Internals->DeliveryManager->GetKdTree());
+    if (this->PartitionOrdering->GetImplementation() == NULL ||
+        this->PartitionOrdering->GetImplementation()->IsA("vtkPKdTree"))
+      {
+      this->Internals->DeliveryManager->RedistributeDataForOrderedCompositing(
+        use_lod_rendering);
+      this->PartitionOrdering->SetImplementation(this->Internals->DeliveryManager->GetKdTree());
+      }
+    else
+      {
+      this->Internals->DeliveryManager->ClearRedistributedData(
+        use_lod_rendering);
+      }
+    this->SynchronizedRenderers->SetPartitionOrdering(this->PartitionOrdering.GetPointer());
     }
   else
     {
-    this->SynchronizedRenderers->SetKdTree(NULL);
+    this->SynchronizedRenderers->SetPartitionOrdering(NULL);
     }
 
   // enable render empty images if it was requested
@@ -1732,6 +1743,27 @@ void vtkPVRenderView::SetOrderedCompositingInformation(
     }
   view->GetDeliveryManager()->SetOrderedCompositingInformation(
     repr, translator, whole_extents, origin, spacing);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetOrderedCompositingInformation(
+  vtkInformation* info, const double bounds[6])
+{
+  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!view)
+    {
+    vtkGenericWarningMacro("Missing VIEW().");
+    return;
+    }
+  vtkNew<vtkPartitionOrdering> partitionOrdering;
+  partitionOrdering->Construct(bounds);
+  view->PartitionOrdering->SetImplementation(partitionOrdering.GetPointer());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::ClearOrderedCompositingInformation()
+{
+  this->PartitionOrdering->SetImplementation(NULL);
 }
 
 //----------------------------------------------------------------------------

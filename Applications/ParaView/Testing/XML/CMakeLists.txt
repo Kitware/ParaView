@@ -402,6 +402,16 @@ if (PARAVIEW_USE_MPI)
 
     # Test uses D3 which is available in MPI only builds.
     ${CMAKE_CURRENT_SOURCE_DIR}/ExportSelectionToCSV.xml
+
+    # Test Use Data Partitions for volume rendering
+    #${CMAKE_CURRENT_SOURCE_DIR}/UseDataPartitions.xml
+
+  )
+
+  # This test requires a parallel partition to make sense so we
+  # skip running it with the built-in server.
+  add_client_server_tests("pvcs"
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/UseDataPartitions.xml
   )
 
   # Test uses GhostCellsGenerator which is available in MPI only builds.

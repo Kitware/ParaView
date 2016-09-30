@@ -497,18 +497,19 @@ void vtkPVSynchronizedRenderer::SetDataReplicatedOnAllProcesses(bool replicated)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSynchronizedRenderer::SetKdTree(vtkPKdTree* tree)
+void vtkPVSynchronizedRenderer::SetPartitionOrdering(
+  vtkPartitionOrderingInterface* partitionOrdering)
 {
 #if defined PARAVIEW_USE_ICE_T && defined PARAVIEW_USE_MPI
   vtkIceTSynchronizedRenderers* sync =
     vtkIceTSynchronizedRenderers::SafeDownCast(this->ParallelSynchronizer);
   if (sync)
     {
-    sync->SetKdTree(tree);
-    sync->SetUseOrderedCompositing(tree != NULL);
+    sync->SetPartitionOrdering(partitionOrdering);
+    sync->SetUseOrderedCompositing(partitionOrdering != NULL);
     }
 #endif
-  (void)tree;
+  (void)partitionOrdering;
 }
 
 //----------------------------------------------------------------------------
