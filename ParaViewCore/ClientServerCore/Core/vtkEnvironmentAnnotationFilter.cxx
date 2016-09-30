@@ -37,6 +37,7 @@ vtkEnvironmentAnnotationFilter::vtkEnvironmentAnnotationFilter()
   : DisplayUserName(false),
   DisplaySystemName(false),
   DisplayFileName(false),
+  DisplayFilePath(false),
   DisplayDate(false)
 {
   this->SetNumberOfInputPorts(1);
@@ -82,6 +83,14 @@ void vtkEnvironmentAnnotationFilter::UpdateAnnotationValue()
     {
     if (this->FileName != "")
       {
+      if (this->DisplayFilePath)
+        {
+        std::string path = vtksys::SystemTools::GetFilenamePath(this->FileName);
+        if (!path.empty())
+          {
+          value += path + "/";
+          }
+        }
       value += vtksys::SystemTools::GetFilenameName(this->FileName);
       }
     }
@@ -134,6 +143,7 @@ void vtkEnvironmentAnnotationFilter::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "AnnotationValue: " << this->AnnotationValue << endl;
   os << indent << "DisplayUserName: " << (this->DisplayUserName? "True" : "False") << endl;
   os << indent << "DisplayFileName: " << (this->DisplayFileName? "True" : "False") << endl;
+  os << indent << "DisplayFilePath: " << (this->DisplayFilePath? "True" : "False") << endl;
   os << indent << "DisplaySystemName: " << (this->DisplaySystemName? "True" : "False") << endl;
   os << indent << "DisplayDate: " << (this->DisplayDate? "True" : "False") << endl;
 }

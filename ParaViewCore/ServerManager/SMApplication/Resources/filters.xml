@@ -359,7 +359,7 @@
       </InputProperty>
       <IntVectorProperty command="SetDisplayUserName"
                          name="DisplayUserName"
-                         default_values="0"
+                         default_values="1"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>
@@ -368,7 +368,7 @@
       </IntVectorProperty>
       <IntVectorProperty command="SetDisplaySystemName"
                          name="DisplaySystemName"
-                         default_values="0"
+                         default_values="1"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>
@@ -377,7 +377,7 @@
       </IntVectorProperty>
       <IntVectorProperty command="SetDisplayDate"
                          name="DisplayDate"
-                         default_values="0"
+                         default_values="1"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>
@@ -386,12 +386,28 @@
       </IntVectorProperty>
       <IntVectorProperty command="SetDisplayFileName"
                          name="DisplayFileName"
-                         default_values="0"
+                         default_values="1"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>
           Toggle File Name Visibility.
         </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDisplayFilePath"
+                         name="DisplayFilePath"
+                         default_values="1"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Toggle Show Full File Path.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="DisplayFileName"
+                                   value="1" />
+          <!-- enable this widget when DisplayFileName==1 -->
+        </Hints>
       </IntVectorProperty>
       <StringVectorProperty command="SetFileName"
                             name="FileName"
