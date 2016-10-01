@@ -80,6 +80,7 @@ public slots:
   void updateImageFileName();
   void updateImageFileNameExtension(const QString&);
   void updateCinemaType(const QString&);
+  void updateComposite(int);
 
 private:
 
