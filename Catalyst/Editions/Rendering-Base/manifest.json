@@ -123,6 +123,8 @@
         { "class": "vtkMPICompositeManager" },
         { "class": "vtkMultiSliceContextItem" },
         { "class": "vtkOrderedCompositeDistributor" },
+        { "class": "vtkPartitionOrdering" },
+        { "class": "vtkPartitionOrderingInterface" },
         { "class": "vtkPVAxesActor" },
         { "class": "vtkPVAxesWidget" },
         { "class": "vtkPVCenterAxesActor" },
