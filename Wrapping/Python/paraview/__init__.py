@@ -100,6 +100,8 @@ class compatibility:
         return _version(cls.major, cls.minor)
     GetVersion = classmethod(GetVersion)
 
+# This is reimplemented in vtkSMCoreUtilities::SanitizeName(). Keep both
+# implementations consistent.
 def make_name_valid(name):
     """Make a string into a valid Python variable name."""
     if not name:
@@ -107,7 +109,7 @@ def make_name_valid(name):
     import string
     valid_chars = "_%s%s" % (string.ascii_letters, string.digits)
     name = str().join([c for c in name if c in valid_chars])
-    if not name[0].isalpha():
+    if name and not name[0].isalpha():
         name = 'a' + name
     return name
 

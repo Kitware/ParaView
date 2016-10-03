@@ -121,4 +121,31 @@
   <pqevent object="pqClientMainWindow/FindDataDialog/selectionDisplayFrame/showFrustumButton" command="set_boolean" arguments="true" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/FindDataDialog13.png" width="300" height="300" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Delete" command="activate" arguments="" />
+
+  <!-- Test field name sanitization -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="RTAnalyticSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Calculator" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ResultArrayName/ResultArrayName" command="set_string" arguments="[Un]sanitized.1 _Name2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Function/Scalars" command="activate" arguments="" />
+  <pqevent object="1QMenu0" command="activate" arguments="RTData" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/Representation/displayRepresentationWidget/comboBox" command="activated" arguments="Surface" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/ColorEditor/DisplayColorWidget/Variables" command="activated" arguments="[Un]sanitized.1 _Name2" />
+
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/selectionType" command="activated" arguments="Point(s)" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/source" command="activated" arguments="Calculator1" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/criteria" command="activated" arguments="[Un]sanitized.1 _Name2" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/condition" command="activated" arguments="is between" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/range/value_min" command="set_string" arguments="37" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/range/value_max" command="set_string" arguments="97" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/runQuery" command="activate" arguments="" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/FindDataDialog15.png" width="300" height="300" />
+
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Delete" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Delete" command="activate" arguments="" />
 </pqevents>
