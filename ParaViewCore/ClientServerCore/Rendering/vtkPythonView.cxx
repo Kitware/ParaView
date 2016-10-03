@@ -493,7 +493,13 @@ int vtkPythonView::RunSimpleStringWithCustomLocals(const char* code)
     }
 
   result = NULL;
-  if (Py_FlushLine())
+  // cast to avoid warning for python 2
+  PyObject *f = PySys_GetObject(const_cast<char *>("stdout"));
+  if (f == NULL)
+    {
+    return 0;
+    }
+  if (PyFile_WriteString("\n", f))
     {
     PyErr_Clear();
     }

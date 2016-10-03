@@ -74,7 +74,7 @@ def memtime_stamp():
     m = logbase.get_memuse()
     n1 = dt.datetime.now()
     et = n1 - n0
-    print et, m
+    print (et, m)
     n0 = n1
     records.append([et, m])
 
@@ -136,7 +136,7 @@ ss.SetPhiResolution(res)
 ss.SetThetaResolution(res)
 
 ap = vtk.vtkAppendPolyData()
-print 'source',p,': generating',end - start,'spheres from',start,'to',end
+print ('source',p,': generating',end - start,'spheres from',start,'to',end)
 for x in range(start,end):
     i = x%edge
     j = math.floor((x / edge))%edge
@@ -229,7 +229,7 @@ self.GetOutput().ShallowCopy(ap.GetOutput())
         logparser.summarize_results(num_frames, (fpsT1-fpsT0).total_seconds(),
                                     num_polys, 'Polys', save_logs,
                                     output_basename)
-        print 'Points / Frame: %(np)d' % {'np': num_points}
+        print ('Points / Frame: %(np)d' % {'np': num_points})
 
 
 def main(argv):

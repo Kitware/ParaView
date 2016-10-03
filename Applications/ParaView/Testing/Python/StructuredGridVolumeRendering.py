@@ -16,8 +16,8 @@ rw.Render()
 ptm = vtk.vtkProjectedTetrahedraMapper()
 ok = ptm.IsSupported(rw)
 print
-print 'ProjectedTetrahedraMapper %s supported '%(
-      'is' if(ok) else 'is not')
+print ('ProjectedTetrahedraMapper %s supported '%(
+      'is' if(ok) else 'is not'))
 del ptm
 del rw
 
@@ -35,12 +35,12 @@ if ok:
     WriteImage('%s/../../%s.png'%(smtesting.TempDir, imageFile))
 
   if not smtesting.DoRegressionTesting(view.SMProxy):
-    raise smtesting.TestError, 'Test failed.'
+    raise smtesting.TestError ('Test failed.')
 
   print
-  print 'Test passes'
+  print ('Test passes')
 
 else:
-  print 'Skipped untested.'
+  print ('Skipped untested.')
 
 print

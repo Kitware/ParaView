@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPythonInterpreter.h"
 #include "vtkStdString.h"
 #include "vtkWeakPointer.h"
+#include "vtkPythonCompatibility.h"
 
 #include <QAbstractItemView>
 #include <QInputDialog>

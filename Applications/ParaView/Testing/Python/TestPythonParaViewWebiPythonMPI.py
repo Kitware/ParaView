@@ -51,19 +51,19 @@ def start_thread():
 
     # Start root+satelites
     thread = threading.Thread(target=start)
-    print "Starting thread"
+    print ("Starting thread")
     thread.start()
     for i in range(20):
-        print "Working... %ds" % (i*5)
+        print ("Working... %ds" % (i*5))
         position = [random.random() * 2, random.random() * 2, random.random() * 2]
-        print position
+        print (position)
         sphere.SetCenter(position)
         sphere.Update()
         pv_ipython.IPythonProtocol.RegisterDataSet('iPython-demo', sphere.GetOutput())
         time.sleep(5)
         pv_ipython.IPythonProtocol.ActivateDataSet('iPython-demo')
     thread.join()
-    print "Done"
+    print ("Done")
 
 #------------------------------------------------------------------------------
 # Main

@@ -7,7 +7,7 @@ import paraview.simple as smp
 
 
 # Make sure the test driver know that process has properly started
-print "Process started"
+print ("Process started")
 
 
 def getHost(url):

@@ -134,7 +134,7 @@ analysisInfo = None
 with open(os.path.join(work_directory, 'info.json'), 'r') as json_file:
     analysisInfo = json.load(json_file)
 
-print json.dumps(analysisInfo, sort_keys=True, indent=4, separators=(',', ': '))
+print (json.dumps(analysisInfo, sort_keys=True, indent=4, separators=(',', ': ')))
 
 # === Execute embedded test functions =========================================
 

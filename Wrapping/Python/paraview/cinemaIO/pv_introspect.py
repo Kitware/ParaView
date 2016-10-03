@@ -392,7 +392,7 @@ def make_cinema_store(proxies,
 
         #start with clean slate, other than time
         cs = cinema_store.FileStore(ocsfname)
-    except IOError, KeyError:
+    except (IOError, KeyError):
         pass
 
     cs.add_metadata({'store_type':'FS'})
@@ -643,13 +643,13 @@ def explore(cs, proxies, iSave = True, currentTime = None, userDefined = {},
         for y in params:
 
             if (y in explorerDir) and (name == y):
-                #print "name in ExplorerDir: ", y, ", ", explorerDir[y]
+                #print ("name in ExplorerDir: ", y, ", ", explorerDir[y])
                 tracks.append(explorerDir[y])
 
             if name in y:
-                #print "N", name
-                #print "X", x
-                #print "Y", y
+                #print ("N", name)
+                #print ("X", x)
+                #print ("Y", y)
 
                 #visibility of the layer
                 sp = paraview.simple.FindSource(name)
@@ -812,14 +812,14 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
         # check if this view was selected to export as spec b
         cinemaParams = viewParams[6]
         if len(cinemaParams) == 0:
-            print "Skipping view: Not selected to export to cinema"
+            print ("Skipping view: Not selected to export to cinema")
             continue
 
         camType = "none"
         if "camera" in cinemaParams and cinemaParams["camera"] != "none":
             camType =  cinemaParams["camera"]
         if camType == "none":
-            print "Skipping view: Not selected to export to cinema."
+            print ("Skipping view: Not selected to export to cinema.")
             continue
 
         specLevel = "A"
@@ -848,7 +848,7 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
             elif view.IsA("vtkSMContextViewProxy") == True:
                 view.ResetDisplay()
             else:
-                print ' do not know what to do with a ', view.GetClassName()
+                print (' do not know what to do with a ', view.GetClassName())
 
         userDefValues = prepare_selection(trackSelection, arraySelection)
         if "theta" in cinemaParams:
@@ -889,13 +889,13 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
         atLeastOneViewExported = True
 
     if not atLeastOneViewExported:
-        print "No view was selected to export to cinema."
+        print ("No view was selected to export to cinema.")
         return
 
     # restore initial state
     paraview.simple.SetActiveView(initialView)
     restore_visibility(pvstate)
-    print "Finished exporting Cinema database!"
+    print ("Finished exporting Cinema database!")
 
 def prepare_selection(trackSelection, arraySelection):
     '''The rest of pv_introspect expects to receive user-defined values in the

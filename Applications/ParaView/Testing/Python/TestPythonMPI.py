@@ -65,6 +65,6 @@ def ComputeNextTimeStep(ds):
     iPythonClient[:].apply_sync(lambda:_push_new_timestep())
 
 
-print "Start waiting"
+print ("Start waiting")
 time.sleep(10)
-print "Done"
+print ("Done")

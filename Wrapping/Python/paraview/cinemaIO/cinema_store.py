@@ -315,9 +315,9 @@ class Store(object):
         Should support empty query or direct values queries e.g.
 
         for doc in store.find({'phi': 0}):
-            print doc.data
+            print (doc.data)
         for doc in store.find({'phi': 0, 'theta': 100}):
-            print doc.data
+            print (doc.data)
 
         """
         raise RuntimeError("Subclasses must define this method")
@@ -498,7 +498,7 @@ class Store(object):
         #prepare to iterate through all the possibilities, in order if one is given
         #param_names = parameters if parameters else sorted(self.parameter_list.keys())
         param_names = parameters if parameters else self.parameter_list.keys()
-        #print "PARAMETERS", param_names
+        #print ("PARAMETERS", param_names)
         params = []
         values = []
         dep_params = []
@@ -575,7 +575,7 @@ class FileStore(Store):
             elif 'parameter_list' in info_json:
                 self._set_parameter_list(info_json['parameter_list'])
             else:
-                print "Error I can't read that file"
+                print ("Error I can't read that file")
                 exit()
             self.metadata = info_json['metadata']
             self.filename_pattern = info_json['name_pattern']
@@ -653,7 +653,7 @@ class FileStore(Store):
 #        #add any dependent parameters
 #        for dep in sorted(self.parameter_associations.keys()):
 #            if dep in desc:
-#                #print "    ->>> base /// dep: ", base, " /// ", dep
+#                #print ("    ->>> base /// dep: ", base, " /// ", dep)
 #                base = base + "/" + dep + "=" + str(desc[dep])
         #a more intuitive layout than the above alphanumeric sort
         #this one follows the graph and thus keeps related things, like
@@ -972,12 +972,12 @@ def make_parameter(name, values, **kwargs):
     """
     default = kwargs['default'] if 'default' in kwargs else values[0]
     if not default in values:
-        raise RuntimeError, "Invalid default, must be one of %s" % str(values)
+        raise RuntimeError ("Invalid default, must be one of %s" % str(values))
 
     typechoice = kwargs['typechoice'] if 'typechoice' in kwargs else 'range'
     valid_types = ['list','range','option','hidden']
     if not typechoice in valid_types:
-        raise RuntimeError, "Invalid typechoice, must be one of %s" % str(valid_types)
+        raise RuntimeError ("Invalid typechoice, must be one of %s" % str(valid_types))
 
     label = kwargs['label'] if 'label' in kwargs else name
 
@@ -1002,11 +1002,11 @@ def make_field(name, _values, **kwargs):
     valid_itypes = ['rgb','depth','value','luminance','normals']
     for i in img_types:
         if i not in valid_itypes:
-            raise RuntimeError, "Invalid typechoice, must be one of %s" % str(valid_itypes)
+            raise RuntimeError ("Invalid typechoice, must be one of %s" % str(valid_itypes))
 
     default = kwargs['default'] if 'default' in kwargs else values[0]
     if not default in values:
-        raise RuntimeError, "Invalid default, must be one of %s" % str(values)
+        raise RuntimeError ("Invalid default, must be one of %s" % str(values))
 
     typechoice = 'hidden'
 

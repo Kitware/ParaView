@@ -1,36 +1,36 @@
 import paraview
 
 try:
-    from vtkCommonComputationalGeometry import *
+    from paraview.vtk.vtkCommonComputationalGeometry import *
 except ImportError:
     paraview.print_error("Error: Could not import vtkCommonComputationalGeometry")
-from vtkCommonCore import *
-from vtkCommonDataModel import *
-from vtkCommonExecutionModel import *
+from paraview.vtk.vtkCommonCore import *
+from paraview.vtk.vtkCommonDataModel import *
+from paraview.vtk.vtkCommonExecutionModel import *
 try:
-    from vtkCommonMath import *
+    from paraview.vtk.vtkCommonMath import *
 except ImportError:
     paraview.print_error("Error: Could not import vtkCommonMath")
 try:
-    from vtkCommonMisc import *
+    from paraview.vtk.vtkCommonMisc import *
 except ImportError:
     paraview.print_error("Error: Could not import vtkCommonMisc")
 try:
-    from vtkCommonSystem import *
+    from paraview.vtk.vtkCommonSystem import *
 except ImportError:
     paraview.print_error("Error: Could not import vtkCommonSystem")
 try:
-    from vtkCommonTransforms import *
+    from paraview.vtk.vtkCommonTransforms import *
 except ImportError:
     paraview.print_error("Error: Could not import vtkCommonTransforms")
-from vtkFiltersProgrammable import *
-from vtkParallelCore import *
+from paraview.vtk.vtkFiltersProgrammable import *
+from paraview.vtk.vtkParallelCore import *
 try:
-    from vtkRenderingCore import vtkCamera
+    from paraview.vtk.vtkRenderingCore import vtkCamera
 except ImportError:
     paraview.print_error("Error: Could not import vtkRenderingCore")
 try:
-    from vtkFiltersCore import *
+    from paraview.vtk.vtkFiltersCore import *
 except ImportError:
     paraview.print_error("Error: Could not import vtkFiltersCore")
 

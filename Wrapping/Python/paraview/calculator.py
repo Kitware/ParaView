@@ -6,8 +6,8 @@ derived quantities.
 try:
   import numpy as np
 except ImportError:
-  raise RuntimeError, "'numpy' module is not found. numpy is needed for "\
-    "this functionality to work. Please install numpy and try again."
+  raise RuntimeError ("'numpy' module is not found. numpy is needed for "\
+    "this functionality to work. Please install numpy and try again.")
 
 import paraview
 from paraview import vtk
@@ -26,8 +26,8 @@ def get_arrays(attribs, controller=None):
     """
     if not isinstance(attribs, dsa.DataSetAttributes) and \
         not isinstance(attribs, dsa.CompositeDataSetAttributes):
-            raise ValueError, \
-                "Argument must be DataSetAttributes or CompositeDataSetAttributes."
+            raise ValueError (
+                "Argument must be DataSetAttributes or CompositeDataSetAttributes.")
     arrays = dict()
     for key in attribs.keys():
         varname = paraview.make_name_valid(key)

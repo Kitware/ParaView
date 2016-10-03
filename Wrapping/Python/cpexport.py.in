@@ -121,9 +121,9 @@ def run(filename=None):
         array_selection = {},
         filename=filename)
     if not filename:
-        print "# *** Generated Script Begin ***"
-        print script
-        print "# *** Generated Script End ***"
+        print ("# *** Generated Script Begin ***")
+        print (script)
+        print ("# *** Generated Script End ***")
 
 if __name__ == "__main__":
     run()

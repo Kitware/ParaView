@@ -33,8 +33,8 @@ class AnalysisManager(object):
             "description": description,
             "analysis": []
         }
-        for key, value in kwargs.iteritems():
-            self.analysis[key] = value
+        for key in kwargs:
+            self.analysis[key] = kwargs[key]
         self.begin()
 
 
@@ -190,7 +190,8 @@ class FileNameGenerator(object):
         """
         Update active arguments and extend arguments range.
         """
-        for key, value in kwargs.iteritems():
+        for key in kwargs:
+            value = kwargs[key]
             value_str = "{value}".format(value=value)
             self.active_arguments[key] = value_str
             if store_value:
@@ -214,7 +215,8 @@ class FileNameGenerator(object):
         """
         Update label arguments, but argument must exist first
         """
-        for key, value in kwargs.iteritems():
+        for key in kwargs:
+            value = kwargs[key]
             if key in self.arguments:
                 self.arguments[key]["label"] = value
 
@@ -313,9 +315,10 @@ class CameraHandler(object):
         if self.active_index + 1 < self.number_of_index:
             self.active_index += 1
 
-            return self.active_index * 100 / self.number_of_index
+            return self.active_index * 100 // self.number_of_index
 
         raise StopIteration()
+    __next__ = next # Python 3.X compatibility
 
     def apply_position(self):
         if self.callback:
@@ -543,9 +546,9 @@ class SliceExplorer(object):
         self.view_proxy.CameraViewUp = self.viewup
         self.view_proxy.CameraFocalPoint = [ 0,0,0 ]
         self.view_proxy.CameraPosition = self.slice.SliceType.Normal
-        self.slice.SliceType.Origin = [ (self.dataBounds[0] + self.dataBounds[1])/2,
-                                        (self.dataBounds[2] + self.dataBounds[3])/2,
-                                        (self.dataBounds[4] + self.dataBounds[5])/2 ]
+        self.slice.SliceType.Origin = [ (self.dataBounds[0] + self.dataBounds[1]) * 0.5,
+                                        (self.dataBounds[2] + self.dataBounds[3]) * 0.5,
+                                        (self.dataBounds[4] + self.dataBounds[5]) * 0.5 ]
         simple.Render(self.view_proxy)
         simple.ResetCamera(self.view_proxy)
         self.view_proxy.CameraParallelScale = self.view_proxy.CameraParallelScale / self.parallelScaleRatio
@@ -603,7 +606,7 @@ class ContourExplorer(object):
         exp = ThreeSixtyImageStackExporter(fileGenerator, view, [0,0,0], 100, [0,0,1], [30, 45])
         for progress in cExplorer:
             exp.UpdatePipeline(time)
-            print progress
+            print (progress)
     """
 
     def __init__(self, file_name_generator, data, contourBy, scalarRange=[0.0, 1.0], steps=10):
@@ -645,9 +648,10 @@ class ContourExplorer(object):
             # Update file name pattern
             self.file_name_generator.update_active_arguments(contourValue=self.contour.Isosurfaces[0])
 
-            return self.current_step * 100 / self.number_of_steps
+            return self.current_step * 100 // self.number_of_steps
 
         raise StopIteration()
+    __next__ = next # Python 3.X compatibility
 
     def reset(self):
         self.current_step = 0
@@ -695,7 +699,7 @@ class ImageResampler(object):
         if custom_probing_bounds:
             self.resampler.UseInputBounds = 0
             self.resampler.CustomSamplingBounds = custom_probing_bounds
-        field = array_colors.keys()[0]
+        field = list(array_colors.keys())[0]
         self.color = simple.ColorByArray(Input=self.resampler, LookupTable=array_colors[field], RGBANaNColor=nanColor, ColorBy=field )
 
         self.file_name_generator.add_image_width(sampling_dimesions[0])

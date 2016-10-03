@@ -14,7 +14,7 @@ def getNextColor():
 
 # This function must be defined. It is where specific data arrays are requested.
 def setup_data(view):
-  print "Setting up data"
+  print ("Setting up data")
 
 # This function must be defined. It is where the actual rendering commands for matplotlib go.
 def render(view,width,height):
@@ -24,7 +24,7 @@ def render(view,width,height):
   ax = figure.add_subplot(111)
   ax.hold = True
   numObjects = view.GetNumberOfVisibleDataObjects()
-  print "num visible objects: ", numObjects
+  print ("num visible objects: ", numObjects)
   for i, color in zip(xrange(0,numObjects), getNextColor()):
     dataObject = view.GetVisibleDataObjectForRendering(i)
     if dataObject:
@@ -55,7 +55,7 @@ try:
   baselineIndex = sys.argv.index('-B')+1
   baselinePath = sys.argv[baselineIndex]
 except:
-  print "Could not get baseline directory. Test failed."
+  print ("Could not get baseline directory. Test failed.")
 
 baseline_file = os.path.join(baselinePath, "TestPythonViewMatplotlibScript.png")
 import vtk.test.Testing

@@ -69,8 +69,8 @@ class CoProcessor(object):
            input, and value is a list of frequencies.
            """
         if type(frequencies) != dict:
-           raise RuntimeError,\
-                 "Incorrect argument type: %s, must be a dict" % type(frequencies)
+           raise RuntimeError (
+                 "Incorrect argument type: %s, must be a dict" % type(frequencies))
         self.__InitialFrequencies = frequencies
 
     def EnableLiveVisualization(self, enable, frequency = 1):
@@ -84,7 +84,7 @@ class CoProcessor(object):
     def CreatePipeline(self, datadescription):
         """This methods must be overridden by subclasses to create the
            visualization pipeline."""
-        raise RuntimeError, "Subclasses must override this method."
+        raise RuntimeError ("Subclasses must override this method.")
 
     def LoadRequestedData(self, datadescription):
         """Call this method in RequestDataDescription co-processing pass to mark
@@ -201,7 +201,7 @@ class CoProcessor(object):
                     elif view.IsA("vtkSMContextViewProxy") == True:
                         view.ResetDisplay()
                     else:
-                        print ' do not know what to do with a ', view.GetClassName()
+                        print (' do not know what to do with a ', view.GetClassName())
                 view.ViewTime = datadescription.GetTime()
                 if rescale_lookuptable:
                     self.RescaleDataRange(view, datadescription.GetTime())
@@ -306,7 +306,7 @@ class CoProcessor(object):
         # Check that the producer name for the input given is valid for the
         # current setup.
         if not datadescription.GetInputDescriptionByName(inputname):
-            raise RuntimeError, "Simulation input name '%s' does not exist" % inputname
+            raise RuntimeError ("Simulation input name '%s' does not exist" % inputname)
 
         grid = datadescription.GetInputDescriptionByName(inputname).GetGrid()
 
@@ -384,7 +384,7 @@ class CoProcessor(object):
         Register a point of control (filter's property) that will be varied over in a cinema export.
         """
         if not isinstance(proxy, servermanager.Proxy):
-            raise RuntimeError, "Invalid 'proxy' argument passed to RegisterCinemaTrack."
+            raise RuntimeError ("Invalid 'proxy' argument passed to RegisterCinemaTrack.")
         self.__CinemaTracksList.append({"name":name, "proxy":proxy, "smproperty":smproperty, "valrange":valrange})
         proxyDefinitions = self.__CinemaTracks[proxy] if (proxy in self.__CinemaTracks) else {}
         proxyDefinitions[smproperty] = valrange
@@ -394,7 +394,7 @@ class CoProcessor(object):
     def AddArraysToCinemaTrack(self, proxy, propertyName, arrayNames):
         ''' Register user-defined target arrays by name. '''
         if not isinstance(proxy, servermanager.Proxy):
-            raise RuntimeError, "Invalid 'proxy' argument passed to AddArraysToCinemaTrack."
+            raise RuntimeError ("Invalid 'proxy' argument passed to AddArraysToCinemaTrack.")
 
         proxyDefinitions = self.__CinemaTracks[proxy] if (proxy in self.__CinemaTracks) else {}
         proxyDefinitions[propertyName] = arrayNames
@@ -405,7 +405,7 @@ class CoProcessor(object):
         """Register a view for image capture with extra meta-data such
         as magnification, size and frequency."""
         if not isinstance(view, servermanager.Proxy):
-            raise RuntimeError, "Invalid 'view' argument passed to RegisterView."
+            raise RuntimeError ("Invalid 'view' argument passed to RegisterView.")
         view.add_attribute("cpFileName", filename)
         view.add_attribute("cpFrequency", freq)
         view.add_attribute("cpFileName", filename)
@@ -481,7 +481,7 @@ class CoProcessor(object):
             globalController.AllReduce(localarray, globalarray, 0)
             globaldatarange = [-globalarray.GetValue(0), globalarray.GetValue(1)]
             rgbpoints = lut.RGBPoints.GetData()
-            numpts = len(rgbpoints)/4
+            numpts = len(rgbpoints)//4
             if globaldatarange[0] != rgbpoints[0] or globaldatarange[1] != rgbpoints[(numpts-1)*4]:
                 # rescale all of the points
                 oldrange = rgbpoints[(numpts-1)*4] - rgbpoints[0]

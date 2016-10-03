@@ -323,11 +323,11 @@ def summarize_results(num_frames, num_seconds_m0, items_per_frame, item_label,
     else:
         rank_frame_logs = None
 
-    print '\nStatistics:\n' + '=' * 40 + '\n'
+    print ('\nStatistics:\n' + '=' * 40 + '\n')
     if rank_frame_logs:
-        print 'Rank 0 Frame 0\n' + '-' * 40
-        print rank_frame_logs[0][0]
-        print ''
+        print ('Rank 0 Frame 0\n' + '-' * 40)
+        print (rank_frame_logs[0][0])
+        print ('')
         if save_logs:
             with open(output_basename + '.stats.r0f0.txt', 'w') as ofile:
                 ofile.write(str(rank_frame_logs[0][0]))
@@ -335,9 +335,9 @@ def summarize_results(num_frames, num_seconds_m0, items_per_frame, item_label,
         frame_stats, summary_stats = summarize_stats(rank_frame_logs)
         if frame_stats:
             for f in range(0, len(frame_stats)):
-                print 'Frame ' + str(f + 1) + '\n' + '-' * 40
+                print ('Frame ' + str(f + 1) + '\n' + '-' * 40)
                 write_stats_to_file(frame_stats[f], outfile=sys.stdout)
-                print ''
+                print ('')
                 with open(output_basename + '.stats.frame.txt', 'w') as ofile:
                     for f in range(0, len(frame_stats)):
                         ofile.write('Frame ' + str(f + 1) + '\n' + '-' * 40 + '\n')
@@ -345,7 +345,7 @@ def summarize_results(num_frames, num_seconds_m0, items_per_frame, item_label,
                         ofile.write('\n')
 
         if summary_stats:
-            print 'Frame Summary\n' + '-' * 40
+            print ('Frame Summary\n' + '-' * 40)
             write_stats_to_file(summary_stats, outfile=sys.stdout)
             if save_logs:
                 with open(output_basename + '.stats.summary.txt', 'w') as ofile:
@@ -353,7 +353,7 @@ def summarize_results(num_frames, num_seconds_m0, items_per_frame, item_label,
 
     fps = (num_frames - 1) / num_seconds_m0
     ips = fps * items_per_frame
-    print ''
-    print 'Frames / Sec: %(fps).2f' % {'fps': fps}
-    print '%(ilabel)s / Frame: %(ipf)d' % {'ilabel': item_label, 'ipf': items_per_frame}
-    print 'Mi%(ilabel)s / Sec: %(ips).3f' % {'ilabel': item_label, 'ips': ips / (1024.0 * 1024.0)}
+    print ('')
+    print ('Frames / Sec: %(fps).2f' % {'fps': fps})
+    print ('%(ilabel)s / Frame: %(ipf)d' % {'ilabel': item_label, 'ipf': items_per_frame})
+    print ('Mi%(ilabel)s / Sec: %(ips).3f' % {'ilabel': item_label, 'ips': ips / (1024.0 * 1024.0)})

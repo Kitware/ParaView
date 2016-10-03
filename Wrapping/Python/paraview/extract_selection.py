@@ -4,11 +4,12 @@ specifically, the Python code used by that class, to compute a mask array from
 the query expression. Once the mask array is obtained, this filter will either
 extract the selected ids, or mark those elements as requested.
 """
+from __future__ import print_function
 try:
   import numpy as np
 except ImportError:
-  raise RuntimeError, "'numpy' module is not found. numpy is needed for "\
-    "this functionality to work. Please install numpy and try again."
+  raise RuntimeError ("'numpy' module is not found. numpy is needed for "\
+    "this functionality to work. Please install numpy and try again.")
 
 import re
 import vtk
@@ -19,7 +20,7 @@ from paraview import calculator
 def _create_id_array(dataobject, attributeType):
     """Returns a VTKArray or VTKCompositeDataArray for the ids"""
     if not dataobject:
-        raise RuntimeError, "dataobject cannot be None"
+        raise RuntimeError ("dataobject cannot be None")
     if dataobject.IsA("vtkCompositeDataSet"):
         ids = []
         for ds in dataobject:
@@ -52,7 +53,7 @@ def execute(self):
     elif field_type == selectionNode.ROW:
         attributeType = vtk.vtkDataObject.ROW
     else:
-        raise RuntimeError, "Unsupported field attributeType %r" % field_type
+        raise RuntimeError ("Unsupported field attributeType %r" % field_type)
 
     # evaluate expression on the inputDO.
     # this is equivalent to executing the Python Calculator on the input dataset
@@ -74,18 +75,18 @@ def execute(self):
         maskArray = calculator.compute(inputs, query, ns=elocals)
     except:
         from sys import stderr
-        print >> stderr, "Error: Failed to evaluate Expression '%s'. "\
+        print ("Error: Failed to evaluate Expression '%s'. "\
             "The following exception stack should provide additional developer "\
             "specific information. This typically implies a malformed "\
-            "expression. Verify that the expression is valid.\n" % query
+            "expression. Verify that the expression is valid.\n" % query, file=sys.stderr)
         raise
 
     if not maskarray_is_valid(maskArray):
-        raise RuntimeError,\
+        raise RuntimeError(
             "Expression '%s' did not produce a valid mask array. The value "\
             "produced is of the type '%s'. This typically implies a malformed "\
             "expression. Verify that the expression is valid." % \
-            (query, type(maskArray))
+            (query, type(maskArray)))
 
     # if inverse selection is requested, just logical_not the mask array.
     if selectionNode.GetProperties().Has(selectionNode.INVERSE()) and \
@@ -109,7 +110,7 @@ def execute(self):
         # vtkPythonExtractSelection to extract the selected ids.
         nonzero_indices =  algos.flatnonzero(maskArray)
         output.FieldData.append(nonzero_indices, "vtkSelectedIds");
-        #print output.FieldData["vtkSelectedIds"]
+        #print (output.FieldData["vtkSelectedIds"])
         self.ExtractElements(attributeType, inputDO, outputDO)
         del nonzero_indices
     del maskArray

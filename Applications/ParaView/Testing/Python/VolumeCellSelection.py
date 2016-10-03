@@ -37,6 +37,6 @@ extract_rep.Visibility = True
 
 ## Compare with baseline
 if not smtesting.DoRegressionTesting(view.SMProxy):
-  raise smtesting.TestError, 'Test failed.'
+  raise smtesting.TestError ('Test failed.')
 
-print '\nTest passed.'
+print ('\nTest passed.')

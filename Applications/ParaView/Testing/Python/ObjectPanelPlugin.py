@@ -26,5 +26,5 @@ QtTesting.playCommand(object7, 'activate', '')
 object8 = 'pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/1QLabel0'
 
 text = QtTesting.getProperty(object8, 'text')
-print text
+print (text)
 

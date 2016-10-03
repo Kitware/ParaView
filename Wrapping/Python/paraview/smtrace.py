@@ -81,10 +81,10 @@ class TraceOutput:
   def append(self, data):
     if isinstance(data, list):
       self.__data += data
-      #print "\n".join(data),"\n"
+      #print ("\n".join(data),"\n")
     elif isinstance(data, str):
       self.__data.append(data)
-      #print data,"\n"
+      #print (data,"\n")
 
   def append_separator(self):
     try:
@@ -597,7 +597,7 @@ class ProxyFilter(object):
         # should we hide properties hidden from panels? yes, generally, except
         # Views.
         if hide_gui_hidden == True and prop.get_object().GetPanelVisibility() == "never":
-            if prop.get_property_name() == "ViewSize": print "skipping hidden"
+            if prop.get_property_name() == "ViewSize": print ("skipping hidden")
             return True
         # if a property is "linked" to settings, then skip it here too. We
         # should eventually add an option for user to save, yes, save these too.
@@ -1223,7 +1223,7 @@ def _create_trace_item_internal(key, args=None, kwargs=None):
             return instance
         raise Untraceable("Non-nestable trace item. Ignoring in current context.")
     raise Untraceable("Unknown trace item type %s" % key)
-    #print "Hello again", key, args
+    #print ("Hello again", key, args)
     #return A(key)
 
 def _start_trace_internal():
@@ -1288,12 +1288,12 @@ def reset_trace_output():
 
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
-    print "Running test"
+    print ("Running test")
     start_trace()
 
     s = simple.Sphere()
     c = simple.PlotOverLine()
     simple.Show()
 
-    print "***** TRACE RESULT *****"
-    print stop_trace()
+    print ("***** TRACE RESULT *****")
+    print (stop_trace())

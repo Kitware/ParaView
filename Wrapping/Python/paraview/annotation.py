@@ -15,11 +15,12 @@
 r"""
 This module is used by vtkPythonAnnotationFilter.
 """
+from __future__ import print_function
 try:
     import numpy as np
 except ImportError:
-    raise RuntimeError, "'numpy' module is not found. numpy is needed for "\
-        "this functionality to work. Please install numpy and try again."
+    raise RuntimeError("'numpy' module is not found. numpy is needed for "\
+            "this functionality to work. Please install numpy and try again.")
 
 from paraview import calculator
 from vtk import vtkDataObject
@@ -85,11 +86,11 @@ def execute(self):
         result = calculator.compute(inputs, expression, ns=ns)
     except:
         from sys import stderr
-        print >> stderr, "Failed to evaluate expression '%s'. "\
+        print("Failed to evaluate expression '%s'. "\
             "The following exception stack should provide additional "\
             "developer specific information. This typically implies a malformed "\
             "expression. Verify that the expression is valid.\n\n" \
-            "Variables in current scope are %s \n" % (expression, ns.keys())
+            "Variables in current scope are %s \n" % (expression, ns.keys()), file=sys.stderr)
         raise
     self.SetComputedAnnotationValue("%s" % result)
     return True
@@ -105,8 +106,8 @@ def execute_on_global_data(self):
     association = self.GetArrayAssociation()
     ns = _get_ns(self, inputs[0], association)
     if not ns.has_key(self.GetFieldArrayName()):
-        print >> stderr, "Failed to locate global array '%s'." % self.GetFieldArrayName()
-        raise RuntimeError, "Failed to locate global array"
+        print("Failed to locate global array '%s'." % self.GetFieldArrayName(), file=sys.stderr)
+        raise RuntimeError("Failed to locate global array")
 
     array = ns[self.GetFieldArrayName()]
     chosen_element = array
@@ -151,8 +152,8 @@ def execute_on_attribute_data(self, evaluate_locally):
     association = self.GetArrayAssociation()
     ns = _get_ns(self, inputs[0], association)
     if not ns.has_key(self.GetArrayName()):
-        print >> stderr, "Failed to locate array '%s'." % self.GetArrayName()
-        raise RuntimeError, "Failed to locate array"
+        print("Failed to locate array '%s'." % self.GetArrayName(), file=sys.stderr)
+        raise RuntimeError("Failed to locate array")
 
     if not evaluate_locally:
         return True

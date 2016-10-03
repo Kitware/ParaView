@@ -22,9 +22,9 @@ A simple example:
 #
 #==============================================================================
 
-import paraview, re, new, sys, vtk
+import paraview, re, types, sys, vtk
 import simple
-import servermanager
+from paraview import servermanager
 
 from paraview.vtk import vtkPVClientServerCoreCore
 from paraview.vtk import vtkPVServerManagerCore

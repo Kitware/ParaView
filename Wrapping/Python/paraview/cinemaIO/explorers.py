@@ -69,7 +69,7 @@ class Explorer(object):
         # Create the document/data product for this sample.
         doc = cinema_store.Document(desc)
         for e in self.tracks:
-            #print "EXECUTING track ", e, doc.descriptor
+            #print ("EXECUTING track ", e, doc.descriptor)
             e.execute(doc)
         self.insert(doc)
 

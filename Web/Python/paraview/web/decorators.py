@@ -57,7 +57,7 @@ def treeDomainDecorator(props, xmlProps, uiProps, domain):
         accumulatedName = me[1]
 
         if len(accumulatedName) > 1 and accumulatedName[0] == 'Element Blocks':
-            print index,' -> ',' + '.join(accumulatedName)
+            print (index,' -> ',' + '.join(accumulatedName))
             valMap[accumulatedName[-1]] = index
 
         index += 1
@@ -180,7 +180,7 @@ def clipScalarDecorator(prop, uiElt, hint):
         try:
             proxy = prop.GetParent()
         except:
-            print 'ERROR: unable to get proxy for property ' + prop.Name
+            print ('ERROR: unable to get proxy for property ' + prop.Name)
             return
     excludeAttr = hint.GetAttribute('exclude')
     if not excludeAttr or excludeAttr != '1':
@@ -200,7 +200,7 @@ def genericDecorator(prop, uiElt, hint):
         try:
             proxy = prop.GetParent()
         except:
-            print 'ERROR: unable to get proxy for property ' + prop.Name
+            print ('ERROR: unable to get proxy for property ' + prop.Name)
             return
 
     mode = hint.GetAttribute("mode")

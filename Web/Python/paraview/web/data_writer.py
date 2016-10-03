@@ -135,7 +135,7 @@ class ScalarRenderer(object):
             dataRange = cdi.GetArray(name).GetRange(component)
             fieldToColorBy[0] = 'CELLS'
         else:
-            print "No array with that name", name
+            print ("No array with that name", name)
             return
 
         realRange = dataRange
@@ -177,7 +177,7 @@ class ScalarRenderer(object):
                 else:
                     rawArray.SetTuple1(idx, float('NaN'))
 
-            # print 'Array bounds', minValue, maxValue, 'compare to', dataRange
+            # print ('Array bounds', minValue, maxValue, 'compare to', dataRange)
 
             with open(path, 'wb') as f:
                 f.write(buffer(rawArray))

@@ -161,8 +161,8 @@ class DataProberDataSetBuilder(DataSetBuilder):
 
                     self.expandRange(magarray)
             else:
-                print 'No array for', field
-                print self.resamplerFilter.GetOutput()
+                print ('No array for', field)
+                print (self.resamplerFilter.GetOutput())
 
     def magnitude(self, tuple):
         value = 0
@@ -199,7 +199,7 @@ class DataProberDataSetBuilder(DataSetBuilder):
 
         if compress:
             for root, dirs, files in os.walk(self.dataHandler.getBasePath()):
-                print 'Compress', root
+                print ('Compress', root)
                 for name in files:
                     if '.array' in name and '.gz' not in name:
                         with open(os.path.join(root, name), 'rb') as f_in:
@@ -320,7 +320,7 @@ class LayerDataSetBuilder(DataSetBuilder):
 
         if compress:
             for root, dirs, files in os.walk(self.dataHandler.getBasePath()):
-                print 'Compress', root
+                print ('Compress', root)
                 for name in files:
                     if '.array' in name and '.gz' not in name:
                         with open(os.path.join(root, name), 'rb') as f_in:
@@ -470,14 +470,14 @@ class CompositeDataSetBuilder(DataSetBuilder):
 
         if clean:
           for root, dirs, files in os.walk(self.dataHandler.getBasePath()):
-              print 'Clean', root
+              print ('Clean', root)
               for name in files:
                   if name in ['camera.json']:
                       os.remove(os.path.join(root, name))
 
         if compress:
             for root, dirs, files in os.walk(self.dataHandler.getBasePath()):
-                print 'Compress', root
+                print ('Compress', root)
                 for name in files:
                     if ('.float32' in name or '.uint8' in name) and '.gz' not in name:
                         with open(os.path.join(root, name), 'rb') as f_in:
@@ -777,7 +777,7 @@ class GeometryDataSetBuilder(DataSetBuilder):
                     topo.InsertNextValue(idList.GetId(2))
                     topo.InsertNextValue(idList.GetId(3))
                 else:
-                    print "Cell size of", cellSize, "not supported"
+                    print ("Cell size of", cellSize, "not supported")
 
             iBuffer = buffer(topo)
             iMd5 = hashlib.md5(iBuffer).hexdigest()
@@ -832,7 +832,7 @@ class GeometryDataSetBuilder(DataSetBuilder):
         if compress:
             for dirName in ['fields', 'index', 'points']:
                 for root, dirs, files in os.walk(os.path.join(self.dataHandler.getBasePath(), dirName)):
-                    print 'Compress', root
+                    print ('Compress', root)
                     for name in files:
                         if 'Array' in name and '.gz' not in name:
                             with open(os.path.join(root, name), 'rb') as f_in:

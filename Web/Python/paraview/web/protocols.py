@@ -89,7 +89,7 @@ class ParaViewWebProtocol(vtk_protocols.vtkWebProtocol):
 
     def debug(self, msg):
         if self.debugMode == True:
-            print msg
+            print (msg)
 
     def setBaseDirectory(self, basePath):
         self.overrideDataDirKey = None
@@ -527,7 +527,7 @@ class ParaViewWebTimeHandler(ParaViewWebProtocol):
             anim.TimeKeeper.Time = anim.TimeKeeper.TimestepValues[step]
             self.getApplication().InvokeEvent('PushRender')
         except:
-            print 'Try to update time with', t, 'but value not found in the list'
+            print ('Try to update time with', t, 'but value not found in the list')
 
         return anim.TimeKeeper.Time
 
@@ -1198,7 +1198,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                 proxy = property.GetParent()
                 name = proxy.GetPropertyName(property)
             except:
-                print 'ERROR: unable to get property parent for property ' + property.Name
+                print ('ERROR: unable to get property parent for property ' + property.Name)
                 return {}
 
         xmlElement = servermanager.ActiveConnection.Session.GetProxyDefinitionManager().GetCollapsedProxyDefinition(proxy.GetXMLGroup(), proxy.GetXMLName(), None)
@@ -1394,7 +1394,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                     try:
                         propJson['value'] = proxy.GetProperty(property).GetData()
                     except AttributeError as attrErr:
-                        print 'Property ' + propertyName + ' has no GetData() method, skipping'
+                        print ('Property ' + propertyName + ' has no GetData() method, skipping')
                         continue
 
                 self.debug('Adding a property to the pre-sorted list: ' + str(propJson))
@@ -1451,7 +1451,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                                 self.applyDomains(parentProxy, internal_proxy.GetGlobalIDAsString())
                 except:
                     exc_type, exc_obj, exc_tb = sys.exc_info()
-                    print "Unexpected error:", exc_type, " line: " , exc_tb.tb_lineno
+                    print ("Unexpected error:", exc_type, " line: " , exc_tb.tb_lineno)
 
         # Reset all properties to leverage domain capabilities
         for prop_name in proxy.ListProperties():
@@ -1469,8 +1469,8 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                         if domain.IsA('vtkSMBoundsDomain'):
                             domain.SetDomainValues(parentProxy.GetDataInformation().GetBounds())
                     except AttributeError as attrErr:
-                        print 'Caught exception setting domain values in apply_domains:'
-                        print attrErr
+                        print ('Caught exception setting domain values in apply_domains:')
+                        print (attrErr)
 
                 prop.ResetToDefault()
 
@@ -1478,7 +1478,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                 iter.UnRegister(None)
             except:
                 exc_type, exc_obj, exc_tb = sys.exc_info()
-                print "Unexpected error:", exc_type, " line: " , exc_tb.tb_lineno
+                print ("Unexpected error:", exc_type, " line: " , exc_tb.tb_lineno)
 
         proxy.UpdateVTKObjects()
 
@@ -1757,8 +1757,8 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         try:
             self.applyDomains(parentProxy, newProxy.GetGlobalIDAsString())
         except Exception as inst:
-            print 'Caught exception applying domains:'
-            print inst
+            print ('Caught exception applying domains:')
+            print (inst)
 
         return self.get(newProxy.GetGlobalIDAsString())
 
@@ -2094,7 +2094,7 @@ class ParaViewWebSaveData(ParaViewWebProtocol):
             servermanager.SaveState(fullPath)
         else:
             msg = 'ERROR: Unrecognized extension (%s) in relative path: %s' % (extension, filePath)
-            print msg
+            print (msg)
             return { 'success': False, 'message': msg }
 
         return { 'success': True }
@@ -2260,12 +2260,12 @@ class ParaViewWebFileListing(ParaViewWebProtocol):
         normBase = os.path.normpath(baseDirectory)
 
         if not currentPath.startswith(normBase):
-            print "### CAUTION =========================================="
-            print " Attempt to get to another root path ###"
-            print "  => Requested:", relativeDir
-            print "  => BaseDir:", normBase
-            print "  => Computed path:", currentPath
-            print "### CAUTION =========================================="
+            print ("### CAUTION ==========================================")
+            print (" Attempt to get to another root path ###")
+            print ("  => Requested:", relativeDir)
+            print ("  => BaseDir:", normBase)
+            print ("  => Computed path:", currentPath)
+            print ("### CAUTION ==========================================")
             currentPath = normBase
 
         self.directory_proxy.List(currentPath)
@@ -2558,7 +2558,7 @@ class ParaViewWebWidgetManager(ParaViewWebProtocol):
         elif proxy.__class__.__name__ == 'Spline':
             widgetProxy = self.CreateWidgetRepresentation(view, 'SplineWidgetRepresentation')
         else:
-            print "No widget representation for %s" % proxy.__class__.__name__
+            print ("No widget representation for %s" % proxy.__class__.__name__)
 
         return widgetProxy.GetGlobalIDAsString()
 

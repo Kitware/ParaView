@@ -274,9 +274,9 @@ def getProxyAsState(id):
                     subProxyId = proxy.GetProperty(property).GetData().GetGlobalID()
                     properties[propertyName] = getProxyAsState(subProxyId)
                 except:
-                    print "Error on", property, propertyName
-                    print "Skip property: ", str(type(data))
-                    print data
+                    print ("Error on", property, propertyName)
+                    print ("Skip property: ", str(type(data)))
+                    print (data)
     state['properties'] = properties;
     return state
 
@@ -355,8 +355,8 @@ def getProxyDomains(id):
                    jsonDefinition[key]['order'] = orderIndex
                    orderIndex = orderIndex + 1
            except:
-               print "(Def) Error on", property, ", skipping it..."
-               #print "(Def) Skip property: ", str(type(data))
+               print ("(Def) Error on", property, ", skipping it...")
+               #print ("(Def) Skip property: ", str(type(data)))
 
    return jsonDefinition
 
@@ -486,7 +486,7 @@ def apply_domains(parentProxy, proxy_id):
                             apply_domains(parentProxy, internal_proxy.GetGlobalIDAsString())
             except:
                 exc_type, exc_obj, exc_tb = sys.exc_info()
-                print "Unexpected error:", exc_type, " line: " , exc_tb.tb_lineno
+                print ("Unexpected error:", exc_type, " line: " , exc_tb.tb_lineno)
 
     # Reset all properties to leverage domain capabilities
     for prop_name in proxy.ListProperties():
@@ -502,8 +502,8 @@ def apply_domains(parentProxy, proxy_id):
                     if domain.IsA('vtkSMBoundsDomain'):
                         domain.SetDomainValues(parentProxy.GetDataInformation().GetBounds())
                 except AttributeError as attrErr:
-                    print 'Caught exception setting domain values in apply_domains:'
-                    print attrErr
+                    print ('Caught exception setting domain values in apply_domains:')
+                    print (attrErr)
 
             prop.ResetToDefault()
 
@@ -511,6 +511,6 @@ def apply_domains(parentProxy, proxy_id):
             iter.UnRegister(None)
         except:
             exc_type, exc_obj, exc_tb = sys.exc_info()
-            print "Unexpected error:", exc_type, " line: " , exc_tb.tb_lineno
+            print ("Unexpected error:", exc_type, " line: " , exc_tb.tb_lineno)
 
     proxy.UpdateVTKObjects()
