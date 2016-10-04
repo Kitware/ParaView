@@ -2074,7 +2074,6 @@
       <IntVectorProperty command="SetUseHiddenLineRemoval"
                          default_values="0"
                          name="HiddenLineRemoval"
-                         panel_visibility="advanced"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>
