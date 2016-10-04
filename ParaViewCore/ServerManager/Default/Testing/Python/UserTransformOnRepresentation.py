@@ -35,5 +35,6 @@ for j in range(4):
 
 display.UserTransform = flattened_transform
 view = Render()
+view.OrientationAxesVisibility = 0
 if not smtesting.DoRegressionTesting(view.SMProxy):
     raise smtesting.TestError, 'Test failed.'
