@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -560,7 +560,7 @@ void pqDisplayColorWidget::componentNumberChanged()
     const QString &arrayName = val.second;
     SM_SCOPED_TRACE(SetScalarColoring)
       .arg("display", this->Representation->getProxy())
-      .arg("arrayname", arrayName.toAscii().data())
+      .arg("arrayname", arrayName.toLatin1().data())
       .arg("attribute_type", association)
       .arg("component", number)
       .arg("lut", this->ColorTransferFunction->getProxy());
