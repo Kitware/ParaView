@@ -59,11 +59,20 @@ public:
     }
 
   // Description:
-  // Enable/disable scalar coloring using the specified array. This will setup a
+  // Enable/disable scalar coloring using the specified array. This will set up a
   // color and opacity transfer functions using vtkSMTransferFunctionProxy
   // instance. If arrayname is NULL, then scalar coloring is turned off.
-  // \c field_association must be one of vtkDataObject::AttributeTypes.
+  // \c attribute_type must be one of vtkDataObject::AttributeTypes.
   virtual bool SetScalarColoring(const char* arrayname, int attribute_type);
+ 
+  // Description:
+  // Enable/disable scalar coloring using the specified array. This will set up a
+  // color and opacity transfer functions using vtkSMTransferFunctionProxy
+  // instance. If arrayname is NULL, then scalar coloring is turned off.
+  // \c attribute_type must be one of vtkDataObject::AttributeTypes.
+  // \param component enables choosing a component to color with,
+  // -1 will change to Magnitude, >=0 will change to corresponding component.
+  virtual bool SetScalarColoring(const char* arrayname, int attribute_type, int component);
 
   // Description:
   // Safely call SetScalarColoring() after casting the proxy to the appropriate
@@ -72,7 +81,17 @@ public:
     {
     vtkSMPVRepresentationProxy* self =
       vtkSMPVRepresentationProxy::SafeDownCast(proxy);
-    return self? self->SetScalarColoring(arrayname, attribute_type) : false;
+    return self ? self->SetScalarColoring(arrayname, attribute_type) : false;
+    }
+
+  // Description:
+  // Safely call SetScalarColoring() after casting the proxy to the appropriate
+  // type, component version
+  static bool SetScalarColoring(vtkSMProxy* proxy, const char* arrayname, int attribute_type, int component)
+    {
+    vtkSMPVRepresentationProxy* self =
+      vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    return self ? self->SetScalarColoring(arrayname, attribute_type, component) : false;
     }
 
   // Description:
@@ -282,6 +301,11 @@ protected:
   // Description:
   // Overridden to process "RepresentationType" elements.
   int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element);
+ 
+  // Description:
+  // Internal method to set scalar coloring, do not use directly.
+  virtual bool SetScalarColoringInternal(const char* arrayname, int attribute_type, 
+    bool useComponent, int component);
 
 private:
   vtkSMPVRepresentationProxy(const vtkSMPVRepresentationProxy&) VTK_DELETE_FUNCTION;

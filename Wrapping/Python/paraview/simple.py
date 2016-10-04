@@ -500,7 +500,7 @@ def ColorBy(rep=None, value=None):
 
     association = rep.ColorArrayName.GetAssociation()
     arrayname = rep.ColorArrayName.GetArrayName()
-
+    component = None
     if value == None:
         rep.SetScalarColoring(None, servermanager.GetAssociationFromString(association))
         return
@@ -508,11 +508,36 @@ def ColorBy(rep=None, value=None):
         value = (value,)
     if len(value) == 1:
         arrayname = value[0]
-    else:
+    elif len(value) >= 2:
         association = value[0]
         arrayname = value[1]
-    rep.SetScalarColoring(arrayname, servermanager.GetAssociationFromString(association))
-
+    if len(value) == 3:
+        # component name provided
+        componentName = value[2]
+        if componentName == "Magnitude":
+          component = -1
+        else:
+          if association == "POINTS":
+            array = rep.Input.PointData.GetArray(arrayname)
+          if association == "CELLS":
+            array = rep.Input.CellData.GetArray(arrayname)
+          if array:
+            # looking for corresponding component name
+            for i in range(0, array.GetNumberOfComponents()):
+              if componentName == array.GetComponentName(i):
+                component = i
+                break
+              # none have been found, try to use the name as an int
+              if i ==  array.GetNumberOfComponents() - 1:
+                try:
+                  component = int(componentName)
+                except ValueError:
+                  pass
+    if component is None:
+      rep.SetScalarColoring(arrayname, servermanager.GetAssociationFromString(association))
+    else:
+      rep.SetScalarColoring(arrayname, servermanager.GetAssociationFromString(association), component)
+    rep.RescaleTransferFunctionToDataRange()
 
 # -----------------------------------------------------------------------------
 def _DisableFirstRenderCameraReset():

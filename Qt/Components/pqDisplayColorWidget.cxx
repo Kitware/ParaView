@@ -554,11 +554,17 @@ void pqDisplayColorWidget::componentNumberChanged()
   if (this->ColorTransferFunction)
     {
     BEGIN_UNDO_SET("Change color component");
-    SM_SCOPED_TRACE(PropertiesModified)
-      .arg("proxy", this->ColorTransferFunction->getProxy())
-      .arg("comment", "change array component used for coloring");
-
     int number = this->componentNumber();
+    QPair<int, QString> val = this->arraySelection();
+    int association = val.first;
+    const QString &arrayName = val.second;
+    SM_SCOPED_TRACE(SetScalarColoring)
+      .arg("display", this->Representation->getProxy())
+      .arg("arrayname", arrayName.toAscii().data())
+      .arg("attribute_type", association)
+      .arg("component", number)
+      .arg("lut", this->ColorTransferFunction->getProxy());
+
     this->ColorTransferFunction->setVectorMode(
       number<0? pqScalarsToColors::MAGNITUDE : pqScalarsToColors::COMPONENT,
       number<0? 0 : number);
