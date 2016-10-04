@@ -82,6 +82,10 @@ private slots:
 
   void resetRotationCenterWithCamera();
 
+  void setInteractiveViewLinkOpacity(double value);
+  void setInteractiveViewLinkBackground(bool hideBackground);
+  void updateInteractiveViewLinkWidgets();
+
 protected:
   void setupGUI();
 

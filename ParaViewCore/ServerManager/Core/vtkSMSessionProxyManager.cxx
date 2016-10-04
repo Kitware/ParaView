@@ -1039,6 +1039,21 @@ vtkSMLink* vtkSMSessionProxyManager::GetRegisteredLink(const char* name)
 }
 
 //---------------------------------------------------------------------------
+const char* vtkSMSessionProxyManager::GetRegisteredLinkName(vtkSMLink* link)
+{
+  for(vtkSMSessionProxyManagerInternals::LinkType::iterator it =
+    this->Internals->RegisteredLinkMap.begin(); 
+    it != this->Internals->RegisteredLinkMap.end(); it++)
+    {
+    if (it->second.GetPointer() == link)
+      {
+      return it->first.c_str();
+      }
+    }
+  return NULL;
+}
+
+//---------------------------------------------------------------------------
 void vtkSMSessionProxyManager::UnRegisterLink(const char* name)
 {
   std::string nameHolder = (name? name : "");

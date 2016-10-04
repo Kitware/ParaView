@@ -673,6 +673,12 @@ bool pqLinksModel::hasInteractiveViewLink(const QString& name)
   return this->Internal->InteractiveViewLinks.contains(name);
 }
 
+pqInteractiveViewLink* pqLinksModel::getInteractiveViewLink(const QString& name)
+{
+  return this->Internal->InteractiveViewLinks.contains(name) ?
+    this->Internal->InteractiveViewLinks[name] : NULL;
+}
+
 void pqLinksModel::addPropertyLink(const QString& name,
                                       vtkSMProxy* inputProxy,
                                       const QString& inputProp,

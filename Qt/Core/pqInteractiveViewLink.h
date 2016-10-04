@@ -54,6 +54,14 @@ public:
   // Save this interactive view link in xml node
   virtual void saveXMLState(vtkPVXMLElement* xml);
 
+  // Set/Get the view link opacity, between 0 and 1
+  virtual void setOpacity(double opacity);
+  virtual double getOpacity();
+
+  // Set/get whether to hide the background of the linked view
+  virtual void setHideLinkedViewBackground(bool hide);
+  virtual bool getHideLinkedViewBackground();
+
 protected:  
   // Generate a correct draw method call from current situation
   // on the back buffer
@@ -71,7 +79,7 @@ protected:
 protected slots:
   
   // draw pixels on the front buffer
-  virtual void finalDrawViewLink();
+  virtual void finalRenderDisplayView();
 
 private:
   class pqInternal;

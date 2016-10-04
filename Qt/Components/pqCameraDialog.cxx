@@ -34,13 +34,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // VTK / ParaView Server Manager includes.
 #include "vtkCamera.h"
+#include "vtkCollection.h"
 #include "vtkMath.h"
 #include "vtkProcessModule.h"
 #include "vtkSMCameraConfigurationReader.h"
 #include "vtkSMCameraConfigurationWriter.h"
+#include "vtkSMCameraLink.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSmartPointer.h"
 #include "vtkTransform.h"
 
@@ -57,6 +60,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqCustomViewButtonDialog.h"
 #include "pqFileDialog.h"
+#include "pqInteractiveViewLink.h"
+#include "pqLinksModel.h"
 #include "pqPropertyLinks.h"
 #include "pqRenderView.h"
 #include "pqSettings.h"
@@ -206,6 +211,18 @@ pqCameraDialog::pqCameraDialog(QWidget* _p/*=null*/,
     this, SLOT(configureCustomViews()));
 
   QObject::connect(
+    this->Internal->interactiveViewLinkComboBox, SIGNAL(currentIndexChanged(int)),
+    this, SLOT(updateInteractiveViewLinkWidgets()));
+
+  QObject::connect(
+    this->Internal->interactiveViewLinkBackground, SIGNAL(toggled(bool)),
+    this, SLOT(setInteractiveViewLinkBackground(bool)));
+
+  QObject::connect(
+    this->Internal->interactiveViewLinkOpacity, SIGNAL(valueChanged(double)),
+    this, SLOT(setInteractiveViewLinkOpacity(double)));
+
+  QObject::connect(
     &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
     this, SLOT(setRenderModule(pqView*)));
 
@@ -331,7 +348,77 @@ void pqCameraDialog::setupGUI()
 
     this->Internal->AutoResetCenterOfRotation->setCheckState(
       this->Internal->RenderModule->getResetCenterWithCamera()? Qt::Checked : Qt::Unchecked);
+
+    // Interactive View Link Options
+    pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();
+    vtkNew<vtkCollection> cameraLinks;
+    model->FindLinksFromProxy(proxy, vtkSMLink::INPUT, cameraLinks.Get());
+    
+    // For each found link
+    vtkSMSessionProxyManager* pxm = pqActiveObjects::instance().proxyManager();
+    this->Internal->interactiveViewLinkComboBox->clear();
+    for (int i = 0; i < cameraLinks->GetNumberOfItems(); i++)
+      {
+      // check if it is a camera link
+      vtkSMCameraLink* cameraLink = vtkSMCameraLink::SafeDownCast(
+        cameraLinks->GetItemAsObject(i));
+      if (cameraLink != NULL)
+        {
+        const char* linkName = pxm->GetRegisteredLinkName(cameraLink);
+        if (model->hasInteractiveViewLink(linkName))
+          {
+          this->Internal->interactiveViewLinkComboBox->addItem(linkName, QVariant::fromValue(static_cast<void*>(model->getInteractiveViewLink(linkName))));
+          }
+        }
+      }
+    if (cameraLinks->GetNumberOfItems() == 0)
+      {
+      this->updateInteractiveViewLinkWidgets();
+      }
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqCameraDialog::updateInteractiveViewLinkWidgets()
+{
+  if (this->Internal->interactiveViewLinkComboBox->count() == 0)
+    {
+    this->Internal->interactiveViewLinkGroup->setEnabled(false);
+    }
+  else
+    {
+    this->Internal->interactiveViewLinkGroup->setEnabled(true);
+
+    pqInteractiveViewLink* ivLink = static_cast<pqInteractiveViewLink*>(
+      this->Internal->interactiveViewLinkComboBox->itemData(
+        this->Internal->interactiveViewLinkComboBox->currentIndex()).value<void*>());
+
+    bool block = this->Internal->interactiveViewLinkOpacity->blockSignals(true);
+    this->Internal->interactiveViewLinkOpacity->setValue(ivLink->getOpacity());
+    this->Internal->interactiveViewLinkOpacity->blockSignals(block);
+
+    block = this->Internal->interactiveViewLinkBackground->blockSignals(true);
+    this->Internal->interactiveViewLinkBackground->setChecked(ivLink->getHideLinkedViewBackground());
+    this->Internal->interactiveViewLinkBackground->blockSignals(block);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqCameraDialog::setInteractiveViewLinkOpacity(double value)
+{
+  pqInteractiveViewLink* ivLink = static_cast<pqInteractiveViewLink*>(
+    this->Internal->interactiveViewLinkComboBox->itemData(
+      this->Internal->interactiveViewLinkComboBox->currentIndex()).value<void*>());
+  ivLink->setOpacity(value);
+}
+
+//-----------------------------------------------------------------------------
+void pqCameraDialog::setInteractiveViewLinkBackground(bool hideBackground)
+{
+  pqInteractiveViewLink* ivLink = static_cast<pqInteractiveViewLink*>(
+    this->Internal->interactiveViewLinkComboBox->itemData(
+      this->Internal->interactiveViewLinkComboBox->currentIndex()).value<void*>());
+  ivLink->setHideLinkedViewBackground(hideBackground);
 }
 
 //-----------------------------------------------------------------------------

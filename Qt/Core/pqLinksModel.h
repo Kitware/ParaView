@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAbstractItemModel>
 
 class vtkCollection;
+class pqInteractiveViewLink;
 class pqProxy;
 class pqRenderView;
 class pqServer;
@@ -125,6 +126,9 @@ public:
 
   /// return true if pqLinksModels contain an interactive view link associated to name
   bool hasInteractiveViewLink(const QString& name);
+
+  /// return pointer to the interactive view link associated to name
+  pqInteractiveViewLink* getInteractiveViewLink(const QString& name);
 
   /// add a property based link
   void addPropertyLink(const QString& name,
