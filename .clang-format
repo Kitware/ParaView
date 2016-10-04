@@ -1,6 +1,7 @@
 ---
 # This configuration requires clang-format 3.8 or higher.
 BasedOnStyle: Mozilla
+AlignAfterOpenBracket: DontAlign
 AlignOperands: false
 AlwaysBreakAfterReturnType: None
 AlwaysBreakAfterDefinitionReturnType: None
