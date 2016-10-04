@@ -1527,10 +1527,11 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     this->GetRenderer()->SetUseHiddenLineRemoval(false);
     }
 
-  // Configure FXAA:
+  // Configure FXAA. Disable for picking, as it mucks up the selection buffers.
+  bool use_fxaa = this->UseFXAA && !this->MakingSelection;
   if (this->SynchronizedRenderers->GetEnabled())
     {
-    this->SynchronizedRenderers->SetUseFXAA(this->UseFXAA);
+    this->SynchronizedRenderers->SetUseFXAA(use_fxaa);
     this->SynchronizedRenderers->SetFXAAOptions(this->FXAAOptions.Get());
     // Disable the renderer's FXAA implementation when rendering remotely. We
     // need to run it on the composed image to avoid seam artifacts.
@@ -1538,10 +1539,10 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     }
   else
     {
-    this->RenderView->GetRenderer()->SetUseFXAA(this->UseFXAA);
+    this->RenderView->GetRenderer()->SetUseFXAA(use_fxaa);
     this->RenderView->GetRenderer()->SetFXAAOptions(this->FXAAOptions.Get());
     }
-  this->OrientationWidget->GetRenderer()->SetUseFXAA(this->UseFXAA);
+  this->OrientationWidget->GetRenderer()->SetUseFXAA(use_fxaa);
   this->OrientationWidget->GetRenderer()->SetFXAAOptions(this->FXAAOptions.Get());
 
   if (this->ShowAnnotation)
