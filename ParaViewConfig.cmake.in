@@ -74,6 +74,16 @@ set (PARAVIEW_USE_VISITBRIDGE "@PARAVIEW_USE_VISITBRIDGE@")
 set (PARAVIEW_ENABLE_COPROCESSING "@PARAVIEW_ENABLE_COPROCESSING@")
 set (PARAVIEW_ENABLE_WEB "@PARAVIEW_ENABLE_WEB@")
 
+if (PARAVIEW_ENABLE_PYTHON)
+  if (__pv_install_tree)
+    set(PARAVIEW_PYTHONPATH "${VTK_INSTALL_PREFIX}/@VTK_INSTALL_LIBRARY_DIR@/site-packages")
+  else ()
+    set(PARAVIEW_PYTHONPATH
+      "@ParaView_BINARY_DIR@/lib/site-packages"
+      "@ParaView_BINARY_DIR@/lib")
+  endif ()
+endif ()
+
 if(PARAVIEW_ENABLE_QT_SUPPORT)
   # If Qt support is enabled, provides clues to Qt version used to build ParaView.
   if(PARAVIEW_QT_VERSION VERSION_GREATER "4")
