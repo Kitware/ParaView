@@ -381,7 +381,11 @@ vtkPVFileInformation::vtkPVFileInformation()
   this->Hidden = false;
   this->Extension = NULL;
   this->Size = 0;
+#ifdef _WIN32
+  this->ModificationTime = _time64(NULL);
+#else
   this->ModificationTime = time(NULL);
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -393,7 +397,11 @@ vtkPVFileInformation::~vtkPVFileInformation()
   this->SetFullPath(NULL);
   this->SetExtension(NULL);
   this->Size = 0;
+#ifdef _WIN32
+  this->ModificationTime = _time64(NULL);
+#else
   this->ModificationTime = time(NULL);
+#endif
 }
 
 bool vtkPVFileInformation::IsDirectory(int t)
@@ -789,8 +797,8 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
       infoD->SetHiddenFlag(); //needs full path set first
 
       // Recover status info
-      struct stat status;
-      int res = stat(infoD->FullPath, &status);
+      struct _stat64 status;
+      int res = _stat64(infoD->FullPath, &status);
       if (res != -1)
         {
         if (isfile)
@@ -1217,7 +1225,11 @@ void vtkPVFileInformation::Initialize()
   this->Contents->RemoveAllItems();
   this->SetExtension(0);
   this->Size=0;
+#ifdef _WIN32
+  this->ModificationTime = _time64(NULL);
+#else
   this->ModificationTime = time(NULL);
+#endif
 }
 
 //-----------------------------------------------------------------------------

@@ -72,7 +72,7 @@ public:
   }
   pqFileDialogModelFileInfo(const QString& l, const QString& filepath,
            vtkPVFileInformation::FileTypes t, const bool &h,
-           const QString& extension,const size_t& sizeVal,
+           const QString& extension, const long long& sizeVal,
            const time_t& modificationTimeVal,
            const QList<pqFileDialogModelFileInfo>& g =
            QList<pqFileDialogModelFileInfo>()) :
@@ -136,10 +136,10 @@ public:
       {
       return QString();
       }
-    const size_t kb = 1024;
-    const size_t mb = 1024 * kb;
-    const size_t gb = 1024 * mb;
-    const size_t tb = 1024 * gb;
+    const long long kb = 1024;
+    const long long mb = 1024 * kb;
+    const long long gb = 1024 * mb;
+    const long long tb = 1024 * gb;
 
     if (this->Size >= tb)
       {
@@ -185,7 +185,7 @@ private:
   QList<pqFileDialogModelFileInfo> Group;
   QString Extension;
   time_t ModificationTime;
-  size_t Size;
+  long long Size;
 };
 
 /////////////////////////////////////////////////////////////////////

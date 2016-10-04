@@ -98,7 +98,7 @@ public:
   // or the contents of this file group if Type ==FILE_GROUP.
   vtkGetObjectMacro(Contents, vtkCollection);
   vtkGetStringMacro(Extension);
-  vtkGetMacro(Size, size_t);
+  vtkGetMacro(Size, long long);
   vtkGetMacro(ModificationTime, time_t);
 
 protected:
@@ -113,7 +113,7 @@ protected:
   int Type;       // Type i.e. File/Directory/FileGroup.
   bool Hidden;    // If file/directory is hidden
   char* Extension; // File extension
-  size_t Size;     // File size
+  long long Size;     // File size
   time_t ModificationTime;  // File modification time
 
   vtkSetStringMacro(Extension);
