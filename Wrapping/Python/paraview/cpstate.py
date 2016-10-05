@@ -78,7 +78,11 @@ class ProducerAccessor(smtrace.RealProxyAccessor):
         trace.append("%s = coprocessor.CreateProducer(datadescription, '%s')" % \
             (self, self.SimulationInputName))
 
-        # TODO, review whether this Accessor should also export arrays.
+        if self.varname in cpstate_globals.cinema_arrays:
+            arrays = cpstate_globals.cinema_arrays[self.varname]
+            trace.append_separated(["# define target arrays of filters."])
+            trace.append(["coprocessor.AddArraysToCinemaTrack(%s, 'arraySelection', %s)" % (self, arrays)])
+            trace.append_separator()
         return trace.raw_data()
 
 # -----------------------------------------------------------------------------
