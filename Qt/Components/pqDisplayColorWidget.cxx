@@ -560,7 +560,7 @@ void pqDisplayColorWidget::componentNumberChanged()
     const QString &arrayName = val.second;
     SM_SCOPED_TRACE(SetScalarColoring)
       .arg("display", this->Representation->getProxy())
-      .arg("arrayname", arrayName.toAscii().data())
+      .arg("arrayname", arrayName.toLatin1().data())
       .arg("attribute_type", association)
       .arg("component", number)
       .arg("lut", this->ColorTransferFunction->getProxy());
