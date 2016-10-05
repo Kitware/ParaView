@@ -207,7 +207,6 @@ class CoProcessor(object):
                     self.RescaleDataRange(view, datadescription.GetTime())
                 cinemaOptions = view.cpCinemaOptions
                 if cinemaOptions and 'camera' in cinemaOptions:
-                    dirname = None
                     if 'composite' in view.cpCinemaOptions and view.cpCinemaOptions['composite'] == True:
                         dirname = self.UpdateCinema(view, datadescription,
                                                     specLevel="B")
@@ -224,26 +223,9 @@ class CoProcessor(object):
                     else:
                         simple.SaveScreenshot(fname, view, magnification=view.cpMagnification)
 
-
         if len(cinema_dirs) > 1:
-            workspace = open('cinema/info.json', 'w')
-            workspace.write('{\n')
-            workspace.write('    "metadata": {\n')
-            workspace.write('        "type": "workbench"\n')
-            workspace.write('    },\n')
-            workspace.write('    "runs": [\n')
-            for i in range(0,len(cinema_dirs)):
-                workspace.write('        {\n')
-                workspace.write('        "title": "%s",\n' % cinema_dirs[i])
-                workspace.write('        "description": "%s",\n' % cinema_dirs[i])
-                workspace.write('        "path": "%s"\n' % cinema_dirs[i])
-                if i+1 < len(cinema_dirs):
-                    workspace.write('        },\n')
-                else:
-                    workspace.write('        }\n')
-            workspace.write('    ]\n')
-            workspace.write('}\n')
-            workspace.close()
+            import paraview.cinemaIO.pv_introspect as pv_introspect
+            pv_introspect.make_workspace_file("cinema", cinema_dirs)
 
 
     def DoLiveVisualization(self, datadescription, hostname, port):
@@ -593,3 +575,4 @@ class CoProcessor(object):
 
         #restore what we showed
         pv_introspect.restore_visibility(pxystate)
+        return os.path.basename(vfname)

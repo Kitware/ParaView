@@ -807,6 +807,7 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
     minbds, maxbds  = max_bounds()
 
     atLeastOneViewExported = False
+    cinema_dirs = []
     for viewName, viewParams in viewSelection.iteritems():
 
         # check if this view was selected to export as spec b
@@ -869,6 +870,7 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
         viewFileName = viewParams[0]
         viewDirName = viewFileName[0:viewFileName.rfind("_")] #strip _num.ext
         filePath = os.path.join(baseDirName, viewDirName, "info.json")
+        cinema_dirs.append(viewDirName)
 
         p = inspect()
 
@@ -885,12 +887,18 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
                 tracking = tracking_def, floatValues = enableFloatVal)
 
         view.LockBounds = 0
-        cs.save()
+        pm = paraview.servermanager.vtkProcessModule.GetProcessModule()
+        pid = pm.GetPartitionId()
+        if pid == 0:
+            cs.save()
         atLeastOneViewExported = True
 
     if not atLeastOneViewExported:
         print ("No view was selected to export to cinema.")
         return
+
+    make_workspace_file(baseDirName, cinema_dirs)
+
 
     # restore initial state
     paraview.simple.SetActiveView(initialView)
@@ -956,3 +964,31 @@ def prepare_selection(trackSelection, arraySelection):
             userDef[source] = options
 
     return userDef
+
+def make_workspace_file(basedirname, cinema_dirs):
+    """
+    This writes out the top level json file that says that there are
+    child cinema stores inside. The viewer sees this and opens up
+    in the children in separate panels.
+    """
+    pm = paraview.servermanager.vtkProcessModule.GetProcessModule()
+    pid = pm.GetPartitionId()
+    if len(cinema_dirs) > 1 and pid == 0:
+        workspace = open(basedirname + '/info.json', 'w')
+        workspace.write('{\n')
+        workspace.write('    "metadata": {\n')
+        workspace.write('        "type": "workbench"\n')
+        workspace.write('    },\n')
+        workspace.write('    "runs": [\n')
+        for i in range(0,len(cinema_dirs)):
+            workspace.write('        {\n')
+            workspace.write('        "title": "%s",\n' % cinema_dirs[i])
+            workspace.write('        "description": "%s",\n' % cinema_dirs[i])
+            workspace.write('        "path": "%s"\n' % cinema_dirs[i])
+            if i+1 < len(cinema_dirs):
+                workspace.write('        },\n')
+            else:
+                workspace.write('        }\n')
+                workspace.write('    ]\n')
+                workspace.write('}\n')
+                workspace.close()
