@@ -378,6 +378,8 @@ def make_cinema_store(proxies,
     eye_values = []
     at_values = []
     up_values = []
+    nearfar_values = []
+    viewangle_values = []
     cs = cinema_store.FileStore(ocsfname)
     try:
         cs.load()
@@ -389,6 +391,10 @@ def make_cinema_store(proxies,
             at_values = cs.metadata['camera_at']
         if 'camera_up' in cs.metadata:
             up_values = cs.metadata['camera_up']
+        if 'camera_nearfar' in cs.metadata:
+            nearfar_values = cs.metadata['camera_nearfar']
+        if 'camera_angle' in cs.metadata:
+            viewangle_values = cs.metadata['camera_angle']
 
         #start with clean slate, other than time
         cs = cinema_store.FileStore(ocsfname)
@@ -408,6 +414,8 @@ def make_cinema_store(proxies,
     cs.add_metadata({'camera_eye':eye_values})
     cs.add_metadata({'camera_at':at_values})
     cs.add_metadata({'camera_up':up_values})
+    cs.add_metadata({'camera_nearfar':nearfar_values})
+    cs.add_metadata({'camera_angle':viewangle_values})
 
     vis = [proxy['name'] for proxy in proxies]
     if specLevel == "A":
@@ -705,6 +713,8 @@ def explore(cs, proxies, iSave = True, currentTime = None, userDefined = {},
     eye_values = cs.metadata['camera_eye']
     at_values = cs.metadata['camera_at']
     up_values = cs.metadata['camera_up']
+    nearfar_values = cs.metadata['camera_nearfar']
+    viewangle_values = cs.metadata['camera_angle']
 
     eye = [x for x in view_proxy.CameraPosition]
     _fp = [x for x in view_proxy.CameraFocalPoint]
@@ -712,6 +722,8 @@ def explore(cs, proxies, iSave = True, currentTime = None, userDefined = {},
     at = project_to_at(eye, _fp, _cr)
     up = [x for x in view_proxy.CameraViewUp]
     times = paraview.simple.GetAnimationScene().TimeKeeper.TimestepValues
+
+    cam = paraview.simple.GetActiveCamera()
 
     #if tracking is turned on, find out how to move
     tracked_source = None
@@ -729,9 +741,13 @@ def explore(cs, proxies, iSave = True, currentTime = None, userDefined = {},
         eye_values.append([x for x in eye])
         at_values.append([x for x in at])
         up_values.append([x for x in up])
+        nearfar_values.append([x for x in cam.GetClippingRange()])
+        viewangle_values.append(cam.GetViewAngle())
         cs.add_metadata({'camera_eye':eye_values})
         cs.add_metadata({'camera_at':at_values})
         cs.add_metadata({'camera_up':up_values})
+        cs.add_metadata({'camera_nearfar':nearfar_values})
+        cs.add_metadata({'camera_angle':viewangle_values})
         e.explore(currentTime)
     else:
         for t in times:
@@ -743,9 +759,14 @@ def explore(cs, proxies, iSave = True, currentTime = None, userDefined = {},
             eye_values.append([x for x in eye])
             at_values.append([x for x in at])
             up_values.append([x for x in up])
+            nearfar_values.append([x for x in cam.GetClippingRange()])
+            viewangle_values.append(cam.GetViewAngle())
+
             cs.add_metadata({'camera_eye':eye_values})
             cs.add_metadata({'camera_at':at_values})
             cs.add_metadata({'camera_up':up_values})
+            cs.add_metadata({'camera_nearfar':nearfar_values})
+            cs.add_metadata({'camera_angle':viewangle_values})
             e.explore({'time':float_limiter(t)})
 
 def explore_customized_array_selection(sourceName, source, colorList, userDefined):
