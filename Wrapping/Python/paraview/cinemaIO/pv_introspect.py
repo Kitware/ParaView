@@ -458,8 +458,16 @@ def make_cinema_store(proxies,
         pass
 
     elif camType == "phi-theta":
-        cs.add_parameter("phi", cinema_store.make_parameter('phi', phis))
-        cs.add_parameter("theta", cinema_store.make_parameter('theta', thetas))
+        bestp = phis[len(phis)/2]
+        bestt = thetas[len(thetas)/2]
+        cs.add_parameter(
+            "phi",
+            cinema_store.make_parameter('phi', phis,
+                                        default=bestp))
+        cs.add_parameter(
+            "theta",
+            cinema_store.make_parameter('theta', thetas,
+                                        default=bestt))
         if fnp == "":
             fnp = "{phi}/{theta}"
         else:
