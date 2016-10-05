@@ -45,7 +45,10 @@ vtkClientServerInterpreterInitializer* vtkClientServerInterpreterInitializer::Ne
     {
     return static_cast<vtkClientServerInterpreterInitializer*>(ret);
     }
-  return new vtkClientServerInterpreterInitializer;
+  vtkClientServerInterpreterInitializer *o =
+      new vtkClientServerInterpreterInitializer;
+  o->InitializeObjectBase();
+  return o;
 }
 
 //----------------------------------------------------------------------------

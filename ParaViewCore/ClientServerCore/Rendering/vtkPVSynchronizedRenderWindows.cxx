@@ -288,10 +288,6 @@ vtkCxxSetObjectMacro(vtkPVSynchronizedRenderWindows, ClientDataServerController,
 vtkPVSynchronizedRenderWindows* vtkPVSynchronizedRenderWindows::New(
   vtkPVSession* session/*=NULL*/)
 {
-#ifdef VTK_DEBUG_LEAKS
-  vtkDebugLeaks::ConstructClass("vtkPVSynchronizedRenderWindows");
-#endif
-
   // Ensure vtkProcessModule is setup correctly.
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!pm)
@@ -311,7 +307,10 @@ vtkPVSynchronizedRenderWindows* vtkPVSynchronizedRenderWindows::New(
     return NULL;
     }
 
-  return new vtkPVSynchronizedRenderWindows(activeSession);
+  vtkPVSynchronizedRenderWindows *ret =
+      new vtkPVSynchronizedRenderWindows(activeSession);
+  ret->InitializeObjectBase();
+  return ret;
 }
 
 //----------------------------------------------------------------------------

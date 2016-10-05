@@ -69,7 +69,7 @@ vtkPVGeneralSettings* vtkPVGeneralSettings::GetInstance()
   if (!vtkPVGeneralSettings::Instance)
     {
     vtkPVGeneralSettings* instance = new vtkPVGeneralSettings();
-    vtkObjectFactory::ConstructInstance(instance->GetClassName());
+    instance->InitializeObjectBase();
     vtkPVGeneralSettings::Instance.TakeReference(instance);
     }
   return vtkPVGeneralSettings::Instance;

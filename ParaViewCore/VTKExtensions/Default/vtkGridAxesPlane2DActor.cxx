@@ -36,9 +36,7 @@ vtkStandardNewMacro(vtkGridAxesPlane2DActor);
 vtkGridAxesPlane2DActor* vtkGridAxesPlane2DActor::New(vtkGridAxesHelper* helper)
 {
   vtkGridAxesPlane2DActor* self = new vtkGridAxesPlane2DActor(helper);
-#if defined(VTK_DEBUG_LEAKS)
-  vtkObjectFactory::ConstructInstance(self->GetClassName());
-#endif
+  self->InitializeObjectBase();
   return self;
 }
 
