@@ -36,7 +36,7 @@ def findQObjectByName(widgets, name):
 def getMainWindow():
     topLevelWidgets = QtGui.QApplication.topLevelWidgets()
     for widget in QtGui.QApplication.topLevelWidgets():
-        if isinstance(widget, PythonQt.private.ParaViewMainWindow)
+        if isinstance(widget, PythonQt.private.ParaViewMainWindow):
             return widget
     #
     # alternate implementation:
