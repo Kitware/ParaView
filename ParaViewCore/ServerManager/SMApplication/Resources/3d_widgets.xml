@@ -43,6 +43,7 @@
                proxyname="LineRepresentation"></Proxy>
         <ExposedProperties>
           <Property name="Visibility" />
+          <Property name="DirectionalLine" />
           <Property name="Point1WorldPositionInfo" />
           <Property name="Point1WorldPosition" />
           <Property name="Point2WorldPositionInfo" />
@@ -1316,6 +1317,12 @@
                          command="SetVisibility"
                          default_values="1"
                          name="Visibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDirectionalLine"
+                         default_values="1"
+                         name="DirectionalLine"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
