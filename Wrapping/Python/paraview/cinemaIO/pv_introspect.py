@@ -378,6 +378,8 @@ def make_cinema_store(proxies,
     eye_values = []
     at_values = []
     up_values = []
+    nearfar_values = []
+    viewangle_values = []
     cs = cinema_store.FileStore(ocsfname)
     try:
         cs.load()
@@ -389,6 +391,10 @@ def make_cinema_store(proxies,
             at_values = cs.metadata['camera_at']
         if 'camera_up' in cs.metadata:
             up_values = cs.metadata['camera_up']
+        if 'camera_nearfar' in cs.metadata:
+            nearfar_values = cs.metadata['camera_nearfar']
+        if 'camera_angle' in cs.metadata:
+            viewangle_values = cs.metadata['camera_angle']
 
         #start with clean slate, other than time
         cs = cinema_store.FileStore(ocsfname)
@@ -408,6 +414,8 @@ def make_cinema_store(proxies,
     cs.add_metadata({'camera_eye':eye_values})
     cs.add_metadata({'camera_at':at_values})
     cs.add_metadata({'camera_up':up_values})
+    cs.add_metadata({'camera_nearfar':nearfar_values})
+    cs.add_metadata({'camera_angle':viewangle_values})
 
     vis = [proxy['name'] for proxy in proxies]
     if specLevel == "A":
@@ -458,8 +466,16 @@ def make_cinema_store(proxies,
         pass
 
     elif camType == "phi-theta":
-        cs.add_parameter("phi", cinema_store.make_parameter('phi', phis))
-        cs.add_parameter("theta", cinema_store.make_parameter('theta', thetas))
+        bestp = phis[len(phis)/2]
+        bestt = thetas[len(thetas)/2]
+        cs.add_parameter(
+            "phi",
+            cinema_store.make_parameter('phi', phis,
+                                        default=bestp))
+        cs.add_parameter(
+            "theta",
+            cinema_store.make_parameter('theta', thetas,
+                                        default=bestt))
         if fnp == "":
             fnp = "{phi}/{theta}"
         else:
@@ -697,6 +713,8 @@ def explore(cs, proxies, iSave = True, currentTime = None, userDefined = {},
     eye_values = cs.metadata['camera_eye']
     at_values = cs.metadata['camera_at']
     up_values = cs.metadata['camera_up']
+    nearfar_values = cs.metadata['camera_nearfar']
+    viewangle_values = cs.metadata['camera_angle']
 
     eye = [x for x in view_proxy.CameraPosition]
     _fp = [x for x in view_proxy.CameraFocalPoint]
@@ -704,6 +722,8 @@ def explore(cs, proxies, iSave = True, currentTime = None, userDefined = {},
     at = project_to_at(eye, _fp, _cr)
     up = [x for x in view_proxy.CameraViewUp]
     times = paraview.simple.GetAnimationScene().TimeKeeper.TimestepValues
+
+    cam = paraview.simple.GetActiveCamera()
 
     #if tracking is turned on, find out how to move
     tracked_source = None
@@ -721,9 +741,13 @@ def explore(cs, proxies, iSave = True, currentTime = None, userDefined = {},
         eye_values.append([x for x in eye])
         at_values.append([x for x in at])
         up_values.append([x for x in up])
+        nearfar_values.append([x for x in cam.GetClippingRange()])
+        viewangle_values.append(cam.GetViewAngle())
         cs.add_metadata({'camera_eye':eye_values})
         cs.add_metadata({'camera_at':at_values})
         cs.add_metadata({'camera_up':up_values})
+        cs.add_metadata({'camera_nearfar':nearfar_values})
+        cs.add_metadata({'camera_angle':viewangle_values})
         e.explore(currentTime)
     else:
         for t in times:
@@ -735,9 +759,14 @@ def explore(cs, proxies, iSave = True, currentTime = None, userDefined = {},
             eye_values.append([x for x in eye])
             at_values.append([x for x in at])
             up_values.append([x for x in up])
+            nearfar_values.append([x for x in cam.GetClippingRange()])
+            viewangle_values.append(cam.GetViewAngle())
+
             cs.add_metadata({'camera_eye':eye_values})
             cs.add_metadata({'camera_at':at_values})
             cs.add_metadata({'camera_up':up_values})
+            cs.add_metadata({'camera_nearfar':nearfar_values})
+            cs.add_metadata({'camera_angle':viewangle_values})
             e.explore({'time':float_limiter(t)})
 
 def explore_customized_array_selection(sourceName, source, colorList, userDefined):
@@ -807,6 +836,7 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
     minbds, maxbds  = max_bounds()
 
     atLeastOneViewExported = False
+    cinema_dirs = []
     for viewName, viewParams in viewSelection.iteritems():
 
         # check if this view was selected to export as spec b
@@ -869,6 +899,7 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
         viewFileName = viewParams[0]
         viewDirName = viewFileName[0:viewFileName.rfind("_")] #strip _num.ext
         filePath = os.path.join(baseDirName, viewDirName, "info.json")
+        cinema_dirs.append(viewDirName)
 
         p = inspect()
 
@@ -885,12 +916,18 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
                 tracking = tracking_def, floatValues = enableFloatVal)
 
         view.LockBounds = 0
-        cs.save()
+        pm = paraview.servermanager.vtkProcessModule.GetProcessModule()
+        pid = pm.GetPartitionId()
+        if pid == 0:
+            cs.save()
         atLeastOneViewExported = True
 
     if not atLeastOneViewExported:
         print ("No view was selected to export to cinema.")
         return
+
+    make_workspace_file(baseDirName, cinema_dirs)
+
 
     # restore initial state
     paraview.simple.SetActiveView(initialView)
@@ -956,3 +993,31 @@ def prepare_selection(trackSelection, arraySelection):
             userDef[source] = options
 
     return userDef
+
+def make_workspace_file(basedirname, cinema_dirs):
+    """
+    This writes out the top level json file that says that there are
+    child cinema stores inside. The viewer sees this and opens up
+    in the children in separate panels.
+    """
+    pm = paraview.servermanager.vtkProcessModule.GetProcessModule()
+    pid = pm.GetPartitionId()
+    if len(cinema_dirs) > 1 and pid == 0:
+        workspace = open(basedirname + '/info.json', 'w')
+        workspace.write('{\n')
+        workspace.write('    "metadata": {\n')
+        workspace.write('        "type": "workbench"\n')
+        workspace.write('    },\n')
+        workspace.write('    "runs": [\n')
+        for i in range(0,len(cinema_dirs)):
+            workspace.write('        {\n')
+            workspace.write('        "title": "%s",\n' % cinema_dirs[i])
+            workspace.write('        "description": "%s",\n' % cinema_dirs[i])
+            workspace.write('        "path": "%s"\n' % cinema_dirs[i])
+            if i+1 < len(cinema_dirs):
+                workspace.write('        },\n')
+            else:
+                workspace.write('        }\n')
+                workspace.write('    ]\n')
+                workspace.write('}\n')
+                workspace.close()

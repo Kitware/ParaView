@@ -292,25 +292,13 @@ class Camera(explorers.Track):
             - math.sin(phi_rad) * math.sin(theta_rad),
             + math.cos(theta_rad)
             ]
+        for i in range(self.offset):
+            pos.insert(0, pos.pop())
+            up.insert(0, up.pop())
+
         self.view.CameraPosition = pos
         self.view.CameraViewUp = up
         self.view.CameraFocalPoint = self.center
-
-    @staticmethod
-    def obtain_angles(angular_steps=[10,15]):
-        thetas = []
-        phis = []
-        theta_offset = 90 % angular_steps[1]
-        if theta_offset == 0:
-            theta_offset += angular_steps[1]
-        for theta in range(-90 + theta_offset,
-                           90 - theta_offset + 1, angular_steps[1]):
-            theta_rad = float(theta) / 180.0 * math.pi
-            for phi in range(0, 360, angular_steps[0]):
-                phi_rad = float(phi) / 180.0 * math.pi
-                thetas.append(theta)
-                phis.append(phi)
-        return thetas, phis
 
 class PoseCamera(explorers.Track):
     """

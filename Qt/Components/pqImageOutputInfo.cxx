@@ -288,6 +288,7 @@ void pqImageOutputInfo::updateComposite(
 {
   int index = this->Ui->cinemaExport->currentIndex();
   this->Ui->cinemaExport->clear();
+  this->Ui->cbUseFloatValues->setEnabled(choseComposite);
   if (choseComposite)
     {
     this->Ui->cinemaExport->addItem("none");
