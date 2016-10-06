@@ -653,6 +653,7 @@ void vtkPVDataInformation::CopyFromTable(vtkTable* data)
     {
     this->RowDataInformation->CopyFromFieldData(data->GetRowData());
     }
+  this->FieldDataInformation->CopyFromFieldData(data->GetFieldData());
 }
 
 //----------------------------------------------------------------------------
