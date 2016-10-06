@@ -53,6 +53,9 @@ public:
   vtkSetMacro(DisplayFileName, bool);
   vtkGetMacro(DisplayFileName, bool);
 
+  vtkSetMacro(DisplayFilePath, bool);
+  vtkGetMacro(DisplayFilePath, bool);
+
   vtkSetMacro(DisplayDate, bool);
   vtkGetMacro(DisplayDate, bool);
 
@@ -77,6 +80,7 @@ private:
   bool DisplayUserName;
   bool DisplaySystemName;
   bool DisplayFileName;
+  bool DisplayFilePath;
   bool DisplayDate;
 
 };

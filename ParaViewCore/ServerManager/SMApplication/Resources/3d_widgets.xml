@@ -1504,7 +1504,7 @@
                             name="Text"></StringVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetWindowLocation"
-                         default_values="0"
+                         default_values="4"
                          name="WindowLocation"
                          number_of_elements="1">
         <EnumerationDomain name="enum">

@@ -29,7 +29,7 @@
       <bool>true</bool>
      </property>
      <property name="checked">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <layout class="QGridLayout">
       <property name="margin">
@@ -135,6 +135,9 @@
         <property name="checkable">
          <bool>true</bool>
         </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
         <property name="autoExclusive">
          <bool>true</bool>
         </property>
@@ -205,9 +208,6 @@
         <property name="checkable">
          <bool>true</bool>
         </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
         <property name="autoExclusive">
          <bool>true</bool>
         </property>
@@ -264,6 +264,9 @@
      </property>
      <property name="checkable">
       <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="1">

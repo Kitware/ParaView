@@ -57,7 +57,6 @@ void vtkSMInputFileNameDomain::Update(vtkSMProperty* vtkNotUsed(prop))
     if (fileNameProperty != NULL)
       {
       std::string fname(vtkSMPropertyHelper(fileNameProperty).GetAsString());
-      fname = vtksys::SystemTools::GetFilenameName(fname);
       this->FileName = fname;
       this->DomainModified();
       return;
