@@ -73,28 +73,22 @@ QModelIndex pqPluginTreeWidgetEventPlayerGetIndex(const QString& str_index,
 QModelIndex pqTreeViewEventPlayerGetIndexByColumnValue(const int column,
   const QString& columnValue, QTreeView* treeView, bool &error)
 {
-  QModelIndex index;
   int rows = treeView->model()->rowCount();
   for (int i=0; i < rows; ++i)
     {
-    index = treeView->model()->index(i, column, treeView->rootIndex());
-    if(index.isValid())
+    QModelIndex index = treeView->model()->index(i, column, treeView->rootIndex());
+    if (index.isValid())
       {
       QString value = index.data().toString();
-      if(index.data().toString() == columnValue)
+      if (index.data().toString() == columnValue)
         {
-        break;
+        return index;
         }
       }
-    else
-      {
-      error=true;
-      qCritical() << "ERROR: Tree view must have changed. "
-        << "Indices recorded in the test are no longer valid. Cannot playback.";
-      break;
-      }
     }
-  return index;
+  error=true;
+  qCritical() << "ERROR: Failed to find column with data '" << columnValue << "'";
+  return QModelIndex();
 }
 
 //-----------------------------------------------------------------------------0000000
