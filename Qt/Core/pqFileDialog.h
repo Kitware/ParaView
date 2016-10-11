@@ -213,6 +213,12 @@ private:
   //returns if true if files are loaded
   bool acceptInternal(const QStringList& selected_files, const bool &doubleclicked);
   QString fixFileExtension(const QString& filename, const QString& filter);
+
+  /// save current state of dialog(size, position, splitters and position of files header)
+  void saveState();
+
+  /// restore state of dialog
+  void restoreState();
 };
 
 #endif // !_pqFileDialog_h

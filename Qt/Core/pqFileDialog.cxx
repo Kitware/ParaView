@@ -30,12 +30,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
+#include "pqApplicationCore.h"
 #include "pqFileDialog.h"
 #include "pqFileDialogFavoriteModel.h"
 #include "pqFileDialogFilter.h"
 #include "pqFileDialogModel.h"
 #include "pqFileDialogRecentDirsModel.h"
 #include "pqServer.h"
+#include "pqSettings.h"
 
 #include <QAbstractButton>
 #include <QAbstractItemView>
@@ -93,7 +95,6 @@ namespace {
     return f.split(sep, QString::SkipEmptyParts);
   }
 
-
   QStringList GetWildCardsFromFilter(const QString& filter)
     {
     QString f = filter;
@@ -141,7 +142,7 @@ public:
   QStringList Filters;
   bool SuppressOverwriteWarning;
   bool ShowMultipleFileHelp;
-  QString FileNamesSeperator;  
+  QString FileNamesSeperator;
 
   // remember the last locations we browsed
   static QMap<QPointer<pqServer>, QString> ServerFilePaths;
@@ -302,7 +303,6 @@ pqFileDialog::pqFileDialog(
   //install the autocompleter
   this->Implementation->Ui.FileName->setCompleter(this->Implementation->Completer);
 
-
   QPixmap back = style()->standardPixmap(QStyle::SP_FileDialogBack);
   this->Implementation->Ui.NavigateBack->setIcon(back);
   this->Implementation->Ui.NavigateBack->setEnabled(false);
@@ -427,13 +427,30 @@ pqFileDialog::pqFileDialog(
     }
   this->Implementation->addHistory(startPath);
   this->Implementation->setCurrentPath(startPath);
+
+  this->Implementation->Ui.Files->resizeColumnToContents(0);
+  this->Implementation->Ui.Files->setTextElideMode(Qt::ElideMiddle);
+  QHeaderView * header = this->Implementation->Ui.Files->header();
+
+  // This code is similar to QFileDialog code
+  // It positions different columns and orders in a standard way
+  QFontMetrics fm(this->font());
+  header->resizeSection(0, fm.width(QLatin1String("wwwwwwwwwwwwwwwwwwwwwwwwww")));
+  header->resizeSection(1, fm.width(QLatin1String("mp3Folder")));
+  header->resizeSection(2, fm.width(QLatin1String("128.88 GB")));
+  header->resizeSection(3, fm.width(QLatin1String("10/29/81 02:02PM")));
+  this->Implementation->Ui.Files->setSortingEnabled(true);
+  this->Implementation->Ui.Files->header()->setSortIndicator(0, Qt::AscendingOrder);
+
+  // Use saved state if any
+  this->restoreState();
 }
 
 //-----------------------------------------------------------------------------
 pqFileDialog::~pqFileDialog()
 {
+  this->saveState();
 }
-
 
 //-----------------------------------------------------------------------------
 void pqFileDialog::onCreateNewFolder()
@@ -889,7 +906,6 @@ void pqFileDialog::onShowHiddenFiles( const bool &hidden )
   this->Implementation->FileFilter.setShowHidden(hidden);
 }
 
-
 //-----------------------------------------------------------------------------
 void pqFileDialog::setShowHidden( const bool &hidden )
 {
@@ -914,11 +930,11 @@ void pqFileDialog::onTextEdited(const QString &str)
   if (str.size() > 0 )
     {
     //convert the typed information to be this->Implementation->FileNames
-    this->Implementation->FileNames = 
+    this->Implementation->FileNames =
       str.split(this->Implementation->FileNamesSeperator,QString::SkipEmptyParts);
     }
   else
-    {    
+    {
     this->Implementation->FileNames.clear();
     }
   this->Implementation->Ui.Files->blockSignals(false);
@@ -934,7 +950,6 @@ QString pqFileDialog::fixFileExtension(
   QString extensionWildcard = GetWildCardsFromFilter(filter).first();
   QString wantedExtension =
     extensionWildcard.mid(extensionWildcard.indexOf('.')+1);
-
 
   if (!ext.isEmpty())
     {
@@ -1186,11 +1201,11 @@ bool pqFileDialog::selectFile(const QString& f)
 
 //-----------------------------------------------------------------------------
 void pqFileDialog::showEvent(QShowEvent *_showEvent )
-{  
+{
   QDialog::showEvent(_showEvent);
   //Qt sets the default keyboard focus to the last item in the tab order
-  //which is determined by the creation order. This means that we have 
-  //to explicitly state that the line edit has the focus on showing no 
+  //which is determined by the creation order. This means that we have
+  //to explicitly state that the line edit has the focus on showing no
   //matter the tab order
   this->Implementation->Ui.FileName->setFocus(Qt::OtherFocusReason);
 }
@@ -1208,4 +1223,52 @@ QString pqFileDialog::getSaveFileName(
     return fileDialog.getSelectedFiles()[0];
     }
   return QString();
+}
+
+//-----------------------------------------------------------------------------
+void pqFileDialog::saveState()
+{
+  pqApplicationCore *core = pqApplicationCore::instance();
+  if(core)
+    {
+    pqSettings *settings = core->settings();
+    settings->saveState(*this, "FileDialog");
+    settings->beginGroup("FileDialog");
+
+    QHeaderView * header = this->Implementation->Ui.Files->header();
+    settings->setValue("Header", header->saveState());
+    settings->setValue("MainSplitter", this->Implementation->Ui.mainSplitter->saveState());
+    settings->setValue("Splitter", this->Implementation->Ui.splitter->saveState());
+    settings->endGroup();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqFileDialog::restoreState() {
+
+  pqApplicationCore *core = pqApplicationCore::instance();
+  if (core)
+    {
+    pqSettings *settings = core->settings();
+    settings->restoreState("FileDialog", *this);
+    settings->beginGroup("FileDialog");
+
+    if (settings->contains("Header"))
+      {
+      this->Implementation->Ui.Files->header()->restoreState(
+        settings->value("Header").toByteArray());
+      }
+
+    if (settings->contains("MainSplitter"))
+      {
+      this->Implementation->Ui.mainSplitter->restoreState(
+        settings->value("MainSplitter").toByteArray());
+      }
+    if (settings->contains("Splitter"))
+      {
+      this->Implementation->Ui.splitter->restoreState(
+        settings->value("Splitter").toByteArray());
+      }
+    settings->endGroup();
+    }
 }
