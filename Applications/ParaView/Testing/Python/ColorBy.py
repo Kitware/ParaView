@@ -37,73 +37,64 @@ wavelet1Display = Show(wavelet1, renderView1)
 # reset view to fit data
 renderView1.ResetCamera()
 
-# create a new 'Random Vectors'
-randomVectors1 = RandomVectors(Input=wavelet1)
+# create a new 'Calculator'
+calculator1 = Calculator(Input=wavelet1)
+calculator1.Function = ''
+
+# Properties modified on calculator1
+calculator1.Function = 'RTData*iHat + ln(RTData)*jHat + coordsZ*kHat'
+
+# get active view
+renderView1 = GetActiveViewOrCreate('RenderView')
+# uncomment following to set a specific view size
+# renderView1.ViewSize = [1158, 833]
 
 # show data in view
-randomVectors1Display = Show(randomVectors1, renderView1)
+calculator1Display = Show(calculator1, renderView1)
 # trace defaults for the display properties.
-randomVectors1Display.Representation = 'Outline'
-randomVectors1Display.ColorArrayName = ['POINTS', '']
-randomVectors1Display.OSPRayScaleArray = 'RTData'
-randomVectors1Display.OSPRayScaleFunction = 'PiecewiseFunction'
-randomVectors1Display.SelectOrientationVectors = 'BrownianVectors'
-randomVectors1Display.ScaleFactor = 2.0
-randomVectors1Display.SelectScaleArray = 'RTData'
-randomVectors1Display.GlyphType = 'Arrow'
-randomVectors1Display.ScalarOpacityUnitDistance = 1.7320508075688779
-randomVectors1Display.Slice = 10
+calculator1Display.Representation = 'Outline'
+calculator1Display.ColorArrayName = ['POINTS', '']
+calculator1Display.OSPRayScaleArray = 'RTData'
+calculator1Display.OSPRayScaleFunction = 'PiecewiseFunction'
+calculator1Display.SelectOrientationVectors = 'Result'
+calculator1Display.ScaleFactor = 2.0
+calculator1Display.SelectScaleArray = 'RTData'
+calculator1Display.GlyphType = 'Arrow'
+calculator1Display.ScalarOpacityUnitDistance = 1.7320508075688779
+calculator1Display.Slice = 10
 
 # hide data in view
 Hide(wavelet1, renderView1)
 
 # set scalar coloring
-ColorBy(randomVectors1Display, ('POINTS', 'BrownianVectors'))
+ColorBy(calculator1Display, ('POINTS', 'Result'))
 
 # rescale color and/or opacity maps used to include current data range
-randomVectors1Display.RescaleTransferFunctionToDataRange(True)
+calculator1Display.RescaleTransferFunctionToDataRange(True)
 
 # show color bar/color legend
-randomVectors1Display.SetScalarBarVisibility(renderView1, True)
+calculator1Display.SetScalarBarVisibility(renderView1, True)
 
-# get color transfer function/color map for 'BrownianVectors'
-brownianVectorsLUT = GetColorTransferFunction('BrownianVectors')
+# get color transfer function/color map for 'Result'
+ResultLUT = GetColorTransferFunction('Result')
 
-# get opacity transfer function/opacity map for 'BrownianVectors'
-brownianVectorsPWF = GetOpacityTransferFunction('BrownianVectors')
+# get opacity transfer function/opacity map for 'Result'
+ResultPWF = GetOpacityTransferFunction('Result')
 
 # set scalar coloring
-ColorBy(randomVectors1Display, ('POINTS', 'BrownianVectors', '2'))
+ColorBy(calculator1Display, ('POINTS', 'Result', '2'))
 
 # change representation type
-randomVectors1Display.SetRepresentationType('Surface')
+calculator1Display.SetRepresentationType('Surface')
 
 # set scalar coloring
-ColorBy(randomVectors1Display, ('POINTS', 'BrownianVectors', '1'))
-
-# set scalar coloring
-ColorBy(randomVectors1Display, ('POINTS', 'RTData'))
+ColorBy(calculator1Display, ('POINTS', 'Result', '1'))
 
 # rescale color and/or opacity maps used to include current data range
-randomVectors1Display.RescaleTransferFunctionToDataRange(True)
+calculator1Display.RescaleTransferFunctionToDataRange(True)
 
 # show color bar/color legend
-randomVectors1Display.SetScalarBarVisibility(renderView1, True)
-
-# get color transfer function/color map for 'RTData'
-rTDataLUT = GetColorTransferFunction('RTData')
-
-# get opacity transfer function/opacity map for 'RTData'
-rTDataPWF = GetOpacityTransferFunction('RTData')
-
-# set scalar coloring
-ColorBy(randomVectors1Display, ('POINTS', 'BrownianVectors'))
-
-# rescale color and/or opacity maps used to include current data range
-randomVectors1Display.RescaleTransferFunctionToDataRange(True)
-
-# show color bar/color legend
-randomVectors1Display.SetScalarBarVisibility(renderView1, True)
+calculator1Display.SetScalarBarVisibility(renderView1, True)
 
 #### saving camera placements for all active views
 
