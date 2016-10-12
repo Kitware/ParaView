@@ -3092,7 +3092,7 @@ def SetActiveConnection(connection=None):
     #supports_simutaneous_connections =\
     #    vtkProcessModule.GetProcessModule().GetMultipleSessionsSupport()
 
-    print ("updating active connection", connection)
+    # print ("updating active connection", connection)
     ActiveConnection = connection
 
     #  This will ensure that servemanager.sources.* will point to the right
