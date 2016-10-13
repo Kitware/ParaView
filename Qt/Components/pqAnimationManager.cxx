@@ -102,6 +102,7 @@ public:
 
   double AspectRatio;
   bool AnimationPlaying;
+  int OldNumberOfFrames;
 };
 
 //-----------------------------------------------------------------------------
@@ -284,6 +285,15 @@ void pqAnimationManager::updateGUI()
     // don't break, let it fall through to SEQUENCE.
 
   case SEQUENCE:
+    {
+      if (this->Internals->OldNumberOfFrames != num_frames && 
+          this->Internals->AnimationSettingsDialog->endTime->text().toInt() ==
+            this->Internals->OldNumberOfFrames - 1)
+        {
+          this->Internals->AnimationSettingsDialog->endTime->setText(QString::number(num_frames - 1));
+        }
+      this->Internals->OldNumberOfFrames = num_frames;
+    }
     this->Internals->AnimationSettingsDialog->animationDuration->
       blockSignals(true);
     this->Internals->AnimationSettingsDialog->animationDuration->setValue(
@@ -445,6 +455,7 @@ bool pqAnimationManager::saveAnimation()
     sceneProxy->GetProperty("FramesPerTimestep")).toInt();
 
   int startFrameCount = 0;
+  this->Internals->OldNumberOfFrames = num_frames;
 
   switch (playMode)
     {
