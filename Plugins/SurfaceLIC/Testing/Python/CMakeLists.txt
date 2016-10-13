@@ -11,8 +11,6 @@ if(NOT PARAVIEW_BUILD_QT_GUI)
 endif()
 paraview_test_load_data(SurfaceLIC ${data_files})
 
-paraview_test_data_target(SurfaceLIC)
-
 # Surface LIC Plugin testing
 # these tests could run safely in serial and
 # in parallel.
