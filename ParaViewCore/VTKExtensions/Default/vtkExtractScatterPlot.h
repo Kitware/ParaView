@@ -12,16 +12,9 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-
-#ifndef vtkExtractScatterPlot_h
-#define vtkExtractScatterPlot_h
-
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
-#include "vtkPolyDataAlgorithm.h"
-
 // .NAME vtkExtractScatterPlot - Extract a scatter plot (two-dimensional histogram) from any dataset
 // .SECTION Description
-
+//
 // vtkExtractScatterPlot accepts any vtkDataSet as input and produces a
 // vtkPolyData containing two-dimensional histogram data as output.  The
 // output vtkPolyData will contain two vtkDoubleArray instances named
@@ -29,6 +22,12 @@
 // between bins along each dimension.  It will also contain a
 // vtkUnsignedLongArray named "bin_values" which contains the value for
 // each bin.
+
+#ifndef vtkExtractScatterPlot_h
+#define vtkExtractScatterPlot_h
+
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
+#include "vtkPolyDataAlgorithm.h"
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkExtractScatterPlot :
   public vtkPolyDataAlgorithm

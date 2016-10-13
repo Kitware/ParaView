@@ -12,6 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+// .NAME vtkExtractHistogram - Extract histogram data (binned values) from any 
+// dataset
+// .SECTION Description
+// vtkExtractHistogram accepts any vtkDataSet as input and produces a
+// vtkPolyData containing histogram data as output.  The output vtkPolyData
+// will have contain a vtkDoubleArray named "bin_extents" which contains
+// the boundaries between each histogram bin, and a vtkUnsignedLongArray
+// named "bin_values" which will contain the value for each bin.
 
 #ifndef vtkExtractHistogram_h
 #define vtkExtractHistogram_h
@@ -23,15 +31,6 @@ class vtkDoubleArray;
 class vtkFieldData;
 class vtkIntArray;
 struct vtkEHInternals;
-
-// .NAME vtkExtractHistogram - Extract histogram data (binned values) from any 
-// dataset
-// .SECTION Description
-// vtkExtractHistogram accepts any vtkDataSet as input and produces a
-// vtkPolyData containing histogram data as output.  The output vtkPolyData
-// will have contain a vtkDoubleArray named "bin_extents" which contains
-// the boundaries between each histogram bin, and a vtkUnsignedLongArray
-// named "bin_values" which will contain the value for each bin.
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkExtractHistogram : public vtkTableAlgorithm
 {

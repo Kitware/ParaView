@@ -46,8 +46,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // Usage:
 //
-// vtkObject* subject = /* ... */
-// foo* observer = /* ... */
+// vtkObject* subject = ...
+// foo* observer = ...
 // vtkMemberFunctionCommand<foo>* adapter = vtkMemberFunctionCommand<foo>::New();
 // adapter->SetCallback(observer, &foo::bar);
 // subject->AddObserver(vtkCommand::AnyEvent, adapter);
@@ -153,8 +153,8 @@ private:
 //
 // Usage:
 //
-// vtkObject* subject = /* ... */
-// foo* observer = /* ... */
+// vtkObject* subject = ...
+// foo* observer = ...
 // vtkCommand* adapter = vtkMakeMemberFunctionCommand(observer, &foo::bar);
 // subject->AddObserver(vtkCommand::AnyEvent, adapter);
 //
