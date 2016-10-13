@@ -159,8 +159,11 @@ int main(int argc, char** argv)
   driver_cache = fopen(driver_cache_path, "r");
   if (driver_cache)
     {
-      (void)fgets(driver_choice, sizeof(driver_choice), driver_cache);
-      fclose(driver_cache);
+    if (fgets(driver_choice, sizeof(driver_choice), driver_cache) == 0)
+      {
+      driver_choice[0] = 0;
+      }
+    fclose(driver_cache);
     }
 
   // If there is a user config, override the site config
@@ -168,7 +171,10 @@ int main(int argc, char** argv)
   driver_cache = fopen(driver_cache_path, "r");
   if (driver_cache)
     {
-    (void)fgets(driver_choice, sizeof(driver_choice), driver_cache);
+    if (fgets(driver_choice, sizeof(driver_choice), driver_cache) == 0)
+      {
+      driver_choice[0] = 0;
+      }
     fclose(driver_cache);
     }
 
