@@ -74,7 +74,7 @@ function (paraview_test_load_baselines name)
     list(APPEND data
       "DATA{${PARAVIEW_TEST_BASELINE_DIR}/${datafile}}")
   endforeach ()
-  _paraview_test_load_data("${name}" ${data})
+  _paraview_test_load_data(${data})
 endfunction ()
 
 function (paraview_test_load_baselines_dirs name)
@@ -83,7 +83,7 @@ function (paraview_test_load_baselines_dirs name)
     list(APPEND data
       "DATA{${PARAVIEW_TEST_BASELINE_DIR}/${datafile}/,REGEX:.*}")
   endforeach ()
-  _paraview_test_load_data("${name}" ${data})
+  _paraview_test_load_data(${data})
 endfunction ()
 
 function (paraview_test_load_data name)
@@ -92,7 +92,7 @@ function (paraview_test_load_data name)
     list(APPEND data
       "DATA{${PARAVIEW_TEST_DATA_DIR}/${datafile}}")
   endforeach ()
-  _paraview_test_load_data("${name}" ${data})
+  _paraview_test_load_data(${data})
 endfunction ()
 
 function (paraview_test_load_data_dirs name)
@@ -101,20 +101,11 @@ function (paraview_test_load_data_dirs name)
     list(APPEND data
       "DATA{${PARAVIEW_TEST_DATA_DIR}/${datafile}/,REGEX:.*}")
   endforeach ()
-  _paraview_test_load_data("${name}" ${data})
+  _paraview_test_load_data(${data})
 endfunction ()
 
-function (_paraview_test_load_data name)
-  ExternalData_Expand_Arguments("ParaViewData${name}" files ${ARGN})
-endfunction ()
-
-function (paraview_test_data_target name)
-  # All non-default data targets should depend on the basic target.
-  if (name)
-    ExternalData_Add_Target("ParaViewData${name}")
-    add_dependencies("ParaViewData${name}"
-      ParaViewData)
-  endif ()
+function (_paraview_test_load_data)
+  ExternalData_Expand_Arguments("ParaViewData" files ${ARGN})
 endfunction ()
 
 # Set up some common testing environment.

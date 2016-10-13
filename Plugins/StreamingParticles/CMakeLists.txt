@@ -26,7 +26,6 @@ if(PARAVIEW_ENABLE_COSMOTOOLS
     paraview_test_load_data_dirs(StreamingParticles
       adaptive-cosmo
       )
-    paraview_test_data_target(StreamingParticles)
 
     add_pv_test("pv" "_DISABLE_C"
       COMMAND --client ${CLIENT_EXECUTABLE}
@@ -41,7 +40,6 @@ if(PARAVIEW_ENABLE_COSMOTOOLS
     paraview_test_load_data_dirs(NewGenericIOStreaming
       multiresolution-streaming
       )
-    paraview_test_data_target(NewGenericIOStreaming)
     add_pv_test("pv" "_DISABLE_C"
       COMMAND --client ${CLIENT_EXECUTABLE}
               --enable-bt

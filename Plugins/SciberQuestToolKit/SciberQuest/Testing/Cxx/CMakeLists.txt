@@ -28,7 +28,6 @@ paraview_test_load_data_dirs(SciberQuestToolKit
   SciberQuestToolKit/Rankine
   SciberQuestToolKit/SmallVector
   )
-paraview_test_data_target(SciberQuestToolKit)
 
 if (PARAVIEW_USE_MPI AND (NOT WIN32))
   # parallel invocations, these could run with any number of
