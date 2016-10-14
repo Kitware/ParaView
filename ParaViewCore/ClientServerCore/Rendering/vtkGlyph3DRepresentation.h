@@ -64,7 +64,6 @@ public:
   void SetOrient(bool val);
   void SetOrientationMode(int val);
   void SetMasking(bool val);
-  double* GetBounds();
 
   //***************************************************************************
   // Overridden to forward to the vtkGlyph3DMapper.
@@ -72,6 +71,18 @@ public:
   virtual void SetLookupTable(vtkScalarsToColors* val);
   virtual void SetMapScalars(int val);
   virtual void SetStatic(int val);
+
+
+  //***************************************************************************
+  // Overridden to forward to the vtkActor used for the glyphs (GlyphActor)
+  virtual void SetOrientation(double, double, double);
+  virtual void SetOrigin(double, double, double);
+  virtual void SetPickable(int val);
+  virtual void SetPosition(double, double, double);
+  virtual void SetScale(double, double, double);
+  virtual void SetTexture(vtkTexture*);
+  virtual void SetUserTransform(const double[16]);
+
 
 protected:
   vtkGlyph3DRepresentation();
@@ -111,6 +122,10 @@ protected:
   // Overridden to ensure that the coloring decisions are passed over to the
   // glyph mapper.
   virtual void UpdateColoringParameters();
+
+  // Description:
+  // Determines bounds using the vtkGlyph3DMapper.
+  void ComputeGlyphBounds(double bounds[6]);
 
   vtkGlyph3DMapper* GlyphMapper;
   vtkGlyph3DMapper* LODGlyphMapper;
