@@ -2224,14 +2224,42 @@
         <Documentation>This property specifies the file name to read for the
         points and field information.</Documentation>
       </StringVectorProperty>
-      <IntVectorProperty command="SetSingleLevel"
-                         default_values="0"
-                         name="SingleLevel"
+      <IntVectorProperty command="SetVerticalDimension"
+                         default_values="1"
+                         name="VerticalDimension"
                          number_of_elements="1">
-        <Documentation>Specify whether to only read in a single level and any
-        variables that are prescribed over this surface.</Documentation>
-        <BooleanDomain name="bool" />
+        <Documentation>Specify whether to only read variables from a
+        single level, from layer midpoints or from layer
+        interface.</Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Single level [time, ncol]"
+                 value="0" />
+          <Entry text="Layer midpoints [time, lev, ncol]"
+                 value="1" />
+          <Entry text="Layer interface [time, ilev, ncol]"
+                 value="2" />
+        </EnumerationDomain>
       </IntVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="PointArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Point" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPointArrayStatus"
+                            element_types="2 0"
+                            information_property="PointArrayInfo"
+                            name="PointArrayStatus"
+                            number_of_elements="2"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which NetCDF dual-grid point
+        variables to load.</Documentation>
+      </StringVectorProperty>
       <IntVectorProperty default_values="1"
                          name="CellLayerRight"
                          number_of_elements="1"
@@ -7082,7 +7110,8 @@
                proxyname="NetCDFCAMReaderCore"></Proxy>
         <ExposedProperties>
           <Property name="ConnectivityFileName" />
-          <Property name="SingleLevel" />
+          <Property name="VerticalDimension" />
+          <Property name="PointArrayStatus" />
           <Property name="CellLayerRight" />
         </ExposedProperties>
       </SubProxy>
