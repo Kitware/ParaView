@@ -142,6 +142,7 @@ public:
   bool SavedAnnotationState;
   bool IsInCapture;
   bool IsInOSPRay;
+  bool OSPRayShadows;
   vtkNew<vtkFloatArray> ArrayHolder;
   vtkNew<vtkWindowToImageFilter> ZGrabber;
 
@@ -331,6 +332,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->Internals->ScalarRange[1] = -1.0;
   this->Internals->IsInCapture = false;
   this->Internals->IsInOSPRay = false;
+  this->Internals->OSPRayShadows = false;
 
   // non-reference counted, so no worries about reference loops.
   this->Internals->DeliveryManager->SetRenderView(this);
@@ -2984,13 +2986,16 @@ void vtkPVRenderView::SetEnableOSPRay(bool v)
     return;
   }
   this->Internals->IsInOSPRay = v;
+  vtkRenderer *ren = this->GetRenderer();
   if (this->Internals->IsInOSPRay)
   {
+    ren->SetUseShadows(this->Internals->OSPRayShadows);
     this->Internals->SavedRenderPass = this->SynchronizedRenderers->GetRenderPass();
     this->SynchronizedRenderers->SetRenderPass(this->Internals->OSPRayPass.GetPointer());
   }
   else
   {
+    ren->SetUseShadows(false);
     this->SynchronizedRenderers->SetRenderPass(this->Internals->SavedRenderPass);
   }
   this->Modified();
@@ -3014,6 +3019,7 @@ bool vtkPVRenderView::GetEnableOSPRay()
 void vtkPVRenderView::SetShadows(bool v)
 {
 #ifdef PARAVIEW_USE_OSPRAY
+  this->Internals->OSPRayShadows = v;
   vtkRenderer* ren = this->GetRenderer();
   ren->SetUseShadows(v);
 #else
