@@ -236,6 +236,8 @@ class ImageExplorer(explorers.Explorer):
             # Ensure context support
             if self.CheckFloatSupport and\
             self.ValueMode == ValueMode().FLOATING_POINT:
+                # Force a proxy update to make sure the rendering mode is set
+                self.view.UpdateVTKObjects()
                 simple.Render()
                 self.ValueMode = self.view.GetValueRenderingMode()
                 self.CheckFloatSupport = False

@@ -1258,17 +1258,29 @@ vtkFloatArray* vtkSMRenderViewProxy::GetValuesFloat()
 }
 
 //------------------------------------------------------------------------------
+void vtkSMRenderViewProxy::StartCaptureValues()
+{
+  this->InvokeCommand("BeginValueCapture");
+}
+
+//------------------------------------------------------------------------------
+void vtkSMRenderViewProxy::StopCaptureValues()
+{
+  this->InvokeCommand("EndValueCapture");
+}
+
+//------------------------------------------------------------------------------
 int vtkSMRenderViewProxy::GetValueRenderingMode()
 {
-  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
-  return view->GetValueRenderingMode();
+  vtkSMPropertyHelper helper(this, "ValueRenderingModeGet");
+  helper.UpdateValueFromServer();
+  return  helper.GetAsInt();
 }
 
 //------------------------------------------------------------------------------
 void vtkSMRenderViewProxy::SetValueRenderingMode(int mode)
 {
-  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
-  view->SetValueRenderingMode(mode);
+  vtkSMPropertyHelper(this, "ValueRenderingMode").Set(mode);
 }
 
 //----------------------------------------------------------------------------
