@@ -1657,17 +1657,11 @@ found and the point will be rejected.</Documentation>
                          name="ExtractionMode"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
-          <Entry text="Extract Point Seeded Regions"
-                 value="1" />
-          <Entry text="Extract Cell Seeded Regions"
-                 value="2" />
-          <Entry text="Extract Specified Regions"
-                 value="3" />
           <Entry text="Extract Largest Region"
                  value="4" />
           <Entry text="Extract All Regions"
                  value="5" />
-          <Entry text="Extract Closes Point Region"
+          <Entry text="Extract Closest Point Region"
                  value="6" />
         </EnumerationDomain>
         <Documentation>Controls the extraction of connected
@@ -1681,12 +1675,22 @@ found and the point will be rejected.</Documentation>
         <Documentation>Controls the coloring of the connected
         regions.</Documentation>
       </IntVectorProperty>
-      <Hints>
-        <Property name="ExtractionMode"
-                  show="0" />
-        <Property name="ColorRegions"
-                  show="0" />
-      </Hints>
+
+      <DoubleVectorProperty
+        name="ClosestPoint"
+        command="SetClosestPoint"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <Documentation>Specifies the point to use in closest point mode.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ExtractionMode"
+                                   value="6" />
+          <!-- show this widget when ExtractionMode==6 -->
+        </Hints>
+      </DoubleVectorProperty>
+
       <!-- End PVConnectivityFilter -->
     </SourceProxy>
     <!-- ==================================================================== -->
