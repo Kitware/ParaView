@@ -14,17 +14,23 @@
 =========================================================================*/
 #include "vtkGlyph3DRepresentation.h"
 
+#include "vtkAlgorithmOutput.h"
 #include "vtkDataObject.h"
 #include "vtkGlyph3DMapper.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMatrix4x4.h"
 #include "vtkMPIMoveData.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVArrowSource.h"
+#include "vtkPVCacheKeeper.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVRenderView.h"
 #include "vtkRenderer.h"
+#include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkTransform.h"
 
 vtkStandardNewMacro(vtkGlyph3DRepresentation);
 //----------------------------------------------------------------------------
@@ -168,6 +174,28 @@ int vtkGlyph3DRepresentation::ProcessViewRequest(
     return 0;
     }
 
+  if (request_type == vtkPVView::REQUEST_UPDATE())
+    {
+    // A little trick to report correct bounds.
+    // Representations are required to report the bounds for the rendered geometry
+    // in vtkPVView::REQUEST_UPDATE() pass. For glyphs, the vtkGlyph3DMapper has
+    // complicated logic to determine the bounds and we want to use that since
+    // it respects orientation array, scale array and other options set on the
+    // mapper. Now the complication is that glyph mapper on the "rendering
+    // ranks" may not have the input set up yet (since it needs to be
+    // redistributed by the view after this pass. So we do this, we change the
+    // GlyphMapper's input be same as the data we have locally and then request
+    // the GlyphMapper to compute bounds. The glyph mapper's input gets set back
+    // to the delivered geometry in vtkPVView::REQUEST_RENDER() on the rendering
+    // nodes, as is correct.
+    double bounds[6];
+    this->ComputeGlyphBounds(bounds);
+
+    vtkNew<vtkMatrix4x4> matrix;
+    this->GlyphActor->GetMatrix(matrix.GetPointer());
+    vtkPVRenderView::SetGeometryBounds(inInfo, bounds, matrix.GetPointer());
+    }
+
   if (request_type == vtkPVView::REQUEST_RENDER())
     {
     vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
@@ -211,6 +239,21 @@ void vtkGlyph3DRepresentation::UpdateColoringParameters()
   this->LODGlyphMapper->SetUseLookupTableScalarRange(1);
   this->LODGlyphMapper->SetScalarMode(
     VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
+}
+
+//----------------------------------------------------------------------------
+void vtkGlyph3DRepresentation::ComputeGlyphBounds(double bounds[6])
+{
+  // we're changing the glyph mapper's input connection temporarily.
+  vtkSmartPointer<vtkAlgorithmOutput> port;
+  if (this->GlyphMapper->GetNumberOfInputConnections(0) == 1)
+    {
+    port = this->GlyphMapper->GetInputConnection(0, 0);
+    }
+
+  this->GlyphMapper->SetInputConnection(this->CacheKeeper->GetOutputPort());
+  this->GlyphMapper->GetBounds(bounds);
+  this->GlyphMapper->SetInputConnection(port);
 }
 
 //----------------------------------------------------------------------------
@@ -320,7 +363,52 @@ void vtkGlyph3DRepresentation::SetMasking(bool val)
 }
 
 //----------------------------------------------------------------------------
-double* vtkGlyph3DRepresentation::GetBounds()
+void vtkGlyph3DRepresentation::SetOrientation(double x, double y, double z)
 {
-  return this->GlyphMapper->GetBounds();
+  this->GlyphActor->SetOrientation(x, y, z);
+  this->Superclass::SetOrientation(x, y, z);
+}
+
+//----------------------------------------------------------------------------
+void vtkGlyph3DRepresentation::SetOrigin(double x, double y, double z)
+{
+  this->GlyphActor->SetOrigin(x, y, z);
+  this->Superclass::SetOrigin(x, y, z);
+}
+
+//----------------------------------------------------------------------------
+void vtkGlyph3DRepresentation::SetPickable(int val)
+{
+  this->GlyphActor->SetPickable(val);
+  this->Superclass::SetPickable(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkGlyph3DRepresentation::SetPosition(double x, double y, double z)
+{
+  this->GlyphActor->SetPosition(x, y, z);
+  this->Superclass::SetPosition(x, y, z);
+}
+
+//----------------------------------------------------------------------------
+void vtkGlyph3DRepresentation::SetScale(double x, double y, double z)
+{
+  this->GlyphActor->SetScale(x, y, z);
+  this->Superclass::SetScale(x, y, z);
+}
+
+//----------------------------------------------------------------------------
+void vtkGlyph3DRepresentation::SetTexture(vtkTexture* tex)
+{
+  // don't think it makes sense to add textures to glyphs.
+  this->Superclass::SetTexture(tex);
+}
+
+//----------------------------------------------------------------------------
+void vtkGlyph3DRepresentation::SetUserTransform(const double matrix[16])
+{
+  vtkNew<vtkTransform> transform;
+  transform->SetMatrix(matrix);
+  this->GlyphActor->SetUserTransform(transform.GetPointer());
+  this->Superclass::SetUserTransform(matrix);
 }
