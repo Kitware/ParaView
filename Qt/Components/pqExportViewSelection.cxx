@@ -153,6 +153,32 @@ void pqExportViewSelection::setCinemaVisible(bool status)
   }
 }
 
+void pqExportViewSelection::setCatalystOptionsVisible(bool status)
+{
+
+  typedef pqImageOutputInfo* InfoPtr;
+
+  int const size_ = this->Ui->swViews->count();
+  for (int i = 0 ; i < size_ ; i++)
+    {
+    if (InfoPtr info = qobject_cast<InfoPtr>(this->Ui->swViews->widget(i)))
+      {
+      if (!status)
+        {
+        info->hideFrequencyInput();
+        info->hideFitToScreen();
+        info->hideMagnification();
+        }
+      else
+        {
+        info->showFrequencyInput();
+        info->showFitToScreen();
+        info->showMagnification();
+        }
+      }
+    }
+}
+
 QString pqExportViewSelection::getSelectionAsString(QString const& scriptFormat)
 {
   QString rendering_info;

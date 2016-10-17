@@ -67,6 +67,9 @@ public:
   */
   void setCinemaVisible(bool status);
 
+  /// Hides/shows catalyst specific entries
+  void setCatalystOptionsVisible(bool status);
+
   QList<pqImageOutputInfo*> getImageOutputInfos();
 
   /**

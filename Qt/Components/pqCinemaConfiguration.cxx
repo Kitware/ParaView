@@ -65,6 +65,7 @@ pqCinemaConfiguration::pqCinemaConfiguration(
   // update ui with current views and filters and connect signals
   this->populateElements();
   this->Ui->wViewSelection->setCinemaVisible(true);
+  this->Ui->wViewSelection->setCatalystOptionsVisible(false);
 }
 
 // ----------------------------------------------------------------------------

@@ -63,6 +63,8 @@ public:
   void showFrequencyInput();
   void hideFitToScreen();
   void showFitToScreen();
+  void hideMagnification();
+  void showMagnification();
   int getWriteFrequency();
   bool fitToScreen();
   int getMagnification();

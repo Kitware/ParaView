@@ -27,7 +27,7 @@
   <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/__qt__passive_wizardbutton1" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/__qt__passive_wizardbutton1" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage_2/outputCinema" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage_2/wViewSelection/groupBox/swViews/ImageOutputInfo/widget_3/composite" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage_2/wViewSelection/groupBox/swViews/ImageOutputInfo/gbCinemaOptions/composite" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage_2/wViewSelection/groupBox/swViews/ImageOutputInfo/gbCinemaOptions/cinemaExport" command="set_string" arguments="phi-theta" />
   <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage_2/wViewSelection/groupBox/swViews/ImageOutputInfo/gbCinemaOptions/wCameraOptions/phiResolution" command="set_int" arguments="3" />
   <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage_2/wViewSelection/groupBox/swViews/ImageOutputInfo/gbCinemaOptions/wCameraOptions/thetaResolution" command="set_int" arguments="3" />
