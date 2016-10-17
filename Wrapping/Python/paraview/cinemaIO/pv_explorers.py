@@ -60,13 +60,13 @@ def printView(view):
     r.SetViewPoint(-1,1,0)
     r.ViewToWorld()
     ul = r.GetWorldPoint()
-    print ll[0], ll[1], ll[2]
-    print lr[0], lr[1], lr[2]
-    print ur[0], ur[1], ur[2]
-    print ul[0], ul[1], ul[2]
-    #print math.sqrt((ur[0]-ll[0])*(ur[0]-ll[0])+
-    #                (ur[1]-ll[1])*(ur[1]-ll[1])+
-    #                (ur[2]-ll[2])*(ur[2]-ll[2]))
+    print (ll[0], ll[1], ll[2])
+    print (lr[0], lr[1], lr[2])
+    print (ur[0], ur[1], ur[2])
+    print (ul[0], ul[1], ul[2])
+    #print (math.sqrt((ur[0]-ll[0])*(ur[0]-ll[0])+
+    #                 (ur[1]-ll[1])*(ur[1]-ll[1])+
+    #                 (ur[2]-ll[2])*(ur[2]-ll[2])))
 
 class ImageExplorer(explorers.Explorer):
     """
@@ -360,7 +360,7 @@ class PoseCamera(explorers.Track):
             self.view.GetActiveCamera().SetFocalPoint(pf)
             self.view.GetActiveCamera().SetPosition(iPosition)
         else:
-            print "ERROR unexpected camera type"
+            print ("ERROR unexpected camera type")
         newUp = VecMatrixMul(iViewUp, mf)
         self.view.GetActiveCamera().SetViewUp(newUp)
 

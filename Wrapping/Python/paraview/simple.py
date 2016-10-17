@@ -1047,7 +1047,7 @@ def HideScalarBarIfNotNeeded(lut, view=None):
     if not view:
         view = active_objects.view
     if not view:
-        raise ValueError, "'view' argument cannot be None with no active present."
+        raise ValueError ("'view' argument cannot be None with no active present.")
     tfmgr = servermanager.vtkSMTransferFunctionManager()
     return tfmgr.HideScalarBarIfNotNeeded(lut.SMProxy, view.SMProxy)
 
