@@ -12,12 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCompleteArrays - Filter adds arrays to empty partitions.
-// .SECTION Description
-// This is a temporary solution for fixing a writer bug.  When partition 0
-// has no cells or points, it does not have arrays either.  The writers
-// get confused.  This filter creates empty arrays on node zero if there
-// are no cells or points in that partition.
+/**
+ * @class   vtkCompleteArrays
+ * @brief   Filter adds arrays to empty partitions.
+ *
+ * This is a temporary solution for fixing a writer bug.  When partition 0
+ * has no cells or points, it does not have arrays either.  The writers
+ * get confused.  This filter creates empty arrays on node zero if there
+ * are no cells or points in that partition.
+*/
 
 #ifndef vtkCompleteArrays_h
 #define vtkCompleteArrays_h
@@ -34,10 +37,13 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkCompleteArrays *New();
 
-  // Description:
-  // The user can set the controller used for inter-process communication.
+  //@{
+  /**
+   * The user can set the controller used for inter-process communication.
+   */
   void SetController(vtkMultiProcessController *controller);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
+  //@}
 
 protected:
   vtkCompleteArrays();

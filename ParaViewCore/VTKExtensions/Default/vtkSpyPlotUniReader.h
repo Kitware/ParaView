@@ -12,21 +12,25 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSpyPlotUniReader - Read SPCTH Spy Plot file format
-// .SECTION Description
-// vtkSpyPlotUniReader is a reader that reads SPCTH Spy Plot file binary format
-// that describes part of a dataset (in the case that the simulation consists of
-// more than 1 file) or the entire simulation. 
-// The reader supports both Spy dataset types: flat mesh and AMR
-// (Adaptive Mesh Refinement).
-//
-// .SECTION Implementation Details
-// Class was extracted from vtkSpyPlotReader.cxx and is a helper to that 
-// class.  Note the grids in the reader may have bad ghost cells that will
-// need to be taken into consideration in terms of both geometry and 
-// cell data
-//-----------------------------------------------------------------------------
-//=============================================================================
+/**
+ * @class   vtkSpyPlotUniReader
+ * @brief   Read SPCTH Spy Plot file format
+ *
+ * vtkSpyPlotUniReader is a reader that reads SPCTH Spy Plot file binary format
+ * that describes part of a dataset (in the case that the simulation consists of
+ * more than 1 file) or the entire simulation. 
+ * The reader supports both Spy dataset types: flat mesh and AMR
+ * (Adaptive Mesh Refinement).
+ *
+ * @par Implementation Details:
+ * Class was extracted from vtkSpyPlotReader.cxx and is a helper to that 
+ * class.  Note the grids in the reader may have bad ghost cells that will
+ * need to be taken into consideration in terms of both geometry and 
+ * cell data
+ *-----------------------------------------------------------------------------
+ *=============================================================================
+*/
+
 #ifndef vtkSpyPlotUniReader_h
 #define vtkSpyPlotUniReader_h
 
@@ -48,87 +52,110 @@ public:
   static vtkSpyPlotUniReader* New();
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  //Description:
-  // Set and get the Binary SpyPlot File name the reader will process
+  //@{
+  /**
+   * Set and get the Binary SpyPlot File name the reader will process
+   */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
   virtual void SetCellArraySelection(vtkDataArraySelection* da);
+  //@}
   
-  // Description:
-  // Reads the basic information from the file such as the header, number
-  // of fields, etc..
+  /**
+   * Reads the basic information from the file such as the header, number
+   * of fields, etc..
+   */
   virtual int ReadInformation();
   
-  // Description:
-  // Make sure that actual data (including grid blocks) is current
-  // else it will read in the required data from file
+  /**
+   * Make sure that actual data (including grid blocks) is current
+   * else it will read in the required data from file
+   */
   int MakeCurrent();
 
   void PrintInformation();
   void PrintMemoryUsage();
 
-  //Description:
-  // Set and get the current time step to process
+  //@{
+  /**
+   * Set and get the current time step to process
+   */
   int SetCurrentTime(double time);
   int SetCurrentTimeStep(int timeStep);
   vtkGetMacro(CurrentTime, double);
   vtkGetMacro(CurrentTimeStep, int);
+  //@}
 
-  //Description:
-  // Set and Get the time range for the simulation run
+  //@{
+  /**
+   * Set and Get the time range for the simulation run
+   */
   vtkGetVector2Macro(TimeStepRange, int);
   vtkGetVector2Macro(TimeRange, double);
+  //@}
 
-  // Description:
+  //@{
   vtkSetMacro(NeedToCheck, int);
+  //@}
 
-  // Description:
-  // Functions that map from time to time step and vice versa
+  //@{
+  /**
+   * Functions that map from time to time step and vice versa
+   */
   int GetTimeStepFromTime(double time);
   double GetTimeFromTimeStep(int timeStep);
+  //@}
 
   vtkGetMacro(NumberOfCellFields, int);
 
   double* GetTimeArray();
 
-  // Description:
-  // Returns 1 if the grid information contained in the file has
-  // Adaptive Mesh Refinement (AMR) else it returns 0
+  /**
+   * Returns 1 if the grid information contained in the file has
+   * Adaptive Mesh Refinement (AMR) else it returns 0
+   */
   int IsAMR();
 
-  // Description:
-  // Return the number of grids in the reader
+  /**
+   * Return the number of grids in the reader
+   */
   int GetNumberOfDataBlocks();
 
-  // Description:
-  // Return the name of the ith field
+  /**
+   * Return the name of the ith field
+   */
   const char* GetCellFieldName(int field);
 
-  //Description:
-  // Return the data array of the block's field.  The "fixed"
-  //arguement is set to 1 if the array has been corrected for
-  // bad ghost cells else it is set to 0
+  /**
+   * Return the data array of the block's field.  The "fixed"
+   * arguement is set to 1 if the array has been corrected for
+   * bad ghost cells else it is set to 0
+   */
   vtkDataArray* GetCellFieldData(int block, int field, int* fixed);
 
-  //Description:
-  // Return the mass data array for the material index passed in
-  // for the passed in block
+  /**
+   * Return the mass data array for the material index passed in
+   * for the passed in block
+   */
   vtkDataArray* GetMaterialMassField(const int& block,
     const int& materialIndex);
   
-  //Description:
-  // Return the volume fraction data array for the material index passed in
-  // for the passed in block
+  /**
+   * Return the volume fraction data array for the material index passed in
+   * for the passed in block
+   */
   vtkDataArray* GetMaterialVolumeFractionField(const int& block,
     const int& materialIndex);  
     
 
-  // Description:
-  // Mark the block's field to have been fixed w/r bad ghost cells
+  /**
+   * Mark the block's field to have been fixed w/r bad ghost cells
+   */
   int MarkCellFieldDataFixed(int block, int field);
 
-  // Description:
-  // Return the data array for the tracer positions.
+  /**
+   * Return the data array for the tracer positions.
+   */
   vtkFloatArray* GetTracers ();
 
   // Return the ith block (i.e. grid) in the reader

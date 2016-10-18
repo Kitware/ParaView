@@ -12,11 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSIUnstructuredGridVolumeRepresentationProxy - representation that can be used to
-// show a unstructured grid volume in a render view.
-// .SECTION Description
-// vtkSIUnstructuredGridVolumeRepresentationProxy is a concrete representation that can be used
-// to render the unstructured grid volume in a vtkSIRenderViewProxy.
+/**
+ * @class   vtkSIUnstructuredGridVolumeRepresentationProxy
+ * @brief   representation that can be used to
+ * show a unstructured grid volume in a render view.
+ *
+ * vtkSIUnstructuredGridVolumeRepresentationProxy is a concrete representation that can be used
+ * to render the unstructured grid volume in a vtkSIRenderViewProxy.
+*/
 
 #ifndef vtkSIUnstructuredGridVolumeRepresentationProxy_h
 #define vtkSIUnstructuredGridVolumeRepresentationProxy_h
@@ -35,8 +38,9 @@ protected:
   vtkSIUnstructuredGridVolumeRepresentationProxy();
   ~vtkSIUnstructuredGridVolumeRepresentationProxy();
 
-  // Description:
-  // Register the mappers
+  /**
+   * Register the mappers
+   */
   bool CreateVTKObjects() VTK_OVERRIDE;
 
 

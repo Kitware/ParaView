@@ -12,9 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCPMultiBlockGridBuilder - Class for creating multiblock grids.
-// .SECTION Description
-// Class for creating vtkMultiBlockDataSet grids for a test driver.
+/**
+ * @class   vtkCPMultiBlockGridBuilder
+ * @brief   Class for creating multiblock grids.
+ *
+ * Class for creating vtkMultiBlockDataSet grids for a test driver.
+*/
 
 #ifndef vtkCPMultiBlockGridBuilder_h
 #define vtkCPMultiBlockGridBuilder_h
@@ -34,55 +37,67 @@ public:
   vtkTypeMacro(vtkCPMultiBlockGridBuilder, vtkCPBaseGridBuilder);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Return a grid.  BuiltNewGrid is 0 if the grid is the same
-  // as the last time step.
+  /**
+   * Return a grid.  BuiltNewGrid is 0 if the grid is the same
+   * as the last time step.
+   */
   virtual vtkDataObject* GetGrid(unsigned long timeStep, double time,
                                  int & builtNewGrid);
 
-  // Description:
-  // Get the Grid.
+  /**
+   * Get the Grid.
+   */
   vtkMultiBlockDataSet* GetGrid();
 
-  // Description:
-  // Add a vtkCPGridBuilder.
+  /**
+   * Add a vtkCPGridBuilder.
+   */
   void AddGridBuilder(vtkCPGridBuilder* gridBuilder);
 
-  // Description:
-  // Remove a vtkCPGridBuilder.
+  /**
+   * Remove a vtkCPGridBuilder.
+   */
   void RemoveGridBuilder(vtkCPGridBuilder* gridBuilder);
   
-  // Description:
-  // Clear out all of the current vtkCPGridBuilders.
+  /**
+   * Clear out all of the current vtkCPGridBuilders.
+   */
   void RemoveAllGridBuilders();
 
-  // Description:
-  // Get the number of vtkCPGridBuilders.
+  /**
+   * Get the number of vtkCPGridBuilders.
+   */
   unsigned int GetNumberOfGridBuilders();
 
-  // Description:
-  // Get a specific vtkCPGridBuilder.
+  /**
+   * Get a specific vtkCPGridBuilder.
+   */
   vtkCPGridBuilder* GetGridBuilder(unsigned int which);
 
 protected:
   vtkCPMultiBlockGridBuilder();
   ~vtkCPMultiBlockGridBuilder();
 
-  // Description:
-  // Set the Grid.
+  /**
+   * Set the Grid.
+   */
   void SetGrid(vtkMultiBlockDataSet* multiBlock);
 
 private:
   vtkCPMultiBlockGridBuilder(const vtkCPMultiBlockGridBuilder&) VTK_DELETE_FUNCTION;
   void operator=(const vtkCPMultiBlockGridBuilder&) VTK_DELETE_FUNCTION;
 
-  // Description:
-  // The grid that is returned.
+  /**
+   * The grid that is returned.
+   */
   vtkMultiBlockDataSet* Grid;
 
-  // Description:
-  // Internals used for storing the vtkCPGridBuilders.
+  //@{
+  /**
+   * Internals used for storing the vtkCPGridBuilders.
+   */
   vtkCPMultiBlockGridBuilderInternals* Internal;
 };
+  //@}
 
 #endif

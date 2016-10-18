@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkVRMLSource - Converts importer to a source.
-// .SECTION Description
-// Since paraview can only use vtkSources, I am wrapping the VRML importer
-// as a source.  I will loose lights, texture maps and colors,
+/**
+ * @class   vtkVRMLSource
+ * @brief   Converts importer to a source.
+ *
+ * Since paraview can only use vtkSources, I am wrapping the VRML importer
+ * as a source.  I will loose lights, texture maps and colors,
+*/
 
 #ifndef vtkVRMLSource_h
 #define vtkVRMLSource_h
@@ -33,23 +36,32 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkVRMLSource *New();
 
-  // Description:
-  // VRML file name.  Set
+  //@{
+  /**
+   * VRML file name.  Set
+   */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
+  //@}
 
-  // Description: 
-  // Descided whether to generate color arrays or not.
+  //@{
+  /**
+   * Descided whether to generate color arrays or not.
+   */
   vtkSetMacro(Color,int);
   vtkGetMacro(Color,int);
   vtkBooleanMacro(Color,int);
+  //@}
 
-  // Description:
-  // This method allows all parts to be put into a single output.
-  // By default this flag is on.
+  //@{
+  /**
+   * This method allows all parts to be put into a single output.
+   * By default this flag is on.
+   */
   vtkSetMacro(Append,int);
   vtkGetMacro(Append,int);
   vtkBooleanMacro(Append,int);
+  //@}
 
   static int CanReadFile(const char *filename);
 

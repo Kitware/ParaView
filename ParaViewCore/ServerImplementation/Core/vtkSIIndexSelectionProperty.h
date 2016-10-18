@@ -12,14 +12,17 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSIIndexSelectionProperty - Select names from an indexed string list.
-// .SECTION Description
-// Expected Methods on reader (assuming command="Dimension"):
-// int GetNumberOfDimensions()
-// std::string GetDimensionName(int)
-// int GetCurrentDimensionIndex(std::string)
-// int GetDimensionSize(std::string)
-// void SetCurrentDimensionIndex(std::string, int)
+/**
+ * @class   vtkSIIndexSelectionProperty
+ * @brief   Select names from an indexed string list.
+ *
+ * Expected Methods on reader (assuming command="Dimension"):
+ * int GetNumberOfDimensions()
+ * std::string GetDimensionName(int)
+ * int GetCurrentDimensionIndex(std::string)
+ * int GetDimensionSize(std::string)
+ * void SetCurrentDimensionIndex(std::string, int)
+*/
 
 #ifndef vtkSIIndexSelectionProperty_h
 #define vtkSIIndexSelectionProperty_h
@@ -41,8 +44,9 @@ protected:
 
   friend class vtkSIProxy;
 
-  // Description:
-  // Pull the current state of the underneath implementation
+  /**
+   * Pull the current state of the underneath implementation
+   */
   virtual bool Pull(vtkSMMessage*);
 
 private:

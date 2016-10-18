@@ -12,12 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkMaterialInterfaceProcessRing
-// .SECTION Description
-// Data structure used to distribute work amongst available
-// processes. The buffer can be intialized from a process
-// priority queue such that only those processes with loading
-// less than a specified tolerance are included.
+/**
+ * @class   vtkMaterialInterfaceProcessRing
+ *
+ * Data structure used to distribute work amongst available
+ * processes. The buffer can be intialized from a process
+ * priority queue such that only those processes with loading
+ * less than a specified tolerance are included.
+*/
 
 #ifndef vtkMaterialInterfaceProcessRing_h
 #define vtkMaterialInterfaceProcessRing_h
@@ -29,27 +31,30 @@
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMaterialInterfaceProcessRing
 {
 public:
-  // Description:
   vtkMaterialInterfaceProcessRing();
-  // Description:
   ~vtkMaterialInterfaceProcessRing();
-  // Description:
-  // Return the object to an empty state.
+  /**
+   * Return the object to an empty state.
+   */
   void Clear();
-  // Description:
-  // Size buffer and point to first element.
+  /**
+   * Size buffer and point to first element.
+   */
   void Initialize(int nProcs);
-  // Description:
-  // Build from a process loading from a sorted
-  // vector of process loading items.
+  /**
+   * Build from a process loading from a sorted
+   * vector of process loading items.
+   */
   void Initialize(
       std::vector<vtkMaterialInterfaceProcessLoading> &Q,
       vtkIdType upperLoadingBound);
-  // Description:
-  // Get the next process id from the ring.
+  /**
+   * Get the next process id from the ring.
+   */
   vtkIdType GetNextId();
-  // Description:
-  // Print the state of the ring.
+  /**
+   * Print the state of the ring.
+   */
   void Print();
 
 private:

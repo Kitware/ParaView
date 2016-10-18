@@ -17,7 +17,10 @@
  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 ----------------------------------------------------------------------------*/
 
-// .NAME vtkAllToNRedistributePolyData - do balanced redistribution of cells on from all to n processors
+/**
+ * @class   vtkAllToNRedistributePolyData
+ * @brief   do balanced redistribution of cells on from all to n processors
+*/
 
 #ifndef vtkAllToNRedistributePolyData_h
 #define vtkAllToNRedistributePolyData_h
@@ -35,7 +38,6 @@ public:
   vtkTypeMacro(vtkAllToNRedistributePolyData, vtkWeightedRedistributePolyData);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
   static vtkAllToNRedistributePolyData *New();
 
   vtkSetMacro(NumberOfProcesses, int);

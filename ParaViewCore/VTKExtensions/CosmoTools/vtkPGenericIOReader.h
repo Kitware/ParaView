@@ -12,10 +12,12 @@
  PURPOSE.  See the above copyright notice for more information.
 
  =========================================================================*/
-// .NAME vtkPGenericIOReader.h -- Read GenericIO formatted data
-//
-// .SECTION Description
-//  Creates a vtkUnstructuredGrid instance from a GenericIO file.
+/**
+ * @class   vtkPGenericIOReader
+ *
+ *
+ *  Creates a vtkUnstructuredGrid instance from a GenericIO file.
+*/
 
 #ifndef vtkPGenericIOReader_h
 #define vtkPGenericIOReader_h
@@ -64,138 +66,187 @@ enum BlockAssignment {
   vtkTypeMacro(vtkPGenericIOReader,vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Specify the name of the cosmology particle binary file to read
+  //@{
+  /**
+   * Specify the name of the cosmology particle binary file to read
+   */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
+  //@}
 
-  // Description:
-  // Set/Get the variable name to be used as the x-axis for plotting particles.
+  //@{
+  /**
+   * Set/Get the variable name to be used as the x-axis for plotting particles.
+   */
   vtkSetStringMacro(XAxisVariableName);
   vtkGetStringMacro(XAxisVariableName);
+  //@}
 
-  // Description:
-  // Set/Get the variable name to be used as the x-axis for plotting particles.
+  //@{
+  /**
+   * Set/Get the variable name to be used as the x-axis for plotting particles.
+   */
   vtkSetStringMacro(YAxisVariableName);
   vtkGetStringMacro(YAxisVariableName);
+  //@}
 
-  // Description:
-  // Set/Get the variable name to be used as the x-axis for plotting particles.
+  //@{
+  /**
+   * Set/Get the variable name to be used as the x-axis for plotting particles.
+   */
   vtkSetStringMacro(ZAxisVariableName);
   vtkGetStringMacro(ZAxisVariableName);
+  //@}
 
-  // Description:
-  // Set/Get the underlying IO method the reader will employ, i.e., MPI or POSIX.
+  //@{
+  /**
+   * Set/Get the underlying IO method the reader will employ, i.e., MPI or POSIX.
+   */
   vtkSetMacro(GenericIOType,int);
   vtkGetMacro(GenericIOType,int);
+  //@}
 
-  // Description:
-  // Set/Get the underlying block-assignment strategy to use, i.e., ROUND_ROBIN,
-  // or RCB.
+  //@{
+  /**
+   * Set/Get the underlying block-assignment strategy to use, i.e., ROUND_ROBIN,
+   * or RCB.
+   */
   vtkSetMacro(BlockAssignment,int);
   vtkGetMacro(BlockAssignment,int);
+  //@}
 
-  // Description:
-  // Set/Get the RankInQuery. Used in combination with SetQueryRankNeighbors(1)
-  // tells the reader to render only the data of the RankInQuery and its
-  // neighbors.
+  //@{
+  /**
+   * Set/Get the RankInQuery. Used in combination with SetQueryRankNeighbors(1)
+   * tells the reader to render only the data of the RankInQuery and its
+   * neighbors.
+   */
   vtkSetMacro(RankInQuery,int);
   vtkGetMacro(RankInQuery,int);
+  //@}
 
-  // Description:
-  // Set/Get whether the reader should read/render only the data of the
-  // user-supplied rank, via SetRankInQuery(),
+  //@{
+  /**
+   * Set/Get whether the reader should read/render only the data of the
+   * user-supplied rank, via SetRankInQuery(),
+   */
   vtkSetMacro(QueryRankNeighbors,int);
   vtkGetMacro(QueryRankNeighbors,int);
+  //@}
 
-  // Description:
-  // Set/Get whether the reader should append the coordinates of the block each
-  // point was read from as a point data array.  Defaults to false (Off).
+  //@{
+  /**
+   * Set/Get whether the reader should append the coordinates of the block each
+   * point was read from as a point data array.  Defaults to false (Off).
+   */
   vtkSetMacro(AppendBlockCoordinates,bool);
   vtkBooleanMacro(AppendBlockCoordinates,bool);
   vtkGetMacro(AppendBlockCoordinates,bool);
+  //@}
 
-  // Description:
-  // Returns the list of arrays used to select the variables to be used
-  // for the x,y and z axis.
+  //@{
+  /**
+   * Returns the list of arrays used to select the variables to be used
+   * for the x,y and z axis.
+   */
   vtkGetObjectMacro(ArrayList,vtkStringArray);
+  //@}
 
-  // Description:
-  // Get the data array selection tables used to configure which data
-  // arrays are loaded by the reader.
+  //@{
+  /**
+   * Get the data array selection tables used to configure which data
+   * arrays are loaded by the reader.
+   */
   vtkGetObjectMacro(PointDataArraySelection,vtkDataArraySelection);
+  //@}
 
-  // Description:
-  // Set/Get a multiprocess-controller for reading in parallel.
-  // By default this parameter is set to NULL by the constructor.
+  //@{
+  /**
+   * Set/Get a multiprocess-controller for reading in parallel.
+   * By default this parameter is set to NULL by the constructor.
+   */
   vtkSetMacro(Controller,vtkMultiProcessController*);
   vtkGetMacro(Controller,vtkMultiProcessController*);
+  //@}
 
-  // Description:
-  // Returns the number of arrays in the file, i.e., the number of columns.
+  /**
+   * Returns the number of arrays in the file, i.e., the number of columns.
+   */
   int GetNumberOfPointArrays();
 
-  // Description:
-  // Returns the name of the ith array.
+  /**
+   * Returns the name of the ith array.
+   */
   const char* GetPointArrayName(int i);
 
-  // Description:
-  // Returns the status of the array corresponding to the given name.
+  /**
+   * Returns the status of the array corresponding to the given name.
+   */
   int GetPointArrayStatus(const char* name);
 
-  // Description:
-  // Sets the status of the array named.  If the status is 1, the array
-  // will be read in on the resulting dataset.
+  /**
+   * Sets the status of the array named.  If the status is 1, the array
+   * will be read in on the resulting dataset.
+   */
   void SetPointArrayStatus(const char* name, int status);
 
-  // Description:
-  // Gets/Sets the variable name for the halo id of the particle.
-  // This is used by the requested halo selector to select only the
-  // points in the desired halos.
+  //@{
+  /**
+   * Gets/Sets the variable name for the halo id of the particle.
+   * This is used by the requested halo selector to select only the
+   * points in the desired halos.
+   */
   vtkSetStringMacro(HaloIdVariableName);
   vtkGetStringMacro(HaloIdVariableName);
+  //@}
 
-  // Description:
-  // Gets the ith requested halo id.
-  // If the number of requested halo ids is
-  // greater than 0, only points with those halo ids will be read in.
-  // Otherwise all points will be read in.
+  /**
+   * Gets the ith requested halo id.
+   * If the number of requested halo ids is
+   * greater than 0, only points with those halo ids will be read in.
+   * Otherwise all points will be read in.
+   */
   vtkIdType GetRequestedHaloId(vtkIdType i);
 
-  // Description:
-  // Gets the number of requested halo ids.
-  // If the number of requested halo ids is
-  // greater than 0, only points with those halo ids will be read in.
-  // Otherwise all points will be read in.
+  /**
+   * Gets the number of requested halo ids.
+   * If the number of requested halo ids is
+   * greater than 0, only points with those halo ids will be read in.
+   * Otherwise all points will be read in.
+   */
   vtkIdType GetNumberOfRequestedHaloIds();
 
-  // Description:
-  // Sets the number of requested halo ids.
-  // Use SetRequestedHaloId() to se the ids after this is called
-  // If the number of requested halo ids is
-  // greater than 0, only points with those halo ids will be read in.
-  // Otherwise all points will be read in.
+  /**
+   * Sets the number of requested halo ids.
+   * Use SetRequestedHaloId() to se the ids after this is called
+   * If the number of requested halo ids is
+   * greater than 0, only points with those halo ids will be read in.
+   * Otherwise all points will be read in.
+   */
   void SetNumberOfRequestedHaloIds(vtkIdType numIds);
 
-  // Description:
-  // Adds the given halo id to the list of halo ids to request.
-  // If the number of requested halo ids is
-  // greater than 0, only points with those halo ids will be read in.
-  // Otherwise all points will be read in.
+  /**
+   * Adds the given halo id to the list of halo ids to request.
+   * If the number of requested halo ids is
+   * greater than 0, only points with those halo ids will be read in.
+   * Otherwise all points will be read in.
+   */
   void AddRequestedHaloId(vtkIdType haloId);
 
-  // Description:
-  // Clears the list of requested halo ids.
-  // If the number of requested halo ids is
-  // greater than 0, only points with those halo ids will be read in.
-  // Otherwise all points will be read in.
+  /**
+   * Clears the list of requested halo ids.
+   * If the number of requested halo ids is
+   * greater than 0, only points with those halo ids will be read in.
+   * Otherwise all points will be read in.
+   */
   void ClearRequestedHaloIds();
 
-  // Description:
-  // Sets the ith requested halo id to the given haloId.
-  // If the number of requested halo ids is
-  // greater than 0, only points with those halo ids will be read in.
-  // Otherwise all points will be read in.
+  /**
+   * Sets the ith requested halo id to the given haloId.
+   * If the number of requested halo ids is
+   * greater than 0, only points with those halo ids will be read in.
+   * Otherwise all points will be read in.
+   */
   void SetRequestedHaloId(vtkIdType i, vtkIdType haloId);
 
 protected:
@@ -208,23 +259,27 @@ protected:
   virtual int RequestData(
       vtkInformation*,vtkInformationVector**,vtkInformationVector*);
 
-  // Description:
-  // Loads the GenericIO metadata from the file.
+  /**
+   * Loads the GenericIO metadata from the file.
+   */
   void LoadMetaData();
 
-  // Description:
-  // This method checks if the internal reader parameters have changed.
-  // Namely, if the I/O method or filename have changed, the method returns
-  // true.
+  /**
+   * This method checks if the internal reader parameters have changed.
+   * Namely, if the I/O method or filename have changed, the method returns
+   * true.
+   */
   bool ReaderParametersChanged();
 
-  // Description:
-  // Returns the internal reader instance according to IOType.
+  /**
+   * Returns the internal reader instance according to IOType.
+   */
   gio::GenericIOReader* GetInternalReader();
 
 
-  // Description:
-  // Return the point from the raw data.
+  /**
+   * Return the point from the raw data.
+   */
   void GetPointFromRawData(
           int xType, void* xBuffer,
           int yType, void* yBuffer,
@@ -232,30 +287,36 @@ protected:
           vtkIdType idx,
           double pnt[3]);
 
-  // Description:
-  // Loads the variable with the given name
+  /**
+   * Loads the variable with the given name
+   */
   void LoadRawVariableData(std::string varName);
 
-  // Description:
-  // Loads the Raw data
+  /**
+   * Loads the Raw data
+   */
   void LoadRawData();
 
-  // Description:
-  // Loads the particle coordinates
+  /**
+   * Loads the particle coordinates
+   */
   void LoadCoordinates(vtkUnstructuredGrid *grid,
                        std::set< vtkIdType >& pointsInSelectedHalos);
 
-  // Description:
-  // Loads the particle data arrays
+  /**
+   * Loads the particle data arrays
+   */
   void LoadData(vtkUnstructuredGrid *grid,
                 const std::set< vtkIdType >& pointsInSelectedHalos);
 
-  // Description:
-  // Finds the neighbors of the user-supplied rank
+  /**
+   * Finds the neighbors of the user-supplied rank
+   */
   void FindRankNeighbors();
 
-  // Descriptions
-  // Call-back registered with the SelectionObserver.
+  /**
+   * Call-back registered with the SelectionObserver.
+   */
   static void SelectionModifiedCallback(
     vtkObject *caller,unsigned long eid,
     void *clientdata,void *calldata );

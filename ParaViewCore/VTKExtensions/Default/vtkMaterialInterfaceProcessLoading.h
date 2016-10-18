@@ -12,10 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkMaterialInterfaceProcessLoading
-// .SECTION Description
-// Data type to represent a node in a multiprocess job
-// and its current loading state.
+/**
+ * @class   vtkMaterialInterfaceProcessLoading
+ *
+ * Data type to represent a node in a multiprocess job
+ * and its current loading state.
+*/
 
 #ifndef vtkMaterialInterfaceProcessLoading_h
 #define vtkMaterialInterfaceProcessLoading_h
@@ -35,51 +37,63 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMaterialInterfaceProcessLoading
     vtkMaterialInterfaceProcessLoading(){ this->Initialize(-1,0); }
     //
     ~vtkMaterialInterfaceProcessLoading(){ this->Initialize(-1,0); }
-    // Description:
-    // Set the id and load factor.
+    //@{
+    /**
+     * Set the id and load factor.
+     */
     void Initialize(int id, vtkIdType loadFactor)
     {
       this->Data[ID]=id;
       this->Data[LOADING]=loadFactor;
     }
-    // Description:
-    // Comparision of two objects loading.
+    //@}
+    /**
+     * Comparision of two objects loading.
+     */
     bool operator<(const vtkMaterialInterfaceProcessLoading &rhs) const
     {
       return this->Data[LOADING]<rhs.Data[LOADING];
     }
-    // Description:
-    // Comparision of two objects loading.
+    /**
+     * Comparision of two objects loading.
+     */
     bool operator<=(const vtkMaterialInterfaceProcessLoading &rhs) const
     {
       return this->Data[LOADING]<=rhs.Data[LOADING];
     }
-    // Description:
-    // Comparision of two objects loading.
+    /**
+     * Comparision of two objects loading.
+     */
     bool operator>(const vtkMaterialInterfaceProcessLoading &rhs) const
     {
       return this->Data[LOADING]>rhs.Data[LOADING];
     }
-    // Description:
-    // Comparision of two objects loading.
+    /**
+     * Comparision of two objects loading.
+     */
     bool operator>=(const vtkMaterialInterfaceProcessLoading &rhs) const
     {
       return this->Data[LOADING]>=rhs.Data[LOADING];
     }
-    // Description:
-    // Comparision of two objects loading.
+    /**
+     * Comparision of two objects loading.
+     */
     bool operator==(const vtkMaterialInterfaceProcessLoading &rhs) const
     {
       return this->Data[LOADING]==rhs.Data[LOADING];
     }
-    // Description:
-    // Return the process id.
+    /**
+     * Return the process id.
+     */
     vtkIdType GetId() const{ return this->Data[ID]; }
-    // Description:
-    // Return the load factor.
+    /**
+     * Return the load factor.
+     */
     vtkIdType GetLoadFactor() const{ return this->Data[LOADING]; }
-    // Description:
-    // Add to the load factor.
+    //@{
+    /**
+     * Add to the load factor.
+     */
     vtkIdType UpdateLoadFactor(vtkIdType loadFactor)
     {
       assert("Update would make loading negative."
@@ -94,6 +108,7 @@ std::ostream &operator<<(std::ostream &sout, const vtkMaterialInterfaceProcessLo
 VTKPVVTKEXTENSIONSDEFAULT_EXPORT
 std::ostream &operator<<(std::ostream &sout, const std::vector<vtkMaterialInterfaceProcessLoading> &vfp);
 #endif
+    //@}
 
 
 // VTK-HeaderTest-Exclude: vtkMaterialInterfaceProcessLoading.h

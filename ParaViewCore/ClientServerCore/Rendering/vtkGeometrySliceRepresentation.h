@@ -12,12 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkGeometrySliceRepresentation - extends vtkGeometryRepresentation to
-// add support for showing just specific slices from the dataset.
-// .SECTION Description
-// vtkGeometrySliceRepresentation extends vtkGeometryRepresentation to show
-// slices from the dataset. This is used for vtkPVMultiSliceView and
-// vtkPVOrthographicSliceView.
+/**
+ * @class   vtkGeometrySliceRepresentation
+ * @brief   extends vtkGeometryRepresentation to
+ * add support for showing just specific slices from the dataset.
+ *
+ * vtkGeometrySliceRepresentation extends vtkGeometryRepresentation to show
+ * slices from the dataset. This is used for vtkPVMultiSliceView and
+ * vtkPVOrthographicSliceView.
+*/
 
 #ifndef vtkGeometrySliceRepresentation_h
 #define vtkGeometrySliceRepresentation_h
@@ -45,10 +48,13 @@ public:
   vtkSetClampMacro(Mode, int, X_SLICE_ONLY, ALL_SLICES);
   vtkGetMacro(Mode, int);
 
-  // Description:
-  // Get/Set whether original data outline should be shown in the view.
+  //@{
+  /**
+   * Get/Set whether original data outline should be shown in the view.
+   */
   vtkSetMacro(ShowOutline, bool);
   vtkGetMacro(ShowOutline, bool);
+  //@}
 
 protected:
   vtkGeometrySliceRepresentation();

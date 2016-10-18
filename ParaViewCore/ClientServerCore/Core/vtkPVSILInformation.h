@@ -12,10 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVSILInformation
-// .SECTION Description
-// Information object used to retreived the SIL graph from a file reader or
-// any compatible source.
+/**
+ * @class   vtkPVSILInformation
+ *
+ * Information object used to retreived the SIL graph from a file reader or
+ * any compatible source.
+*/
 
 #ifndef vtkPVSILInformation_h
 #define vtkPVSILInformation_h
@@ -32,18 +34,25 @@ public:
   vtkTypeMacro(vtkPVSILInformation, vtkPVInformation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Transfer information about a single object into this object.
+  /**
+   * Transfer information about a single object into this object.
+   */
   virtual void CopyFromObject(vtkObject*);
 
-  // Description:
-  // Manage a serialized version of the information.
+  //@{
+  /**
+   * Manage a serialized version of the information.
+   */
   virtual void CopyToStream(vtkClientServerStream*);
   virtual void CopyFromStream(const vtkClientServerStream*);
+  //@}
 
-  // Description:
-  // Returns the SIL.
+  //@{
+  /**
+   * Returns the SIL.
+   */
   vtkGetObjectMacro(SIL, vtkGraph);
+  //@}
 
 protected:
   vtkPVSILInformation();

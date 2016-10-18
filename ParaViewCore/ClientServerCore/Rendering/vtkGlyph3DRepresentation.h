@@ -12,12 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkGlyph3DRepresentation
-// .SECTION Description
-// vtkGlyph3DRepresentation is a representation that uses the vtkGlyph3DMapper
-// for rendering glyphs.
-// Note that vtkGlyph3DRepresentation requires that the "glyph" source data is
-// available on all rendering processes.
+/**
+ * @class   vtkGlyph3DRepresentation
+ *
+ * vtkGlyph3DRepresentation is a representation that uses the vtkGlyph3DMapper
+ * for rendering glyphs.
+ * Note that vtkGlyph3DRepresentation requires that the "glyph" source data is
+ * available on all rendering processes.
+*/
 
 #ifndef vtkGlyph3DRepresentation_h
 #define vtkGlyph3DRepresentation_h
@@ -35,22 +37,25 @@ public:
   vtkTypeMacro(vtkGlyph3DRepresentation, vtkGeometryRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is
-  // typically called by the vtkView to request meta-data from the
-  // representations or ask them to perform certain tasks e.g.
-  // PrepareForRendering.
+  /**
+   * vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is
+   * typically called by the vtkView to request meta-data from the
+   * representations or ask them to perform certain tasks e.g.
+   * PrepareForRendering.
+   */
   virtual int ProcessViewRequest(vtkInformationRequestKey* request_type,
     vtkInformation* inInfo, vtkInformation* outInfo);
 
-  // Description:
-  // Toggle the visibility of the original mesh.
-  // If this->GetVisibility() is false, then this has no effect.
+  /**
+   * Toggle the visibility of the original mesh.
+   * If this->GetVisibility() is false, then this has no effect.
+   */
   void SetMeshVisibility(bool visible);
 
-  // Description:
-  // Get/Set the visibility for this representation. When the visibility of
-  // representation of false, all view passes are ignored.
+  /**
+   * Get/Set the visibility for this representation. When the visibility of
+   * representation of false, all view passes are ignored.
+   */
   virtual void SetVisibility(bool);
 
   //**************************************************************************
@@ -88,43 +93,50 @@ protected:
   vtkGlyph3DRepresentation();
   ~vtkGlyph3DRepresentation();
 
-  // Description:
-  // Fill input port information.
+  /**
+   * Fill input port information.
+   */
   virtual int FillInputPortInformation(int port, vtkInformation* info);
 
   virtual int RequestData(vtkInformation*,
     vtkInformationVector**, vtkInformationVector*);
 
-  // Description:
-  // Overridden to request single piece from the Glyph source.
+  /**
+   * Overridden to request single piece from the Glyph source.
+   */
   int RequestUpdateExtent(vtkInformation* request,
     vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
-  // Description:
-  // Adds the representation to the view.  This is called from
-  // vtkView::AddRepresentation().  Subclasses should override this method.
-  // Returns true if the addition succeeds.
+  /**
+   * Adds the representation to the view.  This is called from
+   * vtkView::AddRepresentation().  Subclasses should override this method.
+   * Returns true if the addition succeeds.
+   */
   virtual bool AddToView(vtkView* view);
 
-  // Description:
-  // Removes the representation to the view.  This is called from
-  // vtkView::RemoveRepresentation().  Subclasses should override this method.
-  // Returns true if the removal succeeds.
+  /**
+   * Removes the representation to the view.  This is called from
+   * vtkView::RemoveRepresentation().  Subclasses should override this method.
+   * Returns true if the removal succeeds.
+   */
   virtual bool RemoveFromView(vtkView* view);
 
-  // Description:
-  // Used in ConvertSelection to locate the prop used for actual rendering.
+  /**
+   * Used in ConvertSelection to locate the prop used for actual rendering.
+   */
   virtual vtkPVLODActor* GetRenderedProp()
     { return this->GlyphActor; }
 
-  // Description:
-  // Overridden to ensure that the coloring decisions are passed over to the
-  // glyph mapper.
+  /**
+   * Overridden to ensure that the coloring decisions are passed over to the
+   * glyph mapper.
+   */
   virtual void UpdateColoringParameters();
 
-  // Description:
-  // Determines bounds using the vtkGlyph3DMapper.
+  /**
+   * Determines bounds using the vtkGlyph3DMapper.
+   */
   void ComputeGlyphBounds(double bounds[6]);
 
   vtkGlyph3DMapper* GlyphMapper;

@@ -12,16 +12,18 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkMaterialInterfacePieceTransaction
-// .SECTION Description
-// Helper to the transaction matrix.
-//
-// Data structure that describes a single transaction
-// that needs to be executed in the process of
-// moving a fragment piece around.
-//
-// The fragment to be transacted and the executing process are
-// determined implicitly by where the transaction is stored.
+/**
+ * @class   vtkMaterialInterfacePieceTransaction
+ *
+ * Helper to the transaction matrix.
+ *
+ * Data structure that describes a single transaction
+ * that needs to be executed in the process of
+ * moving a fragment piece around.
+ *
+ * The fragment to be transacted and the executing process are
+ * determined implicitly by where the transaction is stored.
+*/
 
 #ifndef vtkMaterialInterfacePieceTransaction_h
 #define vtkMaterialInterfacePieceTransaction_h

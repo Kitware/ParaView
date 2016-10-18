@@ -12,18 +12,21 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMAnimationSceneImageWriter - helper class to write animation 
-// images/movies.
-// .SECTION Description
-// vtkSMAnimationSceneImageWriter is a concrete implementation of
-// vtkSMAnimationSceneWriter that can write movies or images. The generated
-// output's size and alignment is exactly as specified on the GUISize,
-// WindowPosition properties of the view modules. One can optionally specify
-// Magnification to scale the output.
-// .SECTION Notes
-// This class does not support changing the dimensions of the view, one has to 
-// do that before calling Save(). It only provides Magnification which can scale 
-// the size using integral scale factor.
+/**
+ * @class   vtkSMAnimationSceneImageWriter
+ * @brief   helper class to write animation 
+ * images/movies.
+ *
+ * vtkSMAnimationSceneImageWriter is a concrete implementation of
+ * vtkSMAnimationSceneWriter that can write movies or images. The generated
+ * output's size and alignment is exactly as specified on the GUISize,
+ * WindowPosition properties of the view modules. One can optionally specify
+ * Magnification to scale the output.
+ * @attention
+ * This class does not support changing the dimensions of the view, one has to 
+ * do that before calling Save(). It only provides Magnification which can scale 
+ * the size using integral scale factor.
+*/
 
 #ifndef vtkSMAnimationSceneImageWriter_h
 #define vtkSMAnimationSceneImageWriter_h
@@ -43,47 +46,65 @@ public:
   vtkTypeMacro(vtkSMAnimationSceneImageWriter, vtkSMAnimationSceneWriter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Set the magnification factor to use for the saved animation.
+  //@{
+  /**
+   * Set the magnification factor to use for the saved animation.
+   */
   vtkSetClampMacro(Magnification, int, 1, VTK_INT_MAX);
   vtkGetMacro(Magnification, int);
+  //@}
 
-  // Description:
-  // Get/Set the quality for the generated movie.
-  // Applicable only if the choose file format supports it.
-  // 0 means worst quality and smallest file size
-  // 2 means best quality and largest file size
+  //@{
+  /**
+   * Get/Set the quality for the generated movie.
+   * Applicable only if the choose file format supports it.
+   * 0 means worst quality and smallest file size
+   * 2 means best quality and largest file size
+   */
   vtkSetClampMacro(Quality, int, 0, 2);
   vtkGetMacro(Quality, int);
+  //@}
 
-  // Description:
-  // Turns on(the default) or off compression.
-  // Turning off compression overrides quality setting.
-  // NOTE: This only affects the FFMPEG backend.
+  //@{
+  /**
+   * Turns on(the default) or off compression.
+   * Turning off compression overrides quality setting.
+   * NOTE: This only affects the FFMPEG backend.
+   */
   vtkSetMacro(Compression, bool);
   vtkGetMacro(Compression, bool);
   vtkBooleanMacro(Compression, bool);
+  //@}
 
-  // Description:
-  // Get/Set the setting whether the movie encoder should use subsampling of
-  // the chrome planes or not, if applicable. Since the human eye is more
-  // sensitive to brightness than color variations, subsampling can be
-  // useful to reduce the bitrate. Default value is 0.
+  //@{
+  /**
+   * Get/Set the setting whether the movie encoder should use subsampling of
+   * the chrome planes or not, if applicable. Since the human eye is more
+   * sensitive to brightness than color variations, subsampling can be
+   * useful to reduce the bitrate. Default value is 0.
+   */
   vtkSetMacro(Subsampling, int);
   vtkGetMacro(Subsampling, int);
   vtkBooleanMacro(Subsampling, int);
+  //@}
 
-  // Description:
-  // Get the error code which is set if there's an error while writing
-  // the images.
+  //@{
+  /**
+   * Get the error code which is set if there's an error while writing
+   * the images.
+   */
   vtkGetMacro(ErrorCode, int);
+  //@}
 
 
-  // Description:
-  // Get/Set the RGB background color to use to fill empty spaces in the image.
-  // RGB components are in the range [0,1].
+  //@{
+  /**
+   * Get/Set the RGB background color to use to fill empty spaces in the image.
+   * RGB components are in the range [0,1].
+   */
   vtkSetVector3Macro(BackgroundColor, double);
   vtkGetVector3Macro(BackgroundColor, double);
+  //@}
 
   // Get/Set the frame rate to use for saving the animation.
   // This frame rate is the frame rate that gets saved in the movie 
@@ -95,25 +116,31 @@ public:
   vtkGetMacro(FrameRate, double);
 
 
-  // Description:
-  // Convenience method used to merge a smaller image (\c src) into a 
-  // larger one (\c dest). The location of the smaller image in the larger image
-  // are determined by their extents.
+  //@{
+  /**
+   * Convenience method used to merge a smaller image (\c src) into a
+   * larger one (\c dest). The location of the smaller image in the larger image
+   * are determined by their extents.
+   */
   static void Merge(vtkImageData* dest, vtkImageData* src);
 protected:
   vtkSMAnimationSceneImageWriter();
   ~vtkSMAnimationSceneImageWriter();
+  //@}
 
-  // Description:
-  // Called to initialize saving.
+  /**
+   * Called to initialize saving.
+   */
   virtual bool SaveInitialize(int startCount);
 
-  // Description:
-  // Called to save a particular frame.
+  /**
+   * Called to save a particular frame.
+   */
   virtual bool SaveFrame(double time);
 
-  // Description:
-  // Called to finalize saving.
+  /**
+   * Called to finalize saving.
+   */
   virtual bool SaveFinalize();
 
   // Creates the writer based on file type.
@@ -123,11 +150,12 @@ protected:
   // resolution of the generated animation frame.
   void UpdateImageSize();
 
-  // Description:
-  // Captures the view from the given module and
-  // returns a new Image data object. May return NULL.
-  // Default implementation can only handle vtkSMViewProxy subclasses.
-  // Subclassess must override to handle other types of view modules.
+  /**
+   * Captures the view from the given module and
+   * returns a new Image data object. May return NULL.
+   * Default implementation can only handle vtkSMViewProxy subclasses.
+   * Subclassess must override to handle other types of view modules.
+   */
   virtual vtkImageData* CaptureViewImage(
     vtkSMViewProxy*, int magnification);
 

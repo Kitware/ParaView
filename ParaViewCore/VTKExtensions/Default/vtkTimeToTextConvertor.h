@@ -12,13 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkTimeToTextConvertor
-// .SECTION Description
-// This filter can be attached to any filter/source/reader that supports time.
-// vtkTimeToTextConvertor will generate a 1x1 vtkTable with the string
-// for the data time using the format specified.
-// The input to this filter is optional. If no input is specified, it will show
-// produce request time in the output.
+/**
+ * @class   vtkTimeToTextConvertor
+ *
+ * This filter can be attached to any filter/source/reader that supports time.
+ * vtkTimeToTextConvertor will generate a 1x1 vtkTable with the string
+ * for the data time using the format specified.
+ * The input to this filter is optional. If no input is specified, it will show
+ * produce request time in the output.
+*/
 
 #ifndef vtkTimeToTextConvertor_h
 #define vtkTimeToTextConvertor_h
@@ -33,22 +35,31 @@ public:
   vtkTypeMacro(vtkTimeToTextConvertor, vtkTableAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Get/Set the format in which the to display the
-  // input update time. Use printf formatting.
-  // Default is "Time: %f".
+  //@{
+  /**
+   * Get/Set the format in which the to display the
+   * input update time. Use printf formatting.
+   * Default is "Time: %f".
+   */
   vtkSetStringMacro(Format);
   vtkGetStringMacro(Format);
+  //@}
 
-  // Description:
-  // Apply a translation to the time
+  //@{
+  /**
+   * Apply a translation to the time
+   */
   vtkSetMacro(Shift, double);
   vtkGetMacro(Shift, double);
+  //@}
 
-  // Description:
-  // Apply a scale to the time.
+  //@{
+  /**
+   * Apply a scale to the time.
+   */
   vtkSetMacro(Scale, double);
   vtkGetMacro(Scale, double);
+  //@}
 
 protected:
   vtkTimeToTextConvertor();

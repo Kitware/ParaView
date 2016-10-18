@@ -12,19 +12,21 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkHybridProbeFilter
-// .SECTION Description
-// vtkHybridProbeFilter is a combination of vtkExtractSelection at a specific
-// location and vtkProbeFilter. Since the 'Selection Inspector' in ParaView was
-// removed, we were missing ability to extract cells based on location. This
-// filter fills that gap until we get the change to extend "Find Data" mechanism
-// to support location based selections.
-//
-// This filter also "probes" just as a convenience since the user may not know
-// exactly what he/she is looking for -- interpolate at point location (probe)
-// or extract cell containing the point (extract selection).
-//
-// Internally this filter uses vtkPProbeFilter and vtkExtractSelection.
+/**
+ * @class   vtkHybridProbeFilter
+ *
+ * vtkHybridProbeFilter is a combination of vtkExtractSelection at a specific
+ * location and vtkProbeFilter. Since the 'Selection Inspector' in ParaView was
+ * removed, we were missing ability to extract cells based on location. This
+ * filter fills that gap until we get the change to extend "Find Data" mechanism
+ * to support location based selections.
+ *
+ * This filter also "probes" just as a convenience since the user may not know
+ * exactly what he/she is looking for -- interpolate at point location (probe)
+ * or extract cell containing the point (extract selection).
+ *
+ * Internally this filter uses vtkPProbeFilter and vtkExtractSelection.
+*/
 
 #ifndef vtkHybridProbeFilter_h
 #define vtkHybridProbeFilter_h
@@ -52,10 +54,13 @@ public:
   void SetModeToInterpolateAtLocation() { this->SetMode(INTERPOLATE_AT_LOCATION); }
   void SetModeToExtractCellContainingLocation() { this->SetMode(EXTRACT_CELL_CONTAINING_LOCATION); }
 
-  // Description:
-  // Get/Set the location to probe/pick at.
+  //@{
+  /**
+   * Get/Set the location to probe/pick at.
+   */
   vtkSetVector3Macro(Location, double);
   vtkGetVector3Macro(Location, double);
+  //@}
 
 protected:
   vtkHybridProbeFilter();

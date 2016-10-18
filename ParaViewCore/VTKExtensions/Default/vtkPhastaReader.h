@@ -12,12 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPhastaReader - Reader for RPI's PHASTA software
-// .SECTION Description
-// vtkPhastaReader reads RPI's Scorec's PHASTA (Parallel Hierarchic
-// Adaptive Stabilized Transient Analysis) dumps.  See
-// http://www.scorec.rpi.edu/software_products.html or contact Scorec for
-// information on PHASTA.
+/**
+ * @class   vtkPhastaReader
+ * @brief   Reader for RPI's PHASTA software
+ *
+ * vtkPhastaReader reads RPI's Scorec's PHASTA (Parallel Hierarchic
+ * Adaptive Stabilized Transient Analysis) dumps.  See
+ * http://www.scorec.rpi.edu/software_products.html or contact Scorec for
+ * information on PHASTA.
+*/
 
 #ifndef vtkPhastaReader_h
 #define vtkPhastaReader_h
@@ -39,18 +42,26 @@ public:
   vtkTypeMacro(vtkPhastaReader,vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Specify file name of Phasta geometry file to read.
+  //@{
+  /**
+   * Specify file name of Phasta geometry file to read.
+   */
   vtkSetStringMacro(GeometryFileName);
   vtkGetStringMacro(GeometryFileName);
+  //@}
 
-  // Description:
-  // Specify file name of Phasta field file to read.
+  //@{
+  /**
+   * Specify file name of Phasta field file to read.
+   */
   vtkSetStringMacro(FieldFileName);
   vtkGetStringMacro(FieldFileName);
+  //@}
 
-  // Description:
-  // Clear/Set info. in FieldInfoMap for object of vtkPhastaReaderInternal
+  //@{
+  /**
+   * Clear/Set info. in FieldInfoMap for object of vtkPhastaReaderInternal
+   */
   void ClearFieldInfo();
   void SetFieldInfo(const char *paraviewFieldTag,
                     const char* phastaFieldTag,
@@ -58,6 +69,7 @@ public:
                     int numOfComps,
                     int dataDependency,
                     const char* dataType);
+  //@}
 
   void SetCachedGrid(vtkUnstructuredGrid*);
   vtkGetObjectMacro(CachedGrid, vtkUnstructuredGrid);

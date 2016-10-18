@@ -12,9 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCPFileGridBuilder - Class for creating grids from a VTK file.
-// .SECTION Description
-// Class for creating grids from a VTK file.  
+/**
+ * @class   vtkCPFileGridBuilder
+ * @brief   Class for creating grids from a VTK file.
+ *
+ * Class for creating grids from a VTK file.  
+*/
 
 #ifndef vtkCPFileGridBuilder_h
 #define vtkCPFileGridBuilder_h
@@ -31,38 +34,50 @@ public:
   vtkTypeMacro(vtkCPFileGridBuilder, vtkCPGridBuilder);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Return a grid.  BuiltNewGrid is set to 0 if the grids
-  // that were returned were already built before.
-  // vtkCPFileGridBuilder will also delete the grid.
+  /**
+   * Return a grid.  BuiltNewGrid is set to 0 if the grids
+   * that were returned were already built before.
+   * vtkCPFileGridBuilder will also delete the grid.
+   */
   virtual vtkDataObject* GetGrid(unsigned long timeStep, double time,
                                  int & builtNewGrid);
 
-  // Description:
-  // Set/get the FileName.
+  //@{
+  /**
+   * Set/get the FileName.
+   */
   vtkGetStringMacro(FileName);
   vtkSetStringMacro(FileName);
+  //@}
 
-  // Description:
-  // Set/get KeepPointData.
+  //@{
+  /**
+   * Set/get KeepPointData.
+   */
   vtkGetMacro(KeepPointData, bool);
   vtkSetMacro(KeepPointData, bool);
+  //@}
 
-  // Description:
-  // Set/get KeepPointData.
+  //@{
+  /**
+   * Set/get KeepPointData.
+   */
   vtkGetMacro(KeepCellData, bool);
   vtkSetMacro(KeepCellData, bool);
+  //@}
 
-  // Description:
-  // Get the current grid.
+  /**
+   * Get the current grid.
+   */
   vtkDataObject* GetGrid();
 
 protected:
   vtkCPFileGridBuilder();
   ~vtkCPFileGridBuilder();
 
-  // Description:
-  // Function to set the grid and take care of the reference counting.
+  /**
+   * Function to set the grid and take care of the reference counting.
+   */
   virtual void SetGrid(vtkDataObject*);
 
 private:
@@ -70,23 +85,29 @@ private:
 
   void operator=(const vtkCPFileGridBuilder&) VTK_DELETE_FUNCTION;
 
-  // Description:
-  // The name of the VTK file to be read.
+  /**
+   * The name of the VTK file to be read.
+   */
   char * FileName;
 
-  // Description:
-  // Flag to indicate that any vtkPointData arrays that are set by the
-  // file reader are to be cleared out.  By default this is true.
+  /**
+   * Flag to indicate that any vtkPointData arrays that are set by the
+   * file reader are to be cleared out.  By default this is true.
+   */
   bool KeepPointData;
 
-  // Description:
-  // Flag to indicate that any vtkCellData arrays that are set by the
-  // file reader are to be cleared out.  By default this is true.
+  /**
+   * Flag to indicate that any vtkCellData arrays that are set by the
+   * file reader are to be cleared out.  By default this is true.
+   */
   bool KeepCellData;
 
-  // Description:
-  // The grid that is returned.
+  //@{
+  /**
+   * The grid that is returned.
+   */
   vtkDataObject* Grid;
 };
+  //@}
 
 #endif

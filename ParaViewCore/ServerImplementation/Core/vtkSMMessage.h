@@ -12,10 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMMessage
-// .SECTION Description
-// Header class that setup every thing in order to use Protobuf messages in
-// a transparent manner
+/**
+ * @class   vtkSMMessage
+ *
+ * Header class that setup every thing in order to use Protobuf messages in
+ * a transparent manner
+*/
 
 #ifndef vtkSMMessage_h
 #define vtkSMMessage_h

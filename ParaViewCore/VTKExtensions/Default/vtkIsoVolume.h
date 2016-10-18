@@ -12,13 +12,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkIsoVolume - This filter extract cells using lower / upper
-// threshold set and vtkPVClipDataSet filter.
-//
-// .SECTION Description
-//
-// .SECTION See Also
-// vtkThreshold vtkPVClipDataSet
+/**
+ * @class   vtkIsoVolume
+ * @brief   This filter extract cells using lower / upper
+ * threshold set and vtkPVClipDataSet filter.
+ *
+ *
+ *
+ * @sa
+ * vtkThreshold vtkPVClipDataSet
+*/
 
 #ifndef vtkIsoVolume_h
 #define vtkIsoVolume_h
@@ -36,15 +39,19 @@ public:
   vtkTypeMacro(vtkIsoVolume, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Criterion is cells whose scalars are between lower and upper thresholds
-  // (inclusive of the end values).
+  /**
+   * Criterion is cells whose scalars are between lower and upper thresholds
+   * (inclusive of the end values).
+   */
   void ThresholdBetween(double lower, double upper);
 
-  // Description:
-  // Get the Upper and Lower thresholds.
+  //@{
+  /**
+   * Get the Upper and Lower thresholds.
+   */
   vtkGetMacro(UpperThreshold, double);
   vtkGetMacro(LowerThreshold, double);
+  //@}
 
 protected:
   vtkIsoVolume();
@@ -54,9 +61,10 @@ protected:
   virtual int RequestData(vtkInformation* request, vtkInformationVector**,
                           vtkInformationVector*);
 
-  // Description:
-  // This filter produces a vtkMultiBlockDataSet when the input is a
-  // vtkCompositeDataSet otherwise, it produces a vtkUnstructuredGrid.
+  /**
+   * This filter produces a vtkMultiBlockDataSet when the input is a
+   * vtkCompositeDataSet otherwise, it produces a vtkUnstructuredGrid.
+   */
   virtual int RequestDataObject(vtkInformation* request,
                                 vtkInformationVector** inputVector,
                                 vtkInformationVector* outputVector);

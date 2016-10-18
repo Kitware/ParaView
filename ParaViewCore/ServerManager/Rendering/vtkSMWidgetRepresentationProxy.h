@@ -12,12 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMWidgetRepresentationProxy - proxy for a widget representation
-// .SECTION Description
-// vtkSMWidgetRepresentationProxy is a specialized proxy that represents
-// VTK widget representation. It adds the capability of syncing the 
-// appearance of server-side representation to the client-side 
-// representation
+/**
+ * @class   vtkSMWidgetRepresentationProxy
+ * @brief   proxy for a widget representation
+ *
+ * vtkSMWidgetRepresentationProxy is a specialized proxy that represents
+ * VTK widget representation. It adds the capability of syncing the 
+ * appearance of server-side representation to the client-side 
+ * representation
+*/
 
 #ifndef vtkSMWidgetRepresentationProxy_h
 #define vtkSMWidgetRepresentationProxy_h
@@ -32,12 +35,15 @@ public:
   vtkTypeMacro(vtkSMWidgetRepresentationProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // These method forward the representation state of the client side
-  // widget representation to the server.
+  //@{
+  /**
+   * These method forward the representation state of the client side
+   * widget representation to the server.
+   */
   virtual void OnStartInteraction();
   virtual void OnEndInteraction();
   virtual void OnInteraction();
+  //@}
 
 protected:
   vtkSMWidgetRepresentationProxy();

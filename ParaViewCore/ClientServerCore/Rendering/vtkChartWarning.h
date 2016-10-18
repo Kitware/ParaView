@@ -13,11 +13,14 @@
 
 =========================================================================*/
 
-// .NAME vtkChartWarning - a vtkContextItem that draws a block (optional label).
-//
-// .SECTION Description
-// This is a vtkContextItem that can be placed into a vtkContextScene. It draws
-// a block of the given dimensions, and reacts to mouse events.
+/**
+ * @class   vtkChartWarning
+ * @brief   a vtkContextItem that draws a block (optional label).
+ *
+ *
+ * This is a vtkContextItem that can be placed into a vtkContextScene. It draws
+ * a block of the given dimensions, and reacts to mouse events.
+*/
 
 #ifndef vtkChartWarning_h
 #define vtkChartWarning_h
@@ -34,12 +37,14 @@ public:
   vtkTypeMacro(vtkChartWarning,vtkBlockItem);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Paint event for the item.
+  /**
+   * Paint event for the item.
+   */
   virtual bool Paint(vtkContext2D* painter);
 
-  // Description:
-  // Returns true if the supplied x, y coordinate is inside the item.
+  /**
+   * Returns true if the supplied x, y coordinate is inside the item.
+   */
   virtual bool Hit(const vtkContextMouseEvent& mouse);
 
   vtkSetMacro(TextPad,double);

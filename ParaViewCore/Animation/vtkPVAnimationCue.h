@@ -12,15 +12,18 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVAnimationCue - proxy for vtkAnimationCue.
-// .SECTION Description
-// This is a proxy for vtkAnimationCue. All animation proxies are client
-// side proxies.
-// This class needs a vtkPVCueManipulator. The \b Manipulator
-// performs the actual interpolation.
-// .SECTION See Also
-// vtkAnimationCue vtkSMAnimationSceneProxy
-//
+/**
+ * @class   vtkPVAnimationCue
+ * @brief   proxy for vtkAnimationCue.
+ *
+ * This is a proxy for vtkAnimationCue. All animation proxies are client
+ * side proxies.
+ * This class needs a vtkPVCueManipulator. The \b Manipulator
+ * performs the actual interpolation.
+ * @sa
+ * vtkAnimationCue vtkSMAnimationSceneProxy
+ *
+*/
 
 #ifndef vtkPVAnimationCue_h
 #define vtkPVAnimationCue_h
@@ -38,57 +41,76 @@ public:
   vtkTypeMacro(vtkPVAnimationCue, vtkAnimationCue);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // The index of the element of the property this cue animates.
-  // If the index is -1, the cue will animate all the elements
-  // of the animated property.
+  //@{
+  /**
+   * The index of the element of the property this cue animates.
+   * If the index is -1, the cue will animate all the elements
+   * of the animated property.
+   */
   vtkSetMacro(AnimatedElement, int);
   vtkGetMacro(AnimatedElement, int);
+  //@}
 
-  // Description:
-  // Get/Set the manipulator used to compute values
-  // for each instance in the animation.
-  // Note that the time passed to the Manipulator is normalized [0,1]
-  // to the extents of this cue.
+  //@{
+  /**
+   * Get/Set the manipulator used to compute values
+   * for each instance in the animation.
+   * Note that the time passed to the Manipulator is normalized [0,1]
+   * to the extents of this cue.
+   */
   void SetManipulator(vtkPVCueManipulator*);
   vtkGetObjectMacro(Manipulator, vtkPVCueManipulator);
+  //@}
 
-  // Description:
-  // Enable/Disable this cue.
+  //@{
+  /**
+   * Enable/Disable this cue.
+   */
   vtkSetMacro(Enabled, int);
   vtkGetMacro(Enabled, int);
   vtkBooleanMacro(Enabled, int);
+  //@}
 
-  // Description:
-  // Used to update the animated item. This API makes it possible for vtk-level
-  // classes to update properties without actually linking with the
-  // ServerManager library. This only works since they object are created only
-  // on the client.
+  //@{
+  /**
+   * Used to update the animated item. This API makes it possible for vtk-level
+   * classes to update properties without actually linking with the
+   * ServerManager library. This only works since they object are created only
+   * on the client.
+   */
   virtual void BeginUpdateAnimationValues() = 0;
   virtual void SetAnimationValue(int index, double value) =0;
   virtual void EndUpdateAnimationValues() = 0;
+  //@}
 
-  // Description:
-  // When set to true, the manipulator is skipped and the key frame value is set
-  // by using the ClockTime directly. false by default.
+  //@{
+  /**
+   * When set to true, the manipulator is skipped and the key frame value is set
+   * by using the ClockTime directly. false by default.
+   */
   vtkSetMacro(UseAnimationTime, bool);
   vtkGetMacro(UseAnimationTime, bool);
+  //@}
 
-  // Description:
-  // Overridden to ignore the calls when this->Enabled == false.
+  //@{
+  /**
+   * Overridden to ignore the calls when this->Enabled == false.
+   */
   virtual void Initialize();
   virtual void Tick(double currenttime, double deltatime, double clocktime);
   virtual void Finalize();
+  //@}
 
 protected:
   vtkPVAnimationCue();
   ~vtkPVAnimationCue();
 
-  // Description:
+  //@{
   virtual void StartCueInternal();
   virtual void TickInternal(double currenttime, double deltatime,
     double clocktime);
   virtual void EndCueInternal();
+  //@}
 
   friend class vtkSMAnimationSceneProxy;
 

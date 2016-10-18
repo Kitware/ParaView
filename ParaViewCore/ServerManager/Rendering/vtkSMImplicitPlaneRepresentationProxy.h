@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMImplicitPlaneRepresentationProxy - proxy for a implicit plane representation
-// .SECTION Description
-// Specialized proxy for implicit planes. Overrides the default appearance
-// of VTK implicit plane representation.
+/**
+ * @class   vtkSMImplicitPlaneRepresentationProxy
+ * @brief   proxy for a implicit plane representation
+ *
+ * Specialized proxy for implicit planes. Overrides the default appearance
+ * of VTK implicit plane representation.
+*/
 
 #ifndef vtkSMImplicitPlaneRepresentationProxy_h
 #define vtkSMImplicitPlaneRepresentationProxy_h

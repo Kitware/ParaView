@@ -12,9 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVDisplayInformation - provides information about the rendering
-// display and OpenGL context.
-// .SECTION Description
+/**
+ * @class   vtkPVDisplayInformation
+ * @brief   provides information about the rendering
+ * display and OpenGL context.
+ *
+*/
 
 #ifndef vtkPVDisplayInformation_h
 #define vtkPVDisplayInformation_h
@@ -28,37 +31,50 @@ public:
   vtkTypeMacro(vtkPVDisplayInformation, vtkPVInformation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Returns if the display can be opened up on the current processes.
+  /**
+   * Returns if the display can be opened up on the current processes.
+   */
   static bool CanOpenDisplayLocally();
 
-  // Description:
-  // Returns true if OpenGL context supports core features required for
-  // rendering.
+  /**
+   * Returns true if OpenGL context supports core features required for
+   * rendering.
+   */
   static bool SupportsOpenGLLocally();
 
-  // Description:
-  // Transfer information about a single object into this object.
+  /**
+   * Transfer information about a single object into this object.
+   */
   virtual void CopyFromObject(vtkObject*);
 
-  // Description:
-  // Merge another information object. Calls AddInformation(info, 0).
+  /**
+   * Merge another information object. Calls AddInformation(info, 0).
+   */
   virtual void AddInformation(vtkPVInformation* info);
 
-  // Description:
-  // Manage a serialized version of the information.
+  //@{
+  /**
+   * Manage a serialized version of the information.
+   */
   virtual void CopyToStream(vtkClientServerStream*);
   virtual void CopyFromStream(const vtkClientServerStream*);
+  //@}
 
-  // Description:
-  // CanOpenDisplay is set to 1 if a window can be opened on
-  // the display.
+  //@{
+  /**
+   * CanOpenDisplay is set to 1 if a window can be opened on
+   * the display.
+   */
   vtkGetMacro(CanOpenDisplay, int);
+  //@}
 
-  // Description:
-  // SupportsOpenGL is set to 1 if the OpenGL context available supports core
-  // features needed for rendering.
+  //@{
+  /**
+   * SupportsOpenGL is set to 1 if the OpenGL context available supports core
+   * features needed for rendering.
+   */
   vtkGetMacro(SupportsOpenGL, int);
+  //@}
 
 protected:
   vtkPVDisplayInformation();

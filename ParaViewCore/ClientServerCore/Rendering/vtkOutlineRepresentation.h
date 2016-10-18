@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkOutlineRepresentation - representation for outline.
-// .SECTION Description
-// vtkOutlineRepresentation is merely a vtkGeometryRepresentationWithFaces that forces
-// the geometry filter to produce outlines.
+/**
+ * @class   vtkOutlineRepresentation
+ * @brief   representation for outline.
+ *
+ * vtkOutlineRepresentation is merely a vtkGeometryRepresentationWithFaces that forces
+ * the geometry filter to produce outlines.
+*/
 
 #ifndef vtkOutlineRepresentation_h
 #define vtkOutlineRepresentation_h

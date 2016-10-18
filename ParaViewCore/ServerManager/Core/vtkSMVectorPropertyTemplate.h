@@ -12,9 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMVectorPropertyTemplate
-// .SECTION Description
-//
+/**
+ * @class   vtkSMVectorPropertyTemplate
+ *
+ *
+*/
 
 #ifndef vtkSMVectorPropertyTemplate_h
 #define vtkSMVectorPropertyTemplate_h

@@ -12,9 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSIIdTypeVectorProperty
-// .SECTION Description
-// IdType ServerSide Property use to set IdType array as method parameter.
+/**
+ * @class   vtkSIIdTypeVectorProperty
+ *
+ * IdType ServerSide Property use to set IdType array as method parameter.
+*/
 
 #ifndef vtkSIIdTypeVectorProperty_h
 #define vtkSIIdTypeVectorProperty_h

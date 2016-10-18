@@ -13,8 +13,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVServerSideAnimationPlayer - help class for server side animation
-// saving at disconnection time.
+/**
+ * @class   vtkPVServerSideAnimationPlayer
+ * @brief   help class for server side animation
+ * saving at disconnection time.
+*/
 
 #ifndef vtkPVServerSideAnimationPlayer_h
 #define vtkPVServerSideAnimationPlayer_h
@@ -39,8 +42,9 @@ protected:
   vtkPVServerSideAnimationPlayer();
   virtual ~vtkPVServerSideAnimationPlayer();
 
-  // Description:
-  // Callback that is used to trigger the execution of the animation writing.
+  /**
+   * Callback that is used to trigger the execution of the animation writing.
+   */
   void TriggerExecution();
 
 private:

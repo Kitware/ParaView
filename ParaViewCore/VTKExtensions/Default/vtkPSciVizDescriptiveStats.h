@@ -17,14 +17,18 @@
   Under the terms of Contract DE-AC04-94AL85000 with Sandia Corporation,
   the U.S. Government retains certain rights in this software.
   -------------------------------------------------------------------------*/
-// .NAME vtkPSciVizDescriptiveStats - Provide access to VTK descriptive statistics.
-// .SECTION Description
-// This filter provides access to the features of vtkDescriptiveStatistics.
-// See VTK documentation for details
-//
-// .SECTION Thanks
-// Thanks to David Thompson and Philippe Pebay from Sandia National Laboratories 
-// for implementing this class.
+/**
+ * @class   vtkPSciVizDescriptiveStats
+ * @brief   Provide access to VTK descriptive statistics.
+ *
+ * This filter provides access to the features of vtkDescriptiveStatistics.
+ * See VTK documentation for details
+ *
+ * @par Thanks:
+ * Thanks to David Thompson and Philippe Pebay from Sandia National Laboratories 
+ * for implementing this class.
+*/
+
 #ifndef vtkPSciVizDescriptiveStats_h
 #define vtkPSciVizDescriptiveStats_h
 

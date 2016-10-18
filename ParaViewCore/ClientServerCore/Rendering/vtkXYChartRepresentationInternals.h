@@ -12,9 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXYChartRepresentationInternals
-// .SECTION Description
-// Implementation class used by vtkXYChartRepresentation.
+/**
+ * @class   vtkXYChartRepresentationInternals
+ *
+ * Implementation class used by vtkXYChartRepresentation.
+*/
 
 #ifndef vtkXYChartRepresentationInternals_h
 #define vtkXYChartRepresentationInternals_h
@@ -244,10 +246,11 @@ public:
     }
 
   //---------------------------------------------------------------------------
-  // Description:
-  // Subclasses can override this method to assign a role for a specific data
-  // array in the input dataset. This is useful when multiple plots are to be
-  // created for a single series.
+  /**
+   * Subclasses can override this method to assign a role for a specific data
+   * array in the input dataset. This is useful when multiple plots are to be
+   * created for a single series.
+   */
   virtual std::string GetSeriesRole(
     const std::string& vtkNotUsed(tableName), const std::string& vtkNotUsed(columnName))
     {

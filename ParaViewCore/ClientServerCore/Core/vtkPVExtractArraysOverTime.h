@@ -12,15 +12,18 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVExtractArraysOverTime - extract point or cell data over time (parallel)
-// .SECTION Description
-// vtkPVExtractArraysOverTime is a subclass of vtkPExtractArraysOverTime
-// that overrides the default SelectionExtractor with a vtkPVExtractSelection
-// instance.
-// This enables query selections to be extracted at each time step.
-// .SECTION See Also
-// vtkExtractArraysOverTime
-// vtkPExtractArraysOverTime
+/**
+ * @class   vtkPVExtractArraysOverTime
+ * @brief   extract point or cell data over time (parallel)
+ *
+ * vtkPVExtractArraysOverTime is a subclass of vtkPExtractArraysOverTime
+ * that overrides the default SelectionExtractor with a vtkPVExtractSelection
+ * instance.
+ * This enables query selections to be extracted at each time step.
+ * @sa
+ * vtkExtractArraysOverTime
+ * vtkPExtractArraysOverTime
+*/
 
 #ifndef vtkPVExtractArraysOverTime_h
 #define vtkPVExtractArraysOverTime_h

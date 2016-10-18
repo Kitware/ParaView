@@ -22,19 +22,21 @@
  * statement of authorship are reproduced on all copies.
  */
 
-// .NAME vtkOrderedCompositeDistributor
-//
-// .SECTION Description
-//
-// This class distributes data for use with ordered compositing (i.e. with
-// IceT).  The composite distributor takes the same vtkPKdTree
-// that IceT and will use that to distribute the data.
-//
-// Input poly data will be converted back to poly data on the output.
-//
-// This class also has an optional pass through mode to make it easy to
-// turn ordered compositing on and off.
-//
+/**
+ * @class   vtkOrderedCompositeDistributor
+ *
+ *
+ *
+ * This class distributes data for use with ordered compositing (i.e. with
+ * IceT).  The composite distributor takes the same vtkPKdTree
+ * that IceT and will use that to distribute the data.
+ *
+ * Input poly data will be converted back to poly data on the output.
+ *
+ * This class also has an optional pass through mode to make it easy to
+ * turn ordered compositing on and off.
+ *
+*/
 
 #ifndef vtkOrderedCompositeDistributor_h
 #define vtkOrderedCompositeDistributor_h
@@ -56,26 +58,38 @@ public:
   static vtkOrderedCompositeDistributor *New();
   virtual void PrintSelf(ostream &os, vtkIndent indent);
 
-  // Description:
-  // Set the vtkPKdTree to distribute with.
+  //@{
+  /**
+   * Set the vtkPKdTree to distribute with.
+   */
   virtual void SetPKdTree(vtkPKdTree *);
   vtkGetObjectMacro(PKdTree, vtkPKdTree);
+  //@}
 
-  // Description:
-  // Set/get the controller to distribute with.
+  //@{
+  /**
+   * Set/get the controller to distribute with.
+   */
   virtual void SetController(vtkMultiProcessController *);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
+  //@}
 
-  // Description:
-  // When on, data is passed through without compositing.
+  //@{
+  /**
+   * When on, data is passed through without compositing.
+   */
   vtkSetMacro(PassThrough, bool);
   vtkGetMacro(PassThrough, bool);
   vtkBooleanMacro(PassThrough, bool);
+  //@}
 
-  // Description:
-  // When non-null, the output will be converted to the given type.
+  //@{
+  /**
+   * When non-null, the output will be converted to the given type.
+   */
   vtkSetStringMacro(OutputType);
   vtkGetStringMacro(OutputType);
+  //@}
 
 protected:
   vtkOrderedCompositeDistributor();

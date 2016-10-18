@@ -12,12 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVSelectionSource - selection source used to produce different types
-// of vtkSelections.
-// .SECTION Description
-// vtkPVSelectionSource is used to create different types of selections. It
-// provides different APIs for different types of selections to create.
-// The output selection type depends on the API used most recently.
+/**
+ * @class   vtkPVSelectionSource
+ * @brief   selection source used to produce different types
+ * of vtkSelections.
+ *
+ * vtkPVSelectionSource is used to create different types of selections. It
+ * provides different APIs for different types of selections to create.
+ * The output selection type depends on the API used most recently.
+*/
 
 #ifndef vtkPVSelectionSource_h
 #define vtkPVSelectionSource_h
@@ -32,88 +35,127 @@ public:
   vtkTypeMacro(vtkPVSelectionSource, vtkSelectionAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Set a frustum to choose within. 
+  /**
+   * Set a frustum to choose within.
+   */
   void SetFrustum(double vertices[32]);
 
-  // Description:
-  // Add global IDs.
+  //@{
+  /**
+   * Add global IDs.
+   */
   void AddGlobalID(vtkIdType id);
   void RemoveAllGlobalIDs();
+  //@}
 
-  // Description:
-  // Add integer pedigree IDs in a particular domain.
+  //@{
+  /**
+   * Add integer pedigree IDs in a particular domain.
+   */
   void AddPedigreeID(const char* domain, vtkIdType id);
   void RemoveAllPedigreeIDs();
+  //@}
 
-  // Description:
-  // Add string pedigree IDs in a particular domain.
+  //@{
+  /**
+   * Add string pedigree IDs in a particular domain.
+   */
   void AddPedigreeStringID(const char* domain, const char* id);
   void RemoveAllPedigreeStringIDs();
+  //@}
 
-  // Description:
-  // Add a (piece, id) to the selection set. The source will generate
-  // only the ids for which piece == UPDATE_PIECE_NUMBER.
-  // If piece == -1, the id applies to all pieces.
+  //@{
+  /**
+   * Add a (piece, id) to the selection set. The source will generate
+   * only the ids for which piece == UPDATE_PIECE_NUMBER.
+   * If piece == -1, the id applies to all pieces.
+   */
   void AddID(vtkIdType piece, vtkIdType id);
   void RemoveAllIDs();
+  //@}
 
-  // Description:
-  // Add IDs that will be added to the selection produced by the
-  // selection source.
-  // The source will generate
-  // only the ids for which piece == UPDATE_PIECE_NUMBER.
-  // If piece == -1, the id applies to all pieces.
+  //@{
+  /**
+   * Add IDs that will be added to the selection produced by the
+   * selection source.
+   * The source will generate
+   * only the ids for which piece == UPDATE_PIECE_NUMBER.
+   * If piece == -1, the id applies to all pieces.
+   */
   void AddCompositeID(unsigned int composite_index, vtkIdType piece, vtkIdType id);
   void RemoveAllCompositeIDs();
+  //@}
 
-  // Description:
-  // The list of IDs that will be added to the selection produced by the
-  // selection source.
+  //@{
+  /**
+   * The list of IDs that will be added to the selection produced by the
+   * selection source.
+   */
   void AddHierarhicalID(unsigned int level, unsigned int dataset, vtkIdType id);
   void RemoveAllHierarchicalIDs();
+  //@}
 
-  // Description:
-  // Add a value range to threshold within.
+  //@{
+  /**
+   * Add a value range to threshold within.
+   */
   void AddThreshold(double min, double max);
   void RemoveAllThresholds();
+  //@}
 
-  // Description:
-  // Add the flat-index/composite index for a block.
+  //@{
+  /**
+   * Add the flat-index/composite index for a block.
+   */
   void AddBlock(vtkIdType blockno);
   void RemoveAllBlocks();
+  //@}
   
-  // Description:
-  // For threshold and value selection, this controls the name of the
-  // scalar array that will be thresholded within.
+  /**
+   * For threshold and value selection, this controls the name of the
+   * scalar array that will be thresholded within.
+   */
   void SetArrayName(const char* arrayName);
 
-  // Description:
-  // Add a point in world space to probe at.
+  //@{
+  /**
+   * Add a point in world space to probe at.
+   */
   void AddLocation(double x, double y, double z);
   void RemoveAllLocations();
+  //@}
 
-  // Description:
-  // Set the field type for the generated selection.
-  // Possible values are as defined by
-  // vtkSelection::SelectionField.
+  //@{
+  /**
+   * Set the field type for the generated selection.
+   * Possible values are as defined by
+   * vtkSelection::SelectionField.
+   */
   vtkSetMacro(FieldType, int);
   vtkGetMacro(FieldType, int);
+  //@}
 
-  // Description:
-  // When extracting by points, extract the cells that contain the 
-  // passing points.
+  //@{
+  /**
+   * When extracting by points, extract the cells that contain the
+   * passing points.
+   */
   vtkSetMacro(ContainingCells, int);
   vtkGetMacro(ContainingCells, int);
+  //@}
 
-  // Description:
+  //@{
   vtkSetMacro(Inverse, int);
   vtkGetMacro(Inverse, int);
+  //@}
 
-  // Description:
-  // Set/get the query expression string.
+  //@{
+  /**
+   * Set/get the query expression string.
+   */
   vtkSetStringMacro(QueryString);
   vtkGetStringMacro(QueryString);
+  //@}
 
 protected:
   vtkPVSelectionSource();

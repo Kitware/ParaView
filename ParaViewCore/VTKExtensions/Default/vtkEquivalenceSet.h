@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkEquivalenceSet - records groups of integers that are equivalent.
-// .SECTION Description
-// Useful for connectivity on multiple processes.  Run connectivity
-// on each processes, then make touching fragments equivalent.
+/**
+ * @class   vtkEquivalenceSet
+ * @brief   records groups of integers that are equivalent.
+ *
+ * Useful for connectivity on multiple processes.  Run connectivity
+ * on each processes, then make touching fragments equivalent.
+*/
 
 #ifndef vtkEquivalenceSet_h
 #define vtkEquivalenceSet_h

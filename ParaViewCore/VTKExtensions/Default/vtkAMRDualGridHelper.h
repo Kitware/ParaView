@@ -12,15 +12,18 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkAMRDualGridHelper - Tools for processing AMR as a dual grid.
-// .SECTION Description
-// This helper object was developed to help the AMR dual grid connectivity
-// and integration filter but I also want a dual grid iso surface filter
-// so I mad it a separate class.  The API needs to be improved to make
-// it more generally useful.
-// This class will take advantage of some meta information, if available
-// from a coprocessing adaptor.  If not available, it will compute the 
-// information.
+/**
+ * @class   vtkAMRDualGridHelper
+ * @brief   Tools for processing AMR as a dual grid.
+ *
+ * This helper object was developed to help the AMR dual grid connectivity
+ * and integration filter but I also want a dual grid iso surface filter
+ * so I mad it a separate class.  The API needs to be improved to make
+ * it more generally useful.
+ * This class will take advantage of some meta information, if available
+ * from a coprocessing adaptor.  If not available, it will compute the 
+ * information.
+*/
 
 #ifndef vtkAMRDualGridHelper_h
 #define vtkAMRDualGridHelper_h
@@ -50,35 +53,47 @@ public:
   vtkTypeMacro(vtkAMRDualGridHelper,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
   
-  // Description:
-  // An option to turn off copying ghost values across process boundaries.
-  // If the ghost values are already correct, then the extra communication is 
-  // not necessary.  If this assumption is wrong, this option will produce
-  // cracks / seams.  This is off by default.
+  //@{
+  /**
+   * An option to turn off copying ghost values across process boundaries.
+   * If the ghost values are already correct, then the extra communication is
+   * not necessary.  If this assumption is wrong, this option will produce
+   * cracks / seams.  This is off by default.
+   */
   vtkGetMacro(SkipGhostCopy, int);
   vtkSetMacro(SkipGhostCopy, int);
   vtkBooleanMacro(SkipGhostCopy, int);
+  //@}
 
-  // Description:
-  // Turn on/off the ability to create meshing between levels in the grid.  This
-  // is on by default.  Set this before you call initialize.
+  //@{
+  /**
+   * Turn on/off the ability to create meshing between levels in the grid.  This
+   * is on by default.  Set this before you call initialize.
+   */
   vtkGetMacro(EnableDegenerateCells, int);
   vtkSetMacro(EnableDegenerateCells, int);
   vtkBooleanMacro(EnableDegenerateCells, int);
+  //@}
 
-  // Description:
-  // When this option is on (the default) and a controller that supports
-  // asynchronous communication (like MPI) is detected, use asynchronous
-  // communication where appropriate.  This can prevent processes from blocking
-  // while waiting for communication in other processes to finish.
+  //@{
+  /**
+   * When this option is on (the default) and a controller that supports
+   * asynchronous communication (like MPI) is detected, use asynchronous
+   * communication where appropriate.  This can prevent processes from blocking
+   * while waiting for communication in other processes to finish.
+   */
   vtkGetMacro(EnableAsynchronousCommunication, int);
   vtkSetMacro(EnableAsynchronousCommunication, int);
   vtkBooleanMacro(EnableAsynchronousCommunication, int);
+  //@}
 
-  // Description:
-  // The controller to use for communication.
+  //@{
+  /**
+   * The controller to use for communication.
+   */
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
   virtual void SetController(vtkMultiProcessController *);
+  //@}
 
   int                       Initialize(vtkNonOverlappingAMR* input);
   int                       SetupData(vtkNonOverlappingAMR* input,
@@ -92,37 +107,44 @@ public:
   vtkAMRDualGridHelperBlock* GetBlock(int level, int xGrid, int yGrid, int zGrid);
 
 
-  // Description:
-  // I am generalizing the code that copies lowres blocks to highres ghost regions.
-  // I need to do this for the clip filter (level mask).
-  //
-  // For transitions between levels, degeneracy works well to create
-  // and contour wedges and pyramids, but the volume fraction values
-  // in the high-level blocks ghost cells need to be the same
-  // as the closest cell in the low resolution block.  These methods
-  // copy low values to high.
+  /**
+   * I am generalizing the code that copies lowres blocks to highres ghost regions.
+   * I need to do this for the clip filter (level mask).
+
+   * For transitions between levels, degeneracy works well to create
+   * and contour wedges and pyramids, but the volume fraction values
+   * in the high-level blocks ghost cells need to be the same
+   * as the closest cell in the low resolution block.  These methods
+   * copy low values to high.
+   */
   void CopyDegenerateRegionBlockToBlock(
     int regionX, int regionY, int regionZ,
     vtkAMRDualGridHelperBlock* lowResBlock, vtkDataArray* lowResArray,
     vtkAMRDualGridHelperBlock* highResBlock, vtkDataArray* highResArray);
-  // Description:
-  // This queues up either a copy from a remote process to this process
-  // or a copy from this process to a remote process.
-  // Only the local block needs an array.  LowRes block is the source.
+  /**
+   * This queues up either a copy from a remote process to this process
+   * or a copy from this process to a remote process.
+   * Only the local block needs an array.  LowRes block is the source.
+   */
   void QueueRegionRemoteCopy(
     int regionX, int regionY, int regionZ,
     vtkAMRDualGridHelperBlock* lowResBlock, vtkDataArray* lowResArray,
     vtkAMRDualGridHelperBlock* highResBlock, vtkDataArray* highResArray);
-  // Description:
-  // This should be called on every process.  It processes the queue of region copies.
-  // It sends and copies the regions into blocks.
+  /**
+   * This should be called on every process.  It processes the queue of region copies.
+   * It sends and copies the regions into blocks.
+   */
   void ProcessRegionRemoteCopyQueue(bool hackLevelFlag);
-  // Description:
-  // Call this before adding regions to the queue.  It clears the queue.
+  /**
+   * Call this before adding regions to the queue.  It clears the queue.
+   */
   void ClearRegionRemoteCopyQueue();
-  // Description:
-  // It is convenient to get this here.
+  //@{
+  /**
+   * It is convenient to get this here.
+   */
   vtkGetStringMacro(ArrayName);
+  //@}
 
 private:
   vtkAMRDualGridHelper();

@@ -12,11 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVServerManagerPluginInterface
-// .SECTION Description
-// vtkPVServerManagerPluginInterface defines the interface needed to be
-// implemented by a server-manager plugin i.e. a plugin that adds new
-// filters/readers/proxies etc. to ParaView.
+/**
+ * @class   vtkPVServerManagerPluginInterface
+ *
+ * vtkPVServerManagerPluginInterface defines the interface needed to be
+ * implemented by a server-manager plugin i.e. a plugin that adds new
+ * filters/readers/proxies etc. to ParaView.
+*/
 
 #ifndef vtkPVServerManagerPluginInterface_h
 #define vtkPVServerManagerPluginInterface_h
@@ -31,17 +33,21 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVServerManagerPluginInterface
 public:
   virtual ~vtkPVServerManagerPluginInterface();
 
-  // Description:
-  // Obtain the server-manager configuration xmls, if any.
+  /**
+   * Obtain the server-manager configuration xmls, if any.
+   */
   virtual void GetXMLs(std::vector<std::string>& vtkNotUsed(xmls)) = 0;
 
-  // Description:
-  // Returns the callback function to call to initialize the interpretor for the
-  // new vtk/server-manager classes added by this plugin. Returning NULL is
-  // perfectly valid.
+  //@{
+  /**
+   * Returns the callback function to call to initialize the interpretor for the
+   * new vtk/server-manager classes added by this plugin. Returning NULL is
+   * perfectly valid.
+   */
   virtual vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
     GetInitializeInterpreterCallback() = 0;
 };
+  //@}
 
 #endif
 

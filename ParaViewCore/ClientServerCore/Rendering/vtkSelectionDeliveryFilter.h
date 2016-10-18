@@ -12,12 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSelectionDeliveryFilter
-// .SECTION Description
-// vtkSelectionDeliveryFilter is a filter that can deliver vtkSelection from
-// data-server nodes to the client. This should not be instantiated on the
-// pure-render-server nodes to avoid odd side effects (We can fix this later if
-// the need arises).
+/**
+ * @class   vtkSelectionDeliveryFilter
+ *
+ * vtkSelectionDeliveryFilter is a filter that can deliver vtkSelection from
+ * data-server nodes to the client. This should not be instantiated on the
+ * pure-render-server nodes to avoid odd side effects (We can fix this later if
+ * the need arises).
+*/
 
 #ifndef vtkSelectionDeliveryFilter_h
 #define vtkSelectionDeliveryFilter_h

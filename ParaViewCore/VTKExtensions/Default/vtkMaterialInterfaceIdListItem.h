@@ -12,9 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkMaterialInterfaceIdListItem
-// .SECTION Description
-// Elemental data type for fragment id list conatiners.
+/**
+ * @class   vtkMaterialInterfaceIdListItem
+ *
+ * Elemental data type for fragment id list conatiners.
+*/
 
 #ifndef vtkMaterialInterfaceIdListItem_h
 #define vtkMaterialInterfaceIdListItem_h

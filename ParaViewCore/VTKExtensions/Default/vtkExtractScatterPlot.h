@@ -12,16 +12,19 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkExtractScatterPlot - Extract a scatter plot (two-dimensional histogram) from any dataset
-// .SECTION Description
-//
-// vtkExtractScatterPlot accepts any vtkDataSet as input and produces a
-// vtkPolyData containing two-dimensional histogram data as output.  The
-// output vtkPolyData will contain two vtkDoubleArray instances named
-// "x_bin_extents" and "y_bin_extents", which contain the boundaries
-// between bins along each dimension.  It will also contain a
-// vtkUnsignedLongArray named "bin_values" which contains the value for
-// each bin.
+/**
+ * @class   vtkExtractScatterPlot
+ * @brief   Extract a scatter plot (two-dimensional histogram) from any dataset
+ *
+ *
+ * vtkExtractScatterPlot accepts any vtkDataSet as input and produces a
+ * vtkPolyData containing two-dimensional histogram data as output.  The
+ * output vtkPolyData will contain two vtkDoubleArray instances named
+ * "x_bin_extents" and "y_bin_extents", which contain the boundaries
+ * between bins along each dimension.  It will also contain a
+ * vtkUnsignedLongArray named "bin_values" which contains the value for
+ * each bin.
+*/
 
 #ifndef vtkExtractScatterPlot_h
 #define vtkExtractScatterPlot_h
@@ -37,26 +40,38 @@ public:
   vtkTypeMacro(vtkExtractScatterPlot, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
   
-  // Description:
-  // Controls which input data component should be binned, for input arrays with more-than-one component
+  //@{
+  /**
+   * Controls which input data component should be binned, for input arrays with more-than-one component
+   */
   vtkSetClampMacro(XComponent, int, 0, VTK_INT_MAX);
   vtkGetMacro(XComponent, int);
+  //@}
   
-  // Description:
-  // Controls which input data component should be binned, for input arrays
-  // with more-than-one component
+  //@{
+  /**
+   * Controls which input data component should be binned, for input arrays
+   * with more-than-one component
+   */
   vtkSetClampMacro(YComponent, int, 0, VTK_INT_MAX);
   vtkGetMacro(YComponent, int);
+  //@}
   
-  // Description:
-  // Controls the number of bins along the X axis in the output histogram data
+  //@{
+  /**
+   * Controls the number of bins along the X axis in the output histogram data
+   */
   vtkSetClampMacro(XBinCount, int, 1, VTK_INT_MAX);
   vtkGetMacro(XBinCount, int);
+  //@}
   
-  // Description:
-  // Controls the number of bins along the Y axis in the output histogram data
+  //@{
+  /**
+   * Controls the number of bins along the Y axis in the output histogram data
+   */
   vtkSetClampMacro(YBinCount, int, 1, VTK_INT_MAX);
   vtkGetMacro(YBinCount, int);
+  //@}
   
 private:
   vtkExtractScatterPlot();

@@ -12,9 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMOrthographicSliceViewProxy
-// .SECTION Description
-//
+/**
+ * @class   vtkSMOrthographicSliceViewProxy
+ *
+ *
+*/
 
 #ifndef vtkSMOrthographicSliceViewProxy_h
 #define vtkSMOrthographicSliceViewProxy_h
@@ -29,15 +31,17 @@ public:
   vtkTypeMacro(vtkSMOrthographicSliceViewProxy, vtkSMRenderViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Overridden to forward the call to the internal root view proxy.
+  /**
+   * Overridden to forward the call to the internal root view proxy.
+   */
   virtual const char* GetRepresentationType(
     vtkSMSourceProxy* producer, int outputPort);
 
-  // Description:
-  // Overridden to set initial default slices when a representation is created.
-  // Not sure that's the best way to do this, but leaving the logic unchanged in
-  // this pass.
+  /**
+   * Overridden to set initial default slices when a representation is created.
+   * Not sure that's the best way to do this, but leaving the logic unchanged in
+   * this pass.
+   */
   virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(
     vtkSMProxy* proxy, int outputPort);
 
@@ -45,7 +49,6 @@ protected:
   vtkSMOrthographicSliceViewProxy();
   ~vtkSMOrthographicSliceViewProxy();
 
-  // Description:
   void InitDefaultSlices(vtkSMSourceProxy* source, int opport,
     vtkSMRepresentationProxy* repr);
 

@@ -17,7 +17,10 @@
  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 ----------------------------------------------------------------------------*/
 
-// .NAME vtkWeightedRedistributePolyData - do weighted balance of cells on processors
+/**
+ * @class   vtkWeightedRedistributePolyData
+ * @brief   do weighted balance of cells on processors
+*/
 
 #ifndef vtkWeightedRedistributePolyData_h
 #define vtkWeightedRedistributePolyData_h
@@ -35,8 +38,9 @@ public:
   vtkTypeMacro(vtkWeightedRedistributePolyData, vtkRedistributePolyData);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Construct object.
+  /**
+   * Construct object.
+   */
   static vtkWeightedRedistributePolyData *New();
 
   void SetWeights (int, int, float );

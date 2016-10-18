@@ -12,11 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkAppendRectilinearGrid - appends rectliner grids together.
-// .SECTION Description
-// vtkAppendRectilinearGrid appends rectilinear grids to produce a
-// single combined rectilinear grid. Inputs are appends based on
-// their extents.
+/**
+ * @class   vtkAppendRectilinearGrid
+ * @brief   appends rectliner grids together.
+ *
+ * vtkAppendRectilinearGrid appends rectilinear grids to produce a
+ * single combined rectilinear grid. Inputs are appends based on
+ * their extents.
+*/
 
 #ifndef vtkAppendRectilinearGrid_h
 #define vtkAppendRectilinearGrid_h

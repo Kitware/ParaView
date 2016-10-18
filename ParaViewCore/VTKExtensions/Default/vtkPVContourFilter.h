@@ -12,16 +12,19 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVContourFilter - generate isosurfaces/isolines from scalar values
-// .SECTION Description
-// vtkPVContourFilter is an extension to vtkContourFilter. It adds the
-// ability to generate isosurfaces / isolines for AMR dataset.
-//
-// .SECTION Caveats
-// Certain flags in vtkAMRDualContour are assumed to be ON.
-//
-// .SECTION See Also
-// vtkContourFilter vtkAMRDualContour
+/**
+ * @class   vtkPVContourFilter
+ * @brief   generate isosurfaces/isolines from scalar values
+ *
+ * vtkPVContourFilter is an extension to vtkContourFilter. It adds the
+ * ability to generate isosurfaces / isolines for AMR dataset.
+ *
+ * @warning
+ * Certain flags in vtkAMRDualContour are assumed to be ON.
+ *
+ * @sa
+ * vtkContourFilter vtkAMRDualContour
+*/
 
 #ifndef vtkPVContourFilter_h
 #define vtkPVContourFilter_h
@@ -59,9 +62,10 @@ protected:
  virtual int FillInputPortInformation(int port, vtkInformation* info);
  virtual int FillOutputPortInformation(int port, vtkInformation* info);
 
- // Description:
- // Class superclass request data. Also handles iterating over
- // vtkHierarchicalBoxDataSet.
+ /**
+  * Class superclass request data. Also handles iterating over
+  * vtkHierarchicalBoxDataSet.
+  */
  int ContourUsingSuperclass(
    vtkInformation* request, vtkInformationVector** inputVector,
    vtkInformationVector* outputVector);

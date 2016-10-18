@@ -12,10 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVOpenGLInformation - Gets OpenGL information.
-// .SECTION Description
-// Get details of OpenGL from the render server.
-
+/**
+ * @class   vtkPVOpenGLInformation
+ * @brief   Gets OpenGL information.
+ *
+ * Get details of OpenGL from the render server.
+*/
 
 #ifndef vtkPVOpenGLInformation_h
 #define vtkPVOpenGLInformation_h
@@ -33,26 +35,34 @@ public:
   vtkTypeMacro(vtkPVOpenGLInformation, vtkPVInformation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Transfer information about a single object into this object.
+  /**
+   * Transfer information about a single object into this object.
+   */
   virtual void CopyFromObject(vtkObject*);
 
-  // Description:
-  // Merge another information object.
+  /**
+   * Merge another information object.
+   */
   virtual void AddInformation(vtkPVInformation*);
 
-  // Description:
-  // Manage a serialized version of the information.
+  //@{
+  /**
+   * Manage a serialized version of the information.
+   */
   virtual void CopyToStream(vtkClientServerStream*);
   virtual void CopyFromStream(const vtkClientServerStream*);
+  //@}
 
-  // Description:
-  // Serialize/Deserialize the parameters that control how/what information is
-  // gathered. This are different from the ivars that constitute the gathered
-  // information itself. For example, PortNumber on vtkPVDataInformation
-  // controls what output port the data-information is gathered from.
+  //@{
+  /**
+   * Serialize/Deserialize the parameters that control how/what information is
+   * gathered. This are different from the ivars that constitute the gathered
+   * information itself. For example, PortNumber on vtkPVDataInformation
+   * controls what output port the data-information is gathered from.
+   */
   virtual void CopyParametersToStream(vtkMultiProcessStream&) {};
   virtual void CopyParametersFromStream(vtkMultiProcessStream&) {};
+  //@}
 
   const std::string& GetVendor();
   const std::string& GetVersion();

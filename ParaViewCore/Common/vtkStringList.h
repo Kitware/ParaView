@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWAssignment - Manages allocation and freeing for a string list.
-// .SECTION Description
-// A vtkStringList holds a list of strings.  
-// We might be able to replace it in the future.
+/**
+ * @class   vtkKWAssignment
+ * @brief   Manages allocation and freeing for a string list.
+ *
+ * A vtkStringList holds a list of strings.  
+ * We might be able to replace it in the future.
+*/
 
 #ifndef vtkStringList_h
 #define vtkStringList_h
@@ -31,35 +34,44 @@ public:
   vtkTypeMacro(vtkStringList,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
   
-  // Description:
-  // Add a simple string.
+  //@{
+  /**
+   * Add a simple string.
+   */
   void AddString(const char* str);
   void AddUniqueString(const char* str);
+  //@}
   
 
-  // Description:
-  // Add a command and format it any way you like.
+  /**
+   * Add a command and format it any way you like.
+   */
   void AddFormattedString(const char* EventString, ...);
 
   
-  // Description:
-  // Initialize to empty.
+  /**
+   * Initialize to empty.
+   */
   void RemoveAllItems();
 
-  // Description:
-  // Random access.
+  /**
+   * Random access.
+   */
   void SetString(int idx, const char *str);
 
-  // Description:
-  // Get the length of the list.
+  /**
+   * Get the length of the list.
+   */
   int GetLength() { return this->NumberOfStrings;}
 
-  // Description:
-  // Get the index of a string.
+  /**
+   * Get the index of a string.
+   */
   int GetIndex(const char* str);
   
-  // Description:
-  // Get a command from its index.
+  /**
+   * Get a command from its index.
+   */
   const char *GetString(int idx);
   
   vtkGetMacro(NumberOfStrings, int);

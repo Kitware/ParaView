@@ -12,16 +12,19 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMStringVectorProperty - property representing a vector of strings
-// .SECTION Description
-// vtkSMStringVectorProperty is a concrete sub-class of vtkSMVectorProperty
-// representing a vector of strings. vtkSMStringVectorProperty can also
-// be used to store double and int values as strings. The strings
-// are converted to the appropriate type when they are being passed
-// to the stream. This is generally used for calling methods that have mixed 
-// type arguments.
-// .SECTION See Also
-// vtkSMVectorProperty vtkSMDoubleVectorProperty vtkSMIntVectorProperty
+/**
+ * @class   vtkSMStringVectorProperty
+ * @brief   property representing a vector of strings
+ *
+ * vtkSMStringVectorProperty is a concrete sub-class of vtkSMVectorProperty
+ * representing a vector of strings. vtkSMStringVectorProperty can also
+ * be used to store double and int values as strings. The strings
+ * are converted to the appropriate type when they are being passed
+ * to the stream. This is generally used for calling methods that have mixed 
+ * type arguments.
+ * @sa
+ * vtkSMVectorProperty vtkSMDoubleVectorProperty vtkSMIntVectorProperty
+*/
 
 #ifndef vtkSMStringVectorProperty_h
 #define vtkSMStringVectorProperty_h
@@ -42,131 +45,161 @@ public:
   vtkTypeMacro(vtkSMStringVectorProperty, vtkSMVectorProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Returns the size of the vector.
+  /**
+   * Returns the size of the vector.
+   */
   virtual unsigned int GetNumberOfElements();
 
-  // Description:
-  // Sets the size of the vector. If num is larger than the current
-  // number of elements, this may cause reallocation and copying.
+  /**
+   * Sets the size of the vector. If num is larger than the current
+   * number of elements, this may cause reallocation and copying.
+   */
   virtual void SetNumberOfElements(unsigned int num);
 
-  // Description:
-  // Set the value of 1 element. The vector is resized as necessary.
-  // Returns 0 if Set fails either because the property is read only
-  // or the value is not in all domains. Returns 1 otherwise.
+  /**
+   * Set the value of 1 element. The vector is resized as necessary.
+   * Returns 0 if Set fails either because the property is read only
+   * or the value is not in all domains. Returns 1 otherwise.
+   */
   int SetElement(unsigned int idx, const char* value);
 
-  // Description:
-  // Sets multiple elements. The size of the property is changed to match count.
+  /**
+   * Sets multiple elements. The size of the property is changed to match count.
+   */
   int SetElements(const char* values[], unsigned int count);
 
-  // Description:
-  // Sets multiple elements. The size of the property is changed to match count.
+  //@{
+  /**
+   * Sets multiple elements. The size of the property is changed to match count.
+   */
   int SetElements(vtkStringList* newvalue);
   int SetElements(const std::vector<std::string>& newvalue);
+  //@}
 
-  // Description:
-  // Sets the values of all the unchecked elements.
+  //@{
+  /**
+   * Sets the values of all the unchecked elements.
+   */
   int SetUncheckedElements(const char* values[], unsigned int count);
   int SetUncheckedElements(const std::vector<std::string>& newvalue);
+  //@}
 
-  // Description:
-  // Fills up the vtkStringList instance with the current value.
+  /**
+   * Fills up the vtkStringList instance with the current value.
+   */
   void GetElements(vtkStringList* list);
 
-  // Description:
-  // Returns the value of 1 element.
+  /**
+   * Returns the value of 1 element.
+   */
   const char* GetElement(unsigned int idx);
 
-  // Description:
-  // Returns the index of an element with a particular value.
-  // exists is set to false if element does not exist.
+  /**
+   * Returns the index of an element with a particular value.
+   * exists is set to false if element does not exist.
+   */
   unsigned int GetElementIndex(const char *value, int& exists);
   
-  // Description:
-  // Set the cast type used when passing a value to the stream.
-  // For example, if the type is INT, the string is converted
-  // to an int (with atoi()) before being passed to stream.
-  // Note that representing scalar values as strings can result
-  // in loss of accuracy.
-  // Possible values are: INT, DOUBLE, STRING.
+  //@{
+  /**
+   * Set the cast type used when passing a value to the stream.
+   * For example, if the type is INT, the string is converted
+   * to an int (with atoi()) before being passed to stream.
+   * Note that representing scalar values as strings can result
+   * in loss of accuracy.
+   * Possible values are: INT, DOUBLE, STRING.
+   */
   void SetElementType(unsigned int idx, int type);
   int GetElementType(unsigned int idx);
+  //@}
 
-  // Description:
-  // Returns the value of 1 unchecked element. These are used by
-  // domains. SetElement() first sets the value of 1 unchecked
-  // element and then calls IsInDomain and updates the value of
-  // the corresponding element only if IsInDomain passes.
+  /**
+   * Returns the value of 1 unchecked element. These are used by
+   * domains. SetElement() first sets the value of 1 unchecked
+   * element and then calls IsInDomain and updates the value of
+   * the corresponding element only if IsInDomain passes.
+   */
   const char* GetUncheckedElement(unsigned int idx);
 
-  // Description:
-  // Set the value of 1 unchecked element. This can be used to
-  // check if a value is in all domains of the property. Call
-  // this and call IsInDomains().
+  /**
+   * Set the value of 1 unchecked element. This can be used to
+   * check if a value is in all domains of the property. Call
+   * this and call IsInDomains().
+   */
   void SetUncheckedElement(unsigned int idx, const char* value);
 
-  // Description:
-  // Get/Set unchecked elements.
+  //@{
+  /**
+   * Get/Set unchecked elements.
+   */
   void GetUncheckedElements(vtkStringList* list);
   int SetUncheckedElements(vtkStringList* list);
+  //@}
 
-  // Description:
-  // Returns the size of unchecked elements. Usually this is
-  // the same as the number of elements but can be different
-  // before a domain check is performed.
+  /**
+   * Returns the size of unchecked elements. Usually this is
+   * the same as the number of elements but can be different
+   * before a domain check is performed.
+   */
   virtual unsigned int GetNumberOfUncheckedElements();
 
   enum ElementTypes{ INT, DOUBLE, STRING };
 
-  // Description: 
-  // Copy all property values.
+  /**
+   * Copy all property values.
+   */
   virtual void Copy(vtkSMProperty* src);
 
-  // Description:
-  // Returns the default value, if any, specified in the XML.
+  /**
+   * Returns the default value, if any, specified in the XML.
+   */
   const char* GetDefaultValue(int idx);
 
   virtual void ClearUncheckedElements();
 
   virtual bool IsValueDefault();
 
-  // Description:
-  // For properties that support specifying defaults in XML configuration, this
-  // method will reset the property value to the default values specified in the
-  // XML.
+  /**
+   * For properties that support specifying defaults in XML configuration, this
+   * method will reset the property value to the default values specified in the
+   * XML.
+   */
   virtual void ResetToXMLDefaults();
 
 protected:
   vtkSMStringVectorProperty();
   ~vtkSMStringVectorProperty();
 
-  // Description:
-  // Sets the size of unchecked elements. Usually this is
-  // the same as the number of elements but can be different
-  // before a domain check is performed.
+  /**
+   * Sets the size of unchecked elements. Usually this is
+   * the same as the number of elements but can be different
+   * before a domain check is performed.
+   */
   virtual void SetNumberOfUncheckedElements(unsigned int num);
 
-  // Description:
-  // Manage additional attribute from the XML
-  // -default_values_delimiter:
-  //    char used to split the "default_values" into a vector.
-  // -element_types:
-  //    StringVectorProperty may be used to store non homogeneous vector,
-  //    therefore we store for each element its type. [INT, DOUBLE, STRING]
+  /**
+   * Manage additional attribute from the XML
+   * -default_values_delimiter:
+   * char used to split the "default_values" into a vector.
+   * -element_types:
+   * StringVectorProperty may be used to store non homogeneous vector,
+   * therefore we store for each element its type. [INT, DOUBLE, STRING]
+   */
   virtual int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element);
 
-  // Description:
-  // Let the property write its content into the stream
+  /**
+   * Let the property write its content into the stream
+   */
   virtual void WriteTo(vtkSMMessage*);
 
-  // Description:
-  // Let the property read and set its content from the stream
+  /**
+   * Let the property read and set its content from the stream
+   */
   virtual void ReadFrom(const vtkSMMessage*, int msg_offset, vtkSMProxyLocator*);
 
-  // Description:
-  // Load the XML state.
+  /**
+   * Load the XML state.
+   */
   virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader);
 
   // Save concrete property values into the XML state property declaration

@@ -17,8 +17,11 @@
  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 ----------------------------------------------------------------------------*/
 
-// .NAME vtkRedistributePolyData - redistribute poly cells from other processes
-//                        (special version to color according to processor)
+/**
+ * @class   vtkRedistributePolyData
+ * @brief   redistribute poly cells from other processes
+ *                        (special version to color according to processor)
+*/
 
 #ifndef vtkRedistributePolyData_h
 #define vtkRedistributePolyData_h
@@ -38,11 +41,11 @@ public:
   vtkTypeMacro(vtkRedistributePolyData, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
   static vtkRedistributePolyData *New();
 
-  // Description:
-  // The filter needs a controller to determine which process it is in.
+  /**
+   * The filter needs a controller to determine which process it is in.
+   */
   virtual void SetController(vtkMultiProcessController*);
   vtkGetObjectMacro(Controller, vtkMultiProcessController); 
 
@@ -50,12 +53,15 @@ public:
   vtkSetMacro(ColorProc,int);
   void SetColorProc() { this->ColorProc = 1; };
 
-  // Description:
-  // These are here for ParaView compatibility. Not used.
+  //@{
+  /**
+   * These are here for ParaView compatibility. Not used.
+   */
   virtual void SetSocketController(vtkSocketController*) {};
   virtual void SetPassThrough(int) {};
   virtual int  GetPassThrough() { return 0; };
   vtkBooleanMacro(PassThrough, int);
+  //@}
 
 protected:
   vtkRedistributePolyData();

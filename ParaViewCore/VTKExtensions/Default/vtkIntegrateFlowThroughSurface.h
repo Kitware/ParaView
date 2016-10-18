@@ -12,12 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkIntegrateFlowThroughSurface - Integrates vector dot normal.
-// .SECTION Description
-// First this filter finds point normals for a surface.  It
-// Takes a point vector field from the input and computes the
-// dot product with the normal.  It then integrates this dot value
-// to get net flow through the surface.
+/**
+ * @class   vtkIntegrateFlowThroughSurface
+ * @brief   Integrates vector dot normal.
+ *
+ * First this filter finds point normals for a surface.  It
+ * Takes a point vector field from the input and computes the
+ * dot product with the normal.  It then integrates this dot value
+ * to get net flow through the surface.
+*/
 
 #ifndef vtkIntegrateFlowThroughSurface_h
 #define vtkIntegrateFlowThroughSurface_h

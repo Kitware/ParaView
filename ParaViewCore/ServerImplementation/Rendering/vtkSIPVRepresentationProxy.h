@@ -12,9 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSIPVRepresentationProxy
-// .SECTION Description
-// vtkSIPVRepresentationProxy is the helper for vtkSMPVRepresentationProxy.
+/**
+ * @class   vtkSIPVRepresentationProxy
+ *
+ * vtkSIPVRepresentationProxy is the helper for vtkSMPVRepresentationProxy.
+*/
 
 #ifndef vtkSIPVRepresentationProxy_h
 #define vtkSIPVRepresentationProxy_h
@@ -35,9 +37,10 @@ protected:
   vtkSIPVRepresentationProxy();
   ~vtkSIPVRepresentationProxy();
 
-  // Description:
-  // Parses the XML to create property/subproxy helpers.
-  // Overridden to parse all the "RepresentationType" elements.
+  /**
+   * Parses the XML to create property/subproxy helpers.
+   * Overridden to parse all the "RepresentationType" elements.
+   */
   virtual bool ReadXMLAttributes(vtkPVXMLElement* element);
 
 private:

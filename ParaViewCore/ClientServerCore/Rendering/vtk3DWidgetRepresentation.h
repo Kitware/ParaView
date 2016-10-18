@@ -12,11 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtk3DWidgetRepresentation
-// .SECTION Description
-// vtk3DWidgetRepresentation is a vtkDataRepresentation subclass for 3D widgets
-// and their representations. It makes it possible to add 3D widgets to
-// vtkPVRenderView.
+/**
+ * @class   vtk3DWidgetRepresentation
+ *
+ * vtk3DWidgetRepresentation is a vtkDataRepresentation subclass for 3D widgets
+ * and their representations. It makes it possible to add 3D widgets to
+ * vtkPVRenderView.
+*/
 
 #ifndef vtk3DWidgetRepresentation_h
 #define vtk3DWidgetRepresentation_h
@@ -36,59 +38,76 @@ public:
   vtkTypeMacro(vtk3DWidgetRepresentation, vtkDataRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Get/Set the widget.
+  //@{
+  /**
+   * Get/Set the widget.
+   */
   void SetWidget(vtkAbstractWidget*);
   vtkGetObjectMacro(Widget, vtkAbstractWidget);
+  //@}
 
-  // Description:
-  // Get/Set the representation.
+  //@{
+  /**
+   * Get/Set the representation.
+   */
   void SetRepresentation(vtkWidgetRepresentation*);
   vtkGetObjectMacro(Representation, vtkWidgetRepresentation);
+  //@}
 
-  // Description:
-  // Set to true to add the vtkWidgetRepresentation to the non-composited
-  // renderer. false by default.
+  //@{
+  /**
+   * Set to true to add the vtkWidgetRepresentation to the non-composited
+   * renderer. false by default.
+   */
   vtkSetMacro(UseNonCompositedRenderer, bool);
   vtkGetMacro(UseNonCompositedRenderer, bool);
   vtkBooleanMacro(UseNonCompositedRenderer, bool);
+  //@}
 
-  // Description:
-  // Get/Set whether the widget is enabled.
+  //@{
+  /**
+   * Get/Set whether the widget is enabled.
+   */
   void SetEnabled(bool);
   vtkGetMacro(Enabled, bool);
   vtkBooleanMacro(Enabled, bool);
+  //@}
 
 protected:
   vtk3DWidgetRepresentation();
   ~vtk3DWidgetRepresentation();
 
-  // Description:
-  // Adds the representation to the view.  This is called from
-  // vtkView::AddRepresentation().  Subclasses should override this method.
-  // Returns true if the addition succeeds.
+  /**
+   * Adds the representation to the view.  This is called from
+   * vtkView::AddRepresentation().  Subclasses should override this method.
+   * Returns true if the addition succeeds.
+   */
   virtual bool AddToView(vtkView* view);
 
-  // Description:
-  // Removes the representation to the view.  This is called from
-  // vtkView::RemoveRepresentation().  Subclasses should override this method.
-  // Returns true if the removal succeeds.
+  /**
+   * Removes the representation to the view.  This is called from
+   * vtkView::RemoveRepresentation().  Subclasses should override this method.
+   * Returns true if the removal succeeds.
+   */
   virtual bool RemoveFromView(vtkView* view);
 
-  // Description:
-  // Updates 'Enabled' on this->Widget.
+  /**
+   * Updates 'Enabled' on this->Widget.
+   */
   void UpdateEnabled();
 
-  // Description:
-  // Callback whenever the representation is modified. We call UpdateEnabled()
-  // to ensure that the widget is not left enabled when the representation is
-  // hidden.
+  /**
+   * Callback whenever the representation is modified. We call UpdateEnabled()
+   * to ensure that the widget is not left enabled when the representation is
+   * hidden.
+   */
   void OnRepresentationModified();
 
-  // Description:
-  // Callback whenever the view is modified. If the view's interactor has
-  // changed, we will pass that to the vtkAbstractWidget instance and then call
-  // UpdateEnabled().
+  /**
+   * Callback whenever the view is modified. If the view's interactor has
+   * changed, we will pass that to the vtkAbstractWidget instance and then call
+   * UpdateEnabled().
+   */
   void OnViewModified();
 
   bool Enabled;

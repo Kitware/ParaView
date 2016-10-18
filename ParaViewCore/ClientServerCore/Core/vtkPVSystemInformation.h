@@ -12,13 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVSystemInformation
-// Information object used to collect miscellaneous system and memory
-// information from all processes.
-// .SECTION Description
-// vtkPVProcessMemoryInformation is used to collect miscellaneous information
-// from all processes involved. Implementation uses vtksys::SystemInformation to
-// obtain the relevant information for each of the processes.
+/**
+ * @class   vtkPVSystemInformation
+ * Information object used to collect miscellaneous system and memory
+ * information from all processes.
+ *
+ * vtkPVProcessMemoryInformation is used to collect miscellaneous information
+ * from all processes involved. Implementation uses vtksys::SystemInformation to
+ * obtain the relevant information for each of the processes.
+*/
 
 #ifndef vtkPVSystemInformation_h
 #define vtkPVSystemInformation_h
@@ -36,18 +38,23 @@ public:
   vtkTypeMacro(vtkPVSystemInformation, vtkPVInformation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Transfer information about a single object into this object.
+  /**
+   * Transfer information about a single object into this object.
+   */
   virtual void CopyFromObject(vtkObject*);
 
-  // Description:
-  // Merge another information object.
+  /**
+   * Merge another information object.
+   */
   virtual void AddInformation(vtkPVInformation*);
 
-  // Description:
-  // Manage a serialized version of the information.
+  //@{
+  /**
+   * Manage a serialized version of the information.
+   */
   virtual void CopyToStream(vtkClientServerStream*);
   virtual void CopyFromStream(const vtkClientServerStream*);
+  //@}
 
   struct SystemInformationType
     {

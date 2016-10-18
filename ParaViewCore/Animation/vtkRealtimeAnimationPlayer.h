@@ -12,9 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkRealtimeAnimationPlayer
-// .SECTION Description
-// Animation player that plays in real time.
+/**
+ * @class   vtkRealtimeAnimationPlayer
+ *
+ * Animation player that plays in real time.
+*/
 
 #ifndef vtkRealtimeAnimationPlayer_h
 #define vtkRealtimeAnimationPlayer_h
@@ -31,10 +33,13 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
 
-  // Description:
-  // Get/Set the duration for playing the animation in seconds.
+  //@{
+  /**
+   * Get/Set the duration for playing the animation in seconds.
+   */
   vtkGetMacro(Duration, unsigned long);
   vtkSetMacro(Duration, unsigned long);
+  //@}
 
 protected:
   vtkRealtimeAnimationPlayer();
@@ -43,8 +48,9 @@ protected:
   virtual void StartLoop(double, double, double*);
   virtual void EndLoop() {}
 
-  // Description:
-  // Return the next time given the current time.
+  /**
+   * Return the next time given the current time.
+   */
   virtual double GetNextTime(double currentime);
 
   virtual double GoToNext(double start, double end, double currenttime);

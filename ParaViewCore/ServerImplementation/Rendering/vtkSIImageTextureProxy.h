@@ -12,12 +12,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSIImageTextureProxy - proxy for a vtkTexture.
-// .SECTION Description
-// Combines vtkTexture and vtkNetworkImageSource. This makes it simple for
-// applications to create textures from image files where the image file is
-// present on only one process, say client, but is needed for rendering on the
-// render server and the data server.
+/**
+ * @class   vtkSIImageTextureProxy
+ * @brief   proxy for a vtkTexture.
+ *
+ * Combines vtkTexture and vtkNetworkImageSource. This makes it simple for
+ * applications to create textures from image files where the image file is
+ * present on only one process, say client, but is needed for rendering on the
+ * render server and the data server.
+*/
+
 #ifndef vtkSIImageTextureProxy_h
 #define vtkSIImageTextureProxy_h
 
@@ -35,8 +39,9 @@ protected:
   vtkSIImageTextureProxy();
   ~vtkSIImageTextureProxy();
 
-  // Description:
-  // Overridden to hookup the image source with the Texture, if available.
+  /**
+   * Overridden to hookup the image source with the Texture, if available.
+   */
   bool CreateVTKObjects() VTK_OVERRIDE;
 
 private:

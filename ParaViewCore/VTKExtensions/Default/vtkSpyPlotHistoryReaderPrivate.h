@@ -13,12 +13,14 @@
 
 =========================================================================*/
 
-// .NAME vtkSpyPlotHistoryReaderPrivate - Private implementation for
-// spy plot history file reader.
-//
-// .SECTION Description
-// \internal
-
+/**
+ * @class   vtkSpyPlotHistoryReaderPrivate
+ * @brief   Private implementation for
+ * spy plot history file reader.
+ *
+ *
+ * \internal
+*/
 
 #ifndef vtkSpyPlotHistoryReaderPrivate_h
 #define vtkSpyPlotHistoryReaderPrivate_h

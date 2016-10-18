@@ -12,15 +12,18 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkAttributeDataReductionFilter - Reduces cell/point attribute data 
-// with different modes to combine cell/point data.
-// .SECTION Description
-// Filter that takes data with same structure on multiple input connections to
-// produce a reduced dataset with cell/point data summed/maxed/minned for 
-// all cells/points. Data arrays not available in all inputs
-// are discarded. The attribute to reduce can be set to point or cell or field
-// or all. Only selected attributes will be reduced according to the 
-// type choosen, all other attributes are those at the first input.
+/**
+ * @class   vtkAttributeDataReductionFilter
+ * @brief   Reduces cell/point attribute data 
+ * with different modes to combine cell/point data.
+ *
+ * Filter that takes data with same structure on multiple input connections to
+ * produce a reduced dataset with cell/point data summed/maxed/minned for 
+ * all cells/points. Data arrays not available in all inputs
+ * are discarded. The attribute to reduce can be set to point or cell or field
+ * or all. Only selected attributes will be reduced according to the 
+ * type choosen, all other attributes are those at the first input.
+*/
 
 #ifndef vtkAttributeDataReductionFilter_h
 #define vtkAttributeDataReductionFilter_h
@@ -89,9 +92,10 @@ protected:
                           vtkInformationVector** inputVector,
                           vtkInformationVector* outputVector);
 
-  // Description:
-  // This is called by the superclass.
-  // This is the method you should override.
+  /**
+   * This is called by the superclass.
+   * This is the method you should override.
+   */
   virtual int RequestDataObject(vtkInformation*,
                                 vtkInformationVector**,
                                 vtkInformationVector*);

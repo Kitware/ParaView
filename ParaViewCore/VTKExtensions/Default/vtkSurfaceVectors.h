@@ -12,11 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSurfaceVectors - Constrains vectors to surface.
-// .SECTION Description
-// This filter works on point vectors.  It does not work on cell vectors yet.
-// A normal is conputed for a point by averaging normals of surrounding
-// 2D cells.  The vector is then constrained to be perpendicular to the normal.
+/**
+ * @class   vtkSurfaceVectors
+ * @brief   Constrains vectors to surface.
+ *
+ * This filter works on point vectors.  It does not work on cell vectors yet.
+ * A normal is conputed for a point by averaging normals of surrounding
+ * 2D cells.  The vector is then constrained to be perpendicular to the normal.
+*/
 
 #ifndef vtkSurfaceVectors_h
 #define vtkSurfaceVectors_h
@@ -40,10 +43,12 @@ public:
     PerpendicularScale
   };
 
-  // Description:
-  // This mode determines whether this filter projects vectors to be 
-  // perpendicular to surface or parallel to surface.  
-  // It defaults to parallel.
+  //@{
+  /**
+   * This mode determines whether this filter projects vectors to be
+   * perpendicular to surface or parallel to surface.
+   * It defaults to parallel.
+   */
   vtkSetMacro(ConstraintMode,int);
   vtkGetMacro(ConstraintMode,int);
   void SetConstraintModeToParallel() 
@@ -52,6 +57,7 @@ public:
     {this->SetConstraintMode(vtkSurfaceVectors::Perpendicular);}
   void SetConstraintModeToPerpendicularScale() 
     {this->SetConstraintMode(vtkSurfaceVectors::PerpendicularScale);}
+  //@}
     
 protected:
   vtkSurfaceVectors();

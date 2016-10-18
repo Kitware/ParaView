@@ -12,17 +12,21 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMCameraConfigurationReader - A reader for XML camera configuration.
-//
-// .SECTION Description
-// A reader for XML camera configuration. Reades camera configuration files.
-// writen by the vtkSMCameraConfigurationWriter.
-//
-// .SECTION See Also
-// vtkSMCameraConfigurationWriter, vtkSMProxyConfigurationReader
-//
-// .SECTION Thanks
-// This class was contributed by SciberQuest Inc.
+/**
+ * @class   vtkSMCameraConfigurationReader
+ * @brief   A reader for XML camera configuration.
+ *
+ *
+ * A reader for XML camera configuration. Reades camera configuration files.
+ * writen by the vtkSMCameraConfigurationWriter.
+ *
+ * @sa
+ * vtkSMCameraConfigurationWriter, vtkSMProxyConfigurationReader
+ *
+ * @par Thanks:
+ * This class was contributed by SciberQuest Inc.
+*/
+
 #ifndef vtkSMCameraConfigurationReader_h
 #define vtkSMCameraConfigurationReader_h
 
@@ -39,15 +43,18 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkSMCameraConfigurationReader *New();
 
-  // Description:
-  // Set the render view proxy to extract camera properties from.
+  /**
+   * Set the render view proxy to extract camera properties from.
+   */
   void SetRenderViewProxy(vtkSMProxy *rvProxy);
 
 
-  // Description:
-  // Read the named file, and push the properties into the underying
-  // managed render view proxy. This will make sure the renderview is
-  // updated after the read.
+  //@{
+  /**
+   * Read the named file, and push the properties into the underying
+   * managed render view proxy. This will make sure the renderview is
+   * updated after the read.
+   */
   virtual int ReadConfiguration(const char *filename);
   virtual int ReadConfiguration(vtkPVXMLElement *x);
   // unhide
@@ -55,6 +62,7 @@ public:
     {
     return this->Superclass::ReadConfiguration();
     }
+  //@}
 
 protected:
   vtkSMCameraConfigurationReader();

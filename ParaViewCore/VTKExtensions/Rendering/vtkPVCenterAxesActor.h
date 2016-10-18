@@ -12,10 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVCenterAxesActor
-// .SECTION Description
-// vtkPVCenterAxesActor is an actor for the center-axes used in ParaView. It
-// merely uses vtkAxes as the poly data source.
+/**
+ * @class   vtkPVCenterAxesActor
+ *
+ * vtkPVCenterAxesActor is an actor for the center-axes used in ParaView. It
+ * merely uses vtkAxes as the poly data source.
+*/
 
 #ifndef vtkPVCenterAxesActor_h
 #define vtkPVCenterAxesActor_h
@@ -33,12 +35,14 @@ public:
   vtkTypeMacro(vtkPVCenterAxesActor, vtkOpenGLActor);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // If Symetric is on, the the axis continue to negative values.
+  /**
+   * If Symetric is on, the the axis continue to negative values.
+   */
   void SetSymmetric(int);
 
-  // Description:
-  // Option for computing normals.  By default they are computed.
+  /**
+   * Option for computing normals.  By default they are computed.
+   */
   void SetComputeNormals(int);
 
 protected:

@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVTrackballZoomToMouse - Zooms camera with vertical mouse movement to mouse position.
-// .SECTION Description
-// vtkPVTrackballZoomToMouse is a redifinition of a vtkPVTrackballZoom
-// allowing the user to zoom at the point projected under the mouse position.
+/**
+ * @class   vtkPVTrackballZoomToMouse
+ * @brief   Zooms camera with vertical mouse movement to mouse position.
+ *
+ * vtkPVTrackballZoomToMouse is a redifinition of a vtkPVTrackballZoom
+ * allowing the user to zoom at the point projected under the mouse position.
+*/
 
 #ifndef vtkPVTrackballZoomToMouse_h
 #define vtkPVTrackballZoomToMouse_h
@@ -30,13 +33,16 @@ public:
   vtkTypeMacro(vtkPVTrackballZoomToMouse, vtkPVTrackballZoom);
   void PrintSelf(ostream& os, vtkIndent indent);
   
-  // Description:
-  // Event bindings controlling the effects of pressing mouse buttons
-  // or moving the mouse.
+  //@{
+  /**
+   * Event bindings controlling the effects of pressing mouse buttons
+   * or moving the mouse.
+   */
   virtual void OnMouseMove(int x, int y, vtkRenderer *ren,
                            vtkRenderWindowInteractor *rwi);
   virtual void OnButtonDown(int x, int y, vtkRenderer *ren,
                             vtkRenderWindowInteractor *rwi);
+  //@}
 
 protected:
   vtkPVTrackballZoomToMouse();

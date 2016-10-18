@@ -12,13 +12,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVDataRepresentationPipeline - executive for
-// vtkPVDataRepresentation.
-// .SECTION Description
-// vtkPVDataRepresentationPipeline is an executive for vtkPVDataRepresentation.
-// In works in collaboration with the vtkPVView and vtkPVDataRepresentation to
-// ensure appropriate time/piece is requested from the upstream. This also helps
-// when caching is employed by the view.
+/**
+ * @class   vtkPVDataRepresentationPipeline
+ * @brief   executive for
+ * vtkPVDataRepresentation.
+ *
+ * vtkPVDataRepresentationPipeline is an executive for vtkPVDataRepresentation.
+ * In works in collaboration with the vtkPVView and vtkPVDataRepresentation to
+ * ensure appropriate time/piece is requested from the upstream. This also helps
+ * when caching is employed by the view.
+*/
 
 #ifndef vtkPVDataRepresentationPipeline_h
 #define vtkPVDataRepresentationPipeline_h

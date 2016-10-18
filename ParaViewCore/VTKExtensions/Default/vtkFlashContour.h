@@ -12,11 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkFlashContour - Contour of a flash AMR volume.
-// .SECTION Description
-// This filter takes a cell data array and generates a polydata
-// surface.  
-
+/**
+ * @class   vtkFlashContour
+ * @brief   Contour of a flash AMR volume.
+ *
+ * This filter takes a cell data array and generates a polydata
+ * surface.  
+*/
 
 #ifndef vtkFlashContour_h
 #define vtkFlashContour_h

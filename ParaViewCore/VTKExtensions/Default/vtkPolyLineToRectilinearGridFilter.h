@@ -12,14 +12,17 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPolyLineToRectilinearGridFilter - filter that converts an input
-// poly data with a single polyline to a 1-D regular rectilinear grid.
-// .SECTION Description
-// vtkPolyLineToRectilinearGridFilter converts an input polydata with single 
-// polyline to a 1-D regular rectilinear grid. The output has additional point
-// data indicating the arc-length for each point. Note that the Xcoordinates
-// of the output are not related to those of the input. The input point 
-// coordinates themselves are added as point data in the output.
+/**
+ * @class   vtkPolyLineToRectilinearGridFilter
+ * @brief   filter that converts an input
+ * poly data with a single polyline to a 1-D regular rectilinear grid.
+ *
+ * vtkPolyLineToRectilinearGridFilter converts an input polydata with single 
+ * polyline to a 1-D regular rectilinear grid. The output has additional point
+ * data indicating the arc-length for each point. Note that the Xcoordinates
+ * of the output are not related to those of the input. The input point 
+ * coordinates themselves are added as point data in the output.
+*/
 
 #ifndef vtkPolyLineToRectilinearGridFilter_h
 #define vtkPolyLineToRectilinearGridFilter_h

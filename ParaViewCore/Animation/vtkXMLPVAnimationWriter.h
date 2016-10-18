@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLPVAnimationWriter - Data writer for ParaView
-// .SECTION Description
-// vtkXMLPVAnimationWriter is used to save all parts of a current
-// source to a file with pieces spread across ther server processes.
+/**
+ * @class   vtkXMLPVAnimationWriter
+ * @brief   Data writer for ParaView
+ *
+ * vtkXMLPVAnimationWriter is used to save all parts of a current
+ * source to a file with pieces spread across ther server processes.
+*/
 
 #ifndef vtkXMLPVAnimationWriter_h
 #define vtkXMLPVAnimationWriter_h
@@ -32,21 +35,27 @@ public:
   vtkTypeMacro(vtkXMLPVAnimationWriter,vtkXMLPVDWriter);
   void PrintSelf(ostream& os, vtkIndent indent);  
 
-  // Description:
-  // Add/Remove representations.
+  //@{
+  /**
+   * Add/Remove representations.
+   */
   void AddRepresentation(vtkAlgorithm*, const char* groupname);
   void RemoveAllRepresentations();
+  //@}
 
-  // Description:
-  // Start a new animation with the current set of inputs.
+  /**
+   * Start a new animation with the current set of inputs.
+   */
   void Start();
   
-  // Description:
-  // Write the current time step.
+  /**
+   * Write the current time step.
+   */
   void WriteTime(double time);
   
-  // Description:
-  // Finish an animation by writing the collection file.
+  /**
+   * Finish an animation by writing the collection file.
+   */
   void Finish();
   
 protected:

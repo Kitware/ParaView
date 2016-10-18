@@ -12,13 +12,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVRepresentationAnimationHelper - helper proxy used to animate
-// properties on the representations for any source.
-// .SECTION Description
-// vtkPVRepresentationAnimationHelper is helper proxy used to animate
-// properties on the representations for any source. This makes is possible to
-// set up an animation cue that will affect properties on all representations
-// for a source without directly referring to the representation proxies.
+/**
+ * @class   vtkPVRepresentationAnimationHelper
+ * @brief   helper proxy used to animate
+ * properties on the representations for any source.
+ *
+ * vtkPVRepresentationAnimationHelper is helper proxy used to animate
+ * properties on the representations for any source. This makes is possible to
+ * set up an animation cue that will affect properties on all representations
+ * for a source without directly referring to the representation proxies.
+*/
 
 #ifndef vtkPVRepresentationAnimationHelper_h
 #define vtkPVRepresentationAnimationHelper_h
@@ -34,11 +37,14 @@ public:
   vtkTypeMacro(vtkPVRepresentationAnimationHelper, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Don't use directly. Use the corresponding properties intstead.
+  //@{
+  /**
+   * Don't use directly. Use the corresponding properties intstead.
+   */
   void SetVisibility(int);
   void SetOpacity(double);
   void SetSourceProxy(vtkSMProxy* proxy);
+  //@}
 
 protected:
   vtkPVRepresentationAnimationHelper();

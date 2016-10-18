@@ -12,9 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkExtractsDeliveryHelper
-// .SECTION Description
-//
+/**
+ * @class   vtkExtractsDeliveryHelper
+ *
+ *
+*/
 
 #ifndef vtkExtractsDeliveryHelper_h
 #define vtkExtractsDeliveryHelper_h
@@ -59,8 +61,9 @@ public:
 
   void AddExtractProducer(const char* key, vtkAlgorithmOutput* producerPort);
 
-  // Description:
-  // Returns true if the data has been made available.
+  /**
+   * Returns true if the data has been made available.
+   */
   bool Update();
 
   vtkSetMacro(NumberOfVisualizationProcesses, int);

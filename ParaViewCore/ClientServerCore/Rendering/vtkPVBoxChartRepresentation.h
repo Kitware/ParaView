@@ -12,11 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVBoxChartRepresentation
-// .SECTION Description
-// vtkPVBoxChartRepresentation is the vtkChartBox
-// subclass for box plots representation. It exposes API from
-// underlying vtkChartBox.
+/**
+ * @class   vtkPVBoxChartRepresentation
+ *
+ * vtkPVBoxChartRepresentation is the vtkChartBox
+ * subclass for box plots representation. It exposes API from
+ * underlying vtkChartBox.
+*/
 
 #ifndef vtkPVBoxChartRepresentation_h
 #define vtkPVBoxChartRepresentation_h
@@ -33,53 +35,72 @@ public:
   vtkTypeMacro(vtkPVBoxChartRepresentation, vtkChartRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Set visibility of the representation.
+  /**
+   * Set visibility of the representation.
+   */
   virtual void SetVisibility(bool visible);
 
-  // Description:
-  // Set/Clear the properties for series/columns.
+  //@{
+  /**
+   * Set/Clear the properties for series/columns.
+   */
   void SetSeriesVisibility(const char* series, bool visibility);
   void SetSeriesColor(const char* name, double r, double g, double b);
+  //@}
 
   void ClearSeriesVisibilities();
   void ClearSeriesColors();
 
-  // Description:
-  // Provides access to the underlying VTK representation.
+  /**
+   * Provides access to the underlying VTK representation.
+   */
   vtkChartBox* GetChart();
 
-  // Description:
-  // Sets the line thickness for the plot.
+  //@{
+  /**
+   * Sets the line thickness for the plot.
+   */
   vtkSetMacro(LineThickness, int);
+  //@}
 
-  // Description:
-  // Set the line style for the plot.
+  //@{
+  /**
+   * Set the line style for the plot.
+   */
   vtkSetMacro(LineStyle, int);
+  //@}
 
-  // Description:
-  // Sets the color to used for the lines in the plot.
+  //@{
+  /**
+   * Sets the color to used for the lines in the plot.
+   */
   vtkSetVector3Macro(Color, double);
+  //@}
 
-  // Description:
-  // Set the visibility of the legend (plot labels)
+  //@{
+  /**
+   * Set the visibility of the legend (plot labels)
+   */
   vtkSetMacro(Legend, bool);
+  //@}
 
 protected:
   vtkPVBoxChartRepresentation();
   ~vtkPVBoxChartRepresentation();
 
-  // Description:
-  // Overridden to pass information about changes to series visibility etc. to
-  // the plot-matrix.
+  /**
+   * Overridden to pass information about changes to series visibility etc. to
+   * the plot-matrix.
+   */
   virtual void PrepareForRendering();
 
   virtual bool AddToView(vtkView* view);
 
-  // Description:
-  // Removes the representation to the view.  This is called from
-  // vtkView::RemoveRepresentation().  Subclasses should override this method.
-  // Returns true if the removal succeeds.
+  /**
+   * Removes the representation to the view.  This is called from
+   * vtkView::RemoveRepresentation().  Subclasses should override this method.
+   * Returns true if the removal succeeds.
+   */
   virtual bool RemoveFromView(vtkView* view);
 
   int LineThickness;

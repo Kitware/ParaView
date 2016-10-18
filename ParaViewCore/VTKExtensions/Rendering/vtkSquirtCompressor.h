@@ -17,33 +17,36 @@
  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 ----------------------------------------------------------------------------*/
 
-// .NAME vtkSquirtCompressor - Image compressor/decompressor using SQUIRT.
-// .SECTION Description
-// This class compresses Image data using SQUIRT a Run-Length-Encoded
-// compression scheme. The Squirt Level controls the compression. 0 is
-// lossless compression, 1 through 5 are lossy compression levels with
-// 5 being maximum compression.
-//
-// Squirt produces smaller compression ratio than some other popular
-// compression algorithm. However, Squirt has a relatively high
-// throughput compared to some other compression algorithm. Squirt's
-// performance is optimized for RGBa images, however the class can
-// also work with RGB images. There is no performance hit when applying
-// the lossy comrpession levels.
-//
-// Levels 1 through 5 apply a color reducing mask to the run computation,
-// not to the pixel directly. This is clever in that no new colors are
-// introduced to the image, and as a result one doesn't see drastic changes
-// between the reduced color image and the original. However, when using
-// the higher levels one may get runs that produce visual artifiacts. For
-// example when a run starts in one actor whose reduced color matches the
-// background the background is colored with the actor color.
-//
-// The compressor uses a modified SQUIRT implementation where encode 4-bit
-// opacity information as well. This is needed to improve background color
-// blending for translucent renderings in ParaView.
-// .SECTION Thanks
-// Thanks to Sandia National Laboratories for this compression technique
+/**
+ * @class   vtkSquirtCompressor
+ * @brief   Image compressor/decompressor using SQUIRT.
+ *
+ * This class compresses Image data using SQUIRT a Run-Length-Encoded
+ * compression scheme. The Squirt Level controls the compression. 0 is
+ * lossless compression, 1 through 5 are lossy compression levels with
+ * 5 being maximum compression.
+ *
+ * Squirt produces smaller compression ratio than some other popular
+ * compression algorithm. However, Squirt has a relatively high
+ * throughput compared to some other compression algorithm. Squirt's
+ * performance is optimized for RGBa images, however the class can
+ * also work with RGB images. There is no performance hit when applying
+ * the lossy comrpession levels.
+ *
+ * Levels 1 through 5 apply a color reducing mask to the run computation,
+ * not to the pixel directly. This is clever in that no new colors are
+ * introduced to the image, and as a result one doesn't see drastic changes
+ * between the reduced color image and the original. However, when using
+ * the higher levels one may get runs that produce visual artifiacts. For
+ * example when a run starts in one actor whose reduced color matches the
+ * background the background is colored with the actor color.
+ *
+ * The compressor uses a modified SQUIRT implementation where encode 4-bit
+ * opacity information as well. This is needed to improve background color
+ * blending for translucent renderings in ParaView.
+ * @par Thanks:
+ * Thanks to Sandia National Laboratories for this compression technique
+*/
 
 #ifndef vtkSquirtCompressor_h
 #define vtkSquirtCompressor_h
@@ -60,23 +63,32 @@ public:
   vtkTypeMacro(vtkSquirtCompressor, vtkImageCompressor);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Set Squirt compression level.
-  // Level 0 is lossless compression, 1 through 5 are lossy compression
-  // levels with 5 being maximum compression.
+  //@{
+  /**
+   * Set Squirt compression level.
+   * Level 0 is lossless compression, 1 through 5 are lossy compression
+   * levels with 5 being maximum compression.
+   */
   vtkSetClampMacro(SquirtLevel, int, 0, 5);
   vtkGetMacro(SquirtLevel, int);
+  //@}
 
-  // Description:
-  // Compress/Decompress data array on the objects input with results
-  // in the objects output. See also Set/GetInput/Output.
+  //@{
+  /**
+   * Compress/Decompress data array on the objects input with results
+   * in the objects output. See also Set/GetInput/Output.
+   */
   virtual int Compress();
   virtual int Decompress();
+  //@}
 
-  // Description:
-  // Serialize/Restore compressor configuration (but not the data) into the stream.
+  //@{
+  /**
+   * Serialize/Restore compressor configuration (but not the data) into the stream.
+   */
   virtual void SaveConfiguration(vtkMultiProcessStream *stream);
   virtual bool RestoreConfiguration(vtkMultiProcessStream *stream);
+  //@}
 
   virtual const char *SaveConfiguration();
   virtual const char *RestoreConfiguration(const char *stream);

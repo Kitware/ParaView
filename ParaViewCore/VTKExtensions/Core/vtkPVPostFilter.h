@@ -12,15 +12,18 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVPostFilter - Post Filter for on demand conversion
-// .SECTION Description
-// vtkPVPostFilter is a filter used for on demand conversion
-// of properties
-// Provide the ability to automatically use a vector component as a scalar
-// input property.
-//
-//  Interpolate cell centered data to point data, and the inverse if needed
-// by the filter.
+/**
+ * @class   vtkPVPostFilter
+ * @brief   Post Filter for on demand conversion
+ *
+ * vtkPVPostFilter is a filter used for on demand conversion
+ * of properties
+ * Provide the ability to automatically use a vector component as a scalar
+ * input property.
+ *
+ *  Interpolate cell centered data to point data, and the inverse if needed
+ * by the filter.
+*/
 
 #ifndef vtkPVPostFilter_h
 #define vtkPVPostFilter_h
@@ -36,10 +39,11 @@ public:
   vtkTypeMacro(vtkPVPostFilter,vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // We need to override this method because the composite data pipeline
-  // is not what we want. Instead we need the PVCompositeDataPipeline
-  // so that we can figure out what we conversion(s) we need to do
+  /**
+   * We need to override this method because the composite data pipeline
+   * is not what we want. Instead we need the PVCompositeDataPipeline
+   * so that we can figure out what we conversion(s) we need to do
+   */
   vtkExecutive* CreateDefaultExecutive();
 
   static vtkStdString DefaultComponentName(int componentNumber, int componentCount);

@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkViewLayout - used by vtkSMViewLayoutProxy.
-// .SECTION Description
-// vtkViewLayout is the server-side object corresponding to
-// vtkSMViewLayoutProxy.
+/**
+ * @class   vtkViewLayout
+ * @brief   used by vtkSMViewLayoutProxy.
+ *
+ * vtkViewLayout is the server-side object corresponding to
+ * vtkSMViewLayoutProxy.
+*/
 
 #ifndef vtkViewLayout_h
 #define vtkViewLayout_h

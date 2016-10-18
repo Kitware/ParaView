@@ -12,18 +12,21 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkMaterialInterfaceFilter - Extract particles and analyse them.
-// .SECTION Description
-// This filter takes a cell data volume fraction and generates a polydata
-// surface.  It also performs connectivity on the particles and generates
-// a particle index as part of the cell data of the output.  It computes
-// the volume of each particle from the volume fraction.
-
-// This will turn on validation and debug i/o of the filter.
-//#define vtkMaterialInterfaceFilterDEBUG
-
-// This will turn on profiling of how long each part of the filter takes
-//#define vtkMaterialInterfaceFilterPROFILE
+/**
+ * @class   vtkMaterialInterfaceFilter
+ * @brief   Extract particles and analyse them.
+ *
+ * This filter takes a cell data volume fraction and generates a polydata
+ * surface.  It also performs connectivity on the particles and generates
+ * a particle index as part of the cell data of the output.  It computes
+ * the volume of each particle from the volume fraction.
+ *
+ * This will turn on validation and debug i/o of the filter.
+ *#define vtkMaterialInterfaceFilterDEBUG
+ *
+ * This will turn on profiling of how long each part of the filter takes
+ *#define vtkMaterialInterfaceFilterPROFILE
+*/
 
 #ifndef vtkMaterialInterfaceFilter_h
 #define vtkMaterialInterfaceFilter_h
@@ -70,196 +73,267 @@ public:
   // PARAVIEW interface stuff
 
   /// Material sellection
-  // Description:
-  // Add a single array
+  /**
+   * Add a single array
+   */
   void SelectMaterialArray(const char *name);
-  // Description:
-  // remove a single array
+  /**
+   * remove a single array
+   */
   void UnselectMaterialArray( const char *name );
-  // Description:
-  // remove all arrays
+  /**
+   * remove all arrays
+   */
   void UnselectAllMaterialArrays();
-  // Description:
-  // Enable/disable processing on an array
+  /**
+   * Enable/disable processing on an array
+   */
   void SetMaterialArrayStatus( const char* name,
                                int status );
-  // Description:
-  // Get enable./disable status for a given array
+  //@{
+  /**
+   * Get enable./disable status for a given array
+   */
   int GetMaterialArrayStatus(const char* name);
   int GetMaterialArrayStatus(int index);
-  // Description:
-  // Query the number of available arrays
+  //@}
+  /**
+   * Query the number of available arrays
+   */
   int GetNumberOfMaterialArrays();
-  // Description:
-  // Get the name of a specific array
+  /**
+   * Get the name of a specific array
+   */
   const char *GetMaterialArrayName(int index);
 
   /// Mass sellection
-  // Description:
-  // Add a single array
+  /**
+   * Add a single array
+   */
   void SelectMassArray(const char *name);
-  // Description:
-  // remove a single array
+  /**
+   * remove a single array
+   */
   void UnselectMassArray( const char *name );
-  // Description:
-  // remove all arrays
+  /**
+   * remove all arrays
+   */
   void UnselectAllMassArrays();
-  // Description:
-  // Enable/disable processing on an array
+  /**
+   * Enable/disable processing on an array
+   */
   void SetMassArrayStatus( const char* name,
                                int status );
-  // Description:
-  // Get enable./disable status for a given array
+  //@{
+  /**
+   * Get enable./disable status for a given array
+   */
   int GetMassArrayStatus(const char* name);
   int GetMassArrayStatus(int index);
-  // Description:
-  // Query the number of available arrays
+  //@}
+  /**
+   * Query the number of available arrays
+   */
   int GetNumberOfMassArrays();
-  // Description:
-  // Get the name of a specific array
+  /**
+   * Get the name of a specific array
+   */
   const char *GetMassArrayName(int index);
 
   /// Volume weighted average attribute sellection
-  // Description:
-  // Add a single array
+  /**
+   * Add a single array
+   */
   void SelectVolumeWtdAvgArray(const char *name);
-  // Description:
-  // remove a single array
+  /**
+   * remove a single array
+   */
   void UnselectVolumeWtdAvgArray(const char *name);
-  // Description:
-  // remove all arrays
+  /**
+   * remove all arrays
+   */
   void UnselectAllVolumeWtdAvgArrays();
 
-  // Description:
-  // Enable/disable processing on an array
+  /**
+   * Enable/disable processing on an array
+   */
   void SetVolumeWtdAvgArrayStatus(const char* name,
                                   int status );
-  // Description:
-  // Get enable./disable status for a given array
+  //@{
+  /**
+   * Get enable./disable status for a given array
+   */
   int GetVolumeWtdAvgArrayStatus(const char* name);
   int GetVolumeWtdAvgArrayStatus(int index);
-  // Description:
-  // Query the number of available arrays
+  //@}
+  /**
+   * Query the number of available arrays
+   */
   int GetNumberOfVolumeWtdAvgArrays();
-  // Description:
-  // Get the name of a specific array
+  /**
+   * Get the name of a specific array
+   */
   const char *GetVolumeWtdAvgArrayName(int index);
 
   /// Mass weighted average attribute sellection
-  // Description:
-  // Add a single array
+  /**
+   * Add a single array
+   */
   void SelectMassWtdAvgArray(const char *name);
-  // Description:
-  // remove a single array
+  /**
+   * remove a single array
+   */
   void UnselectMassWtdAvgArray(const char *name);
-  // Description:
-  // remove all arrays
+  /**
+   * remove all arrays
+   */
   void UnselectAllMassWtdAvgArrays();
 
-  // Description:
-  // Enable/disable processing on an array
+  /**
+   * Enable/disable processing on an array
+   */
   void SetMassWtdAvgArrayStatus(const char* name,
                                   int status );
-  // Description:
-  // Get enable./disable status for a given array
+  //@{
+  /**
+   * Get enable./disable status for a given array
+   */
   int GetMassWtdAvgArrayStatus(const char* name);
   int GetMassWtdAvgArrayStatus(int index);
-  // Description:
-  // Query the number of available arrays
+  //@}
+  /**
+   * Query the number of available arrays
+   */
   int GetNumberOfMassWtdAvgArrays();
-  // Description:
-  // Get the name of a specific array
+  /**
+   * Get the name of a specific array
+   */
   const char *GetMassWtdAvgArrayName(int index);
 
   /// Summation attribute sellection
-  // Description:
-  // Add a single array
+  /**
+   * Add a single array
+   */
   void SelectSummationArray(const char *name);
-  // Description:
-  // remove a single array
+  /**
+   * remove a single array
+   */
   void UnselectSummationArray( const char *name );
-  // Description:
-  // remove all arrays
+  /**
+   * remove all arrays
+   */
   void UnselectAllSummationArrays();
-  // Description:
-  // Enable/disable processing on an array
+  /**
+   * Enable/disable processing on an array
+   */
   void SetSummationArrayStatus( const char* name,
                                   int status );
-  // Description:
-  // Get enable./disable status for a given array
+  //@{
+  /**
+   * Get enable./disable status for a given array
+   */
   int GetSummationArrayStatus(const char* name);
   int GetSummationArrayStatus(int index);
-  // Description:
-  // Query the number of available arrays
+  //@}
+  /**
+   * Query the number of available arrays
+   */
   int GetNumberOfSummationArrays();
-  // Description:
-  // Get the name of a specific array
+  /**
+   * Get the name of a specific array
+   */
   const char *GetSummationArrayName(int index);
 
   /// Volume Fraction
-  // Description:
-  // Volume fraction which volxels are included in a frgament.
+  //@{
+  /**
+   * Volume fraction which volxels are included in a frgament.
+   */
   void SetMaterialFractionThreshold(double fraction);
   vtkGetMacro(MaterialFractionThreshold, double);
+  //@}
 
   /// OBB
-  // Description:
-  // Turn on/off OBB calculations
+  //@{
+  /**
+   * Turn on/off OBB calculations
+   */
   vtkSetMacro(ComputeOBB,bool);
   vtkGetMacro(ComputeOBB,bool);
+  //@}
 
   /// Loading
-  //Description:
-  // Set the upper bound(in number of polygons) that will
-  // be used to exclude processes from work sharing
-  // during memory intensive portions of the algorithm.
-  // acceptable values are [1 INF), however the default
-  // is 1,000,000 polys. Increasing increases parallelism
-  // while decresing reduces parallelism. Setting too low
-  // can cause problems. For instance if it's set so low
-  // that all processes are excluded.
+  //@{
+  /**
+   * Set the upper bound(in number of polygons) that will
+   * be used to exclude processes from work sharing
+   * during memory intensive portions of the algorithm.
+   * acceptable values are [1 INF), however the default
+   * is 1,000,000 polys. Increasing increases parallelism
+   * while decresing reduces parallelism. Setting too low
+   * can cause problems. For instance if it's set so low
+   * that all processes are excluded.
+   */
   void SetUpperLoadingBound(int nPolys);
   vtkGetMacro(UpperLoadingBound,int);
+  //@}
 
   /// Output file
-  // Description:
-  // Name the file to save a table of fragment attributes to.
+  //@{
+  /**
+   * Name the file to save a table of fragment attributes to.
+   */
   vtkSetStringMacro(OutputBaseName);
   vtkGetStringMacro(OutputBaseName);
-  // Description:
-  // If true, save the results of the filter in a text file
+  //@}
+  //@{
+  /**
+   * If true, save the results of the filter in a text file
+   */
   vtkSetMacro(WriteGeometryOutput,bool);
   vtkGetMacro(WriteGeometryOutput,bool);
   vtkSetMacro(WriteStatisticsOutput,bool);
   vtkGetMacro(WriteStatisticsOutput,bool);
+  //@}
 
-  // Description:
-  // Variable used to specify the number of ghost level
-  // is available in each block.
-  // By Default set to 1 which is what the scth reader provides
+  //@{
+  /**
+   * Variable used to specify the number of ghost level
+   * is available in each block.
+   * By Default set to 1 which is what the scth reader provides
+   */
   vtkSetMacro(BlockGhostLevel, unsigned char);
   vtkGetMacro(BlockGhostLevel, unsigned char);
+  //@}
 
-  // Description:
-  // Sets modified if array selection changes.
+  /**
+   * Sets modified if array selection changes.
+   */
   static void SelectionModifiedCallback( vtkObject*,
                                          unsigned long,
                                          void* clientdata,
                                          void* );
 
-  // Description:
-  // Set the clip function which can be a plane or a sphere
+  //@{
+  /**
+   * Set the clip function which can be a plane or a sphere
+   */
   void SetClipFunction(vtkImplicitFunction *clipFunction);
   vtkGetObjectMacro(ClipFunction,vtkImplicitFunction);
+  //@}
 
-  // Description:
-  // Invert the volume fraction to extract the negative space.
-  // This is useful for extracting a crater.
+  //@{
+  /**
+   * Invert the volume fraction to extract the negative space.
+   * This is useful for extracting a crater.
+   */
   vtkSetMacro(InvertVolumeFraction,int);
   vtkGetMacro(InvertVolumeFraction,int);
+  //@}
 
-  // Description:
-  // Return the mtime also considering the locator and clip function.
+  /**
+   * Return the mtime also considering the locator and clip function.
+   */
   vtkMTimeType GetMTime();
 
 protected:

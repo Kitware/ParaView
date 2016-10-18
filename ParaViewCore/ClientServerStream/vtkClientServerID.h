@@ -12,12 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkClientServerID - Identifier for a ClientServer object.
-// .SECTION Description
-// vtkClientServerID identifies an object managed by a
-// vtkClientServerInterpreter.  Although the identifier is simply an
-// integer, this class allows vtkClientServerStream to identify the
-// integer as an object identifier.
+/**
+ * @class   vtkClientServerID
+ * @brief   Identifier for a ClientServer object.
+ *
+ * vtkClientServerID identifies an object managed by a
+ * vtkClientServerInterpreter.  Although the identifier is simply an
+ * integer, this class allows vtkClientServerStream to identify the
+ * integer as an object identifier.
+*/
 
 #ifndef vtkClientServerID_h
 #define vtkClientServerID_h

@@ -12,8 +12,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVEnSightMasterServerReader - 
-// .SECTION Description
+/**
+ * @class   vtkPVEnSightMasterServerReader
+ *
+*/
 
 #ifndef vtkPVEnSightMasterServerReader_h
 #define vtkPVEnSightMasterServerReader_h
@@ -32,25 +34,32 @@ public:
   vtkTypeMacro(vtkPVEnSightMasterServerReader, vtkGenericEnSightReader);
   void PrintSelf(ostream& os, vtkIndent indent);
   
-  // Description:
-  // This class uses MPI communication mechanisms to verify the
-  // integrity of all case files in the master file.  The get method
-  // interface must use vtkMultiProcessController instead of
-  // vtkMPIController because Tcl wrapping requires the class's
-  // wrapper to be defined, but it is not defined if MPI is not on.
-  // In client-server mode, we may still need to create an instance of
-  // this class on the client process even if MPI is not compiled in.
+  //@{
+  /**
+   * This class uses MPI communication mechanisms to verify the
+   * integrity of all case files in the master file.  The get method
+   * interface must use vtkMultiProcessController instead of
+   * vtkMPIController because Tcl wrapping requires the class's
+   * wrapper to be defined, but it is not defined if MPI is not on.
+   * In client-server mode, we may still need to create an instance of
+   * this class on the client process even if MPI is not compiled in.
+   */
   virtual vtkMultiProcessController* GetController();
   virtual void SetController(vtkMultiProcessController* controller);
+  //@}
 
-  // Description:
-  // Return whether we can read the file given.
+  /**
+   * Return whether we can read the file given.
+   */
   virtual int CanReadFile(const char*);
   
-  // Description:
-  // Get the number of pieces in the file.  Valid after
-  // UpdateInformation.
+  //@{
+  /**
+   * Get the number of pieces in the file.  Valid after
+   * UpdateInformation.
+   */
   vtkGetMacro(NumberOfPieces, int);
+  //@}
 
 protected:
   vtkPVEnSightMasterServerReader();

@@ -12,9 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSciVizStatisticsPrivate - Private class for scientific viz statistics classes.
-// .SECTION Description
-// This class handles array selection in a way that makes ParaView happy.
+/**
+ * @class   vtkSciVizStatisticsPrivate
+ * @brief   Private class for scientific viz statistics classes.
+ *
+ * This class handles array selection in a way that makes ParaView happy.
+*/
 
 #ifndef vtkSciVizStatisticsPrivate_h
 #define vtkSciVizStatisticsPrivate_h

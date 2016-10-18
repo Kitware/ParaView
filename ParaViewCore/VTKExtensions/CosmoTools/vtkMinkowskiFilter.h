@@ -12,11 +12,13 @@
  PURPOSE.  See the above copyright notice for more information.
 
  =========================================================================*/
-// .NAME vtkMinkowskiFilter.h -- Computes Minkowski functionals
-//
-// .SECTION Description
-// Given as input a voronoi tesselation, stored in a vtkUnstructuredGrid, this
-// filter computes the Minkowski functionals on each cell.
+/**
+ * @class   vtkMinkowskiFilter
+ *
+ *
+ * Given as input a voronoi tesselation, stored in a vtkUnstructuredGrid, this
+ * filter computes the Minkowski functionals on each cell.
+*/
 
 #ifndef vtkMinkowskiFilter_h
 #define vtkMinkowskiFilter_h

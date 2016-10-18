@@ -12,10 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVCameraAnimationCue
-// .SECTION Description
-// vtkPVCameraAnimationCue is a specialization of the vtkPVKeyFrameAnimationCue suitable
-// for animating cameras from a vtkPVRenderView.
+/**
+ * @class   vtkPVCameraAnimationCue
+ *
+ * vtkPVCameraAnimationCue is a specialization of the vtkPVKeyFrameAnimationCue suitable
+ * for animating cameras from a vtkPVRenderView.
+*/
 
 #ifndef vtkPVCameraAnimationCue_h
 #define vtkPVCameraAnimationCue_h
@@ -35,17 +37,22 @@ public:
   vtkTypeMacro(vtkPVCameraAnimationCue, vtkPVKeyFrameAnimationCue);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Get/Set the render view.
+  //@{
+  /**
+   * Get/Set the render view.
+   */
   void SetView(vtkPVRenderView*);
   vtkGetObjectMacro(View, vtkPVRenderView);
+  //@}
 
-  // Description:
-  // Returns the animated camera, if any.
+  /**
+   * Returns the animated camera, if any.
+   */
   vtkCamera* GetCamera();
 
-  // Description:
-  // Forwarded to vtkPVCameraCueManipulator.
+  /**
+   * Forwarded to vtkPVCameraCueManipulator.
+   */
   void SetMode(int mode);
 
   virtual void BeginUpdateAnimationValues() {}

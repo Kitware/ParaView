@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLPVDWriter - Data writer for ParaView
-// .SECTION Description
-// vtkXMLPVDWriter is used to save all parts of a current
-// source to a file with pieces spread across ther server processes.
+/**
+ * @class   vtkXMLPVDWriter
+ * @brief   Data writer for ParaView
+ *
+ * vtkXMLPVDWriter is used to save all parts of a current
+ * source to a file with pieces spread across ther server processes.
+*/
 
 #ifndef vtkXMLPVDWriter_h
 #define vtkXMLPVDWriter_h
@@ -33,36 +36,50 @@ public:
   vtkTypeMacro(vtkXMLPVDWriter,vtkXMLWriter);
   void PrintSelf(ostream& os, vtkIndent indent);  
   
-  // Description:
-  // Get the default file extension for files written by this writer.
+  /**
+   * Get the default file extension for files written by this writer.
+   */
   virtual const char* GetDefaultFileExtension();
   
-  // Description:
-  // Get/Set the piece number to write.  The same piece number is used
-  // for all inputs.
+  //@{
+  /**
+   * Get/Set the piece number to write.  The same piece number is used
+   * for all inputs.
+   */
   vtkGetMacro(Piece, int);
   vtkSetMacro(Piece, int);
+  //@}
   
-  // Description:
-  // Get/Set the number of pieces into which the inputs are split.
+  //@{
+  /**
+   * Get/Set the number of pieces into which the inputs are split.
+   */
   vtkGetMacro(NumberOfPieces, int);
   vtkSetMacro(NumberOfPieces, int);
+  //@}
   
-  // Description:
-  // Get/Set the number of ghost levels to be written for unstructured
-  // data.
+  //@{
+  /**
+   * Get/Set the number of ghost levels to be written for unstructured
+   * data.
+   */
   vtkGetMacro(GhostLevel, int);
   vtkSetMacro(GhostLevel, int);
+  //@}
   
-  // Description:
-  // Add an input of this algorithm.
+  /**
+   * Add an input of this algorithm.
+   */
   void AddInputData(vtkDataObject *);
 
-  // Description:
-  // Get/Set whether this instance will write the main collection
-  // file.
+  //@{
+  /**
+   * Get/Set whether this instance will write the main collection
+   * file.
+   */
   vtkGetMacro(WriteCollectionFile, int);
   virtual void SetWriteCollectionFile(int flag);
+  //@}
 
   // See the vtkAlgorithm for a desciption of what these do
   int ProcessRequest(vtkInformation*,

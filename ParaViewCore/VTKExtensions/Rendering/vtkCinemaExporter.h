@@ -12,13 +12,17 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCinemaExporter - Exports a view as a Cinema database.
-//
-// .SECTION Description
-// Specifies and runs a Python script which uses pv_introspect.py to generate
-// images from a set of parameters of the different elements in a pipeline for
-// later visualization. Takes different options from pqCinemaTrackSelection and
-// pqExportViewSelection as strings to be included in the script.
+/**
+ * @class   vtkCinemaExporter
+ * @brief   Exports a view as a Cinema database.
+ *
+ *
+ * Specifies and runs a Python script which uses pv_introspect.py to generate
+ * images from a set of parameters of the different elements in a pipeline for
+ * later visualization. Takes different options from pqCinemaTrackSelection and
+ * pqExportViewSelection as strings to be included in the script.
+*/
+
 #ifndef vtkCinemaExporter_h
 #define vtkCinemaExporter_h
 

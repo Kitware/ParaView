@@ -12,16 +12,20 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVPlugin - defines the core interface for any ParaView plugin. 
-// .SECTION Description
-// vtkPVPlugin defines the core interface for any ParaView plugin. A plugin
-// implementing merely this interface is pretty much useless.
-// The header file also defines few import macros that are required for
-// exporting/importing plugins.
-//
-// When debugging issues with plugins try setting the PV_PLUGIN_DEBUG
-// environment variable on all the processes where you are trying to load the
-// plugin. That will print extra information as the plugin is being loaded.
+/**
+ * @class   vtkPVPlugin
+ * @brief   defines the core interface for any ParaView plugin. 
+ *
+ * vtkPVPlugin defines the core interface for any ParaView plugin. A plugin
+ * implementing merely this interface is pretty much useless.
+ * The header file also defines few import macros that are required for
+ * exporting/importing plugins.
+ *
+ * When debugging issues with plugins try setting the PV_PLUGIN_DEBUG
+ * environment variable on all the processes where you are trying to load the
+ * plugin. That will print extra information as the plugin is being loaded.
+*/
+
 #ifndef vtkPVPlugin_h
 #define vtkPVPlugin_h
 
@@ -55,39 +59,48 @@ public:
   const char* GetFileName()
     { return this->FileName; }
 
-  // Description:
-  // Returns the name for this plugin.
+  /**
+   * Returns the name for this plugin.
+   */
   virtual const char* GetPluginName() = 0;
 
-  // Description:
-  // Returns the version for this plugin.
+  /**
+   * Returns the version for this plugin.
+   */
   virtual const char* GetPluginVersionString() = 0;
 
-  // Description:
-  // Returns true if this plugin is required on the server.
+  /**
+   * Returns true if this plugin is required on the server.
+   */
   virtual bool GetRequiredOnServer() = 0;
 
-  // Description:
-  // Returns true if this plugin is required on the client.
+  /**
+   * Returns true if this plugin is required on the client.
+   */
   virtual bool GetRequiredOnClient() = 0;
 
-  // Description:
-  // Returns a ';' separated list of plugin names required by this plugin.
+  /**
+   * Returns a ';' separated list of plugin names required by this plugin.
+   */
   virtual const char* GetRequiredPlugins() = 0;
 
-  // Description:
-  // Provides access to binary resources compiled into the plugin.
-  // This is primarily used to compile in icons and compressed help project
-  // (qch) files into plugins.
+  /**
+   * Provides access to binary resources compiled into the plugin.
+   * This is primarily used to compile in icons and compressed help project
+   * (qch) files into plugins.
+   */
   virtual void GetBinaryResources(std::vector<std::string>& resources);
 
-  // Description:
-  // Used when import plugins programmatically.
-  // This must only be called after the application has initialized, more
-  // specifically, all plugin managers have been created and they have
-  // registered their callbacks.
+  //@{
+  /**
+   * Used when import plugins programmatically.
+   * This must only be called after the application has initialized, more
+   * specifically, all plugin managers have been created and they have
+   * registered their callbacks.
+   */
   static void ImportPlugin(vtkPVPlugin* plugin);
 };
+  //@}
 
 #ifndef __WRAP__
 typedef const char* (C_DECL *pv_plugin_query_verification_data_fptr)();

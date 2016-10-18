@@ -23,15 +23,18 @@
  * statement of authorship are reproduced on all copies.
  */
 
-// .NAME vtkExodusFileSeriesReader - meta-reader to read Exodus file series from simulation restarts
-//
-// .SECTION Description
-//
-// Add some special sauce to the superclass that allows it to work with the
-// parallel Exodus reader.  Specifically, changing the file name causes
-// the selected output arrays to be cleared out.  This class saves and
-// restores the information.
-//
+/**
+ * @class   vtkExodusFileSeriesReader
+ * @brief   meta-reader to read Exodus file series from simulation restarts
+ *
+ *
+ *
+ * Add some special sauce to the superclass that allows it to work with the
+ * parallel Exodus reader.  Specifically, changing the file name causes
+ * the selected output arrays to be cleared out.  This class saves and
+ * restores the information.
+ *
+*/
 
 #ifndef vtkExodusFileSeriesReader_h
 #define vtkExodusFileSeriesReader_h

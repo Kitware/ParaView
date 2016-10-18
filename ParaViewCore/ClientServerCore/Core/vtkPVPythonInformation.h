@@ -12,10 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVPythonInformation - Gets python features.
-// .SECTION Description
-// Get details of python availabilty on the root server.
-
+/**
+ * @class   vtkPVPythonInformation
+ * @brief   Gets python features.
+ *
+ * Get details of python availabilty on the root server.
+*/
 
 #ifndef vtkPVPythonInformation_h
 #define vtkPVPythonInformation_h
@@ -37,28 +39,38 @@ public:
 
   void DeepCopy(vtkPVPythonInformation *info);
 
-  // Description:
-  // Transfer information about a single object into this object.
+  /**
+   * Transfer information about a single object into this object.
+   */
   virtual void CopyFromObject(vtkObject*);
 
-  // Description:
-  // Same as DeepCopy for this object.
+  /**
+   * Same as DeepCopy for this object.
+   */
   virtual void AddInformation(vtkPVInformation*);
 
-  // Description:
-  // Manage a serialized version of the information.
+  //@{
+  /**
+   * Manage a serialized version of the information.
+   */
   virtual void CopyToStream(vtkClientServerStream*);
   virtual void CopyFromStream(const vtkClientServerStream*);
+  //@}
 
-  // Description:
-  // Whether the server was compiled with python support.
+  //@{
+  /**
+   * Whether the server was compiled with python support.
+   */
   vtkSetMacro(PythonSupport, bool)
   vtkGetMacro(PythonSupport, bool)
   vtkBooleanMacro(PythonSupport, bool)
+  //@}
 
-  // Description:
-  // If GetPythonSupport() is true, returns the version of python detected on
-  // the server.
+  //@{
+  /**
+   * If GetPythonSupport() is true, returns the version of python detected on
+   * the server.
+   */
   void SetPythonVersion(const std::string &arg)
   {
     if (arg != this->PythonVersion)
@@ -71,10 +83,13 @@ public:
   {
     return this->PythonVersion;
   }
+  //@}
 
-  // Description:
-  // If GetPythonSupport() is true, returns the path to the python libraries
-  // detected on the server.
+  //@{
+  /**
+   * If GetPythonSupport() is true, returns the path to the python libraries
+   * detected on the server.
+   */
   void SetPythonPath(const std::string &arg)
   {
     if (arg != this->PythonPath)
@@ -87,16 +102,22 @@ public:
   {
     return this->PythonPath;
   }
+  //@}
 
-  // Description:
-  // Whether the numpy module is available on the server.
+  //@{
+  /**
+   * Whether the numpy module is available on the server.
+   */
   vtkSetMacro(NumpySupport, bool)
   vtkGetMacro(NumpySupport, bool)
   vtkBooleanMacro(NumpySupport, bool)
+  //@}
 
-  // Description:
-  // If GetNumpySupport() is true, returns the version of numpy detected on the
-  // server.
+  //@{
+  /**
+   * If GetNumpySupport() is true, returns the version of numpy detected on the
+   * server.
+   */
   void SetNumpyVersion(const std::string &arg)
   {
     if (arg != this->NumpyVersion)
@@ -109,10 +130,13 @@ public:
   {
     return this->NumpyVersion;
   }
+  //@}
 
-  // Description:
-  // If GetNumpySupport() is true, returns the path to numpy detected on the
-  // server.
+  //@{
+  /**
+   * If GetNumpySupport() is true, returns the path to numpy detected on the
+   * server.
+   */
   void SetNumpyPath(const std::string &arg)
   {
     if (arg != this->NumpyPath)
@@ -125,16 +149,22 @@ public:
   {
     return this->NumpyPath;
   }
+  //@}
 
-  // Description:
-  // Whether the matplotlib module is available on the server.
+  //@{
+  /**
+   * Whether the matplotlib module is available on the server.
+   */
   vtkSetMacro(MatplotlibSupport, bool)
   vtkGetMacro(MatplotlibSupport, bool)
   vtkBooleanMacro(MatplotlibSupport, bool)
+  //@}
 
-  // Description:
-  // If GetMatplotlibSupport() is true, returns the version of matplotlib
-  // detected on the server.
+  //@{
+  /**
+   * If GetMatplotlibSupport() is true, returns the version of matplotlib
+   * detected on the server.
+   */
   void SetMatplotlibVersion(const std::string &arg)
   {
     if (arg != this->MatplotlibVersion)
@@ -147,10 +177,13 @@ public:
   {
     return this->MatplotlibVersion;
   }
+  //@}
 
-  // Description:
-  // If GetMatplotlibSupport() is true, returns the path to matplotlib detected
-  // on the server.
+  //@{
+  /**
+   * If GetMatplotlibSupport() is true, returns the path to matplotlib detected
+   * on the server.
+   */
   void SetMatplotlibPath(const std::string &arg)
   {
     if (arg != this->MatplotlibPath)
@@ -163,6 +196,7 @@ public:
   {
     return this->MatplotlibPath;
   }
+  //@}
 
 protected:
   vtkPVPythonInformation();

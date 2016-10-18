@@ -12,10 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVStreamingMacros
-// .SECTION Description
-// This file simple consolidates arbitrary macros used to debugging/logging for
-// streaming.
+/**
+ * @class   vtkPVStreamingMacros
+ *
+ * This file simple consolidates arbitrary macros used to debugging/logging for
+ * streaming.
+*/
 
 #ifndef vtkPVStreamingMacros_h
 #define vtkPVStreamingMacros_h

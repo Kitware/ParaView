@@ -12,12 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkStreamingPriorityQueue - provides a datastructure for building
-// priority queues.
-// .SECTION Description
-// vtkStreamingPriorityQueue provides a data-structure for building priority
-// queue for steraming based on block bounds. This used by
-// vtkAMRStreamingPriorityQueue.
+/**
+ * @class   vtkStreamingPriorityQueue
+ * @brief   provides a datastructure for building
+ * priority queues.
+ *
+ * vtkStreamingPriorityQueue provides a data-structure for building priority
+ * queue for steraming based on block bounds. This used by
+ * vtkAMRStreamingPriorityQueue.
+*/
 
 #ifndef vtkStreamingPriorityQueue_h
 #define vtkStreamingPriorityQueue_h
@@ -206,8 +209,10 @@ class vtkStreamingPriorityQueue :
   std::vector<vtkStreamingPriorityQueueItem>, Comparator>
 {
 public:
-  // Description:
-  // Updates the priorities of items in the queue.
+  //@{
+  /**
+   * Updates the priorities of items in the queue.
+   */
   void UpdatePriorities(
     const double view_planes[24],
     const double clamp_bounds[6])
@@ -215,6 +220,7 @@ public:
     bool clamp_bounds_initialized =
       (vtkMath::AreBoundsInitialized(const_cast<double*>(clamp_bounds)) != 0);
     vtkBoundingBox clampBox(const_cast<double*>(clamp_bounds));
+  //@}
 
     vtkStreamingPriorityQueue current_queue;
     std::swap(current_queue, *this);

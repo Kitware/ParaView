@@ -12,40 +12,43 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMRangeDomainTemplate - superclass for type-specific range domains
-// i.e. domains that constrain a value within a min and max.
-// .SECTION Description
-// vtkSMRangeDomainTemplate represents an interval in real space (using
-// precision based on the data-type) specified using a min and a max value.
-// Valid XML attributes are:
-// @verbatim
-// * min 
-// * max
-// @endverbatim
-// Both min and max attributes can have one or more space space
-// separated value arguments.
-// Optionally, a Required Property may be specified (which typically is a
-// information property) which can be used to obtain the range for the values as
-// follows:
-// @verbatim
-// <DoubleRangeDomain ...>
-//    <RequiredProperties>
-//      <Property name="<InfoPropName>" function="RangeInfo" />
-//    </RequiredProperties>
-// </DoubleRangeDomain>
-// @endverbatim
-//
-// vtkSMRangeDomainTemplate provides a mechanism to control how the default
-// value for any property can be determined using the domain either the min, max
-// or mid of the range. One can do that using the "default_mode" attribute in
-// XML with valid values as "min", "max", "mid", or a comma separated sequence
-// of the three e.g "min,max,min". If none is specified, "mid" is assumed.
-// The comma-separated sequence can be used to set a different mode for each
-// component of the property i.e. "min,max,min" means set element 0 as min,
-// element 1 as max and element 2 and min. If the number of elements on the
-// property is less than the number of default specified, the last value is
-// assumed to be repeated. Thus, "min,max,min" is same as the regular expression
-// "min,max,min(,min)*".
+/**
+ * @class   vtkSMRangeDomainTemplate
+ * @brief   superclass for type-specific range domains
+ * i.e. domains that constrain a value within a min and max.
+ *
+ * vtkSMRangeDomainTemplate represents an interval in real space (using
+ * precision based on the data-type) specified using a min and a max value.
+ * Valid XML attributes are:
+ * @verbatim
+ * * min 
+ * * max
+ * @endverbatim
+ * Both min and max attributes can have one or more space space
+ * separated value arguments.
+ * Optionally, a Required Property may be specified (which typically is a
+ * information property) which can be used to obtain the range for the values as
+ * follows:
+ * @verbatim
+ * <DoubleRangeDomain ...>
+ *    <RequiredProperties>
+ *      <Property name="<InfoPropName>" function="RangeInfo" />
+ *    </RequiredProperties>
+ * </DoubleRangeDomain>
+ * @endverbatim
+ *
+ * vtkSMRangeDomainTemplate provides a mechanism to control how the default
+ * value for any property can be determined using the domain either the min, max
+ * or mid of the range. One can do that using the "default_mode" attribute in
+ * XML with valid values as "min", "max", "mid", or a comma separated sequence
+ * of the three e.g "min,max,min". If none is specified, "mid" is assumed.
+ * The comma-separated sequence can be used to set a different mode for each
+ * component of the property i.e. "min,max,min" means set element 0 as min,
+ * element 1 as max and element 2 and min. If the number of elements on the
+ * property is less than the number of default specified, the last value is
+ * assumed to be repeated. Thus, "min,max,min" is same as the regular expression
+ * "min,max,min(,min)*".
+*/
 
 #ifndef vtkSMRangeDomainTemplate_h
 #define vtkSMRangeDomainTemplate_h
@@ -63,58 +66,69 @@ public:
   typedef vtkSMDomain Superclass;
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Returns true if the value of the properyy is in the domain.
-  // If all vector values are in the domain, it returns 1. It returns
-  // 0 otherwise. A value is in the domain if it is between (min, max).
+  /**
+   * Returns true if the value of the properyy is in the domain.
+   * If all vector values are in the domain, it returns 1. It returns
+   * 0 otherwise. A value is in the domain if it is between (min, max).
+   */
   virtual int IsInDomain(vtkSMProperty* property);
 
-  // Description:
-  // Returns true if the double (val) is in the domain. If value is
-  // in domain, it's index is return in idx.
-  // A value is in the domain if it is between (min, max)
+  /**
+   * Returns true if the double (val) is in the domain. If value is
+   * in domain, it's index is return in idx.
+   * A value is in the domain if it is between (min, max)
+   */
   bool IsInDomain(unsigned int idx, T val);
 
-  // Description:
-  // Return a min. value if it exists. If the min. exists
-  // exists is set to 1. Otherwise, it is set to 0.
-  // An unspecified min. is equivalent to -inf
+  /**
+   * Return a min. value if it exists. If the min. exists
+   * exists is set to 1. Otherwise, it is set to 0.
+   * An unspecified min. is equivalent to -inf
+   */
   T GetMinimum(unsigned int idx, int& exists);
 
-  // Description:
-  // Return a max. value if it exists. If the max. exists
-  // exists is set to 1. Otherwise, it is set to 0.
-  // An unspecified max. is equivalent to +inf
+  /**
+   * Return a max. value if it exists. If the max. exists
+   * exists is set to 1. Otherwise, it is set to 0.
+   * An unspecified max. is equivalent to +inf
+   */
   T GetMaximum(unsigned int idx, int& exists);
 
-  // Description:
-  // Returns if minimum/maximum bound is set for the domain.
+  //@{
+  /**
+   * Returns if minimum/maximum bound is set for the domain.
+   */
   bool GetMinimumExists(unsigned int idx);
   bool GetMaximumExists(unsigned int idx);
+  //@}
 
-  // Description:
-  // Returns the minimum/maximum value, is exists, otherwise
-  // 0 is returned. Use GetMaximumExists() GetMaximumExists() to make sure that
-  // the bound is set.
+  /**
+   * Returns the minimum/maximum value, is exists, otherwise
+   * 0 is returned. Use GetMaximumExists() GetMaximumExists() to make sure that
+   * the bound is set.
+   */
   T GetMinimum(unsigned int idx)
     { int not_used; return this->GetMinimum(idx, not_used); }
   T GetMaximum(unsigned int idx)
     { int not_used; return this->GetMaximum(idx, not_used); }
 
-  // Description:
-  // Returns the number of entries in the internal
-  // maxima/minima list. No maxima/minima exists beyond
-  // this index. Maxima/minima below this number may or
-  // may not exist.
+  /**
+   * Returns the number of entries in the internal
+   * maxima/minima list. No maxima/minima exists beyond
+   * this index. Maxima/minima below this number may or
+   * may not exist.
+   */
   unsigned int GetNumberOfEntries();
 
-  // Description:
-  // Update self checking the "unchecked" values of all required
-  // properties.
+  /**
+   * Update self checking the "unchecked" values of all required
+   * properties.
+   */
   virtual void Update(vtkSMProperty*);
   
-  // Description:
-  // Set the value of an element of a property from the animation editor.
+  /**
+   * Set the value of an element of a property from the animation editor.
+   */
   virtual void SetAnimationValue(
     vtkSMProperty *property, int idx, double value);
 
@@ -125,22 +139,25 @@ public:
     MID
     };
 
-  // Description:
-  // Get the default-mode that controls how SetDefaultValues() behaves.
+  /**
+   * Get the default-mode that controls how SetDefaultValues() behaves.
+   */
   DefaultModes GetDefaultMode(unsigned int index=0);
 
-  // Description:
-  // Set the property's default value based on the domain. How the value is
-  // determined using the range is controlled by DefaultMode.
+  /**
+   * Set the property's default value based on the domain. How the value is
+   * determined using the range is controlled by DefaultMode.
+   */
   virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values);
 
 protected:
   vtkSMRangeDomainTemplate();
   ~vtkSMRangeDomainTemplate();
 
-  // Description:
-  // Set the appropriate ivars from the xml element. Should
-  // be overwritten by subclass if adding ivars.
+  /**
+   * Set the appropriate ivars from the xml element. Should
+   * be overwritten by subclass if adding ivars.
+   */
   virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element);
 
   struct vtkEntry

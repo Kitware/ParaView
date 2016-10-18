@@ -12,19 +12,21 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkEnvironmentAnnotationFilter - filter used to generate text annotation
-// for the current project.
-// .SECTION Description
-// vtkEnvironmentAnnotationFilter is designed to help annotate the scene with 
-// frequently needed information. 
-//
-// The variables available in the expression evaluation scope are as follows:
-// \li FileName: the name of the file that the user is working on.
-// \li DisplayFileName: Boolean value representing whether the file name is visible.
-// \li DisplayDate: Boolean value representing whether thedate/time is visible.
-// \li DisplaySystemName: Boolean value representing whether the system type is visible.
-// \li DisplayUserName: Boolean value representing whether the username is visible.
-
+/**
+ * @class   vtkEnvironmentAnnotationFilter
+ * @brief   filter used to generate text annotation
+ * for the current project.
+ *
+ * vtkEnvironmentAnnotationFilter is designed to help annotate the scene with 
+ * frequently needed information. 
+ *
+ * The variables available in the expression evaluation scope are as follows:
+ * \li FileName: the name of the file that the user is working on.
+ * \li DisplayFileName: Boolean value representing whether the file name is visible.
+ * \li DisplayDate: Boolean value representing whether thedate/time is visible.
+ * \li DisplaySystemName: Boolean value representing whether the system type is visible.
+ * \li DisplayUserName: Boolean value representing whether the username is visible.
+*/
 
 #ifndef vtkEnvironmentAnnotationFilter_h
 #define vtkEnvironmentAnnotationFilter_h

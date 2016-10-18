@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkUpdateSuppressorPipeline - pipeline for vtkPVUpdateSuppressor
-// .SECTION Description
-// vtkUpdateSuppressorPipeline is designed to for with vtkPVUpdateSuppressor.
-// It stops all update extent and data requests.
+/**
+ * @class   vtkUpdateSuppressorPipeline
+ * @brief   pipeline for vtkPVUpdateSuppressor
+ *
+ * vtkUpdateSuppressorPipeline is designed to for with vtkPVUpdateSuppressor.
+ * It stops all update extent and data requests.
+*/
 
 #ifndef vtkUpdateSuppressorPipeline_h
 #define vtkUpdateSuppressorPipeline_h
@@ -30,21 +33,25 @@ public:
   vtkTypeMacro(vtkUpdateSuppressorPipeline, vtkCompositeDataPipeline);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Generalized interface for asking the executive to fullfill update
-  // requests.
+  /**
+   * Generalized interface for asking the executive to fullfill update
+   * requests.
+   */
   virtual int ProcessRequest(vtkInformation* request,
                              vtkInformationVector** inInfo,
                              vtkInformationVector* outInfo);
 
-  // Description:
-  // Get/Set if the update suppressions are enabled.
-  // Enabled by default.
+  //@{
+  /**
+   * Get/Set if the update suppressions are enabled.
+   * Enabled by default.
+   */
   void SetEnabled(bool e) {this->Enabled = e;}
   vtkGetMacro(Enabled, bool);
 protected:
   vtkUpdateSuppressorPipeline();
   ~vtkUpdateSuppressorPipeline();
+  //@}
 
   bool Enabled;
 private:

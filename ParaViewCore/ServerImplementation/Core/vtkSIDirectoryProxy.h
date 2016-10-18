@@ -12,11 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSIDirectoryProxy
-// .SECTION Description
-// vtkSIDirectoryProxy is the server-implementation for a vtkSMDirectory
-// which will customly handle server file listing for the pull request
-
+/**
+ * @class   vtkSIDirectoryProxy
+ *
+ * vtkSIDirectoryProxy is the server-implementation for a vtkSMDirectory
+ * which will customly handle server file listing for the pull request
+*/
 
 #ifndef vtkSIDirectoryProxy_h
 #define vtkSIDirectoryProxy_h
@@ -36,8 +37,9 @@ public:
   vtkTypeMacro(vtkSIDirectoryProxy, vtkSIProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Pull the current state of the underneath implementation
+  /**
+   * Pull the current state of the underneath implementation
+   */
   virtual void Pull(vtkSMMessage* msg);
 
 protected:

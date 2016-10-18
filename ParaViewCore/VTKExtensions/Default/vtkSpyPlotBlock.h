@@ -12,15 +12,18 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSpyPlotBlock - Represents a SpyPlot Block Grid
-// .SECTION Description
-// vtkSpyPlotBlock is a regular hexahedral grid stored in a SpyPlot file.
-// The grid can be part of an Adaptive Mesh Refinement (AMR) dataset or
-// part 
-// The class was extracted from vtkSpyPlotUniReader and expanded upon by 
-// transisitioning functionality from vtkSpyPlotUniReader and adding it to 
-// this class.  Note that this helper class is not derived from vtkObject 
-// and can be allocated on the static
+/**
+ * @class   vtkSpyPlotBlock
+ * @brief   Represents a SpyPlot Block Grid
+ *
+ * vtkSpyPlotBlock is a regular hexahedral grid stored in a SpyPlot file.
+ * The grid can be part of an Adaptive Mesh Refinement (AMR) dataset or
+ * part 
+ * The class was extracted from vtkSpyPlotUniReader and expanded upon by 
+ * transisitioning functionality from vtkSpyPlotUniReader and adding it to 
+ * this class.  Note that this helper class is not derived from vtkObject 
+ * and can be allocated on the static
+*/
 
 #ifndef vtkSpyPlotBlock_h
 #define vtkSpyPlotBlock_h
@@ -42,8 +45,10 @@ public:
   
   vtkSpyPlotBlock();
   ~vtkSpyPlotBlock();    
-  // Description:
-  // 
+  //@{
+  /**
+
+   */
   int GetLevel() const;
   void GetDimensions(int dims[3]) const;
   int GetDimension(int i) const;
@@ -72,6 +77,7 @@ public:
   // whether the block is allocated in the time step is returned
   // as an arguement
   static int Scan(vtkSpyPlotIStream *stream, unsigned char *isAllocated, int fileVersion);
+  //@}
 
   int SetGeometry(int dir,
                   const unsigned char* encodedInfo, 

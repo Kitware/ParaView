@@ -12,13 +12,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVRenderViewSettings - singleton used to keep track of options for
-// vtkPVRenderView.
-// .SECTION Description
-// vtkPVRenderViewSettings is a singleton used to keep track of selections for
-// various configurable parameters used by vtkPVRenderView.
-// All class to vtkPVRenderViewSettings::New() returns a reference to the
-// singleton instance.
+/**
+ * @class   vtkPVRenderViewSettings
+ * @brief   singleton used to keep track of options for
+ * vtkPVRenderView.
+ *
+ * vtkPVRenderViewSettings is a singleton used to keep track of selections for
+ * various configurable parameters used by vtkPVRenderView.
+ * All class to vtkPVRenderViewSettings::New() returns a reference to the
+ * singleton instance.
+*/
 
 #ifndef vtkPVRenderViewSettings_h
 #define vtkPVRenderViewSettings_h
@@ -34,12 +37,14 @@ public:
   vtkTypeMacro(vtkPVRenderViewSettings, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Access the singleton.
+  /**
+   * Access the singleton.
+   */
   static vtkPVRenderViewSettings* GetInstance();
 
-  // Description:
-  // Get/Set use display lists.
+  /**
+   * Get/Set use display lists.
+   */
   void SetUseDisplayLists(bool val);
 
   enum
@@ -50,29 +55,41 @@ public:
     ZSHIFT=3
     };
 
-  // Description:
-  // vtkMapper settings.
+  //@{
+  /**
+   * vtkMapper settings.
+   */
   void SetResolveCoincidentTopology(int mode);
   void SetPolygonOffsetParameters(double factor, double units);
   void SetZShift(double a);
+  //@}
 
-  // Description:
-  // Set the number of cells (in millions) when the representations show try to
-  // use outline by default.
+  //@{
+  /**
+   * Set the number of cells (in millions) when the representations show try to
+   * use outline by default.
+   */
   vtkSetMacro(OutlineThreshold, vtkIdType);
   vtkGetMacro(OutlineThreshold, vtkIdType);
+  //@}
 
-  // Description:
-  // Set the radius in pixels to include for finding the closet point when
-  // selecting a point on render view. This only after single point selections
-  // i.e. when selecting a regions this radius is not respected.
+  //@{
+  /**
+   * Set the radius in pixels to include for finding the closet point when
+   * selecting a point on render view. This only after single point selections
+   * i.e. when selecting a regions this radius is not respected.
+   */
   vtkSetMacro(PointPickingRadius, int);
   vtkGetMacro(PointPickingRadius, int);
+  //@}
 
-  // Description:
-  // EXPERIMENTAL: Add ability to disable IceT.
+  //@{
+  /**
+   * EXPERIMENTAL: Add ability to disable IceT.
+   */
   vtkSetMacro(DisableIceT, bool);
   vtkGetMacro(DisableIceT, bool);
+  //@}
 
 protected:
   vtkPVRenderViewSettings();

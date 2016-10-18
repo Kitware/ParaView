@@ -12,9 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPConvertSelection - parallel aware vtkConvertSelection subclass.
-// .SECTION Description
-// vtkPConvertSelection is a parallel aware vtkConvertSelection subclass.
+/**
+ * @class   vtkPConvertSelection
+ * @brief   parallel aware vtkConvertSelection subclass.
+ *
+ * vtkPConvertSelection is a parallel aware vtkConvertSelection subclass.
+*/
 
 #ifndef vtkPConvertSelection_h
 #define vtkPConvertSelection_h
@@ -31,10 +34,13 @@ public:
   vtkTypeMacro(vtkPConvertSelection, vtkConvertSelection);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Get/Set the parallel controller.
+  //@{
+  /**
+   * Get/Set the parallel controller.
+   */
   void SetController(vtkMultiProcessController*);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
+  //@}
 
 protected:
   vtkPConvertSelection();

@@ -12,9 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVBox - extends vtkBox to add ParaView specific API.
-// .SECTION Description
-// vtkPVBox extends vtkBox to add ParaView specific API.
+/**
+ * @class   vtkPVBox
+ * @brief   extends vtkBox to add ParaView specific API.
+ *
+ * vtkPVBox extends vtkBox to add ParaView specific API.
+*/
 
 #ifndef vtkPVBox_h
 #define vtkPVBox_h
@@ -29,8 +32,10 @@ public:
   vtkTypeMacro(vtkPVBox, vtkBox);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Get/Set Position of the box.
+  //@{
+  /**
+   * Get/Set Position of the box.
+   */
   void SetPosition(double x, double y, double z)
     {
     double pos[3] = {x, y, z};
@@ -38,9 +43,12 @@ public:
     }
   void SetPosition(const double pos[3]);
   vtkGetVector3Macro(Position, double);
+  //@}
 
-  // Description:
-  // Get/Set Rotation for the box.
+  //@{
+  /**
+   * Get/Set Rotation for the box.
+   */
   void SetRotation(double x, double y, double z)
     {
     double pos[3] = {x, y, z};
@@ -48,9 +56,12 @@ public:
     }
   void SetRotation(const double pos[3]);
   vtkGetVector3Macro(Rotation, double);
+  //@}
 
-  // Description:
-  // Get/Set Scale for the box.
+  //@{
+  /**
+   * Get/Set Scale for the box.
+   */
   void SetScale(double x, double y, double z)
     {
     double pos[3] = {x, y, z};
@@ -58,6 +69,7 @@ public:
     }
   void SetScale(const double pos[3]);
   vtkGetVector3Macro(Scale, double);
+  //@}
 
 protected:
   vtkPVBox();

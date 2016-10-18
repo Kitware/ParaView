@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVJoystickFlyIn - Rotates camera with xy mouse movement.
-// .SECTION Description
-// vtkPVJoystickFlyIn allows the user to interactively
-// manipulate the camera, the viewpoint of the scene.
+/**
+ * @class   vtkPVJoystickFlyIn
+ * @brief   Rotates camera with xy mouse movement.
+ *
+ * vtkPVJoystickFlyIn allows the user to interactively
+ * manipulate the camera, the viewpoint of the scene.
+*/
 
 #ifndef vtkPVJoystickFlyIn_h
 #define vtkPVJoystickFlyIn_h

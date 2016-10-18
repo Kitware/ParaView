@@ -12,11 +12,14 @@
   the U.S. Government retains certain rights in this software.
 
 =========================================================================*/
-// .NAME vtkAMRConnectivity - Identify fragments in the grid
-//
-// .SECTION Description
-//
-// .SEE vtkAMRConnectivity
+/**
+ * @class   vtkAMRConnectivity
+ * @brief   Identify fragments in the grid
+ *
+ *
+ *
+ * .SEE vtkAMRConnectivity
+*/
 
 #ifndef vtkAMRConnectivity_h
 #define vtkAMRConnectivity_h
@@ -44,25 +47,37 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkAMRConnectivity *New();
 
-  // Description:
-  // Add to list of volume arrays to find connected fragments
+  //@{
+  /**
+   * Add to list of volume arrays to find connected fragments
+   */
   void AddInputVolumeArrayToProcess(const char* name);
   void ClearInputVolumeArrayToProcess();
+  //@}
 
-  // Description:
-  // Get / Set volume fraction value.
+  //@{
+  /**
+   * Get / Set volume fraction value.
+   */
   vtkGetMacro(VolumeFractionSurfaceValue, double);
   vtkSetMacro(VolumeFractionSurfaceValue, double);
+  //@}
 
-  // Description:
-  // Get / Set where to resolve the regions between blocks
+  //@{
+  /**
+   * Get / Set where to resolve the regions between blocks
+   */
   vtkGetMacro(ResolveBlocks, bool);
   vtkSetMacro(ResolveBlocks, bool);
+  //@}
 
-  // Description:
-  // Get / Set where to resolve the regions between blocks
+  //@{
+  /**
+   * Get / Set where to resolve the regions between blocks
+   */
   vtkGetMacro(PropagateGhosts, bool);
   vtkSetMacro(PropagateGhosts, bool);
+  //@}
 
 protected:
   vtkAMRConnectivity();

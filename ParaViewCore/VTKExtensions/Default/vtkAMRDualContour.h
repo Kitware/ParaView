@@ -12,16 +12,19 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkAMRDualContour - Extract particles and analyse them.
-// .SECTION Description
-// This filter takes a cell data volume fraction and generates a polydata
-// surface.  It also performs connectivity on the particles and generates
-// a particle index as part of the cell data of the output.  It computes
-// the volume of each particle from the volume fraction.
-
-// This will turn on validation and debug i/o of the filter.
-//#define vtkAMRDualContourDEBUG
-//#define vtkAMRDualContourPROFILE
+/**
+ * @class   vtkAMRDualContour
+ * @brief   Extract particles and analyse them.
+ *
+ * This filter takes a cell data volume fraction and generates a polydata
+ * surface.  It also performs connectivity on the particles and generates
+ * a particle index as part of the cell data of the output.  It computes
+ * the volume of each particle from the volume fraction.
+ *
+ * This will turn on validation and debug i/o of the filter.
+ *#define vtkAMRDualContourDEBUG
+ *#define vtkAMRDualContourPROFILE
+*/
 
 #ifndef vtkAMRDualContour_h
 #define vtkAMRDualContour_h
@@ -61,10 +64,12 @@ public:
   vtkSetMacro(IsoValue, double);
   vtkGetMacro(IsoValue, double);
 
-  // Description:
-  // These are to evaluate performances. You can turn off capping, degenerate cells
-  // and multiprocess comunication to see how they affect speed of execution.
-  // Degenerate cells is the meshing between levels in the grid.
+  //@{
+  /**
+   * These are to evaluate performances. You can turn off capping, degenerate cells
+   * and multiprocess comunication to see how they affect speed of execution.
+   * Degenerate cells is the meshing between levels in the grid.
+   */
   vtkSetMacro(EnableCapping,int);
   vtkGetMacro(EnableCapping,int);
   vtkBooleanMacro(EnableCapping,int);
@@ -74,29 +79,39 @@ public:
   vtkSetMacro(EnableMultiProcessCommunication,int);
   vtkGetMacro(EnableMultiProcessCommunication,int);
   vtkBooleanMacro(EnableMultiProcessCommunication,int);
+  //@}
 
-  // Description:
-  // This flag causes blocks to share locators so there are no
-  // boundary edges between blocks. It does not eliminate
-  // boundary edges between processes.
+  //@{
+  /**
+   * This flag causes blocks to share locators so there are no
+   * boundary edges between blocks. It does not eliminate
+   * boundary edges between processes.
+   */
   vtkSetMacro(EnableMergePoints,int);
   vtkGetMacro(EnableMergePoints,int);
   vtkBooleanMacro(EnableMergePoints,int);
+  //@}
 
-  // Description:
-  // A flag that causes the polygons on the capping surfaces to be triagulated.
+  //@{
+  /**
+   * A flag that causes the polygons on the capping surfaces to be triagulated.
+   */
   vtkSetMacro(TriangulateCap,int);
   vtkGetMacro(TriangulateCap,int);
   vtkBooleanMacro(TriangulateCap,int);
+  //@}
 
-  // Description:
-  // An option to turn off copying ghost values across process boundaries.
-  // If the ghost values are already correct, then the extra communication is
-  // not necessary.  If this assumption is wrong, this option will produce
-  // cracks / seams.
+  //@{
+  /**
+   * An option to turn off copying ghost values across process boundaries.
+   * If the ghost values are already correct, then the extra communication is
+   * not necessary.  If this assumption is wrong, this option will produce
+   * cracks / seams.
+   */
   vtkSetMacro(SkipGhostCopy,int);
   vtkGetMacro(SkipGhostCopy,int);
   vtkBooleanMacro(SkipGhostCopy,int);
+  //@}
 
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
   virtual void SetController(vtkMultiProcessController *);
@@ -117,17 +132,20 @@ protected:
 
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 
-  // Description:
-  // This should be called before any number of calls to DoRequestData 
+  /**
+   * This should be called before any number of calls to DoRequestData
+   */
   void InitializeRequest (vtkNonOverlappingAMR* input);
 
-  // Description:
-  // This should be called after any number of calls to DoRequestData
+  /**
+   * This should be called after any number of calls to DoRequestData
+   */
   void FinalizeRequest ();
 
-  // Description:
-  // Not a pipeline function. This is a helper function that
-  // allows creating a new data set given a input and a cell array name.
+  /**
+   * Not a pipeline function. This is a helper function that
+   * allows creating a new data set given a input and a cell array name.
+   */
   vtkMultiBlockDataSet* DoRequestData(vtkNonOverlappingAMR* input,
                                           const char* arrayNameToProcess);
 

@@ -12,9 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSIVectorPropertyTemplate
-// .SECTION Description
-//
+/**
+ * @class   vtkSIVectorPropertyTemplate
+ *
+ *
+*/
 
 #ifndef vtkSIVectorPropertyTemplate_h
 #define vtkSIVectorPropertyTemplate_h
@@ -29,37 +31,44 @@ public:
   typedef vtkSIVectorProperty Superclass;
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // If ArgumentIsArray is true, multiple elements are passed in as
-  // array arguments. For example, For example, if
-  // RepeatCommand is true, NumberOfElementsPerCommand is 2, the
-  // command is SetFoo and the values are 1 2 3 4 5 6, the resulting
-  // stream will have:
-  // @verbatim
-  // * Invoke obj SetFoo array(1, 2)
-  // * Invoke obj SetFoo array(3, 4)
-  // * Invoke obj SetFoo array(5, 6)
-  // @endverbatim
+  //@{
+  /**
+   * If ArgumentIsArray is true, multiple elements are passed in as
+   * array arguments. For example, For example, if
+   * RepeatCommand is true, NumberOfElementsPerCommand is 2, the
+   * command is SetFoo and the values are 1 2 3 4 5 6, the resulting
+   * stream will have:
+   * @verbatim
+   * * Invoke obj SetFoo array(1, 2)
+   * * Invoke obj SetFoo array(3, 4)
+   * * Invoke obj SetFoo array(5, 6)
+   * @endverbatim
+   */
   vtkGetMacro(ArgumentIsArray, bool);
+  //@}
 
 protected:
   vtkSIVectorPropertyTemplate();
   ~vtkSIVectorPropertyTemplate();
 
-  // Description:
-  // Push a new state to the underneath implementation
+  /**
+   * Push a new state to the underneath implementation
+   */
   virtual bool Push(vtkSMMessage*, int);
 
-  // Description:
-  // Pull the current state of the underneath implementation
+  /**
+   * Pull the current state of the underneath implementation
+   */
   virtual bool Pull(vtkSMMessage*);
 
-  // Description:
-  // Parse the xml for the property.
+  /**
+   * Parse the xml for the property.
+   */
   virtual bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element);
 
-  // Description:
-  // Implements the actual push.
+  /**
+   * Implements the actual push.
+   */
   bool Push(T* values, int number_of_elements);
 
   bool ArgumentIsArray;

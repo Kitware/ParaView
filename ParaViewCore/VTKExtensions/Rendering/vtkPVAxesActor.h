@@ -12,13 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVAxesActor - a 3D axes representation
-// .SECTION Description
-//
-// vtkPVAxesActor is used to represent 3D axes in the scene. The user can
-// define the geometry to use for the shaft and the tip, and the user can
-// set the text for the three axes. The text will follow the camera.
-
+/**
+ * @class   vtkPVAxesActor
+ * @brief   a 3D axes representation
+ *
+ *
+ * vtkPVAxesActor is used to represent 3D axes in the scene. The user can
+ * define the geometry to use for the shaft and the tip, and the user can
+ * set the text for the three axes. The text will follow the camera.
+*/
 
 #ifndef vtkPVAxesActor_h
 #define vtkPVAxesActor_h
@@ -47,95 +49,125 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
 
-  // Description:
-  // For some exporters and other other operations we must be
-  // able to collect all the actors or volumes. These methods
-  // are used in that process.
+  /**
+   * For some exporters and other other operations we must be
+   * able to collect all the actors or volumes. These methods
+   * are used in that process.
+   */
   virtual void GetActors(vtkPropCollection *);
 
-  // Description:
-  // Support the standard render methods.
+  //@{
+  /**
+   * Support the standard render methods.
+   */
   virtual int RenderOpaqueGeometry(vtkViewport *viewport);
   virtual int RenderTranslucentPolygonalGeometry(vtkViewport *viewport);
   virtual int HasTranslucentPolygonalGeometry();
+  //@}
 
-  // Description:
-  // Shallow copy of an axes actor. Overloads the virtual vtkProp method.
+  /**
+   * Shallow copy of an axes actor. Overloads the virtual vtkProp method.
+   */
   void ShallowCopy(vtkProp *prop);
 
-  // Description:
-  // Release any graphics resources that are being consumed by this actor.
-  // The parameter window could be used to determine which graphic
-  // resources to release.
+  /**
+   * Release any graphics resources that are being consumed by this actor.
+   * The parameter window could be used to determine which graphic
+   * resources to release.
+   */
   void ReleaseGraphicsResources(vtkWindow *);
 
-  // Description:
-  // Get the bounds for this Actor as (Xmin,Xmax,Ymin,Ymax,Zmin,Zmax). (The
-  // method GetBounds(double bounds[6]) is available from the superclass.)
+  //@{
+  /**
+   * Get the bounds for this Actor as (Xmin,Xmax,Ymin,Ymax,Zmin,Zmax). (The
+   * method GetBounds(double bounds[6]) is available from the superclass.)
+   */
   void GetBounds(double bounds[6]);
   double *GetBounds();
+  //@}
 
-  // Description:
-  // Get the actors mtime plus consider its properties and texture if set.
+  /**
+   * Get the actors mtime plus consider its properties and texture if set.
+   */
   vtkMTimeType GetMTime();
 
-  // Description:
-  // Return the mtime of anything that would cause the rendered image to
-  // appear differently. Usually this involves checking the mtime of the
-  // prop plus anything else it depends on such as properties, textures
-  // etc.
+  /**
+   * Return the mtime of anything that would cause the rendered image to
+   * appear differently. Usually this involves checking the mtime of the
+   * prop plus anything else it depends on such as properties, textures
+   * etc.
+   */
   virtual vtkMTimeType GetRedrawMTime();
 
-  // Description:
-  // Set the total length of the axes in 3 dimensions.
+  //@{
+  /**
+   * Set the total length of the axes in 3 dimensions.
+   */
   void SetTotalLength( float v[3] )
     { this->SetTotalLength( v[0], v[1], v[2] ); }
   void SetTotalLength( float x, float y, float z );
   vtkGetVectorMacro( TotalLength, float, 3 );
+  //@}
 
-  // Description:
-  // Set the normalized (0-1) length of the shaft.
+  //@{
+  /**
+   * Set the normalized (0-1) length of the shaft.
+   */
   void SetNormalizedShaftLength( float v[3] )
     { this->SetNormalizedShaftLength( v[0], v[1], v[2] ); }
   void SetNormalizedShaftLength( float x, float y, float z );
   vtkGetVectorMacro( NormalizedShaftLength, float, 3 );
+  //@}
 
-  // Description:
-  // Set the normalized (0-1) length of the tip.
+  //@{
+  /**
+   * Set the normalized (0-1) length of the tip.
+   */
   void SetNormalizedTipLength( float v[3] )
     { this->SetNormalizedTipLength( v[0], v[1], v[2] ); }
   void SetNormalizedTipLength( float x, float y, float z );
   vtkGetVectorMacro( NormalizedTipLength, float, 3 );
+  //@}
 
-  // Description:
-  // Set/get the resolution of the pieces of the axes actor
+  //@{
+  /**
+   * Set/get the resolution of the pieces of the axes actor
+   */
   vtkSetClampMacro(ConeResolution, int, 3, 128);
   vtkGetMacro(ConeResolution, int);
   vtkSetClampMacro(SphereResolution, int, 3, 128);
   vtkGetMacro(SphereResolution, int);
   vtkSetClampMacro(CylinderResolution, int, 3, 128);
   vtkGetMacro(CylinderResolution, int);
+  //@}
 
-  // Description:
-  // Set/get the radius of the pieces of the axes actor
+  //@{
+  /**
+   * Set/get the radius of the pieces of the axes actor
+   */
   vtkSetClampMacro(ConeRadius, float, 0, VTK_FLOAT_MAX);
   vtkGetMacro(ConeRadius, float);
   vtkSetClampMacro(SphereRadius, float, 0, VTK_FLOAT_MAX);
   vtkGetMacro(SphereRadius, float);
   vtkSetClampMacro(CylinderRadius, float, 0, VTK_FLOAT_MAX);
   vtkGetMacro(CylinderRadius, float);
+  //@}
 
-  // Description:
-  // Set/get the positions of the axis labels
+  //@{
+  /**
+   * Set/get the positions of the axis labels
+   */
   vtkSetClampMacro(XAxisLabelPosition, float, 0, 1);
   vtkGetMacro(XAxisLabelPosition, float);
   vtkSetClampMacro(YAxisLabelPosition, float, 0, 1);
   vtkGetMacro(YAxisLabelPosition, float);
   vtkSetClampMacro(ZAxisLabelPosition, float, 0, 1);
   vtkGetMacro(ZAxisLabelPosition, float);
+  //@}
 
-  // Description:
-  // Set the type of the shaft to a cylinder, line, or user defined geometry.
+  /**
+   * Set the type of the shaft to a cylinder, line, or user defined geometry.
+   */
   void SetShaftType( int type );
   void SetShaftTypeToCylinder()
     { this->SetShaftType( vtkPVAxesActor::CYLINDER_SHAFT ); }
@@ -144,8 +176,9 @@ public:
   void SetShaftTypeToUserDefined()
     { this->SetShaftType( vtkPVAxesActor::USER_DEFINED_SHAFT ); }
 
-  // Description:
-  // Set the type of the tip to a cone, sphere, or user defined geometry.
+  /**
+   * Set the type of the tip to a cone, sphere, or user defined geometry.
+   */
   void SetTipType( int type );
   void SetTipTypeToCone()
     { this->SetTipType( vtkPVAxesActor::CONE_TIP ); }
@@ -154,40 +187,58 @@ public:
   void SetTipTypeToUserDefined()
     { this->SetTipType( vtkPVAxesActor::USER_DEFINED_TIP ); }
 
-  // Description:
-  // Set the user defined tip polydata.
+  //@{
+  /**
+   * Set the user defined tip polydata.
+   */
   void SetUserDefinedTip( vtkPolyData * );
   vtkGetObjectMacro( UserDefinedTip, vtkPolyData );
+  //@}
 
-  // Description:
-  // Set the user defined shaft polydata.
+  //@{
+  /**
+   * Set the user defined shaft polydata.
+   */
   void SetUserDefinedShaft( vtkPolyData * );
   vtkGetObjectMacro( UserDefinedShaft, vtkPolyData );
+  //@}
 
-  // Description:
-  // Get the tip properties.
+  //@{
+  /**
+   * Get the tip properties.
+   */
   vtkProperty *GetXAxisTipProperty();
   vtkProperty *GetYAxisTipProperty();
   vtkProperty *GetZAxisTipProperty();
+  //@}
 
-  // Description:
-  // Get the shaft properties.
+  //@{
+  /**
+   * Get the shaft properties.
+   */
   vtkProperty *GetXAxisShaftProperty();
   vtkProperty *GetYAxisShaftProperty();
   vtkProperty *GetZAxisShaftProperty();
+  //@}
 
-  // Description:
-  // Get the label properties.
+  //@{
+  /**
+   * Get the label properties.
+   */
   vtkProperty *GetXAxisLabelProperty();
   vtkProperty *GetYAxisLabelProperty();
   vtkProperty *GetZAxisLabelProperty();
+  //@}
 
   //
-  // Description:
-  // Set the label text.
+  //@{
+  /**
+   * Set the label text.
+   */
   vtkSetStringMacro( XAxisLabelText );
   vtkSetStringMacro( YAxisLabelText );
   vtkSetStringMacro( ZAxisLabelText );
+  //@}
 
   enum
   {

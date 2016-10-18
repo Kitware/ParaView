@@ -12,13 +12,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMComparativeAnimationCueProxy - cue used for parameter animation by
-// the comparative view.
-// .SECTION Description
-// vtkSMComparativeAnimationCueProxy is a animation cue used for parameter
-// animation by the vtkSMComparativeViewProxy. It provides a non-conventional
-// API i.e. without using properties to allow the user to setup parameter
-// values over the comparative grid.
+/**
+ * @class   vtkSMComparativeAnimationCueProxy
+ * @brief   cue used for parameter animation by
+ * the comparative view.
+ *
+ * vtkSMComparativeAnimationCueProxy is a animation cue used for parameter
+ * animation by the vtkSMComparativeViewProxy. It provides a non-conventional
+ * API i.e. without using properties to allow the user to setup parameter
+ * values over the comparative grid.
+*/
 
 #ifndef vtkSMComparativeAnimationCueProxy_h
 #define vtkSMComparativeAnimationCueProxy_h
@@ -35,10 +38,12 @@ public:
   vtkTypeMacro(vtkSMComparativeAnimationCueProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Methods simply forwarded to vtkPVComparativeAnimationCue.
-  // Any of these methods changing the state of the proxy, also call
-  // this->MarkModified(this).
+  //@{
+  /**
+   * Methods simply forwarded to vtkPVComparativeAnimationCue.
+   * Any of these methods changing the state of the proxy, also call
+   * this->MarkModified(this).
+   */
   void UpdateXRange(int y, double minx, double maxx);
   void UpdateYRange(int x, double miny, double maxy);
   void UpdateWholeRange(double mint, double maxt);
@@ -52,37 +57,42 @@ public:
   double* GetValues(int x, int y, int dx, int dy, unsigned int &numValues);
   double GetValue(int x, int y, int dx, int dy);
   void UpdateAnimatedValue(int x, int y, int dx, int dy);
+  //@}
 
-  // Description:
-  // Saves the state of the proxy. This state can be reloaded
-  // to create a new proxy that is identical the present state of this proxy.
-  // The resulting proxy's XML hieratchy is returned, in addition if the root
-  // argument is not NULL then it's also inserted as a nested element.
-  // This call saves all a proxy's properties, including exposed properties
-  // and sub-proxies. More control is provided by the following overload.
+  /**
+   * Saves the state of the proxy. This state can be reloaded
+   * to create a new proxy that is identical the present state of this proxy.
+   * The resulting proxy's XML hieratchy is returned, in addition if the root
+   * argument is not NULL then it's also inserted as a nested element.
+   * This call saves all a proxy's properties, including exposed properties
+   * and sub-proxies. More control is provided by the following overload.
+   */
   virtual vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root)
     { return this->Superclass::SaveXMLState(root); }
 
-  // Description:
-  // The iterator is use to filter the property available on the given proxy
+  /**
+   * The iterator is use to filter the property available on the given proxy
+   */
   virtual vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root, vtkSMPropertyIterator* iter);
 
-  // Description:
-  // Loads the proxy state from the XML element. Returns 0 on failure.
-  // \c locator is used to locate other proxies that may be referred to in the
-  // state XML (which happens in case of properties of type vtkSMProxyProperty
-  // or subclasses). If locator is NULL, then such properties are left
-  // unchanged.
+  /**
+   * Loads the proxy state from the XML element. Returns 0 on failure.
+   * \c locator is used to locate other proxies that may be referred to in the
+   * state XML (which happens in case of properties of type vtkSMProxyProperty
+   * or subclasses). If locator is NULL, then such properties are left
+   * unchanged.
+   */
   virtual int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator);
 
 protected:
   vtkSMComparativeAnimationCueProxy();
   ~vtkSMComparativeAnimationCueProxy();
 
-  // Description:
-  // Given a class name (by setting VTKClassName) and server ids (by
-  // setting ServerIDs), this methods instantiates the objects on the
-  // server(s)
+  /**
+   * Given a class name (by setting VTKClassName) and server ids (by
+   * setting ServerIDs), this methods instantiates the objects on the
+   * server(s)
+   */
   virtual void CreateVTKObjects();
 
   // Method used to simplify the access to the concreate VTK class underneath

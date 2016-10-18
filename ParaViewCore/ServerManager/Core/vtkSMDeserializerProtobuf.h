@@ -12,11 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMDeserializerProtobuf - deserializes proxies from their Protobuf states.
-// .SECTION Description
-// vtkSMDeserializerProtobuf is used to deserialize proxies from their Protobuf
-// states. This is the base class of deserialization classes that load Protobuf
-// messagess to restore proxy/servermanager state (or part thereof).
+/**
+ * @class   vtkSMDeserializerProtobuf
+ * @brief   deserializes proxies from their Protobuf states.
+ *
+ * vtkSMDeserializerProtobuf is used to deserialize proxies from their Protobuf
+ * states. This is the base class of deserialization classes that load Protobuf
+ * messagess to restore proxy/servermanager state (or part thereof).
+*/
 
 #ifndef vtkSMDeserializerProtobuf_h
 #define vtkSMDeserializerProtobuf_h
@@ -36,10 +39,13 @@ public:
   vtkTypeMacro(vtkSMDeserializerProtobuf, vtkSMDeserializer);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Get/Set the session.
+  //@{
+  /**
+   * Get/Set the session.
+   */
   vtkGetObjectMacro(StateLocator, vtkSMStateLocator);
   virtual void SetStateLocator(vtkSMStateLocator*);
+  //@}
 
 protected:
   vtkSMDeserializerProtobuf();
@@ -48,9 +54,10 @@ protected:
   // Friend to access NewProxy().
   friend class vtkSMProxyLocator;
 
-  // Description:
-  // First ask the session, to find the given proxy.
-  // If not found in the session then Create a new proxy with the id if possible.
+  /**
+   * First ask the session, to find the given proxy.
+   * If not found in the session then Create a new proxy with the id if possible.
+   */
   virtual vtkSMProxy* NewProxy(vtkTypeUInt32 id, vtkSMProxyLocator* locator);
 
   vtkSMStateLocator* StateLocator;

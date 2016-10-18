@@ -12,13 +12,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkAMRDualClip - Clip (with scalars) an AMR volume to unstructured grid.
-// .SECTION Description
-// This filter clips an AMR volume but does not copy attributes yet.
-// This filter has two important features.  First is that the level
-// transitions are handled correctly, and second is that interal
-// cells are decimated.  I use a variation of degenerate points/cells
-// used for level transitions.
+/**
+ * @class   vtkAMRDualClip
+ * @brief   Clip (with scalars) an AMR volume to unstructured grid.
+ *
+ * This filter clips an AMR volume but does not copy attributes yet.
+ * This filter has two important features.  First is that the level
+ * transitions are handled correctly, and second is that interal
+ * cells are decimated.  I use a variation of degenerate points/cells
+ * used for level transitions.
+*/
 
 #ifndef vtkAMRDualClip_h
 #define vtkAMRDualClip_h
@@ -56,10 +59,12 @@ public:
   vtkSetMacro(IsoValue, double);
   vtkGetMacro(IsoValue, double);
 
-  // Description:
-  // These are to evaluate performances. You can turn off degenerate cells
-  // and multiprocess comunication to see how they affect speed of execution.
-  // Degenerate cells is the meshing between levels in the grid.
+  //@{
+  /**
+   * These are to evaluate performances. You can turn off degenerate cells
+   * and multiprocess comunication to see how they affect speed of execution.
+   * Degenerate cells is the meshing between levels in the grid.
+   */
   vtkSetMacro(EnableInternalDecimation,int);
   vtkGetMacro(EnableInternalDecimation,int);
   vtkSetMacro(EnableDegenerateCells,int);
@@ -68,14 +73,18 @@ public:
   vtkSetMacro(EnableMultiProcessCommunication,int);
   vtkGetMacro(EnableMultiProcessCommunication,int);
   vtkBooleanMacro(EnableMultiProcessCommunication,int);
+  //@}
 
-  // Description:
-  // This flag causes blocks to share locators so there are no
-  // boundary edges between blocks. It does not eliminate
-  // boundary edges between processes.
+  //@{
+  /**
+   * This flag causes blocks to share locators so there are no
+   * boundary edges between blocks. It does not eliminate
+   * boundary edges between processes.
+   */
   vtkSetMacro(EnableMergePoints,int);
   vtkGetMacro(EnableMergePoints,int);
   vtkBooleanMacro(EnableMergePoints,int);
+  //@}
 
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
   virtual void SetController(vtkMultiProcessController *);
@@ -100,9 +109,10 @@ protected:
 
   void InitializeCopyAttributes(vtkNonOverlappingAMR *hbdsInput, vtkDataSet* mesh);
 
-  // Description:
-  // Not a pipeline function. This is a helper function that
-  // allows creating a new data set given a input and a cell array name.
+  /**
+   * Not a pipeline function. This is a helper function that
+   * allows creating a new data set given a input and a cell array name.
+   */
   vtkMultiBlockDataSet* DoRequestData(vtkNonOverlappingAMR* input,
                                           const char* arrayNameToProcess);
 

@@ -12,13 +12,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVDataInformationHelper - allows extension of types that
-// PVDataInformation can handle
-//
-// .SECTION Description
-// Plugins can subclass this and call vtkPVDataInformation::RegisterHelper()
-// in order to allow vtkPVDataInformation (and thus ParaView) to handle new
-// data types.
+/**
+ * @class   vtkPVDataInformationHelper
+ * @brief   allows extension of types that
+ * PVDataInformation can handle
+ *
+ *
+ * Plugins can subclass this and call vtkPVDataInformation::RegisterHelper()
+ * in order to allow vtkPVDataInformation (and thus ParaView) to handle new
+ * data types.
+*/
 
 #ifndef vtkPVDataInformationHelper_h
 #define vtkPVDataInformationHelper_h
@@ -35,9 +38,10 @@ public:
   vtkTypeMacro(vtkPVDataInformationHelper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  //Description:
-  //This class is a friend of PVDI, so the work of copying
-  //into self happens here.
+  /**
+   * This class is a friend of PVDI, so the work of copying
+   * into self happens here.
+   */
   void CopyFromDataObject(vtkPVDataInformation *self,
                           vtkDataObject* data);
 

@@ -12,19 +12,22 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkMinMax - Finds the min, max, or sum of all of its input data
-// attributes.
-//
-// .SECTION Description
-// This filter lets the user choose from a set of operations and then runs
-// that operation on all of the attribute data of its input(s). For example
-// if MIN is requested, it finds the minimum values in all of its input data
-// arrays. If this filter has multiple input data sets attached to its
-// first input port, it will run the operation on each input data set in
-// turn, producing a global minimum value over all the inputs. In parallel 
-// runs this filter REQUIRES ghost arrays to skip redundant 
-// information. The output of this filter will always be a single vtkPolyData 
-// that contains exactly one point and one cell (a VTK_VERTEX).
+/**
+ * @class   vtkMinMax
+ * @brief   Finds the min, max, or sum of all of its input data
+ * attributes.
+ *
+ *
+ * This filter lets the user choose from a set of operations and then runs
+ * that operation on all of the attribute data of its input(s). For example
+ * if MIN is requested, it finds the minimum values in all of its input data
+ * arrays. If this filter has multiple input data sets attached to its
+ * first input port, it will run the operation on each input data set in
+ * turn, producing a global minimum value over all the inputs. In parallel 
+ * runs this filter REQUIRES ghost arrays to skip redundant 
+ * information. The output of this filter will always be a single vtkPolyData 
+ * that contains exactly one point and one cell (a VTK_VERTEX).
+*/
 
 #ifndef vtkMinMax_h
 #define vtkMinMax_h
@@ -43,9 +46,10 @@ public:
   vtkTypeMacro(vtkMinMax, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  //Description:
-  //Selects the operation to perform on the data.
-  //min/max, sum...
+  /**
+   * Selects the operation to perform on the data.
+   * min/max, sum...
+   */
 
   enum Operations
     {
@@ -58,17 +62,23 @@ public:
   vtkGetMacro(Operation, int);
   void SetOperation(const char *op);
 
-  //Description:
-  //A diagnostic that should be zero.
-  //One indicates that some array didn't match up exactly. 
+  //@{
+  /**
+   * A diagnostic that should be zero.
+   * One indicates that some array didn't match up exactly.
+   */
   vtkGetMacro(MismatchOccurred, int);
+  //@}
 
-  //Description:
-  //Contains a flag for each component of each (Point or Cell) array 
-  //that indicates if any of the results were never initialized.
+  //@{
+  /**
+   * Contains a flag for each component of each (Point or Cell) array
+   * that indicates if any of the results were never initialized.
+   */
   vtkGetStringMacro(FirstPasses);
   void FlagsForPoints();
   void FlagsForCells();
+  //@}
 
   //temp for debugging
   const char *Name;

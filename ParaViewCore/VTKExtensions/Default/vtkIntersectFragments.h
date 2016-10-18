@@ -12,9 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkIntersectFragments - Geometry intersection operations.
-// .SECTION Description
-// TODO
+/**
+ * @class   vtkIntersectFragments
+ * @brief   Geometry intersection operations.
+ *
+ * TODO
+*/
 
 #ifndef vtkIntersectFragments_h
 #define vtkIntersectFragments_h
@@ -42,18 +45,24 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /// PARAVIEW interface stuff
-  // Description
-  // Specify the implicit function to perform the cutting.
+  //@{
+  /**
+   * Specify the implicit function to perform the cutting.
+   */
   virtual void SetCutFunction(vtkImplicitFunction*);
   vtkGetObjectMacro(CutFunction,vtkImplicitFunction);
-  // Description:
-  // Specify the geometry Input.
+  //@}
+  /**
+   * Specify the geometry Input.
+   */
   void SetGeometryInputConnection(vtkAlgorithmOutput* algOutput);
-  // Description:
-  // Specify the geometry Input.
+  /**
+   * Specify the geometry Input.
+   */
   void SetStatisticsInputConnection(vtkAlgorithmOutput* algOutput);
-  // Description:
-  // Override GetMTime because we refer to vtkImplicitFunction.
+  /**
+   * Override GetMTime because we refer to vtkImplicitFunction.
+   */
   vtkMTimeType GetMTime();
 
 protected:

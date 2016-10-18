@@ -12,13 +12,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVServerOptions - ParaView options for server executables.
-// .SECTION Description
-// An object of this class represents a storage for command line options for
-// various server executables.
-//
-// These options can be retrieved during run-time, set using configuration file
-// or using Command Line Arguments.
+/**
+ * @class   vtkPVServerOptions
+ * @brief   ParaView options for server executables.
+ *
+ * An object of this class represents a storage for command line options for
+ * various server executables.
+ *
+ * These options can be retrieved during run-time, set using configuration file
+ * or using Command Line Arguments.
+*/
 
 #ifndef vtkPVServerOptions_h
 #define vtkPVServerOptions_h
@@ -35,23 +38,32 @@ public:
   vtkTypeMacro(vtkPVServerOptions,vtkPVOptions);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Name of the client-host. By default, the client are server are assumed to
-  // be on the same host.
+  //@{
+  /**
+   * Name of the client-host. By default, the client are server are assumed to
+   * be on the same host.
+   */
   vtkGetStringMacro(ClientHostName);
+  //@}
 
-  // Description:
-  // The configuration port for this process. The interpretation of the port
-  // number depends on the configuration and process type.
+  //@{
+  /**
+   * The configuration port for this process. The interpretation of the port
+   * number depends on the configuration and process type.
+   */
   vtkGetMacro(ServerPort, int);
+  //@}
 
-  // Description:
-  // Pass in the name and the attributes for all tags that are not Options.
-  // If it returns 1, then it is successful, and 0 if it failed.
+  /**
+   * Pass in the name and the attributes for all tags that are not Options.
+   * If it returns 1, then it is successful, and 0 if it failed.
+   */
   virtual int ParseExtraXMLTag(const char* name, const char** atts);
 
-  // Description:
-  // Get information about machines used in a data or render server.
+  //@{
+  /**
+   * Get information about machines used in a data or render server.
+   */
   double GetEyeSeparation();
   unsigned int GetNumberOfMachines();
   const char* GetMachineName(unsigned int idx);
@@ -62,26 +74,31 @@ public:
   double* GetLowerLeft(unsigned int idx);
   double* GetLowerRight(unsigned int idx);
   double* GetUpperRight(unsigned int idx);
+  //@}
 
   // Returns -1 to indicate not stereo type was specified. 0 indicate no stereo
   // is to be used.
   int GetStereoType(unsigned int idx);
   virtual char* GetStereoType() { return this->Superclass::GetStereoType(); }
 protected:
-  // Description:
-  // Add machine information from the xml tag <Machine ....>
+  /**
+   * Add machine information from the xml tag <Machine ....>
+   */
   int AddMachineInformation(const char** atts);
 
-  // Description:
-  // Add eye separation information from the xml tag <EyeSeparation ...>
+  /**
+   * Add eye separation information from the xml tag <EyeSeparation ...>
+   */
   int AddEyeSeparationInformation(const char** atts);
 
-  // Description:
-  // Default constructor.
+  /**
+   * Default constructor.
+   */
   vtkPVServerOptions();
 
-  // Description:
-  // Destructor.
+  /**
+   * Destructor.
+   */
   virtual ~vtkPVServerOptions();
 
   virtual void Initialize();

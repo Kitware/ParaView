@@ -12,11 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCacheSizeKeeper - keeps track of amount of memory consumed
-// by caches in vtkPVUpateSupressor objects. 
-// .SECTION Description:
-// vtkCacheSizeKeeper keeps track of the amount of memory cached
-// by several vtkPVUpdateSuppressor objects.
+/**
+ * @class   vtkCacheSizeKeeper
+ * @brief   keeps track of amount of memory consumed
+ * by caches in vtkPVUpateSupressor objects. 
+ *
+ * vtkCacheSizeKeeper keeps track of the amount of memory cached
+ * by several vtkPVUpdateSuppressor objects.
+*/
 
 #ifndef vtkCacheSizeKeeper_h
 #define vtkCacheSizeKeeper_h
@@ -30,12 +33,15 @@ public:
   vtkTypeMacro(vtkCacheSizeKeeper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Returns the singleton.
+  /**
+   * Returns the singleton.
+   */
   static vtkCacheSizeKeeper* GetInstance();
 
-  // Description:
-  // Report increase in cache size (in kbytes).
+  //@{
+  /**
+   * Report increase in cache size (in kbytes).
+   */
   void AddCacheSize(unsigned long kbytes)
     {
     if (this->CacheFull)
@@ -47,30 +53,41 @@ public:
       this->CacheSize += kbytes;
       }
     }
+  //@}
 
-  // Description:
-  // Report decrease in cache size (in bytes).
+  /**
+   * Report decrease in cache size (in bytes).
+   */
   void FreeCacheSize(unsigned long kbytes)
     {
     this->CacheSize = (this->CacheSize > kbytes)?
       (this->CacheSize-kbytes) : 0;
     }
 
-  // Description:
-  // Get the size of cache reported to this keeper.
+  //@{
+  /**
+   * Get the size of cache reported to this keeper.
+   */
   vtkGetMacro(CacheSize, unsigned long);
+  //@}
 
-  // Description:
-  // Get/Set the cache size limit. One can set this separately on each
-  // processes. vtkPVView::Update ensures that the cache fullness state is
-  // synchronized among all participating processes. (in KBs)
+  //@{
+  /**
+   * Get/Set the cache size limit. One can set this separately on each
+   * processes. vtkPVView::Update ensures that the cache fullness state is
+   * synchronized among all participating processes. (in KBs)
+   */
   vtkGetMacro(CacheLimit, unsigned long);
   vtkSetMacro(CacheLimit, unsigned long);
+  //@}
 
-  // Description:
-  // Get/Set if the cache is full. 
+  //@{
+  /**
+   * Get/Set if the cache is full.
+   */
   vtkGetMacro(CacheFull, int);
   vtkSetMacro(CacheFull, int);
+  //@}
 
 protected:
   static vtkCacheSizeKeeper* New();

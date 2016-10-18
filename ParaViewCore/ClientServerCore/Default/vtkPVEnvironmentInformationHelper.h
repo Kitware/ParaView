@@ -12,11 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVEnvironmentInformationHelper - Helper object that can
-// be used to obtain information about an environment.
-// .SECTION Description
-// vtkPVEnvironmentInformationHelper can be used to get values of environment
-// variables.
+/**
+ * @class   vtkPVEnvironmentInformationHelper
+ * @brief   Helper object that can
+ * be used to obtain information about an environment.
+ *
+ * vtkPVEnvironmentInformationHelper can be used to get values of environment
+ * variables.
+*/
 
 #ifndef vtkPVEnvironmentInformationHelper_h
 #define vtkPVEnvironmentInformationHelper_h
@@ -31,10 +34,13 @@ public:
   vtkTypeMacro(vtkPVEnvironmentInformationHelper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
   
-  // Description:
-  // Get/Set the environment variable that we want to get the value of
+  //@{
+  /**
+   * Get/Set the environment variable that we want to get the value of
+   */
   vtkSetStringMacro(Variable);
   vtkGetStringMacro(Variable);
+  //@}
 
 protected:
   vtkPVEnvironmentInformationHelper();

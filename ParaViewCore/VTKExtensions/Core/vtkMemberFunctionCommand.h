@@ -29,41 +29,44 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkMemberFunctionCommand - Call a class member method in response to a
-// VTK event.
-// .SECTION Description
-// vtkMemberFunctionCommand is a vtkCommand-derivative that will listen for VTK
-// events, calling a class member function when a VTK event is received.
-//
-// It is generally more useful than vtkCallbackCommand, which can only call
-// non-member functions in response to a VTK event.
-//
-// Usage: create an instance of vtkMemberFunctionCommand, specialized for the
-// class that will receive events.  Use the SetCallback() method to pass the
-// instance and member function that will be called when an event is received.
-// Use vtkObject::AddObserver() to control which VTK events the
-// vtkMemberFunctionCommand object will receive.
-//
-// Usage:
-//
-// vtkObject* subject = ...
-// foo* observer = ...
-// vtkMemberFunctionCommand<foo>* adapter = vtkMemberFunctionCommand<foo>::New();
-// adapter->SetCallback(observer, &foo::bar);
-// subject->AddObserver(vtkCommand::AnyEvent, adapter);
-//
-// Alternative Usage
-//
-// vtkCommand* command = vtkMakeMemberFunctionCommand(*observer, &foo::Callback);
-// subject->AddObserver(vtkCommand::AnyEvent, command);
-//
-// There are two types of callback methods that could be defined.
-// \li void Callback() -- which takes no arguments.
-// \li void Callback(vtkObject* caller, unsigned long event, void* calldata) --
-// which is passed the same arguments as vtkCommand::Execute(), thus making it
-// possible to get additional details about the event.
-// .SECTION See Also
-// vtkCallbackCommand
+/**
+ * @class   vtkMemberFunctionCommand
+ * @brief   Call a class member method in response to a
+ * VTK event.
+ *
+ * vtkMemberFunctionCommand is a vtkCommand-derivative that will listen for VTK
+ * events, calling a class member function when a VTK event is received.
+ *
+ * It is generally more useful than vtkCallbackCommand, which can only call
+ * non-member functions in response to a VTK event.
+ *
+ * Usage: create an instance of vtkMemberFunctionCommand, specialized for the
+ * class that will receive events.  Use the SetCallback() method to pass the
+ * instance and member function that will be called when an event is received.
+ * Use vtkObject::AddObserver() to control which VTK events the
+ * vtkMemberFunctionCommand object will receive.
+ *
+ * Usage:
+ *
+ * vtkObject* subject = ...
+ * foo* observer = ...
+ * vtkMemberFunctionCommand<foo>* adapter = vtkMemberFunctionCommand<foo>::New();
+ * adapter->SetCallback(observer, &foo::bar);
+ * subject->AddObserver(vtkCommand::AnyEvent, adapter);
+ *
+ * Alternative Usage
+ *
+ * vtkCommand* command = vtkMakeMemberFunctionCommand(*observer, &foo::Callback);
+ * subject->AddObserver(vtkCommand::AnyEvent, command);
+ *
+ * There are two types of callback methods that could be defined.
+ * \li void Callback() -- which takes no arguments.
+ * \li void Callback(vtkObject* caller, unsigned long event, void* calldata) --
+ * which is passed the same arguments as vtkCommand::Execute(), thus making it
+ * possible to get additional details about the event.
+ * @sa
+ * vtkCallbackCommand
+*/
 
 #include "vtkCommand.h"
 
@@ -92,14 +95,17 @@ public:
     vtkCommand::PrintSelf(os, indent);
     }
 
-  // Description:
-  // Set which class instance and member function will be called when a VTK
-  // event is received.
+  //@{
+  /**
+   * Set which class instance and member function will be called when a VTK
+   * event is received.
+   */
   void SetCallback(ClassT& object, void (ClassT::*method)())
     {
     this->Object = &object;
     this->Method = method;
     }
+  //@}
 
   void SetCallback(ClassT& object,
     void (ClassT::*method2)(vtkObject*, unsigned long, void*))
@@ -147,19 +153,20 @@ private:
   void operator=(const vtkMemberFunctionCommand&) VTK_DELETE_FUNCTION;
 };
 
-// Description:
-// Convenience function for creating vtkMemberFunctionCommand instances that
-// automatically deduces its arguments.
-//
-// Usage:
-//
-// vtkObject* subject = ...
-// foo* observer = ...
-// vtkCommand* adapter = vtkMakeMemberFunctionCommand(observer, &foo::bar);
-// subject->AddObserver(vtkCommand::AnyEvent, adapter);
-//
-// See Also:
-// vtkMemberFunctionCommand, vtkCallbackCommand
+/**
+ * Convenience function for creating vtkMemberFunctionCommand instances that
+ * automatically deduces its arguments.
+
+ * Usage:
+
+ * vtkObject* subject = ...
+ * foo* observer = ...
+ * vtkCommand* adapter = vtkMakeMemberFunctionCommand(observer, &foo::bar);
+ * subject->AddObserver(vtkCommand::AnyEvent, adapter);
+
+ * See Also:
+ * vtkMemberFunctionCommand, vtkCallbackCommand
+ */
 
 template<class ClassT>
 vtkMemberFunctionCommand<ClassT>* vtkMakeMemberFunctionCommand(

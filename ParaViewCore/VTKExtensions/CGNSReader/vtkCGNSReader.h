@@ -14,21 +14,23 @@
   =========================================================================*/
 // Copyright 2013-2014 Mickael Philit.
 
-// .NAME vtkCGNSReader -- reads a dataset in "CGNS" format
-// .SECTION Description
-// vtkCGNSReader creates a multi-block dataset and reads unstructured grids,
-// and structured meshes from binary files stored in CGNS file format,
-// with data stored at the nodes or at the cells.
-//
-// vtkCGNSReader is inspired by the VisIt CGNS reader originally written by
-// B. Whitlock. vtkCGNSReader relies on the low level CGNS API to load DataSet
-// and reduce memory footprint.
-//
-// .SECTION Caveats
-//   ...
-//
-// .SECTION Thanks
-// Thanks to .
+/**
+ * @class   vtkCGNSReader
+ *
+ * vtkCGNSReader creates a multi-block dataset and reads unstructured grids,
+ * and structured meshes from binary files stored in CGNS file format,
+ * with data stored at the nodes or at the cells.
+ *
+ * vtkCGNSReader is inspired by the VisIt CGNS reader originally written by
+ * B. Whitlock. vtkCGNSReader relies on the low level CGNS API to load DataSet
+ * and reduce memory footprint.
+ *
+ * @warning
+ *   ...
+ *
+ * @par Thanks:
+ * Thanks to .
+*/
 
 #ifndef vtkCGNSReader_h
 #define vtkCGNSReader_h
@@ -53,13 +55,17 @@ public:
   vtkTypeMacro(vtkCGNSReader,vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Specify file name of CGNS datafile to read
+  //@{
+  /**
+   * Specify file name of CGNS datafile to read
+   */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
+  //@}
 
-  // Description:
-  // Is the given file name a CGNS file?
+  /**
+   * Is the given file name a CGNS file?
+   */
   int CanReadFile(const char* filename);
 
 
@@ -101,16 +107,20 @@ public:
   vtkGetMacro(CreateEachSolutionAsBlock,int);
   vtkBooleanMacro(CreateEachSolutionAsBlock,int);
 
-  // Description:
-  // Set/get the communication object used to relay a list of files
-  // from the rank 0 process to all others. This is the only interprocess
-  // communication required by vtkPExodusIIReader.
+  //@{
+  /**
+   * Set/get the communication object used to relay a list of files
+   * from the rank 0 process to all others. This is the only interprocess
+   * communication required by vtkPExodusIIReader.
+   */
   void SetController(vtkMultiProcessController* c);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
+  //@}
 
-  // Description:
-  // Sends metadata (that read from the input file, not settings modified
-  // through this API) from the rank 0 node to all other processes in a job.
+  /**
+   * Sends metadata (that read from the input file, not settings modified
+   * through this API) from the rank 0 node to all other processes in a job.
+   */
   void Broadcast( vtkMultiProcessController* ctrl );
 
 protected:

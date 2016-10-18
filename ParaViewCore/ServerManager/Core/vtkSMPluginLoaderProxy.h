@@ -12,11 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMPluginLoaderProxy - used to load a plugin remotely.
-// .SECTION Description
-// vtkSMPluginLoaderProxy is used to load a plugin on dataserver and
-// renderserver processes. Simply call vtkSMPluginLoaderProxy::LoadPlugin() with
-// the right path to load the plugin remotely.
+/**
+ * @class   vtkSMPluginLoaderProxy
+ * @brief   used to load a plugin remotely.
+ *
+ * vtkSMPluginLoaderProxy is used to load a plugin on dataserver and
+ * renderserver processes. Simply call vtkSMPluginLoaderProxy::LoadPlugin() with
+ * the right path to load the plugin remotely.
+*/
 
 #ifndef vtkSMPluginLoaderProxy_h
 #define vtkSMPluginLoaderProxy_h
@@ -31,16 +34,18 @@ public:
   vtkTypeMacro(vtkSMPluginLoaderProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Loads the plugin. Returns true on success else false. To get the error
-  // string, call UpdatePropertyInformation() on this proxy and then look at the
-  // ErrorString property.
+  /**
+   * Loads the plugin. Returns true on success else false. To get the error
+   * string, call UpdatePropertyInformation() on this proxy and then look at the
+   * ErrorString property.
+   */
   bool LoadPlugin(const char* filename);
 
-  // Description:
-  // Loads the configuration xml contents. Look at
-  // vtkPVPluginTracker::LoadPluginConfigurationXMLFromString() to see the
-  // details about the configuration xml.
+  /**
+   * Loads the configuration xml contents. Look at
+   * vtkPVPluginTracker::LoadPluginConfigurationXMLFromString() to see the
+   * details about the configuration xml.
+   */
   void LoadPluginConfigurationXMLFromString(const char* xmlcontents);
 
 protected:

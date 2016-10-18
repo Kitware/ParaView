@@ -12,9 +12,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPlotEdges - 
-// .SECTION Description
-
+/**
+ * @class   vtkPlotEdges
+ *
+*/
 
 #ifndef vtkPlotEdges_h
 #define vtkPlotEdges_h

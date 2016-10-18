@@ -12,25 +12,28 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPSciVizContingencyStats - Derive contingency tables and use them to assess the likelihood of associations.
-// .SECTION Description
-// This filter either computes a statistical model of
-// a dataset or takes such a model as its second input.
-// Then, the model (however it is obtained) may
-// optionally be used to assess the input dataset.
-//
-// This filter computes contingency tables between pairs of attributes.
-// This result is a tabular bivariate probability distribution
-// which serves as a Bayesian-style prior model.
-// Data is assessed by computing
-// <ul>
-// <li> the probability of observing both variables simultaneously;
-// <li> the probability of each variable conditioned on the other
-//      (the two values need not be identical); and
-// <li> the pointwise mutual information (PMI).
-// </ul>
-// Finally, the summary statistics include the information entropy
-// of the observations.
+/**
+ * @class   vtkPSciVizContingencyStats
+ * @brief   Derive contingency tables and use them to assess the likelihood of associations.
+ *
+ * This filter either computes a statistical model of
+ * a dataset or takes such a model as its second input.
+ * Then, the model (however it is obtained) may
+ * optionally be used to assess the input dataset.
+ *
+ * This filter computes contingency tables between pairs of attributes.
+ * This result is a tabular bivariate probability distribution
+ * which serves as a Bayesian-style prior model.
+ * Data is assessed by computing
+ * <ul>
+ * <li> the probability of observing both variables simultaneously;
+ * <li> the probability of each variable conditioned on the other
+ *      (the two values need not be identical); and
+ * <li> the pointwise mutual information (PMI).
+ * </ul>
+ * Finally, the summary statistics include the information entropy
+ * of the observations.
+*/
 
 #ifndef vtkPSciVizContingencyStats_h
 #define vtkPSciVizContingencyStats_h

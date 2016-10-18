@@ -12,11 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMBagChartSeriesListDomain - extends vtkSMChartSeriesListDomain to
-// setup defaults specific for bag plot representations.
-// .SECTION Description
-// vtkSMBagChartSeriesListDomain extends vtkSMChartSeriesListDomain to
-// setup defaults specific for bag plot representations.
+/**
+ * @class   vtkSMBagChartSeriesListDomain
+ * @brief   extends vtkSMChartSeriesListDomain to
+ * setup defaults specific for bag plot representations.
+ *
+ * vtkSMBagChartSeriesListDomain extends vtkSMChartSeriesListDomain to
+ * setup defaults specific for bag plot representations.
+*/
+
 #ifndef vtkSMBagChartSeriesListDomain_h
 #define vtkSMBagChartSeriesListDomain_h
 
@@ -33,8 +37,9 @@ public:
   vtkTypeMacro(vtkSMBagChartSeriesListDomain, vtkSMChartSeriesListDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Set the default values for the property.
+  /**
+   * Set the default values for the property.
+   */
   virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values);
 
 protected:

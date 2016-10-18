@@ -12,13 +12,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVStreamingPiecesInformation - information object used by
-// vtkSMDataDeliveryManager to get information about representations that have
-// pieces to stream from the data-server.
-// .SECTION Description
-// vtkPVStreamingPiecesInformation is an information object used by
-// vtkSMDataDeliveryManager to get information about representations that have
-// pieces to stream from the data-server. 
+/**
+ * @class   vtkPVStreamingPiecesInformation
+ * @brief   information object used by
+ * vtkSMDataDeliveryManager to get information about representations that have
+ * pieces to stream from the data-server.
+ *
+ * vtkPVStreamingPiecesInformation is an information object used by
+ * vtkSMDataDeliveryManager to get information about representations that have
+ * pieces to stream from the data-server. 
+*/
 
 #ifndef vtkPVStreamingPiecesInformation_h
 #define vtkPVStreamingPiecesInformation_h
@@ -35,21 +38,27 @@ public:
   vtkTypeMacro(vtkPVStreamingPiecesInformation, vtkPVInformation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Transfer information about a single object into this object.
+  /**
+   * Transfer information about a single object into this object.
+   */
   virtual void CopyFromObject(vtkObject*);
 
-  // Description:
-  // Merge another information object. Calls AddInformation(info, 0).
+  /**
+   * Merge another information object. Calls AddInformation(info, 0).
+   */
   virtual void AddInformation(vtkPVInformation* info);
 
-  // Description:
-  // Manage a serialized version of the information.
+  //@{
+  /**
+   * Manage a serialized version of the information.
+   */
   virtual void CopyToStream(vtkClientServerStream*);
   virtual void CopyFromStream(const vtkClientServerStream*);
+  //@}
 
-  // Description:
-  // API to access the internal keys. 
+  /**
+   * API to access the internal keys.
+   */
   void GetKeys(std::vector<unsigned int>& keys) const;
 
 protected:

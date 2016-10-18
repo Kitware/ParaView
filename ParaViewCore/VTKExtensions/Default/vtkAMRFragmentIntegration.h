@@ -12,14 +12,17 @@
   the U.S. Government retains certain rights in this software.
 
 =========================================================================*/
-// .NAME vtkAMRFragmentIntegration - Generates fragment analysis from an
-// amr volume and a previously run contour on that volume
-//
-// .SECTION Description
-//   Input 0: The AMR Volume
-//
-//   Output 0: A multiblock containing tables of fragments, one block 
-//             for each requested material
+/**
+ * @class   vtkAMRFragmentIntegration
+ * @brief   Generates fragment analysis from an
+ * amr volume and a previously run contour on that volume
+ *
+ *
+ *   Input 0: The AMR Volume
+ *
+ *   Output 0: A multiblock containing tables of fragments, one block 
+ *             for each requested material
+*/
 
 #ifndef vtkAMRFragmentIntegration_h
 #define vtkAMRFragmentIntegration_h
@@ -49,8 +52,9 @@ protected:
 
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 
-  // Description:
-  //   Pipeline helper.  Run on each material independently.
+  /**
+   * Pipeline helper.  Run on each material independently.
+   */
   vtkTable* DoRequestData(vtkNonOverlappingAMR* volume, 
                           const char* volumeArray,
                           const char* massArray,

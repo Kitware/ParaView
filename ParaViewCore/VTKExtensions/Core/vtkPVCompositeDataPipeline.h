@@ -12,15 +12,18 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVCompositeDataPipeline - executive to add support for
-// vtkPVPostFilter in ParaView data pipelines.
-// .SECTION Description
-// vtkPVCompositeDataPipeline extends vtkCompositeDataPipeline to add ParaView
-// specific extensions to the pipeline.
-// \li Post Filter :- it adds support to ensure that array requests made on
-//     algorithms are passed along to the input vtkPVPostFilter, if one exists.
-//     vtkPVPostFilter is used to automatically extract components or generated
-//     derived arrays such as magnitude array for vectors.
+/**
+ * @class   vtkPVCompositeDataPipeline
+ * @brief   executive to add support for
+ * vtkPVPostFilter in ParaView data pipelines.
+ *
+ * vtkPVCompositeDataPipeline extends vtkCompositeDataPipeline to add ParaView
+ * specific extensions to the pipeline.
+ * \li Post Filter :- it adds support to ensure that array requests made on
+ *     algorithms are passed along to the input vtkPVPostFilter, if one exists.
+ *     vtkPVPostFilter is used to automatically extract components or generated
+ *     derived arrays such as magnitude array for vectors.
+*/
 
 #ifndef vtkPVCompositeDataPipeline_h
 #define vtkPVCompositeDataPipeline_h

@@ -12,11 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVDefaultPass - encapsulates the traditional OpenGL pipeline
-// (minus the camera).
-// .SECTION Description
-// vtkPVDefaultPass is a simple render pass that encapsulates the traditional
-// OpenGL pipeline (minus the camera).
+/**
+ * @class   vtkPVDefaultPass
+ * @brief   encapsulates the traditional OpenGL pipeline
+ * (minus the camera).
+ *
+ * vtkPVDefaultPass is a simple render pass that encapsulates the traditional
+ * OpenGL pipeline (minus the camera).
+*/
 
 #ifndef vtkPVDefaultPass_h
 #define vtkPVDefaultPass_h
@@ -31,8 +34,9 @@ public:
   vtkTypeMacro(vtkPVDefaultPass, vtkRenderPass);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Actual rendering code.
+  /**
+   * Actual rendering code.
+   */
   virtual void Render(const vtkRenderState* render_state);
 
 protected:

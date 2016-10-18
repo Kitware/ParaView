@@ -12,12 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSpreadSheetView
-// .SECTION Description
-// vtkSpreadSheetView is a vtkPVView subclass for a view used to show any data
-// as a spreadsheet. This view can only show one representation at a
-// time. If more than one representation is added to this view, only the first
-// visible representation will be shown.
+/**
+ * @class   vtkSpreadSheetView
+ *
+ * vtkSpreadSheetView is a vtkPVView subclass for a view used to show any data
+ * as a spreadsheet. This view can only show one representation at a
+ * time. If more than one representation is added to this view, only the first
+ * visible representation will be shown.
+*/
 
 #ifndef vtkSpreadSheetView_h
 #define vtkSpreadSheetView_h
@@ -43,94 +45,117 @@ public:
   vtkTypeMacro(vtkSpreadSheetView, vtkPVView);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Triggers a high-resolution render.
-  // @CallOnAllProcessess
+  /**
+   * Triggers a high-resolution render.
+   * @CallOnAllProcessess
+   */
   virtual void StillRender() { this->StreamToClient(); }
 
-  // Description:
-  // Triggers a interactive render. Based on the settings on the view, this may
-  // result in a low-resolution rendering or a simplified geometry rendering.
-  // @CallOnAllProcessess
+  /**
+   * Triggers a interactive render. Based on the settings on the view, this may
+   * result in a low-resolution rendering or a simplified geometry rendering.
+   * @CallOnAllProcessess
+   */
   virtual void InteractiveRender() { this->StreamToClient(); }
 
-  // Description:
-  // Overridden to identify and locate the active-representation.
+  /**
+   * Overridden to identify and locate the active-representation.
+   */
   virtual void Update();
 
-  // Description:
-  // Get/Set if the view shows extracted selection only or the actual data.
-  // false by default.
-  // @CallOnAllProcessess
+  //@{
+  /**
+   * Get/Set if the view shows extracted selection only or the actual data.
+   * false by default.
+   * @CallOnAllProcessess
+   */
   void SetShowExtractedSelection(bool);
   vtkBooleanMacro(ShowExtractedSelection, bool);
   vtkGetMacro(ShowExtractedSelection, bool);
+  //@}
 
-  // Description
-  // Manage column visibilities, used only for export
+  //@{
+  /**
+   * Manage column visibilities, used only for export
+   */
   void SetColumnVisibility(int fieldAssociation, const char* column, int visibility);
   void ClearColumnVisibilities();
+  //@}
 
-  // Description:
-  // Get the number of columns.
-  // @CallOnClient
+  /**
+   * Get the number of columns.
+   * @CallOnClient
+   */
   vtkIdType GetNumberOfColumns();
 
-  // Description:
-  // Get the number of rows.
-  // @CallOnClient
+  /**
+   * Get the number of rows.
+   * @CallOnClient
+   */
   vtkIdType GetNumberOfRows();
 
-  // Description:
-  // Returns the name for the column.
-  // @CallOnClient
+  /**
+   * Returns the name for the column.
+   * @CallOnClient
+   */
   const char* GetColumnName(vtkIdType index);
 
-  // Description:
-  // Returns the value at given location. This may result in collective
-  // operations is data is not available locally. This method can only be called
-  // on the CLIENT process for now.
-  // @CallOnClient
+  //@{
+  /**
+   * Returns the value at given location. This may result in collective
+   * operations is data is not available locally. This method can only be called
+   * on the CLIENT process for now.
+   * @CallOnClient
+   */
   vtkVariant GetValue(vtkIdType row, vtkIdType col);
   vtkVariant GetValueByName(vtkIdType row, const char* columnName);
+  //@}
 
-  // Description:
-  // Returns true if the row is selected.
+  /**
+   * Returns true if the row is selected.
+   */
   bool IsRowSelected(vtkIdType row);
 
-  // Description:
-  // Returns true is the data for the particular row is locally available.
+  /**
+   * Returns true is the data for the particular row is locally available.
+   */
   bool IsAvailable(vtkIdType row);
 
   //***************************************************************************
   // Forwarded to vtkSortedTableStreamer.
-  // Description:
-  // Get/Set the column name to sort by.
-  // @CallOnAllProcessess
+  /**
+   * Get/Set the column name to sort by.
+   * @CallOnAllProcessess
+   */
   void SetColumnNameToSort(const char*);
   void SetColumnNameToSort() { this->SetColumnNameToSort(NULL); }
 
-  // Description:
-  // Get/Set the component to sort with. Use -1 (default) for magnitude.
-  // @CallOnAllProcessess
+  /**
+   * Get/Set the component to sort with. Use -1 (default) for magnitude.
+   * @CallOnAllProcessess
+   */
   void SetComponentToSort(int val);
 
-  // Description:
-  // Get/Set whether the sort order must be Max to Min rather than Min to Max.
-  // @CallOnAllProcessess
+  /**
+   * Get/Set whether the sort order must be Max to Min rather than Min to Max.
+   * @CallOnAllProcessess
+   */
   void SetInvertSortOrder(bool);
 
-  // Description:
-  // Set the block size
-  // @CallOnAllProcessess
+  /**
+   * Set the block size
+   * @CallOnAllProcessess
+   */
   void SetBlockSize(vtkIdType val);
 
-  // Description:
-  // Export the contents of this view using the exporter.
+  /**
+   * Export the contents of this view using the exporter.
+   */
   bool Export(vtkCSVExporter* exporter);
 
-  // Description:
-  // Allow user to clear the cache if he needs to.
+  /**
+   * Allow user to clear the cache if he needs to.
+   */
   void ClearCache();
 
   // INTERNAL METHOD. Don't call directly.
@@ -141,11 +166,12 @@ protected:
   ~vtkSpreadSheetView();
 
 
-  // Description:
-  // On render streams all the data from the processes to the client.
-  // Returns 0 on failure.
-  // Note: Was removed from update because you can't call update()
-  // while in an update
+  /**
+   * On render streams all the data from the processes to the client.
+   * Returns 0 on failure.
+   * Note: Was removed from update because you can't call update()
+   * while in an update
+   */
   int StreamToClient();
 
   void OnRepresentationUpdated();

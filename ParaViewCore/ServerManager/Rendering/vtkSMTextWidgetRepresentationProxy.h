@@ -12,8 +12,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMTextWidgetRepresentationProxy 
-// .SECTION Description
+/**
+ * @class   vtkSMTextWidgetRepresentationProxy
+ *
+*/
 
 #ifndef vtkSMTextWidgetRepresentationProxy_h
 #define vtkSMTextWidgetRepresentationProxy_h

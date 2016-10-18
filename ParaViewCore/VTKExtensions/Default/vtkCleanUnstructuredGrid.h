@@ -13,16 +13,19 @@
 
 =========================================================================*/
 
-// .NAME vtkCleanUnstructuredGrid - merge duplicate points
-//
-// .SECTION Description
-// vtkCleanUnstructuredGrid is a filter that takes unstructured grid data as 
-// input and generates unstructured grid data as output. vtkCleanUnstructuredGrid can 
-// merge duplicate points (with coincident coordinates) using the vtkMergePoints object
-// to merge points.
-
-// .SECTION See Also
-// vtkCleanPolyData
+/**
+ * @class   vtkCleanUnstructuredGrid
+ * @brief   merge duplicate points
+ *
+ *
+ * vtkCleanUnstructuredGrid is a filter that takes unstructured grid data as 
+ * input and generates unstructured grid data as output. vtkCleanUnstructuredGrid can 
+ * merge duplicate points (with coincident coordinates) using the vtkMergePoints object
+ * to merge points.
+ *
+ * @sa
+ * vtkCleanPolyData
+*/
 
 #ifndef vtkCleanUnstructuredGrid_h
 #define vtkCleanUnstructuredGrid_h

@@ -12,8 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCSVWriter - CSV writer for vtkTable
-// Writes a vtkTable as a delimited text file (such as CSV). 
+/**
+ * @class   vtkCSVWriter
+ * @brief   CSV writer for vtkTable
+ * Writes a vtkTable as a delimited text file (such as CSV). 
+*/
+
 #ifndef vtkCSVWriter_h
 #define vtkCSVWriter_h
 
@@ -30,47 +34,68 @@ public:
   vtkTypeMacro(vtkCSVWriter, vtkWriter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Get/Set the delimiter use to separate fields ("," by default.)
+  //@{
+  /**
+   * Get/Set the delimiter use to separate fields ("," by default.)
+   */
   vtkSetStringMacro(FieldDelimiter);
   vtkGetStringMacro(FieldDelimiter);
+  //@}
 
-  // Description:
-  // Get/Set the delimiter used for string data, if any 
-  // eg. double quotes(").
+  //@{
+  /**
+   * Get/Set the delimiter used for string data, if any
+   * eg. double quotes(").
+   */
   vtkSetStringMacro(StringDelimiter);
   vtkGetStringMacro(StringDelimiter);
+  //@}
 
-  // Description:
-  // Get/Set the filename for the file.
+  //@{
+  /**
+   * Get/Set the filename for the file.
+   */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
+  //@}
 
-  // Description:
-  // Get/Set if StringDelimiter must be used for string data.
-  // True by default.
+  //@{
+  /**
+   * Get/Set if StringDelimiter must be used for string data.
+   * True by default.
+   */
   vtkSetMacro(UseStringDelimiter, bool);
   vtkGetMacro(UseStringDelimiter, bool);
+  //@}
 
-  // Description:
-  // Get/Set the precision to use for printing numeric values.
-  // Default is 5.
+  //@{
+  /**
+   * Get/Set the precision to use for printing numeric values.
+   * Default is 5.
+   */
   vtkSetClampMacro(Precision, int, 0, VTK_INT_MAX);
   vtkGetMacro(Precision, int);
+  //@}
 
-  // Description:
-  // Get/Set whether scientific notation is used for numeric values.
+  //@{
+  /**
+   * Get/Set whether scientific notation is used for numeric values.
+   */
   vtkSetMacro(UseScientificNotation, bool);
   vtkGetMacro(UseScientificNotation, bool);
   vtkBooleanMacro(UseScientificNotation, bool);
+  //@}
 
-  // Description:
-  // Internal method: decortes the "string" with the "StringDelimiter" if 
-  // UseStringDelimiter is true.
+  //@{
+  /**
+   * Internal method: decortes the "string" with the "StringDelimiter" if
+   * UseStringDelimiter is true.
+   */
   vtkStdString GetString(vtkStdString string);
 protected:
   vtkCSVWriter();
   ~vtkCSVWriter();
+  //@}
 
   bool OpenFile();
 

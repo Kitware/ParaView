@@ -12,10 +12,13 @@
   the U.S. Government retains certain rights in this software.
 
 =========================================================================*/
-// .NAME vtkPEquivalenceSet - distributed method of Equivalence
-// .SECTION Description
-// Same as EquivalenceSet, but resolving is a global operation.
-// .SEE vtkEquivalenceSet
+/**
+ * @class   vtkPEquivalenceSet
+ * @brief   distributed method of Equivalence
+ *
+ * Same as EquivalenceSet, but resolving is a global operation.
+ * .SEE vtkEquivalenceSet
+*/
 
 #ifndef vtkPEquivalenceSet_h
 #define vtkPEquivalenceSet_h

@@ -17,7 +17,10 @@
  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 ----------------------------------------------------------------------------*/
 
-// .NAME vtkBalancedRedistributePolyData - do balance of cells on processors
+/**
+ * @class   vtkBalancedRedistributePolyData
+ * @brief   do balance of cells on processors
+*/
 
 #ifndef vtkBalancedRedistributePolyData_h
 #define vtkBalancedRedistributePolyData_h
@@ -35,7 +38,6 @@ public:
   vtkTypeMacro(vtkBalancedRedistributePolyData, vtkWeightedRedistributePolyData);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
   static vtkBalancedRedistributePolyData *New();
 
 protected:

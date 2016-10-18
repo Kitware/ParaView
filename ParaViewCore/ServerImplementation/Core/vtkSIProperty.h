@@ -12,11 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSIProperty
-// .SECTION Description
-// Basic ServerImplementation property used to call a method with no argument
-// on a VTK object. If overriden, we naturally allow to call a method either
-// to set or get a set of values.
+/**
+ * @class   vtkSIProperty
+ *
+ * Basic ServerImplementation property used to call a method with no argument
+ * on a VTK object. If overriden, we naturally allow to call a method either
+ * to set or get a set of values.
+*/
 
 #ifndef vtkSIProperty_h
 #define vtkSIProperty_h
@@ -38,33 +40,48 @@ public:
   vtkTypeMacro(vtkSIProperty, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // The name assigned by the xml parser. Used to get the property
-  // from a proxy.
+  //@{
+  /**
+   * The name assigned by the xml parser. Used to get the property
+   * from a proxy.
+   */
   vtkGetStringMacro(XMLName);
+  //@}
 
-  // Description:
-  // The command name used to set the value on the server object.
-  // For example: SetThetaResolution
+  //@{
+  /**
+   * The command name used to set the value on the server object.
+   * For example: SetThetaResolution
+   */
   vtkGetStringMacro(Command);
+  //@}
 
-  // Description:
-  // Is InformationOnly is set to true, this property is used to
-  // get information from server instead of setting values.
+  //@{
+  /**
+   * Is InformationOnly is set to true, this property is used to
+   * get information from server instead of setting values.
+   */
   vtkGetMacro(InformationOnly, bool);
+  //@}
 
-  // Description:
-  // If repeatable, a property can have 1 or more values of the same kind.
-  // This ivar is configured when the xml file is read and is mainly useful
-  // for information (for example from python).
+  //@{
+  /**
+   * If repeatable, a property can have 1 or more values of the same kind.
+   * This ivar is configured when the xml file is read and is mainly useful
+   * for information (for example from python).
+   */
   vtkGetMacro(Repeatable, bool);
+  //@}
 
-  // Description:
-  // This ivar is configured when the xml file is read and is mainly useful
-  // to trigger a method call.
-  // Internal properties are not saved in state
+  //@{
+  /**
+   * This ivar is configured when the xml file is read and is mainly useful
+   * to trigger a method call.
+   * Internal properties are not saved in state
+   */
   vtkSetMacro(IsInternal, bool);
   vtkGetMacro(IsInternal, bool);
+  //@}
 
 protected:
   vtkSIProperty();
@@ -72,27 +89,34 @@ protected:
 
   friend class vtkSIProxy;
 
-  // Description:
-  // Convenience method to obtain a vtkSIObject subclass given its global id.
+  /**
+   * Convenience method to obtain a vtkSIObject subclass given its global id.
+   */
   vtkSIObject* GetSIObject(vtkTypeUInt32 globalid);
 
-  // Description:
-  // Push a new state to the underneath implementation
+  /**
+   * Push a new state to the underneath implementation
+   */
   virtual bool Push(vtkSMMessage*, int);
 
-  // Description:
-  // Pull the current state of the underneath implementation
+  /**
+   * Pull the current state of the underneath implementation
+   */
   virtual bool Pull(vtkSMMessage*);
 
-  // Description:
-  // Parse the xml for the property.
+  /**
+   * Parse the xml for the property.
+   */
   virtual bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element);
 
-  // Description:
-  // Interprets the message.
+  //@{
+  /**
+   * Interprets the message.
+   */
   bool ProcessMessage(vtkClientServerStream& stream);
   const vtkClientServerStream& GetLastResult();
   vtkObjectBase* GetVTKObject();
+  //@}
 
   vtkSetStringMacro(Command);
   vtkSetStringMacro(XMLName);

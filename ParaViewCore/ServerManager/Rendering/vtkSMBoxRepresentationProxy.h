@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMBoxRepresentationProxy - proxy for vtkBoxRepresentation
-// .SECTION Description
-// vtkSMBoxRepresentationProxy is a proxy for vtkBoxRepresentation. A
-// specialization is needed to set the tranform on the vtkBoxRepresentation.
+/**
+ * @class   vtkSMBoxRepresentationProxy
+ * @brief   proxy for vtkBoxRepresentation
+ *
+ * vtkSMBoxRepresentationProxy is a proxy for vtkBoxRepresentation. A
+ * specialization is needed to set the tranform on the vtkBoxRepresentation.
+*/
 
 #ifndef vtkSMBoxRepresentationProxy_h
 #define vtkSMBoxRepresentationProxy_h

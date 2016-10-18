@@ -12,9 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMDoubleMapProperty - a map property storing double values
-// .SECTION Description
-// vtkSMDoubleMapProperty stores a map of vtkIdType keys to double values.
+/**
+ * @class   vtkSMDoubleMapProperty
+ * @brief   a map property storing double values
+ *
+ * vtkSMDoubleMapProperty stores a map of vtkIdType keys to double values.
+*/
 
 #ifndef vtkSMDoubleMapProperty_h
 #define vtkSMDoubleMapProperty_h
@@ -32,69 +35,84 @@ public:
   vtkTypeMacro(vtkSMDoubleMapProperty, vtkSMMapProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Sets the number of components.
+  /**
+   * Sets the number of components.
+   */
   void SetNumberOfComponents(unsigned int components);
 
-  // Description:
-  // Returns the number of components.
+  /**
+   * Returns the number of components.
+   */
   unsigned int GetNumberOfComponents();
 
-  // Description:
-  // Sets the element at index to value.
+  /**
+   * Sets the element at index to value.
+   */
   void SetElement(vtkIdType index, double value);
 
-  // Description:
-  // Sets the elements at index to values.
+  /**
+   * Sets the elements at index to values.
+   */
   void SetElements(vtkIdType index, const double *values);
 
-  // Description:
-  // Sets the elements at index to values.
+  /**
+   * Sets the elements at index to values.
+   */
   void SetElements(vtkIdType index, const double *values, unsigned int numValues);
 
-  // Description:
-  // Sets the component at index to value.
+  /**
+   * Sets the component at index to value.
+   */
   void SetElementComponent(vtkIdType index, unsigned int component, double value);
 
-  // Description:
-  // Returns the element at index.
+  /**
+   * Returns the element at index.
+   */
   double GetElement(vtkIdType index);
 
-  // Description:
-  // Returns the elements at index.
+  /**
+   * Returns the elements at index.
+   */
   double* GetElements(vtkIdType index);
 
-  // Description:
-  // Returns the element component at index.
+  /**
+   * Returns the element component at index.
+   */
   double GetElementComponent(vtkIdType index, vtkIdType component);
 
-  // Description:
-  // Removes the element at index.
+  /**
+   * Removes the element at index.
+   */
   void RemoveElement(vtkIdType index);
 
-  // Description:
-  // Returns the number of elements.
+  /**
+   * Returns the number of elements.
+   */
   virtual vtkIdType GetNumberOfElements();
 
-  // Description:
-  // Clears all of the elements from the property.
+  /**
+   * Clears all of the elements from the property.
+   */
   void ClearElements();
 
-  // Description:
-  // Returns a new iterator for the map.
+  /**
+   * Returns a new iterator for the map.
+   */
   VTK_NEWINSTANCE
   vtkSMDoubleMapPropertyIterator* NewIterator();
 
   void* GetMapPointer();
 
-  // Description:
-  // Copy all property values.
+  /**
+   * Copy all property values.
+   */
   virtual void Copy(vtkSMProperty* src);
 
-  // Description:
-  // For properties that support specifying defaults in XML configuration, this
-  // method will reset the property value to the default values specified in the
-  // XML.
+  /**
+   * For properties that support specifying defaults in XML configuration, this
+   * method will reset the property value to the default values specified in the
+   * XML.
+   */
   virtual void ResetToXMLDefaults();
 
 protected:

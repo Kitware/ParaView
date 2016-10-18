@@ -12,13 +12,15 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSpyPlotIStream
-// .SECTION Description
-// vtkSpyPlotIStream represents input functionality required by 
-// the vtkSpyPlotReader and vtkSpyPlotUniReader classes.  The class
-// was factored out of vtkSpyPlotReader.cxx.  The class wraps an already
-// opened istream
-//
+/**
+ * @class   vtkSpyPlotIStream
+ *
+ * vtkSpyPlotIStream represents input functionality required by 
+ * the vtkSpyPlotReader and vtkSpyPlotUniReader classes.  The class
+ * was factored out of vtkSpyPlotReader.cxx.  The class wraps an already
+ * opened istream
+ *
+*/
 
 #ifndef vtkSpyPlotIStream_h
 #define vtkSpyPlotIStream_h

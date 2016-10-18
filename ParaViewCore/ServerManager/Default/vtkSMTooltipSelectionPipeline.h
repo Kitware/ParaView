@@ -12,17 +12,18 @@
  PURPOSE.  See the above copyright notice for more information.
 
  =========================================================================*/
-// .NAME vtkSMTooltipSelectionPipeline -- Pipeline for point tooltip mode
-//
-// .SECTION Description
-// Point tooltip mode enables the user to inspect points (coordinates,
-// data array values) by hovering the mouse cursor over a point.
-// This is a global object that holds the pipeline for showing the point
-// tooltip mode.
-//
-// .SECTION See Also
-// vtkSMPreselectionPipeline vtkSMInteractiveSelectionPipeline
-
+/**
+ * @class   vtkSMTooltipSelectionPipeline
+ *
+ *
+ * Point tooltip mode enables the user to inspect points (coordinates,
+ * data array values) by hovering the mouse cursor over a point.
+ * This is a global object that holds the pipeline for showing the point
+ * tooltip mode.
+ *
+ * @sa
+ * vtkSMPreselectionPipeline vtkSMInteractiveSelectionPipeline
+*/
 
 #ifndef vtkSMTooltipSelectionPipeline_h
 #define vtkSMTooltipSelectionPipeline_h
@@ -44,44 +45,53 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent );
   static vtkSMTooltipSelectionPipeline* GetInstance();
 
-  // Description:
-  // Re-implemented from vtkSMPreselectionPipeline
+  //@{
+  /**
+   * Re-implemented from vtkSMPreselectionPipeline
+   */
   virtual void Hide(vtkSMRenderViewProxy* view);
   virtual void Show(vtkSMSourceProxy* sourceRepresentation,
     vtkSMSourceProxy* selection, vtkSMRenderViewProxy* view);
+  //@}
 
-  // Description:
-  // Return true if a tooltip can be displayed according to the context,
-  // otherwise return false. The argument showTooltip is true if the tooltip
-  // must be shown, false if the tooltip must be hidden.
+  /**
+   * Return true if a tooltip can be displayed according to the context,
+   * otherwise return false. The argument showTooltip is true if the tooltip
+   * must be shown, false if the tooltip must be hidden.
+   */
   bool CanDisplayTooltip(bool& showTooltip);
 
-  // Description:
-  // Get information about the tooltip to be displayed.
-  // Return false if the method failed computing information.
+  /**
+   * Get information about the tooltip to be displayed.
+   * Return false if the method failed computing information.
+   */
   bool GetTooltipInfo(double tooltipPos[2], std::string& tooltipText);
 
 protected:
   vtkSMTooltipSelectionPipeline();
   ~vtkSMTooltipSelectionPipeline();
 
-  // Description:
-  // Re-implemented from vtkSMPreselectionPipeline
+  /**
+   * Re-implemented from vtkSMPreselectionPipeline
+   */
   void ClearCache();
 
-  // Description:
-  // Connect the ClientServerMoveData filter to the pipeline to get
-  // the selection on the client side.
+  /**
+   * Connect the ClientServerMoveData filter to the pipeline to get
+   * the selection on the client side.
+   */
   vtkDataObject* ConnectPVMoveSelectionToClient(
     vtkSMSourceProxy* source, unsigned int sourceOutputPort);
 
-  // Description:
-  // Get the id of the selected point.
+  /**
+   * Get the id of the selected point.
+   */
   bool GetCurrentSelectionId(vtkSMRenderViewProxy* view, vtkIdType& selId);
 
-  // Description:
-  // Extract dataset from the dataObject, which can be either directly a dataset 
-  // or a composite dataset containing only one dataset.
+  /**
+   * Extract dataset from the dataObject, which can be either directly a dataset
+   * or a composite dataset containing only one dataset.
+   */
   vtkDataSet* FindDataSet(vtkDataObject* dataObject, 
     bool& compositeFound, std::string& compositeName);
 

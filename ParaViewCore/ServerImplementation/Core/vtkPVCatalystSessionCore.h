@@ -12,12 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVCatalystSessionCore
-// .SECTION Description
-// vtkPVCatalystSessionCore is used by vtkSMSession.
-// vtkPVCatalystSessionCore handle catalyst based proxy which don't contains any
-// real data and therefore are not allowed to execute the VTK pipeline.
-// @ingroup LiveInsitu
+/**
+ * @class   vtkPVCatalystSessionCore
+ *
+ * vtkPVCatalystSessionCore is used by vtkSMSession.
+ * vtkPVCatalystSessionCore handle catalyst based proxy which don't contains any
+ * real data and therefore are not allowed to execute the VTK pipeline.
+ * @ingroup LiveInsitu
+*/
 
 #ifndef vtkPVCatalystSessionCore_h
 #define vtkPVCatalystSessionCore_h
@@ -36,17 +38,19 @@ public:
   vtkTypeMacro(vtkPVCatalystSessionCore, vtkPVSessionCore);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Gather information about an object referred by the \c globalid.
-  // \c location identifies the processes to gather the information from.
+  /**
+   * Gather information about an object referred by the \c globalid.
+   * \c location identifies the processes to gather the information from.
+   */
   virtual bool GatherInformation( vtkTypeUInt32 location,
                                   vtkPVInformation* information,
                                   vtkTypeUInt32 globalid );
 
-  // Description:
-  // Update the data information for a given proxy with the given globalid.
-  // This will allow the GatherInformation to work with "fake" VTK pipeline.
-  // Return the real corresponding proxy id
+  /**
+   * Update the data information for a given proxy with the given globalid.
+   * This will allow the GatherInformation to work with "fake" VTK pipeline.
+   * Return the real corresponding proxy id
+   */
   vtkTypeUInt32 RegisterDataInformation(vtkTypeUInt32 globalid, unsigned int port,
                                         vtkPVInformation* information);
 

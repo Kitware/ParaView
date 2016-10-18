@@ -12,8 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMComparativeAnimationCueUndoElement - UndoElement for ComparativeAnimationCue
-// .SECTION Description
+/**
+ * @class   vtkSMComparativeAnimationCueUndoElement
+ * @brief   UndoElement for ComparativeAnimationCue
+ *
+*/
 
 #ifndef vtkSMComparativeAnimationCueUndoElement_h
 #define vtkSMComparativeAnimationCueUndoElement_h

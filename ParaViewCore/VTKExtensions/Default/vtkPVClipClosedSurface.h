@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVClipClosedSurface - Clipper for generating closed surfaces
-//
-// .SECTION Description
-//  This is a subclass of vtkClipClosedSurface
+/**
+ * @class   vtkPVClipClosedSurface
+ * @brief   Clipper for generating closed surfaces
+ *
+ *
+ *  This is a subclass of vtkClipClosedSurface
+*/
 
 #ifndef vtkPVClipClosedSurface_h
 #define vtkPVClipClosedSurface_h
@@ -32,14 +35,18 @@ public:
   void PrintSelf( ostream & os, vtkIndent indent );
   static vtkPVClipClosedSurface * New();
 
-  // Description:
-  // Set/Get the InsideOut flag (off by default)
+  //@{
+  /**
+   * Set/Get the InsideOut flag (off by default)
+   */
   vtkSetMacro( InsideOut, int );
   vtkGetMacro( InsideOut, int );
   vtkBooleanMacro( InsideOut, int );
+  //@}
 
-  // Description:
-  // Set the clipping plane.
+  /**
+   * Set the clipping plane.
+   */
   void   SetClippingPlane( vtkPlane * plane );
 
 protected:

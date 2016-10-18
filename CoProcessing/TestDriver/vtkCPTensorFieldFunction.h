@@ -12,9 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCPTensorFieldFunction - Abstract class for specifying tensor fields at points.
-// .SECTION Description
-// Abstract class for specifying tensor fields at specified points.  
+/**
+ * @class   vtkCPTensorFieldFunction
+ * @brief   Abstract class for specifying tensor fields at points.
+ *
+ * Abstract class for specifying tensor fields at specified points.  
+*/
 
 #ifndef vtkCPTensorFieldFunction_h
 #define vtkCPTensorFieldFunction_h
@@ -28,13 +31,15 @@ public:
   vtkTypeMacro(vtkCPTensorFieldFunction, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Get the NumberOfComponents.  This is abstract to make sure 
-  // that the value for the NumberOfComponents cannot be changed.
+  /**
+   * Get the NumberOfComponents.  This is abstract to make sure
+   * that the value for the NumberOfComponents cannot be changed.
+   */
   virtual unsigned int GetNumberOfComponents() = 0;
 
-  // Description:
-  // Compute the field value at Point.
+  /**
+   * Compute the field value at Point.
+   */
   virtual double ComputeComponenentAtPoint(unsigned int component, double point[3],
                                            unsigned long timeStep, double time) = 0;
 

@@ -12,17 +12,20 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVDataInformation - Light object for holding data information.
-// .SECTION Description
-// This object is a light weight object.  It has no user interface and
-// does not necessarily last a long time.  It is meant to help collect
-// information about data object and collections of data objects.  It
-// has a PV in the class name because it should never be moved into
-// VTK.
-// 
-// .SECTION Caveats
-// Get polygons only works for poly data and it does not work propelry for the
-// triangle strips.
+/**
+ * @class   vtkPVDataInformation
+ * @brief   Light object for holding data information.
+ *
+ * This object is a light weight object.  It has no user interface and
+ * does not necessarily last a long time.  It is meant to help collect
+ * information about data object and collections of data objects.  It
+ * has a PV in the class name because it should never be moved into
+ * VTK.
+ *
+ * @warning
+ * Get polygons only works for poly data and it does not work propelry for the
+ * triangle strips.
+*/
 
 #ifndef vtkPVDataInformation_h
 #define vtkPVDataInformation_h
@@ -51,58 +54,74 @@ public:
   vtkTypeMacro(vtkPVDataInformation, vtkPVInformation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Method to find and return attribute array information for a particular
-  // array for the given attribute type if one exists.
-  // Returns NULL if none is found.
-  // \c fieldAssociation can be vtkDataObject::FIELD_ASSOCIATION_POINTS,
-  // vtkDataObject::FIELD_ASSOCIATION_CELLS etc.
-  // (use vtkDataObject::FIELD_ASSOCIATION_NONE for field data) (or
-  // vtkDataObject::POINT, vtkDataObject::CELL, vtkDataObject::FIELD).
+  /**
+   * Method to find and return attribute array information for a particular
+   * array for the given attribute type if one exists.
+   * Returns NULL if none is found.
+   * \c fieldAssociation can be vtkDataObject::FIELD_ASSOCIATION_POINTS,
+   * vtkDataObject::FIELD_ASSOCIATION_CELLS etc.
+   * (use vtkDataObject::FIELD_ASSOCIATION_NONE for field data) (or
+   * vtkDataObject::POINT, vtkDataObject::CELL, vtkDataObject::FIELD).
+   */
   vtkPVArrayInformation* GetArrayInformation(
     const char* arrayname, int fieldAssociation);
 
-  // Description:
-  // Port number controls which output port the information is gathered from.
-  // This is the only parameter that can be set on  the client-side before
-  // gathering the information.
+  //@{
+  /**
+   * Port number controls which output port the information is gathered from.
+   * This is the only parameter that can be set on  the client-side before
+   * gathering the information.
+   */
   vtkSetMacro(PortNumber, int);
   vtkGetMacro(PortNumber, int);
+  //@}
 
-  // Description:
-  // Transfer information about a single object into this object.
+  /**
+   * Transfer information about a single object into this object.
+   */
   virtual void CopyFromObject(vtkObject*);
 
-  // Description:
-  // Merge another information object. Calls AddInformation(info, 0).
+  /**
+   * Merge another information object. Calls AddInformation(info, 0).
+   */
   virtual void AddInformation(vtkPVInformation* info);
 
-  // Description:
-  // Merge another information object. If adding information of
-  // 1 part across processors, set addingParts to false. If
-  // adding information of parts, set addingParts to true.
+  /**
+   * Merge another information object. If adding information of
+   * 1 part across processors, set addingParts to false. If
+   * adding information of parts, set addingParts to true.
+   */
   virtual void AddInformation(vtkPVInformation*, int addingParts);
 
-  // Description:
-  // Manage a serialized version of the information.
+  //@{
+  /**
+   * Manage a serialized version of the information.
+   */
   virtual void CopyToStream(vtkClientServerStream*);
   virtual void CopyFromStream(const vtkClientServerStream*);
+  //@}
 
-  // Description:
-  // Serialize/Deserialize the parameters that control how/what information is
-  // gathered. This are different from the ivars that constitute the gathered
-  // information itself. For example, PortNumber on vtkPVDataInformation
-  // controls what output port the data-information is gathered from.
+  //@{
+  /**
+   * Serialize/Deserialize the parameters that control how/what information is
+   * gathered. This are different from the ivars that constitute the gathered
+   * information itself. For example, PortNumber on vtkPVDataInformation
+   * controls what output port the data-information is gathered from.
+   */
   virtual void CopyParametersToStream(vtkMultiProcessStream&);
   virtual void CopyParametersFromStream(vtkMultiProcessStream&);
+  //@}
 
-  // Description:
-  // Remove all information.  The next add will be like a copy.
-  // I might want to put this in the PVInformation superclass.
+  /**
+   * Remove all information.  The next add will be like a copy.
+   * I might want to put this in the PVInformation superclass.
+   */
   void Initialize();
 
-  // Description:
-  // Access to information.
+  //@{
+  /**
+   * Access to information.
+   */
   vtkGetMacro(DataSetType, int);
   vtkGetMacro(CompositeDataSetType, int);
   const char *GetDataSetTypeAsString();
@@ -114,106 +133,150 @@ public:
   vtkGetMacro(PolygonCount, int);
   vtkGetMacro(NumberOfDataSets, int);
   vtkGetVector6Macro(Bounds, double);
+  //@}
   
-  // Description:
-  // Returns a string describing the datatype that can be directly
-  // shown in a user interface.
+  /**
+   * Returns a string describing the datatype that can be directly
+   * shown in a user interface.
+   */
   const char* GetPrettyDataTypeString();
 
-  // Description:
-  // Of course Extent is only valid for structured data sets.
-  // Extent is the largest extent that contains all the parts.
+  //@{
+  /**
+   * Of course Extent is only valid for structured data sets.
+   * Extent is the largest extent that contains all the parts.
+   */
   vtkGetVector6Macro(Extent, int);
+  //@}
 
-  // Description:
-  // Access to information about points. Only valid for subclasses
-  // of vtkPointSet.
+  //@{
+  /**
+   * Access to information about points. Only valid for subclasses
+   * of vtkPointSet.
+   */
   vtkGetObjectMacro(PointArrayInformation,vtkPVArrayInformation);
+  //@}
 
-  // Description:
-  // Access to information about point/cell/vertex/edge/row data.
+  //@{
+  /**
+   * Access to information about point/cell/vertex/edge/row data.
+   */
   vtkGetObjectMacro(PointDataInformation, vtkPVDataSetAttributesInformation);
   vtkGetObjectMacro(CellDataInformation, vtkPVDataSetAttributesInformation);
   vtkGetObjectMacro(VertexDataInformation, vtkPVDataSetAttributesInformation);
   vtkGetObjectMacro(EdgeDataInformation, vtkPVDataSetAttributesInformation);
   vtkGetObjectMacro(RowDataInformation, vtkPVDataSetAttributesInformation);
+  //@}
 
-  // Description:
-  // Accesse to information about field data, if any.
+  //@{
+  /**
+   * Accesse to information about field data, if any.
+   */
   vtkGetObjectMacro(FieldDataInformation,vtkPVDataSetAttributesInformation);
+  //@}
 
-  // Description:
-  // Method to access vtkPVDataSetAttributesInformation using field association
-  // type.
-  // \c fieldAssociation can be vtkDataObject::FIELD_ASSOCIATION_POINTS,
-  // vtkDataObject::FIELD_ASSOCIATION_CELLS etc.
-  // (use vtkDataObject::FIELD_ASSOCIATION_NONE for field data).
+  /**
+   * Method to access vtkPVDataSetAttributesInformation using field association
+   * type.
+   * \c fieldAssociation can be vtkDataObject::FIELD_ASSOCIATION_POINTS,
+   * vtkDataObject::FIELD_ASSOCIATION_CELLS etc.
+   * (use vtkDataObject::FIELD_ASSOCIATION_NONE for field data).
+   */
   vtkPVDataSetAttributesInformation* GetAttributeInformation(int fieldAssociation);
 
-  // Description:
-  // If data is composite, this provides information specific to
-  // composite datasets.
+  //@{
+  /**
+   * If data is composite, this provides information specific to
+   * composite datasets.
+   */
   vtkGetObjectMacro(CompositeDataInformation,vtkPVCompositeDataInformation);
+  //@}
 
-  // Description:
-  // Given the flat-index for a node in a composite dataset, this method returns
-  // the data information for the node, it available.
+  /**
+   * Given the flat-index for a node in a composite dataset, this method returns
+   * the data information for the node, it available.
+   */
   vtkPVDataInformation* GetDataInformationForCompositeIndex(int index);
 
-  // Description:
-  // Compute the number of block leaf from this information
-  // multipieces are counted as single block.
-  // The boolean skipEmpty parameter allows to choose to count empty dataset are not
-  // Calling this method with skipEmpty to false will correspond to the vtkBlockColors array
-  // in a multiblock.
+  /**
+   * Compute the number of block leaf from this information
+   * multipieces are counted as single block.
+   * The boolean skipEmpty parameter allows to choose to count empty dataset are not
+   * Calling this method with skipEmpty to false will correspond to the vtkBlockColors array
+   * in a multiblock.
+   */
   unsigned int GetNumberOfBlockLeafs(bool skipEmpty);
 
-  // Description:
-  // This is same as GetDataInformationForCompositeIndex() however note that the
-  // index will get modified in this method.
+  /**
+   * This is same as GetDataInformationForCompositeIndex() however note that the
+   * index will get modified in this method.
+   */
   vtkPVDataInformation* GetDataInformationForCompositeIndex(int* index);
 
-  // Description:
-  // ClassName of the data represented by information object.
+  //@{
+  /**
+   * ClassName of the data represented by information object.
+   */
   vtkGetStringMacro(DataClassName);
+  //@}
 
-  // Description:
-  // The least common class name of composite dataset blocks
+  //@{
+  /**
+   * The least common class name of composite dataset blocks
+   */
   vtkGetStringMacro(CompositeDataClassName);
+  //@}
 
   vtkGetVector2Macro(TimeSpan, double);
 
-  // Description:
-  // Returns if the Time is set.
+  //@{
+  /**
+   * Returns if the Time is set.
+   */
   vtkGetMacro(HasTime, int);
+  //@}
 
-  // Description:
-  // Returns the data time if, GetHasTime() return true.
+  //@{
+  /**
+   * Returns the data time if, GetHasTime() return true.
+   */
   vtkGetMacro(Time, double);
+  //@}
 
-  // Description:
-  // Returns the number of time steps.
+  //@{
+  /**
+   * Returns the number of time steps.
+   */
   vtkGetMacro(NumberOfTimeSteps, int);
+  //@}
 
-  // Description:
-  // Returns the label that should be used instead of "Time" if any.
+  //@{
+  /**
+   * Returns the label that should be used instead of "Time" if any.
+   */
   vtkGetStringMacro(TimeLabel);
+  //@}
 
-  // Description:
-  // Returns if the data type is structured.
+  /**
+   * Returns if the data type is structured.
+   */
   int IsDataStructured();
 
-  // Description:
-  // If this instance of vtkPVDataInformation summarizes a node in a
-  // composite-dataset, and if that node has been given a label in that
-  // composite dataset (using vtkCompositeDataSet::NAME meta-data), then this
-  // will return that name. Returns NULL if this instance doesn't represent a
-  // node in a composite dataset or doesn't have a label/name associated with
-  // it.
+  //@{
+  /**
+   * If this instance of vtkPVDataInformation summarizes a node in a
+   * composite-dataset, and if that node has been given a label in that
+   * composite dataset (using vtkCompositeDataSet::NAME meta-data), then this
+   * will return that name. Returns NULL if this instance doesn't represent a
+   * node in a composite dataset or doesn't have a label/name associated with
+   * it.
+   */
   vtkGetStringMacro(CompositeDataSetName);
+  //@}
 
-  // Description:
-  // Allows run time addition of information getters for new classes
+  /**
+   * Allows run time addition of information getters for new classes
+   */
   static void RegisterHelper(const char *classname,
                              const char *helperclassname);
 

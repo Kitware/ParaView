@@ -12,13 +12,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVCompositeDataInformation - Light object for holding composite data information.
-// .SECTION Description
-// vtkPVCompositeDataInformation is used to copy the meta information of 
-// a composite dataset from server to client. It holds a vtkPVDataInformation
-// for each block of the composite dataset.
-// .SECTION See Also
-// vtkHierarchicalBoxDataSet vtkPVDataInformation
+/**
+ * @class   vtkPVCompositeDataInformation
+ * @brief   Light object for holding composite data information.
+ *
+ * vtkPVCompositeDataInformation is used to copy the meta information of 
+ * a composite dataset from server to client. It holds a vtkPVDataInformation
+ * for each block of the composite dataset.
+ * @sa
+ * vtkHierarchicalBoxDataSet vtkPVDataInformation
+*/
 
 #ifndef vtkPVCompositeDataInformation_h
 #define vtkPVCompositeDataInformation_h
@@ -38,49 +41,64 @@ public:
   vtkTypeMacro(vtkPVCompositeDataInformation, vtkPVInformation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Transfer information about a single object into this object.
+  /**
+   * Transfer information about a single object into this object.
+   */
   virtual void CopyFromObject(vtkObject*);
 
-  // Description:
-  // Merge another information object.
+  /**
+   * Merge another information object.
+   */
   virtual void AddInformation(vtkPVInformation*);
 
-  // Description:
-  // Manage a serialized version of the information.
+  //@{
+  /**
+   * Manage a serialized version of the information.
+   */
   virtual void CopyToStream(vtkClientServerStream*);
   virtual void CopyFromStream(const vtkClientServerStream*);
+  //@}
 
-  // Description:
-  // Clears all internal data structures.
+  /**
+   * Clears all internal data structures.
+   */
   virtual void Initialize();
 
-  // Description:
-  // Returns the number of children.
+  /**
+   * Returns the number of children.
+   */
   unsigned int GetNumberOfChildren();
 
-  // Description:
-  // Returns the information for the data object at the given index. If the
-  // child is a composite dataset itself, then the return vtkPVDataInformation
-  // will have the CompositeDataInformation set appropriately.
+  /**
+   * Returns the information for the data object at the given index. If the
+   * child is a composite dataset itself, then the return vtkPVDataInformation
+   * will have the CompositeDataInformation set appropriately.
+   */
   vtkPVDataInformation* GetDataInformation(unsigned int idx);
 
-  // Description:
-  // Return the name of the child node at the given index, if any. This is the
-  // value for the key vtkCompositeDataSet::NAME() in the meta-data associated
-  // with the node.
+  /**
+   * Return the name of the child node at the given index, if any. This is the
+   * value for the key vtkCompositeDataSet::NAME() in the meta-data associated
+   * with the node.
+   */
   const char* GetName(unsigned int idx);
 
-  // Description:
-  // Get/Set if the data is multipiece. If so, then GetDataInformation() will
-  // always return NULL. For vtkMultiblockDataSet, we don't collect information
-  // about individual pieces. One can however, query the number of pieces by
-  // using GetNumberOfChildren().
+  //@{
+  /**
+   * Get/Set if the data is multipiece. If so, then GetDataInformation() will
+   * always return NULL. For vtkMultiblockDataSet, we don't collect information
+   * about individual pieces. One can however, query the number of pieces by
+   * using GetNumberOfChildren().
+   */
   vtkGetMacro(DataIsMultiPiece, int);
+  //@}
 
-  // Description:
-  // Returns if the dataset is a composite dataset.
+  //@{
+  /**
+   * Returns if the dataset is a composite dataset.
+   */
   vtkGetMacro(DataIsComposite, int);
+  //@}
 
   // TODO:
   // Add API to obtain meta data information for each of the children. 
@@ -89,8 +107,9 @@ protected:
   vtkPVCompositeDataInformation();
   ~vtkPVCompositeDataInformation();
 
-  // Description:
-  // Copy information from an amr dataset.
+  /**
+   * Copy information from an amr dataset.
+   */
   void CopyFromAMR(vtkUniformGridAMR* amr);
 
   int DataIsMultiPiece;

@@ -12,19 +12,22 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkVolumeRepresentationPreprocessor - prepare data object for volume rendering
-// .SECTION Description
-// vtkVolumeRepresentationPreprocessor prepares data objects for volume rendering.  If
-// the data object is a data set, then the set is passed through a vtkDataSetTriangleFilter
-// before being output as a vtkUnstructuredGrid.  If the data object is a multiblock
-// dataset with at least one unstructured grid leaf node, then the unstructured grid
-// is extracted using vtkExtractBlock before being passed to the vtkDataSetTriangleFilter.
-// If the multiblock dataset contains more than one unstructured grid, the ExtractedBlockIndex
-// property may by set to indicate which unstructured grid to volume render.  The TetrahedraOnly
-// property may be set and it will be passed to the vtkDataSetTriangleFilter.
-//
-// .SECTION See Also
-// vtkExtractBlock vtkTriangleFilter
+/**
+ * @class   vtkVolumeRepresentationPreprocessor
+ * @brief   prepare data object for volume rendering
+ *
+ * vtkVolumeRepresentationPreprocessor prepares data objects for volume rendering.  If
+ * the data object is a data set, then the set is passed through a vtkDataSetTriangleFilter
+ * before being output as a vtkUnstructuredGrid.  If the data object is a multiblock
+ * dataset with at least one unstructured grid leaf node, then the unstructured grid
+ * is extracted using vtkExtractBlock before being passed to the vtkDataSetTriangleFilter.
+ * If the multiblock dataset contains more than one unstructured grid, the ExtractedBlockIndex
+ * property may by set to indicate which unstructured grid to volume render.  The TetrahedraOnly
+ * property may be set and it will be passed to the vtkDataSetTriangleFilter.
+ *
+ * @sa
+ * vtkExtractBlock vtkTriangleFilter
+*/
 
 #ifndef vtkVolumeRepresentationPreprocessor_h
 #define vtkVolumeRepresentationPreprocessor_h
@@ -45,17 +48,23 @@ public:
   vtkTypeMacro(vtkVolumeRepresentationPreprocessor, vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // When On, the internal triangle filter will cull all 1D and 2D cells from the output.
-  // The default is Off.
+  //@{
+  /**
+   * When On, the internal triangle filter will cull all 1D and 2D cells from the output.
+   * The default is Off.
+   */
   void SetTetrahedraOnly(int);
   vtkGetMacro(TetrahedraOnly, int);
+  //@}
 
-  // Description:
-  // Sets which block will be extracted for volume rendering.
-  // Ignored if input is not multiblock.  Default is 0.
+  //@{
+  /**
+   * Sets which block will be extracted for volume rendering.
+   * Ignored if input is not multiblock.  Default is 0.
+   */
   void SetExtractedBlockIndex(int);
   vtkGetMacro(ExtractedBlockIndex, int);
+  //@}
 
 protected:
 

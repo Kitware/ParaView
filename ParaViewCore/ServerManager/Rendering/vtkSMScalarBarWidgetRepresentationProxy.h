@@ -12,9 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMScalarBarWidgetRepresentationProxy - is the representation
-// corresponding to a scalar bar or color legend in a Render View.
-// .SECTION Description
+/**
+ * @class   vtkSMScalarBarWidgetRepresentationProxy
+ * @brief   is the representation
+ * corresponding to a scalar bar or color legend in a Render View.
+ *
+*/
 
 #ifndef vtkSMScalarBarWidgetRepresentationProxy_h
 #define vtkSMScalarBarWidgetRepresentationProxy_h
@@ -33,9 +36,11 @@ public:
   vtkTypeMacro(vtkSMScalarBarWidgetRepresentationProxy, vtkSMNewWidgetRepresentationProxy);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Updates the scalar bar's component title using the data information to
-  // determine component names if possible.
+  //@{
+  /**
+   * Updates the scalar bar's component title using the data information to
+   * determine component names if possible.
+   */
   virtual bool UpdateComponentTitle(vtkPVArrayInformation* dataInfo);
   static bool UpdateComponentTitle(vtkSMProxy* proxy, vtkPVArrayInformation* dataInfo)
     {
@@ -43,10 +48,13 @@ public:
       vtkSMScalarBarWidgetRepresentationProxy::SafeDownCast(proxy);
     return self? self->UpdateComponentTitle(dataInfo) : false;
     }
+  //@}
 
-  // Description:
-  // Attempt to place the scalar bar in the view based on the placement of other
-  // currently shown and visible scalar bars.
+  //@{
+  /**
+   * Attempt to place the scalar bar in the view based on the placement of other
+   * currently shown and visible scalar bars.
+   */
   virtual bool PlaceInView(vtkSMProxy* view);
   static bool PlaceInView(vtkSMProxy* proxy, vtkSMProxy* view)
     {
@@ -54,18 +62,21 @@ public:
       vtkSMScalarBarWidgetRepresentationProxy::SafeDownCast(proxy);
     return self? self->PlaceInView(view) : false;
     }
+  //@}
 
 protected:
   vtkSMScalarBarWidgetRepresentationProxy();
   ~vtkSMScalarBarWidgetRepresentationProxy();
 
-  // Description:
-  // Overridden from vtkSMProxy to call BeginCreateVTKObjects() and
-  // EndCreateVTKObjects().
+  /**
+   * Overridden from vtkSMProxy to call BeginCreateVTKObjects() and
+   * EndCreateVTKObjects().
+   */
   virtual void CreateVTKObjects();
 
-  // Description:
-  // Called every time the user interacts with the widget.
+  /**
+   * Called every time the user interacts with the widget.
+   */
   virtual void ExecuteEvent(unsigned long event);
 
   vtkSMProxy* ActorProxy;

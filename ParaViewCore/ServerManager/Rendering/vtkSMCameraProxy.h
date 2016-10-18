@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMCameraProxy - proxy for a camera.
-// .SECTION Description
-// This a proxy for a vtkCamera. This class optimizes UpdatePropertyInformation
-// to use the client side object.
+/**
+ * @class   vtkSMCameraProxy
+ * @brief   proxy for a camera.
+ *
+ * This a proxy for a vtkCamera. This class optimizes UpdatePropertyInformation
+ * to use the client side object.
+*/
 
 #ifndef vtkSMCameraProxy_h
 #define vtkSMCameraProxy_h
@@ -30,15 +33,18 @@ public:
   vtkTypeMacro(vtkSMCameraProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Updates all property informations by calling UpdateInformation()
-  // and populating the values.
+  //@{
+  /**
+   * Updates all property informations by calling UpdateInformation()
+   * and populating the values.
+   */
   virtual void UpdatePropertyInformation();
   virtual void UpdatePropertyInformation(vtkSMProperty* prop)
     { this->Superclass::UpdatePropertyInformation(prop); }
 protected:
   vtkSMCameraProxy();
   ~vtkSMCameraProxy();
+  //@}
 
 private:
   vtkSMCameraProxy(const vtkSMCameraProxy&) VTK_DELETE_FUNCTION;

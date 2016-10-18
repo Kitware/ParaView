@@ -12,13 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkMaterialInterfaceIdList
-// .SECTION Description
-// Class that facilitates efficient operation on
-// lists fragment ids. This class is introduced to
-// deal with the fact that local to global id search
-// is a constant time operation, while its inverse
-// glooabl to local id search is not.
+/**
+ * @class   vtkMaterialInterfaceIdList
+ *
+ * Class that facilitates efficient operation on
+ * lists fragment ids. This class is introduced to
+ * deal with the fact that local to global id search
+ * is a constant time operation, while its inverse
+ * glooabl to local id search is not.
+*/
 
 #ifndef vtkMaterialInterfaceIdList_h
 #define vtkMaterialInterfaceIdList_h
@@ -33,16 +35,20 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMaterialInterfaceIdList
 public:
   vtkMaterialInterfaceIdList();
   ~vtkMaterialInterfaceIdList();
-  // Description:
-  // Return the container to an empty state.
+  /**
+   * Return the container to an empty state.
+   */
   void Clear();
-  // Description:
-  // Initialize the container with a list of id's
-  // these must be in ascending order.
+  /**
+   * Initialize the container with a list of id's
+   * these must be in ascending order.
+   */
   void Initialize(const std::vector<int>& ids, bool preSorted=false);
-  // Description:
-  // Given a global id, get the local id, or -1 if the
-  // global id is not in the list.
+  //@{
+  /**
+   * Given a global id, get the local id, or -1 if the
+   * global id is not in the list.
+   */
   int GetLocalId(int globalId);
 private:
   bool IsInitialized;
@@ -50,5 +56,6 @@ private:
   IdListContainer *IdList;
 };
 #endif
+  //@}
 
 // VTK-HeaderTest-Exclude: vtkMaterialInterfaceIdList.h

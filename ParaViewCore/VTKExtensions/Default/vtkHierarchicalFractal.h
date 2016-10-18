@@ -12,15 +12,18 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkHierarchicalFractal - A source to test AMR data object.
-// .SECTION Description
-// vtkHierarchicalFractal is a collection of uniform grids.  All have the same
-// dimensions. Each block has a different origin and spacing.  It uses
-// mandelbrot to create cell data. I scale the fractal array to look like a
-// volme fraction.
-// I may also add block id and level as extra cell arrays.
-// If GenerateRectilinearGrids is true then this filter outputs
-// vtkHierarchicalBoxDataSet otherwise it generates a vtkMultiBlockDataSet.
+/**
+ * @class   vtkHierarchicalFractal
+ * @brief   A source to test AMR data object.
+ *
+ * vtkHierarchicalFractal is a collection of uniform grids.  All have the same
+ * dimensions. Each block has a different origin and spacing.  It uses
+ * mandelbrot to create cell data. I scale the fractal array to look like a
+ * volme fraction.
+ * I may also add block id and level as extra cell arrays.
+ * If GenerateRectilinearGrids is true then this filter outputs
+ * vtkHierarchicalBoxDataSet otherwise it generates a vtkMultiBlockDataSet.
+*/
 
 #ifndef vtkHierarchicalFractal_h
 #define vtkHierarchicalFractal_h
@@ -48,61 +51,88 @@ public:
   vtkTypeMacro(vtkHierarchicalFractal,vtkCompositeDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Essentially the iso surface value.
-  // The fractal array is scaled to map this value to 0.5 for use as a volume
-  // fraction.
+  //@{
+  /**
+   * Essentially the iso surface value.
+   * The fractal array is scaled to map this value to 0.5 for use as a volume
+   * fraction.
+   */
   vtkSetMacro(FractalValue, float);
   vtkGetMacro(FractalValue, float);
+  //@}
 
-  // Description:
-  // Any blocks touching a predefined line will be subdivided to this level.
-  // Other blocks are subdivided so that neighboring blocks only differ
-  // by one level.
+  //@{
+  /**
+   * Any blocks touching a predefined line will be subdivided to this level.
+   * Other blocks are subdivided so that neighboring blocks only differ
+   * by one level.
+   */
   vtkSetMacro(MaximumLevel, int);
   vtkGetMacro(MaximumLevel, int);
+  //@}
 
-  // Description:
-  // XYZ dimensions of cells.
+  //@{
+  /**
+   * XYZ dimensions of cells.
+   */
   vtkSetMacro(Dimensions, int);
   vtkGetMacro(Dimensions, int);
+  //@}
 
-  // Description:
-  // For testing ghost levels.
+  //@{
+  /**
+   * For testing ghost levels.
+   */
   vtkSetMacro(GhostLevels, int);
   vtkGetMacro(GhostLevels, int);
   vtkBooleanMacro(GhostLevels, int);
+  //@}
 
-  // Description:
-  // Dummy time-step
+  //@{
+  /**
+   * Dummy time-step
+   */
   vtkSetMacro(TimeStep, int);
   vtkGetMacro(TimeStep, int);
   vtkGetVector2Macro(TimeStepRange, int);
+  //@}
 
-  // Description:
-  // Generate either rectilinear grids either uniform grids.
-  // Default is false.
+  //@{
+  /**
+   * Generate either rectilinear grids either uniform grids.
+   * Default is false.
+   */
   vtkSetMacro(GenerateRectilinearGrids, int);
   vtkGetMacro(GenerateRectilinearGrids, int);
   vtkBooleanMacro(GenerateRectilinearGrids, int);
+  //@}
 
-  // Description:
-  // Make a 2D data set to test.
+  //@{
+  /**
+   * Make a 2D data set to test.
+   */
   vtkSetMacro(TwoDimensional, int);
   vtkGetMacro(TwoDimensional, int);
   vtkBooleanMacro(TwoDimensional, int);
+  //@}
 
-  // Description:
-  // Test the case when the blocks do not have the same sizes.
-  // Adds 2 to the x extent of the far x blocks (level 1).
+  //@{
+  /**
+   * Test the case when the blocks do not have the same sizes.
+   * Adds 2 to the x extent of the far x blocks (level 1).
+   */
   vtkSetMacro(Asymetric,int);
   vtkGetMacro(Asymetric,int);
+  //@}
 
-  // Description:
-  // Test with lower levels overlapping higher levels.
-  // This is what I assume flash is like.
+  //@{
+  /**
+   * Test with lower levels overlapping higher levels.
+   * This is what I assume flash is like.
+   */
   vtkSetMacro(Overlap,int);
   vtkGetMacro(Overlap,int);
+  //@}
 
 protected:
   vtkHierarchicalFractal();
@@ -120,16 +150,18 @@ protected:
     vtkInformationVector **inV,
     vtkInformationVector *outV);
 
-  // Description:
-  // This is called by the superclass.
-  // This is the method you should override.
+  /**
+   * This is called by the superclass.
+   * This is the method you should override.
+   */
   virtual int RequestInformation(vtkInformation *request,
                                  vtkInformationVector **inputVector,
                                  vtkInformationVector *outputVector);
 
-  // Description:
-  // This is called by the superclass.
-  // This is the method you should override.
+  /**
+   * This is called by the superclass.
+   * This is the method you should override.
+   */
   virtual int RequestData(vtkInformation *request,
                           vtkInformationVector **inputVector,
                           vtkInformationVector *outputVector);

@@ -12,11 +12,14 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMPSWriterProxy - proxy for the parallel-serial writer.
-// .SECTION Description
-// vtkSMPSWriterProxy is the proxy for all vtkParallelSerialWriter
-// objects. It is responsible of setting the internal writer that is
-// configured as a sub-proxy.
+/**
+ * @class   vtkSMPSWriterProxy
+ * @brief   proxy for the parallel-serial writer.
+ *
+ * vtkSMPSWriterProxy is the proxy for all vtkParallelSerialWriter
+ * objects. It is responsible of setting the internal writer that is
+ * configured as a sub-proxy.
+*/
 
 #ifndef vtkSMPSWriterProxy_h
 #define vtkSMPSWriterProxy_h

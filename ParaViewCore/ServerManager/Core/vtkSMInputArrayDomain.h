@@ -12,43 +12,47 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMInputArrayDomain - domain to ensure that input has required types
-// of arrays.
-// .SECTION Description
-// vtkSMInputArrayDomain is a domain that can be used on a vtkSMInputProperty to
-// check if the pipeline input provides attribute arrays of the required types
-// e.g. if a filter can only work if the input data set has cell data arrays,
-// then one can use this domain.
-//
-// vtkSMInputArrayDomain also provides a mechanism to check if the attribute
-// arrays have a certain number of components.
-//
-// When enabled, ParaView supports automatic array conversion i.e. extracting
-// components or converting cell data to point data and vice-versa is done
-// implicitly. In that case, vtkSMInputArrayDomain's behavior also changes as
-// appropriate.
-//
-// Supported XML attributes:
-// \li \c attribute_type : (optional) value can be 'point', 'cell', 'field',
-//                         'vertex', 'edge', 'row', 'none', 'any-except-field', 'any'.
-//                         If not specified, 'any-except-field' is assumed. This
-//                         indicates the attribute type for acceptable arrays.
-// \li \c number_of_components : (optional) Indicates the number of components 
-//                         required in arrays that are considered acceptable. 
-//                         0 (default) indicates any number of components is acceptable. 
-//                         A comma-separated list (e.g., "1" or "1,3,4") of component counts 
-//                         limits acceptable arrays to those with a number of components that 
-//                         appear in the list. 
-//
-// This domain doesn't support any required properties (to help clean old
-// code, we print a warning if any required properties are specified).
-//
-// .SECTION Note on change in behaviour
-// Prior to ParaView 5.0, attribute_type="any" meant all attributes excepting
-// field data. For being consistent with general understanding of "any", this
-// has been changed to include field data arrays since 5.0. Use
-// "any-except-field" for cases where the intention is to match any attribute arrays except
-// field data arrays.
+/**
+ * @class   vtkSMInputArrayDomain
+ * @brief   domain to ensure that input has required types
+ * of arrays.
+ *
+ * vtkSMInputArrayDomain is a domain that can be used on a vtkSMInputProperty to
+ * check if the pipeline input provides attribute arrays of the required types
+ * e.g. if a filter can only work if the input data set has cell data arrays,
+ * then one can use this domain.
+ *
+ * vtkSMInputArrayDomain also provides a mechanism to check if the attribute
+ * arrays have a certain number of components.
+ *
+ * When enabled, ParaView supports automatic array conversion i.e. extracting
+ * components or converting cell data to point data and vice-versa is done
+ * implicitly. In that case, vtkSMInputArrayDomain's behavior also changes as
+ * appropriate.
+ *
+ * Supported XML attributes:
+ * \li \c attribute_type : (optional) value can be 'point', 'cell', 'field',
+ *                         'vertex', 'edge', 'row', 'none', 'any-except-field', 'any'.
+ *                         If not specified, 'any-except-field' is assumed. This
+ *                         indicates the attribute type for acceptable arrays.
+ * \li \c number_of_components : (optional) Indicates the number of components 
+ *                         required in arrays that are considered acceptable. 
+ *                         0 (default) indicates any number of components is acceptable. 
+ *                         A comma-separated list (e.g., "1" or "1,3,4") of component counts 
+ *                         limits acceptable arrays to those with a number of components that 
+ *                         appear in the list. 
+ *
+ * This domain doesn't support any required properties (to help clean old
+ * code, we print a warning if any required properties are specified).
+ *
+ * @attention
+ * Prior to ParaView 5.0, attribute_type="any" meant all attributes excepting
+ * field data. For being consistent with general understanding of "any", this
+ * has been changed to include field data arrays since 5.0. Use
+ * "any-except-field" for cases where the intention is to match any attribute arrays except
+ * field data arrays.
+*/
+
 #ifndef vtkSMInputArrayDomain_h
 #define vtkSMInputArrayDomain_h
 
@@ -74,32 +78,39 @@ public:
   vtkTypeMacro(vtkSMInputArrayDomain, vtkSMDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Returns true if the value of the propery is in the domain.
-  // The propery has to be a vtkSMProxyProperty which points
-  // to a vtkSMSourceProxy. The input has to have one or more
-  // arrays that match the requirements.
+  /**
+   * Returns true if the value of the propery is in the domain.
+   * The propery has to be a vtkSMProxyProperty which points
+   * to a vtkSMSourceProxy. The input has to have one or more
+   * arrays that match the requirements.
+   */
   virtual int IsInDomain(vtkSMProperty* property);
 
-  // Description:
-  // Returns true if input has one or more arrays that match the
-  // requirements on  the given output port.
+  /**
+   * Returns true if input has one or more arrays that match the
+   * requirements on  the given output port.
+   */
   int IsInDomain(vtkSMSourceProxy* proxy, unsigned int outputport=0);
 
-  // Description:
-  // Get the attribute type. Valid values are defined in AttributeTypes which
-  // map to vtkDataObject::AttributeTypes. 
+  //@{
+  /**
+   * Get the attribute type. Valid values are defined in AttributeTypes which
+   * map to vtkDataObject::AttributeTypes.
+   */
   vtkGetMacro(AttributeType, int);
   const char* GetAttributeTypeAsString();
+  //@}
 
-  // Description:
-  // Return the first acceptable number of components or 0 if any number of
-  // components are acceptable. This method is deprecated.
+  /**
+   * Return the first acceptable number of components or 0 if any number of
+   * components are acceptable. This method is deprecated.
+   */
   VTK_LEGACY(int GetNumberOfComponents());
 
-  // Description:
-  // Get the AcceptableNumberOfComponents vector
-  // Empty or containing a zero means no check.
+  /**
+   * Get the AcceptableNumberOfComponents vector
+   * Empty or containing a zero means no check.
+   */
   std::vector<int> GetAcceptableNumbersOfComponents() const;
 
   /// Get/Set the application wide setting for automatic conversion of properties.
@@ -121,66 +132,73 @@ public:
     NUMBER_OF_ATTRIBUTE_TYPES = ANY+1,
     };
 
-  // Description:
-  // Method to check if a particular attribute-type (\c attribute_type) will
-  // be accepted by this domain with a required attribute type (\c required_type).
-  // This takes into consideration the state of AutomaticePropertyConversion flag.
-  // If a particular attribute_type is acceptable only because
-  // AutomaticPropertyConversion is true, \c acceptable_as_type value will be set
-  // to the attribute type that the particular attribute was automatically converted
-  // to. e.g. is required_type = POINT and attribute_type is CELL and
-  // AutomaticPropertyConversion is true, this method will return true and
-  // acceptable_as_type will be set to POINT. In other cases, acceptable_as_type
-  // is simply set to attribute_type.
+  /**
+   * Method to check if a particular attribute-type (\c attribute_type) will
+   * be accepted by this domain with a required attribute type (\c required_type).
+   * This takes into consideration the state of AutomaticePropertyConversion flag.
+   * If a particular attribute_type is acceptable only because
+   * AutomaticPropertyConversion is true, \c acceptable_as_type value will be set
+   * to the attribute type that the particular attribute was automatically converted
+   * to. e.g. is required_type = POINT and attribute_type is CELL and
+   * AutomaticPropertyConversion is true, this method will return true and
+   * acceptable_as_type will be set to POINT. In other cases, acceptable_as_type
+   * is simply set to attribute_type.
+   */
   static bool IsAttributeTypeAcceptable(int required_type, int attribute_type,
     int *acceptable_as_type=NULL);
 
-  // Description:
-  // Method to check if a particular array is acceptable to a domain with the
-  // specified required number of components (\c required_number_of_components).
-  // This takes into consideration the state of AutomaticePropertyConversion flag.
-  // If AutomaticePropertyConversion, required_numer_of_components == 1 and
-  // the actual number of components in the array are >= 1, then this method
-  // will return true. This method will return true if
-  // required_number_of_components == 0 (i.e. no restriction of num. of components
-  // is specified) or if required_number_of_components == num. of components
-  // in the array.
-  // This method is deprecated.
+  /**
+   * Method to check if a particular array is acceptable to a domain with the
+   * specified required number of components (\c required_number_of_components).
+   * This takes into consideration the state of AutomaticePropertyConversion flag.
+   * If AutomaticePropertyConversion, required_numer_of_components == 1 and
+   * the actual number of components in the array are >= 1, then this method
+   * will return true. This method will return true if
+   * required_number_of_components == 0 (i.e. no restriction of num. of components
+   * is specified) or if required_number_of_components == num. of components
+   * in the array.
+   * This method is deprecated.
+   */
   VTK_LEGACY(static bool IsArrayAcceptable(
     int required_number_of_components, vtkPVArrayInformation* arrayInfo));
 
-  // Description:
-  // This method will check if the arrayInfo contain info about an acceptable array,
-  // by checking its number of components against this domain acceptable 
-  // numbers of components. Note that it takes into account property conversion
-  // This method return the accepted number of components to use.
+  /**
+   * This method will check if the arrayInfo contain info about an acceptable array,
+   * by checking its number of components against this domain acceptable
+   * numbers of components. Note that it takes into account property conversion
+   * This method return the accepted number of components to use.
+   */
   int IsArrayAcceptable(vtkPVArrayInformation* arrayInfo);
   
 protected:
   vtkSMInputArrayDomain();
   ~vtkSMInputArrayDomain();
 
-  // Description:
-  // Set the first acceptable number of components
-  // This method is deprecated
+  /**
+   * Set the first acceptable number of components
+   * This method is deprecated
+   */
   VTK_LEGACY(void SetNumberOfComponents(int));
 
   vtkSetMacro(AttributeType, int);
   void SetAttributeType(const char* type);
 
-  // Description:
-  // Set the appropriate ivars from the xml element. Should
-  // be overwritten by subclass if adding ivars.
+  /**
+   * Set the appropriate ivars from the xml element. Should
+   * be overwritten by subclass if adding ivars.
+   */
   virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element);
 
-  // Description:
-  // Returns true if based on this->AttributeType, the specified \c
-  // attributeType is acceptable to this domain.
+  /**
+   * Returns true if based on this->AttributeType, the specified \c
+   * attributeType is acceptable to this domain.
+   */
   bool IsAttributeTypeAcceptable(int attributeType);
 
-  // Description:
-  // Returns true if based on this->AutomaticPropertyConversion and
-  // this->NumberOfComponents, an acceptable array can be found in the attrInfo.
+  /**
+   * Returns true if based on this->AutomaticPropertyConversion and
+   * this->NumberOfComponents, an acceptable array can be found in the attrInfo.
+   */
   bool HasAcceptableArray(vtkPVDataSetAttributesInformation* attrInfo);
 
   int AttributeType;

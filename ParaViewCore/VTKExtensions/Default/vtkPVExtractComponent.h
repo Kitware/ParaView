@@ -12,9 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVExtractComponent - Extract a component of an attribute.
-// .SECTION Description
-// vtkPVExtractComponent Extract a component of an attribute.
+/**
+ * @class   vtkPVExtractComponent
+ * @brief   Extract a component of an attribute.
+ *
+ * vtkPVExtractComponent Extract a component of an attribute.
+*/
 
 #ifndef vtkPVExtractComponent_h
 #define vtkPVExtractComponent_h

@@ -12,10 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVChangeOfBasisHelper
-// .SECTION Description
-// vtkPVChangeOfBasisHelper is designed for ORNL-SNS use-cases where we needed
-// to add support for different basis.
+/**
+ * @class   vtkPVChangeOfBasisHelper
+ *
+ * vtkPVChangeOfBasisHelper is designed for ORNL-SNS use-cases where we needed
+ * to add support for different basis.
+*/
 
 #ifndef vtkPVChangeOfBasisHelper_h
 #define vtkPVChangeOfBasisHelper_h
@@ -37,8 +39,10 @@
 class vtkPVChangeOfBasisHelper
 {
 public:
-  // Description:
-  // Given a set of basis vectors, returns the change-of-basis matrix.
+  //@{
+  /**
+   * Given a set of basis vectors, returns the change-of-basis matrix.
+   */
   static vtkSmartPointer<vtkMatrix4x4> GetChangeOfBasisMatrix(
     const vtkVector3d& u, const vtkVector3d& v, const vtkVector3d& w)
     {
@@ -50,6 +54,7 @@ public:
     cobMatrix->Transpose();
     return cobMatrix;
     }
+  //@}
 
   static bool GetBasisVectors(vtkMatrix4x4* matrix,
     vtkVector3d& u, vtkVector3d& v, vtkVector3d& w)
@@ -83,8 +88,10 @@ public:
     }
 
 
-  // Description:
-  // Add change-of-basis matrix to the field data for the given dataobject.
+  //@{
+  /**
+   * Add change-of-basis matrix to the field data for the given dataobject.
+   */
   static bool AddChangeOfBasisMatrixToFieldData(vtkDataObject* dataObject,
     vtkMatrix4x4* matrix)
     {
@@ -100,6 +107,7 @@ public:
       }
     return false;
     }
+  //@}
 
   static vtkSmartPointer<vtkMatrix4x4> GetChangeOfBasisMatrix(vtkDataObject* dataObject)
     {
@@ -117,8 +125,10 @@ public:
     return vtkSmartPointer<vtkMatrix4x4>();
     }
 
-  // Description:
-  // Add basis titles to field data.
+  //@{
+  /**
+   * Add basis titles to field data.
+   */
   static bool AddBasisNames(vtkDataObject* dataObject,
     const char* utitle, const char* vtitle, const char* wtitle)
     {
@@ -155,6 +165,7 @@ public:
       }
     return (utitle || vtitle || wtitle);
     }
+  //@}
 
   static void GetBasisName(vtkDataObject* dataObject,
     const char*& utitle, const char* &vtitle, const char* &wtitle)
@@ -187,8 +198,10 @@ public:
       }
     }
 
-  // Description:
-  // Add bounding box in model space.
+  //@{
+  /**
+   * Add bounding box in model space.
+   */
   static bool AddBoundingBoxInBasis(vtkDataObject* dataObject, const double bbox[6])
     {
     if (dataObject)
@@ -203,6 +216,7 @@ public:
       }
     return false;
     }
+  //@}
 
   static bool GetBoundingBoxInBasis(vtkDataObject* dataObject, double bbox[6])
     {

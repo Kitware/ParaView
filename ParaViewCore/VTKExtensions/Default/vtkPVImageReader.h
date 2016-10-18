@@ -12,8 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVImageReader - ImageReader that automatically switch between
-// vtkMPIImageReader or vtkImageReader based on the build setup.
+/**
+ * @class   vtkPVImageReader
+ * @brief   ImageReader that automatically switch between
+ * vtkMPIImageReader or vtkImageReader based on the build setup.
+*/
+
 #ifndef vtkPVImageReader_h
 #define vtkPVImageReader_h
 

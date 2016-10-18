@@ -12,11 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVClipDataSet - Clip filter
-//
-// .SECTION Description
-// This is a subclass of vtkTableBasedClipDataSet that allows selection of input
-// scalars.
+/**
+ * @class   vtkPVClipDataSet
+ * @brief   Clip filter
+ *
+ *
+ * This is a subclass of vtkTableBasedClipDataSet that allows selection of input
+ * scalars.
+*/
 
 #ifndef vtkPVClipDataSet_h
 #define vtkPVClipDataSet_h
@@ -30,19 +33,21 @@ public:
   vtkTypeMacro(vtkPVClipDataSet,vtkTableBasedClipDataSet);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
   static vtkPVClipDataSet* New();
 
   virtual int ProcessRequest(vtkInformation*,
                              vtkInformationVector**,
                              vtkInformationVector*);
 
-  // Description:
-  // This filter uses vtkAMRDualClip for clipping AMR datasets. Do disable that
-  // behavior, turn this flag off.
+  //@{
+  /**
+   * This filter uses vtkAMRDualClip for clipping AMR datasets. Do disable that
+   * behavior, turn this flag off.
+   */
   vtkSetMacro(UseAMRDualClipForAMR, bool);
   vtkGetMacro(UseAMRDualClipForAMR, bool);
   vtkBooleanMacro(UseAMRDualClipForAMR, bool);
+  //@}
 
 protected:
   vtkPVClipDataSet(vtkImplicitFunction *cf=NULL);
@@ -59,16 +64,19 @@ protected:
   virtual int FillInputPortInformation(int, vtkInformation* info);
   virtual int FillOutputPortInformation(int, vtkInformation* info);
 
-  // Description:
-  // Uses superclass to clip the input. This also handles composite datasets
-  // (since superclass does not handle composite datasets). This method loops
-  // over the composite dataset calling superclass repeatedly.
+  //@{
+  /**
+   * Uses superclass to clip the input. This also handles composite datasets
+   * (since superclass does not handle composite datasets). This method loops
+   * over the composite dataset calling superclass repeatedly.
+   */
   int ClipUsingSuperclass(
     vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
   int ClipUsingThreshold(
     vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
+  //@}
 
   bool UseAMRDualClipForAMR;
 private:

@@ -12,11 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVSession - extends vtkSession to add API for ParaView sessions.
-// .SECTION Description
-// vtkPVSession adds APIs to vtkSession for ParaView-specific sessions, namely
-// those that are used to communicate between data-server,render-server and
-// client. This is an abstract class.
+/**
+ * @class   vtkPVSession
+ * @brief   extends vtkSession to add API for ParaView sessions.
+ *
+ * vtkPVSession adds APIs to vtkSession for ParaView-specific sessions, namely
+ * those that are used to communicate between data-server,render-server and
+ * client. This is an abstract class.
+*/
 
 #ifndef vtkPVSession_h
 #define vtkPVSession_h
@@ -47,59 +50,72 @@ public:
     CLIENT_AND_SERVERS = DATA_SERVER | CLIENT | RENDER_SERVER
     };
 
-  // Description:
-  // Returns a ServerFlags indicate the nature of the current processes. e.g. if
-  // the current processes acts as a data-server and a render-server, it returns
-  // DATA_SERVER | RENDER_SERVER.
+  /**
+   * Returns a ServerFlags indicate the nature of the current processes. e.g. if
+   * the current processes acts as a data-server and a render-server, it returns
+   * DATA_SERVER | RENDER_SERVER.
+   */
   virtual ServerFlags GetProcessRoles();
 
-  // Description:
-  // Convenience method that returns true if the current session is serving the
-  // indicated role on this process.
+  /**
+   * Convenience method that returns true if the current session is serving the
+   * indicated role on this process.
+   */
   bool HasProcessRole(vtkTypeUInt32 flag)
     {
     return ((flag & static_cast<vtkTypeUInt32>(this->GetProcessRoles())) == flag);
     }
 
-  // Description:
-  // Returns the controller used to communicate with the process. Value must be
-  // DATA_SERVER_ROOT or RENDER_SERVER_ROOT or CLIENT.
-  // Default implementation returns NULL.
+  /**
+   * Returns the controller used to communicate with the process. Value must be
+   * DATA_SERVER_ROOT or RENDER_SERVER_ROOT or CLIENT.
+   * Default implementation returns NULL.
+   */
   virtual vtkMultiProcessController* GetController(ServerFlags processType);
 
-  // Description:
-  // This is socket connection, if any to communicate between the data-server
-  // and render-server nodes.
+  /**
+   * This is socket connection, if any to communicate between the data-server
+   * and render-server nodes.
+   */
   virtual vtkMPIMToNSocketConnection* GetMPIMToNSocketConnection()
     { return NULL; }
 
-  // Description:
-  // vtkPVServerInformation is an information-object that provides information
-  // about the server processes. These include server-side capabilities as well
-  // as server-side command line arguments e.g. tile-display parameters. Use
-  // this method to obtain the server-side information.
-  // NOTE: For now, we are not bothering to provide separate informations from
-  // data-server and render-server (as was the case earlier). We can easily add
-  // API for the same if needed.
+  /**
+   * vtkPVServerInformation is an information-object that provides information
+   * about the server processes. These include server-side capabilities as well
+   * as server-side command line arguments e.g. tile-display parameters. Use
+   * this method to obtain the server-side information.
+   * NOTE: For now, we are not bothering to provide separate informations from
+   * data-server and render-server (as was the case earlier). We can easily add
+   * API for the same if needed.
+   */
   virtual vtkPVServerInformation* GetServerInformation()=0;
 
-  // Description:
-  // Allow anyone to know easily if the current session is involved in
-  // collaboration or not. This is mostly true for the Client side.
+  /**
+   * Allow anyone to know easily if the current session is involved in
+   * collaboration or not. This is mostly true for the Client side.
+   */
   virtual bool IsMultiClients();
 
-  // Description:
-  // Provides access to the progress handler.
+  //@{
+  /**
+   * Provides access to the progress handler.
+   */
   vtkGetObjectMacro(ProgressHandler, vtkPVProgressHandler);
+  //@}
 
-  // Description:
-  // Should be called to begin/end receiving progresses on this session.
+  //@{
+  /**
+   * Should be called to begin/end receiving progresses on this session.
+   */
   void PrepareProgress();
   void CleanupPendingProgress();
+  //@}
 
-  // Description:
-  // Returns true if the session is within a PrepareProgress() and
-  // CleanupPendingProgress() block.
+  /**
+   * Returns true if the session is within a PrepareProgress() and
+   * CleanupPendingProgress() block.
+   */
   bool GetPendingProgress();
 
 protected:
@@ -111,16 +127,20 @@ protected:
     EXCEPTION_EVENT_TAG=31416
     };
 
-  // Description:
-  // Callback when any vtkMultiProcessController subclass fires a WrongTagEvent.
-  // Return true if the event was handle localy.
+  /**
+   * Callback when any vtkMultiProcessController subclass fires a WrongTagEvent.
+   * Return true if the event was handle localy.
+   */
   virtual bool OnWrongTagEvent(vtkObject* caller, unsigned long eventid,
     void* calldata);
 
-  // Description:
-  // Virtual methods subclasses can override.
+  //@{
+  /**
+   * Virtual methods subclasses can override.
+   */
   virtual void PrepareProgressInternal();
   virtual void CleanupPendingProgressInternal();
+  //@}
 
   vtkPVProgressHandler* ProgressHandler;
 private:

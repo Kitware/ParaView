@@ -12,11 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMIntRangeDomain - type specific extension to
-// vtkSMRangeDomainTemplate for ints.
-// .SECTION Description
-// vtkSMIntRangeDomain is a type specific extension to
-// vtkSMRangeDomainTemplate for ints.
+/**
+ * @class   vtkSMIntRangeDomain
+ * @brief   type specific extension to
+ * vtkSMRangeDomainTemplate for ints.
+ *
+ * vtkSMIntRangeDomain is a type specific extension to
+ * vtkSMRangeDomainTemplate for ints.
+*/
+
 #ifndef vtkSMIntRangeDomain_h
 #define vtkSMIntRangeDomain_h
 
@@ -42,31 +46,35 @@ public:
   vtkTypeMacro(vtkSMIntRangeDomain, vtkSMDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Return a min. value if it exists. If the min. exists
-  // exists is set to 1. Otherwise, it is set to 0.
-  // An unspecified min. is equivalent to -inf
+  /**
+   * Return a min. value if it exists. If the min. exists
+   * exists is set to 1. Otherwise, it is set to 0.
+   * An unspecified min. is equivalent to -inf
+   */
   int GetMinimum(unsigned int idx, int& exists)
     { return this->RealSuperclass::GetMinimum(idx, exists); }
 
-  // Description:
-  // Return a max. value if it exists. If the max. exists
-  // exists is set to 1. Otherwise, it is set to 0.
-  // An unspecified max. is equivalent to +inf
+  /**
+   * Return a max. value if it exists. If the max. exists
+   * exists is set to 1. Otherwise, it is set to 0.
+   * An unspecified max. is equivalent to +inf
+   */
   int GetMaximum(unsigned int idx, int& exists)
     { return this->RealSuperclass::GetMaximum(idx, exists); }
 
-  // Description:
-  // Returns if minimum/maximum bound is set for the domain.
+  /**
+   * Returns if minimum/maximum bound is set for the domain.
+   */
   int GetMinimumExists(unsigned int idx)
     { return this->RealSuperclass::GetMinimumExists(idx)? 1: 0; }
   int GetMaximumExists(unsigned int idx)
     { return this->RealSuperclass::GetMaximumExists(idx)? 1: 0; }
 
-  // Description:
-  // Returns the minimum/maximum value, is exists, otherwise
-  // 0 is returned. Use GetMaximumExists() GetMaximumExists() to make sure that
-  // the bound is set.
+  /**
+   * Returns the minimum/maximum value, is exists, otherwise
+   * 0 is returned. Use GetMaximumExists() GetMaximumExists() to make sure that
+   * the bound is set.
+   */
   int GetMinimum(unsigned int idx)
     { return this->RealSuperclass::GetMinimum(idx); }
   int GetMaximum(unsigned int idx)

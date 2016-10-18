@@ -12,46 +12,50 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMTrace - vtkSMTrace is used to produce Python trace in the ParaView
-// application.
-// .SECTION Description
-// vtkSMTrace is used to produce Python trace in the ParaView
-// application. To start/stop trace, use the static API vtkSMTrace::StartTrace()
-// and vtkSMTrace::StopTrace(). That sets up the vtkSMTrace instance used as the
-// ActiveTracer. You can setup configuration parameters on the vtkSMTrace
-// instance returned by vtkSMTrace::StartTrace(). The configuration parameters
-// control various aspects of the trace.
-//
-// To effective tracing, the application logic should explicitly trace traceable
-// actions by using the SM_SCOPED_TRACE() macro. This macro will have any effect
-// only when there's an ActiveTracer setup i.e tracing is in effect. The result
-// on using SM_SCOPED_TRACE() when tracing is active, is to crate a Python class
-// instance. The name of the class is the argument to SM_SCOPED_TRACE() and the
-// class is defined in paraview.smtrace module. There are various classes
-// defined for tracing specific actions like Show, RegisterViewProxy, and
-// generic actions like PropertiesModified. Keyword or positional arguments can
-// be passed to the constructor using the following the syntax:
-//
-// \code{.cpp}
-//    // pass keyword arguments.
-//    SM_SCOPED_TRACE(PropertiesModified)
-//                .arg("proxy", aProxy)
-//                .arg("comment", "some comment");
-//
-//    // pass positional arguments.
-//    SM_SCOPED_TRACE(PropertiesModified)
-//                .arg(aProxy)
-//                .arg("some comment");
-//
-//    // mixing positional and keyword arguments.
-//    SM_SCOPED_TRACE(PropertiesModified)
-//                .arg(aProxy)
-//                .arg("comment", "some comment");
-// \endcode
-//
-// The constructed class instance is \c finalized and deleted when the temporary
-// variable created by the macro goes out of scope (hence the name
-// SM_SCOPED_TRACE).
+/**
+ * @class   vtkSMTrace
+ * @brief   vtkSMTrace is used to produce Python trace in the ParaView
+ * application.
+ *
+ * vtkSMTrace is used to produce Python trace in the ParaView
+ * application. To start/stop trace, use the static API vtkSMTrace::StartTrace()
+ * and vtkSMTrace::StopTrace(). That sets up the vtkSMTrace instance used as the
+ * ActiveTracer. You can setup configuration parameters on the vtkSMTrace
+ * instance returned by vtkSMTrace::StartTrace(). The configuration parameters
+ * control various aspects of the trace.
+ *
+ * To effective tracing, the application logic should explicitly trace traceable
+ * actions by using the SM_SCOPED_TRACE() macro. This macro will have any effect
+ * only when there's an ActiveTracer setup i.e tracing is in effect. The result
+ * on using SM_SCOPED_TRACE() when tracing is active, is to crate a Python class
+ * instance. The name of the class is the argument to SM_SCOPED_TRACE() and the
+ * class is defined in paraview.smtrace module. There are various classes
+ * defined for tracing specific actions like Show, RegisterViewProxy, and
+ * generic actions like PropertiesModified. Keyword or positional arguments can
+ * be passed to the constructor using the following the syntax:
+ *
+ * \code{.cpp}
+ *    // pass keyword arguments.
+ *    SM_SCOPED_TRACE(PropertiesModified)
+ *                .arg("proxy", aProxy)
+ *                .arg("comment", "some comment");
+ *
+ *    // pass positional arguments.
+ *    SM_SCOPED_TRACE(PropertiesModified)
+ *                .arg(aProxy)
+ *                .arg("some comment");
+ *
+ *    // mixing positional and keyword arguments.
+ *    SM_SCOPED_TRACE(PropertiesModified)
+ *                .arg(aProxy)
+ *                .arg("comment", "some comment");
+ * \endcode
+ *
+ * The constructed class instance is \c finalized and deleted when the temporary
+ * variable created by the macro goes out of scope (hence the name
+ * SM_SCOPED_TRACE).
+*/
+
 #ifndef vtkSMTrace_h
 #define vtkSMTrace_h
 
@@ -70,44 +74,56 @@ public:
   vtkTypeMacro(vtkSMTrace, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Provides access to the "active" tracer. There can only be one active tracer
-  // in the application currently.
+  /**
+   * Provides access to the "active" tracer. There can only be one active tracer
+   * in the application currently.
+   */
   static vtkSMTrace* GetActiveTracer()
     { return vtkSMTrace::ActiveTracer.GetPointer(); }
 
-  // Description:
-  // Methods to start/stop tracing. This will create a new instance of
-  // vtkSMTrace and set that up as the active tracer. If an active tracer is
-  // already present, then this will simply return the current active tracer.
+  /**
+   * Methods to start/stop tracing. This will create a new instance of
+   * vtkSMTrace and set that up as the active tracer. If an active tracer is
+   * already present, then this will simply return the current active tracer.
+   */
   static vtkSMTrace* StartTrace();
 
-  // Description:
-  // Stop trace and return the generated trace script.
-  // This will also destroy the active tracer.
+  /**
+   * Stop trace and return the generated trace script.
+   * This will also destroy the active tracer.
+   */
   static vtkStdString StopTrace();
 
-  // Description:
-  // Get/Set whether all properties should be saved for a proxy,
-  // including the default values. If false, only the properties
-  // that have been modified from the XML-defaults will be logged.
+  //@{
+  /**
+   * Get/Set whether all properties should be saved for a proxy,
+   * including the default values. If false, only the properties
+   * that have been modified from the XML-defaults will be logged.
+   */
   vtkSetMacro(TraceXMLDefaults, bool);
   vtkGetMacro(TraceXMLDefaults, bool);
+  //@}
 
-  // Description:
-  // Log generated trace to stdout as the trace is being generated
-  // (useful for debugging).
+  //@{
+  /**
+   * Log generated trace to stdout as the trace is being generated
+   * (useful for debugging).
+   */
   vtkSetMacro(LogTraceToStdout, bool);
   vtkGetMacro(LogTraceToStdout, bool);
+  //@}
 
-  // Description:
-  // Supplemental proxies are proxies that not explicitly created by the user
-  // i.e. proxies such as lookup tables, scalar bars, animation scene, etc.
-  // When set to true (default is false), the first time such a proxy is
-  // encountered in the trace, the trace will log the property values on that
-  // proxy using the PropertiesToTraceOnCreate rules.
+  //@{
+  /**
+   * Supplemental proxies are proxies that not explicitly created by the user
+   * i.e. proxies such as lookup tables, scalar bars, animation scene, etc.
+   * When set to true (default is false), the first time such a proxy is
+   * encountered in the trace, the trace will log the property values on that
+   * proxy using the PropertiesToTraceOnCreate rules.
+   */
   vtkSetMacro(FullyTraceSupplementalProxies, bool);
   vtkGetMacro(FullyTraceSupplementalProxies, bool);
+  //@}
 
   enum
     {
@@ -120,25 +136,30 @@ public:
     RECORD_ALL_PROPERTIES, RECORD_USER_MODIFIED_PROPERTIES);
   vtkGetMacro(PropertiesToTraceOnCreate, int);
 
-  // Description:
-  // Return the current trace.
+  /**
+   * Return the current trace.
+   */
   vtkStdString GetCurrentTrace();
 
-  // Description:
-  // Save a Python state for the application and return it. Note this cannot be
-  // called when tracing is active.
+  /**
+   * Save a Python state for the application and return it. Note this cannot be
+   * called when tracing is active.
+   */
   static vtkStdString GetState(
     int propertiesToTraceOnCreate, bool skipHiddenRepresentations);
 
   // ************** BEGIN INTERNAL *************************
-  // Description:
-  // Internal class not meant to be used directly.
+  //@{
+  /**
+   * Internal class not meant to be used directly.
+   */
   class TraceItem;
   class VTKPVSERVERMANAGERCORE_EXPORT TraceItemArgs
     {
   public:
     TraceItemArgs();
     ~TraceItemArgs();
+  //@}
 
     // Overloads for keyword arguments.
     TraceItemArgs& arg(const char* key, vtkObject* val);
@@ -182,8 +203,9 @@ protected:
   vtkSMTrace();
   virtual ~vtkSMTrace();
 
-  // Description:
-  // Returns true of there's an error. Otherwise, returns false.
+  /**
+   * Returns true of there's an error. Otherwise, returns false.
+   */
   bool CheckForError();
 
   bool TraceXMLDefaults;

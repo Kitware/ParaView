@@ -12,13 +12,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCellIntegrator - Calculates length/area/volume of a cell
-// .SECTION Description
-// vtkCellIntegrator is a helper class that calculates the
-// length/area/volume of a 1D/2D/3D cell. The calculation is exact for
-// lines, polylines, triangles, triangle strips, pixels, voxels, convex 
-// polygons, quads and tetrahedra. All other 3D cells are triangulated
-// during volume calculation. In such cases, the result may not be exact.
+/**
+ * @class   vtkCellIntegrator
+ * @brief   Calculates length/area/volume of a cell
+ *
+ * vtkCellIntegrator is a helper class that calculates the
+ * length/area/volume of a 1D/2D/3D cell. The calculation is exact for
+ * lines, polylines, triangles, triangle strips, pixels, voxels, convex 
+ * polygons, quads and tetrahedra. All other 3D cells are triangulated
+ * during volume calculation. In such cases, the result may not be exact.
+*/
 
 #ifndef vtkCellIntegrator_h
 #define vtkCellIntegrator_h
@@ -35,10 +38,11 @@ public:
   vtkTypeMacro(vtkCellIntegrator,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Returns length/area/volume of a 1D/2D/3D cell given by cell id. If the
-  // length/area/volume cannot be calculated (because of unsupposed cell
-  // type), 0 is returned
+  /**
+   * Returns length/area/volume of a 1D/2D/3D cell given by cell id. If the
+   * length/area/volume cannot be calculated (because of unsupposed cell
+   * type), 0 is returned
+   */
   static double Integrate(vtkDataSet* input,  vtkIdType cellId);
 
 protected:

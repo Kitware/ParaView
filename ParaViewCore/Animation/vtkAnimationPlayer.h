@@ -12,9 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkAnimationPlayer
-// .SECTION Description
-// Abstract superclass for an animation player.
+/**
+ * @class   vtkAnimationPlayer
+ *
+ * Abstract superclass for an animation player.
+*/
 
 #ifndef vtkAnimationPlayer_h
 #define vtkAnimationPlayer_h
@@ -30,45 +32,58 @@ public:
   vtkTypeMacro(vtkAnimationPlayer, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Set the animation scene that is to be played by this player.
-  // Note that the animation scene is not reference counted to avoid loops.
+  //@{
+  /**
+   * Set the animation scene that is to be played by this player.
+   * Note that the animation scene is not reference counted to avoid loops.
+   */
   virtual void SetAnimationScene(vtkSMAnimationScene*);
   vtkSMAnimationScene* GetAnimationScene();
+  //@}
 
-  // Description:
-  // Start playing the animation.
-  // Fires StartEvent when play begins and EndEvent when play stops.
+  /**
+   * Start playing the animation.
+   * Fires StartEvent when play begins and EndEvent when play stops.
+   */
   void Play();
 
-  // Description:
-  // Stop playing the animation.
+  /**
+   * Stop playing the animation.
+   */
   void Stop();
 
-  // Description:
-  // Returns if the animation is currently playing.
+  /**
+   * Returns if the animation is currently playing.
+   */
   int IsInPlay() { return this->InPlay? 1 : 0; }
   vtkGetMacro(InPlay, bool);
 
-  // Description:
-  // Set to true to play the animation in a loop.
+  //@{
+  /**
+   * Set to true to play the animation in a loop.
+   */
   vtkSetMacro(Loop, bool);
   vtkGetMacro(Loop, bool);
+  //@}
 
-  // Description:
-  // Take the animation scene to next frame.
+  /**
+   * Take the animation scene to next frame.
+   */
   void GoToNext();
 
-  // Description:
-  // Take animation scene to previous frame.
+  /**
+   * Take animation scene to previous frame.
+   */
   void GoToPrevious();
 
-  // Description:
-  // Take animation scene to first frame.
+  /**
+   * Take animation scene to first frame.
+   */
   void GoToFirst();
 
-  // Description:
-  // Take animation scene to last frame.
+  /**
+   * Take animation scene to last frame.
+   */
   void GoToLast();
 
 protected:
@@ -80,8 +95,9 @@ protected:
   virtual void StartLoop(double starttime, double endtime, double* playbackWindow)=0;
   virtual void EndLoop()=0;
 
-  // Description:
-  // Return the next time given the current time.
+  /**
+   * Return the next time given the current time.
+   */
   virtual double GetNextTime(double currentime) = 0;
 
   virtual double GoToNext(double start, double end, double currenttime)=0;

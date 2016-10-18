@@ -12,10 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVSystemConfigInformation
-// .SECTION Description
-// A vtkClientServerStream serializable conatiner of information describing
-// memory configuration of the host of a single process.
+/**
+ * @class   vtkPVSystemConfigInformation
+ *
+ * A vtkClientServerStream serializable conatiner of information describing
+ * memory configuration of the host of a single process.
+*/
 
 #ifndef vtkPVSystemConfigInformation_h
 #define vtkPVSystemConfigInformation_h
@@ -72,21 +74,27 @@ public:
   vtkTypeMacro(vtkPVSystemConfigInformation, vtkPVInformation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Transfer information about a single object into this object.
+  /**
+   * Transfer information about a single object into this object.
+   */
   virtual void CopyFromObject(vtkObject* obj);
 
-  // Description:
-  // Merge another information object.
+  /**
+   * Merge another information object.
+   */
   virtual void AddInformation(vtkPVInformation* info);
 
-  // Description:
-  // Manage a serialized version of the information.
+  //@{
+  /**
+   * Manage a serialized version of the information.
+   */
   virtual void CopyToStream(vtkClientServerStream *css);
   virtual void CopyFromStream(const vtkClientServerStream *css);
+  //@}
 
-  // Description:
-  // Access managed information
+  /**
+   * Access managed information
+   */
   size_t GetSize(){ return this->Configs.size(); }
 
   const char *GetOSDescriptor(size_t i){ return this->Configs[i].OSDescriptor.c_str(); }
@@ -101,8 +109,9 @@ public:
   long long GetHostMemoryAvailable(size_t i){ return this->Configs[i].HostMemoryAvailable; }
   long long GetProcMemoryAvailable(size_t i){ return this->Configs[i].ProcMemoryAvailable; }
 
-  // Description:
-  // Sort elements by mpi rank.
+  /**
+   * Sort elements by mpi rank.
+   */
   void Sort();
 
 protected:

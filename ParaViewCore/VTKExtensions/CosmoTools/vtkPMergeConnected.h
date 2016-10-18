@@ -12,11 +12,13 @@
  PURPOSE.  See the above copyright notice for more information.
 
  =========================================================================*/
-// .NAME vtkPMergeConnected.h -- Merges connected voronoi tesselation regions.
-//
-// .SECTION Description
-//  This filter merges connected voroni tesselation regions based on the
-//  global region ID.
+/**
+ * @class   vtkPMergeConnected
+ *
+ *
+ *  This filter merges connected voroni tesselation regions based on the
+ *  global region ID.
+*/
 
 #ifndef vtkPMergeConnected_h
 #define vtkPMergeConnected_h

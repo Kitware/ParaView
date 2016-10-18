@@ -16,15 +16,18 @@
  Copyright (c) Sandia Corporation
  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 ----------------------------------------------------------------------------*/
-// .NAME vtkMergeCompositeDataSet - Make a vtkPolyData with a vertex on each
-// point.
-//
-// .SECTION Description
-//
-// This filter throws away all of the cells in the input and replaces them with
-// a vertex on each point. This filter may take a graph, a point set or a 
-// CompositeDataSet as input.
-//
+/**
+ * @class   vtkMergeCompositeDataSet
+ * @brief   Make a vtkPolyData with a vertex on each
+ * point.
+ *
+ *
+ *
+ * This filter throws away all of the cells in the input and replaces them with
+ * a vertex on each point. This filter may take a graph, a point set or a 
+ * CompositeDataSet as input.
+ *
+*/
 
 #ifndef vtkMergeCompositeDataSet_h
 #define vtkMergeCompositeDataSet_h

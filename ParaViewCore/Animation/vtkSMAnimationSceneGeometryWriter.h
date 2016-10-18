@@ -12,12 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMAnimationSceneGeometryWriter - helper class to write
-// animation geometry in a data file.
-// .SECTION Description
-// vtkSMAnimationSceneGeometryWriter is a concrete implementation of
-// vtkSMAnimationSceneWriter that can write the geometry as a data file.
-// This writer can only write the visible geometry in one view.
+/**
+ * @class   vtkSMAnimationSceneGeometryWriter
+ * @brief   helper class to write
+ * animation geometry in a data file.
+ *
+ * vtkSMAnimationSceneGeometryWriter is a concrete implementation of
+ * vtkSMAnimationSceneWriter that can write the geometry as a data file.
+ * This writer can only write the visible geometry in one view.
+*/
 
 #ifndef vtkSMAnimationSceneGeometryWriter_h
 #define vtkSMAnimationSceneGeometryWriter_h
@@ -44,16 +47,19 @@ protected:
   vtkSMAnimationSceneGeometryWriter();
   ~vtkSMAnimationSceneGeometryWriter();
 
-  // Description:
-  // Called to initialize saving.
+  /**
+   * Called to initialize saving.
+   */
   virtual bool SaveInitialize(int startCount);
 
-  // Description:
-  // Called to save a particular frame.
+  /**
+   * Called to save a particular frame.
+   */
   virtual bool SaveFrame(double time);
 
-  // Description:
-  // Called to finalize saving.
+  /**
+   * Called to finalize saving.
+   */
   virtual bool SaveFinalize();
 
   vtkSMProxy* GeometryWriter;

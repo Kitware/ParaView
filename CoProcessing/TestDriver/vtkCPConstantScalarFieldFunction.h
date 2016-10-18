@@ -12,9 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCPConstantScalarFieldFunction - Class for specifying constant scalars at points.
-// .SECTION Description
-// Class for specifying a constant scalar field.
+/**
+ * @class   vtkCPConstantScalarFieldFunction
+ * @brief   Class for specifying constant scalars at points.
+ *
+ * Class for specifying a constant scalar field.
+*/
 
 #ifndef vtkCPConstantScalarFieldFunction_h
 #define vtkCPConstantScalarFieldFunction_h
@@ -29,15 +32,19 @@ public:
   vtkTypeMacro(vtkCPConstantScalarFieldFunction, vtkCPScalarFieldFunction);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Compute the field value at Point which is an array of length 3.
+  /**
+   * Compute the field value at Point which is an array of length 3.
+   */
   virtual double ComputeComponenentAtPoint(unsigned int component, double* point,
                                            unsigned long timeStep, double time);
 
-  // Description:
-  // Set/get the constant value for the field.
+  //@{
+  /**
+   * Set/get the constant value for the field.
+   */
   vtkSetMacro(Constant, double);
   vtkGetMacro(Constant, double);
+  //@}
 
 protected:
   vtkCPConstantScalarFieldFunction();
@@ -47,9 +54,12 @@ private:
   vtkCPConstantScalarFieldFunction(const vtkCPConstantScalarFieldFunction&) VTK_DELETE_FUNCTION;
   void operator=(const vtkCPConstantScalarFieldFunction&) VTK_DELETE_FUNCTION;
 
-  // Description:
-  // The constant value for the scalar field.
+  //@{
+  /**
+   * The constant value for the scalar field.
+   */
   double Constant;
 };
+  //@}
 
 #endif

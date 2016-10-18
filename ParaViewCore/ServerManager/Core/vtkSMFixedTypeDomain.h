@@ -12,15 +12,18 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMFixedTypeDomain - restricts the proxy to have the same type as previous proxy
-// .SECTION Description
-// vtkSMFixedTypeDomain is used by input properties of filters that can
-// not have different input types after input is set the first time. For
-// example, a sub-class vtkDataSetToDataSetFilter, once connected in
-// a pipeline can not change it's input type, say, from vtkImageData to
-// vtkUnstructuredGrid because it's output can not change. 
-// .SECTION See Also
-// vtkSMDomain 
+/**
+ * @class   vtkSMFixedTypeDomain
+ * @brief   restricts the proxy to have the same type as previous proxy
+ *
+ * vtkSMFixedTypeDomain is used by input properties of filters that can
+ * not have different input types after input is set the first time. For
+ * example, a sub-class vtkDataSetToDataSetFilter, once connected in
+ * a pipeline can not change it's input type, say, from vtkImageData to
+ * vtkUnstructuredGrid because it's output can not change. 
+ * @sa
+ * vtkSMDomain 
+*/
 
 #ifndef vtkSMFixedTypeDomain_h
 #define vtkSMFixedTypeDomain_h
@@ -37,17 +40,19 @@ public:
   vtkTypeMacro(vtkSMFixedTypeDomain, vtkSMDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Returns true if the value of the propery is in the domain.
-  // The propery has to be a vtkSMProxyProperty which points
-  // to a vtkSMSourceProxy. If the new (unchecked) source proxy
-  // has the same number of parts and data types as the old
-  // (checked) one, it returns 1. Returns 0 otherwise.
+  /**
+   * Returns true if the value of the propery is in the domain.
+   * The propery has to be a vtkSMProxyProperty which points
+   * to a vtkSMSourceProxy. If the new (unchecked) source proxy
+   * has the same number of parts and data types as the old
+   * (checked) one, it returns 1. Returns 0 otherwise.
+   */
   virtual int IsInDomain(vtkSMProperty* property);
 
-  // Description:
-  // Returns true if old and new source proxies have the same
-  // output data type, false otherwise.
+  /**
+   * Returns true if old and new source proxies have the same
+   * output data type, false otherwise.
+   */
   virtual int IsInDomain(vtkSMSourceProxy* oldProxy,
                          vtkSMSourceProxy* newProxy);
 

@@ -12,11 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVLinearExtrusionFilter - change a default value
-// .SECTION Description
-// vtkPVLinearExtrusionFilter is a subclass of vtkPLinearExtrusionFilter.
-// The only difference is changing the default extrusion type to vector
-// extrusion
+/**
+ * @class   vtkPVLinearExtrusionFilter
+ * @brief   change a default value
+ *
+ * vtkPVLinearExtrusionFilter is a subclass of vtkPLinearExtrusionFilter.
+ * The only difference is changing the default extrusion type to vector
+ * extrusion
+*/
 
 #ifndef vtkPVLinearExtrusionFilter_h
 #define vtkPVLinearExtrusionFilter_h

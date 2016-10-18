@@ -12,33 +12,36 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPSciVizPCAStats - Perform PCA on data and/or project data into a subspace defined by the PCA.
-// .SECTION Description
-// This filter either computes a statistical model of
-// a dataset or takes such a model as its second input.
-// Then, the model (however it is obtained) may
-// optionally be used to assess the input dataset.
-//
-// This filter performs additional analysis above
-// and beyond the vtkPSciVizMultiCorrelativeStats filter.
-// It computes the eigenvalues and eigenvectors of the
-// covariance matrix from the multicorrelative filter.
-// Data is then assessed by projecting the original tuples
-// into a possibly lower-dimensional space.
-//
-// Since the PCA filter uses the multicorrelative filter's analysis,
-// it shares the same raw covariance table specified in the
-// multicorrelative documentation.
-// The second table in the multiblock dataset comprising the model output
-// is an expanded version of the multicorrelative version.
-//
-// As with the multicorrlative filter, the second model table contains the
-// mean values, the upper-triangular portion of the symmetric covariance
-// matrix, and the non-zero lower-triangular portion of the Cholesky
-// decomposition of the covariance matrix.
-// Below these entries are the eigenvalues of the covariance matrix (in the
-// column labeled "Mean") and the eigenvectors (as row vectors) in an
-// additional NxN matrix.
+/**
+ * @class   vtkPSciVizPCAStats
+ * @brief   Perform PCA on data and/or project data into a subspace defined by the PCA.
+ *
+ * This filter either computes a statistical model of
+ * a dataset or takes such a model as its second input.
+ * Then, the model (however it is obtained) may
+ * optionally be used to assess the input dataset.
+ *
+ * This filter performs additional analysis above
+ * and beyond the vtkPSciVizMultiCorrelativeStats filter.
+ * It computes the eigenvalues and eigenvectors of the
+ * covariance matrix from the multicorrelative filter.
+ * Data is then assessed by projecting the original tuples
+ * into a possibly lower-dimensional space.
+ *
+ * Since the PCA filter uses the multicorrelative filter's analysis,
+ * it shares the same raw covariance table specified in the
+ * multicorrelative documentation.
+ * The second table in the multiblock dataset comprising the model output
+ * is an expanded version of the multicorrelative version.
+ *
+ * As with the multicorrlative filter, the second model table contains the
+ * mean values, the upper-triangular portion of the symmetric covariance
+ * matrix, and the non-zero lower-triangular portion of the Cholesky
+ * decomposition of the covariance matrix.
+ * Below these entries are the eigenvalues of the covariance matrix (in the
+ * column labeled "Mean") and the eigenvectors (as row vectors) in an
+ * additional NxN matrix.
+*/
 
 #ifndef vtkPSciVizPCAStats_h
 #define vtkPSciVizPCAStats_h

@@ -12,10 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVSingleOutputExtractSelection
-// .SECTION Description
-// vtkPVSingleOutputExtractSelection extends to vtkPVExtractSelection to simply
-// hide the second output-port. This is the filter used in ParaView GUI.
+/**
+ * @class   vtkPVSingleOutputExtractSelection
+ *
+ * vtkPVSingleOutputExtractSelection extends to vtkPVExtractSelection to simply
+ * hide the second output-port. This is the filter used in ParaView GUI.
+*/
 
 #ifndef vtkPVSingleOutputExtractSelection_h
 #define vtkPVSingleOutputExtractSelection_h

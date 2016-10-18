@@ -12,9 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMChartRepresentationProxy
-// .SECTION Description
-//
+/**
+ * @class   vtkSMChartRepresentationProxy
+ *
+ *
+*/
 
 #ifndef vtkSMChartRepresentationProxy_h
 #define vtkSMChartRepresentationProxy_h
@@ -31,22 +33,25 @@ public:
   vtkTypeMacro(vtkSMChartRepresentationProxy, vtkSMRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Returns client side representation object.
+  /**
+   * Returns client side representation object.
+   */
   vtkChartRepresentation* GetRepresentation();
 
-  // Description:
-  // Overridden to handle links with subproxy properties.
+  /**
+   * Overridden to handle links with subproxy properties.
+   */
   int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element);
 
 protected:
   vtkSMChartRepresentationProxy();
   ~vtkSMChartRepresentationProxy();
 
-  // Description:
-  // Overridden to ensure that whenever "Input" property changes, we update the
-  // "Input" properties for all internal representations (including setting up
-  // of the link to the extract-selection representation).
+  /**
+   * Overridden to ensure that whenever "Input" property changes, we update the
+   * "Input" properties for all internal representations (including setting up
+   * of the link to the extract-selection representation).
+   */
   virtual void SetPropertyModifiedFlag(const char* name, int flag);
 
 private:

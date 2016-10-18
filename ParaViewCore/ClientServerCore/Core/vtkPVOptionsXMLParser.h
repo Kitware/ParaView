@@ -12,12 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVOptionsXMLParser - ParaView options storage
-// .SECTION Description
-// An object of this class represents a storage for ParaView options
-// 
-// These options can be retrieved during run-time, set using configuration file
-// or using Command Line Arguments.
+/**
+ * @class   vtkPVOptionsXMLParser
+ * @brief   ParaView options storage
+ *
+ * An object of this class represents a storage for ParaView options
+ *
+ * These options can be retrieved during run-time, set using configuration file
+ * or using Command Line Arguments.
+*/
 
 #ifndef vtkPVOptionsXMLParser_h
 #define vtkPVOptionsXMLParser_h

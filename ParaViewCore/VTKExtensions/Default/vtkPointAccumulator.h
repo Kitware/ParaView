@@ -11,16 +11,19 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPointAccumulator - Container class that manages appending data arrays of points.
-// .SECTION Description
-//
-// The template types are T_CPP for the c++ data type and T_VTK for
-// the VTK data type. Eg: if T_CCP==double the T_VTK must be
-// vtkDoubleArray. The main difference between the way this
-// works and if you were to do the same thing with a data array is
-// that here the memory grows by exactly what is needed, and
-// in VTK data arrays the memory will grow by at least twice
-// what is requested.
+/**
+ * @class   vtkPointAccumulator
+ * @brief   Container class that manages appending data arrays of points.
+ *
+ *
+ * The template types are T_CPP for the c++ data type and T_VTK for
+ * the VTK data type. Eg: if T_CCP==double the T_VTK must be
+ * vtkDoubleArray. The main difference between the way this
+ * works and if you were to do the same thing with a data array is
+ * that here the memory grows by exactly what is needed, and
+ * in VTK data arrays the memory will grow by at least twice
+ * what is requested.
+*/
 
 #ifndef vtkPointAccumulator_hxx
 #define vtkPointAccumulator_hxx
@@ -42,8 +45,10 @@ class vtkPointAccumulator
     {
       this->Clear();
     }
-    // Description:
-    // Free resources and mark as empty.
+    //@{
+    /**
+     * Free resources and mark as empty.
+     */
     void Clear()
     {
       if (this->PtStore!=0)
@@ -53,15 +58,19 @@ class vtkPointAccumulator
       this->PtStore=0;
       this->NPts=0;
     }
-    // Description:
-    // Test if there is anything in the store.
+    //@}
+    /**
+     * Test if there is anything in the store.
+     */
     bool Empty()
     {
       return this->NPts==0;
     }
-    // Description:
-    // Extend the internal store and get a pointer to
-    // the newly added memory.
+    //@{
+    /**
+     * Extend the internal store and get a pointer to
+     * the newly added memory.
+     */
     T_CPP *Expand(vtkIdType n)
     {
       const int bytesPerPoint=3*sizeof(T_CPP);
@@ -82,12 +91,15 @@ class vtkPointAccumulator
       // update
       this->PtStore=newPointStore;
       this->NPts=newNPts;
+    //@}
 
       return writePointer;
     }
-    // Description:
-    // Adds an array of points to the end of
-    // the internal store.
+    //@{
+    /**
+     * Adds an array of points to the end of
+     * the internal store.
+     */
     void Accumulate(T_CPP *pts, vtkIdType n)
     {
       // extend
@@ -96,16 +108,20 @@ class vtkPointAccumulator
       const int bytesPerPoint=3*sizeof(T_CPP);
       memcpy(writePointer,pts,n*bytesPerPoint);
     }
-    // Description:
-    // Adds an array of points at the end of
-    // the internal store.
+    //@}
+    /**
+     * Adds an array of points at the end of
+     * the internal store.
+     */
     void Accumulate(T_VTK *pts)
     {
       this->Accumulate(pts->GetPointer(0),pts->GetNumberOfTuples());
     }
-    // Description:
-    // Creates a vtkPoints data structure from
-    // the internal store. Caller to delete the points.
+    //@{
+    /**
+     * Creates a vtkPoints data structure from
+     * the internal store. Caller to delete the points.
+     */
     vtkPoints *BuildVtkPoints()
     {
       T_VTK *da=T_VTK::New();
@@ -114,13 +130,16 @@ class vtkPointAccumulator
       vtkPoints *pts=vtkPoints::New();
       pts->SetData(da);
       da->Delete();
+    //@}
 
       return pts;
     }
-    // Description:
-    // Compute axis-aligned bounding box. An exhaustive search is made
-    // through points every time. It's calllers responsibility to use
-    // sparingly.
+    //@{
+    /**
+     * Compute axis-aligned bounding box. An exhaustive search is made
+     * through points every time. It's calllers responsibility to use
+     * sparingly.
+     */
     void GetBounds(double bounds[6])
     {
       // Prepare
@@ -145,14 +164,18 @@ class vtkPointAccumulator
         if (pt[2]>bounds[5]) bounds[5]=pt[2];
         }
     }
-    // Description:
-    // Return the number of points currently in the point store.
+    //@}
+    /**
+     * Return the number of points currently in the point store.
+     */
     vtkIdType GetNumberOfPoints()
     {
       return this->NPts;
     }
-    // Description:
-    // Print the contents of the internal store.
+    //@{
+    /**
+     * Print the contents of the internal store.
+     */
     void Print()
     {
       T_CPP *pBuf=this->PtStore;
@@ -167,6 +190,7 @@ class vtkPointAccumulator
         pBuf+=3;
         }
     }
+    //@}
 
   private:
     vtkPointAccumulator(const vtkPointAccumulator &) VTK_DELETE_FUNCTION;

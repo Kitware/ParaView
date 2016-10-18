@@ -12,11 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVNullSource - source for NULL data.
-// .SECTION Description
-// This is a source for null data. Although this actually produces a
-// vtkPolyLine paraview blocks all data information from this source resulting
-// in it being treated as a null source.
+/**
+ * @class   vtkPVNullSource
+ * @brief   source for NULL data.
+ *
+ * This is a source for null data. Although this actually produces a
+ * vtkPolyLine paraview blocks all data information from this source resulting
+ * in it being treated as a null source.
+*/
 
 #ifndef vtkPVNullSource_h
 #define vtkPVNullSource_h

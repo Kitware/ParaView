@@ -12,8 +12,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPGenericIOMultiBlockWriter 
-// .SECTION Description
+/**
+ * @class   vtkPGenericIOMultiBlockWriter
+ *
+*/
 
 #ifndef vtkPGenericIOMultiBlockWriter_h
 #define vtkPGenericIOMultiBlockWriter_h

@@ -12,14 +12,17 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPartitionOrderingInterface - Interface for ordering compositing.
-//
-// .SECTION Description
-//      An interface class to get the order of process for parallel
-//      compositing.
-//
-// .SECTION See Also
-//      vtkPKdTree,vtkPartitionOrdering
+/**
+ * @class   vtkPartitionOrderingInterface
+ * @brief   Interface for ordering compositing.
+ *
+ *
+ *      An interface class to get the order of process for parallel
+ *      compositing.
+ *
+ * @sa
+ *      vtkPKdTree,vtkPartitionOrdering
+*/
 
 #ifndef vtkPartitionOrderingInterface_h
 #define vtkPartitionOrderingInterface_h
@@ -43,32 +46,37 @@ public:
   // the number of processes
   int GetNumberOfRegions();
 
-  // Description:
-  // Return a list of all processes in order from front to back given a
-  // vector direction of projection.  Use this to do visibility sorts
-  // in parallel projection mode. `orderedList' will be resized to the number
-  // of processes. The return value is the number of processes.
-  // \pre orderedList_exists: orderedList!=0
+  /**
+   * Return a list of all processes in order from front to back given a
+   * vector direction of projection.  Use this to do visibility sorts
+   * in parallel projection mode. `orderedList' will be resized to the number
+   * of processes. The return value is the number of processes.
+   * \pre orderedList_exists: orderedList!=0
+   */
   int ViewOrderAllProcessesInDirection(const double directionOfProjection[3],
                                        vtkIntArray *orderedList);
 
-  // Description:
-  // Return a list of all processes in order from front to back given a
-  // camera position.  Use this to do visibility sorts in perspective
-  // projection mode. `orderedList' will be resized to the number
-  // of processes. The return value is the number of processes.
-  // \pre orderedList_exists: orderedList!=0
+  /**
+   * Return a list of all processes in order from front to back given a
+   * camera position.  Use this to do visibility sorts in perspective
+   * projection mode. `orderedList' will be resized to the number
+   * of processes. The return value is the number of processes.
+   * \pre orderedList_exists: orderedList!=0
+   */
   int ViewOrderAllProcessesFromPosition(const double cameraPosition[3],
                                         vtkIntArray *orderedList);
 
-  // Description:
-  // Set the implementation to use for the view order methods. Current options
-  // are vtkPKdTree and vtkPartitionOrdering.
+  //@{
+  /**
+   * Set the implementation to use for the view order methods. Current options
+   * are vtkPKdTree and vtkPartitionOrdering.
+   */
   void SetImplementation(vtkObject* implementation);
   vtkObject* GetImplementation()
   {
     return this->Implementation;
   }
+  //@}
 
   virtual vtkMTimeType GetMTime();
 

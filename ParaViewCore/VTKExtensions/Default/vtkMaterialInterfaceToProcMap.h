@@ -12,12 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkMaterialInterfaceProcMap
-// .SECTION Description
-// Data structure which allows constant time determination
-// of weather a given process has a piece of some fragment,
-// and the number of processes which a specified fragment is
-// spread across.
+/**
+ * @class   vtkMaterialInterfaceProcMap
+ *
+ * Data structure which allows constant time determination
+ * of weather a given process has a piece of some fragment,
+ * and the number of processes which a specified fragment is
+ * spread across.
+*/
 
 #ifndef vtkMaterialInterfaceToProcMap_h
 #define vtkMaterialInterfaceToProcMap_h

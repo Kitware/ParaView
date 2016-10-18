@@ -12,9 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSISILProperty
-// .SECTION Description
-// SIProperty that deals with SIL data extraction to get the property value
+/**
+ * @class   vtkSISILProperty
+ *
+ * SIProperty that deals with SIL data extraction to get the property value
+*/
 
 #ifndef vtkSISILProperty_h
 #define vtkSISILProperty_h
@@ -37,14 +39,16 @@ protected:
 
   friend class vtkSIProxy;
 
-  // Description:
-  // Parse the xml for the property and specially the "subtree" extra attribute
-  // and the "output_port" if this one is different than the default one which
-  // is 0.
+  /**
+   * Parse the xml for the property and specially the "subtree" extra attribute
+   * and the "output_port" if this one is different than the default one which
+   * is 0.
+   */
   virtual bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element);
 
-  // Description:
-  // Pull the current state of the underneath implementation
+  /**
+   * Pull the current state of the underneath implementation
+   */
   virtual bool Pull(vtkSMMessage*);
 
   vtkSetStringMacro(SubTree);

@@ -12,14 +12,18 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCleanArrays - filter used to remove partial arrays across processes.
-// .SECTION Description
-// vtkCleanArrays is a filter used to remove (or fill up) partial arrays in a
-// vtkDataSet (or a vtkCompositeDataSet) across processes (and blocks).
-// Empty dataset on any processes is skipped and doesn't affect the array pruned
-// (or filled) in the output. This filter also handles certain non-composite
-// data objects such a tables.
-//
+/**
+ * @class   vtkCleanArrays
+ * @brief   filter used to remove partial arrays across processes.
+ *
+ * vtkCleanArrays is a filter used to remove (or fill up) partial arrays in a
+ * vtkDataSet (or a vtkCompositeDataSet) across processes (and blocks).
+ * Empty dataset on any processes is skipped and doesn't affect the array pruned
+ * (or filled) in the output. This filter also handles certain non-composite
+ * data objects such a tables.
+ *
+*/
+
 #ifndef vtkCleanArrays_h
 #define vtkCleanArrays_h
 
@@ -34,18 +38,24 @@ public:
   vtkTypeMacro(vtkCleanArrays, vtkPassInputTypeAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // The user can set the controller used for inter-process communication. By
-  // default set to the global communicator.
+  //@{
+  /**
+   * The user can set the controller used for inter-process communication. By
+   * default set to the global communicator.
+   */
   void SetController(vtkMultiProcessController *controller);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
+  //@}
 
-  // Description:
-  // When set to true (false by default), 0 filled array will be added for
-  // missing arrays on this process (instead of removing partial arrays).
+  //@{
+  /**
+   * When set to true (false by default), 0 filled array will be added for
+   * missing arrays on this process (instead of removing partial arrays).
+   */
   vtkSetMacro(FillPartialArrays, bool);
   vtkGetMacro(FillPartialArrays, bool);
   vtkBooleanMacro(FillPartialArrays, bool);
+  //@}
 
 protected:
   vtkCleanArrays();

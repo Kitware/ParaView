@@ -12,10 +12,12 @@
  PURPOSE.  See the above copyright notice for more information.
 
  =========================================================================*/
-// .NAME vtkPGenericIOMultiBlockReader.h -- Read GenericIO formatted data
-//
-// .SECTION Description
-//  Creates a vtkMultiBlockDataSet from a GenericIO file
+/**
+ * @class   vtkPGenericIOMultiBlockReader
+ *
+ *
+ *  Creates a vtkMultiBlockDataSet from a GenericIO file
+*/
 
 #ifndef vtkPGenericIOMultiBlockReader_h
 #define vtkPGenericIOMultiBlockReader_h
@@ -58,117 +60,157 @@ public:
   vtkTypeMacro(vtkPGenericIOMultiBlockReader,vtkMultiBlockDataSetAlgorithm)
   void PrintSelf(ostream &os, vtkIndent indent);
 
-  // Description:
-  // Set/Get the variable name to be used as the x-axis for plotting particles.
+  //@{
+  /**
+   * Set/Get the variable name to be used as the x-axis for plotting particles.
+   */
   vtkSetStringMacro(XAxisVariableName)
   vtkGetStringMacro(XAxisVariableName)
+  //@}
 
-  // Description:
-  // Set/Get the variable name to be used as the y-axis for plotting particles.
+  //@{
+  /**
+   * Set/Get the variable name to be used as the y-axis for plotting particles.
+   */
   vtkSetStringMacro(YAxisVariableName)
   vtkGetStringMacro(YAxisVariableName)
+  //@}
 
-  // Description:
-  // Set/Get the variable name to be used as the z-axis for plotting particles.
+  //@{
+  /**
+   * Set/Get the variable name to be used as the z-axis for plotting particles.
+   */
   vtkSetStringMacro(ZAxisVariableName)
   vtkGetStringMacro(ZAxisVariableName)
+  //@}
 
-  // Description:
-  // Specify the name of the cosmology particle binary file to read
+  //@{
+  /**
+   * Specify the name of the cosmology particle binary file to read
+   */
   vtkSetStringMacro(FileName)
   vtkGetStringMacro(FileName)
+  //@}
 
-  // Description:
-  // Set/Get the underlying IO method the reader will employ, i.e., MPI or POSIX.
+  //@{
+  /**
+   * Set/Get the underlying IO method the reader will employ, i.e., MPI or POSIX.
+   */
   vtkSetMacro(GenericIOType,int)
   vtkGetMacro(GenericIOType,int)
+  //@}
 
-  // Description:
-  // Set/Get the underlying block-assignment strategy to use, i.e., ROUND_ROBIN,
-  // or RCB.
+  //@{
+  /**
+   * Set/Get the underlying block-assignment strategy to use, i.e., ROUND_ROBIN,
+   * or RCB.
+   */
   vtkSetMacro(BlockAssignment,int)
   vtkGetMacro(BlockAssignment,int)
+  //@}
 
-  // Description:
-  // Returns the list of arrays used to select the variables to be used
-  // for the x,y and z axis.
+  //@{
+  /**
+   * Returns the list of arrays used to select the variables to be used
+   * for the x,y and z axis.
+   */
   vtkGetObjectMacro(ArrayList,vtkStringArray)
+  //@}
 
-  // Description:
-  // Get the data array selection tables used to configure which data
-  // arrays are loaded by the reader.
+  //@{
+  /**
+   * Get the data array selection tables used to configure which data
+   * arrays are loaded by the reader.
+   */
   vtkGetObjectMacro(PointDataArraySelection,vtkDataArraySelection)
+  //@}
 
-  // Description:
-  // Set/Get a multiprocess-controller for reading in parallel.
-  // By default this parameter is set to NULL by the constructor.
+  //@{
+  /**
+   * Set/Get a multiprocess-controller for reading in parallel.
+   * By default this parameter is set to NULL by the constructor.
+   */
   vtkGetMacro(Controller,vtkMultiProcessController*)
   vtkSetMacro(Controller,vtkMultiProcessController*)
+  //@}
 
-  // Description:
-  // Returns the number of arrays in the file, i.e., the number of columns.
+  /**
+   * Returns the number of arrays in the file, i.e., the number of columns.
+   */
   int GetNumberOfPointArrays();
 
-  // Description:
-  // Returns the name of the ith array.
+  /**
+   * Returns the name of the ith array.
+   */
   const char* GetPointArrayName(int i);
 
-  // Description:
-  // Returns the status of the array corresponding to the given name.
+  /**
+   * Returns the status of the array corresponding to the given name.
+   */
   int GetPointArrayStatus(const char* name);
 
-  // Description:
-  // Sets the status of the array corresponding to the given name.
+  /**
+   * Sets the status of the array corresponding to the given name.
+   */
   void SetPointArrayStatus(const char* name, int status);
 
-  // Description:
-  // Gets/Sets the variable name for the halo id of the particle.
-  // This is used by the requested halo selector to select only the
-  // points in the desired halos.
+  //@{
+  /**
+   * Gets/Sets the variable name for the halo id of the particle.
+   * This is used by the requested halo selector to select only the
+   * points in the desired halos.
+   */
   vtkSetStringMacro(HaloIdVariableName)
   vtkGetStringMacro(HaloIdVariableName)
+  //@}
 
-  // Description:
-  // Gets the ith requested halo id.
-  // If the number of requested halo ids is
-  // greater than 0, only points with those halo ids will be read in.
-  // Otherwise all points will be read in.
+  /**
+   * Gets the ith requested halo id.
+   * If the number of requested halo ids is
+   * greater than 0, only points with those halo ids will be read in.
+   * Otherwise all points will be read in.
+   */
   vtkIdType GetRequestedHaloId(vtkIdType i);
 
-  // Description:
-  // Gets the number of requested halo ids.
-  // If the number of requested halo ids is
-  // greater than 0, only points with those halo ids will be read in.
-  // Otherwise all points will be read in.
+  /**
+   * Gets the number of requested halo ids.
+   * If the number of requested halo ids is
+   * greater than 0, only points with those halo ids will be read in.
+   * Otherwise all points will be read in.
+   */
   vtkIdType GetNumberOfRequestedHaloIds();
 
-  // Description:
-  // Sets the number of requested halo ids.
-  // Use SetRequestedHaloId() to se the ids after this is called
-  // If the number of requested halo ids is
-  // greater than 0, only points with those halo ids will be read in.
-  // Otherwise all points will be read in.
+  /**
+   * Sets the number of requested halo ids.
+   * Use SetRequestedHaloId() to se the ids after this is called
+   * If the number of requested halo ids is
+   * greater than 0, only points with those halo ids will be read in.
+   * Otherwise all points will be read in.
+   */
   void SetNumberOfRequestedHaloIds(vtkIdType numIds);
 
-  // Description:
-  // Adds the given halo id to the list of halo ids to request.
-  // If the number of requested halo ids is
-  // greater than 0, only points with those halo ids will be read in.
-  // Otherwise all points will be read in.
+  /**
+   * Adds the given halo id to the list of halo ids to request.
+   * If the number of requested halo ids is
+   * greater than 0, only points with those halo ids will be read in.
+   * Otherwise all points will be read in.
+   */
   void AddRequestedHaloId(vtkIdType haloId);
 
-  // Description:
-  // Clears the list of requested halo ids.
-  // If the number of requested halo ids is
-  // greater than 0, only points with those halo ids will be read in.
-  // Otherwise all points will be read in.
+  /**
+   * Clears the list of requested halo ids.
+   * If the number of requested halo ids is
+   * greater than 0, only points with those halo ids will be read in.
+   * Otherwise all points will be read in.
+   */
   void ClearRequestedHaloIds();
 
-  // Description:
-  // Sets the ith requested halo id to the given haloId.
-  // If the number of requested halo ids is
-  // greater than 0, only points with those halo ids will be read in.
-  // Otherwise all points will be read in.
+  /**
+   * Sets the ith requested halo id to the given haloId.
+   * If the number of requested halo ids is
+   * greater than 0, only points with those halo ids will be read in.
+   * Otherwise all points will be read in.
+   */
   void SetRequestedHaloId(vtkIdType i, vtkIdType haloId);
 
 
@@ -220,8 +262,9 @@ protected:
 
   vtkUnstructuredGrid* LoadBlock(int blockId);
 
-  // Descriptions
-  // Call-back registered with the SelectionObserver.
+  /**
+   * Call-back registered with the SelectionObserver.
+   */
   static void SelectionModifiedCallback(
     vtkObject *caller,unsigned long eid,
     void *clientdata,void *calldata );

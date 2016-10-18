@@ -12,9 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVMetaClipDataSet -
-// Meta class for clip filter that will allow the user to switch between
-// a regular clip filter or an extract cell by region filter.
+/**
+ * @class   vtkPVMetaClipDataSet
+ * Meta class for clip filter that will allow the user to switch between
+ * a regular clip filter or an extract cell by region filter.
+*/
 
 #ifndef vtkPVMetaClipDataSet_h
 #define vtkPVMetaClipDataSet_h
@@ -32,8 +34,9 @@ public:
 
   static vtkPVMetaClipDataSet *New();
 
-  // Description:
-  // Enable or disable the Extract Cells By Regions.
+  /**
+   * Enable or disable the Extract Cells By Regions.
+   */
   void PreserveInputCells(int keepCellAsIs);
 
   void SetImplicitFunction(vtkImplicitFunction* func);
@@ -42,13 +45,15 @@ public:
 
   // Only available for cut -------------
 
-  // Description:
-  // Expose method from vtkCutter
+  /**
+   * Expose method from vtkCutter
+   */
   void SetClipFunction(vtkImplicitFunction* func)
   { this->SetImplicitFunction(func); };
 
-  // Description:
-  // Expose method from vtkClip
+  /**
+   * Expose method from vtkClip
+   */
   void SetValue(double value);
 
   virtual void SetInputArrayToProcess(int idx, int port, int connection,
@@ -61,13 +66,15 @@ public:
 
   virtual void SetInputArrayToProcess(int idx, int port, int connection, const char* fieldName, const char* fieldType);
 
-  // Description:
-  // Expose method from vtkClip
+  /**
+   * Expose method from vtkClip
+   */
   void SetUseValueAsOffset(int);
 
-  // Description:
-  // Add validation for active filter so that the vtkExtractGeometry
-  // won't be used without ImplicifFuntion being set.
+  /**
+   * Add validation for active filter so that the vtkExtractGeometry
+   * won't be used without ImplicifFuntion being set.
+   */
   virtual int ProcessRequest(vtkInformation* request,
     vtkInformationVector** inInfo,
     vtkInformationVector* outInfo);

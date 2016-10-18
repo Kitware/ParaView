@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVPLYWriter - provides a ParaView friendly API for vtkPLYWriter.
-// .SECTION Description
-// This is a facade for vtkPLYWriter that provides an API more amiable to the
-// GUI shown in the ParaView application.
+/**
+ * @class   vtkPVPLYWriter
+ * @brief   provides a ParaView friendly API for vtkPLYWriter.
+ *
+ * This is a facade for vtkPLYWriter that provides an API more amiable to the
+ * GUI shown in the ParaView application.
+*/
 
 #ifndef vtkPVPLYWriter_h
 #define vtkPVPLYWriter_h
@@ -35,27 +38,34 @@ public:
   vtkTypeMacro(vtkPVPLYWriter, vtkWriter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Enable coloring.
+  //@{
+  /**
+   * Enable coloring.
+   */
   vtkSetMacro(EnableColoring, bool);
   vtkGetMacro(EnableColoring, bool);
+  //@}
 
-  // Description:
-  // If the file type is binary, then the user can specify which
-  // byte order to use (little versus big endian).
+  /**
+   * If the file type is binary, then the user can specify which
+   * byte order to use (little versus big endian).
+   */
   void SetDataByteOrder(int dbo);
 
-  // Description:
-  // Specify file type (ASCII or BINARY) for vtk data file.
+  /**
+   * Specify file type (ASCII or BINARY) for vtk data file.
+   */
   void SetFileType(int ftype);
 
-  // Description:
-  // Specify file name of vtk polygon data file to write.
+  /**
+   * Specify file name of vtk polygon data file to write.
+   */
   void SetFileName(const char* fname);
 
-  // Description:
-  // A lookup table can be specified in order to convert data arrays to
-  // RGBA colors.
+  /**
+   * A lookup table can be specified in order to convert data arrays to
+   * RGBA colors.
+   */
   void SetLookupTable(vtkScalarsToColors* lut);
 
 protected:

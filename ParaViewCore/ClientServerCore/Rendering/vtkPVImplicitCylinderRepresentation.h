@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVImplicitCylinderRepresentation - extends vtkImplicitCylinderRepresentation
-// .SECTION Description
-// vtkPVImplicitCylinderRepresentation extends vtkImplicitCylinderRepresentation
-// to add ParaView proper initialisation values
+/**
+ * @class   vtkPVImplicitCylinderRepresentation
+ * @brief   extends vtkImplicitCylinderRepresentation
+ *
+ * vtkPVImplicitCylinderRepresentation extends vtkImplicitCylinderRepresentation
+ * to add ParaView proper initialisation values
+*/
 
 #ifndef vtkPVImplicitCylinderRepresentation_h
 #define vtkPVImplicitCylinderRepresentation_h

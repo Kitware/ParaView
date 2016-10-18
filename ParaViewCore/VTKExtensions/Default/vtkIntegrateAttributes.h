@@ -12,15 +12,18 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkIntegrateAttributes - Integrates lines, surfaces and volume.
-// .SECTION Description
-// Integrates all point and cell data attributes while computing
-// length, area or volume.  Works for 1D, 2D or 3D.  Only one dimensionality
-// at a time.  For volume, this filter ignores all but 3D cells.  It
-// will not compute the volume contained in a closed surface.
-// The output of this filter is a single point and vertex.  The attributes
-// for this point and cell will contain the integration results
-// for the corresponding input attributes.
+/**
+ * @class   vtkIntegrateAttributes
+ * @brief   Integrates lines, surfaces and volume.
+ *
+ * Integrates all point and cell data attributes while computing
+ * length, area or volume.  Works for 1D, 2D or 3D.  Only one dimensionality
+ * at a time.  For volume, this filter ignores all but 3D cells.  It
+ * will not compute the volume contained in a closed surface.
+ * The output of this filter is a single point and vertex.  The attributes
+ * for this point and cell will contain the integration results
+ * for the corresponding input attributes.
+*/
 
 #ifndef vtkIntegrateAttributes_h
 #define vtkIntegrateAttributes_h

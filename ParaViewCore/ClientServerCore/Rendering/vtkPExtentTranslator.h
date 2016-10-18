@@ -12,12 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPExtentTranslator - extent translator that collects information
-// about extents from multiple processes in parallel.
-// .SECTION Description
-// vtkPExtentTranslator is used by vtkImageVolumeRepresentation to collect
-// information about image extents on all the ranks. This is resurrected version
-// of vtkPVTrivialExtentTranslator.
+/**
+ * @class   vtkPExtentTranslator
+ * @brief   extent translator that collects information
+ * about extents from multiple processes in parallel.
+ *
+ * vtkPExtentTranslator is used by vtkImageVolumeRepresentation to collect
+ * information about image extents on all the ranks. This is resurrected version
+ * of vtkPVTrivialExtentTranslator.
+*/
 
 #ifndef vtkPExtentTranslator_h
 #define vtkPExtentTranslator_h
@@ -35,10 +38,11 @@ public:
   vtkTypeMacro(vtkPExtentTranslator, vtkExtentTranslator);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // If DataSet is topologically regular, each process will only know
-  // about its own subextent.  This function does an allreduce to make sure
-  // that each process knows the subextent of every process.
+  /**
+   * If DataSet is topologically regular, each process will only know
+   * about its own subextent.  This function does an allreduce to make sure
+   * that each process knows the subextent of every process.
+   */
   void GatherExtents(vtkDataSet* dataset);
 
 protected:

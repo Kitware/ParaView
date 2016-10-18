@@ -12,10 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVKeyFrameAnimationCueForProxies
-// .SECTION Description
-// vtkPVKeyFrameAnimationCueForProxies extends vtkPVKeyFrameAnimationCue to
-// update properties on proxies in SetAnimationValue().
+/**
+ * @class   vtkPVKeyFrameAnimationCueForProxies
+ *
+ * vtkPVKeyFrameAnimationCueForProxies extends vtkPVKeyFrameAnimationCue to
+ * update properties on proxies in SetAnimationValue().
+*/
 
 #ifndef vtkPVKeyFrameAnimationCueForProxies_h
 #define vtkPVKeyFrameAnimationCueForProxies_h
@@ -33,42 +35,56 @@ public:
   vtkTypeMacro(vtkPVKeyFrameAnimationCueForProxies, vtkPVKeyFrameAnimationCue);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Set/Get the animated proxy.
+  //@{
+  /**
+   * Set/Get the animated proxy.
+   */
   void SetAnimatedProxy(vtkSMProxy*);
   vtkGetObjectMacro(AnimatedProxy, vtkSMProxy);
+  //@}
 
   void RemoveAnimatedProxy();
 
-  // Description:
-  // Set/Get the animated property name.
+  //@{
+  /**
+   * Set/Get the animated property name.
+   */
   vtkSetStringMacro(AnimatedPropertyName);
   vtkGetStringMacro(AnimatedPropertyName);
+  //@}
 
-  // Description:
-  // Set/Get the animated domain name.
+  //@{
+  /**
+   * Set/Get the animated domain name.
+   */
   vtkSetStringMacro(AnimatedDomainName);
   vtkGetStringMacro(AnimatedDomainName);
+  //@}
 
-  // Description:
-  // Used to update the animated item. This API makes it possible for vtk-level
-  // classes to update properties without actually linking with the
-  // ServerManager library. This only works since they object are created only
-  // on the client.
+  //@{
+  /**
+   * Used to update the animated item. This API makes it possible for vtk-level
+   * classes to update properties without actually linking with the
+   * ServerManager library. This only works since they object are created only
+   * on the client.
+   */
   virtual void BeginUpdateAnimationValues();
   virtual void SetAnimationValue(int index, double value);
   virtual void EndUpdateAnimationValues();
+  //@}
 
 protected:
   vtkPVKeyFrameAnimationCueForProxies();
   ~vtkPVKeyFrameAnimationCueForProxies();
 
-  // Description:
-  // Get the property being animated.
+  /**
+   * Get the property being animated.
+   */
   vtkSMProperty* GetAnimatedProperty();
 
-  // Description:
-  // Get the domain being animated.
+  /**
+   * Get the domain being animated.
+   */
   vtkSMDomain* GetAnimatedDomain();
 
   vtkSMProxy* AnimatedProxy;

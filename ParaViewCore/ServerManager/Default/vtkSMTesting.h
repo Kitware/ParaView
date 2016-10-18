@@ -12,12 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMTesting - vtkTesting adaptor for Server Manager.
-// .DESCRIPTION
-// This provides helper methods to use view proxy for testing.
-// This is also required for python testing, since when SM is python wrapped,
-// VTK need not by python wrapped, hence we cannot use vtkTesting in python 
-// testing.
+/**
+ * @class   vtkSMTesting
+ * @brief   vtkTesting adaptor for Server Manager.
+ * .DESCRIPTION
+ * This provides helper methods to use view proxy for testing.
+ * This is also required for python testing, since when SM is python wrapped,
+ * VTK need not by python wrapped, hence we cannot use vtkTesting in python 
+ * testing.
+*/
 
 #ifndef vtkSMTesting_h
 #define vtkSMTesting_h
@@ -35,21 +38,25 @@ public:
   vtkTypeMacro(vtkSMTesting, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Set/get the render module proxy.
+  /**
+   * Set/get the render module proxy.
+   */
   void SetViewProxy(vtkSMViewProxy* view);
 
-  // Description:
-  // API for backwards compatibility. Simply calls SetViewProxy(..).
+  /**
+   * API for backwards compatibility. Simply calls SetViewProxy(..).
+   */
   void SetRenderViewProxy(vtkSMViewProxy* proxy)
     { this->SetViewProxy(proxy); }
 
-  // Description:
-  // Add argument
+  /**
+   * Add argument
+   */
   virtual void AddArgument(const char* arg);
 
-  // Description:
-  // Perform the actual test.
+  /**
+   * Perform the actual test.
+   */
   virtual int RegressionTest(float thresh);
 
 protected:

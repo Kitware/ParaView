@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVJoystickFly - Fly camera towards or away from the object
-// .SECTION Description
-// vtkPVJoystickFly allows the user to interactively manipulate the
-// camera, the viewpoint of the scene.
+/**
+ * @class   vtkPVJoystickFly
+ * @brief   Fly camera towards or away from the object
+ *
+ * vtkPVJoystickFly allows the user to interactively manipulate the
+ * camera, the viewpoint of the scene.
+*/
 
 #ifndef vtkPVJoystickFly_h
 #define vtkPVJoystickFly_h
@@ -31,20 +34,26 @@ public:
   vtkTypeMacro(vtkPVJoystickFly, vtkCameraManipulator);
   void PrintSelf(ostream& os, vtkIndent indent);
   
-  // Description:
-  // Event bindings controlling the effects of pressing mouse buttons
-  // or moving the mouse.
+  //@{
+  /**
+   * Event bindings controlling the effects of pressing mouse buttons
+   * or moving the mouse.
+   */
   virtual void OnMouseMove(int x, int y, vtkRenderer *ren,
                            vtkRenderWindowInteractor *rwi);
   virtual void OnButtonDown(int x, int y, vtkRenderer *ren,
                             vtkRenderWindowInteractor *rwi);
   virtual void OnButtonUp(int x, int y, vtkRenderer *ren,
                           vtkRenderWindowInteractor *rwi);
+  //@}
 
-  // Description:
-  // Set and get the speed of flying.
+  //@{
+  /**
+   * Set and get the speed of flying.
+   */
   vtkSetClampMacro(FlySpeed, double, 1, 30);  
   vtkGetMacro(FlySpeed, double);  
+  //@}
 
 protected:
   vtkPVJoystickFly();

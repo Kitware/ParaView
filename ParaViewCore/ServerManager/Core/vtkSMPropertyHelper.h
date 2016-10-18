@@ -38,21 +38,24 @@
 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-// .NAME vtkSMPropertyHelper - helper class to get/set property values.
-// .SECTION Description
-// vtkSMPropertyHelper is a helper class to get/set property values in a type
-// independent fashion.
-// eg.
-// \code
-//    vtkSMPropertyHelper(proxy, "Visibility").Set(0);
-//    vtkSMPropertyHelper(proxy, "Input").Set(inputProxy, 0);
-//
-//    double center[3] = {...};
-//    vtkSMPropertyHelper(proxy, "Center").Set(center, 3);
-// \endcode
-// .SECTION Caveat
-// This class is not wrapped, hence not available in any of the wrapped
-// languagues such as python.
+/**
+ * @class   vtkSMPropertyHelper
+ * @brief   helper class to get/set property values.
+ *
+ * vtkSMPropertyHelper is a helper class to get/set property values in a type
+ * independent fashion.
+ * eg.
+ * \code
+ *    vtkSMPropertyHelper(proxy, "Visibility").Set(0);
+ *    vtkSMPropertyHelper(proxy, "Input").Set(inputProxy, 0);
+ *
+ *    double center[3] = {...};
+ *    vtkSMPropertyHelper(proxy, "Center").Set(center, 3);
+ * \endcode
+ * @par Caveat:
+ * This class is not wrapped, hence not available in any of the wrapped
+ * languagues such as python.
+*/
 
 #ifndef vtkSMPropertyHelper_h
 #define vtkSMPropertyHelper_h
@@ -86,52 +89,64 @@ class vtkSMInputProperty;
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMPropertyHelper 
 {
 public:
-  // Description:
-  // If quiet is true, then no errors or warning are raised if the property is
-  // missing or of incorrect type.
+  //@{
+  /**
+   * If quiet is true, then no errors or warning are raised if the property is
+   * missing or of incorrect type.
+   */
   vtkSMPropertyHelper(vtkSMProxy* proxy, const char* name, bool quiet=false);
   vtkSMPropertyHelper(vtkSMProperty *property, bool quiet = false);
   ~vtkSMPropertyHelper();
+  //@}
 
-  // Description:
-  // Updates the property value by fetching the value from the server. This only
-  // works for properties with \c InformationOnly attribute set to 1. For all
-  // other properties, this has no effect.
+  /**
+   * Updates the property value by fetching the value from the server. This only
+   * works for properties with \c InformationOnly attribute set to 1. For all
+   * other properties, this has no effect.
+   */
   void UpdateValueFromServer();
 
-  // Description:
-  // Set the number of elements in the property. For vtkSMProxyProperty, this is
-  // equivalent to SetNumberOfProxies().
+  /**
+   * Set the number of elements in the property. For vtkSMProxyProperty, this is
+   * equivalent to SetNumberOfProxies().
+   */
   void SetNumberOfElements(unsigned int elems);
 
-  // Description:
-  // Get the number of elements in the property.
-  // For vtkSMProxyProperty, this is equivalent to GetNumberOfProxies().
+  /**
+   * Get the number of elements in the property.
+   * For vtkSMProxyProperty, this is equivalent to GetNumberOfProxies().
+   */
   unsigned int GetNumberOfElements() const;
 
-  // Description:
-  // Equivalent to SetNumberOfElements(0).
+  /**
+   * Equivalent to SetNumberOfElements(0).
+   */
   void RemoveAllValues() { this->SetNumberOfElements(0); }
 
-  // Description:
-  // Get value as a variant.
+  /**
+   * Get value as a variant.
+   */
   vtkVariant GetAsVariant(unsigned int index);
 
-  // Description:
-  // Templated method to call GetIntArray(), GetDoubleArray(), GetIdTypeArray().
-  // Note, we  only provide implementations for T==double, int, vtkIdType.
+  /**
+   * Templated method to call GetIntArray(), GetDoubleArray(), GetIdTypeArray().
+   * Note, we  only provide implementations for T==double, int, vtkIdType.
+   */
   template <class T>
   std::vector<T> GetArray();
 
-  // Description:
-  // Templated method to call GetAsInt(), GetAsDouble(), GetAsIdType()
-  // Note, we  only provide implementations for T==double, int, vtkIdType.
+  /**
+   * Templated method to call GetAsInt(), GetAsDouble(), GetAsIdType()
+   * Note, we  only provide implementations for T==double, int, vtkIdType.
+   */
   template <class T>
   T GetAs(unsigned int index=0);
 
-  // Description:
-  // Set/Get methods with \c int API. Calling these method on
-  // vtkSMStringVectorProperty or vtkSMProxyProperty will raise errors.
+  //@{
+  /**
+   * Set/Get methods with \c int API. Calling these method on
+   * vtkSMStringVectorProperty or vtkSMProxyProperty will raise errors.
+   */
   void Set(int value)
     { this->Set(0, value); }
   void Set(unsigned int index, int value);
@@ -139,10 +154,13 @@ public:
   int GetAsInt(unsigned int index = 0);
   unsigned int Get(int* values, unsigned int count = 1);
   std::vector<int> GetIntArray();
+  //@}
 
-  // Description:
-  // Set/Get methods with \c double API. Calling these method on
-  // vtkSMStringVectorProperty or vtkSMProxyProperty will raise errors.
+  //@{
+  /**
+   * Set/Get methods with \c double API. Calling these method on
+   * vtkSMStringVectorProperty or vtkSMProxyProperty will raise errors.
+   */
   void Set(double value)
     { this->Set(0, value); }
   void Set(unsigned int index, double value);
@@ -150,11 +168,14 @@ public:
   double GetAsDouble(unsigned int index = 0);
   unsigned int Get(double* values, unsigned int count = 1);
   std::vector<double> GetDoubleArray();
+  //@}
 
 #if VTK_SIZEOF_ID_TYPE != VTK_SIZEOF_INT
-  // Description:
-  // Set/Get methods with \c vtkIdType API. Calling these method on
-  // vtkSMStringVectorProperty or vtkSMProxyProperty will raise errors.
+  //@{
+  /**
+   * Set/Get methods with \c vtkIdType API. Calling these method on
+   * vtkSMStringVectorProperty or vtkSMProxyProperty will raise errors.
+   */
   void Set(vtkIdType value)
     { this->Set(0, value); }
   void Set(unsigned int index, vtkIdType value);
@@ -163,22 +184,28 @@ public:
 #endif
   vtkIdType GetAsIdType(unsigned int index = 0);
   std::vector<vtkIdType> GetIdTypeArray();
+  //@}
 
-  // Description:
-  // Set/Get methods for vtkSMStringVectorProperty. Calling these methods on any
-  // other type of property will raise errors.
-  // These overloads can be used for vtkSMIntVectorProperty with an enumeration
-  // domain as well, in which case the string-to-int (and vice-versa)
-  // translations are done internally.
+  //@{
+  /**
+   * Set/Get methods for vtkSMStringVectorProperty. Calling these methods on any
+   * other type of property will raise errors.
+   * These overloads can be used for vtkSMIntVectorProperty with an enumeration
+   * domain as well, in which case the string-to-int (and vice-versa)
+   * translations are done internally.
+   */
   void Set(const char* value)
     { this->Set(0, value); }
   void Set(unsigned int index, const char* value);
   const char* GetAsString(unsigned int index = 0);
+  //@}
 
-  // Description:
-  // Set/Get methods for vtkSMProxyProperty or vtkSMInputProperty. 
-  // Calling these methods on any other type of property will raise errors.
-  // The option \c outputport(s) argument is used only for vtkSMInputProperty.
+  //@{
+  /**
+   * Set/Get methods for vtkSMProxyProperty or vtkSMInputProperty.
+   * Calling these methods on any other type of property will raise errors.
+   * The option \c outputport(s) argument is used only for vtkSMInputProperty.
+   */
   void Set(vtkSMProxy* value, unsigned int outputport=0)
     { this->Set(0, value, outputport); }
   void Set(unsigned int index, vtkSMProxy* value, unsigned int outputport=0);
@@ -187,45 +214,60 @@ public:
   void Remove(vtkSMProxy* value);
   vtkSMProxy* GetAsProxy(unsigned int index=0);
   unsigned int GetOutputPort(unsigned int index=0);
+  //@}
  
-  // Description:
-  // This API is useful for setting values on vtkSMStringVectorProperty that is
-  // used for status where the first value is the name of the array (for
-  // example) and the second value is it's status.
+  //@{
+  /**
+   * This API is useful for setting values on vtkSMStringVectorProperty that is
+   * used for status where the first value is the name of the array (for
+   * example) and the second value is it's status.
+   */
   void SetStatus(const char* key, int value);
   int GetStatus(const char* key, int default_value=0);
+  //@}
 
-  // Description:
-  // This API is useful for setting values on vtkSMStringVectorProperty that is
-  // used for status where the first value is the name of the array (for
-  // example) and the second value is it's status.
+  //@{
+  /**
+   * This API is useful for setting values on vtkSMStringVectorProperty that is
+   * used for status where the first value is the name of the array (for
+   * example) and the second value is it's status.
+   */
   void SetStatus(const char* key, double *values, int num_values);
   bool GetStatus(const char* key, double *values, int num_values);
+  //@}
 
-  // Description:
-  // This API is useful for setting values on vtkSMStringVectorProperty that is
-  // used for status where the first value is the name of the array (for
-  // example) and the second value is it's status (as a string)
+  //@{
+  /**
+   * This API is useful for setting values on vtkSMStringVectorProperty that is
+   * used for status where the first value is the name of the array (for
+   * example) and the second value is it's status (as a string)
+   */
   void SetStatus(const char* key, const char* value);
   const char* GetStatus(const char* key, const char* default_value);
+  //@}
 
-  // Description:
-  // For vtkSMStringVectorProperty that is used to setting input array to
-  // process on algorithms, this provides a convenient API to get/set the
-  // values.
+  //@{
+  /**
+   * For vtkSMStringVectorProperty that is used to setting input array to
+   * process on algorithms, this provides a convenient API to get/set the
+   * values.
+   */
   void SetInputArrayToProcess(int fieldAssociation, const char* arrayName);
   int GetInputArrayAssociation();
   const char* GetInputArrayNameToProcess();
+  //@}
 
-  // Description:
-  // Get/Set whether to use unchecked properties.
+  /**
+   * Get/Set whether to use unchecked properties.
+   */
   void SetUseUnchecked(bool val) { this->UseUnchecked = val; }
   bool GetUseUnchecked() { return this->UseUnchecked; }
 
-  // Description:
-  // Copy property values from another vtkSMPropertyHelper. This only
-  // works for compatible properties and currently only supported for numeric
-  // vtkSMVectorProperty subclasses.
+  /**
+   * Copy property values from another vtkSMPropertyHelper. This only
+   * works for compatible properties and currently only supported for numeric
+   * vtkSMVectorProperty subclasses.
+   */
   bool Copy(vtkSMPropertyHelper& source);
 
 protected:

@@ -12,19 +12,23 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMNamedPropertyIterator - iterates over a subset of a proxy's properties
-//
-// .SECTION Description
-// vtkSMNamedPropertyIterator can be used to iterate over a subset of a proxy's 
-// properties. The subset is defined through a list of strings naming properties.
-// The properties of the root proxies as well as sub-proxies are  included in the
-// iteration. For sub-proxies, only exposed properties are iterated over.
-//
-// .SECTION See Also
-// vtkSMPropertyIterator
-//
-// .SECTION Thanks
-// This class was contributed by SciberQuest Inc.
+/**
+ * @class   vtkSMNamedPropertyIterator
+ * @brief   iterates over a subset of a proxy's properties
+ *
+ *
+ * vtkSMNamedPropertyIterator can be used to iterate over a subset of a proxy's 
+ * properties. The subset is defined through a list of strings naming properties.
+ * The properties of the root proxies as well as sub-proxies are  included in the
+ * iteration. For sub-proxies, only exposed properties are iterated over.
+ *
+ * @sa
+ * vtkSMPropertyIterator
+ *
+ * @par Thanks:
+ * This class was contributed by SciberQuest Inc.
+*/
+
 #ifndef vtkSMNamedPropertyIterator_h
 #define vtkSMNamedPropertyIterator_h
 
@@ -42,33 +46,40 @@ public:
   vtkTypeMacro(vtkSMNamedPropertyIterator, vtkSMPropertyIterator);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Set the names of properties to iterate over.
+  /**
+   * Set the names of properties to iterate over.
+   */
   void SetPropertyNames(vtkStringList *names);
 
-  // Description:
-  // Go to the first property.
+  /**
+   * Go to the first property.
+   */
   virtual void Begin();
 
-  // Description:
-  // Returns true if iterator points past the end of the collection.
+  /**
+   * Returns true if iterator points past the end of the collection.
+   */
   virtual int IsAtEnd();
 
-  // Description:
-  // Move to the next property.
+  /**
+   * Move to the next property.
+   */
   virtual void Next();
 
-  // Description:
-  // Returns the key (name) at the current iterator position.
+  /**
+   * Returns the key (name) at the current iterator position.
+   */
   virtual const char* GetKey();
 
-  // Description:
-  // Returns the XMLLabel for self properties and the exposed name for
-  // sub-proxy properties.
+  /**
+   * Returns the XMLLabel for self properties and the exposed name for
+   * sub-proxy properties.
+   */
   virtual const char* GetPropertyLabel();
 
-  // Description:
-  // Returns the property at the current iterator position.
+  /**
+   * Returns the property at the current iterator position.
+   */
   virtual vtkSMProperty* GetProperty();
 
 protected:

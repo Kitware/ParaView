@@ -12,11 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCustomUnstructuredGridBuilder - Class for creating unstructured grids.
-// .SECTION Description
-// Class for creating vtkUnstructuredGrids for a test driver.  The 
-// UnstructuredGrid is built directly from a vtkUniformGrid to demonstrate
-// how to input a grid into the coprocessor.
+/**
+ * @class   vtkCustomUnstructuredGridBuilder
+ * @brief   Class for creating unstructured grids.
+ *
+ * Class for creating vtkUnstructuredGrids for a test driver.  The 
+ * UnstructuredGrid is built directly from a vtkUniformGrid to demonstrate
+ * how to input a grid into the coprocessor.
+*/
 
 #ifndef vtkCustomUnstructuredGridBuilder_h
 #define vtkCustomUnstructuredGridBuilder_h
@@ -36,23 +39,26 @@ public:
   vtkTypeMacro(vtkCustomUnstructuredGridBuilder, vtkCPUnstructuredGridBuilder);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Return a grid.  BuiltNewGrid is set to 0 if the grids
-  // that were returned were already built before.
-  // vtkCustomUnstructuredGridBuilder will also delete the grid.
+  /**
+   * Return a grid.  BuiltNewGrid is set to 0 if the grids
+   * that were returned were already built before.
+   * vtkCustomUnstructuredGridBuilder will also delete the grid.
+   */
   virtual vtkDataObject* GetGrid(unsigned long timeStep, double time,
                                  int & builtNewGrid);
 
-  // Description:
-  // Customized function to build UnstructuredGrid.
+  /**
+   * Customized function to build UnstructuredGrid.
+   */
   void BuildGrid();
 
 protected:
   vtkCustomUnstructuredGridBuilder();
   ~vtkCustomUnstructuredGridBuilder();
 
-  // Description:
-  // Method to compute the centroid of Cell and return the values in xyz.
+  /**
+   * Method to compute the centroid of Cell and return the values in xyz.
+   */
   void ComputeCellCentroid(vtkGenericCell* cell, double xyz[3]);
 
 private:

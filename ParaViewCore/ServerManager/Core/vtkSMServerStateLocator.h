@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMServerStateLocator - Class used to retreive a given message state based
-// on its GlobalID from the DataServer.
-// .SECTION Description
-// Retreive a given state from the server.
+/**
+ * @class   vtkSMServerStateLocator
+ * @brief   Class used to retreive a given message state based
+ * on its GlobalID from the DataServer.
+ *
+ * Retreive a given state from the server.
+*/
 
 #ifndef vtkSMServerStateLocator_h
 #define vtkSMServerStateLocator_h
@@ -34,17 +37,21 @@ public:
   vtkTypeMacro(vtkSMServerStateLocator, vtkSMStateLocator);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Set/Get a parent locator to search which is used as a backup location
-  // to search from if a given state was not found locally.
+  //@{
+  /**
+   * Set/Get a parent locator to search which is used as a backup location
+   * to search from if a given state was not found locally.
+   */
   vtkSMSession* GetSession();
   void SetSession(vtkSMSession* session);
+  //@}
 
-  // Description:
-  // Fill the provided State message with the state found inside the current
-  // locator or one of its parent. The method return true if the state was
-  // successfully filled.
-  // In that case useParent is not used and is set to false.
+  /**
+   * Fill the provided State message with the state found inside the current
+   * locator or one of its parent. The method return true if the state was
+   * successfully filled.
+   * In that case useParent is not used and is set to false.
+   */
   virtual bool FindState(vtkTypeUInt32 globalID, vtkSMMessage* stateToFill,
                          bool useParent);
 

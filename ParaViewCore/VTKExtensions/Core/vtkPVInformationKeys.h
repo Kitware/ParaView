@@ -12,8 +12,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVInformationKeys -
-// .SECTION Description
+/**
+ * @class   vtkPVInformationKeys
+ *
+*/
 
 #ifndef vtkPVInformationKeys_h
 #define vtkPVInformationKeys_h
@@ -26,15 +28,19 @@ class vtkInformationDoubleVectorKey;
 class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVInformationKeys
 {
 public:
-  // Description:
-  // Key to store the label that should be used for labelling the time in the UI
+  /**
+   * Key to store the label that should be used for labelling the time in the UI
+   */
   static vtkInformationStringKey* TIME_LABEL_ANNOTATION();
 
-  // Description:
-  // Key to store the bounding box of the entire data set in pipeline
-  // information.
+  //@{
+  /**
+   * Key to store the bounding box of the entire data set in pipeline
+   * information.
+   */
   static vtkInformationDoubleVectorKey* WHOLE_BOUNDING_BOX();
 };
+  //@}
 
 #endif // vtkPVInformationKeys_h
 // VTK-HeaderTest-Exclude: vtkPVInformationKeys.h

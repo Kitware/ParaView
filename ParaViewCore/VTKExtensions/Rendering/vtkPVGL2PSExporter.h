@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVGL2PSExporter - ParaView wrapper for vtkGL2PS exporter.
-// .SECTION Description
-// This is used to export ParaView renderings to a variety of vector graphics
-// formats.
+/**
+ * @class   vtkPVGL2PSExporter
+ * @brief   ParaView wrapper for vtkGL2PS exporter.
+ *
+ * This is used to export ParaView renderings to a variety of vector graphics
+ * formats.
+*/
 
 #ifndef vtkPVGL2PSExporter_h
 #define vtkPVGL2PSExporter_h
@@ -32,20 +35,26 @@ public:
   vtkTypeMacro(vtkPVGL2PSExporter, vtkOpenGLGL2PSExporter)
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Set/Get the name of the output file.
+  //@{
+  /**
+   * Set/Get the name of the output file.
+   */
   vtkSetMacro(FileName, const char *)
   const char *GetFileName()
   {
     return this->FileName.c_str();
   }
+  //@}
 
-  // Description:
-  // If Write3DPropsAsRasterImage is true, add all instances of
-  // vtkCubeAxesActors to the RenderExclusions.
+  //@{
+  /**
+   * If Write3DPropsAsRasterImage is true, add all instances of
+   * vtkCubeAxesActors to the RenderExclusions.
+   */
   vtkSetMacro(ExcludeCubeAxesActorsFromRasterization, int)
   vtkGetMacro(ExcludeCubeAxesActorsFromRasterization, int)
   vtkBooleanMacro(ExcludeCubeAxesActorsFromRasterization, int)
+  //@}
 
 protected:
   vtkPVGL2PSExporter();

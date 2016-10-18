@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVTextSource - source that generates a 1x1 vtkTable with a single
-// string data.
-// .SECTION Description
-// vtkPVTextSource is used to generate a table with a single string. 
+/**
+ * @class   vtkPVTextSource
+ * @brief   source that generates a 1x1 vtkTable with a single
+ * string data.
+ *
+ * vtkPVTextSource is used to generate a table with a single string. 
+*/
 
 #ifndef vtkPVTextSource_h
 #define vtkPVTextSource_h
@@ -30,10 +33,13 @@ public:
   vtkTypeMacro(vtkPVTextSource, vtkTableAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Get/Set the text string to generate in the output.
+  //@{
+  /**
+   * Get/Set the text string to generate in the output.
+   */
   vtkSetStringMacro(Text);
   vtkGetStringMacro(Text);
+  //@}
   
 
 protected:

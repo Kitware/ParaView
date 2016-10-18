@@ -14,15 +14,18 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVPostFilterExecutive - Executive supporting post filters.
-// .SECTION Description
-// vtkPVPostFilterExecutive is an executive that supports the creation of
-// post filters for the following uses cases:
-// Provide the ability to automatically use a vector component as a scalar
-// input property.
-//
-// Interpolate cell centered data to point data, and the inverse if needed
-// by the filter.
+/**
+ * @class   vtkPVPostFilterExecutive
+ * @brief   Executive supporting post filters.
+ *
+ * vtkPVPostFilterExecutive is an executive that supports the creation of
+ * post filters for the following uses cases:
+ * Provide the ability to automatically use a vector component as a scalar
+ * input property.
+ *
+ * Interpolate cell centered data to point data, and the inverse if needed
+ * by the filter.
+*/
 
 #ifndef vtkPVPostFilterExecutive_h
 #define vtkPVPostFilterExecutive_h
@@ -42,9 +45,10 @@ public:
   static vtkInformationInformationVectorKey* POST_ARRAYS_TO_PROCESS();
   static vtkInformationStringVectorKey* POST_ARRAY_COMPONENT_KEY();
 
-  // Description:
-  // Returns the data object stored with the DATA_OBJECT() in the
-  // input port
+  /**
+   * Returns the data object stored with the DATA_OBJECT() in the
+   * input port
+   */
   vtkDataObject* GetCompositeInputData(
     int port, int index, vtkInformationVector **inInfoVec);
 

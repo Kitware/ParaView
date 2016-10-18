@@ -14,15 +14,17 @@
 =========================================================================*/
 //  Copyright (c) 2013-2014 Mickael Philit
 
-// .NAME vtkCGNSReaderInternal -- class(es) used by vtkCGNSReader
-// .SECTION Description
-//     parse a file in "CGNS" format
-//
-// .SECTION Caveats
-//     Only Cell/Vertex data are supported.
-//
-// .SECTION Thanks
-// Thanks to .
+/**
+ * @class   vtkCGNSReaderInternal
+ *
+ *     parse a file in "CGNS" format
+ *
+ * @warning
+ *     Only Cell/Vertex data are supported.
+ *
+ * @par Thanks:
+ * Thanks to .
+*/
 
 #ifndef vtkCGNSReaderInternal_h
 #define vtkCGNSReaderInternal_h
@@ -231,42 +233,50 @@ public:
 class vtkCGNSMetaData
 {
 public:
-  // Description:
-  // quick parsing of cgns file to get interesting information
-  // from a VTK point of view
+  /**
+   * quick parsing of cgns file to get interesting information
+   * from a VTK point of view
+   */
   bool Parse(const char* cgnsFileName);
 
-  // Description:
-  // return number of base nodes
+  /**
+   * return number of base nodes
+   */
   int GetNumberOfBaseNodes()
     {
     return static_cast<int>(this->baseList.size());
     }
 
-  // Description:
-  // return const reference to a base information
+  /**
+   * return const reference to a base information
+   */
   const CGNSRead::BaseInformation & GetBase(int numBase)
     {
     return this->baseList[numBase];
     }
 
-  // Description
-  // return reference to GlobalTime
+  /**
+   * return reference to GlobalTime
+   */
   std::vector<double> & GetTimes()
     {
     return this->GlobalTime;
     }
 
-  // Description:
-  // print object debugging purpose
+  /**
+   * print object debugging purpose
+   */
   void PrintSelf(std::ostream& os);
 
   void Broadcast ( vtkMultiProcessController* controller, int rank );
 
-  // Description
-  // Constructor/Destructor
+  //@{
+  /**
+   * Constructor/Destructor
+   */
   vtkCGNSMetaData();
   ~vtkCGNSMetaData();
+  //@}
 
 private:
   vtkCGNSMetaData(const vtkCGNSMetaData&) VTK_DELETE_FUNCTION;

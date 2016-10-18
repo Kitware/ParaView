@@ -12,9 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVCacheKeeperPipeline
-// .SECTION Description
-//
+/**
+ * @class   vtkPVCacheKeeperPipeline
+ *
+ *
+*/
 
 #ifndef vtkPVCacheKeeperPipeline_h
 #define vtkPVCacheKeeperPipeline_h

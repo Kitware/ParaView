@@ -12,10 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVLastSelectionInformation
-// .SECTION Description
-// vtkPVLastSelectionInformation is used to obtain the LastSelection from
-// vtkPVRenderView.
+/**
+ * @class   vtkPVLastSelectionInformation
+ *
+ * vtkPVLastSelectionInformation is used to obtain the LastSelection from
+ * vtkPVRenderView.
+*/
 
 #ifndef vtkPVLastSelectionInformation_h
 #define vtkPVLastSelectionInformation_h

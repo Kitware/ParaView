@@ -12,11 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 ==============================================================================*/
-// .NAME vtkSMIndexSelectionDomain - Select names from an indexed string list.
-//
-// .SECTION Description
-// See the vtkMPASReader proxy in readers.xml for how the properties should be
-// set up for this domain.
+/**
+ * @class   vtkSMIndexSelectionDomain
+ * @brief   Select names from an indexed string list.
+ *
+ *
+ * See the vtkMPASReader proxy in readers.xml for how the properties should be
+ * set up for this domain.
+*/
 
 #ifndef vtkSMIndexSelectionDomain_h
 #define vtkSMIndexSelectionDomain_h

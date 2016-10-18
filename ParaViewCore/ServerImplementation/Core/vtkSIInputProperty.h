@@ -12,11 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSIInputProperty
-// .SECTION Description
-// ServerSide Property use to set vtkOutputPort as method parameter.
-// For that we need the object on which we should get the Port and its port
-// number.
+/**
+ * @class   vtkSIInputProperty
+ *
+ * ServerSide Property use to set vtkOutputPort as method parameter.
+ * For that we need the object on which we should get the Port and its port
+ * number.
+*/
 
 #ifndef vtkSIInputProperty_h
 #define vtkSIInputProperty_h
@@ -31,21 +33,26 @@ public:
   vtkTypeMacro(vtkSIInputProperty, vtkSIProxyProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Controls which input port this property uses when making connections.
-  // By default, this is 0.
+  //@{
+  /**
+   * Controls which input port this property uses when making connections.
+   * By default, this is 0.
+   */
   vtkGetMacro(PortIndex, int);
+  //@}
 
 protected:
   vtkSIInputProperty();
   ~vtkSIInputProperty();
 
-  // Description:
-  // Push a new state to the underneath implementation
+  /**
+   * Push a new state to the underneath implementation
+   */
   virtual bool Push(vtkSMMessage*, int);
 
-  // Description:
-  // Parse the xml for the property.
+  /**
+   * Parse the xml for the property.
+   */
   virtual bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element);
 
   vtkSetMacro(PortIndex, int);

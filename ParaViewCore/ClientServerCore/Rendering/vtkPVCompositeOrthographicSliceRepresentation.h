@@ -12,12 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVCompositeOrthographicSliceRepresentation
-// .SECTION Description
-// vtkPVCompositeOrthographicSliceRepresentation is designed for use with
-// vtkPVOrthographicSliceView. We add 3 vtkGeometrySliceRepresentation
-// instances to render the 3 slices in vtkPVOrthographicSliceView's orthographic
-// views.
+/**
+ * @class   vtkPVCompositeOrthographicSliceRepresentation
+ *
+ * vtkPVCompositeOrthographicSliceRepresentation is designed for use with
+ * vtkPVOrthographicSliceView. We add 3 vtkGeometrySliceRepresentation
+ * instances to render the 3 slices in vtkPVOrthographicSliceView's orthographic
+ * views.
+*/
 
 #ifndef vtkPVCompositeOrthographicSliceRepresentation_h
 #define vtkPVCompositeOrthographicSliceRepresentation_h
@@ -42,45 +44,53 @@ public:
   void SetSliceRepresentation2(vtkGeometrySliceRepresentation* repr)
     { this->SetSliceRepresentation(2, repr); }
 
-  // Description:
-  // Set visibility of the representation.
-  // Overridden to update the cube-axes and selection visibilities.
+  /**
+   * Set visibility of the representation.
+   * Overridden to update the cube-axes and selection visibilities.
+   */
   virtual void SetVisibility(bool visible);
 
-  // Description:
-  // Overridden to simply pass the input to the internal representations. We
-  // won't need this if vtkDataRepresentation correctly respected in the
-  // arguments passed to it during ProcessRequest() etc.
+  //@{
+  /**
+   * Overridden to simply pass the input to the internal representations. We
+   * won't need this if vtkDataRepresentation correctly respected in the
+   * arguments passed to it during ProcessRequest() etc.
+   */
   virtual void SetInputConnection(int port, vtkAlgorithmOutput* input);
   virtual void SetInputConnection(vtkAlgorithmOutput* input);
   virtual void AddInputConnection(int port, vtkAlgorithmOutput* input);
   virtual void AddInputConnection(vtkAlgorithmOutput* input);
   virtual void RemoveInputConnection(int port, vtkAlgorithmOutput* input);
   virtual void RemoveInputConnection(int port, int index);
+  //@}
 
-  // Description:
-  // Propagate the modification to all internal representations.
+  /**
+   * Propagate the modification to all internal representations.
+   */
   virtual void MarkModified();
 
-  // Description:
-  // Override because of internal composite representations that need to be
-  // initilized as well.
+  /**
+   * Override because of internal composite representations that need to be
+   * initilized as well.
+   */
   virtual unsigned int Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable);
 
 protected:
   vtkPVCompositeOrthographicSliceRepresentation();
   ~vtkPVCompositeOrthographicSliceRepresentation();
 
-  // Description:
-  // Adds the representation to the view.  This is called from
-  // vtkView::AddRepresentation().  Subclasses should override this method.
-  // Returns true if the addition succeeds.
+  /**
+   * Adds the representation to the view.  This is called from
+   * vtkView::AddRepresentation().  Subclasses should override this method.
+   * Returns true if the addition succeeds.
+   */
   virtual bool AddToView(vtkView* view);
 
-  // Description:
-  // Removes the representation to the view.  This is called from
-  // vtkView::RemoveRepresentation().  Subclasses should override this method.
-  // Returns true if the removal succeeds.
+  /**
+   * Removes the representation to the view.  This is called from
+   * vtkView::RemoveRepresentation().  Subclasses should override this method.
+   * Returns true if the removal succeeds.
+   */
   virtual bool RemoveFromView(vtkView* view);
 
   vtkSmartPointer<vtkGeometrySliceRepresentation> SliceRepresentations[3];
