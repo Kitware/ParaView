@@ -350,6 +350,7 @@
         { "class": "vtkAssemblyNode" },
         { "class": "vtkAssemblyPath" },
         { "class": "vtkAssemblyPaths" },
+        { "class": "vtkBillboardTextActor3D" },
         { "class": "vtkCamera" },
         { "class": "vtkCellPicker" },
         { "class": "vtkColorTransferFunction" },
