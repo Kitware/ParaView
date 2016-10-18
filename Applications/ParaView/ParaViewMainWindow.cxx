@@ -42,7 +42,9 @@ void vtkPVInitializePythonModules();
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqDeleteReaction.h"
+#ifdef PARAVIEW_USE_QTHELP
 #include "pqHelpReaction.h"
+#endif
 #include "pqLoadDataReaction.h"
 #include "pqOptions.h"
 #include "pqParaViewBehaviors.h"
@@ -249,7 +251,9 @@ ParaViewMainWindow::~ParaViewMainWindow()
 //-----------------------------------------------------------------------------
 void ParaViewMainWindow::showHelpForProxy(const QString& groupname, const QString& proxyname)
 {
+#ifdef PARAVIEW_USE_QTHELP
   pqHelpReaction::showProxyHelp(groupname, proxyname);
+#endif
 }
 
 //-----------------------------------------------------------------------------

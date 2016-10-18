@@ -60,7 +60,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqExampleVisualizationsDialogReaction.h"
 #include "pqExportReaction.h"
 #include "pqFiltersMenuReaction.h"
+#ifdef PARAVIEW_USE_QTHELP
 #include "pqHelpReaction.h"
+#endif
 #include "pqHideAllReaction.h"
 #include "pqIgnoreSourceTimeReaction.h"
 #include "pqLinkSelectionReaction.h"
@@ -340,9 +342,11 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
   guide->setShortcut(QKeySequence::HelpContents);
   new pqDesktopServicesReaction(QUrl::fromLocalFile(paraViewGuideFile), guide);
 
+#ifdef PARAVIEW_USE_QTHELP
   // Help
   QAction* help = menu.addAction("Reader, Filter, and Writer Reference") << pqSetName("actionHelp");
   new pqHelpReaction(help);
+#endif
 
   // -----------------
   menu.addSeparator();

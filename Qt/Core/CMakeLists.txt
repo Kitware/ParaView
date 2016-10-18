@@ -329,9 +329,15 @@ endif()
 
 #-------------------------------------------------------------------------
 include(ParaViewQt)
-pv_find_package_qt(qt_private_targets REQUIRED QUIET
-  QT4_COMPONENTS QtHelp
-  QT5_COMPONENTS Help)
+if (PARAVIEW_USE_QTHELP)
+  pv_find_package_qt(qt_private_targets REQUIRED QUIET
+    QT4_COMPONENTS QtHelp
+    QT5_COMPONENTS Help)
+else()
+  pv_find_package_qt(qt_private_targets REQUIRED QUIET
+    QT4_COMPONENTS QtGui
+    QT5_COMPONENTS Widgets)
+endif()
 
 pv_qt_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
 pv_qt_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})

@@ -80,8 +80,6 @@ set(Module_SRCS
   pqExpanderButton.h
   pqFlatTreeView.cxx
   pqFlatTreeView.h
-  pqHelpWindow.cxx
-  pqHelpWindow.h
   pqHighlightablePushButton.cxx
   pqHighlightablePushButton.h
   pqLineEdit.cxx
@@ -180,21 +178,29 @@ set (QtWidgets_SRCS
   pqTreeWidgetItemObject.h
   pqTreeWidgetSelectionHelper.h
   pqTreeViewSelectionHelper.h
-  pqHelpWindow.h
 )
 
 include(ParaViewQt)
 
 set(qt4_public_comps QtGui)
-set(qt4_private_comps QtHelp QtNetwork)
+set(qt4_private_comps QtNetwork)
 
 set(qt5_public_comps Core Gui Widgets)
-set(qt5_private_comps Network Help)
+set(qt5_private_comps Network)
 if(PARAVIEW_USE_QTWEBKIT)
   list(APPEND qt4_private_comps QtWebKit)
 endif()
 if(APPLE)
   list(APPEND qt5_private_comps PrintSupport)
+endif()
+
+if (PARAVIEW_USE_QTHELP)
+  list(APPEND Module_SRCS pqHelpWindow.cxx pqHelpWindow.h)
+  list(APPEND QtWidgets_SRCS pqHelpWindow.h)
+  set(${vtk-module}_EXPORT_CODE
+    "#ifndef PARAVIEW_USE_QTHELP\n#  define PARAVIEW_USE_QTHELP\n#endif\n")
+  list(APPEND qt4_private_comps QtHelp)
+  list(APPEND qt5_private_comps Help)
 endif()
 
 pv_find_package_qt(qt_public_targets REQUIRED

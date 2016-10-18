@@ -37,7 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 #include <QDebug>
 #include <QFile>
+#ifdef PARAVIEW_USE_QTHELP
 #include <QHelpEngine>
+#endif
 #include <QMainWindow>
 #include <QMap>
 #include <QPointer>
@@ -140,7 +142,9 @@ void pqApplicationCore::constructor()
   this->RecentlyUsedResourcesList = NULL;
   this->ServerConfigurations = NULL;
   this->Settings = NULL;
+#ifdef PARAVIEW_USE_QTHELP
   this->HelpEngine = NULL;
+#endif
 
   // initialize statics in case we're a static library
   pqCoreInit();
@@ -230,6 +234,7 @@ pqApplicationCore::~pqApplicationCore()
   delete this->Settings;
   this->Settings = 0;
 
+#ifdef PARAVIEW_USE_QTHELP
   if (this->HelpEngine)
   {
     QString collectionFile = this->HelpEngine->collectionFile();
@@ -237,6 +242,7 @@ pqApplicationCore::~pqApplicationCore()
     QFile::remove(collectionFile);
   }
   this->HelpEngine = NULL;
+#endif
 
   // We don't call delete on these since we have already setup parent on these
   // correctly so they will be deleted. It's possible that the user calls delete
@@ -653,6 +659,7 @@ pqTestUtility* pqApplicationCore::testUtility()
   return this->TestUtility;
 }
 
+#ifdef PARAVIEW_USE_QTHELP
 //-----------------------------------------------------------------------------
 QHelpEngine* pqApplicationCore::helpEngine()
 {
@@ -689,10 +696,12 @@ QHelpEngine* pqApplicationCore::helpEngine()
 
   return this->HelpEngine;
 }
+#endif
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::registerDocumentation(const QString& filename)
 {
+#ifdef PARAVIEW_USE_QTHELP
   QHelpEngine* engine = this->helpEngine();
 
   // QHelpEngine doesn't like files from resource space. So we create a local
@@ -709,6 +718,7 @@ void pqApplicationCore::registerDocumentation(const QString& filename)
   {
     engine->registerDocumentation(filename);
   }
+#endif
 }
 
 //-----------------------------------------------------------------------------
