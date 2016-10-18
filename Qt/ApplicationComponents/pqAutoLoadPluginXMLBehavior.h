@@ -40,9 +40,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 /// ParaView plugins can load gui configuration xmls eg. xmls for defining the
 /// filters menu, readers etc. This behavior ensures that as soon as such
-/// plugins are loaded if they provide any XMLs in the ":/.*/ParaViewResources/"
+/// plugins are loaded if they provide any XMLs in the ":/.{*}/ParaViewResources/"
 /// resource location, then such xmls are parsed and an attempt is made to load
 /// them (by calling pqApplicationCore::loadConfiguration()).
+///
+/// Note: {} is to keep the *+/ from ending the comment block.
 ///
 /// Without going into too much detail, if you want your application to
 /// automatically load GUI configuration XMLs from plugins, instantiate this
