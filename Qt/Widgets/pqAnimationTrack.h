@@ -45,25 +45,37 @@ class pqAnimationKeyFrame;
 class PQWIDGETS_EXPORT pqAnimationTrack : public QObject, public QGraphicsItem
 {
   Q_OBJECT
-  /// Declare the interfaces implemented - fails with Qt 4.5, warns on 4.6
+  /**
+  * Declare the interfaces implemented - fails with Qt 4.5, warns on 4.6
+  */
 #if QT_VERSION >= 0x40600
   Q_INTERFACES(QGraphicsItem)
 #endif
-  /// the property animated in this track
+  /**
+  * the property animated in this track
+  */
   Q_PROPERTY(QVariant property READ property WRITE setProperty)
 public:
 
   pqAnimationTrack(QObject* p = 0);
   ~pqAnimationTrack();
 
-  /// number of keyframes
+  /**
+  * number of keyframes
+  */
   int count();
-  /// get a keyframe
+  /**
+  * get a keyframe
+  */
   pqAnimationKeyFrame* keyFrame(int);
 
-  /// add a keyframe
+  /**
+  * add a keyframe
+  */
   pqAnimationKeyFrame* addKeyFrame();
-  /// remove a keyframe
+  /**
+  * remove a keyframe
+  */
   void removeKeyFrame(pqAnimationKeyFrame* frame);
 
 

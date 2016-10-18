@@ -34,8 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqReaction.h"
 
-/// @ingroup Reactions
-/// Reaction for showing the timer log dialog.
+/**
+* @ingroup Reactions
+* Reaction for showing the timer log dialog.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqTimerLogReaction : public pqReaction
 {
   Q_OBJECT
@@ -43,11 +45,15 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqTimerLogReaction : public pqReaction
 public:
   pqTimerLogReaction(QAction* parentObject): Superclass(parentObject) { }
 
-  /// Pops up (or raises) the timer log dialog.
+  /**
+  * Pops up (or raises) the timer log dialog.
+  */
   static void showTimerLog();
 
 protected:
-  /// Called when the action is triggered.
+  /**
+  * Called when the action is triggered.
+  */
   virtual void onTriggered()
     { pqTimerLogReaction::showTimerLog(); }
 

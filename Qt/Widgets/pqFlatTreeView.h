@@ -30,8 +30,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqFlatTreeView.h
-/// \date 3/27/2006
+/**
+* \file pqFlatTreeView.h
+* \date 3/27/2006
+*/
 
 #ifndef _pqFlatTreeView_h
 #define _pqFlatTreeView_h
@@ -56,19 +58,21 @@ class QPoint;
 class QRect;
 
 
-/// \class pqFlatTreeView
-/// \brief
-///   The pqFlatTreeView class is used to display a flattened tree
-///   view of a hierarchical model.
-///
-/// The tree view is flattened by taking long indented chains of
-/// single items and lining them up vertically. If an item is the
-/// only descendent of its parent item, it is drawn directly below
-/// its parent. A vertical branch is drawn between the items to
-/// indicate relationship. If an item has more than one descendent,
-/// those items are indented from the parent. Normal tree view
-/// branches are drawn between the parent and child items to show
-/// the relationship.
+/**
+* \class pqFlatTreeView
+* \brief
+*   The pqFlatTreeView class is used to display a flattened tree
+*   view of a hierarchical model.
+*
+* The tree view is flattened by taking long indented chains of
+* single items and lining them up vertically. If an item is the
+* only descendent of its parent item, it is drawn directly below
+* its parent. A vertical branch is drawn between the items to
+* indicate relationship. If an item has more than one descendent,
+* those items are indented from the parent. Normal tree view
+* branches are drawn between the parent and child items to show
+* the relationship.
+*/
 class PQWIDGETS_EXPORT pqFlatTreeView : public QAbstractScrollArea
 {
   Q_OBJECT
@@ -89,23 +93,29 @@ public:
     };
 
 public:
-  /// \brief
-  ///   Creates a flat tree view.
-  /// \param parent The parent widget for this instance.
+  /**
+  * \brief
+  *   Creates a flat tree view.
+  * \param parent The parent widget for this instance.
+  */
   pqFlatTreeView(QWidget *parent=0);
   virtual ~pqFlatTreeView();
 
-  /// \brief
-  ///   Used to monitor the header view.
-  ///
-  /// When the header view is shown or hidden, the layout needs to be
-  /// updated and repainted.
-  ///
-  /// \param object The object which will receive the event.
-  /// \param e The event to be sent.
+  /**
+  * \brief
+  *   Used to monitor the header view.
+  *
+  * When the header view is shown or hidden, the layout needs to be
+  * updated and repainted.
+  *
+  * \param object The object which will receive the event.
+  * \param e The event to be sent.
+  */
   virtual bool eventFilter(QObject *object, QEvent *e);
 
-  /// \name Model Setup Methods
+  /**
+  * \name Model Setup Methods
+  */
   //@{
   QAbstractItemModel *getModel() const {return this->Model;}
   void setModel(QAbstractItemModel *model);
@@ -114,7 +124,9 @@ public:
   void setRootIndex(const QModelIndex &index);
   //@}
 
-  /// \name Selection Setup Methods
+  /**
+  * \name Selection Setup Methods
+  */
   //@{
   QItemSelectionModel *getSelectionModel() const {return this->Selection;}
   void setSelectionModel(QItemSelectionModel *selectionModel);
@@ -126,37 +138,47 @@ public:
   void setSelectionMode(SelectionMode mode);
   //@}
 
-  /// \name Column Management Methods
+  /**
+  * \name Column Management Methods
+  */
   //@{
   QHeaderView *getHeader() const {return this->HeaderView;}
   void setHeader(QHeaderView *headerView);
 
-  /// \brief
-  ///   Gets whether or not the column size is managed by the view.
-  ///
-  /// Column size management is on by default and used when the
-  /// view header is hidden. When size management is on, the columns
-  /// will be resized to fit the model data in the column.
-  ///
-  /// \return
-  ///   True if the column size is managed by the view.
+  /**
+  * \brief
+  *   Gets whether or not the column size is managed by the view.
+  *
+  * Column size management is on by default and used when the
+  * view header is hidden. When size management is on, the columns
+  * will be resized to fit the model data in the column.
+  *
+  * \return
+  *   True if the column size is managed by the view.
+  */
   bool isColumnSizeManaged() const {return this->ManageSizes;}
 
-  /// \brief
-  ///   Sets whether or not the column size is managed by the view.
-  /// \param managed True if the column size should be managed.
-  /// \sa
-  ///   pqFlatTreeView::isColumnSizeManaged()
+  /**
+  * \brief
+  *   Sets whether or not the column size is managed by the view.
+  * \param managed True if the column size should be managed.
+  * \sa
+  *   pqFlatTreeView::isColumnSizeManaged()
+  */
   void setColumnSizeManaged(bool managed);
   //@}
 
-  /// \name Drawing Options
+  /**
+  * \name Drawing Options
+  */
   //@{
   int getIconSize() const;
   void setIconSize(int iconSize);
   //@}
 
-  /// \name Index Location Methods
+  /**
+  * \name Index Location Methods
+  */
   //@{
   bool isIndexHidden(const QModelIndex &index) const;
   void getVisibleRect(const QModelIndex &index, QRect &area) const;
@@ -165,7 +187,9 @@ public:
   void getSelectionIn(const QRect &rect, QItemSelection &items) const;
   //@}
 
-  /// \name Index Navigation Methods
+  /**
+  * \name Index Navigation Methods
+  */
   //@{
   bool isIndexExpanded(const QModelIndex &index) const;
   QModelIndex getNextVisibleIndex(const QModelIndex &index,
@@ -176,7 +200,9 @@ public:
       const QModelIndex &root=QModelIndex()) const;
   //@}
 
-  /// \name Editing Methods
+  /**
+  * \name Editing Methods
+  */
   //@{
   bool startEditing(const QModelIndex &index);
   void finishEditing();
@@ -197,7 +223,9 @@ public slots:
   void scrollTo(const QModelIndex &index);
 
 protected slots:
-  /// \name Model Change Handlers
+  /**
+  * \name Model Change Handlers
+  */
   //@{
   void insertRows(const QModelIndex &parent, int start, int end);
   void startRowRemoval(const QModelIndex &parent, int start, int end);
@@ -209,13 +237,17 @@ protected slots:
   //@}
 
 protected:
-  /// \name Keyboard Event Handlers
+  /**
+  * \name Keyboard Event Handlers
+  */
   //@{
   virtual void keyPressEvent(QKeyEvent *e);
   void keyboardSearch(const QString &search);
   //@}
 
-  /// \name Mouse Event Handlers
+  /**
+  * \name Mouse Event Handlers
+  */
   //@{
   virtual void mousePressEvent(QMouseEvent *e);
   virtual void mouseMoveEvent(QMouseEvent *e);
@@ -224,7 +256,9 @@ protected:
   virtual void wheelEvent(QWheelEvent *e);
   //@}
 
-  /// \name Event Handlers
+  /**
+  * \name Event Handlers
+  */
   //@{
   virtual bool event(QEvent *e);
   //@}
@@ -238,13 +272,17 @@ protected:
   QStyleOptionViewItem getViewOptions() const;
 
 private slots:
-  /// \name Header Signal Handlers
+  /**
+  * \name Header Signal Handlers
+  */
   //@{
   void handleSectionResized(int index, int oldSize, int newSize);
   void handleSectionMoved(int index, int oldVisual, int newVisual);
   //@}
 
-  /// \name Selection Signal Handlers
+  /**
+  * \name Selection Signal Handlers
+  */
   //@{
   void changeCurrent(const QModelIndex &current, const QModelIndex &previous);
   void changeCurrentRow(const QModelIndex &current,
@@ -259,7 +297,9 @@ private:
   void resetRoot();
   void resetPreferredSizes();
 
-  /// \name Layout Methods
+  /**
+  * \name Layout Methods
+  */
   //@{
   void layoutEditor();
   void layoutItems();
@@ -272,7 +312,9 @@ private:
   void addChildItems(pqFlatTreeViewItem *item, int parentChildCount);
   //@}
 
-  /// \name Tree Navigation Methods
+  /**
+  * \name Tree Navigation Methods
+  */
   //@{
   bool getIndexRowList(const QModelIndex &index,
       pqFlatTreeViewItemRows &rowList) const;

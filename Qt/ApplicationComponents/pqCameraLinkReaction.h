@@ -41,16 +41,22 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCameraLinkReaction : public pqReaction
 public:
   pqCameraLinkReaction(QAction* parent);
 
-  /// Adds camera link with the active view.
+  /**
+  * Adds camera link with the active view.
+  */
   static void addCameraLink();
 
 public slots:
-  /// Updates the enabled state. Applications need not explicitly call
-  /// this.
+  /**
+  * Updates the enabled state. Applications need not explicitly call
+  * this.
+  */
   void updateEnableState();
 
 protected:
-  /// Called when the action is triggered.
+  /**
+  * Called when the action is triggered.
+  */
   virtual void onTriggered()
     { pqCameraLinkReaction::addCameraLink(); }
 

@@ -38,8 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqDataInformationModel;
 class QTableView;
 
-/// Widget for the DataInformation(or Statistics View).
-/// It creates the model and the view and connects them.
+/**
+* Widget for the DataInformation(or Statistics View).
+* It creates the model and the view and connects them.
+*/
 class PQCOMPONENTS_EXPORT pqDataInformationWidget : public QWidget
 {
   Q_OBJECT
@@ -48,7 +50,9 @@ public:
   virtual ~pqDataInformationWidget();
 
 protected:
-  /// Filters events received by the View.
+  /**
+  * Filters events received by the View.
+  */
   virtual bool eventFilter(QObject* object, QEvent *event);
 
 private slots:

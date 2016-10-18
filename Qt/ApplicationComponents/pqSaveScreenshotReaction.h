@@ -34,19 +34,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqReaction.h"
 
-/// @ingroup Reactions
-/// Reaction to save a screen shot.
+/**
+* @ingroup Reactions
+* Reaction to save a screen shot.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqSaveScreenshotReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
 public:
-  /// Constructor. Parent cannot be NULL.
+  /**
+  * Constructor. Parent cannot be NULL.
+  */
   pqSaveScreenshotReaction(QAction* parent);
 
-  /// Saves the screenshot.
-  /// Note that this method is static. Applications can simply use this without
-  /// having to create a reaction instance.
+  /**
+  * Saves the screenshot.
+  * Note that this method is static. Applications can simply use this without
+  * having to create a reaction instance.
+  */
   static void saveScreenshot();
   static void saveScreenshot(const QString& filename,
     const QSize& size,
@@ -54,12 +60,16 @@ public:
     bool all_views=false);
 
 public slots:
-  /// Updates the enabled state. Applications need not explicitly call
-  /// this.
+  /**
+  * Updates the enabled state. Applications need not explicitly call
+  * this.
+  */
   void updateEnableState();
 
 protected:
-  /// Called when the action is triggered.
+  /**
+  * Called when the action is triggered.
+  */
   virtual void onTriggered()
     { pqSaveScreenshotReaction::saveScreenshot(); }
 

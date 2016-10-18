@@ -37,10 +37,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkSMTransferFunctionProxy;
 
-/// A property widget for editing a transfer function. 
-///
-/// To use this widget for a property add the 
-/// 'panel_widget="transfer_function_editor"' to the property's XML.
+/**
+* A property widget for editing a transfer function. 
+*
+* To use this widget for a property add the 
+* 'panel_widget="transfer_function_editor"' to the property's XML.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqTransferFunctionWidgetPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT

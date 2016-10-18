@@ -36,33 +36,45 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqPipelineSource;
 
-/// @ingroup Reactions
-/// Reaction to save data files.
+/**
+* @ingroup Reactions
+* Reaction to save data files.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqSaveDataReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
 public:
-  /// Constructor. Parent cannot be NULL.
+  /**
+  * Constructor. Parent cannot be NULL.
+  */
   pqSaveDataReaction(QAction* parent);
 
-  /// Save data files from active port. Users the vtkSMWriterFactory to decide
-  /// what writes are available. Returns true if the creation is
-  /// successful, otherwise returns false.
-  /// Note that this method is static. Applications can simply use this without
-  /// having to create a reaction instance.
+  /**
+  * Save data files from active port. Users the vtkSMWriterFactory to decide
+  * what writes are available. Returns true if the creation is
+  * successful, otherwise returns false.
+  * Note that this method is static. Applications can simply use this without
+  * having to create a reaction instance.
+  */
   static bool saveActiveData(const QString& files);
   static bool saveActiveData();
 
 public slots:
-  /// Updates the enabled state. Applications need not explicitly call
-  /// this.
+  /**
+  * Updates the enabled state. Applications need not explicitly call
+  * this.
+  */
   void updateEnableState();
-  /// Triggered when a source became valid
+  /**
+  * Triggered when a source became valid
+  */
   void dataUpdated(pqPipelineSource* source);
 
 protected:
-  /// Called when the action is triggered.
+  /**
+  * Called when the action is triggered.
+  */
   virtual void onTriggered()
     { pqSaveDataReaction::saveActiveData(); }
 

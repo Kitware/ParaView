@@ -38,14 +38,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqDataRepresentation;
 class pqScalarBarVisibilityReaction;
 
-/// @ingroup Reactions
-/// Reaction to allow editing of scalar bar properties using a
-/// pqProxyWidgetDialog.
-///
-/// Reaction allows editing of scalar bar properties using a
-/// pqProxyWidgetDialog. Internally, it uses pqScalarBarVisibilityReaction to
-/// track the visibility state for the scalar to enable/disable the parent
-/// action.
+/**
+* @ingroup Reactions
+* Reaction to allow editing of scalar bar properties using a
+* pqProxyWidgetDialog.
+*
+* Reaction allows editing of scalar bar properties using a
+* pqProxyWidgetDialog. Internally, it uses pqScalarBarVisibilityReaction to
+* track the visibility state for the scalar to enable/disable the parent
+* action.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqEditScalarBarReaction : public pqReaction
 {
   Q_OBJECT
@@ -55,21 +57,29 @@ public:
   virtual ~pqEditScalarBarReaction();
 
 public slots:
-  /// Set the active representation. This should only be used when
-  /// \c track_active_objects is false. If used when \c track_active_objects is
-  /// true, the representation will get replaced whenever the active
-  /// representation changes.
+  /**
+  * Set the active representation. This should only be used when
+  * \c track_active_objects is false. If used when \c track_active_objects is
+  * true, the representation will get replaced whenever the active
+  * representation changes.
+  */
   void setRepresentation(pqDataRepresentation*);
 
-  /// Show the editor dialog for editing scalar bar properties.
+  /**
+  * Show the editor dialog for editing scalar bar properties.
+  */
   bool editScalarBar();
 
 protected slots:
-  /// Updates the enabled state. Applications need not explicitly call
-  /// this.
+  /**
+  * Updates the enabled state. Applications need not explicitly call
+  * this.
+  */
   virtual void updateEnableState();
 
-  /// Called when the action is triggered.
+  /**
+  * Called when the action is triggered.
+  */
   virtual void onTriggered();
 
 private:

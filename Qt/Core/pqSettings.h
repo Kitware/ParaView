@@ -40,8 +40,10 @@ class QMainWindow;
 class QDockWidget;
 class vtkSMProperty;
 
-/// pqSettings extends QSettings to add support for following:
-/// \li saving/restoring window/dialog geometry.
+/**
+* pqSettings extends QSettings to add support for following:
+* \li saving/restoring window/dialog geometry.
+*/
 class PQCORE_EXPORT pqSettings : public QSettings
 {
   Q_OBJECT
@@ -50,8 +52,10 @@ public:
   pqSettings(const QString& organization, const QString& application, QObject* p=NULL);
   pqSettings(const QString& fileName, Format format, QObject* parent=NULL);
 
-  /// use this constructor to use a file. If temporary is true, then the file
-  /// will be deleted when the pqSettings object is destroyed.
+  /**
+  * use this constructor to use a file. If temporary is true, then the file
+  * will be deleted when the pqSettings object is destroyed.
+  */
   pqSettings(const QString& filename, bool temporary, QObject* parent=NULL);
 
   void saveState(const QMainWindow& window, const QString& key);
@@ -60,15 +64,21 @@ public:
   void restoreState(const QString& key, QMainWindow& window);
   void restoreState(const QString& key, QDialog& dialog);
 
-  /// Calling this method will cause the modified signal to be emited.
+  /**
+  * Calling this method will cause the modified signal to be emited.
+  */
   void alertSettingsModified();
 
-  /// Save a property value to a given setting name
+  /**
+  * Save a property value to a given setting name
+  */
   void saveInQSettings(const char* key, vtkSMProperty* smproperty);
 
 private:
-  /// ensure that when window state is being loaded, if dock windows are
-  /// beyond the viewport, we correct them.
+  /**
+  * ensure that when window state is being loaded, if dock windows are
+  * beyond the viewport, we correct them.
+  */
   void sanityCheckDock(QDockWidget* dock_widget);
 signals:
   void modified();

@@ -35,7 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsModule.h"
 #include <QDialog>
 
-/// Dialog used to ask the user what resolution to lock the views to.
+/**
+* Dialog used to ask the user what resolution to lock the views to.
+*/
 class PQCOMPONENTS_EXPORT pqLockViewSizeCustomDialog : public QDialog
 {
   Q_OBJECT;
@@ -45,17 +47,25 @@ public:
   pqLockViewSizeCustomDialog(QWidget *parent, Qt::WindowFlags f=0);
   virtual ~pqLockViewSizeCustomDialog();
 
-  /// The custom resolution currently entered by the user.
+  /**
+  * The custom resolution currently entered by the user.
+  */
   QSize customResolution() const;
 
 public slots:
-  /// Sets the view size to the displayed resolution.
+  /**
+  * Sets the view size to the displayed resolution.
+  */
   virtual void apply();
 
-  /// Applies the resolution and accepts the dialog.
+  /**
+  * Applies the resolution and accepts the dialog.
+  */
   virtual void accept();
 
-  /// Unlocks the size on the view.
+  /**
+  * Unlocks the size on the view.
+  */
   virtual void unlock();
 
 private:

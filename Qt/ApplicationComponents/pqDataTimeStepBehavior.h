@@ -37,9 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqPipelineSource;
 
-/// @ingroup Behaviors
-/// pqDataTimeStepBehavior ensures that whenever a file is opened with more
-/// than 1 timestep, the application time >= the time for the last timestep.
+/**
+* @ingroup Behaviors
+* pqDataTimeStepBehavior ensures that whenever a file is opened with more
+* than 1 timestep, the application time >= the time for the last timestep.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqDataTimeStepBehavior : public QObject
 {
   Q_OBJECT
@@ -48,7 +50,9 @@ public:
   pqDataTimeStepBehavior(QObject* parent=0);
 
 protected slots:
-  /// called when a reader is created.
+  /**
+  * called when a reader is created.
+  */
   void onReaderCreated(pqPipelineSource* reader);
 
 private:

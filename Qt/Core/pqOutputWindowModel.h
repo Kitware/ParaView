@@ -52,8 +52,10 @@ struct MessageT
   QString Message;
 };
 
-/// This is a model for the pqOutputWindow table that shows collated and
-/// abbreviated messages.
+/**
+* This is a model for the pqOutputWindow table that shows collated and
+* abbreviated messages.
+*/
 class PQCORE_EXPORT pqOutputWindowModel : public QAbstractTableModel
 {
   Q_OBJECT
@@ -74,27 +76,39 @@ public:
   
   void setView(QTableView* view);
 
-  /// Appends the last message to the table
+  /**
+  * Appends the last message to the table
+  */
   void appendLastRow();
 
-  /// clears the table
+  /**
+  * clears the table
+  */
   void clear();
 
-  /// Shows in the table only messages that match the 'show' array.
-  /// 'show' tells us if a pqOutputArray::MessageType element should be shown 
-  /// or not
+  /**
+  * Shows in the table only messages that match the 'show' array.
+  * 'show' tells us if a pqOutputArray::MessageType element should be shown 
+  * or not
+  */
   void ShowMessages(bool* show);
 
-  /// Expand/Contract a row to show/hide the location of the message
+  /**
+  * Expand/Contract a row to show/hide the location of the message
+  */
   void expandRow(int r);
   void contractRow(int r);
 
-  /// Updates the model when the count for the message at 'messageIndex'
-  /// was updated
+  /**
+  * Updates the model when the count for the message at 'messageIndex'
+  * was updated
+  */
   void updateCount(int messageIndex);
 
 private:
-  /// Resize all columns but the last to fit the contents. 
+  /**
+  * Resize all columns but the last to fit the contents. 
+  */
   void resizeColumnsToContents();
 
 private:

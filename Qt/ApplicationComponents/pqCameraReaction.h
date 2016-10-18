@@ -34,9 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqReaction.h"
 
-/// @ingroup Reactions
-/// pqCameraReaction has the logic to handle common operations associated with
-/// the camera such as reset view along X axis etc.
+/**
+* @ingroup Reactions
+* pqCameraReaction has the logic to handle common operations associated with
+* the camera such as reset view along X axis etc.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqCameraReaction : public pqReaction
 {
   Q_OBJECT
@@ -72,12 +74,16 @@ public:
   static void rotateCamera(double angle);
 
 public slots:
-  /// Updates the enabled state. Applications need not explicitly call
-  /// this.
+  /**
+  * Updates the enabled state. Applications need not explicitly call
+  * this.
+  */
   void updateEnableState();
 
 protected:
-  /// Called when the action is triggered.
+  /**
+  * Called when the action is triggered.
+  */
   virtual void onTriggered();
 
 private:

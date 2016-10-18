@@ -56,22 +56,32 @@ public:
   ~pqPythonDialog();
 
 public slots:
-  /// Execute a commond in the python shell.
+  /**
+  * Execute a commond in the python shell.
+  */
   void runString(const QString& script);
 
-  /// Simply prints some text onto the shell. Note that this does not treat it
-  /// as a python script and hence doesn't execute it.
+  /**
+  * Simply prints some text onto the shell. Note that this does not treat it
+  * as a python script and hence doesn't execute it.
+  */
   void print(const QString& msg);
 
-  /// Treats each string in the given stringlist as a filename and tries to
-  /// execute the file as a python script.
+  /**
+  * Treats each string in the given stringlist as a filename and tries to
+  * execute the file as a python script.
+  */
   void runScript(const QStringList&);
 
-  /// Return a pointer to the pqPythonShell widget used by this dialog.
+  /**
+  * Return a pointer to the pqPythonShell widget used by this dialog.
+  */
   pqPythonShell* shell();
 
 protected:
-  /// Overloaded to save window geometry on close events.
+  /**
+  * Overloaded to save window geometry on close events.
+  */
   void closeEvent(QCloseEvent *event);
 
 private slots:

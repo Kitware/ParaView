@@ -42,7 +42,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqServer;
 class vtkSMDoubleVectorProperty;
 
-/// Provides a complete Qt UI for working with a 3D plane widget
+/**
+* Provides a complete Qt UI for working with a 3D plane widget
+*/
 class PQDEPRECATED_EXPORT pqImplicitPlaneWidget : public pq3DWidget
 {
   typedef pq3DWidget Superclass;
@@ -54,60 +56,96 @@ public:
   ~pqImplicitPlaneWidget();
 
 public slots:
-  /// Resets the bounds of the 3D widget to the reference proxy bounds.
+  /**
+  * Resets the bounds of the 3D widget to the reference proxy bounds.
+  */
   virtual void resetBounds()
     { this->Superclass::resetBounds(); }
   virtual void resetBounds(double bounds[6]);
 
-  /// accept the changes
+  /**
+  * accept the changes
+  */
   void accept();
 
-  /// reset the changes
+  /**
+  * reset the changes
+  */
   void reset();
 
-  /// Overridden to update widget placement based on data bounds.
+  /**
+  * Overridden to update widget placement based on data bounds.
+  */
   virtual void select();
 
 protected:
 
-  /// Makes the 3D widget plane visible (respects the overall visibility flag)
+  /**
+  * Makes the 3D widget plane visible (respects the overall visibility flag)
+  */
   virtual void showPlane();
 
-  /// Hides the 3D widget plane
+  /**
+  * Hides the 3D widget plane
+  */
   virtual void hidePlane();
 
-  /// Subclasses can override this method to map properties to
-  /// GUI. Default implementation updates the internal datastructures
-  /// so that default implementations can be provided for
-  /// accept/reset.
+  /**
+  * Subclasses can override this method to map properties to
+  * GUI. Default implementation updates the internal datastructures
+  * so that default implementations can be provided for
+  * accept/reset.
+  */
   virtual void setControlledProperty(const char* function,
     vtkSMProperty * controlled_property);
 
-  /// Called on pick.
+  /**
+  * Called on pick.
+  */
   virtual void pick(double, double, double);
 
 protected:
-  /// Internal method to create the widget.
+  /**
+  * Internal method to create the widget.
+  */
   void createWidget(pqServer*);
 
 private slots:
-  /// Called to show/hide the 3D widget
+  /**
+  * Called to show/hide the 3D widget
+  */
   void onShow3DWidget(bool);
-  /// Called to set the widget origin to the center of the bounding box proxy's data
+  /**
+  * Called to set the widget origin to the center of the bounding box proxy's data
+  */
   void onUseCenterBounds();
-  /// Called to set the widget normal to the X axis
+  /**
+  * Called to set the widget normal to the X axis
+  */
   void onUseXNormal();
-  /// Called to set the widget normal to the Y axis
+  /**
+  * Called to set the widget normal to the Y axis
+  */
   void onUseYNormal();
-  /// Called to set the widget normal to the Z axis
+  /**
+  * Called to set the widget normal to the Z axis
+  */
   void onUseZNormal();
-  /// Called to set the widget normal to the camera direction
+  /**
+  * Called to set the widget normal to the camera direction
+  */
   void onUseCameraNormal();
-  /// Called when the user starts dragging the 3D widget
+  /**
+  * Called when the user starts dragging the 3D widget
+  */
   void onStartInteraction();
-  /// Called whenever the 3D widget visibility is modified
+  /**
+  * Called whenever the 3D widget visibility is modified
+  */
   void onWidgetVisibilityChanged(bool visible);
-  /// Called to set the reset the camera to face the widget
+  /**
+  * Called to set the reset the camera to face the widget
+  */
   void resetCameraToNormal();
 
 private:

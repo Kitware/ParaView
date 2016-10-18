@@ -37,7 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqSILModel;
 
-/// pqSignalAdaptorSILModel is a signal adaptor for a pqSILModel.
+/**
+* pqSignalAdaptorSILModel is a signal adaptor for a pqSILModel.
+*/
 class PQCOMPONENTS_EXPORT pqSignalAdaptorSILModel : public QObject
 {
   Q_OBJECT

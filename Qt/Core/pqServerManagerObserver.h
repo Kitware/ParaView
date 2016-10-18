@@ -46,10 +46,12 @@ class vtkPVXMLElement;
 class vtkSMProxy;
 class vtkSMProxyLocator;
 
-/// This is a vtkSMProxyManager observer. This class should simply listen to events
-/// fired by proxy manager and responds. It does not support any creation method.
-/// Use pqObjectBuilder for creating objects. The purpose of this class
-/// is mostly to filter vtkSMProxyManager manager events and emit Qt signals.
+/**
+* This is a vtkSMProxyManager observer. This class should simply listen to events
+* fired by proxy manager and responds. It does not support any creation method.
+* Use pqObjectBuilder for creating objects. The purpose of this class
+* is mostly to filter vtkSMProxyManager manager events and emit Qt signals.
+*/
 class PQCORE_EXPORT pqServerManagerObserver : public QObject
 {
   Q_OBJECT
@@ -59,10 +61,14 @@ public:
   virtual ~pqServerManagerObserver();
 
 signals:
-  /// Fired when a compound proxy definition is registered.
+  /**
+  * Fired when a compound proxy definition is registered.
+  */
   void compoundProxyDefinitionRegistered(QString name);
 
-  /// Fired when a compound proxy definition is unregistered.
+  /**
+  * Fired when a compound proxy definition is unregistered.
+  */
   void compoundProxyDefinitionUnRegistered(QString name);
   
   // Fired when a proxy is registered.
@@ -73,16 +79,24 @@ signals:
   void proxyUnRegistered(const QString& group, const QString& name, 
     vtkSMProxy* proxy);
 
-  /// Fired when a server connection is created by the vtkProcessModule.
+  /**
+  * Fired when a server connection is created by the vtkProcessModule.
+  */
   void connectionCreated(vtkIdType connectionId);
 
-  /// Fired when a server connection is closed by  the vtkProcessModule.
+  /**
+  * Fired when a server connection is closed by  the vtkProcessModule.
+  */
   void connectionClosed(vtkIdType connectionId);
 
-  /// Fired when a state file is loaded successfully.
+  /**
+  * Fired when a state file is loaded successfully.
+  */
   void stateLoaded(vtkPVXMLElement* root, vtkSMProxyLocator* locator);
   
-  /// Fired when state is being saved.
+  /**
+  * Fired when state is being saved.
+  */
   void stateSaved(vtkPVXMLElement* root);
 
 private slots:

@@ -34,8 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqReaction.h"
 
-/// @ingroup Reactions
-/// Reaction to hide all sources output ports.
+/**
+* @ingroup Reactions
+* Reaction to hide all sources output ports.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqHideAllReaction : public pqReaction
 {
   Q_OBJECT
@@ -45,7 +47,9 @@ public:
 
   static void HideAll();
 protected:
-  /// Called when the action is triggered.
+  /**
+  * Called when the action is triggered.
+  */
   virtual void onTriggered()
     {
     pqHideAllReaction::HideAll();

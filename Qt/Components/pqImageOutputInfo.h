@@ -67,7 +67,9 @@ public:
   bool getComposite();
   bool getUseFloatValues();
 
-  /// Remove or add options depending on whether cinema is visible.
+  /**
+  * Remove or add options depending on whether cinema is visible.
+  */
   void setCinemaVisible(bool status);
   const QString getCameraType();
   double getPhi();

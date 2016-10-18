@@ -53,9 +53,13 @@ class PQCOMPONENTS_EXPORT pqPluginDialog :
   Q_OBJECT
   typedef QDialog Superclass;
 public:
-  /// create this dialog with a parent
+  /**
+  * create this dialog with a parent
+  */
   pqPluginDialog(pqServer* server, QWidget* p=0);
-  /// destroy this dialog
+  /**
+  * destroy this dialog
+  */
   ~pqPluginDialog();
 
 public slots:

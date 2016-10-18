@@ -59,7 +59,9 @@ public:
   virtual void setStream(QTextStream* stream);
 
 public slots:
-  /// Record on event in xml file
+  /**
+  * Record on event in xml file
+  */
   virtual void onRecordEvent(
     const QString& Widget,
     const QString& Command,

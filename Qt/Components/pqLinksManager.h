@@ -41,24 +41,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 namespace Ui { class pqLinksManager; }
-/// dialog for viewing, creating, editing, removing proxy/property/camera links
+/**
+* dialog for viewing, creating, editing, removing proxy/property/camera links
+*/
 class PQCOMPONENTS_EXPORT pqLinksManager :
   public QDialog
 {
   Q_OBJECT
   typedef QDialog base;
 public:
-  /// create this dialog with a parent
+  /**
+  * create this dialog with a parent
+  */
   pqLinksManager(QWidget* p=0);
-  /// destroy this dialog
+  /**
+  * destroy this dialog
+  */
   ~pqLinksManager();
 
 public slots:
-  /// add a link
+  /**
+  * add a link
+  */
   void addLink();
-  /// edit the currently selected link
+  /**
+  * edit the currently selected link
+  */
   void editLink();
-  /// edit the currently selected link
+  /**
+  * edit the currently selected link
+  */
   void removeLink();
 
 private slots:

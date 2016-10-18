@@ -38,8 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqSMProxy.h"  // For property.
 
-/// pqSelectionInputWidget is a custom widget used for specifying
-/// the selection to use on filters that have a selection as input.
+/**
+* pqSelectionInputWidget is a custom widget used for specifying
+* the selection to use on filters that have a selection as input.
+*/
 class PQCOMPONENTS_EXPORT pqSelectionInputWidget : public QWidget
 {
   Q_OBJECT
@@ -63,14 +65,18 @@ public slots:
   // state or undo-redo).
   void initializeDefaultValueIfNeeded();
 
-  /// This must be connected to the panel-accept signal to ensure that the new
-  /// selection source object gets registered for undo-redo/state to work. This
-  /// method also gets rid of any obsolete selection_sources.
+  /**
+  * This must be connected to the panel-accept signal to ensure that the new
+  * selection source object gets registered for undo-redo/state to work. This
+  * method also gets rid of any obsolete selection_sources.
+  */
   virtual void preAccept();
   virtual void postAccept();
 
 signals:
-  /// Signal that the selection proxy changed.
+  /**
+  * Signal that the selection proxy changed.
+  */
   void selectionChanged(pqSMProxy);
 
 protected slots:

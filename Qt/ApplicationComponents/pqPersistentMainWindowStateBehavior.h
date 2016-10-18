@@ -37,16 +37,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class QMainWindow;
 
-/// @ingroup Behaviors
-/// pqPersistentMainWindowStateBehavior saves and restores the MainWindow state
-/// on shutdown and restart. Simply instantiate this behavior if you want your
-/// main window layout to be persistent. 
+/**
+* @ingroup Behaviors
+* pqPersistentMainWindowStateBehavior saves and restores the MainWindow state
+* on shutdown and restart. Simply instantiate this behavior if you want your
+* main window layout to be persistent. 
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqPersistentMainWindowStateBehavior : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
 public:
-  /// Parent cannot be NULL.
+  /**
+  * Parent cannot be NULL.
+  */
   pqPersistentMainWindowStateBehavior(QMainWindow* parent);
   virtual ~pqPersistentMainWindowStateBehavior();
 

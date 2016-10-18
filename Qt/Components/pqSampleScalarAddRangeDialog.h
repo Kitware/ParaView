@@ -38,8 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDialog>
 #include <QVariant>
 
-/// Provides a dialog for specifying a range of scalar samples, used
-/// by pqSampleScalarWidget
+/**
+* Provides a dialog for specifying a range of scalar samples, used
+* by pqSampleScalarWidget
+*/
 class PQCOMPONENTS_EXPORT pqSampleScalarAddRangeDialog :
   public QDialog
 {

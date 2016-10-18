@@ -37,8 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkSMPropertyGroup;
 
-/// pqTextLocationWidget is a pqPropertyWidget that can be used to set
-/// the location of the a text representation relative to the viewport.
+/**
+* pqTextLocationWidget is a pqPropertyWidget that can be used to set
+* the location of the a text representation relative to the viewport.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqTextLocationWidget :
   public pqPropertyWidget
 {

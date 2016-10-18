@@ -34,38 +34,52 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqReaction.h"
 
-/// @ingroup Reactions
-/// Reaction for saving state file.
+/**
+* @ingroup Reactions
+* Reaction for saving state file.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqSaveStateReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
 public:
-  /// Constructor. Parent cannot be NULL.
+  /**
+  * Constructor. Parent cannot be NULL.
+  */
   pqSaveStateReaction(QAction* parent);
   ~pqSaveStateReaction() {}
 
-  /// Open File dialog in order to choose the location and the type of
-  /// the state file that should be saved
+  /**
+  * Open File dialog in order to choose the location and the type of
+  * the state file that should be saved
+  */
   static void saveState();
 
-  /// Saves the state file.
-  /// Note that this method is static. Applications can simply use this without
-  /// having to create a reaction instance.
+  /**
+  * Saves the state file.
+  * Note that this method is static. Applications can simply use this without
+  * having to create a reaction instance.
+  */
   static void saveState(const QString& filename);
 
-  /// Saves the state file as a python state.
-  /// Note that this method is static. Applications can simply use this without
-  /// having to create a reaction instance.
+  /**
+  * Saves the state file as a python state.
+  * Note that this method is static. Applications can simply use this without
+  * having to create a reaction instance.
+  */
   static void savePythonState(const QString& filename);
 
 public slots:
-  /// Updates the enabled state. Applications need not explicitly call
-  /// this.
+  /**
+  * Updates the enabled state. Applications need not explicitly call
+  * this.
+  */
   void updateEnableState();
 
 protected:
-  /// Called when the action is triggered.
+  /**
+  * Called when the action is triggered.
+  */
   virtual void onTriggered()
     { pqSaveStateReaction::saveState(); }
 

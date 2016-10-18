@@ -34,26 +34,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqReaction.h"
 
-/// @ingroup Reactions
-/// pqDataQueryReaction is the reaction that popups the Data Query Dialog/Find
-/// Data Dialog allowing the user to 'search' his data.
+/**
+* @ingroup Reactions
+* pqDataQueryReaction is the reaction that popups the Data Query Dialog/Find
+* Data Dialog allowing the user to 'search' his data.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqDataQueryReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
 public:
-  /// Constructor. Parent cannot be NULL.
+  /**
+  * Constructor. Parent cannot be NULL.
+  */
   pqDataQueryReaction(QAction* parent);
   virtual ~pqDataQueryReaction();
 
-  /// Show the query dialog for querying the data from the active source.
+  /**
+  * Show the query dialog for querying the data from the active source.
+  */
   void showQueryDialog();
 
 public slots:
   void showHelp();
 
 protected:
-  /// Called when the action is triggered.
+  /**
+  * Called when the action is triggered.
+  */
   virtual void onTriggered()
     { pqDataQueryReaction::showQueryDialog(); }
 

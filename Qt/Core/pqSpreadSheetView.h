@@ -38,9 +38,11 @@ class vtkSMSourceProxy;
 class pqDataRepresentation;
 class pqSpreadSheetViewModel;
 
-/// View for spread-sheet view. It can show data from any source/filter on the
-/// client. Uses pqSpreadSheetViewModel, pqSpreadSheetViewWidget and
-/// pqSpreadSheetViewSelectionModel.
+/**
+* View for spread-sheet view. It can show data from any source/filter on the
+* client. Uses pqSpreadSheetViewModel, pqSpreadSheetViewWidget and
+* pqSpreadSheetViewSelectionModel.
+*/
 class PQCORE_EXPORT pqSpreadSheetView : public pqView
 {
   Q_OBJECT
@@ -54,41 +56,61 @@ public:
     QObject* parent=NULL);
   virtual ~pqSpreadSheetView();
 
-  /// Get the internal model for the view
+  /**
+  * Get the internal model for the view
+  */
   pqSpreadSheetViewModel* getViewModel();
 
 signals:
-  /// Fired when the currently shown representation changes. \c repr may be
-  /// NULL.
+  /**
+  * Fired when the currently shown representation changes. \c repr may be
+  * NULL.
+  */
   void showing(pqDataRepresentation* repr);
   void viewportUpdated();
 
 public slots:
-  /// Called when a new repr is added.
+  /**
+  * Called when a new repr is added.
+  */
   void onAddRepresentation(pqRepresentation*);
 
 protected slots:
-  /// Called to ensure that at most 1 repr is visible at a time.
+  /**
+  * Called to ensure that at most 1 repr is visible at a time.
+  */
   void updateRepresentationVisibility(pqRepresentation* repr, bool visible);
 
-  /// Called at start of every render. 
-  /// If in "selection-only" mode, and showing composite dataset, we want to make
-  /// sure that we are shown a block with non-empty cells/points (if possible).
+  /**
+  * Called at start of every render. 
+  * If in "selection-only" mode, and showing composite dataset, we want to make
+  * sure that we are shown a block with non-empty cells/points (if possible).
+  */
   void onBeginRender();
 
-  /// Called at end of every render. We update the table view.
+  /**
+  * Called at end of every render. We update the table view.
+  */
   void onEndRender();
 
-  /// When user creates a "surface" selection on the view.
+  /**
+  * When user creates a "surface" selection on the view.
+  */
   void onCreateSelection(vtkSMSourceProxy* selSource);
 
-  /// Called when checkbox "Show Only Selected Elements" is updated
+  /**
+  * Called when checkbox "Show Only Selected Elements" is updated
+  */
   void onSelectionOnly();
 
-  /// Called when the "Font Size" property is updated
+  /**
+  * Called when the "Font Size" property is updated
+  */
   void onFontSizeChanged();
 
-  /// Create a QWidget for the view's viewport.
+  /**
+  * Create a QWidget for the view's viewport.
+  */
   virtual QWidget* createWidget();
 private:
   Q_DISABLE_COPY(pqSpreadSheetView)

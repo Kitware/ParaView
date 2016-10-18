@@ -34,8 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqMasterOnlyReaction.h"
 
-/// @ingroup Reactions
-/// pqManagePluginsReaction is the reaction to pop-up the plugins manager dialog.
+/**
+* @ingroup Reactions
+* pqManagePluginsReaction is the reaction to pop-up the plugins manager dialog.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqManagePluginsReaction : public pqMasterOnlyReaction
 {
   Q_OBJECT
@@ -43,7 +45,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqManagePluginsReaction : public pqMasterOn
 public:
   pqManagePluginsReaction(QAction* action): Superclass(action) { }
 
-  /// Pops-up the pqPluginDialog dialog.
+  /**
+  * Pops-up the pqPluginDialog dialog.
+  */
   static void managePlugins();
 
 protected:

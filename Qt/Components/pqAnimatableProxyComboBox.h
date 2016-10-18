@@ -40,9 +40,11 @@ class vtkSMProxy;
 class pqPipelineSource;
 class pqServerManagerModelItem;
 
-/// pqAnimatableProxyComboBox is a combo box that can list the animatable 
-/// proxies.  All pqPipelineSources are automatically in this list
-/// Any other proxies must be manually added.
+/**
+* pqAnimatableProxyComboBox is a combo box that can list the animatable 
+* proxies.  All pqPipelineSources are automatically in this list
+* Any other proxies must be manually added.
+*/
 class PQCOMPONENTS_EXPORT pqAnimatableProxyComboBox : public QComboBox
 {
   Q_OBJECT
@@ -52,7 +54,9 @@ public:
   pqAnimatableProxyComboBox(QWidget* parent=0);
   ~pqAnimatableProxyComboBox();
 
-  /// Returns the current source
+  /**
+  * Returns the current source
+  */
   vtkSMProxy* getCurrentProxy() const;
 
   void addProxy(int index, const QString& label, vtkSMProxy*);

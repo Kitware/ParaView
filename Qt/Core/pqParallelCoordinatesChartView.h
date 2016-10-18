@@ -37,9 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkSMSourceProxy;
 class pqDataRepresentation;
 
-/// pqView subclass of ParallelCoordinatesChartView chart view. Does not do
-/// anything specific besides passing the view type of pqView in the
-/// constructor.
+/**
+* pqView subclass of ParallelCoordinatesChartView chart view. Does not do
+* anything specific besides passing the view type of pqView in the
+* constructor.
+*/
 class PQCORE_EXPORT pqParallelCoordinatesChartView : public pqContextView
 {
   Q_OBJECT

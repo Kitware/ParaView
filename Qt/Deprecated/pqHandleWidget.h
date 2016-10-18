@@ -37,7 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDeprecatedModule.h"
 #include "pqProxy.h"
 
-/// Provides a complete Qt UI for working with a 3D handle widget
+/**
+* Provides a complete Qt UI for working with a 3D handle widget
+*/
 class PQDEPRECATED_EXPORT pqHandleWidget : public pq3DWidget
 {
   Q_OBJECT
@@ -48,25 +50,33 @@ public:
   pqHandleWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* p);
   ~pqHandleWidget();
 
-  /// Resets the bounds of the 3D widget to the reference proxy bounds.
-  /// This typically calls PlaceWidget on the underlying 3D Widget 
-  /// with reference proxy bounds.
-  /// This should be explicitly called after the panel is created
-  /// and the widget is initialized i.e. the reference proxy, controlled proxy
-  /// and hints have been set.
+  /**
+  * Resets the bounds of the 3D widget to the reference proxy bounds.
+  * This typically calls PlaceWidget on the underlying 3D Widget 
+  * with reference proxy bounds.
+  * This should be explicitly called after the panel is created
+  * and the widget is initialized i.e. the reference proxy, controlled proxy
+  * and hints have been set.
+  */
   virtual void resetBounds()
     { this->Superclass::resetBounds(); }
   virtual void resetBounds(double bounds[6]);
 
 private slots:
-  /// Called when the user changes widget visibility
+  /**
+  * Called when the user changes widget visibility
+  */
   void onWidgetVisibilityChanged(bool visible);
 
 protected:
-  /// Internal method to create the widget.
+  /**
+  * Internal method to create the widget.
+  */
   void createWidget(pqServer*);
 
-  /// Called on pick.
+  /**
+  * Called on pick.
+  */
   virtual void pick(double, double, double);
 
 private:

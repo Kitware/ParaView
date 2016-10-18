@@ -40,8 +40,10 @@ class vtkContextView;
 class vtkObject;
 class vtkSelection;
 
-/// pqContextView is an abstract base class for all charting views based on the
-/// VTK context charting library.
+/**
+* pqContextView is an abstract base class for all charting views based on the
+* VTK context charting library.
+*/
 class PQCORE_EXPORT pqContextView : public pqView
 {
   Q_OBJECT
@@ -49,33 +51,45 @@ class PQCORE_EXPORT pqContextView : public pqView
 public:
   virtual ~pqContextView();
 
-  /// Returns the internal vtkContextView which provides the implementation for
-  /// the chart rendering.
+  /**
+  * Returns the internal vtkContextView which provides the implementation for
+  * the chart rendering.
+  */
   virtual vtkContextView* getVTKContextView() const;
 
-  /// Returns the context view proxy associated with this object.
+  /**
+  * Returns the context view proxy associated with this object.
+  */
   virtual vtkSMContextViewProxy* getContextViewProxy() const;
 
-  /// Returns true if selection can be done.
+  /**
+  * Returns true if selection can be done.
+  */
   virtual bool supportsSelection() const;
 
-  /// set/get the selection action in the context view, defined
-  /// by vtkChart enumeration from SELECT to SELECT_POLYGON.
+  /**
+  * set/get the selection action in the context view, defined
+  * by vtkChart enumeration from SELECT to SELECT_POLYGON.
+  */
   // Default is vtkChart::SELECT_RECTANGLE
   virtual void setSelectionAction(int selAction);
   virtual int selectionAction();
 
-  /// Resets the zoom level to 100%.
+  /**
+  * Resets the zoom level to 100%.
+  */
   virtual void resetDisplay();
 
 protected:
-  /// Constructor:
-  /// \c type  :- view type.
-  /// \c group :- SManager registration group.
-  /// \c name  :- SManager registration name.
-  /// \c view  :- View proxy.
-  /// \c server:- server on which the proxy is created.
-  /// \c parent:- QObject parent.
+  /**
+  * Constructor:
+  * \c type  :- view type.
+  * \c group :- SManager registration group.
+  * \c name  :- SManager registration name.
+  * \c view  :- View proxy.
+  * \c server:- server on which the proxy is created.
+  * \c parent:- QObject parent.
+  */
   pqContextView(const QString& type,
     const QString& group,
     const QString& name,
@@ -83,14 +97,20 @@ protected:
     pqServer* server,
     QObject* parent=NULL);
 
-  /// Creates a new instance of the QWidget subclass to be used to show this
-  /// view. This will create a pqQVTKWidget for the render window.
+  /**
+  * Creates a new instance of the QWidget subclass to be used to show this
+  * view. This will create a pqQVTKWidget for the render window.
+  */
   virtual QWidget* createWidget();
 
-  /// Listen for new selection events, and pass them back to ParaView
+  /**
+  * Listen for new selection events, and pass them back to ParaView
+  */
   virtual void selectionChanged();
 
-  /// Set selection to the view
+  /**
+  * Set selection to the view
+  */
   virtual void setSelection(vtkSelection*);
   class command;
   command* Command;

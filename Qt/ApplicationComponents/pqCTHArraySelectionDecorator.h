@@ -35,10 +35,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationComponentsModule.h"
 #include "pqPropertyWidgetDecorator.h"
 
-/// pqCTHArraySelectionDecorator is used by ExtractCTH filter (and similar
-/// filters) to ensure only 1 of the array-selection properties is set at any
-/// given time. When the user changes the state of a selection property,
-/// selections on other properties are cleared.
+/**
+* pqCTHArraySelectionDecorator is used by ExtractCTH filter (and similar
+* filters) to ensure only 1 of the array-selection properties is set at any
+* given time. When the user changes the state of a selection property,
+* selections on other properties are cleared.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqCTHArraySelectionDecorator :
   public pqPropertyWidgetDecorator
 {

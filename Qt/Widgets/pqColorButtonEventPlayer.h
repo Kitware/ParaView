@@ -35,7 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetEventPlayer.h"
 #include "pqWidgetsModule.h" // needed for EXPORT macro.
 
-/// pqColorButtonEventPlayer is the player for pqColorChooserButton.
+/**
+* pqColorButtonEventPlayer is the player for pqColorChooserButton.
+*/
 class PQWIDGETS_EXPORT pqColorButtonEventPlayer : public pqWidgetEventPlayer
 {
   Q_OBJECT

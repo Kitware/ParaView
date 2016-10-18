@@ -43,66 +43,96 @@ class pqView;
 class pqPropertyManager;
 class vtkSMProxy;
 
-/// ******DEPRECATION WARNING*******
-/// pqProxyPanel and subclasses will soon be removed
-/// from ParaView. Please update your plugins and custom application to use the
-/// new design of creating panels for proxies (pqProxyWidget).
-/// ********************************
-/// Base class for Widget which provides an editor for editing properties
-/// of a proxy
+/**
+* ******DEPRECATION WARNING*******
+* pqProxyPanel and subclasses will soon be removed
+* from ParaView. Please update your plugins and custom application to use the
+* new design of creating panels for proxies (pqProxyWidget).
+* ********************************
+* Base class for Widget which provides an editor for editing properties
+* of a proxy
+*/
 class PQCOMPONENTS_EXPORT pqProxyPanel : public QWidget
 {
   Q_OBJECT
 public:
-  /// constructor
+  /**
+  * constructor
+  */
   pqProxyPanel(vtkSMProxy* proxy, QWidget* p);
-  /// destructor
+  /**
+  * destructor
+  */
   ~pqProxyPanel();
 
-  /// get the proxy for which properties are displayed
+  /**
+  * get the proxy for which properties are displayed
+  */
   vtkSMProxy* proxy() const;
   
-  /// get the view that this object panel works with.
+  /**
+  * get the view that this object panel works with.
+  */
   pqView* view() const;
   
-  /// size hint for this widget
+  /**
+  * size hint for this widget
+  */
   QSize sizeHint() const;
   
-  /// property manager belongs to this panel
+  /**
+  * property manager belongs to this panel
+  */
   pqPropertyManager* propertyManager();
 
-  /// returns whether selected
+  /**
+  * returns whether selected
+  */
   bool selected() const;
 
 public slots:
-  /// accept the changes made to the properties
-  /// changes will be propogated down to the server manager
-  /// subclasses should only change properties when accept is called to work
-  /// properly with undo/redo
+  /**
+  * accept the changes made to the properties
+  * changes will be propogated down to the server manager
+  * subclasses should only change properties when accept is called to work
+  * properly with undo/redo
+  */
   virtual void accept();
 
-  /// reset the changes made
-  /// editor will query properties from the server manager
+  /**
+  * reset the changes made
+  * editor will query properties from the server manager
+  */
   virtual void reset();
 
-  /// Called when the panel becomes active. Default implemnetation does
-  /// nothing.
+  /**
+  * Called when the panel becomes active. Default implemnetation does
+  * nothing.
+  */
   virtual void select();
 
-  /// Called when the panel becomes inactive. Default implemnetation does
-  /// nothing.
+  /**
+  * Called when the panel becomes inactive. Default implemnetation does
+  * nothing.
+  */
   virtual void deselect();
 
-  /// Set the view that this panel works with
+  /**
+  * Set the view that this panel works with
+  */
   virtual void setView(pqView*);
   
-  /// Fires modified
+  /**
+  * Fires modified
+  */
   virtual void setModified();
   
 private slots:
-  /// Called when the vtkSMProxy fires ModifiedEvent.
-  /// It implies that the proxy information properties (and domains
-  /// depending on those) may now be obsolete.
+  /**
+  * Called when the vtkSMProxy fires ModifiedEvent.
+  * It implies that the proxy information properties (and domains
+  * depending on those) may now be obsolete.
+  */
   void proxyModifiedEvent();
 
 
@@ -115,15 +145,19 @@ signals:
   void viewChanged(pqView*);
 
 protected slots:
-  /// This method gets called to referesh all domains 
-  /// and information properties. Subclassess can override
-  /// this to update any domain related entities.
-  /// Since this is not a particularly fast operation, we update 
-  /// the information and domains only when the panel is selected 
-  /// or an already active panel is accepted. 
+  /**
+  * This method gets called to referesh all domains 
+  * and information properties. Subclassess can override
+  * this to update any domain related entities.
+  * Since this is not a particularly fast operation, we update 
+  * the information and domains only when the panel is selected 
+  * or an already active panel is accepted. 
+  */
   virtual void updateInformationAndDomains();
 
-  /// Called after the algorithm executes.
+  /**
+  * Called after the algorithm executes.
+  */
   void dataUpdated();
   
 protected:

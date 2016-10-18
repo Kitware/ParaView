@@ -52,12 +52,16 @@ public:
   virtual void reset();
 
 signals:
-  /// internal signal used to clear highlights from pqHighlightablePushButton.
+  /**
+  * internal signal used to clear highlights from pqHighlightablePushButton.
+  */
   void clearHighlight();
   void highlightResetButton();
 
 protected slots:
-  /// called when the user clicks the "reset" button for a specific property.
+  /**
+  * called when the user clicks the "reset" button for a specific property.
+  */
   virtual void resetButtonClicked();
 
   void scaleHalf();

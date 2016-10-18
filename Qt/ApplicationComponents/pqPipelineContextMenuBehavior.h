@@ -45,12 +45,14 @@ class pqView;
 class QAction;
 class QMenu;
 
-/// @ingroup Behaviors
-///
-/// This behavior manages showing up of a context menu with sensible pipeline
-/// related actions for changing color/visibility etc. when the user
-/// right-clicks on top of an object in the 3D view. Currently, it only supports
-/// views with proxies that vtkSMRenderViewProxy subclasses.
+/**
+* @ingroup Behaviors
+*
+* This behavior manages showing up of a context menu with sensible pipeline
+* related actions for changing color/visibility etc. when the user
+* right-clicks on top of an object in the 3D view. Currently, it only supports
+* views with proxies that vtkSMRenderViewProxy subclasses.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqPipelineContextMenuBehavior : public QObject
 {
   Q_OBJECT
@@ -60,68 +62,100 @@ public:
   virtual ~pqPipelineContextMenuBehavior();
 
 protected slots:
-  /// Called when a new view is added. We add actions to the widget for context
-  /// menu if the view is a render-view.
+  /**
+  * Called when a new view is added. We add actions to the widget for context
+  * menu if the view is a render-view.
+  */
   void onViewAdded(pqView*);
 
-  /// called to hide the representation.
+  /**
+  * called to hide the representation.
+  */
   void hide();
 
-  /// called to hide the block. the action which emits the signal will
-  /// contain the block index in its data().
+  /**
+  * called to hide the block. the action which emits the signal will
+  * contain the block index in its data().
+  */
   void hideBlock();
 
-  /// called to show only the selected block. the action which emits the
-  /// signal will contain the block index in its data().
+  /**
+  * called to show only the selected block. the action which emits the
+  * signal will contain the block index in its data().
+  */
   void showOnlyBlock();
 
-  /// called to show all blocks.
+  /**
+  * called to show all blocks.
+  */
   void showAllBlocks();
 
-  /// called to unset the visibility flag for the block. after this call the
-  /// block will inherit the visibility from its parent. the action which
-  /// emits the signal will contain the block index in its data()
+  /**
+  * called to unset the visibility flag for the block. after this call the
+  * block will inherit the visibility from its parent. the action which
+  * emits the signal will contain the block index in its data()
+  */
   void unsetBlockVisibility();
 
-  /// called to set the color for the block. the action which emits the
-  /// signal will contain the block index in its data()
+  /**
+  * called to set the color for the block. the action which emits the
+  * signal will contain the block index in its data()
+  */
   void setBlockColor();
 
-  /// called to unset the color for the block. the action which emits the
-  /// signal will contain the block index in its data()
+  /**
+  * called to unset the color for the block. the action which emits the
+  * signal will contain the block index in its data()
+  */
   void unsetBlockColor();
 
-  /// called to set the opacity for the block. the action which emits the
-  /// signal will contain the block index in its data()
+  /**
+  * called to set the opacity for the block. the action which emits the
+  * signal will contain the block index in its data()
+  */
   void setBlockOpacity();
 
-  /// called to unset the opacity for the block. the action which emits the
-  /// signal will contain the block index in its data()
+  /**
+  * called to unset the opacity for the block. the action which emits the
+  * signal will contain the block index in its data()
+  */
   void unsetBlockOpacity();
 
-  /// called to change the representation type.
+  /**
+  * called to change the representation type.
+  */
   void reprTypeChanged(QAction* action);
 
-  /// called to change the coloring mode.
+  /**
+  * called to change the coloring mode.
+  */
   void colorMenuTriggered(QAction* action);
 
 protected:
-  /// called to build the context menu for the given representation. If the
-  /// picked representation was a composite data set the block index of the
-  /// selected block will be passed in blockIndex.
+  /**
+  * called to build the context menu for the given representation. If the
+  * picked representation was a composite data set the block index of the
+  * selected block will be passed in blockIndex.
+  */
   virtual void buildMenu(pqDataRepresentation* repr, unsigned int blockIndex);
 
-  /// called to build the color arrays submenu.
+  /**
+  * called to build the color arrays submenu.
+  */
   virtual void buildColorFieldsMenu(
     pqPipelineRepresentation* pipelineRepr, QMenu* menu);
 
-  /// event filter to capture the right-click. We don't directly use mechanisms
-  /// from QWidget to popup the context menu since all of those mechanism seem
-  /// to eat away the right button release, leaving the render window in a
-  /// dragging state.
+  /**
+  * event filter to capture the right-click. We don't directly use mechanisms
+  * from QWidget to popup the context menu since all of those mechanism seem
+  * to eat away the right button release, leaving the render window in a
+  * dragging state.
+  */
   virtual bool eventFilter(QObject* caller, QEvent* e);
 
-  /// return the name of the block from its flat index
+  /**
+  * return the name of the block from its flat index
+  */
   QString lookupBlockName(unsigned int flatIndex) const;
 
   QMenu* Menu;

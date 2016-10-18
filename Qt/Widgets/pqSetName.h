@@ -55,7 +55,9 @@ private:
   void operator=(const pqSetName&);
 };
 
-/// Sets a Qt object's name
+/**
+* Sets a Qt object's name
+*/
 template<typename T>
 T* operator<<(T* LHS, const pqSetName& RHS)
 {

@@ -40,8 +40,10 @@ class pqOutputPort;
 class vtkPVDataSetAttributesInformation;
 class vtkSMProxy;
 
-/// pqQueryClauseWidget is used by pqQueryDialog as the widget allowing the user
-/// choose the clauses for the queries.
+/**
+* pqQueryClauseWidget is used by pqQueryDialog as the widget allowing the user
+* choose the clauses for the queries.
+*/
 class PQCOMPONENTS_EXPORT pqQueryClauseWidget : public QWidget
 {
   Q_OBJECT
@@ -87,78 +89,106 @@ public:
     QWidget* parent=0, Qt::WindowFlags flags=0);
   virtual ~pqQueryClauseWidget();
 
-  /// Set/Get the data producer.
+  /**
+  * Set/Get the data producer.
+  */
   void setProducer(pqOutputPort* p)
     { this->Producer = p; }
   pqOutputPort* producer() const
     { return this->Producer; }
 
-  /// Set the attribute type. This determine what arrays are listed in the
-  /// selection criteria.
-  /// Valid values are from the enum vtkDataObject::AttributeTypes.
+  /**
+  * Set the attribute type. This determine what arrays are listed in the
+  * selection criteria.
+  * Valid values are from the enum vtkDataObject::AttributeTypes.
+  */
   void setAttributeType(int attrType)
     { this->AttributeType = attrType; }
   int attributeType() const
     { return this->AttributeType; }
 
-  /// Creates a new selection source proxy based on the query.
-  /// Note that this does not register the proxy, it merely creates the
-  /// selection source and returns it.
+  /**
+  * Creates a new selection source proxy based on the query.
+  * Note that this does not register the proxy, it merely creates the
+  * selection source and returns it.
+  */
   vtkSMProxy* newSelectionSource();
 
 public slots:
-  /// use this slot to initialize the clause GUI after all properties have been
-  /// set.
-  /// FIXME: Unsupported Terms: process id, amr-level, amr-block. We will need
-  /// to extend VTK selection support for those, so we will implement them later
-  /// (possibly 3.10/4.0)
+  /**
+  * use this slot to initialize the clause GUI after all properties have been
+  * set.
+  * FIXME: Unsupported Terms: process id, amr-level, amr-block. We will need
+  * to extend VTK selection support for those, so we will implement them later
+  * (possibly 3.10/4.0)
+  */
   void initialize()
     { this->initialize(CriteriaTypes(ANY) ^ PROCESSID ^ AMR_LEVEL ^ AMR_BLOCK ^ BLOCK); }
 
-  /// initialize the widget only with the subset of criteria mentioned.
-  /// A query clause has two components, the query term and the qualifiers. Some
-  /// criteria can be both eg. BLOCK can be both the term or a qualifier. The
-  /// available operators may change in such case. Hence, we specify if it's
-  /// being used as a qualifier or not.
+  /**
+  * initialize the widget only with the subset of criteria mentioned.
+  * A query clause has two components, the query term and the qualifiers. Some
+  * criteria can be both eg. BLOCK can be both the term or a qualifier. The
+  * available operators may change in such case. Hence, we specify if it's
+  * being used as a qualifier or not.
+  */
   void initialize(CriteriaTypes type_flags, bool qualifier_mode=false);
 
 signals:
-  /// Fired when the user clicks on the help button.
+  /**
+  * Fired when the user clicks on the help button.
+  */
   void helpRequested();
 
 protected slots:
-  /// Based on the selection criteria, populate the options in the selection
-  /// "condition" combo box.
+  /**
+  * Based on the selection criteria, populate the options in the selection
+  * "condition" combo box.
+  */
   void populateSelectionCondition();
 
-  /// Update the value widget so show the correct widget based on the chosen
-  /// criteria and condition.
+  /**
+  * Update the value widget so show the correct widget based on the chosen
+  * criteria and condition.
+  */
   void updateValueWidget();
 
-  /// Some query clauses under certain conditions require additional options
-  /// from the user. These are managed using more instances of
-  /// pqQueryClauseWidget internally. This method creates these new instances if
-  /// needed.
+  /**
+  * Some query clauses under certain conditions require additional options
+  * from the user. These are managed using more instances of
+  * pqQueryClauseWidget internally. This method creates these new instances if
+  * needed.
+  */
   void updateDependentClauseWidgets();
 
-  /// Pops up a dialog showing the composite data structure for the data.
+  /**
+  * Pops up a dialog showing the composite data structure for the data.
+  */
   void showCompositeTree();
 
 protected:
-  /// Returns the attribute info for the attribute chosen in the "Selection
-  /// Type" combo box.
+  /**
+  * Returns the attribute info for the attribute chosen in the "Selection
+  * Type" combo box.
+  */
   vtkPVDataSetAttributesInformation* getChosenAttributeInfo() const;
 
-  /// Based on the selection type and data information from the producer,
-  /// populate the "criteria" combo box.
+  /**
+  * Based on the selection type and data information from the producer,
+  * populate the "criteria" combo box.
+  */
   void populateSelectionCriteria(CriteriaTypes type=ANY);
 
-  /// Returns the current criteria type.
+  /**
+  * Returns the current criteria type.
+  */
   CriteriaType currentCriteriaType() const;
 
   ConditionMode currentConditionType() const;
 
-  /// Updates the selection source proxy with the criteria in the clause.
+  /**
+  * Updates the selection source proxy with the criteria in the clause.
+  */
   void addSelectionQualifiers(vtkSMProxy*);
 
   pqOutputPort* Producer;

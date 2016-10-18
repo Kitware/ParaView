@@ -40,8 +40,10 @@ class vtkPVXMLElement;
 class pqServerResource;
 class vtkIndent;
 
-/// pqServerConfiguration corresponds to a server connection configuration.
-/// These are typically read from pvsc files.
+/**
+* pqServerConfiguration corresponds to a server connection configuration.
+* These are typically read from pvsc files.
+*/
 class PQCORE_EXPORT pqServerConfiguration
 {
 public:
@@ -49,26 +51,36 @@ public:
   pqServerConfiguration(vtkPVXMLElement* xml);
   ~pqServerConfiguration();
 
-  /// Get/Set whether the configuration is mutable. This variable is not
-  /// serialized.
+  /**
+  * Get/Set whether the configuration is mutable. This variable is not
+  * serialized.
+  */
   bool isMutable() const {return this->Mutable;}
   void setMutable(bool val) {this->Mutable = val;}
 
-  /// Get/Set the name for the configuration.
+  /**
+  * Get/Set the name for the configuration.
+  */
   void setName(const QString& name);
   QString name() const;
 
-  /// Returns true if the name for this configuration is the default one i.e.
-  /// the one that gets set when none is specified. Useful to determine "empty"
-  /// configurations.
+  /**
+  * Returns true if the name for this configuration is the default one i.e.
+  * the one that gets set when none is specified. Useful to determine "empty"
+  * configurations.
+  */
   bool isNameDefault() const;
 
-  /// Get/Set the URI that describes the server scheme, hostname(s) and port(s).
+  /**
+  * Get/Set the URI that describes the server scheme, hostname(s) and port(s).
+  */
   pqServerResource resource() const;
   void setResource(const pqServerResource&);
   void setResource(const QString&);
 
-  /// Types of start
+  /**
+  * Types of start
+  */
   enum StartupType
     {
     INVALID,
@@ -76,32 +88,48 @@ public:
     COMMAND
     };
 
-  /// returns the startup type for this configuration. There are 3 types of
-  /// startup: manual, simple-command and custom-command.
+  /**
+  * returns the startup type for this configuration. There are 3 types of
+  * startup: manual, simple-command and custom-command.
+  */
   StartupType startupType() const;
 
-  /// If startupType() == COMMAND, then this method can be used to obtain
-  /// the command for the startup. Note that this does not include any
-  /// information options etc. that may be specified in the startup.
+  /**
+  * If startupType() == COMMAND, then this method can be used to obtain
+  * the command for the startup. Note that this does not include any
+  * information options etc. that may be specified in the startup.
+  */
   QString command(double& timeout, double& delay) const;
 
-  /// changes the startup type to manual.
+  /**
+  * changes the startup type to manual.
+  */
   void setStartupToManual();
 
-  /// changes the startup type to command.
+  /**
+  * changes the startup type to command.
+  */
   void setStartupToCommand(
     double timeout, double delay, const QString& command);
 
-  /// serialize to a string.
+  /**
+  * serialize to a string.
+  */
   QString toString(vtkIndent indent) const;
 
-  /// Create a new clone (deep copying the vtkPVXMLElement).
+  /**
+  * Create a new clone (deep copying the vtkPVXMLElement).
+  */
   pqServerConfiguration clone() const;
 
-  /// returns the <Options> element, if any.
+  /**
+  * returns the <Options> element, if any.
+  */
   vtkPVXMLElement* optionsXML() const;
 
-  /// returns the <Hints> element, if any.
+  /**
+  * returns the <Hints> element, if any.
+  */
   vtkPVXMLElement* hintsXML() const;
 
 protected:

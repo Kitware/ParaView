@@ -37,10 +37,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 
 class pqSettings;
-/// pqRecentlyUsedResourcesList encapsulates a persistent collection of
-/// recently-used resources (data files or state files).
-///
-/// \sa pqServerResource
+/**
+* pqRecentlyUsedResourcesList encapsulates a persistent collection of
+* recently-used resources (data files or state files).
+*
+* \sa pqServerResource
+*/
 class PQCORE_EXPORT pqRecentlyUsedResourcesList : public QObject
 {
   Q_OBJECT
@@ -49,26 +51,38 @@ public:
   pqRecentlyUsedResourcesList(QObject* parent=0);
   virtual ~pqRecentlyUsedResourcesList();
 
-  /// convenience typedef.
+  /**
+  * convenience typedef.
+  */
   typedef QList<pqServerResource> ListT;
 
-  /// Add a resource to the collection. Moves the resource to the beginning of
-  /// the list.
+  /**
+  * Add a resource to the collection. Moves the resource to the beginning of
+  * the list.
+  */
   void add(const pqServerResource& resource);
 
-  /// Returns the contents of the collection ordered from most-recently-used to
-  /// least-recently-used.
+  /**
+  * Returns the contents of the collection ordered from most-recently-used to
+  * least-recently-used.
+  */
   const QList<pqServerResource>& list() const
     { return this->ResourceList; }
 
-  /// Load the collection (from local user preferences)
+  /**
+  * Load the collection (from local user preferences)
+  */
   void load(pqSettings&);
 
-  /// Save the collection (to local user preferences)
+  /**
+  * Save the collection (to local user preferences)
+  */
   void save(pqSettings&) const;
 
 signals:
-  /// Signal emitted whenever the collection is changed
+  /**
+  * Signal emitted whenever the collection is changed
+  */
   void changed();
 
 private:

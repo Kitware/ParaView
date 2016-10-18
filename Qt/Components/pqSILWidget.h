@@ -41,24 +41,32 @@ class pqSILModel;
 class pqTreeView;
 class pqProxySILModel;
 
-/// pqSILWidget is a QTabWidget that creates tabs with pqTreeView instances
-/// showing the top-level categories from the SIL.
+/**
+* pqSILWidget is a QTabWidget that creates tabs with pqTreeView instances
+* showing the top-level categories from the SIL.
+*/
 class PQCOMPONENTS_EXPORT pqSILWidget : public QWidget
 {
   Q_OBJECT
 
 public:
-  /// activeCategory is used to mark one of the top-level categories as the
-  /// first one to show. This is typically the sub-tree that you want to set on
-  /// the property.
+  /**
+  * activeCategory is used to mark one of the top-level categories as the
+  * first one to show. This is typically the sub-tree that you want to set on
+  * the property.
+  */
   pqSILWidget(const QString& activeCategory, QWidget* parent=0);
   virtual ~pqSILWidget();
 
-  /// Get/Set the SIL model. This is typically a pqSILModel instance.
+  /**
+  * Get/Set the SIL model. This is typically a pqSILModel instance.
+  */
   void setModel(pqSILModel* silModel);
   pqSILModel* model() const;
 
-  /// Returns the proxy model for the active category.
+  /**
+  * Returns the proxy model for the active category.
+  */
   pqProxySILModel* activeModel()
     { return this->ActiveModel; }
 

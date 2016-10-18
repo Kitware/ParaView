@@ -35,8 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreModule.h"
 #include "vtkSMAnimationSceneImageWriter.h"
 
-/// pqAnimationSceneImageWriter is a subclass of vtkSMAnimationSceneImageWriter
-/// which knows how to generate images from a plot view modules.
+/**
+* pqAnimationSceneImageWriter is a subclass of vtkSMAnimationSceneImageWriter
+* which knows how to generate images from a plot view modules.
+*/
 class PQCORE_EXPORT pqAnimationSceneImageWriter : public vtkSMAnimationSceneImageWriter
 {
 public:

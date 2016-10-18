@@ -39,10 +39,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqDataRepresentation;
 class vtkSMProxy;
 
-/// A widget for representation type for a vtkSMRepresentationProxy. It works
-/// with a vtkSMRepresentationProxy, calling
-/// vtkSMRepresentationProxy::SetRepresentationType() to change the
-/// representation type to the one chosen by the user.
+/**
+* A widget for representation type for a vtkSMRepresentationProxy. It works
+* with a vtkSMRepresentationProxy, calling
+* vtkSMRepresentationProxy::SetRepresentationType() to change the
+* representation type to the one chosen by the user.
+*/
 class PQCOMPONENTS_EXPORT pqDisplayRepresentationWidget : public QWidget
 {
   Q_OBJECT;
@@ -55,21 +57,29 @@ public:
   pqDisplayRepresentationWidget(QWidget* parent=0);
   virtual ~pqDisplayRepresentationWidget();
 
-  /// Returns the selected representation as a string.
+  /**
+  * Returns the selected representation as a string.
+  */
   QString representationText() const;
 
 public slots:
-  /// set the representation proxy or pqDataRepresentation instance.
+  /**
+  * set the representation proxy or pqDataRepresentation instance.
+  */
   void setRepresentation(pqDataRepresentation* display);
   void setRepresentation(vtkSMProxy* proxy);
 
-  /// set representation type.
+  /**
+  * set representation type.
+  */
   void setRepresentationText(const QString&);
 
 private slots:
-  /// Slot called when the combo-box is changed. If this change was due to
-  /// a UI interaction, we need to prompt the user if he really intended to make
-  /// that change (BUG #0015117).
+  /**
+  * Slot called when the combo-box is changed. If this change was due to
+  * a UI interaction, we need to prompt the user if he really intended to make
+  * that change (BUG #0015117).
+  */
   void comboBoxChanged(const QString&);
 
 signals:
@@ -84,7 +94,9 @@ private:
   class PropertyLinksConnection;
 };
 
-/// A property widget for selecting the display representation.
+/**
+* A property widget for selecting the display representation.
+*/
 class PQCOMPONENTS_EXPORT pqDisplayRepresentationPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT

@@ -35,8 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationComponentsModule.h"
 #include "pqReaction.h"
 
-/// @ingroup Reactions
-/// pqPythonShellReaction is a reaction to handle showing of the python shell.
+/**
+* @ingroup Reactions
+* pqPythonShellReaction is a reaction to handle showing of the python shell.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqPythonShellReaction : public pqReaction
 {
   Q_OBJECT
@@ -44,15 +46,21 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqPythonShellReaction : public pqReaction
 public:
   pqPythonShellReaction(QAction* parent);
 
-  /// Pops up the python shell dialog when compiled with PARAVIEW_ENABLE_PYTHON
-  /// flag on.
+  /**
+  * Pops up the python shell dialog when compiled with PARAVIEW_ENABLE_PYTHON
+  * flag on.
+  */
   static void showPythonShell();
 
-  /// Executes a python script.
+  /**
+  * Executes a python script.
+  */
   static void executeScript(const char* filename);
 
 protected:
-  /// Called when the action is triggered.
+  /**
+  * Called when the action is triggered.
+  */
   virtual void onTriggered()
     { pqPythonShellReaction::showPythonShell(); }
 

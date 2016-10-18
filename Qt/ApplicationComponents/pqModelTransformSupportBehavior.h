@@ -40,9 +40,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqView;
 class vtkSMSourceProxy;
 
-/// @ingroup Behaviors
-/// pqModelTransformSupportBehavior is designed for supporting ChangeOfBasis
-/// matrix for MantId.
+/**
+* @ingroup Behaviors
+* pqModelTransformSupportBehavior is designed for supporting ChangeOfBasis
+* matrix for MantId.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqModelTransformSupportBehavior : public QObject
 {
   Q_OBJECT

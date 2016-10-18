@@ -37,7 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqServer;
 
-/// GUI for SplineWidgetRepresentation. This is a 3D widget that edits a spline.
+/**
+* GUI for SplineWidgetRepresentation. This is a 3D widget that edits a spline.
+*/
 class PQDEPRECATED_EXPORT pqSplineWidget : public pq3DWidget
 {
   Q_OBJECT
@@ -46,12 +48,14 @@ public:
   pqSplineWidget(vtkSMProxy* refProxy, vtkSMProxy* proxy, QWidget* parent);
   virtual ~pqSplineWidget();
 
-  /// Resets the bounds of the 3D widget to the reference proxy bounds.
-  /// This typically calls PlaceWidget on the underlying 3D Widget 
-  /// with reference proxy bounds.
-  /// This should be explicitly called after the panel is created
-  /// and the widget is initialized i.e. the reference proxy, controlled proxy
-  /// and hints have been set.
+  /**
+  * Resets the bounds of the 3D widget to the reference proxy bounds.
+  * This typically calls PlaceWidget on the underlying 3D Widget 
+  * with reference proxy bounds.
+  * This should be explicitly called after the panel is created
+  * and the widget is initialized i.e. the reference proxy, controlled proxy
+  * and hints have been set.
+  */
   virtual void resetBounds(double /*bounds*/[6]) {}
   virtual void resetBounds()
     { return this->Superclass::resetBounds(); }
@@ -62,11 +66,15 @@ protected slots:
   void addPoint();
   void removePoints();
 
-  /// Snap currently selected point to surface.
+  /**
+  * Snap currently selected point to surface.
+  */
   virtual void pick(double x, double y, double z);
 
 protected:
-  /// Internal method to create the widget.
+  /**
+  * Internal method to create the widget.
+  */
   void createWidget(pqServer*);
 
 private:

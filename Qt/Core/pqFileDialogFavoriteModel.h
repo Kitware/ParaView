@@ -54,23 +54,35 @@ class PQCORE_EXPORT pqFileDialogFavoriteModel : public QAbstractListModel
   Q_OBJECT
 
 public:
-  /// server is the server for which we need the listing.
-  /// if the server is NULL, we get file listings locally
+  /**
+  * server is the server for which we need the listing.
+  * if the server is NULL, we get file listings locally
+  */
   pqFileDialogFavoriteModel(pqServer* server, QObject* Parent);
   ~pqFileDialogFavoriteModel();
 
-  /// return the path to the favorites item
+  /**
+  * return the path to the favorites item
+  */
   QString filePath(const QModelIndex&) const;
-  /// return whether this item is a directory
+  /**
+  * return whether this item is a directory
+  */
   bool isDir(const QModelIndex&) const;
 
-  /// returns the data for an item
+  /**
+  * returns the data for an item
+  */
   QVariant data(const QModelIndex& idx, int role) const;
  
-  /// return the number of rows in the model 
+  /**
+  * return the number of rows in the model 
+  */
   int rowCount(const QModelIndex& idx) const;
   
-  /// return header data
+  /**
+  * return header data
+  */
   QVariant headerData(int section, Qt::Orientation, int role) const;
 
 private:

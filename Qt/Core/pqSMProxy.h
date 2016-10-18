@@ -38,10 +38,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include <QMetaType>
 
-/// make pqSMProxy synonymous to a smart pointer of a vtkSMProxy
+/**
+* make pqSMProxy synonymous to a smart pointer of a vtkSMProxy
+*/
 typedef vtkSmartPointer<vtkSMProxy> pqSMProxy;
 
-/// declare pqSMProxy for use with QVariant
+/**
+* declare pqSMProxy for use with QVariant
+*/
 Q_DECLARE_METATYPE(pqSMProxy)
 
 extern PQCORE_EXPORT const int pqSMProxyMetaTypeId;

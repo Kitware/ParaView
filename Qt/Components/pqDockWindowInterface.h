@@ -39,7 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QDockWidget;
 class QWidget;
 
-/// interface class for plugins that add a QDockWindow
+/**
+* interface class for plugins that add a QDockWindow
+*/
 class PQCOMPONENTS_EXPORT pqDockWindowInterface
 {
 public:
@@ -48,7 +50,9 @@ public:
 
   virtual QString dockArea() const = 0;
 
-  /// Creates a dock window with the given parent
+  /**
+  * Creates a dock window with the given parent
+  */
   virtual QDockWidget* dockWindow(QWidget* p) = 0;
 private:
   Q_DISABLE_COPY(pqDockWindowInterface)

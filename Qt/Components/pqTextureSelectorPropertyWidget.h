@@ -38,10 +38,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyWidget.h"
 #include "pqTextureComboBox.h"
 
-/// Property widget for selecting the texture to apply to a surface.
-///
-/// To use this widget for a property add the 'panel_widget="texture_selector"'
-/// to the property's XML.
+/**
+* Property widget for selecting the texture to apply to a surface.
+*
+* To use this widget for a property add the 'panel_widget="texture_selector"'
+* to the property's XML.
+*/
 class PQCOMPONENTS_EXPORT pqTextureSelectorPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT

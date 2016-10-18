@@ -44,19 +44,29 @@ class pqAnimationTrack;
 class PQWIDGETS_EXPORT pqAnimationKeyFrame : public QObject, public QGraphicsItem
 {
   Q_OBJECT
-  /// the time as a fraction of scene time that this keyframe starts at
+  /**
+  * the time as a fraction of scene time that this keyframe starts at
+  */
   Q_PROPERTY(double normalizedStartTime
              READ normalizedStartTime
              WRITE setNormalizedStartTime)
-  /// the time as a fraction of scene time that this keyframe ends at
+  /**
+  * the time as a fraction of scene time that this keyframe ends at
+  */
   Q_PROPERTY(double normalizedEndTime
              READ normalizedEndTime
              WRITE setNormalizedEndTime)
-  /// the value at the start of the keyframe
+  /**
+  * the value at the start of the keyframe
+  */
   Q_PROPERTY(QVariant startValue READ startValue WRITE setStartValue)
-  /// the value at the end of the keyframe
+  /**
+  * the value at the end of the keyframe
+  */
   Q_PROPERTY(QVariant endValue READ endValue WRITE setEndValue)
-  /// an icon to help describe the keyframe
+  /**
+  * an icon to help describe the keyframe
+  */
   Q_PROPERTY(QIcon icon READ icon WRITE setIcon)
 #if QT_VERSION >= 0x40600
   Q_INTERFACES(QGraphicsItem)
@@ -89,7 +99,9 @@ signals:
   void iconChanged();
 
 protected:
-  /// Returns the parent pqAnimationTrack.
+  /**
+  * Returns the parent pqAnimationTrack.
+  */
   pqAnimationTrack* parentTrack() const;
 
   virtual void paint(QPainter* p,

@@ -35,8 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetsModule.h"
 #include <QDialog>
 
-/// A borderless pop-up dialog used to show actions that the user can launch.
-/// Provides search capabilities.
+/**
+* A borderless pop-up dialog used to show actions that the user can launch.
+* Provides search capabilities.
+*/
 class PQWIDGETS_EXPORT pqQuickLaunchDialog : public QDialog
 {
   Q_OBJECT
@@ -45,28 +47,40 @@ public:
   pqQuickLaunchDialog(QWidget *parent=0);
   virtual ~pqQuickLaunchDialog();
 
-  /// Set the actions to be launched using this dialog.
-  /// This clears all already added actions.
+  /**
+  * Set the actions to be launched using this dialog.
+  * This clears all already added actions.
+  */
   void setActions(const QList<QAction*>& actions);
 
-  /// Add actions to be launched using this dialog.
-  /// This adds to already added actions.
+  /**
+  * Add actions to be launched using this dialog.
+  * This adds to already added actions.
+  */
   void addActions(const QList<QAction*>& actions);
 
 public slots:
-  /// Overridden to trigger the user selected action.
+  /**
+  * Overridden to trigger the user selected action.
+  */
   virtual void accept();
 
 protected slots:
-  /// Called when the user chooses an item from available choices shown in the
-  /// options list.
+  /**
+  * Called when the user chooses an item from available choices shown in the
+  * options list.
+  */
   void currentRowChanged(int);
 
 protected:
-  /// Overridden to capture key presses.
+  /**
+  * Overridden to capture key presses.
+  */
   virtual bool eventFilter(QObject *watched, QEvent *event);
 
-  /// Given the user entered text, update the GUI.
+  /**
+  * Given the user entered text, update the GUI.
+  */
   void updateSearch();
 private:
   Q_DISABLE_COPY(pqQuickLaunchDialog)

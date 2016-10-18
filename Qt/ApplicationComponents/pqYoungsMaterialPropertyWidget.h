@@ -39,9 +39,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkSMPropertyGroup;
 
-/// This is a custom widget for YoungsMaterialInterface filter. We use a custom widget
-/// since this filter has unusual requirements when it comes to setting
-/// OrderingArrays and NormalArrays properties.
+/**
+* This is a custom widget for YoungsMaterialInterface filter. We use a custom widget
+* since this filter has unusual requirements when it comes to setting
+* OrderingArrays and NormalArrays properties.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqYoungsMaterialPropertyWidget : public pqStringVectorPropertyWidget
 {
   Q_OBJECT

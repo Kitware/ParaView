@@ -39,7 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqDoubleRangeWidget;
 
-/// Provides a dialog for specifying a double between two ranges
+/**
+* Provides a dialog for specifying a double between two ranges
+*/
 class PQWIDGETS_EXPORT pqDoubleRangeDialog : public QDialog
 {
   Q_OBJECT

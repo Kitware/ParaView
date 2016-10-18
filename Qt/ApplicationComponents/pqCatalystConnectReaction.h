@@ -37,10 +37,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqLiveInsituVisualizationManager;
 
-/// Reaction for connecting to Catalyst CoProcessing Engine for Live-Data
-/// Visualization.
-/// @ingroup Reactions
-/// @ingroup LiveInsitu
+/**
+* Reaction for connecting to Catalyst CoProcessing Engine for Live-Data
+* Visualization.
+* @ingroup Reactions
+* @ingroup LiveInsitu
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystConnectReaction : public pqReaction
 {
   Q_OBJECT
@@ -49,16 +51,22 @@ public:
   pqCatalystConnectReaction(QAction* parent=0);
   virtual ~pqCatalystConnectReaction();
 
-  /// Connect to Catalyst 
+  /**
+  * Connect to Catalyst 
+  */
   bool connect();
 
 protected:
-  /// Called when the action is triggered.
+  /**
+  * Called when the action is triggered.
+  */
   virtual void onTriggered()
     { this->connect(); }
 
-  /// reaction disabled when already connected to a catalyst server or in
-  /// collaboration mode.
+  /**
+  * reaction disabled when already connected to a catalyst server or in
+  * collaboration mode.
+  */
   virtual void updateEnableState();
 
 private:

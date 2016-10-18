@@ -38,8 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqPipelineSource;
 class pqProxyGroupMenuManager;
 
-/// @ingroup Reactions
-/// Reaction to handle creation of sources from the sources menu.
+/**
+* @ingroup Reactions
+* Reaction to handle creation of sources from the sources menu.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqSourcesMenuReaction : public QObject
 {
   Q_OBJECT
@@ -51,13 +53,17 @@ public:
     const QString& group, const QString& name);
 
 public slots:
-  /// Updates the enabled state. Applications need not explicitly call
-  /// this.
+  /**
+  * Updates the enabled state. Applications need not explicitly call
+  * this.
+  */
   virtual void updateEnableState();
   void updateEnableState(bool);
 
 protected slots:
-  /// Called when the action is triggered.
+  /**
+  * Called when the action is triggered.
+  */
   virtual void onTriggered(const QString& group, const QString& name)
     { pqSourcesMenuReaction::createSource(group, name); } 
 

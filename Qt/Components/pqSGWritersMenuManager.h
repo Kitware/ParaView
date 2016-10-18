@@ -39,13 +39,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QMenu;
 class QAction;
 
-/// pqSGWritersMenuManager is responsible for managing the menu for "Writers".
-/// pqSGPluginManager calls createMenu() when the plugin is initialized, then
-/// pqSGWritersMenuManager creates and setups up the co-processing writers menu.
-/// If another plugin is loaded after this one is then it rechecks to see
-/// if any writers were added with the CoProcessing hint in the XML file
-/// and if they were then the writers get added to the Writers menu.  See
-/// Resources/servermanager.xml for an example of how to do that.
+/**
+* pqSGWritersMenuManager is responsible for managing the menu for "Writers".
+* pqSGPluginManager calls createMenu() when the plugin is initialized, then
+* pqSGWritersMenuManager creates and setups up the co-processing writers menu.
+* If another plugin is loaded after this one is then it rechecks to see
+* if any writers were added with the CoProcessing hint in the XML file
+* and if they were then the writers get added to the Writers menu.  See
+* Resources/servermanager.xml for an example of how to do that.
+*/
 class PQCOMPONENTS_EXPORT pqSGWritersMenuManager : public QObject
 {
   Q_OBJECT
@@ -56,24 +58,32 @@ public:
   ~pqSGWritersMenuManager();
 
 public slots:
-  /// Creates a new writers menu and adds the writers to it.
-  /// The name of the Qt menu object will be ObjectMenuName
-  /// and the the name of GUI menu will be WritersMenuName.
+  /**
+  * Creates a new writers menu and adds the writers to it.
+  * The name of the Qt menu object will be ObjectMenuName
+  * and the the name of GUI menu will be WritersMenuName.
+  */
   void createMenu();
 
 protected slots:
-  /// Updates the enable state for the writers menu.
+  /**
+  * Updates the enable state for the writers menu.
+  */
   void updateEnableState();
 
-  /// Called when user requests to create a writer.
+  /**
+  * Called when user requests to create a writer.
+  */
   void onActionTriggered(QAction*);
 protected:
   void createWriter(const QString& xmlgroup, const QString& xmlname);
 
 private:
   QMenu* Menu;
-  /// The name of the Qt writers menu object will be ObjectMenuName
-  /// and the the name of GUI menu will be WritersMenuName.
+  /**
+  * The name of the Qt writers menu object will be ObjectMenuName
+  * and the the name of GUI menu will be WritersMenuName.
+  */
   QString WritersMenuName;
   QString ObjectMenuName;
 

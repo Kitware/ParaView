@@ -38,35 +38,45 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class QTextEdit;
 
-/// This class is a helper object to attach to a QTextEdit to add Python
-/// syntax highlighting to the text that is displayed.  The pygments python
-/// module is used to generate syntax highlighting.  Since mixing tabs and
-/// spaces is an error for python's indentation, tabs are highlighted in red.
-///
-/// The QTextEdit is set up so that it uses a fixed-width font and tabs are
-/// the width of 4 spaces by the constructor.
-///
-/// This will also optionally
-/// capture presses of the tab key that would go to the QTextEdit and
-/// insert 4 spaces instead of the tab.  This option is enabled by default.
+/**
+* This class is a helper object to attach to a QTextEdit to add Python
+* syntax highlighting to the text that is displayed.  The pygments python
+* module is used to generate syntax highlighting.  Since mixing tabs and
+* spaces is an error for python's indentation, tabs are highlighted in red.
+*
+* The QTextEdit is set up so that it uses a fixed-width font and tabs are
+* the width of 4 spaces by the constructor.
+*
+* This will also optionally
+* capture presses of the tab key that would go to the QTextEdit and
+* insert 4 spaces instead of the tab.  This option is enabled by default.
+*/
 class PQPYTHON_EXPORT pqPythonSyntaxHighlighter : public QObject {
   Q_OBJECT
 public:
   typedef QObject Superclass;
-  /// Creates a pqPythonSyntaxHighlighter on the given QTextEdit
-  /// NOTE: the optional tab key capture is enabled by the constructor
+  /**
+  * Creates a pqPythonSyntaxHighlighter on the given QTextEdit
+  * NOTE: the optional tab key capture is enabled by the constructor
+  */
   explicit pqPythonSyntaxHighlighter(QTextEdit* textEdit, QObject* p = 0);
   virtual ~pqPythonSyntaxHighlighter();
 
-  /// Returns true if the tab key is being intercepted to insert spaces in
-  /// the text edit
+  /**
+  * Returns true if the tab key is being intercepted to insert spaces in
+  * the text edit
+  */
   bool isReplacingTabs() const;
-  /// Used to enable/disable tab key capture
-  /// Passing true will cause the tab key to insert 4 spaces in the QTextEdit
+  /**
+  * Used to enable/disable tab key capture
+  * Passing true will cause the tab key to insert 4 spaces in the QTextEdit
+  */
   void setReplaceTabs(bool replaceTabs);
 protected:
-  /// This event filter is applied to the TextEdit to translate presses of the
-  /// Tab key into 4 spaces being inserted
+  /**
+  * This event filter is applied to the TextEdit to translate presses of the
+  * Tab key into 4 spaces being inserted
+  */
   bool eventFilter(QObject*, QEvent*);
 private slots:
   void rehighlightSyntax();

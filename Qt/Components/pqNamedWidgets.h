@@ -75,13 +75,19 @@ minimums/maximums will automatically updated.
 class PQCOMPONENTS_EXPORT pqNamedWidgets
 {
 public:
-  /// populate a grid layout with widgets to represent the properties
+  /**
+  * populate a grid layout with widgets to represent the properties
+  */
   static void createWidgets(QGridLayout* l, vtkSMProxy* pxy, bool summaryOnly = false);
 
-  /// Link a collection of Qt child widgets with server manager properties by name
+  /**
+  * Link a collection of Qt child widgets with server manager properties by name
+  */
   static void link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* property_manager,
                          const QStringList* exceptions=NULL);
-  /// Remove links between Qt widgets and server manager properties
+  /**
+  * Remove links between Qt widgets and server manager properties
+  */
   static void unlink(QWidget* parent, pqSMProxy proxy, pqPropertyManager* property_manager);
 
   static void linkObject(QObject* object, pqSMProxy proxy, 
@@ -92,23 +98,29 @@ public:
                            const QString& property,
                            pqPropertyManager* property_manager);
 
-  /// given an object, find the user property and its associated signal
-  /// this is used to find which property of a widget to link with
-  /// returns whether it was found
-  /// for QCheckBox and QTextEdit, the signal names not derived from the user
-  /// property
+  /**
+  * given an object, find the user property and its associated signal
+  * this is used to find which property of a widget to link with
+  * returns whether it was found
+  * for QCheckBox and QTextEdit, the signal names not derived from the user
+  * property
+  */
   static bool propertyInformation(QObject* object, 
     QString& property, QString& signal);
 
-  /// this function does the actual linking, and adds a range domain if one is
-  /// needed
+  /**
+  * this function does the actual linking, and adds a range domain if one is
+  * needed
+  */
   static void linkObject(QObject* o, const QString& property,
                          const QString& signal, pqSMProxy proxy,
                          vtkSMProperty* smProperty, int index,
                          pqPropertyManager* pm);
   
-  /// this function does the actual un-linking, and removes a range domain if one
-  /// exists
+  /**
+  * this function does the actual un-linking, and removes a range domain if one
+  * exists
+  */
   static void unlinkObject(QObject* o, const QString& property,
                          const QString& signal, pqSMProxy proxy,
                          vtkSMProperty* smProperty, int index,

@@ -34,29 +34,39 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqReaction.h"
 
-/// @ingroup Reactions
-/// Reaction for load state action.
+/**
+* @ingroup Reactions
+* Reaction for load state action.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqLoadStateReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
 public:
-  /// Constructor. Parent cannot be NULL.
+  /**
+  * Constructor. Parent cannot be NULL.
+  */
   pqLoadStateReaction(QAction *parent);
 
-  /// Loads the state file.
-  /// Note that this method is static. Applications can simply use this without
-  /// having to create a reaction instance.
+  /**
+  * Loads the state file.
+  * Note that this method is static. Applications can simply use this without
+  * having to create a reaction instance.
+  */
   static void loadState(const QString& filename);
   static void loadState();
 
 public slots:
-  /// Updates the enabled state. Applications need not explicitly call
-  /// this.
+  /**
+  * Updates the enabled state. Applications need not explicitly call
+  * this.
+  */
   void updateEnableState();
 
 protected:
-  /// Called when the action is triggered.
+  /**
+  * Called when the action is triggered.
+  */
   virtual void onTriggered()
     { pqLoadStateReaction::loadState(); }
 

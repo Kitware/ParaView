@@ -36,7 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqServer;
 
-/// Provides UI for Box Widget.
+/**
+* Provides UI for Box Widget.
+*/
 class PQDEPRECATED_EXPORT pqBoxWidget : public pq3DWidget
 {
   Q_OBJECT
@@ -45,31 +47,43 @@ public:
   pqBoxWidget(vtkSMProxy* refProxy, vtkSMProxy* proxy, QWidget* p = 0);
   virtual ~pqBoxWidget();
 
-  /// Resets the bounds of the 3D widget to the reference proxy bounds.
-  /// This typically calls PlaceWidget on the underlying 3D Widget
-  /// with reference proxy bounds.
-  /// This should be explicitly called after the panel is created
-  /// and the widget is initialized i.e. the reference proxy, controlled proxy
-  /// and hints have been set.
+  /**
+  * Resets the bounds of the 3D widget to the reference proxy bounds.
+  * This typically calls PlaceWidget on the underlying 3D Widget
+  * with reference proxy bounds.
+  * This should be explicitly called after the panel is created
+  * and the widget is initialized i.e. the reference proxy, controlled proxy
+  * and hints have been set.
+  */
   virtual void resetBounds(double bounds[6]);
   virtual void resetBounds()
     { this->Superclass::resetBounds(); }
 
-  /// accept the changes. Overridden to hide handles.
+  /**
+  * accept the changes. Overridden to hide handles.
+  */
   virtual void accept();
 
-  /// reset the changes. Overridden to hide handles.
+  /**
+  * reset the changes. Overridden to hide handles.
+  */
   virtual void reset();
 
-  /// Overridden to update widget placement based on data bounds.
+  /**
+  * Overridden to update widget placement based on data bounds.
+  */
   virtual void select();
 
 protected:
-  /// Internal method to create the widget.
+  /**
+  * Internal method to create the widget.
+  */
   void createWidget(pqServer*);
 
 private slots:
-  /// Called when the user changes widget visibility
+  /**
+  * Called when the user changes widget visibility
+  */
   void onWidgetVisibilityChanged(bool visible);
 
   void onEnableTranslation(bool);

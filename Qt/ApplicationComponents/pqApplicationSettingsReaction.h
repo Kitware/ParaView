@@ -37,23 +37,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqSettingsDialog;
 
-/// @ingroup Reactions
-/// pqApplicationSettingsReaction is a reaction to popup the application
-/// settings dialog. It creates pqSettingsDialog when required.
+/**
+* @ingroup Reactions
+* pqApplicationSettingsReaction is a reaction to popup the application
+* settings dialog. It creates pqSettingsDialog when required.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqApplicationSettingsReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
 public:
-  /// Constructor. Parent cannot be NULL.
+  /**
+  * Constructor. Parent cannot be NULL.
+  */
   pqApplicationSettingsReaction(QAction* parent);
   virtual ~pqApplicationSettingsReaction();
 
-  /// Show the application settings dialog.
+  /**
+  * Show the application settings dialog.
+  */
   static void showApplicationSettingsDialog(const QString& tabName="");
 
 protected:
-  /// Called when the action is triggered.
+  /**
+  * Called when the action is triggered.
+  */
   virtual void onTriggered()
     { pqApplicationSettingsReaction::showApplicationSettingsDialog(); }
 

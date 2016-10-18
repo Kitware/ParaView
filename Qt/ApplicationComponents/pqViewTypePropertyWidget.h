@@ -38,9 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class QComboBox;
 
-/// pqViewTypePropertyWidget is a property widget that shows a combo-box with
-/// values equal to the currently available types of views. This could have been
-/// implemented as a domain, but I was being lazy :).
+/**
+* pqViewTypePropertyWidget is a property widget that shows a combo-box with
+* values equal to the currently available types of views. This could have been
+* implemented as a domain, but I was being lazy :).
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqViewTypePropertyWidget :
   public pqPropertyWidget
 {
@@ -52,11 +54,15 @@ public:
     vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent=0);
   virtual ~pqViewTypePropertyWidget();
 
-  /// get the current value in the widget
+  /**
+  * get the current value in the widget
+  */
   QString value() const;
 
 public slots:
-  /// set the value for the widget.
+  /**
+  * set the value for the widget.
+  */
   void setValue(const QString& value);
 
 signals:

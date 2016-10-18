@@ -45,9 +45,11 @@ class pqTestUtility;
 class QMenu;
 class QWidget;
 
-/// pqPVApplicationCore is the application code used by ParaView-based
-/// applications that use more of ParaView's functionality than that provided by
-/// pqApplicationCore such as the the selection manager, animation  manager etc.
+/**
+* pqPVApplicationCore is the application code used by ParaView-based
+* applications that use more of ParaView's functionality than that provided by
+* pqApplicationCore such as the the selection manager, animation  manager etc.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqPVApplicationCore : public pqApplicationCore
 {
   Q_OBJECT
@@ -56,47 +58,67 @@ public:
   pqPVApplicationCore(int& argc, char** argv, pqOptions* options=0);
   ~pqPVApplicationCore();
 
-  /// Returns the pqPVApplicationCore instance. If no pqPVApplicationCore has been
-  /// created then return NULL.
+  /**
+  * Returns the pqPVApplicationCore instance. If no pqPVApplicationCore has been
+  * created then return NULL.
+  */
   static pqPVApplicationCore* instance()
     { return qobject_cast<pqPVApplicationCore*>(Superclass::instance()); }
 
-  /// Provides access to the selection manager. Selection manager provides
-  /// access to the ParaView wide data selection mechanism. This must not be
-  /// confused with the active-object selection.
+  /**
+  * Provides access to the selection manager. Selection manager provides
+  * access to the ParaView wide data selection mechanism. This must not be
+  * confused with the active-object selection.
+  */
   pqSelectionManager* selectionManager() const;
 
-  /// Provides access to the animation manager. Animation manager helps with the
+  /**
+  * Provides access to the animation manager. Animation manager helps with the
+  */
   //animation subsystem -- saving movies, creating scenes etc.
   pqAnimationManager* animationManager() const;
 
-  /// Provides access to the test utility.
+  /**
+  * Provides access to the test utility.
+  */
   virtual pqTestUtility* testUtility();
 
-  /// Provides access to the python manager. This is non-null only when paraview
-  /// is compiled with python support i.e. PARAVIEW_ENABLE_PYTHON is ON.
+  /**
+  * Provides access to the python manager. This is non-null only when paraview
+  * is compiled with python support i.e. PARAVIEW_ENABLE_PYTHON is ON.
+  */
   pqPythonManager* pythonManager() const;
 
-  /// ParaView provides a mechanism to trigger menu actions using a quick-launch
-  /// dialog. Applications can register menus action from which should be
-  /// launch-able from the quick-launch dialog. Typical candidates are the
-  /// sources menu, filters menu etc.
+  /**
+  * ParaView provides a mechanism to trigger menu actions using a quick-launch
+  * dialog. Applications can register menus action from which should be
+  * launch-able from the quick-launch dialog. Typical candidates are the
+  * sources menu, filters menu etc.
+  */
   virtual void registerForQuicklaunch(QWidget*);
 
 public slots:
-  /// Pops-up the quick launch dialog.
+  /**
+  * Pops-up the quick launch dialog.
+  */
   void quickLaunch();
-  /// Pops-up the search dialog if the focused widget is
-  /// QAsbstractItemView type.
+  /**
+  * Pops-up the search dialog if the focused widget is
+  * QAsbstractItemView type.
+  */
   void startSearch();
 
 signals:
-  /// Emitted whenever the quickLaunch dialog is about to show.  This can be used
-  /// to update the menu items (QActions) that will be shown in the quick-launch
-  /// dialog.
+  /**
+  * Emitted whenever the quickLaunch dialog is about to show.  This can be used
+  * to update the menu items (QActions) that will be shown in the quick-launch
+  * dialog.
+  */
   void aboutToShowQuickLaunch();
 protected:
-  /// Override event filter in order to catch file association mechanism
+  /**
+  * Override event filter in order to catch file association mechanism
+  */
   virtual bool eventFilter ( QObject * obj, QEvent * event );
 
   QPointer<pqSelectionManager> SelectionManager;

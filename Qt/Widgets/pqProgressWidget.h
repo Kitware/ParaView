@@ -51,15 +51,21 @@ public:
     return this->AbortButton;
     }
 public slots:
-  /// Set the progress.
+  /**
+  * Set the progress.
+  */
   void setProgress(const QString& message, int value);
 
-  /// Enabled/Disable the progress. This is different from 
-  /// enabling/disabling the widget itself. This shows/hides
-  /// the progress part of the widget.
+  /**
+  * Enabled/Disable the progress. This is different from 
+  * enabling/disabling the widget itself. This shows/hides
+  * the progress part of the widget.
+  */
   void enableProgress(bool enabled);
 
-  /// Enable/Disable the abort button.
+  /**
+  * Enable/Disable the abort button.
+  */
   void enableAbort(bool enabled);
 
 signals:

@@ -42,11 +42,13 @@ class pqDataRepresentation;
 class pqServer;
 class vtkEventQtSlotConnect;
 
-/// @ingroup Reactions
-/// Reaction to reset the active lookup table's range to match the active
-/// representation. You can disable tracking of the active representation,
-/// instead explicitly provide one using setRepresentation() by pass
-/// track_active_objects as false to the constructor.
+/**
+* @ingroup Reactions
+* Reaction to reset the active lookup table's range to match the active
+* representation. You can disable tracking of the active representation,
+* instead explicitly provide one using setRepresentation() by pass
+* track_active_objects as false to the constructor.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqResetScalarRangeReaction : public pqReaction
 {
   Q_OBJECT
@@ -59,35 +61,51 @@ public:
     TEMPORAL
     };
 
-  /// if \c track_active_objects is false, then the reaction will not track
-  /// pqActiveObjects automatically.
+  /**
+  * if \c track_active_objects is false, then the reaction will not track
+  * pqActiveObjects automatically.
+  */
   pqResetScalarRangeReaction(QAction* parent, bool track_active_objects=true , Modes mode=DATA);
   ~pqResetScalarRangeReaction();
 
 
-  /// @deprecated Use resetScalarRangeToData().
+  /**
+  * @deprecated Use resetScalarRangeToData().
+  */
   static void resetScalarRange(pqPipelineRepresentation* repr=NULL)
     { pqResetScalarRangeReaction::resetScalarRangeToData(repr); }
 
-  /// Reset to current data range.
+  /**
+  * Reset to current data range.
+  */
   static bool resetScalarRangeToData(pqPipelineRepresentation* repr=NULL);
 
-  /// Reset range to a custom range.
+  /**
+  * Reset range to a custom range.
+  */
   static bool resetScalarRangeToCustom(pqPipelineRepresentation* repr=NULL);
 
-  /// Reset range to data range over time.
+  /**
+  * Reset range to data range over time.
+  */
   static bool resetScalarRangeToDataOverTime(pqPipelineRepresentation* repr=NULL);
 
 public slots:
-  /// Updates the enabled state. Applications need not explicitly call
-  /// this.
+  /**
+  * Updates the enabled state. Applications need not explicitly call
+  * this.
+  */
   void updateEnableState();
 
-  /// Set the data representation explicitly when track_active_objects is false.
+  /**
+  * Set the data representation explicitly when track_active_objects is false.
+  */
   void setRepresentation(pqDataRepresentation* repr);
 
 protected:
-  /// Called when the action is triggered.
+  /**
+  * Called when the action is triggered.
+  */
   virtual void onTriggered();
 
 protected slots:

@@ -38,21 +38,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class QMainWindow;
 
-/// @defgroup Behaviors ParaView Behaviors
-/// Behaviors are classes that manage certain behaviors in the application.
-/// Developers should simply instantiate behaviors if the expect that
-/// behavior in their client.
-///
-/// @ingroup Behaviors
-/// pqParaViewBehaviors creates all the behaviors used by ParaView. If your
-/// client is merely a branded version of ParaView, then you may want to simply
-/// use this behavior. You can also enable/disable behaviors created by
-/// pqParaViewBehaviors before instantiating the pqParaViewBehaviors instance by
-/// using static methods of the form pqParaViewBehaviors::set<behavior name>(bool)
-/// e.g. pqParaViewBehaviors::setStandardPropertyWidgets(false).
-///
-/// Since ParaView 5.1, ObjectPickingBehavior is disabled by default in
-/// ParaView.
+/**
+* @defgroup Behaviors ParaView Behaviors
+* Behaviors are classes that manage certain behaviors in the application.
+* Developers should simply instantiate behaviors if the expect that
+* behavior in their client.
+*
+* @ingroup Behaviors
+* pqParaViewBehaviors creates all the behaviors used by ParaView. If your
+* client is merely a branded version of ParaView, then you may want to simply
+* use this behavior. You can also enable/disable behaviors created by
+* pqParaViewBehaviors before instantiating the pqParaViewBehaviors instance by
+* using static methods of the form pqParaViewBehaviors::set<behavior name>(bool)
+* e.g. pqParaViewBehaviors::setStandardPropertyWidgets(false).
+*
+* Since ParaView 5.1, ObjectPickingBehavior is disabled by default in
+* ParaView.
+*/
 
 #define PQ_BEHAVIOR_DEFINE_METHODS(_name) \
   static void setEnable##_name(bool val) { pqParaViewBehaviors::_name = val; } \

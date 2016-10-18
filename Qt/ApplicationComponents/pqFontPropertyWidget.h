@@ -37,11 +37,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkSMPropertyGroup;
 
-/// pqFontPropertyWidget is a pqPropertyWidget that can be used to set
-/// properties relating to fonts. The widget expects the property-group to have
-/// properties with functions set to "Color", "Opacity", "Family", "Size",
-/// "Bold", "Italics" and "Shadow". If any property is missing, the
-/// corresponding widget will be hidden.
+/**
+* pqFontPropertyWidget is a pqPropertyWidget that can be used to set
+* properties relating to fonts. The widget expects the property-group to have
+* properties with functions set to "Color", "Opacity", "Family", "Size",
+* "Bold", "Italics" and "Shadow". If any property is missing, the
+* corresponding widget will be hidden.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqFontPropertyWidget :
   public pqPropertyGroupWidget
 {

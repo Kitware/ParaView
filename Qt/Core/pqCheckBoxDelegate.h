@@ -33,11 +33,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreModule.h"
 #include <QStyledItemDelegate>
 
-/// Delegate for QTableView to draw a checkbox as an left-right (unchecked)
-/// and top-bottom (checked) arrow.
-/// The checkbox has an extra state for unchecked disabled.
-/// Based on a Stack overflow answer:
-/// http://stackoverflow.com/questions/3363190/qt-qtableview-how-to-have-a-checkbox-only-column
+/**
+* Delegate for QTableView to draw a checkbox as an left-right (unchecked)
+* and top-bottom (checked) arrow.
+* The checkbox has an extra state for unchecked disabled.
+* Based on a Stack overflow answer:
+* http://stackoverflow.com/questions/3363190/qt-qtableview-how-to-have-a-checkbox-only-column
+*/
 class PQCORE_EXPORT pqCheckBoxDelegate : public QStyledItemDelegate
 {
   Q_OBJECT

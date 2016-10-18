@@ -39,13 +39,15 @@ class QModelIndex;
 class vtkObject;
 class vtkSMPropertyGroup;
 
-/// pqSeriesEditorPropertyWidget is the pqPropertyWidget used to edit
-/// plot-options for a xy-series. It works with a property-group with properties
-/// for various functions, including required properties (SeriesVisibility)
-/// and optional properties (SeriesLabel, SeriesColor, SeriesLineThickness,
-/// SeriesLineStyle, SeriesMarkerStyle, and SeriesPlotCorner).
-/// If any of optional property functions are missing from the group, the
-/// corresponding widgets will be hidden.
+/**
+* pqSeriesEditorPropertyWidget is the pqPropertyWidget used to edit
+* plot-options for a xy-series. It works with a property-group with properties
+* for various functions, including required properties (SeriesVisibility)
+* and optional properties (SeriesLabel, SeriesColor, SeriesLineThickness,
+* SeriesLineStyle, SeriesMarkerStyle, and SeriesPlotCorner).
+* If any of optional property functions are missing from the group, the
+* corresponding widgets will be hidden.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqSeriesEditorPropertyWidget :
   public pqPropertyWidget
 {
@@ -91,72 +93,110 @@ public:
     vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent=0);
   virtual ~pqSeriesEditorPropertyWidget();
 
-  /// Get/Set the visibility for series.
+  /**
+  * Get/Set the visibility for series.
+  */
   QList<QVariant> seriesVisibility() const;
   void setSeriesVisibility(const QList<QVariant>&);
 
-  /// Get/Set the color for each of the series.
+  /**
+  * Get/Set the color for each of the series.
+  */
   QList<QVariant> seriesColor() const;
   void setSeriesColor(const QList<QVariant>&);
 
-  /// Get/Set the label for each of the series.
+  /**
+  * Get/Set the label for each of the series.
+  */
   QList<QVariant> seriesLabel() const;
   void setSeriesLabel(const QList<QVariant>&);
 
-  /// Get/Set the line-thickness for each of the series.
+  /**
+  * Get/Set the line-thickness for each of the series.
+  */
   QList<QVariant> seriesLineThickness() const;
   void setSeriesLineThickness(const QList<QVariant>&);
 
-  /// Get/Set the line-style for each of the series.
+  /**
+  * Get/Set the line-style for each of the series.
+  */
   QList<QVariant> seriesLineStyle() const;
   void setSeriesLineStyle(const QList<QVariant>&);
 
-  /// Get/Set the marker-style for each of the series.
+  /**
+  * Get/Set the marker-style for each of the series.
+  */
   QList<QVariant> seriesMarkerStyle() const;
   void setSeriesMarkerStyle(const QList<QVariant>&);
 
-  /// Get/Set the plot-corner for each of the series.
+  /**
+  * Get/Set the plot-corner for each of the series.
+  */
   QList<QVariant> seriesPlotCorner() const;
   void setSeriesPlotCorner(const QList<QVariant>&);
  
 signals:
-  /// Fired when the series visibility changes.
+  /**
+  * Fired when the series visibility changes.
+  */
   void seriesVisibilityChanged();
 
-  /// Fired when the series labels change.
+  /**
+  * Fired when the series labels change.
+  */
   void seriesLabelChanged();
 
-  /// Fired when the series colors change.
+  /**
+  * Fired when the series colors change.
+  */
   void seriesColorChanged();
 
-  /// Fired when the series line thickness changes
+  /**
+  * Fired when the series line thickness changes
+  */
   void seriesLineThicknessChanged();
 
-  /// Fired when the series line style changes
+  /**
+  * Fired when the series line style changes
+  */
   void seriesLineStyleChanged();
 
-  /// Fired when the series marker style changes
+  /**
+  * Fired when the series marker style changes
+  */
   void seriesMarkerStyleChanged();
 
-  /// Fired when the series plot corners change
+  /**
+  * Fired when the series plot corners change
+  */
   void seriesPlotCornerChanged();
 
 private slots:
-  /// called whenever the internal model's data changes. We fire
-  /// seriesVisibilityChanged() signals appropriately.
+  /**
+  * called whenever the internal model's data changes. We fire
+  * seriesVisibilityChanged() signals appropriately.
+  */
   void onDataChanged(const QModelIndex& topleft, const QModelIndex& btmright);
 
-  /// called when user double-clicks on an item. If the double click is on the
-  /// 1st column, we show the color editor to allow editing of the series color.
+  /**
+  * called when user double-clicks on an item. If the double click is on the
+  * 1st column, we show the color editor to allow editing of the series color.
+  */
   void onDoubleClicked(const QModelIndex& idx);
 
-  /// update all series-properties widgets using the "current" series.
+  /**
+  * update all series-properties widgets using the "current" series.
+  */
   void refreshPropertiesWidgets();
 
-  /// update all selected series with the value from the sender widget.
+  /**
+  * update all selected series with the value from the sender widget.
+  */
   void savePropertiesWidgets();
   
-  /// called when the vtkSMProperty fires a vtkCommand::DomainModifiedEvent.
+  /**
+  * called when the vtkSMProperty fires a vtkCommand::DomainModifiedEvent.
+  */
   void domainModified(vtkObject* sender);
 
 private:

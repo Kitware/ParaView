@@ -37,9 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkSMSourceProxy;
 class pqDataRepresentation;
 
-/// pqContextView subclass for "HistogramView". Doesn't do much expect adds
-/// the API to get the chartview type and indicates that this view supports
-/// selection.
+/**
+* pqContextView subclass for "HistogramView". Doesn't do much expect adds
+* the API to get the chartview type and indicates that this view supports
+* selection.
+*/
 class PQCORE_EXPORT pqXYHistogramChartView : public pqContextView
 {
   Q_OBJECT
@@ -48,7 +50,9 @@ class PQCORE_EXPORT pqXYHistogramChartView : public pqContextView
 public:
   static QString XYHistogramChartViewType() { return "XYHistogramChartView"; }
 
-  /// Currently the bar chart view is not supporting selection.
+  /**
+  * Currently the bar chart view is not supporting selection.
+  */
   virtual bool supportsSelection() const {return true;}
 
   pqXYHistogramChartView(const QString& group,

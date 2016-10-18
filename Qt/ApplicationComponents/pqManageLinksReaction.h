@@ -34,8 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqMasterOnlyReaction.h"
 
-/// @ingroup Reactions
-/// pqManageLinksReaction is the reaction to pop-up the links manager dialog.
+/**
+* @ingroup Reactions
+* pqManageLinksReaction is the reaction to pop-up the links manager dialog.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqManageLinksReaction : public pqMasterOnlyReaction
 {
   Q_OBJECT
@@ -43,7 +45,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqManageLinksReaction : public pqMasterOnly
 public:
   pqManageLinksReaction(QAction* action): Superclass(action) { }
 
-  /// Pops-up the pqLinksManager dialog.
+  /**
+  * Pops-up the pqLinksManager dialog.
+  */
   static void manageLinks();
 
 protected:

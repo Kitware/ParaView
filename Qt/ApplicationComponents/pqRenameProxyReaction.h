@@ -36,8 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqProxy;
 
-/// @ingroup Reactions
-/// Reaction for renaming a proxy.
+/**
+* @ingroup Reactions
+* Reaction for renaming a proxy.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqRenameProxyReaction : pqReaction
 {
   Q_OBJECT
@@ -46,7 +48,9 @@ public:
   pqRenameProxyReaction(QAction* renameAction, pqProxy* proxy);
 
 protected slots:
-  /// Called when the action is triggered.
+  /**
+  * Called when the action is triggered.
+  */
   virtual void onTriggered();
 
 protected:

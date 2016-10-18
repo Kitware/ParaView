@@ -37,8 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqView;
 
-/// @ingroup Reactions
-/// pqToggleInteractionViewMode is a reaction that toggle 2D/3D interaction mode
+/**
+* @ingroup Reactions
+* pqToggleInteractionViewMode is a reaction that toggle 2D/3D interaction mode
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqToggleInteractionViewMode : public pqReaction
 {
   Q_OBJECT
@@ -47,7 +49,9 @@ public:
   pqToggleInteractionViewMode(QAction* parent, pqView* view=0);
 
 protected:
-  /// Called when the action is triggered.
+  /**
+  * Called when the action is triggered.
+  */
   virtual void onTriggered();
 
 public slots:

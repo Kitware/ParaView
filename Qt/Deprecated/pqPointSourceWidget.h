@@ -40,7 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqPropertyManager;
 
-/// Provides a complete Qt UI for working with a vtkPointSource filter
+/**
+* Provides a complete Qt UI for working with a vtkPointSource filter
+*/
 class PQDEPRECATED_EXPORT pqPointSourceWidget : public pqHandleWidget 
 {
   typedef pqHandleWidget Superclass;
@@ -51,21 +53,25 @@ public:
   pqPointSourceWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p = 0);
   ~pqPointSourceWidget();
 
-  /// Resets the bounds of the 3D widget to the reference proxy bounds.
-  /// This typically calls PlaceWidget on the underlying 3D Widget 
-  /// with reference proxy bounds.
-  /// This should be explicitly called after the panel is created
-  /// and the widget is initialized i.e. the reference proxy, controlled proxy
-  /// and hints have been set.
+  /**
+  * Resets the bounds of the 3D widget to the reference proxy bounds.
+  * This typically calls PlaceWidget on the underlying 3D Widget 
+  * with reference proxy bounds.
+  * This should be explicitly called after the panel is created
+  * and the widget is initialized i.e. the reference proxy, controlled proxy
+  * and hints have been set.
+  */
   virtual void resetBounds(double bounds[6]);
   virtual void resetBounds()
     { this->Superclass::resetBounds(); }
 
 protected:
-  /// Subclasses can override this method to map properties to
-  /// GUI. Default implementation updates the internal datastructures
-  /// so that default implementations can be provided for 
-  /// accept/reset.
+  /**
+  * Subclasses can override this method to map properties to
+  * GUI. Default implementation updates the internal datastructures
+  * so that default implementations can be provided for 
+  * accept/reset.
+  */
   virtual void setControlledProperty(const char* function,
     vtkSMProperty * controlled_property);
 

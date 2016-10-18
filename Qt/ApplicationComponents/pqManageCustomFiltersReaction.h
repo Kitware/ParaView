@@ -36,10 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqCustomFilterManagerModel;
 
-/// @ingroup Reactions
-/// Reaction for showing the custom-filter manager dialog.
-/// For now, this also manages loading and saving of custom filters in the
-/// application settings. We may want to move that code to a separate behavior.
+/**
+* @ingroup Reactions
+* Reaction for showing the custom-filter manager dialog.
+* For now, this also manages loading and saving of custom filters in the
+* application settings. We may want to move that code to a separate behavior.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqManageCustomFiltersReaction : public pqMasterOnlyReaction
 {
   Q_OBJECT
@@ -47,7 +49,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqManageCustomFiltersReaction : public pqMa
 public:
   pqManageCustomFiltersReaction(QAction* parentObject);
 
-  /// Pops up the manage custom filters dialog.
+  /**
+  * Pops up the manage custom filters dialog.
+  */
   void manageCustomFilters();
 
 protected:

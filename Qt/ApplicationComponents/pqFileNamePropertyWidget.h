@@ -35,9 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationComponentsModule.h"
 #include "pqPropertyWidget.h"
 
-/// pqFileNamePropertyWidget is used for the "File Name" property on
-/// the Environment annotation filter. It customizes the resetButtonClicked() 
-/// logic since the Environment filter's filename setup is custom.
+/**
+* pqFileNamePropertyWidget is used for the "File Name" property on
+* the Environment annotation filter. It customizes the resetButtonClicked() 
+* logic since the Environment filter's filename setup is custom.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqFileNamePropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
@@ -48,12 +50,16 @@ public:
   virtual ~pqFileNamePropertyWidget();
 
 signals:
-  /// internal signal used to clear highlights from pqHighlightablePushButton.
+  /**
+  * internal signal used to clear highlights from pqHighlightablePushButton.
+  */
   void clearHighlight();
   void highlightResetButton();
 
 protected slots:
-  /// update the property's value using the domain.
+  /**
+  * update the property's value using the domain.
+  */
   virtual void resetButtonClicked();
 
 private:

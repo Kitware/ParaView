@@ -41,7 +41,9 @@ class pqLineEdit;
 class vtkSMIntRangeDomain;
 class vtkEventQtSlotConnect;
 
-/// a widget with a tied slider and line edit for editing a int property
+/**
+* a widget with a tied slider and line edit for editing a int property
+*/
 class PQCOMPONENTS_EXPORT pqIntRangeWidget : public QWidget
 {
   Q_OBJECT
@@ -50,11 +52,15 @@ class PQCOMPONENTS_EXPORT pqIntRangeWidget : public QWidget
   Q_PROPERTY(int maximum READ maximum WRITE setMaximum)
   Q_PROPERTY(bool strictRange READ strictRange WRITE setStrictRange)
 public:
-  /// constructor requires the proxy, property
+  /**
+  * constructor requires the proxy, property
+  */
   pqIntRangeWidget(QWidget* parent = NULL);
   ~pqIntRangeWidget();
 
-  /// get the value
+  /**
+  * get the value
+  */
   int value() const;
   
   // get the min range value
@@ -70,16 +76,22 @@ public:
   void setDomain(vtkSMIntRangeDomain *domain);
   
 signals:
-  /// signal the value changed
+  /**
+  * signal the value changed
+  */
   void valueChanged(int);
 
-  /// signal the value was edited
-  /// this means the user is done changing text
-  /// or the slider was moved
+  /**
+  * signal the value was edited
+  * this means the user is done changing text
+  * or the slider was moved
+  */
   void valueEdited(int);
 
 public slots:
-  /// set the value
+  /**
+  * set the value
+  */
   void setValue(int);
 
   // set the min range value

@@ -35,8 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetsModule.h"
 #include <QDoubleSpinBox>
 
-/// QDoubleSpinBox which fires editingFinished() signal when the value is changed
-/// by steps (increments).
+/**
+* QDoubleSpinBox which fires editingFinished() signal when the value is changed
+* by steps (increments).
+*/
 class PQWIDGETS_EXPORT pqDoubleSpinBox : public QDoubleSpinBox
 {
   Q_OBJECT
@@ -44,8 +46,10 @@ class PQWIDGETS_EXPORT pqDoubleSpinBox : public QDoubleSpinBox
 public:
   explicit pqDoubleSpinBox(QWidget* parent=0);
 
-  /// Virtual function that is called whenever the user triggers a step.  We are
-  /// overridding this so that we can emit editingFinished() signal
+  /**
+  * Virtual function that is called whenever the user triggers a step.  We are
+  * overridding this so that we can emit editingFinished() signal
+  */
   virtual void stepBy(int steps);
 
 private:

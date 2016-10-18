@@ -40,8 +40,10 @@ class QHelpEngine;
 class QUrl;
 class pqBrowser;
 
-/// pqHelpWindow provides a assistant-like window  for showing help provided by
-/// a QHelpEngine.
+/**
+* pqHelpWindow provides a assistant-like window  for showing help provided by
+* a QHelpEngine.
+*/
 class PQWIDGETS_EXPORT pqHelpWindow : public QMainWindow
 {
   Q_OBJECT
@@ -52,17 +54,23 @@ public:
   virtual ~pqHelpWindow();
 
 public slots:
-  /// Requests showing of a particular page. The url must begin with "qthelp:"
-  /// scheme when referring to pages from the help files.
+  /**
+  * Requests showing of a particular page. The url must begin with "qthelp:"
+  * scheme when referring to pages from the help files.
+  */
   virtual void showPage(const QString& url);
   virtual void showPage(const QUrl& url);
 
-  /// Tires to locate a file name index.html in the given namespace and then
-  /// shows that page.
+  /**
+  * Tires to locate a file name index.html in the given namespace and then
+  * shows that page.
+  */
   virtual void showHomePage(const QString& namespace_name);
 
 signals:
-  /// fired to relay warning messages from the help system.
+  /**
+  * fired to relay warning messages from the help system.
+  */
   void helpWarnings(const QString&);
 
 protected slots:

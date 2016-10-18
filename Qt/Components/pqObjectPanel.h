@@ -40,37 +40,49 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqPropertyManager;
 
-/// ******DEPRECATION WARNING*******
-/// pqProxyPanel and subclasses will soon be removed
-/// from ParaView. Please update your plugins and custom application to use the
-/// new design of creating panels for proxies (pqProxyWidget).
-/// ********************************
-///
-/// Base class for Widget which provides an editor for editing properties
-/// of a proxy
+/**
+* ******DEPRECATION WARNING*******
+* pqProxyPanel and subclasses will soon be removed
+* from ParaView. Please update your plugins and custom application to use the
+* new design of creating panels for proxies (pqProxyWidget).
+* ********************************
+*
+* Base class for Widget which provides an editor for editing properties
+* of a proxy
+*/
 class PQCOMPONENTS_EXPORT pqObjectPanel : public pqProxyPanel
 {
   Q_OBJECT
 public:
-  /// constructor
+  /**
+  * constructor
+  */
   pqObjectPanel(pqProxy* proxy, QWidget* p);
-  /// destructor
+  /**
+  * destructor
+  */
   ~pqObjectPanel();
 
   pqProxy* referenceProxy() const;
   
 public slots:
-  /// Fires modified
+  /**
+  * Fires modified
+  */
   virtual void setModified();
   
-  /// accept the changes made to the properties
-  /// changes will be propogated down to the server manager
-  /// subclasses should only change properties when accept is called to work
-  /// properly with undo/redo
+  /**
+  * accept the changes made to the properties
+  * changes will be propogated down to the server manager
+  * subclasses should only change properties when accept is called to work
+  * properly with undo/redo
+  */
   virtual void accept();
   
-  /// reset the changes made
-  /// editor will query properties from the server manager
+  /**
+  * reset the changes made
+  * editor will query properties from the server manager
+  */
   virtual void reset();
 
 protected:

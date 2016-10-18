@@ -44,18 +44,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqPropertyLinks;
 
-/// pqPropertyLinksConnection is used by pqPropertyLinks to keep a QObject and
-/// vtkSMProperty linked together.
-/// pqPropertyLinksConnection handles most common types of connections.
-/// Developers can subclass this to customize the mechanisms for copy values
-/// from Qt to ServerManager and vice-versa.
+/**
+* pqPropertyLinksConnection is used by pqPropertyLinks to keep a QObject and
+* vtkSMProperty linked together.
+* pqPropertyLinksConnection handles most common types of connections.
+* Developers can subclass this to customize the mechanisms for copy values
+* from Qt to ServerManager and vice-versa.
+*/
 class PQCORE_EXPORT pqPropertyLinksConnection : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
 public:
-  /// This also sets up observers to monitor any changes. This does not change
-  /// any values on either items.
+  /**
+  * This also sets up observers to monitor any changes. This does not change
+  * any values on either items.
+  */
   pqPropertyLinksConnection(
     QObject* qobject, const char* qproperty, const char* qsignal,
     vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex,
@@ -67,43 +71,59 @@ public:
 
   void setUseUncheckedProperties(bool useUnchecked);
 
-  /// Comparison operator
+  /**
+  * Comparison operator
+  */
   bool operator==(const pqPropertyLinksConnection& other) const;
 
-  /// Provides access to the Qt QObject and property name.
+  /**
+  * Provides access to the Qt QObject and property name.
+  */
   QObject* objectQt() const { return this->ObjectQt; }
   const QString& propertyQt() const { return this->PropertyQt; }
 
-  /// Provides access to the ServerManager proxy/property/index.
+  /**
+  * Provides access to the ServerManager proxy/property/index.
+  */
   vtkSMProxy* proxy() const { return this->ProxySM; }
   vtkSMProxy* proxySM() const { return this->ProxySM; }
   vtkSMProperty* propertySM() const { return this->PropertySM; }
   int indexSM() const { return this->IndexSM; }
 
 public slots:
-  /// Copy values from ServerManager to Qt. If use_unchecked is true, unchecked
-  /// SMProperty values are used.
+  /**
+  * Copy values from ServerManager to Qt. If use_unchecked is true, unchecked
+  * SMProperty values are used.
+  */
   void copyValuesFromServerManagerToQt(bool use_unchecked);
 
-  /// Copy values from Qt to ServerManager. If use_unchecked is true, unchecked
-  /// values for SMProperty are updated.
+  /**
+  * Copy values from Qt to ServerManager. If use_unchecked is true, unchecked
+  * values for SMProperty are updated.
+  */
   void copyValuesFromQtToServerManager(bool use_unchecked);
 
 protected:
-  /// These are the methods that subclasses can override to customize how
-  /// values are updated in either directions.
+  /**
+  * These are the methods that subclasses can override to customize how
+  * values are updated in either directions.
+  */
   virtual void setQtValue(const QVariant& value);
   virtual void setServerManagerValue(bool use_unchecked, const QVariant& value);
   virtual QVariant currentQtValue() const;
   virtual QVariant currentServerManagerValue(bool use_unchecked) const;
 
 signals:
-  /// Fired whenever the Qt widget changes (except in during a call to
-  /// copyValuesFromServerManagerToQt()).
+  /**
+  * Fired whenever the Qt widget changes (except in during a call to
+  * copyValuesFromServerManagerToQt()).
+  */
   void qtpropertyModified();
 
-  /// Fired whenever the ServerManager property changes (except in during a call to
-  /// copyValuesFromQtToServerManager()).
+  /**
+  * Fired whenever the ServerManager property changes (except in during a call to
+  * copyValuesFromQtToServerManager()).
+  */
   void smpropertyModified();
 
 private:

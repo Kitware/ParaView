@@ -35,8 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationComponentsModule.h"
 #include <QObject>
 
-/// @ingroup Behaviors
-/// pqUndoRedoBehavior enables application wide undo-redo.
+/**
+* @ingroup Behaviors
+* pqUndoRedoBehavior enables application wide undo-redo.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqUndoRedoBehavior : public QObject
 {
   Q_OBJECT

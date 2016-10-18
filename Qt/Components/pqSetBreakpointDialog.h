@@ -41,11 +41,13 @@ class pqServer;
 class QTreeWidget;
 class pqPipelineSource;
 
-/// Sets a breakpoint for a remote simulation. It allows a user to
-/// specify a time in the future (using simulation time or time step)
-/// when a simulation linked with Catalyst should pause.
-/// 
-/// @ingroup LiveInsitu
+/**
+* Sets a breakpoint for a remote simulation. It allows a user to
+* specify a time in the future (using simulation time or time step)
+* when a simulation linked with Catalyst should pause.
+* 
+* @ingroup LiveInsitu
+*/
 class PQCOMPONENTS_EXPORT pqSetBreakpointDialog :
   public QDialog
 {

@@ -50,7 +50,9 @@ public:
 
   virtual void setContent(const QString& path);
 
-  /// Get the next event from the event source
+  /**
+  * Get the next event from the event source
+  */
   virtual int getNextEvent(
     QString& object,
     QString& command,

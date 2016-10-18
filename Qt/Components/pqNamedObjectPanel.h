@@ -35,9 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqObjectPanel.h"
 
-/// Base class for Widget which provides an editor for editing properties
-/// of a proxy where child widgets are named after the property they
-/// represent
+/**
+* Base class for Widget which provides an editor for editing properties
+* of a proxy where child widgets are named after the property they
+* represent
+*/
 class PQCOMPONENTS_EXPORT pqNamedObjectPanel : public pqObjectPanel
 {
   typedef pqObjectPanel Superclass;
@@ -45,13 +47,19 @@ class PQCOMPONENTS_EXPORT pqNamedObjectPanel : public pqObjectPanel
   Q_OBJECT
   
 public:
-  /// constructor
+  /**
+  * constructor
+  */
   pqNamedObjectPanel(pqProxy* proxy, QWidget* p);
-  /// destructor
+  /**
+  * destructor
+  */
   ~pqNamedObjectPanel();
 
 protected:
-  /// populate widgets with properties from the server manager
+  /**
+  * populate widgets with properties from the server manager
+  */
   virtual void linkServerManagerProperties();
 };
 

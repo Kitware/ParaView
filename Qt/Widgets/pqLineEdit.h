@@ -34,20 +34,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqWidgetsModule.h"
 #include <QLineEdit>
-/// pqLineEdit is a specialization of QLineEdit which provide a new property
-/// 'text2'. When the text on the line widget is set using this 'text2' property
-/// (or using setTextAndResetCursor()), the after the set, the cursor position
-/// is reset to 0.
-///
-/// Additional, this provides a true editingFinished() signal under the name of
-/// textChangedAndEditingFinished(). Unlike QLineEdit::editingFinished() which
-/// gets fired whenever the widget looses focus irrespective of if the text
-/// actually was edited, textChangedAndEditingFinished() is fired only when the
-/// text was changed as well.
-///
-/// To enable/disable whether the cursor position is reset to 0 after
-/// textChangedAndEditingFinished() if fired, use the
-/// resetCursorPositionOnEditingFinished property (default: true).
+/**
+* pqLineEdit is a specialization of QLineEdit which provide a new property
+* 'text2'. When the text on the line widget is set using this 'text2' property
+* (or using setTextAndResetCursor()), the after the set, the cursor position
+* is reset to 0.
+*
+* Additional, this provides a true editingFinished() signal under the name of
+* textChangedAndEditingFinished(). Unlike QLineEdit::editingFinished() which
+* gets fired whenever the widget looses focus irrespective of if the text
+* actually was edited, textChangedAndEditingFinished() is fired only when the
+* text was changed as well.
+*
+* To enable/disable whether the cursor position is reset to 0 after
+* textChangedAndEditingFinished() if fired, use the
+* resetCursorPositionOnEditingFinished property (default: true).
+*/
 class PQWIDGETS_EXPORT pqLineEdit : public QLineEdit
 {
   Q_OBJECT
@@ -64,28 +66,36 @@ public:
   virtual ~pqLineEdit();
 
 
-  /// To enable/disable whether the cursor position is reset to 0 after
-  /// editingFinished() is fired, use the
-  /// resetCursorPositionOnEditingFinished property (default: true).
+  /**
+  * To enable/disable whether the cursor position is reset to 0 after
+  * editingFinished() is fired, use the
+  * resetCursorPositionOnEditingFinished property (default: true).
+  */
   bool resetCursorPositionOnEditingFinished() const
     { return this->ResetCursorPositionOnEditingFinished; }
 
 signals:
-  /// Unlike QLineEdit::editingFinished() which
-  /// gets fired whenever the widget looses focus irrespective of if the text
-  /// actually was edited, textChangedAndEditingFinished() is fired only when the
-  /// text was changed as well.
+  /**
+  * Unlike QLineEdit::editingFinished() which
+  * gets fired whenever the widget looses focus irrespective of if the text
+  * actually was edited, textChangedAndEditingFinished() is fired only when the
+  * text was changed as well.
+  */
   void textChangedAndEditingFinished();
 
 public slots:
-  /// Same as QLineEdit::setText() except that it reset the cursor position to
-  /// 0.  This is useful with the pqLineEdit is used for showing numbers were
-  /// the digits on the left are more significant on the right.
+  /**
+  * Same as QLineEdit::setText() except that it reset the cursor position to
+  * 0.  This is useful with the pqLineEdit is used for showing numbers were
+  * the digits on the left are more significant on the right.
+  */
   void setTextAndResetCursor(const QString& text);
 
-  /// To enable/disable whether the cursor position is reset to 0 after
-  /// editingFinished() is fired, use the
-  /// resetCursorPositionOnEditingFinished property (default: true).
+  /**
+  * To enable/disable whether the cursor position is reset to 0 after
+  * editingFinished() is fired, use the
+  * resetCursorPositionOnEditingFinished property (default: true).
+  */
   void setResetCursorPositionOnEditingFinished(bool val)
     { this->ResetCursorPositionOnEditingFinished = val; }
 
@@ -95,9 +105,11 @@ private slots:
 
 protected:
   friend class pqLineEditEventPlayer;
-  /// this is called by pqLineEditEventPlayer during event playback to ensure
-  /// that the textChangedAndEditingFinished() signal is fired when text is changed
-  /// using setText() in playback.
+  /**
+  * this is called by pqLineEditEventPlayer during event playback to ensure
+  * that the textChangedAndEditingFinished() signal is fired when text is changed
+  * using setText() in playback.
+  */
   void triggerTextChangedAndEditingFinished();
 
 private:

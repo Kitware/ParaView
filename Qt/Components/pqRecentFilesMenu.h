@@ -51,11 +51,15 @@ class PQCOMPONENTS_EXPORT pqRecentFilesMenu :
   Q_OBJECT
 
 public:
-  /// Assigns the menu that will display the list of files
+  /**
+  * Assigns the menu that will display the list of files
+  */
   pqRecentFilesMenu(QMenu& menu, QObject* p=0);
   virtual ~pqRecentFilesMenu();
 
-  /// Open a resource on the given server
+  /**
+  * Open a resource on the given server
+  */
   virtual bool open(
     pqServer* server, const pqServerResource& resource) const;
 

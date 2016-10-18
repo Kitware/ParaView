@@ -37,7 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkSMSourceProxy;
 class pqDataRepresentation;
 
-/// Bar chart view
+/**
+* Bar chart view
+*/
 class PQCORE_EXPORT pqBoxChartView : public pqContextView
 {
   Q_OBJECT
@@ -55,17 +57,23 @@ public:
   virtual ~pqBoxChartView();
 
 signals:
-  /// Fired when the currently shown representation changes. \c repr may be
-  /// NULL.
+  /**
+  * Fired when the currently shown representation changes. \c repr may be
+  * NULL.
+  */
   void showing(pqDataRepresentation* repr);
 
 public slots:
-  /// Called when a new repr is added.
+  /**
+  * Called when a new repr is added.
+  */
   void onAddRepresentation(pqRepresentation*);
   void onRemoveRepresentation(pqRepresentation*);
 
 protected slots:
-  /// Called to ensure that at most 1 repr is visible at a time.
+  /**
+  * Called to ensure that at most 1 repr is visible at a time.
+  */
   void updateRepresentationVisibility(pqRepresentation* repr, bool visible);
 
 private:

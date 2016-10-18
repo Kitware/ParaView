@@ -39,21 +39,31 @@ class pqRenderView;
 class QCheckBox;
 class QLineEdit;
 
-/// a popup window that helps the user select another view
-/// to link with
+/**
+* a popup window that helps the user select another view
+* to link with
+*/
 class PQCORE_EXPORT pqLinkViewWidget : public QWidget
 {
   Q_OBJECT
 public:
-  /// constructor takes the first view
+  /**
+  * constructor takes the first view
+  */
   pqLinkViewWidget(pqRenderView* firstLink);
-  /// destructor
+  /**
+  * destructor
+  */
   virtual ~pqLinkViewWidget();
 
 protected:
-  /// event filter to monitor user's selection
+  /**
+  * event filter to monitor user's selection
+  */
   bool eventFilter(QObject* watched, QEvent* e);
-  /// watch internal events
+  /**
+  * watch internal events
+  */
   bool event(QEvent* e);
 
 private:

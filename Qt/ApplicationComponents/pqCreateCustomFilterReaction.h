@@ -34,26 +34,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqReaction.h"
 
-/// pqCreateCustomFilterReaction popups the create-custom-filter wizard for the
-/// active selection.
+/**
+* pqCreateCustomFilterReaction popups the create-custom-filter wizard for the
+* active selection.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqCreateCustomFilterReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
 public:
-  /// Constructor. Parent cannot be NULL.
+  /**
+  * Constructor. Parent cannot be NULL.
+  */
   pqCreateCustomFilterReaction(QAction* parent);
 
-  /// Create custom filter.
+  /**
+  * Create custom filter.
+  */
   static void createCustomFilter();
 
 public slots:
-  /// Updates the enabled state. Applications need not explicitly call
-  /// this.
+  /**
+  * Updates the enabled state. Applications need not explicitly call
+  * this.
+  */
   void updateEnableState();
 
 protected:
-  /// Called when the action is triggered.
+  /**
+  * Called when the action is triggered.
+  */
   virtual void onTriggered()
     { pqCreateCustomFilterReaction::createCustomFilter(); }
 

@@ -40,44 +40,58 @@ class pqPipelineSource;
 class pqServer;
 class vtkSMReaderFactory;
 
-/// @ingroup Reactions
-/// Reaction for open data files.
+/**
+* @ingroup Reactions
+* Reaction for open data files.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqLoadDataReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
 public:
-  /// Constructor. Parent cannot be NULL.
+  /**
+  * Constructor. Parent cannot be NULL.
+  */
   pqLoadDataReaction(QAction* parent);
 
-  /// Loads multiple data files. Uses reader factory to determine what reader are
-  /// supported. If a file requires user input the reader of choice, it will use
-  /// that reader for all other files of that type.
-  /// Returns the reader is creation successful, otherwise returns
-  /// NULL.
-  /// Note that this method is static. Applications can simply use this without
-  /// having to create a reaction instance.
+  /**
+  * Loads multiple data files. Uses reader factory to determine what reader are
+  * supported. If a file requires user input the reader of choice, it will use
+  * that reader for all other files of that type.
+  * Returns the reader is creation successful, otherwise returns
+  * NULL.
+  * Note that this method is static. Applications can simply use this without
+  * having to create a reaction instance.
+  */
   static pqPipelineSource* loadData(const QList<QStringList>& files);
 
-  /// Loads data files. Uses reader factory to determine what reader are
-  /// supported. Returns the reader is creation successful, otherwise returns
-  /// NULL.
-  /// Note that this method is static. Applications can simply use this without
-  /// having to create a reaction instance.
+  /**
+  * Loads data files. Uses reader factory to determine what reader are
+  * supported. Returns the reader is creation successful, otherwise returns
+  * NULL.
+  * Note that this method is static. Applications can simply use this without
+  * having to create a reaction instance.
+  */
   static pqPipelineSource* loadData(const QStringList& files);
   static QList<pqPipelineSource*> loadData();
 
 public slots:
-  /// Updates the enabled state. Applications need not explicitly call
-  /// this.
+  /**
+  * Updates the enabled state. Applications need not explicitly call
+  * this.
+  */
   void updateEnableState();
 
 signals:
-  /// Fired when a dataset is loaded by this reaction.
+  /**
+  * Fired when a dataset is loaded by this reaction.
+  */
   void loadedData(pqPipelineSource*);
 
 protected:
-  /// Called when the action is triggered.
+  /**
+  * Called when the action is triggered.
+  */
   virtual void onTriggered()
     {
     QList<pqPipelineSource*> sources = pqLoadDataReaction::loadData();

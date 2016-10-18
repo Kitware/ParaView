@@ -38,18 +38,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class QWidget;
 
-/// pqCheckBoxPixMaps is a helper class that can used to create pixmaps for
-/// checkboxs in various states. This is useful for showing checkboxes in qt-views.
+/**
+* pqCheckBoxPixMaps is a helper class that can used to create pixmaps for
+* checkboxs in various states. This is useful for showing checkboxes in qt-views.
+*/
 class PQWIDGETS_EXPORT pqCheckBoxPixMaps : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
 
 public:
-  /// parent cannot be NULL.
+  /**
+  * parent cannot be NULL.
+  */
   pqCheckBoxPixMaps(QWidget* parent);
 
-  /// Returns a pixmap for the given state .
+  /**
+  * Returns a pixmap for the given state .
+  */
   QPixmap getPixmap(Qt::CheckState state, bool active) const;
   QPixmap getPixmap(int state, bool active) const
     {

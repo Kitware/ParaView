@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStringList>
 #include <vtkPVOptions.h>
 
-/*! \brief Command line options for pqClient.
+/** \brief Command line options for pqClient.
  *
  * pqOptions extends vtkPVOptions to handle pqClient specific command line 
  * options.
@@ -59,8 +59,10 @@ public:
   // Returns the test scripts as a list.
   QStringList GetTestScripts();
 
-  /// Returns the server resource name specified
-  /// to load.
+  /**
+  * Returns the server resource name specified
+  * to load.
+  */
   vtkGetStringMacro(ServerResourceName);
 
   vtkSetStringMacro(TileImagePath);
@@ -77,9 +79,11 @@ public:
   int GetTestImageThreshold(int cc)
     { return this->TestScripts[cc].ImageThreshold; }
 
-  /// HACK: When playing back tests, this variable is set to make it easier to locate
-  /// the test image threshold for the current test. This is updated by the
-  /// test playback code.
+  /**
+  * HACK: When playing back tests, this variable is set to make it easier to locate
+  * the test image threshold for the current test. This is updated by the
+  * test playback code.
+  */
   vtkSetMacro(CurrentImageThreshold, int);
   vtkGetMacro(CurrentImageThreshold, int);
 

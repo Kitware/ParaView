@@ -47,11 +47,13 @@ class vtkSMProxy;
 class vtkSMPropertyGroup;
 
 
-/// pqPropertyGroupWidget is a (custom) widget created for a PropertyGroup.
-///
-/// It provides functions for linking standard controls with Server Manager
-/// properties as well as storing the property group.
-/// @see vtkSMPropertyGroup
+/**
+* pqPropertyGroupWidget is a (custom) widget created for a PropertyGroup.
+*
+* It provides functions for linking standard controls with Server Manager
+* properties as well as storing the property group.
+* @see vtkSMPropertyGroup
+*/
 class PQCOMPONENTS_EXPORT pqPropertyGroupWidget : public pqPropertyWidget
 {
   Q_OBJECT
@@ -84,7 +86,9 @@ public:
   // make this signal public
   using Superclass::changeFinished;
 
-  /// Overwrite pqPropertyWidget to forward calls to vtkSMPropertyGroup
+  /**
+  * Overwrite pqPropertyWidget to forward calls to vtkSMPropertyGroup
+  */
   virtual char* panelVisibility() const;
   virtual void setPanelVisibility(const char* vis);
 

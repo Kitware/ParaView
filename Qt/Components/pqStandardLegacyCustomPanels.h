@@ -37,9 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsModule.h"
 
-/// pqStandardLegacyCustomPanels is used by pqPropertiesPanel to create legacy
-/// custom panels. In time, this class needs to disappear with all panels being
-/// created using the newer panels API.
+/**
+* pqStandardLegacyCustomPanels is used by pqPropertiesPanel to create legacy
+* custom panels. In time, this class needs to disappear with all panels being
+* created using the newer panels API.
+*/
 class PQCOMPONENTS_EXPORT pqStandardLegacyCustomPanels :
   public QObject,
   public pqObjectPanelInterface
@@ -51,10 +53,14 @@ public:
   pqStandardLegacyCustomPanels(QObject* parent=0);
   virtual ~pqStandardLegacyCustomPanels();
 
-  /// create panel for proxy.
+  /**
+  * create panel for proxy.
+  */
   virtual pqObjectPanel* createPanel(pqProxy* proxy, QWidget* parent);
 
-  /// returns if a panel can be created.
+  /**
+  * returns if a panel can be created.
+  */
   virtual bool canCreatePanel(pqProxy* proxy) const;
 
 private:

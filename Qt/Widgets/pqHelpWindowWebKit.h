@@ -32,10 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqHelpWindowWebKit_h
 #define pqHelpWindowWebKit_h
 
-///============================================================================
-/// This is an internal header used by pqHelpWindow.
-/// This header gets included when PARAVIEW_USE_QTWEBKIT is ON.
-///============================================================================
+/**
+*============================================================================
+* This is an internal header used by pqHelpWindow.
+* This header gets included when PARAVIEW_USE_QTWEBKIT is ON.
+*============================================================================
+*/
 
 #include <QFileInfo>
 #include <QNetworkAccessManager>
@@ -50,8 +52,10 @@ namespace
 // ****************************************************************************
 //            CLASS pqHelpWindowNetworkReply
 // ****************************************************************************
-/// Internal class used to add support to QWebView to load files from
-/// QHelpEngine.
+/**
+* Internal class used to add support to QWebView to load files from
+* QHelpEngine.
+*/
 class pqHelpWindowNetworkReply : public QNetworkReply
 {
   typedef QNetworkReply Superclass;
@@ -166,7 +170,9 @@ private:
 };
 
 //----------------------------------------------------------------------------------
-/// Extend QWebView to support the interface expected in pqBrowserTemplate.
+/**
+* Extend QWebView to support the interface expected in pqBrowserTemplate.
+*/
 class pqWebView : public QWebView
 {
   typedef QWebView Superclass;

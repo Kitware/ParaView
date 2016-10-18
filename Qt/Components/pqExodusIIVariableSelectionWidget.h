@@ -35,17 +35,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsModule.h"
 #include "pqTreeWidget.h"
 
-/// pqExodusIIVariableSelectionWidget is used by pqExodusIIPanel to show the
-/// a variable selection widget. Unlike typical variable selection widgets used
-/// for array statuses, ExodusReader has separate properties for specifying
-/// different selection e.g. NodeSetResultArrayStatus, EdgeSetResultArrayStatus,
-/// etc., but all are still shown in the same tree-widget to the user. This
-/// widget makes that possible. It provides different signals and properties for
-/// changing/accessing the different values independently and thus can be
-/// directly used with a pqPropertyManager or pqPropertyLinks object.
-///
-/// pqExodusIIVariableSelectionWidget relies on dynamic properties to avoid
-/// having to hard code all the types of properties that ExodusII proxy has.
+/**
+* pqExodusIIVariableSelectionWidget is used by pqExodusIIPanel to show the
+* a variable selection widget. Unlike typical variable selection widgets used
+* for array statuses, ExodusReader has separate properties for specifying
+* different selection e.g. NodeSetResultArrayStatus, EdgeSetResultArrayStatus,
+* etc., but all are still shown in the same tree-widget to the user. This
+* widget makes that possible. It provides different signals and properties for
+* changing/accessing the different values independently and thus can be
+* directly used with a pqPropertyManager or pqPropertyLinks object.
+*
+* pqExodusIIVariableSelectionWidget relies on dynamic properties to avoid
+* having to hard code all the types of properties that ExodusII proxy has.
+*/
 class PQCOMPONENTS_EXPORT pqExodusIIVariableSelectionWidget : public pqTreeWidget
 {
   Q_OBJECT
@@ -56,7 +58,9 @@ public:
   virtual ~pqExodusIIVariableSelectionWidget();
 
 signals:
-  /// fired when widget is modified.
+  /**
+  * fired when widget is modified.
+  */
   void widgetModified();
 
 protected slots:
@@ -64,8 +68,10 @@ protected slots:
   void delayedUpdateProperty(bool check_state);
 
 protected:
-  /// overridden to handle QDynamicPropertyChangeEvent when properties are
-  /// added/removed/updated.
+  /**
+  * overridden to handle QDynamicPropertyChangeEvent when properties are
+  * added/removed/updated.
+  */
   bool eventFilter(QObject* object, QEvent* qevent);
  
   void propertyChanged(const QString& pname);

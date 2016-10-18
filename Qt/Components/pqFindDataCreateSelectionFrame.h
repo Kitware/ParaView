@@ -38,15 +38,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqOutputPort;
 class QComboBox;
 
-/// pqFindDataCreateSelectionFrame is designed to be used by pqFindDataDialog.
-/// pqFindDataDialog uses this as the component to create a new selection based
-/// on the query. This class encapsulates the logic for the UI to create new
-/// query based selections.
-/// Users can construct queries to create new selections. When user "runs" the
-/// query, we create a new selection and update the global application selection
-/// by notifying pqSelectionManager instance, is available.
-/// If the global selection changes from outside pqFindDataCreateSelectionFrame
-/// then we reset any existing query the user may have set.
+/**
+* pqFindDataCreateSelectionFrame is designed to be used by pqFindDataDialog.
+* pqFindDataDialog uses this as the component to create a new selection based
+* on the query. This class encapsulates the logic for the UI to create new
+* query based selections.
+* Users can construct queries to create new selections. When user "runs" the
+* query, we create a new selection and update the global application selection
+* by notifying pqSelectionManager instance, is available.
+* If the global selection changes from outside pqFindDataCreateSelectionFrame
+* then we reset any existing query the user may have set.
+*/
 class PQCOMPONENTS_EXPORT pqFindDataCreateSelectionFrame : public QWidget
 {
   Q_OBJECT
@@ -55,32 +57,46 @@ public:
   pqFindDataCreateSelectionFrame(QWidget* parent=0, Qt::WindowFlags f=0);
   virtual ~pqFindDataCreateSelectionFrame();
 
-  /// Helper method used to fill up a combo-box showing allowed selection types
-  /// based on the data-type produced on the port.
+  /**
+  * Helper method used to fill up a combo-box showing allowed selection types
+  * based on the data-type produced on the port.
+  */
   static void populateSelectionTypeCombo(
     QComboBox* bbox, pqOutputPort* port);
 
 public slots:
-  /// Set the port to create a query selection on. If the port is different from
-  /// the current one, it clears any existing query.
+  /**
+  * Set the port to create a query selection on. If the port is different from
+  * the current one, it clears any existing query.
+  */
   void setPort(pqOutputPort*);
 
 signals:
-  /// Fired when the user clicks on the help button for the query clause widget.
+  /**
+  * Fired when the user clicks on the help button for the query clause widget.
+  */
   void helpRequested();
 
 private slots:
-  /// marks if the underlying data has changed
+  /**
+  * marks if the underlying data has changed
+  */
   void dataChanged();
 
-  /// refreshes the query widget.
+  /**
+  * refreshes the query widget.
+  */
   void refreshQuery();
 
-  /// run the active query.
+  /**
+  * run the active query.
+  */
   void runQuery();
 
-  /// called when the global selection changes. We reset the UI if the
-  /// pqFindDataCreateSelectionFrame didn't create that selection.
+  /**
+  * called when the global selection changes. We reset the UI if the
+  * pqFindDataCreateSelectionFrame didn't create that selection.
+  */
   void onSelectionChanged(pqOutputPort*);
 
 private:

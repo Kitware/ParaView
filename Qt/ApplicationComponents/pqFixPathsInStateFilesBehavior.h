@@ -37,10 +37,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkPVXMLElement;
 
-/// @ingroup Behaviors
-/// pqFixPathsInStateFilesBehavior puts up a dialog (pqFixStateFilenamesDialog)
-/// whenever a state file is loaded allowing the user to fix filenames for
-/// readers in the state file.
+/**
+* @ingroup Behaviors
+* pqFixPathsInStateFilesBehavior puts up a dialog (pqFixStateFilenamesDialog)
+* whenever a state file is loaded allowing the user to fix filenames for
+* readers in the state file.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqFixPathsInStateFilesBehavior : public QObject
 {
   Q_OBJECT
@@ -49,13 +51,17 @@ public:
   pqFixPathsInStateFilesBehavior(QObject* parent=0);
   virtual ~pqFixPathsInStateFilesBehavior();
 
-  /// Description:
-  /// Prompts for fixing filenames in state xml.
+  /**
+  * Description:
+  * Prompts for fixing filenames in state xml.
+  */
   static void fixFileNames(vtkPVXMLElement*);
 
-  /// Description:
-  /// Provides a mechanism to block the dialog temporarily. Returns the current
-  /// value of the ivar.
+  /**
+  * Description:
+  * Provides a mechanism to block the dialog temporarily. Returns the current
+  * value of the ivar.
+  */
   static bool blockDialog(bool);
 
 protected slots:

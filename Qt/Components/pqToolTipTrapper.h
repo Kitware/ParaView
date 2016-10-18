@@ -37,7 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 
-/// To prevent tooltips from appearing, create an instance of this object.
+/**
+* To prevent tooltips from appearing, create an instance of this object.
+*/
 class PQCOMPONENTS_EXPORT pqToolTipTrapper :
   public QObject
 {

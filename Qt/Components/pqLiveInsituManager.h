@@ -46,10 +46,12 @@ class vtkSMLiveInsituLinkProxy;
 class vtkSMProxy;
 
 
-/// Singleton that provides access to Insitu objects. Some of these
-/// objects are pqServer, pqLiveInsituVisualizationManager,
-/// vtkSMLiveInsituLinkProxy.
-/// @ingroup LiveInsitu
+/**
+* Singleton that provides access to Insitu objects. Some of these
+* objects are pqServer, pqLiveInsituVisualizationManager,
+* vtkSMLiveInsituLinkProxy.
+* @ingroup LiveInsitu
+*/
 class PQCOMPONENTS_EXPORT pqLiveInsituManager : public QObject
 {
   Q_OBJECT
@@ -59,8 +61,10 @@ public:
   static vtkIdType INVALID_TIME_STEP;
   static pqLiveInsituManager* instance();
 
-  /// Returns the link proxy to Catalyst or NULL if not connected or if not
-  /// a catalyst server
+  /**
+  * Returns the link proxy to Catalyst or NULL if not connected or if not
+  * a catalyst server
+  */
   static vtkSMLiveInsituLinkProxy* linkProxy(pqServer* insituSession);
   vtkSMLiveInsituLinkProxy* linkProxy()
   {
@@ -81,19 +85,27 @@ signals:
   void breakpointHit(pqServer* insituSession);
 
 public:
-  /// Returns current Catalyst server. The current Catalyst server
-  /// is either selected or its displaySession is selected. If no server is
-  /// selected we choose the first Catalyst server we find.
-  ///  We return NULL if the client is not connected to Catalyst.
+  /**
+  * Returns current Catalyst server. The current Catalyst server
+  * is either selected or its displaySession is selected. If no server is
+  * selected we choose the first Catalyst server we find.
+  *  We return NULL if the client is not connected to Catalyst.
+  */
   pqServer* selectedInsituServer();
-  /// Is this the server where Catalyst displays its extracts
+  /**
+  * Is this the server where Catalyst displays its extracts
+  */
   bool isDisplayServer(pqServer* server);
-  /// Returns the catalyst visualization manager associated with 
-  /// 'displaySession' or 'insituSession'
+  /**
+  * Returns the catalyst visualization manager associated with 
+  * 'displaySession' or 'insituSession'
+  */
   pqLiveInsituVisualizationManager* managerFromDisplay(pqServer* displaySession);
   static pqLiveInsituVisualizationManager* managerFromInsitu(
     pqServer* insituSession);
-  /// Creates the manager and accept connections from Catalyst
+  /**
+  * Creates the manager and accept connections from Catalyst
+  */
   pqLiveInsituVisualizationManager* connect(pqServer* displaySession);
 
   double breakpointTime() const
@@ -126,7 +138,9 @@ public:
 
 
 protected slots:
-  /// called when Catalyst disconnects. We clean up the Catalyst connection.
+  /**
+  * called when Catalyst disconnects. We clean up the Catalyst connection.
+  */
   void onCatalystDisconnected();
   void onBreakpointHit(pqServer* insituSession);
   void onSourceAdded(pqPipelineSource* source);

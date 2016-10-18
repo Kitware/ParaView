@@ -35,8 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationComponentsModule.h"
 #include <QToolBar>
 
-/// pqAxesToolbar is the toolbar that has buttons for setting the center
-/// rotation axes, toggling its visibility etc.
+/**
+* pqAxesToolbar is the toolbar that has buttons for setting the center
+* rotation axes, toggling its visibility etc.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqAxesToolbar : public QToolBar
 {
   Q_OBJECT

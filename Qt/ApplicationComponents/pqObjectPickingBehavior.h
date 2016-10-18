@@ -39,10 +39,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqView;
 class pqOutputPort;
 
-/// @ingroup Behaviors
-/// pqObjectPickingBehavior is used to add support for picking "source" by
-/// clicking on it in a view. This currently only supports render-view. But we
-/// can add support for other views as needed.
+/**
+* @ingroup Behaviors
+* pqObjectPickingBehavior is used to add support for picking "source" by
+* clicking on it in a view. This currently only supports render-view. But we
+* can add support for other views as needed.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqObjectPickingBehavior : public QObject
 {
   Q_OBJECT
@@ -52,12 +54,16 @@ public:
   virtual ~pqObjectPickingBehavior();
 
 protected:
-  /// event filter to capture the left-click.
+  /**
+  * event filter to capture the left-click.
+  */
   virtual bool eventFilter(QObject* caller, QEvent* e);
 
 protected slots:
-  /// Called when a new view is added. We install event-filter to get click
-  /// events.
+  /**
+  * Called when a new view is added. We install event-filter to get click
+  * events.
+  */
   void onViewAdded(pqView*);
 
 private:

@@ -40,10 +40,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqPipelineSource;
 class pqProxyGroupMenuManager;
 
-/// @ingroup Reactions
-/// Reaction to handle creation of filters from the filters menu.
-/// pqFiltersMenuReaction knows when to enable/disable actions in the menu as
-/// well as what to do when an action is triggered.
+/**
+* @ingroup Reactions
+* Reaction to handle creation of filters from the filters menu.
+* pqFiltersMenuReaction knows when to enable/disable actions in the menu as
+* well as what to do when an action is triggered.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqFiltersMenuReaction : public QObject
 {
   Q_OBJECT
@@ -52,17 +54,23 @@ public:
   pqFiltersMenuReaction(pqProxyGroupMenuManager* menuManager);
 
 public slots:
-  /// Updates the enabled state.  The actions in toolbars will
-  /// be updated automatically.  The containing widget of other actions
-  /// should connect its aboutToShow signal to this slot.
+  /**
+  * Updates the enabled state.  The actions in toolbars will
+  * be updated automatically.  The containing widget of other actions
+  * should connect its aboutToShow signal to this slot.
+  */
   virtual void updateEnableState(bool updateOnlyToolbars = false);
 
-  /// Creates a filter of the given type.
+  /**
+  * Creates a filter of the given type.
+  */
   static pqPipelineSource* createFilter(
     const QString& group, const QString& name);
 
 protected slots:
-  /// Called when the action is triggered.
+  /**
+  * Called when the action is triggered.
+  */
   virtual void onTriggered(const QString& group, const QString& name)
     { pqFiltersMenuReaction::createFilter(group, name); } 
   virtual void setEnableStateDirty();

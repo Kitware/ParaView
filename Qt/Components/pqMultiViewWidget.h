@@ -44,10 +44,12 @@ class vtkSMProxy;
 class vtkSMViewLayoutProxy;
 class vtkSMViewProxy;
 
-/// pqMultiViewWidget is a widget that manages layout of multiple views. It
-/// works together with a vtkSMViewLayoutProxy instance to keep track of the layout
-/// for the views. It's acceptable to create multiple instances of
-/// pqMultiViewWidget in the same application.
+/**
+* pqMultiViewWidget is a widget that manages layout of multiple views. It
+* works together with a vtkSMViewLayoutProxy instance to keep track of the layout
+* for the views. It's acceptable to create multiple instances of
+* pqMultiViewWidget in the same application.
+*/
 class PQCOMPONENTS_EXPORT pqMultiViewWidget : public QWidget
 {
   Q_OBJECT
@@ -56,115 +58,165 @@ public:
   pqMultiViewWidget(QWidget * parent=0, Qt::WindowFlags f=0);
   virtual ~pqMultiViewWidget();
 
-  /// Get/Set the vtkSMViewLayoutProxy instance this widget is using as the layout
-  /// manager.
+  /**
+  * Get/Set the vtkSMViewLayoutProxy instance this widget is using as the layout
+  * manager.
+  */
   void setLayoutManager(vtkSMViewLayoutProxy*);
   vtkSMViewLayoutProxy* layoutManager() const;
 
-  /// Returns whether window decorations and splitter handles are visible.
+  /**
+  * Returns whether window decorations and splitter handles are visible.
+  */
   bool isDecorationsVisible() const
      { return this->DecorationsVisible; }
 
-  /// Captures an image for the views in the layout. Note that there must be
-  /// at least one valid view in the widget, otherwise returns NULL.
+  /**
+  * Captures an image for the views in the layout. Note that there must be
+  * at least one valid view in the widget, otherwise returns NULL.
+  */
   vtkImageData* captureImage(int width, int height);
 
-  /// setups up the environment for capture. Returns the magnification that can
-  /// be used to capture the image for required size.
+  /**
+  * setups up the environment for capture. Returns the magnification that can
+  * be used to capture the image for required size.
+  */
   int prepareForCapture(int width, int height);
 
-  /// cleans up the environment after image capture.
+  /**
+  * cleans up the environment after image capture.
+  */
   void cleanupAfterCapture();
 
-  /// Capture an image and saves it out to a file.
+  /**
+  * Capture an image and saves it out to a file.
+  */
   bool writeImage(const QString& filename, int width, int height, int quality=-1);
 
-  /// Returns list of views assigned to frames in this widget.
+  /**
+  * Returns list of views assigned to frames in this widget.
+  */
   QList<vtkSMViewProxy*> viewProxies() const;
 
-  /// Returns true if the view has been assigned to this layout.
+  /**
+  * Returns true if the view has been assigned to this layout.
+  */
   bool isViewAssigned(pqView*) const;
 
-  /// pqMultiViewWidget supports popout mode i.e. the views could be laid out
-  /// in separate popup widget rather than simply placing them  under this
-  /// pqMultiViewWidget frame. Use this method to toggle that. Returns true if
-  /// the view is popped out at the end of this call, false otherwise.
+  /**
+  * pqMultiViewWidget supports popout mode i.e. the views could be laid out
+  * in separate popup widget rather than simply placing them  under this
+  * pqMultiViewWidget frame. Use this method to toggle that. Returns true if
+  * the view is popped out at the end of this call, false otherwise.
+  */
   bool togglePopout();
 
 signals:
-  /// fired when a frame in this widget becomes active.
+  /**
+  * fired when a frame in this widget becomes active.
+  */
   void frameActivated();
 
 public slots:
-  /// This forces the pqMultiViewWidget to reload its layout from the
-  /// vtkSMViewLayoutProxy instance. One does not need to call this method
-  /// explicitly, it is called automatically when the layoutManager is modified.
+  /**
+  * This forces the pqMultiViewWidget to reload its layout from the
+  * vtkSMViewLayoutProxy instance. One does not need to call this method
+  * explicitly, it is called automatically when the layoutManager is modified.
+  */
   void reload();
 
-  /// Assigns a frame to the view. This assumes that the view not already been
-  /// placed in a frame. This will try to locate an empty frame, if possible. If
-  /// no empty frames are available, it will split the active frame along its
-  /// longest dimension and place the view in the newly created child-frame.
+  /**
+  * Assigns a frame to the view. This assumes that the view not already been
+  * placed in a frame. This will try to locate an empty frame, if possible. If
+  * no empty frames are available, it will split the active frame along its
+  * longest dimension and place the view in the newly created child-frame.
+  */
   void assignToFrame(pqView*);
 
-  /// In a tabbed setup, when pqMultiViewWidget becomes active, this method
-  /// should be called to ensure that the first view/frame in this widget is
-  /// indeed made active, as the user would expect.
+  /**
+  * In a tabbed setup, when pqMultiViewWidget becomes active, this method
+  * should be called to ensure that the first view/frame in this widget is
+  * indeed made active, as the user would expect.
+  */
   void makeFrameActive();
 
-  /// Set the visibility for frame decorations and splitter handles.
+  /**
+  * Set the visibility for frame decorations and splitter handles.
+  */
   void setDecorationsVisible(bool);
   void showDecorations() { this->setDecorationsVisible(true); }
   void hideDecorations() { this->setDecorationsVisible(false); }
 
-  /// Locks the maximum size for each view-frame to the given size.
-  /// Use empty QSize() instance to indicate no limits.
+  /**
+  * Locks the maximum size for each view-frame to the given size.
+  * Use empty QSize() instance to indicate no limits.
+  */
   void lockViewSize(const QSize&);
 
-  /// cleans up the layout.
+  /**
+  * cleans up the layout.
+  */
   void reset();
 
-  /// destroys each of the views present in this layout.
-  /// Useful when user closes the frame expecting that all containing views are
-  /// destroyed.
+  /**
+  * destroys each of the views present in this layout.
+  * Useful when user closes the frame expecting that all containing views are
+  * destroyed.
+  */
   void destroyAllViews();
 
 protected slots:
-  /// Slots called on different signals fired by the nested frames or splitters.
-  /// Note that these slots use this->sender(), hence these should not be called
-  /// directly. These result in updating the layoutManager.
+  /**
+  * Slots called on different signals fired by the nested frames or splitters.
+  * Note that these slots use this->sender(), hence these should not be called
+  * directly. These result in updating the layoutManager.
+  */
   void standardButtonPressed(int);
   void splitterMoved();
 
-  /// Makes a frame active. This also call pqActiveObjects::setActiveView() to
-  /// make the corresponding view active.
+  /**
+  * Makes a frame active. This also call pqActiveObjects::setActiveView() to
+  * make the corresponding view active.
+  */
   void makeActive(pqViewFrame* frame);
 
-  /// Marks the frame corresponding to the view, if present in the widget, as
-  /// active. Note that this method does not fire the activeChanged() signal.
+  /**
+  * Marks the frame corresponding to the view, if present in the widget, as
+  * active. Note that this method does not fire the activeChanged() signal.
+  */
   void markActive(pqView* view);
   void markActive(pqViewFrame* frame);
 
-  /// swap frame positions.
+  /**
+  * swap frame positions.
+  */
   void swapPositions(const QString&);
 
-  /// when a view proxy is unregistered, we ensure that the frame is marked as
-  /// empty.
+  /**
+  * when a view proxy is unregistered, we ensure that the frame is marked as
+  * empty.
+  */
   void proxyRemoved(pqProxy*);
 
-  /// called when a new view is added. we update the layout if the view added
-  /// belongs to this layout.
+  /**
+  * called when a new view is added. we update the layout if the view added
+  * belongs to this layout.
+  */
   void viewAdded(pqView*);
 
 protected:
-  /// Called whenever a new frame needs to be created for a view. Note that view
-  /// may be null, in which case a place-holder frame is expected. The caller
-  /// takes over the ownership of the created frame and will delete/re-parent it
-  /// as and when appropriate.
+  /**
+  * Called whenever a new frame needs to be created for a view. Note that view
+  * may be null, in which case a place-holder frame is expected. The caller
+  * takes over the ownership of the created frame and will delete/re-parent it
+  * as and when appropriate.
+  */
   virtual pqViewFrame* newFrame(vtkSMProxy* view);
 
-  /// Event filter callback to detect when a sub-frame becomes active, so that
-  /// we can mark it as such.
+  /**
+  * Event filter callback to detect when a sub-frame becomes active, so that
+  * we can mark it as such.
+  */
   virtual bool eventFilter(QObject* caller, QEvent* evt);
 
 private:

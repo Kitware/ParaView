@@ -38,11 +38,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkEventQtSlotConnect;
 
-/// pqServerManagerModelItem is a element maintained by pqServerManagerModel.
-/// pqServerManagerModel creates instances of pqServerManagerModelItem (and its
-/// subclasses) for every signification Server-Manager object such as a session
-/// (pqServer), source proxy (pqPipelineSource), filter proxy
-/// (pqPipelineFilter), view proxy (pqView) and so on.
+/**
+* pqServerManagerModelItem is a element maintained by pqServerManagerModel.
+* pqServerManagerModel creates instances of pqServerManagerModelItem (and its
+* subclasses) for every signification Server-Manager object such as a session
+* (pqServer), source proxy (pqPipelineSource), filter proxy
+* (pqPipelineFilter), view proxy (pqView) and so on.
+*/
 class PQCORE_EXPORT pqServerManagerModelItem : public QObject
 {
   Q_OBJECT
@@ -52,9 +54,11 @@ public:
   virtual ~pqServerManagerModelItem();
 
 protected:
-  /// All subclasses generally need some vtkEventQtSlotConnect instance to
-  /// connect to VTK events. This provides access to a vtkEventQtSlotConnect
-  /// instance which all subclasses can use for listening to events.
+  /**
+  * All subclasses generally need some vtkEventQtSlotConnect instance to
+  * connect to VTK events. This provides access to a vtkEventQtSlotConnect
+  * instance which all subclasses can use for listening to events.
+  */
   vtkEventQtSlotConnect* getConnector();
 
 private:

@@ -58,11 +58,13 @@ class PQWIDGETS_EXPORT pqAnimationModel : public QGraphicsScene
   Q_PROPERTY(bool interactive READ interactive WRITE setInteractive)
 public:
 
-  /// Real, Sequence or Custom mode
-  /// Real mode shows no tick marks for timesteps
-  /// Sequence mode shows evenly spaced ticks for teach timestep
-  ///  where the number of ticks can be controled by the ticks property
-  /// Custom shows tick marks at the location indicated by the setTickMarks().
+  /**
+  * Real, Sequence or Custom mode
+  * Real mode shows no tick marks for timesteps
+  * Sequence mode shows evenly spaced ticks for teach timestep
+  *  where the number of ticks can be controled by the ticks property
+  * Custom shows tick marks at the location indicated by the setTickMarks().
+  */
   enum ModeType
     {
     Real,
@@ -73,28 +75,48 @@ public:
   pqAnimationModel(QGraphicsView* p = 0);
   ~pqAnimationModel();
   
-  /// the number of tracks
+  /**
+  * the number of tracks
+  */
   int count();
-  /// get a track at an index
+  /**
+  * get a track at an index
+  */
   pqAnimationTrack* track(int);
 
-  /// add a track.
-  /// If \c trackToAdd is NULL, we create a new pqAnimationTrack instance.
+  /**
+  * add a track.
+  * If \c trackToAdd is NULL, we create a new pqAnimationTrack instance.
+  */
   pqAnimationTrack* addTrack(pqAnimationTrack* trackToAdd=NULL);
-  /// remove a track
+  /**
+  * remove a track
+  */
   void removeTrack(pqAnimationTrack* track);
 
-  /// get the animation mode
+  /**
+  * get the animation mode
+  */
   ModeType mode() const;
-  /// get the number of ticks
+  /**
+  * get the number of ticks
+  */
   int ticks() const;
-  /// get the current time
+  /**
+  * get the current time
+  */
   double currentTime() const;
-  /// get the start time
+  /**
+  * get the start time
+  */
   double startTime() const;
-  /// get the end time
+  /**
+  * get the end time
+  */
   double endTime() const;
-  /// get whether this scene is interactive
+  /**
+  * get whether this scene is interactive
+  */
   bool interactive() const;
 
   QAbstractItemModel* header();
@@ -103,33 +125,51 @@ public:
   void setRowHeight(int);
   int rowHeight() const;
 
-  /// provides access to the custom ticks set using
-  /// setTickMarks() method.
+  /**
+  * provides access to the custom ticks set using
+  * setTickMarks() method.
+  */
   const QList<double>& customTicks() const
     { return this->CustomTicks; }
 
-  /// set the tooltip to use for the checkbox in the EnabledHeader.
-  /// default is "Enable/Disable Track".
+  /**
+  * set the tooltip to use for the checkbox in the EnabledHeader.
+  * default is "Enable/Disable Track".
+  */
   void setEnabledHeaderToolTip(const QString& val);
   const QString& enabledHeaderToolTip() const
     { return this->EnabledHeaderToolTip; }
 
 public slots:
 
-  /// set the animation mode
+  /**
+  * set the animation mode
+  */
   void setMode(ModeType);
-  /// set the number of ticks
+  /**
+  * set the number of ticks
+  */
   void setTicks(int);
-  /// set the current time
+  /**
+  * set the current time
+  */
   void setCurrentTime(double);
-  /// set the start time
+  /**
+  * set the start time
+  */
   void setStartTime(double);
-  /// set the end time
+  /**
+  * set the end time
+  */
   void setEndTime(double);
-  /// set whether this scene is interactive
+  /**
+  * set whether this scene is interactive
+  */
   void setInteractive(bool);
-  /// set the locations for tick marks if Mode is Custom.
-  /// This also results in a call to setTicks().
+  /**
+  * set the locations for tick marks if Mode is Custom.
+  * This also results in a call to setTicks().
+  */
   void setTickMarks(int num, double* tick_marks);
 
 signals:
@@ -167,8 +207,10 @@ protected:
   double timeToNormalizedTime(double) const;
   double normalizedTimeToTime(double) const;
 
-  /// Based on this->Mode, this will either returns the number of custom ticks
-  /// or return this->ticks().
+  /**
+  * Based on this->Mode, this will either returns the number of custom ticks
+  * or return this->ticks().
+  */
   int currentTicks() const;
 private:
 

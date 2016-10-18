@@ -40,18 +40,20 @@ class QToolBar;
 class pqServer;
 class pqPythonDialog;
 
-/// pqPythonManager is a class to facilitate the use of a python interpreter
-/// by various paraview GUI components.  The manager has a single instance 
-/// of the pqPythonDialog.  Currently the pqPythonDialog "owns" the
-/// python interpreter.  Anyone who wants to execute python code should call
-/// pythonShellDialog() to get a pointer to the pqPythonDialog instance.  This
-/// manager class provides global access to the python dialog and methods to
-/// ensure the python dialog's interpreter stays in sync with the current active
-/// server.
-///
-/// Note: because the interpreter is initialized lazily, a number of the member
-/// functions on this class have the side effect of initializing the python
-/// interpreter first.
+/**
+* pqPythonManager is a class to facilitate the use of a python interpreter
+* by various paraview GUI components.  The manager has a single instance 
+* of the pqPythonDialog.  Currently the pqPythonDialog "owns" the
+* python interpreter.  Anyone who wants to execute python code should call
+* pythonShellDialog() to get a pointer to the pqPythonDialog instance.  This
+* manager class provides global access to the python dialog and methods to
+* ensure the python dialog's interpreter stays in sync with the current active
+* server.
+*
+* Note: because the interpreter is initialized lazily, a number of the member
+* functions on this class have the side effect of initializing the python
+* interpreter first.
+*/
 class PQPYTHON_EXPORT pqPythonManager : public QObject
 {
   Q_OBJECT

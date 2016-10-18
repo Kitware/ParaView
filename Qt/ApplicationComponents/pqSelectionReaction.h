@@ -37,35 +37,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class QActionGroup;
 
-/// @ingroup Reactions
-/// Generric reaction for creating selections on views.
+/**
+* @ingroup Reactions
+* Generric reaction for creating selections on views.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqSelectionReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
 
 public:
-  /// Constructor.\c modifierGroup is used to determine selection modifier. If
-  /// there's a non-null checkedAction() in the group, we use that action's
-  /// data() to determine the selection mode e.g.
-  /// pqView::PVSELECTION_ADDITION,
-  /// pqView::PVSELECTION_SUBTRACTION etc. If no QActionGroup is
-  /// specified or no checked action is present, then the default mode of
-  /// pqView::PVSELECTION_DEFAULT is used.
+  /**
+  * Constructor.\c modifierGroup is used to determine selection modifier. If
+  * there's a non-null checkedAction() in the group, we use that action's
+  * data() to determine the selection mode e.g.
+  * pqView::PVSELECTION_ADDITION,
+  * pqView::PVSELECTION_SUBTRACTION etc. If no QActionGroup is
+  * specified or no checked action is present, then the default mode of
+  * pqView::PVSELECTION_DEFAULT is used.
+  */
   pqSelectionReaction(QAction* parent, QActionGroup* modifierGroup = NULL);
 
 protected slots:
-  /// called when modifier group is changed.
+  /**
+  * called when modifier group is changed.
+  */
   virtual void modifiersChanged() {}
 
 protected:
-  /// Get the current state of selection modifier, if any
+  /**
+  * Get the current state of selection modifier, if any
+  */
   virtual int getSelectionModifier();
 
-  /// Uncheck selection modifiers, if any
+  /**
+  * Uncheck selection modifiers, if any
+  */
   virtual void uncheckSelectionModifiers();
 
-  /// Disable/Enable selection modifiers, if any
+  /**
+  * Disable/Enable selection modifiers, if any
+  */
   virtual void disableSelectionModifiers(bool disable);
 
   QPointer<QActionGroup> ModifierGroup;

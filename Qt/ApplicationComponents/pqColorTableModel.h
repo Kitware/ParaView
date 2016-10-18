@@ -51,8 +51,10 @@ public:
 
   virtual ~pqColorTableModel() {}
 
-  /// All columns are editable. The first and last value in the first column
-  /// are not editable as they are set by the range.
+  /**
+  * All columns are editable. The first and last value in the first column
+  * are not editable as they are set by the range.
+  */
   virtual Qt::ItemFlags flags(const QModelIndex &idx) const;
 
   virtual bool setData(const QModelIndex &idx, const QVariant &value, int role=Qt::EditRole);

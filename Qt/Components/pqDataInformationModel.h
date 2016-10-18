@@ -48,54 +48,78 @@ public:
   pqDataInformationModel(QObject* _parent=NULL);
   virtual ~pqDataInformationModel();
 
-  /// QAbstractTableModel API. 
-  /// Returns the number of rows under the given parent.
+  /**
+  * QAbstractTableModel API. 
+  * Returns the number of rows under the given parent.
+  */
   virtual int rowCount(const QModelIndex& parent =QModelIndex()) const;
 
-  /// QAbstractTableModel API.
-  /// Returns the number of columns for the given parent.
+  /**
+  * QAbstractTableModel API.
+  * Returns the number of columns for the given parent.
+  */
   virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
 
 
-  /// QAbstractTableModel API.
-  /// Returns the data stored under the given role for the item referred 
-  /// to by the index.
+  /**
+  * QAbstractTableModel API.
+  * Returns the data stored under the given role for the item referred 
+  * to by the index.
+  */
   virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
   
-  /// QAbstractTableModel API.
-  /// Returns the data for the given role and section in the header with the 
-  /// specified orientation.
+  /**
+  * QAbstractTableModel API.
+  * Returns the data for the given role and section in the header with the 
+  * specified orientation.
+  */
   virtual QVariant headerData(int section, Qt::Orientation orientation, 
     int role = Qt::DisplayRole) const;
 
-  /// Given a pqOutputPort, get the index for it, if present in this model,
-  /// otherwise returns invalid index.
+  /**
+  * Given a pqOutputPort, get the index for it, if present in this model,
+  * otherwise returns invalid index.
+  */
   QModelIndex getIndexFor(pqOutputPort* item) const;
 
-  /// Given a valid index, returns the pqOutputPort item corresponding
-  /// to it.
+  /**
+  * Given a valid index, returns the pqOutputPort item corresponding
+  * to it.
+  */
   pqOutputPort* getItemFor(const QModelIndex& index) const;
 
-  /// Method needed for copy/past cell editor
+  /**
+  * Method needed for copy/past cell editor
+  */
   virtual Qt::ItemFlags flags ( const QModelIndex & index ) const;
   virtual bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole );
 
 public slots:
-  /// Called when a new source/filter is registered.
+  /**
+  * Called when a new source/filter is registered.
+  */
   void addSource(pqPipelineSource* source);
 
-  /// Called when a new source/filter is unregistred.
+  /**
+  * Called when a new source/filter is unregistred.
+  */
   void removeSource(pqPipelineSource* source);
 
-  /// Called when the active view changes. Need to correctly show the geometry
-  /// size for the source.
+  /**
+  * Called when the active view changes. Need to correctly show the geometry
+  * size for the source.
+  */
   void setActiveView(pqView* view);
 
 private slots:
-  /// Called after the associated algorithm executes.
+  /**
+  * Called after the associated algorithm executes.
+  */
   void dataUpdated(pqPipelineSource* changedSource);
 
-  /// Called at end of every render since geometry sizes may have changed.
+  /**
+  * Called at end of every render since geometry sizes may have changed.
+  */
   void refreshGeometrySizes();
 
 private:

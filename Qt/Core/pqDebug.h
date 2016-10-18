@@ -35,16 +35,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreModule.h"
 #include <QDebug>
 
-/// pqDebugType provides a mechanism for application to define categories for
-/// debugging various components of the UI. By passing an appropriate name for
-/// the envVariable in the constructor, the debug output will only be
-/// generated when that variable is set.
-/// For example, if you want to put out debug messages when an environment
-/// variable MY_DEBUG_FOO is defined, you can do the following:
-/// \code{.cpp}
-///   pqDebug("MY_DEBUG_FOO") << "This will be printed when MY_DEBUG_FOO "
-///                           << "is defined.";
-/// \endcode
+/**
+* pqDebugType provides a mechanism for application to define categories for
+* debugging various components of the UI. By passing an appropriate name for
+* the envVariable in the constructor, the debug output will only be
+* generated when that variable is set.
+* For example, if you want to put out debug messages when an environment
+* variable MY_DEBUG_FOO is defined, you can do the following:
+* \code{.cpp}
+*   pqDebug("MY_DEBUG_FOO") << "This will be printed when MY_DEBUG_FOO "
+*                           << "is defined.";
+* \endcode
+*/
 class PQCORE_EXPORT pqDebugType
 {
 protected:

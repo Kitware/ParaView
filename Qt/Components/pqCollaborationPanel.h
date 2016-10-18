@@ -42,8 +42,10 @@ class pqCollaborationManager;
 class QTableWidgetItem;
 class vtkSMCollaborationManager;
 
-/// pqCollaborationPanel is a properties page for the collaborative session. It
-/// allows the user to change its name and manage leadership of the session.
+/**
+* pqCollaborationPanel is a properties page for the collaborative session. It
+* allows the user to change its name and manage leadership of the session.
+*/
 class PQCOMPONENTS_EXPORT pqCollaborationPanel : public QWidget
 {
   Q_OBJECT
@@ -53,52 +55,76 @@ public:
   ~pqCollaborationPanel();
 
 signals:
-  /// Emitting this signal will result by adding the message into the UI and
-  /// if the user is the local one, the message will be broadcasted to the
-  /// other clients.
+  /**
+  * Emitting this signal will result by adding the message into the UI and
+  * if the user is the local one, the message will be broadcasted to the
+  * other clients.
+  */
   void triggerChatMessage(pqServer* server,int userId, QString& msgContent);
 
-  /// Emmitting this signal when user has allowed its mouse position to be
-  /// shared and send to the other clients
+  /**
+  * Emmitting this signal when user has allowed its mouse position to be
+  * shared and send to the other clients
+  */
   void shareLocalMousePointer(bool);
 
-  /// This get triggered internally when it's not a good time to update the camera
-  /// so the request get pushed to QueuedConnection
+  /**
+  * This get triggered internally when it's not a good time to update the camera
+  * so the request get pushed to QueuedConnection
+  */
   void delayUpdateCamera(vtkSMMessage* msg);
 
 public slots:
-  /// Called by pqCollaborationManager when a message is received
+  /**
+  * Called by pqCollaborationManager when a message is received
+  */
   void writeChatMessage(pqServer* server, int userId, QString& txt);
-  /// Called by pqCollaborationManager when a user name update occurs
-  /// (this invalidate the table model)
+  /**
+  * Called by pqCollaborationManager when a user name update occurs
+  * (this invalidate the table model)
+  */
   void onUserUpdate();
-  /// Called when a new master has been promoted
+  /**
+  * Called when a new master has been promoted
+  */
   void onNewMaster(int);
 
 protected slots:
-  /// Called when user hit enter in the input line of chat message
+  /**
+  * Called when user hit enter in the input line of chat message
+  */
   void onUserMessage();
 
-  /// Called when pqView are added/removed so we can listen user interaction
+  /**
+  * Called when pqView are added/removed so we can listen user interaction
+  */
   void connectViewLocalSlots(pqView*);
   void disconnectViewLocalSlots(pqView*);
   void stopFollowingCamera();
 
-  /// Called when the user change its name
-  /// (double click in the table on his name)
+  /**
+  * Called when the user change its name
+  * (double click in the table on his name)
+  */
   void itemChanged(QTableWidgetItem* item);
 
-  /// Called when the user double click on any cell
+  /**
+  * Called when the user double click on any cell
+  */
   void cellDoubleClicked(int, int);
 
-  /// Called when to follow a given user camera
+  /**
+  * Called when to follow a given user camera
+  */
   void followUserCamera(int userId);
 
   void onServerChanged();
 
 protected:
 
-  /// Promote a new master
+  /**
+  * Promote a new master
+  */
   void promoteToMaster(int masterId);
 
   Q_DISABLE_COPY(pqCollaborationPanel)

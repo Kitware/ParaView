@@ -38,7 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QSlider;
 class pqLineEdit;
 
-/// a widget with a tied slider and line edit for editing a double property
+/**
+* a widget with a tied slider and line edit for editing a double property
+*/
 class PQWIDGETS_EXPORT pqDoubleRangeWidget : public QWidget
 {
   Q_OBJECT
@@ -48,11 +50,15 @@ class PQWIDGETS_EXPORT pqDoubleRangeWidget : public QWidget
   Q_PROPERTY(bool   strictRange READ strictRange WRITE setStrictRange)
   Q_PROPERTY(int resolution READ resolution WRITE setResolution)
 public:
-  /// constructor requires the proxy, property
+  /**
+  * constructor requires the proxy, property
+  */
   pqDoubleRangeWidget(QWidget* parent = NULL);
   ~pqDoubleRangeWidget();
 
-  /// get the value
+  /**
+  * get the value
+  */
   double value() const;
   
   // get the min range value
@@ -67,16 +73,22 @@ public:
   int resolution() const;
   
 signals:
-  /// signal the value changed
+  /**
+  * signal the value changed
+  */
   void valueChanged(double);
 
-  /// signal the value was edited
-  /// this means the user is done changing text
-  /// or the slider was moved
+  /**
+  * signal the value was edited
+  * this means the user is done changing text
+  * or the slider was moved
+  */
   void valueEdited(double);
 
 public slots:
-  /// set the value
+  /**
+  * set the value
+  */
   void setValue(double);
 
   // set the min range value

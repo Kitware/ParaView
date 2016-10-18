@@ -43,8 +43,10 @@ class QFormLayout;
 class QGroupBox;
 class QVBoxLayout;
 
-/// pqIndexSelectionWidget displays a list of labels and slider widgets,
-/// intended to be used for selecting an index into a zero-based enumeration.
+/**
+* pqIndexSelectionWidget displays a list of labels and slider widgets,
+* intended to be used for selecting an index into a zero-based enumeration.
+*/
 class PQCOMPONENTS_EXPORT pqIndexSelectionWidget : public pqPropertyWidget
 {
   Q_OBJECT
@@ -67,15 +69,21 @@ protected slots:
   void currentChanged(int current);
   void currentChanged(); // pqLineEdit::textChangedAndEditingFinished() handler
 
-  /// Start a timer that calls updatePropertyImpl. This slot is triggered when
-  /// a widget is modified.
+  /**
+  * Start a timer that calls updatePropertyImpl. This slot is triggered when
+  * a widget is modified.
+  */
   void updateProperty();
-  /// Update the Qt property with current widget state. Emits widgetModified.
+  /**
+  * Update the Qt property with current widget state. Emits widgetModified.
+  */
   void updatePropertyImpl();
 
 protected:
   bool eventFilter(QObject *obj, QEvent *e);
-  /// Update the widget state from the PropertyLink Qt property.
+  /**
+  * Update the widget state from the PropertyLink Qt property.
+  */
   void propertyChanged();
 
 private:
@@ -84,7 +92,9 @@ private:
   void buildWidget(vtkSMProperty *infoProp);
   void addRow(const QString &key, int current, int size);
 
-  /// The names of the Qt properties used to sync with the vtkSMProperty.
+  /**
+  * The names of the Qt properties used to sync with the vtkSMProperty.
+  */
   QByteArray PushPropertyName;
 
   bool PropertyUpdatePending; // Only update the property once per 250 ms.

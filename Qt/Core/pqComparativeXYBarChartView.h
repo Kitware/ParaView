@@ -34,7 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComparativeContextView.h"
 
-/// The comparative bar chart subclass.
+/**
+* The comparative bar chart subclass.
+*/
 class PQCORE_EXPORT pqComparativeXYBarChartView : public pqComparativeContextView
 {
   Q_OBJECT

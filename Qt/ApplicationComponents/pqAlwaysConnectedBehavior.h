@@ -38,9 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerResource.h"
 #include "pqTimer.h"
 
-/// @ingroup Behaviors
-/// pqAlwaysConnectedBehavior ensures that the client always remains connected
-/// to a server.
+/**
+* @ingroup Behaviors
+* pqAlwaysConnectedBehavior ensures that the client always remains connected
+* to a server.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqAlwaysConnectedBehavior : public QObject
 {
   Q_OBJECT
@@ -49,7 +51,9 @@ public:
   pqAlwaysConnectedBehavior(QObject* parent=0);
   ~pqAlwaysConnectedBehavior();
 
-  /// Get/Set the default server resource to connect to. 
+  /**
+  * Get/Set the default server resource to connect to. 
+  */
   void setDefaultServer(const pqServerResource& resource)
     { this->DefaultServer = resource; }
   const pqServerResource& defaultServer() const

@@ -35,10 +35,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationComponentsModule.h"
 #include <QObject>
 
-/// @ingroup Behaviors
-/// pqQtMessageHandlerBehavior install a message handler to capture Qt
-/// error/debug messages i.e. install a event handler using qInstallMsgHandler
-/// and post them as VTK messages.
+/**
+* @ingroup Behaviors
+* pqQtMessageHandlerBehavior install a message handler to capture Qt
+* error/debug messages i.e. install a event handler using qInstallMsgHandler
+* and post them as VTK messages.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqQtMessageHandlerBehavior : public QObject
 {
   Q_OBJECT

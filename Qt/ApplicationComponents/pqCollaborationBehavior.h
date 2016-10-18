@@ -38,9 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqServer;
 class pqCollaborationManager;
 
-/// @ingroup Behaviors
-/// pqCollaborationBehavior ensures that a pqCollaborationManager get set
-/// when a new pqServer that support collaboration has been created.
+/**
+* @ingroup Behaviors
+* pqCollaborationBehavior ensures that a pqCollaborationManager get set
+* when a new pqServer that support collaboration has been created.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqCollaborationBehavior : public QObject
 {
   Q_OBJECT

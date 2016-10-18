@@ -39,47 +39,57 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqServer;
 class pqView;
 
-/// pqStereoModeHelper is used to temporarily change stereo mode on all views
-/// on the specified server.
-///
-/// Often times, one wants to temporarily change the stereo mode for all views
-/// that support stereo and then restore it back to their previous value e.g.
-/// when saving screenshots, or animations. This class helps us do that. Simply
-/// instantiate this class on the stack. In the constructor, it changes the
-/// stereo mode for all views (or a single view) and restores it back to its original
-/// value in the destructor.
+/**
+* pqStereoModeHelper is used to temporarily change stereo mode on all views
+* on the specified server.
+*
+* Often times, one wants to temporarily change the stereo mode for all views
+* that support stereo and then restore it back to their previous value e.g.
+* when saving screenshots, or animations. This class helps us do that. Simply
+* instantiate this class on the stack. In the constructor, it changes the
+* stereo mode for all views (or a single view) and restores it back to its original
+* value in the destructor.
+*/
 class PQCORE_EXPORT pqStereoModeHelper
 {
 public:
-  /// Constructor to change stereo mode on all views on a particular
-  /// server/session.
-  ///
-  /// @param stereoMode the new stereo mode to use. 0 for no stereo. For other
-  /// acceptable values, see vtkRenderWindow.h.
-  /// @param server the server to use to locate the views to change stereo mode
-  /// on.
+  /**
+  * Constructor to change stereo mode on all views on a particular
+  * server/session.
+  *
+  * @param stereoMode the new stereo mode to use. 0 for no stereo. For other
+  * acceptable values, see vtkRenderWindow.h.
+  * @param server the server to use to locate the views to change stereo mode
+  * on.
+  */
   pqStereoModeHelper(int stereoMode, pqServer* server);
 
-  /// Another constructor to change the stereo mode on a single view rather
-  /// than all views.
-  ///
-  /// @param stereoMode the new stereo mode to use. 0 for no stereo. For other
-  /// acceptable values, see vtkRenderWindow.h.
-  /// @param view the view to update the stereo mode on.
+  /**
+  * Another constructor to change the stereo mode on a single view rather
+  * than all views.
+  *
+  * @param stereoMode the new stereo mode to use. 0 for no stereo. For other
+  * acceptable values, see vtkRenderWindow.h.
+  * @param view the view to update the stereo mode on.
+  */
   pqStereoModeHelper(int stereoMode, pqView* view);
 
   virtual ~pqStereoModeHelper();
 
-  /// Helper method to get available stereo modes for a render view.
-  ///
-  /// @return a list of labels for available stereo modes.
+  /**
+  * Helper method to get available stereo modes for a render view.
+  *
+  * @return a list of labels for available stereo modes.
+  */
   static const QStringList& availableStereoModes();
 
-  /// Helper method to convert a stereo mode label to a VTK_STEREO_* value
-  /// defined in vtkRenderWindow.
-  ///
-  /// @return 0 for invalid label or no-stereo, otherwise a positive integer
-  /// representating the chosen StereoType for a vtkRenderWindow.
+  /**
+  * Helper method to convert a stereo mode label to a VTK_STEREO_* value
+  * defined in vtkRenderWindow.
+  *
+  * @return 0 for invalid label or no-stereo, otherwise a positive integer
+  * representating the chosen StereoType for a vtkRenderWindow.
+  */
   static int stereoMode(const QString& label);
 
 private:

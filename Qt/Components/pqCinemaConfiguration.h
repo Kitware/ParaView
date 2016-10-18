@@ -41,11 +41,13 @@ namespace Ui
   class CinemaConfiguration;
 }
  
-/// @brief PropertyWidget used to define specifics of a Cinema database to be exported.
-///
-/// This widget is used as the panel_widget of the vtkCinemaExporter (see SMApplication/
-/// Resources/utilities.xml), which is called from the top menu "Export Scene...". Some of
-/// its main components are also used in pqSGExportWizard.
+/**
+* @brief PropertyWidget used to define specifics of a Cinema database to be exported.
+*
+* This widget is used as the panel_widget of the vtkCinemaExporter (see SMApplication/
+* Resources/utilities.xml), which is called from the top menu "Export Scene...". Some of
+* its main components are also used in pqSGExportWizard.
+*/
 class PQCOMPONENTS_EXPORT pqCinemaConfiguration : public pqPropertyWidget
 {
   Q_OBJECT;
@@ -62,21 +64,29 @@ public:
 
   virtual void updateWidget(bool showing_advanced_properties);
 
-  /// Get method for the viewSelection Q_PROPERTY. Defines a python script extract describing
-  /// the user-selected view options.
+  /**
+  * Get method for the viewSelection Q_PROPERTY. Defines a python script extract describing
+  * the user-selected view options.
+  */
   QString viewSelection();
 
-  /// Get method for the trackSelection Q_PROPERTY. Defines a python script extract describing
-  /// the user-selected track options.
+  /**
+  * Get method for the trackSelection Q_PROPERTY. Defines a python script extract describing
+  * the user-selected track options.
+  */
   QString trackSelection();
 
-  /// Get method for the arraySelection Q_PROPERTY. Defines a python script extract describing
-  /// the user-selected array options.
+  /**
+  * Get method for the arraySelection Q_PROPERTY. Defines a python script extract describing
+  * the user-selected array options.
+  */
   QString arraySelection();
 
 protected:
 
-  /// Updates the vtkCinemaExporter proxy by emitting pqPropertyWidget's changeFinished() signal.
+  /**
+  * Updates the vtkCinemaExporter proxy by emitting pqPropertyWidget's changeFinished() signal.
+  */
   void hideEvent(QHideEvent* event_);
 
 signals:

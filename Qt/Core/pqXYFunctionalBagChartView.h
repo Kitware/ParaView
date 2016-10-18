@@ -37,7 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkSMSourceProxy;
 class pqDataRepresentation;
 
-/// FunctionalBag chart view
+/**
+* FunctionalBag chart view
+*/
 class PQCORE_EXPORT pqXYFunctionalBagChartView : public pqContextView
 {
   Q_OBJECT

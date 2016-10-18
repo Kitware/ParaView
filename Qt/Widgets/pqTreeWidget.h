@@ -58,7 +58,9 @@ public:
 
   bool event(QEvent* e);
 
-  /// give a hint on the size
+  /**
+  * give a hint on the size
+  */
   QSize sizeHint() const;
   QSize minimumSizeHint() const;
 
@@ -75,7 +77,9 @@ public slots:
   void allOff();
 
 signals:
-  /// Fired when moveCursor takes the cursor beyond the last row.
+  /**
+  * Fired when moveCursor takes the cursor beyond the last row.
+  */
   void navigatedPastEnd();
 
 protected slots:
@@ -90,8 +94,10 @@ protected:
   QPixmap** CheckPixmaps;
   QPixmap pixmap(Qt::CheckState state, bool active);
 
-  /// Move the cursor in the way described by cursorAction, 
-  /// using the information provided by the button modifiers.
+  /**
+  * Move the cursor in the way described by cursorAction, 
+  * using the information provided by the button modifiers.
+  */
   virtual QModelIndex moveCursor(CursorAction cursorAction, 
     Qt::KeyboardModifiers modifiers);
 

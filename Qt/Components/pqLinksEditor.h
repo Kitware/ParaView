@@ -43,9 +43,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace Ui { class pqLinksEditor; }
 
-/// a Qt dialog for editing a property/proxy/camera link
-/// two proxies can be selected, and if property type is
-/// selected, then two properties can be selected as well.
+/**
+* a Qt dialog for editing a property/proxy/camera link
+* two proxies can be selected, and if property type is
+* selected, then two properties can be selected as well.
+*/
 class PQCOMPONENTS_EXPORT pqLinksEditor :
   public QDialog
 {
@@ -53,29 +55,47 @@ class PQCOMPONENTS_EXPORT pqLinksEditor :
   typedef QDialog base;
 public:
 
-  /// create a link editor to create/edit a link
-  /// initial values are retrieved from the provided vtkSMLink
+  /**
+  * create a link editor to create/edit a link
+  * initial values are retrieved from the provided vtkSMLink
+  */
   pqLinksEditor(vtkSMLink* link, QWidget* p=0);
-  /// destroy this dialog
+  /**
+  * destroy this dialog
+  */
   ~pqLinksEditor();
 
-  /// get the name of the link
+  /**
+  * get the name of the link
+  */
   QString linkName();
 
-  /// get the type of link
+  /**
+  * get the type of link
+  */
   pqLinksModel::ItemType linkType();
 
-  /// get the first selected proxy
+  /**
+  * get the first selected proxy
+  */
   vtkSMProxy* selectedProxy1();
-  /// get the second selected proxy;
+  /**
+  * get the second selected proxy;
+  */
   vtkSMProxy* selectedProxy2();
 
-  /// get the first selected property
+  /**
+  * get the first selected property
+  */
   QString selectedProperty1();
-  /// get the second selected property
+  /**
+  * get the second selected property
+  */
   QString selectedProperty2();
 
-  /// Get the check state of interactive view link check box
+  /**
+  * Get the check state of interactive view link check box
+  */
   bool interactiveViewLinkChecked();
 
 private slots:

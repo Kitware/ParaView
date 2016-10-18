@@ -41,9 +41,11 @@ class vtkSMProxy;
 class vtkSMProperty;
 class pqView;
 
-/// pqPropertyWidget that can be used for any proxy with a vtkSMProxyListDomain.
-/// pqProxyPropertyWidget automatically creates this widget when it encounters a
-/// property with vtkSMProxyListDomain.
+/**
+* pqPropertyWidget that can be used for any proxy with a vtkSMProxyListDomain.
+* pqProxyPropertyWidget automatically creates this widget when it encounters a
+* property with vtkSMProxyListDomain.
+*/
 class PQCOMPONENTS_EXPORT pqProxySelectionWidget : public pqPropertyWidget
 {
   Q_OBJECT
@@ -51,17 +53,23 @@ class PQCOMPONENTS_EXPORT pqProxySelectionWidget : public pqPropertyWidget
   Q_PROPERTY(pqSMProxy chosenProxy READ chosenProxy WRITE setChosenProxy)
 
 public:
-  /// constructor requires the proxy, property. Note that this will abort if the
-  /// property does not have a ProxyListDomain.
+  /**
+  * constructor requires the proxy, property. Note that this will abort if the
+  * property does not have a ProxyListDomain.
+  */
   pqProxySelectionWidget(vtkSMProperty *property, vtkSMProxy *proxy, QWidget *parent = 0);
   ~pqProxySelectionWidget();
 
-  /// get the selected proxy
+  /**
+  * get the selected proxy
+  */
   vtkSMProxy* chosenProxy() const;
   void setChosenProxy(vtkSMProxy* proxy);
 
-  /// Overridden to forward the call to the internal pqProxyWidget maintained
-  /// for the chosen proxy.
+  /**
+  * Overridden to forward the call to the internal pqProxyWidget maintained
+  * for the chosen proxy.
+  */
   virtual void apply();
   virtual void reset();
   virtual void select();
@@ -71,13 +79,17 @@ public:
   virtual void setView(pqView*);
 
 signals:
-  /// Signal fired by setChosenProxy() when the proxy changes.
+  /**
+  * Signal fired by setChosenProxy() when the proxy changes.
+  */
   void chosenProxyChanged();
 
 private slots:
-  /// Called when the current index in the combo-box is changed from the UI.
-  /// This calls setChosenProxy() with the argument as the proxy corresponding
-  /// to the \c idx from the domain.
+  /**
+  * Called when the current index in the combo-box is changed from the UI.
+  * This calls setChosenProxy() with the argument as the proxy corresponding
+  * to the \c idx from the domain.
+  */
   void currentIndexChanged(int);
 
 private:

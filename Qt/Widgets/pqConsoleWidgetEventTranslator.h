@@ -38,8 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqConsoleWidget;
 
-/// pqConsoleWidgetEventTranslator is used to record events from pqConsoleWidget
-/// testing. 
+/**
+* pqConsoleWidgetEventTranslator is used to record events from pqConsoleWidget
+* testing. 
+*/
 class PQWIDGETS_EXPORT pqConsoleWidgetEventTranslator :
   public pqWidgetEventTranslator
 {
@@ -49,7 +51,9 @@ public:
   pqConsoleWidgetEventTranslator(QObject* parent=0);
   virtual ~pqConsoleWidgetEventTranslator();
 
-  /// Translate the event, if possible.
+  /**
+  * Translate the event, if possible.
+  */
   using Superclass::translateEvent;
   virtual bool translateEvent(QObject* target, QEvent* qtevent, bool& errorFlag);
 

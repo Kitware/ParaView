@@ -35,8 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationComponentsModule.h"
 #include <QObject>
 
-/// @ingroup Behaviors
-/// pqPluginSettingsBehavior adds support for adding applicatin settings from plugins
+/**
+* @ingroup Behaviors
+* pqPluginSettingsBehavior adds support for adding applicatin settings from plugins
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqPluginSettingsBehavior : public QObject
 {
   Q_OBJECT

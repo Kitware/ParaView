@@ -34,9 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqReaction.h"
 
-/// @ingroup Reactions
-/// pqAboutDialogReaction used to show the standard about dialog for the
-/// application.
+/**
+* @ingroup Reactions
+* pqAboutDialogReaction used to show the standard about dialog for the
+* application.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqAboutDialogReaction : public pqReaction
 {
   Q_OBJECT
@@ -44,11 +46,15 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqAboutDialogReaction : public pqReaction
 public:
   pqAboutDialogReaction(QAction* parent);
 
-  /// Shows the about dialog for the application.
+  /**
+  * Shows the about dialog for the application.
+  */
   static void showAboutDialog();
 
 protected:
-  /// Called when the action is triggered.
+  /**
+  * Called when the action is triggered.
+  */
   virtual void onTriggered()
     { pqAboutDialogReaction::showAboutDialog(); }
 

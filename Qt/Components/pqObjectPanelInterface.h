@@ -40,16 +40,24 @@ class pqObjectPanel;
 class pqProxy;
 class QWidget;
 
-/// interface class for plugins that create pqObjectPanels
+/**
+* interface class for plugins that create pqObjectPanels
+*/
 class PQCOMPONENTS_EXPORT pqObjectPanelInterface
 {
 public:
-  /// destructor
+  /**
+  * destructor
+  */
   virtual ~pqObjectPanelInterface();
 
-  /// Returns true if this panel can be created for the given the proxy.
+  /**
+  * Returns true if this panel can be created for the given the proxy.
+  */
   virtual bool canCreatePanel(pqProxy* proxy) const = 0;
-  /// Creates a panel for the given proxy
+  /**
+  * Creates a panel for the given proxy
+  */
   virtual pqObjectPanel* createPanel(pqProxy* proxy, QWidget* p) = 0;
 };
 

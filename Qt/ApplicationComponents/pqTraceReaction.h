@@ -34,9 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqReaction.h"
 
-/// @ingroup Reactions
-/// Reaction for application python start/stop trace. This reaction will change the
-/// label on the QAction to reflect whether the trace is started or stopped.
+/**
+* @ingroup Reactions
+* Reaction for application python start/stop trace. This reaction will change the
+* label on the QAction to reflect whether the trace is started or stopped.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqTraceReaction : public pqReaction
 {
   Q_OBJECT
@@ -47,13 +49,19 @@ public:
     const char* stop_trace_label="Stop Trace");
   virtual ~pqTraceReaction();
 
-  /// start tracing.
+  /**
+  * start tracing.
+  */
   void start();
 
-  /// stop tracing.
+  /**
+  * stop tracing.
+  */
   void stop();
 protected:
-  /// Called when the action is triggered.
+  /**
+  * Called when the action is triggered.
+  */
   virtual void onTriggered();
 
 protected slots:

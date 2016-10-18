@@ -52,7 +52,9 @@ public:
   QString lookupBlockName(unsigned int flatIndex) const;
 
 public slots:
-  /// ParaView events
+  /**
+  * ParaView events
+  */
   void onPortChanged(pqOutputPort *port);
   void onRepresentationChanged(pqRepresentation *representation);
   void onDataUpdated();
@@ -80,7 +82,9 @@ public slots:
   void showAllBlocks();
 
 private slots:
-  /// ParaView events
+  /**
+  * ParaView events
+  */
   void onSelectionChanged(pqOutputPort *port);
   void onColorArrayNameModified();
 
